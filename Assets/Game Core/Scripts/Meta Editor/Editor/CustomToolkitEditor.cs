@@ -9,14 +9,15 @@ namespace MetaEditor
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const string ScenesMenuItem = "🕹 Red Line/💾 Scenes/";
+        private const string ScenesMenuItem = "🕹 Horror/💾 Scenes/";
         private const string ScenesPath = "Assets/Game Core/Scenes/";
 
         private const string BootstrapSceneMenuItem = ScenesMenuItem + "🚀 Bootstrap";
 
         //private const string LoginSceneMenuItem = ScenesMenuItem + "🗝 Login";
         //private const string TitleSceneMenuItem = ScenesMenuItem + "✨ Title";
-        //private const string MainMenuSceneMenuItem = ScenesMenuItem + "🌐 Main Menu";
+        private const string MainMenuSceneMenuItem = ScenesMenuItem + "🌐 Main Menu";
+
         private const string GameplaySceneMenuItem = ScenesMenuItem + "⚔ Gameplay";
         //private const string MultiplayerTestSceneMenuItem = ScenesMenuItem + "⚔ Multiplayer Test";
         //private const string PrototypesSceneMenuItem = ScenesMenuItem + "⏳ Prototypes";
@@ -25,7 +26,8 @@ namespace MetaEditor
 
         //private const string LoginScenePath = ScenesPath + "PixelBattleLogin.unity";
         //private const string TitleScenePath = ScenesPath + "TitleScreen.unity";
-        //private const string MainMenuScenePath = ScenesPath + "MainMenu.unity";
+        private const string MainMenuScenePath = ScenesPath + "MainMenu.unity";
+
         private const string GameplayScenePath = ScenesPath + "Gameplay.unity";
         //private const string MultiplayerTestScenePath = ScenesPath + "MultiplayerTest.unity";
         //private const string PrototypesScenePath = ScenesPath + "Prototypes.unity";
@@ -43,10 +45,10 @@ namespace MetaEditor
         // [MenuItem(TitleSceneMenuItem)]
         // private static void LoadTitleScene() =>
         //     OpenScene(TitleScenePath);
-        //
-        // [MenuItem(MainMenuSceneMenuItem)]
-        // private static void LoadMainMenuScene() =>
-        //     OpenScene(MainMenuScenePath);
+
+        [MenuItem(MainMenuSceneMenuItem)]
+        private static void LoadMainMenuScene() =>
+            OpenScene(MainMenuScenePath);
 
         [MenuItem(GameplaySceneMenuItem)]
         private static void LoadGameScene() =>

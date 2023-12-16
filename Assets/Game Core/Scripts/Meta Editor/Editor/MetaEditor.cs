@@ -19,7 +19,7 @@ namespace MetaEditor
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const string EditorMenuItem = "🕹 Red Line/⚙ Meta Editor";
+        private const string EditorMenuItem = "🕹 Horror/⚙ Meta Editor";
         private const string GameDataPath = "Assets/Resources/Game Data/";
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
