@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Game Config
   m_EditorClassIdentifier: 
   _metaName: Game Config
-  _useStartScene: 1
+  _useStartScene: 0
   _forceLoadBootstrapScene: 0
   _startScene: 1

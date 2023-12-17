@@ -43,10 +43,12 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateOnlineMenu() =>
             _onlineMenuView = MenuFactory.Create<OnlineMenuView>();
 
+        private void EnterCreateLobbyState() =>
+            _gameStateMachine.ChangeState<CreateLobbyState>();
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnHostClicked() =>
-            NetworkManager.Singleton.StartHost();
+        private void OnHostClicked() => EnterCreateLobbyState();
 
         private void OnClientClicked() =>
             NetworkManager.Singleton.StartClient();

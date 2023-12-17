@@ -3,6 +3,7 @@ using GameCore.Enums;
 using GameCore.Gameplay;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Infrastructure.Services.Global;
+using UnityEngine.SceneManagement;
 
 namespace GameCore.Infrastructure.StateMachine
 {
@@ -14,33 +15,42 @@ namespace GameCore.Infrastructure.StateMachine
             IScenesLoaderService scenesLoaderService)
         {
             _gameStateMachine = gameStateMachine;
-            _configsProvider = configsProvider;
             _scenesLoaderService = scenesLoaderService;
+            _gameConfig = configsProvider.GetGameConfig();
+
             _gameStateMachine.AddState(this);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IConfigsProvider _configsProvider;
         private readonly IScenesLoaderService _scenesLoaderService;
+        private readonly GameConfigMeta _gameConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter() => CheckGameConfig();
+        public void Enter()
+        {
+            bool useStartScene = _gameConfig.UseStartScene;
+
+            if (useStartScene)
+            {
+                CheckGameConfig();
+                return;
+            }
+
+            if (!IsCurrentSceneMainMenu())
+                return;
+
+            EnterPrepareMainMenuState();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CheckGameConfig()
         {
-            GameConfigMeta gameConfig = _configsProvider.GetGameConfig();
-            bool useStartScene = gameConfig.UseStartScene;
-
-            if (!useStartScene)
-                return;
-
-            SceneName startScene = gameConfig.StartScene;
-            bool forceLoadBootstrapScene = gameConfig.ForceLoadBootstrapScene;
+            SceneName startScene = _gameConfig.StartScene;
+            bool forceLoadBootstrapScene = _gameConfig.ForceLoadBootstrapScene;
             bool loadOnlyBootstrapScene = forceLoadBootstrapScene && startScene == SceneName.Bootstrap;
 
             if (forceLoadBootstrapScene)
@@ -56,5 +66,15 @@ namespace GameCore.Infrastructure.StateMachine
                 _scenesLoaderService.LoadScene(startScene);
             }
         }
+
+        private bool IsCurrentSceneMainMenu()
+        {
+            string sceneName = SceneManager.GetActiveScene().name;
+            bool isSceneMainMenu = string.Equals(sceneName, SceneName.MainMenu.ToString());
+            return isSceneMainMenu;
+        }
+
+        private void EnterPrepareMainMenuState() =>
+            _gameStateMachine.ChangeState<PrepareMainMenuState>();
     }
 }

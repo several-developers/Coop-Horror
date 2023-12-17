@@ -6,6 +6,13 @@ using Zenject;
 
 namespace GameCore.Infrastructure.StateMachine
 {
+    //  -----------------------------------------
+    //
+    //               STATES FLOW:
+    //  Bootstrap -> Load Data -> Load Main Menu
+    //
+    //  -----------------------------------------
+
     public class BootstrapState : IEnterState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------

@@ -12,6 +12,7 @@ namespace GameCore.Infrastructure.Installers.MainMenu
             BindPrepareMainMenuState();
             BindOnlineMenuState();
             BindOfflineMenuState();
+            BindCreateLobbyState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -36,6 +37,14 @@ namespace GameCore.Infrastructure.Installers.MainMenu
         {
             Container
                 .Bind<OfflineMenuState>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindCreateLobbyState()
+        {
+            Container
+                .Bind<CreateLobbyState>()
                 .AsSingle()
                 .NonLazy();
         }
