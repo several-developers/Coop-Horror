@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Factories;
 using GameCore.Utilities;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -16,12 +17,14 @@ namespace GameCore.Infrastructure.Providers.Global
         {
             _scenesLoaderPrefab = Load<GameObject>(path: AssetsPaths.ScenesLoaderPrefab);
             _menuPrefabsList = Load<MenuPrefabsListMeta>(path: AssetsPaths.MenuPrefabsList);
+            _networkManager = Load<NetworkManager>(path: AssetsPaths.NetworkManager);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly GameObject _scenesLoaderPrefab;
         private readonly MenuPrefabsListMeta _menuPrefabsList;
+        private readonly NetworkManager _networkManager;
         private readonly Dictionary<string, AsyncOperationHandle> _completedCache = new();
         private readonly Dictionary<string, List<AsyncOperationHandle>> _handles = new();
         
@@ -72,10 +75,13 @@ namespace GameCore.Infrastructure.Providers.Global
         }
         
         public GameObject GetScenesLoaderPrefab() => _scenesLoaderPrefab;
+        
         public MenuPrefabsListMeta GetMenuPrefabsList() => _menuPrefabsList;
 
+        public NetworkManager GetNetworkManager() => _networkManager;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
         private async UniTask<T> RunWitchCacheOnComplete<T>(AsyncOperationHandle<T> handle, string cacheKey)
             where T : class
         {

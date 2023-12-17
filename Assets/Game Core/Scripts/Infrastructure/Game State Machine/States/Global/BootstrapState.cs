@@ -1,5 +1,6 @@
 ﻿using GameCore.Gameplay;
 using GameCore.Infrastructure.Providers.Global;
+using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
@@ -30,6 +31,7 @@ namespace GameCore.Infrastructure.StateMachine
         public void Enter()
         {
             CreateScenesLoader();
+            CreateNetworkManager();
             EnterLoadDataState();
         }
 
@@ -39,6 +41,12 @@ namespace GameCore.Infrastructure.StateMachine
         {
             GameObject scenesLoaderPrefab = _assetsProvider.GetScenesLoaderPrefab();
             _diContainer.InstantiatePrefab(scenesLoaderPrefab);
+        }
+
+        private void CreateNetworkManager()
+        {
+            NetworkManager networkManagerPrefab = _assetsProvider.GetNetworkManager();
+            Object.Instantiate(networkManagerPrefab);
         }
 
         private void EnterLoadDataState() =>

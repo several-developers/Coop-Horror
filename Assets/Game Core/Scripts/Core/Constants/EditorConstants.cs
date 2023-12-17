@@ -4,10 +4,8 @@
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public const string ConfigsCategory = "Configs";
+        public const string GlobalConfigsCategory = ConfigsCategory + "/Global";
         public const string PlayerConfigsCategory = ConfigsCategory + "/Player";
-        public const string LevelsCategory = "Levels";
-        public const string WeaponsCategory = "Weapons";
         public const string CollectionsCategory = "Collections";
 
         public const string GamesData = Settings + "GamesData";
@@ -18,7 +16,8 @@
         public const string NoCategory = "No category";
 
         public const string DataTitle = "Data";
-        
+
+        private const string ConfigsCategory = "Configs";
         private const string Settings = "Settings/";
     }
 }

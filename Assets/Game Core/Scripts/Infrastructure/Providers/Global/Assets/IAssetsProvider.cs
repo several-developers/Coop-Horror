@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Factories;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -14,7 +15,8 @@ namespace GameCore.Infrastructure.Providers.Global
         UniTask<GameObject> Instantiate(string address, Vector3 at);
         UniTask<GameObject> Instantiate(string address, Transform parent);
         void Cleanup();
-        GameObject GetScenesLoaderPrefab();
-        MenuPrefabsListMeta GetMenuPrefabsList();
+        GameObject GetScenesLoaderPrefab(); // TEMP
+        MenuPrefabsListMeta GetMenuPrefabsList(); // TEMP
+        NetworkManager GetNetworkManager();
     }
 }

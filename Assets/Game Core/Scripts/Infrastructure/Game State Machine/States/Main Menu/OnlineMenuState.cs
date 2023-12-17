@@ -1,6 +1,7 @@
 ﻿using GameCore.Gameplay;
 using GameCore.Gameplay.Factories;
-using GameCore.UI.MainMenu.SaveSelectionMenu;
+using GameCore.UI.MainMenu.OnlineMenu;
+using Unity.Netcode;
 
 namespace GameCore.Infrastructure.StateMachine
 {
@@ -19,33 +20,35 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
 
+        private OnlineMenuView _onlineMenuView;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
-            SaveSelectionMenuView menuInstance = CreateSaveLoadMenu();
+            CreateOnlineMenu();
+
+            _onlineMenuView.OnHostClickedEvent += OnHostClicked;
+            _onlineMenuView.OnClientClickedEvent += OnClientClicked;
         }
 
         public void Exit()
         {
-            
+            _onlineMenuView.OnHostClickedEvent -= OnHostClicked;
+            _onlineMenuView.OnClientClickedEvent -= OnClientClicked;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static SaveSelectionMenuView CreateSaveLoadMenu() =>
-            MenuFactory.Create<SaveSelectionMenuView>();
+        private void CreateOnlineMenu() =>
+            _onlineMenuView = MenuFactory.Create<OnlineMenuView>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnOnlineClicked()
-        {
-            
-        }
-        
-        private void OnOfflineClicked()
-        {
-            
-        }
+        private void OnHostClicked() =>
+            NetworkManager.Singleton.StartHost();
+
+        private void OnClientClicked() =>
+            NetworkManager.Singleton.StartClient();
     }
 }

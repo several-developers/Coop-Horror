@@ -12,6 +12,10 @@ namespace GameCore.Infrastructure.Installers.Global
             BindBootstrapState();
             BindLoadDataState();
             BindLoadMainMenuState();
+
+#if UNITY_EDITOR
+            BindGameSetupForEditorState();
+#endif
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -39,5 +43,15 @@ namespace GameCore.Infrastructure.Installers.Global
                 .AsSingle()
                 .NonLazy();
         }
+
+#if UNITY_EDITOR
+        private void BindGameSetupForEditorState()
+        {
+            Container
+                .Bind<GameSetupForEditorState>()
+                .AsSingle()
+                .NonLazy();
+        }
+#endif
     }
 }

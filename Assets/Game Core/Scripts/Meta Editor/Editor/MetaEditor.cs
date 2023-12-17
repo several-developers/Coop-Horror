@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System.IO;
 using System.Linq;
-using GameCore.Gameplay.Levels;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
@@ -169,7 +168,7 @@ namespace MetaEditor
 
         private static void AddDraggableItems(OdinMenuTree tree)
         {
-            AddDraggable<LevelMeta>(tree);
+            //AddDraggable<LevelMeta>(tree);
         }
 
         private static void AddDraggable<T>(OdinMenuTree tree) where T : EditorMeta

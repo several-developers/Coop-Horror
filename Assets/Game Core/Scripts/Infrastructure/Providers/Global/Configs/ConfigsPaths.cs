@@ -4,7 +4,7 @@
     {
         // FIELDS: --------------------------------------------------------------------------------
         
-        public const string GameConfig = Configs + "Game Config";
+        public const string GameConfig = GlobalConfigs + "Game Config";
         public const string GameplayConfig = GlobalConfigs + "Gameplay Config";
         public const string PlayerConfig = Configs + "Player/Player Config";
         public const string GameBalanceConfig = Configs + "Game Balance Config";

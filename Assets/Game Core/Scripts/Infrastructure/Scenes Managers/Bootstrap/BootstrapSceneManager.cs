@@ -1,7 +1,4 @@
-﻿using GameCore.Enums;
-using GameCore.Infrastructure.Services.Global;
-using GameCore.Infrastructure.Services.Global.Rewards;
-using UnityEngine;
+﻿using UnityEngine;
 using Zenject;
 
 namespace GameCore.Infrastructure.ScenesManagers.BootstrapScene
@@ -11,26 +8,15 @@ namespace GameCore.Infrastructure.ScenesManagers.BootstrapScene
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IScenesLoaderService scenesLoaderService) =>
-            _scenesLoaderService = scenesLoaderService;
-
-        // FIELDS: --------------------------------------------------------------------------------
-
-        private IScenesLoaderService _scenesLoaderService;
-        private IRewardsService _rewardsService;
+        private void Construct()
+        {
+        }
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Start()
         {
-            // Load some SDK or assets
-
-            LoadGameScene();
+            //Debug.Log("Bootstrap scene loaded.");
         }
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void LoadGameScene() =>
-            _scenesLoaderService.LoadScene(SceneName.Gameplay);
     }
 }

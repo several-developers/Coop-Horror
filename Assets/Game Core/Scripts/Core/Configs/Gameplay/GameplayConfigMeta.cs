@@ -9,6 +9,6 @@ namespace GameCore.Configs.Gameplay
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override string GetMetaCategory() =>
-            EditorConstants.ConfigsCategory;
+            EditorConstants.GlobalConfigsCategory;
     }
 }

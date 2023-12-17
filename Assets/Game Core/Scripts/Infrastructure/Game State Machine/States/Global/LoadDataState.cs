@@ -25,7 +25,12 @@ namespace GameCore.Infrastructure.StateMachine
         public void Enter()
         {
             SetupGameSettings();
+
+#if UNITY_EDITOR
+            EnterGameSetupForEditorState();
+#else
             EnterLoadMainMenuState();
+#endif
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -35,6 +40,9 @@ namespace GameCore.Infrastructure.StateMachine
             float soundVolume = _gameSettingsDataService.GetSoundVolume();
             float musicVolume = _gameSettingsDataService.GetMusicVolume();
         }
+
+        private void EnterGameSetupForEditorState() =>
+            _gameStateMachine.ChangeState<GameSetupForEditorState>();
 
         private void EnterLoadMainMenuState() =>
             _gameStateMachine.ChangeState<LoadMainMenuState>();
