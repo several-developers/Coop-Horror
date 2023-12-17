@@ -24,13 +24,10 @@ namespace GameCore.Infrastructure.Providers.Global.Data
 
         public DataManager GetDataManager() => _dataManager;
 
-        public GameData GetGameData() =>
-            _dataManager.GameData;
+        public GamesData GetGameData() =>
+            _dataManager.GamesData;
 
         public GameSettingsData GetGameSettingsData() =>
             _dataManager.GameSettingsData;
-
-        public PlayerData GetPlayerData() =>
-            _dataManager.PlayerData;
     }
 }

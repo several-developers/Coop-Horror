@@ -12,9 +12,8 @@ namespace GameCore.Infrastructure.Data
 
         public DataManager()
         {
-            _gameData = new GameData();
+            _gamesData = new GamesData();
             _gameSettingsData = new GameSettingsData();
-            _playerData = new PlayerData();
 
             _jsonUtility = new JsonUtilitySaveLoadData();
         }
@@ -22,20 +21,16 @@ namespace GameCore.Infrastructure.Data
         // MEMBERS: -------------------------------------------------------------------------------
 
         [TitleGroup(Constants.Settings)]
-        [BoxGroup(EditorConstants.GameData, showLabel: false), SerializeField]
-        private GameData _gameData;
+        [BoxGroup(EditorConstants.GamesData, showLabel: false), SerializeField]
+        private GamesData _gamesData;
 
         [BoxGroup(EditorConstants.GameSettings, showLabel: false), SerializeField]
         private GameSettingsData _gameSettingsData;
 
-        [BoxGroup(EditorConstants.PlayerData, showLabel: false), SerializeField]
-        private PlayerData _playerData;
-        
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public GameData GameData => _gameData ??= new();
+        public GamesData GamesData => _gamesData ??= new();
         public GameSettingsData GameSettingsData => _gameSettingsData ??= new();
-        public PlayerData PlayerData => _playerData ??= new();
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -49,23 +44,20 @@ namespace GameCore.Infrastructure.Data
 
         public void LoadLocalData()
         {
-            _jsonUtility.TryLoadData(ref _gameData);
+            _jsonUtility.TryLoadData(ref _gamesData);
             _jsonUtility.TryLoadData(ref _gameSettingsData);
-            _jsonUtility.TryLoadData(ref _playerData);
         }
 
         public void SaveLocalData()
         {
-            _jsonUtility.TrySaveData(_gameData);
+            _jsonUtility.TrySaveData(_gamesData);
             _jsonUtility.TrySaveData(_gameSettingsData);
-            _jsonUtility.TrySaveData(_playerData);
         }
         
         public void DeleteLocalData()
         {
-            _jsonUtility.TryDeleteData(ref _gameData);
+            _jsonUtility.TryDeleteData(ref _gamesData);
             _jsonUtility.TryDeleteData(ref _gameSettingsData);
-            _jsonUtility.TryDeleteData(ref _playerData);
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

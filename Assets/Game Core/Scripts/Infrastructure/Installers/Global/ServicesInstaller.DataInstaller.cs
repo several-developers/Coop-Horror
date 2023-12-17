@@ -22,7 +22,6 @@ namespace GameCore.Infrastructure.Installers.Global
             {
                 BindGameData();
                 BindGameSettingsData();
-                BindPlayerData();
             }
 
             // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -30,7 +29,7 @@ namespace GameCore.Infrastructure.Installers.Global
             private void BindGameData()
             {
                 _container
-                    .BindInterfacesTo<GameDataService>()
+                    .BindInterfacesTo<GamesDataService>()
                     .AsSingle()
                     .NonLazy();
             }
@@ -39,14 +38,6 @@ namespace GameCore.Infrastructure.Installers.Global
             {
                 _container
                     .BindInterfacesTo<GameSettingsDataService>()
-                    .AsSingle()
-                    .NonLazy();
-            }
-
-            private void BindPlayerData()
-            {
-                _container
-                    .BindInterfacesTo<PlayerDataService>()
                     .AsSingle()
                     .NonLazy();
             }

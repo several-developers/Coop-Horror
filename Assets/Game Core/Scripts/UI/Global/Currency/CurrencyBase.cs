@@ -14,8 +14,9 @@ namespace GameCore.UI.Global.Currency
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IPlayerDataService playerDataService) =>
-            PlayerDataService = playerDataService;
+        private void Construct()
+        {
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -32,7 +33,6 @@ namespace GameCore.UI.Global.Currency
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        protected IPlayerDataService PlayerDataService;
         protected float LastCurrency;
 
         private Coroutine _valueUpdaterCO;

@@ -10,13 +10,14 @@
         public const string WeaponsCategory = "Weapons";
         public const string CollectionsCategory = "Collections";
 
-        public const string GameData = Settings + "GameData";
+        public const string GamesData = Settings + "GamesData";
         public const string GameSettings = Settings + "GameSettings";
-        public const string PlayerData = Settings + "PlayerData";
         
         public const string MetaSettings = "Meta Settings";
         public const string MetaSettingsIn = "Meta Settings/In";
         public const string NoCategory = "No category";
+
+        public const string DataTitle = "Data";
         
         private const string Settings = "Settings/";
     }

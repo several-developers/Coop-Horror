@@ -15,11 +15,11 @@
         public const string AnimationIn = "Animation/In";
         public const string Events = "Events";
 
-        public const string GameDataKey = "GameData";
-        public const string PlayerDataKey = "PlayerData";
+        public const string GamesDataKey = "GamesData";
         public const string GameSettingsDataKey = "GameSettingsData";
-        public const string TutorialDataKey = "TutorialData";
 
         public const string UISoundBus = "UI";
+
+        public const int SaveCellsAmount = 3;
     }
 }

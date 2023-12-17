@@ -6,17 +6,18 @@ namespace GameCore.Infrastructure.Services.Global.Rewards
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public RewardsService(IPlayerDataService playerDataService) =>
-            _playerDataService = playerDataService;
+        public RewardsService()
+        {
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly IPlayerDataService _playerDataService;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void AddGold(long amount, bool autoSave = true) =>
-            _playerDataService.AddGold(amount, autoSave);
+        public void AddGold(long amount, bool autoSave = true)
+        {
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

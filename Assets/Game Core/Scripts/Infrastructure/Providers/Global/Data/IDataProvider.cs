@@ -5,8 +5,7 @@ namespace GameCore.Infrastructure.Providers.Global.Data
     public interface IDataProvider
     {
         DataManager GetDataManager();
-        GameData GetGameData();
+        GamesData GetGameData();
         GameSettingsData GetGameSettingsData();
-        PlayerData GetPlayerData();
     }
 }

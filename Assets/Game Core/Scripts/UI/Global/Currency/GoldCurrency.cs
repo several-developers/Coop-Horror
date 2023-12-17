@@ -23,7 +23,9 @@ namespace GameCore.UI.Global.Currency
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private long GetGold() =>
-            PlayerDataService.GetGold();
+        private long GetGold()
+        {
+            return 0;
+        }
     }
 }
