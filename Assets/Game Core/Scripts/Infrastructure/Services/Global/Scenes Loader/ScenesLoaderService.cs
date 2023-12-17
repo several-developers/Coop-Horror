@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using GameCore.Utilities;
 using GameCore.Enums;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,7 +20,7 @@ namespace GameCore.Infrastructure.Services.Global
 
         public event Action OnSceneStartLoading;
         public event Action OnSceneFinishedLoading;
-        
+
         private readonly ICoroutineRunner _coroutineRunner;
 
         private bool _isSceneLoading;
@@ -29,12 +31,34 @@ namespace GameCore.Infrastructure.Services.Global
         {
             if (_isSceneLoading)
                 return;
-            
+
             _coroutineRunner.StartCoroutine(SceneLoader(sceneName, callback));
         }
-        
+
+        public void LoadSceneNetwork(SceneName sceneName)
+        {
+            if (_isSceneLoading)
+                return;
+
+            _isSceneLoading = true;
+
+            NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
+            networkSceneManager.LoadScene(sceneName.ToString(), LoadSceneMode.Single);
+            
+            networkSceneManager.OnLoadEventCompleted += OnSceneLoaded;
+
+            // LOCAL METHODS: -----------------------------
+
+            void OnSceneLoaded(string localSceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,
+                List<ulong> clientsTimedOut)
+            {
+                _isSceneLoading = false;
+                networkSceneManager.OnLoadEventCompleted -= OnSceneLoaded;
+            }
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
         private IEnumerator SceneLoader(SceneName sceneName, Action callback = null)
         {
             // The Application loads the Scene in the background as the current Scene runs.
@@ -52,7 +76,7 @@ namespace GameCore.Infrastructure.Services.Global
                 yield return null;
 
             _isSceneLoading = false;
-            
+
             callback?.Invoke();
             OnSceneFinishedLoading?.Invoke();
         }

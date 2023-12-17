@@ -10,7 +10,8 @@ namespace GameCore.Infrastructure.Installers.MainMenu
         public override void InstallBindings()
         {
             BindPrepareMainMenuState();
-            BindPlayModeSelectionMenu();
+            BindOnlineMenuState();
+            BindOfflineMenuState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -23,10 +24,18 @@ namespace GameCore.Infrastructure.Installers.MainMenu
                 .NonLazy();
         }
         
-        private void BindPlayModeSelectionMenu()
+        private void BindOnlineMenuState()
         {
             Container
-                .Bind<PlayModeSelectionMenu>()
+                .Bind<OnlineMenuState>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindOfflineMenuState()
+        {
+            Container
+                .Bind<OfflineMenuState>()
                 .AsSingle()
                 .NonLazy();
         }

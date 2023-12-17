@@ -1,15 +1,14 @@
 ﻿using GameCore.Gameplay;
 using GameCore.Gameplay.Factories;
-using GameCore.UI.MainMenu.OfflineMenu;
 using GameCore.UI.MainMenu.SaveSelectionMenu;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class OfflineMenuState : IEnterState
+    public class OnlineMenuState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public OfflineMenuState(IGameStateMachine gameStateMachine)
+        public OnlineMenuState(IGameStateMachine gameStateMachine)
         {
             _gameStateMachine = gameStateMachine;
 
@@ -24,16 +23,29 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Enter()
         {
-            CreateSaveSelectionMenu();
-            CreateOfflineMenu();
+            SaveSelectionMenuView menuInstance = CreateSaveLoadMenu();
+        }
+
+        public void Exit()
+        {
+            
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static void CreateSaveSelectionMenu() =>
+        private static SaveSelectionMenuView CreateSaveLoadMenu() =>
             MenuFactory.Create<SaveSelectionMenuView>();
 
-        private static void CreateOfflineMenu() =>
-            MenuFactory.Create<OfflineMenuView>();
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnOnlineClicked()
+        {
+            
+        }
+        
+        private void OnOfflineClicked()
+        {
+            
+        }
     }
 }

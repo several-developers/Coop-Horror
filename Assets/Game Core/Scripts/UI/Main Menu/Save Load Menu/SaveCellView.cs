@@ -4,7 +4,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameCore.UI.MainMenu.SaveLoadMenu
+namespace GameCore.UI.MainMenu.SaveSelectionMenu
 {
     public class SaveCellView : BaseButton
     {

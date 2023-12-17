@@ -33,6 +33,7 @@ namespace GameCore.UI.Global
 
         public event Action OnHideEvent;
         public event Action OnShowEvent;
+        public event Action OnDestroyEvent;
         
         private const string UIElementsSettings = "UI Elements Settings";
         
@@ -68,12 +69,6 @@ namespace GameCore.UI.Global
         protected void DestroyOnHide() =>
             _destroyOnHide = true;
 
-        protected void DestroySelf()
-        {
-            OnHideEvent = null;
-            Destroy(gameObject);
-        }
-        
         protected void VisibilityState(bool show)
         {
             if (show && _changeCanvasState)
@@ -110,5 +105,13 @@ namespace GameCore.UI.Global
         
         private void SetInteractableState(bool isInteractable) =>
             _targetCG.blocksRaycasts = isInteractable;
+        
+        private void DestroySelf()
+        {
+            OnHideEvent = null;
+            OnDestroyEvent?.Invoke();
+            
+            Destroy(gameObject);
+        }
     }
 }

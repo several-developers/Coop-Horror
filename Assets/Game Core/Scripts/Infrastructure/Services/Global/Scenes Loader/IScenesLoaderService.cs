@@ -8,5 +8,6 @@ namespace GameCore.Infrastructure.Services.Global
         event Action OnSceneStartLoading;
         event Action OnSceneFinishedLoading;
         void LoadScene(SceneName sceneName, Action callback = null);
+        void LoadSceneNetwork(SceneName sceneName);
     }
 }

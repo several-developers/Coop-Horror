@@ -1,7 +1,8 @@
-﻿using Sirenix.OdinInspector;
+﻿using GameCore.Gameplay.Other;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.UI.MainMenu.SaveLoadMenu
+namespace GameCore.UI.MainMenu.SaveSelectionMenu
 {
     public class SaveCellsController : MonoBehaviour
     {
@@ -12,13 +13,15 @@ namespace GameCore.UI.MainMenu.SaveLoadMenu
         private SaveCellView[] _saveCellsView;
 
         // FIELDS: --------------------------------------------------------------------------------
-
+        
         private int _lastSelectedCellIndex;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
+            _lastSelectedCellIndex = GameSingleton.SelectedSaveIndex;
+            
             SetupCellsView();
             SelectNewCellView();
         }
@@ -55,6 +58,8 @@ namespace GameCore.UI.MainMenu.SaveLoadMenu
             SelectNewCellView();
             
             Debug.Log($"Save Cell ({cellIndex}) clicked.");
+
+            GameSingleton.SetSelectedSaveIndex(cellIndex);
         }
     }
 }

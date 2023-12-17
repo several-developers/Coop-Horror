@@ -25,7 +25,7 @@ namespace GameCore.Infrastructure.StateMachine
         public void Enter()
         {
             SetupGameSettings();
-            //EnterLoadMainMenuState();
+            EnterLoadMainMenuState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

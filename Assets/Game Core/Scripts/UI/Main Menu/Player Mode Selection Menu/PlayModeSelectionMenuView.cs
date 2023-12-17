@@ -36,13 +36,13 @@ namespace GameCore.UI.MainMenu.PlayModeSelectionMenu
 
         private void OnOnlineClicked()
         {
-            DisableInteraction();
+            Hide();
             OnOnlineClickedEvent?.Invoke();
         }
 
         private void OnOfflineClicked()
         {
-            DisableInteraction();
+            Hide();
             OnOfflineClickedEvent?.Invoke();
         }
     }
