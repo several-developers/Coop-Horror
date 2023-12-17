@@ -102,10 +102,13 @@ namespace GameCore.UI.Global
                 });
         }
 
-        protected void SetInteractableState(bool isInteractable) =>
-            _targetCG.blocksRaycasts = isInteractable;
+        protected void EnableInteraction() => SetInteractableState(isInteractable: true);
 
-        protected bool IsShown() =>
-            _targetCG.alpha > 0;
+        protected void DisableInteraction() => SetInteractableState(isInteractable: false);
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+        
+        private void SetInteractableState(bool isInteractable) =>
+            _targetCG.blocksRaycasts = isInteractable;
     }
 }

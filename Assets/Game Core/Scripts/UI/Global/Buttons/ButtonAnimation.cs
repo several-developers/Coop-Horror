@@ -25,9 +25,9 @@ namespace GameCore.UI.Global.Buttons
         private Vector2 _scale = new(0.9f, 0.9f);
 
         [Title(Constants.References)]
-        [InfoBox("Missing 'Rect Transform'!", InfoMessageType.Error, "@_rectTransform == null")]
+        [InfoBox("Missing 'Scale RT'!", InfoMessageType.Error, "@_scaleRT == null")]
         [SerializeField]
-        private RectTransform _rectTransform;
+        private RectTransform _scaleRT;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ namespace GameCore.UI.Global.Buttons
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Start() =>
-            _startScale = _rectTransform.localScale;
+            _startScale = _scaleRT.localScale;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ namespace GameCore.UI.Global.Buttons
             _finalScale = _startScale * _scale;
             _finalScale.z = _finalScale.x;
 
-            _scaleTN = _rectTransform
+            _scaleTN = _scaleRT
                 .DOScale(_finalScale, _scaleTime)
                 .SetUpdate(true)
                 .SetLink(gameObject);
@@ -67,7 +67,7 @@ namespace GameCore.UI.Global.Buttons
 
             _scaleTN.Complete();
 
-            _scaleTN = _rectTransform
+            _scaleTN = _scaleRT
                 .DOScale(_startScale, _scaleTime)
                 .SetUpdate(true)
                 .SetLink(gameObject);

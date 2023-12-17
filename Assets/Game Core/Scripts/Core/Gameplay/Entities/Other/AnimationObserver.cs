@@ -9,7 +9,6 @@ namespace GameCore.Gameplay.Entities.Other
 
         public event Action OnAttackEvent;
         public event Action OnAttackFinishedEvent;
-        public event Action OnScreamFinishedEvent;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -17,9 +16,6 @@ namespace GameCore.Gameplay.Entities.Other
             OnAttackEvent?.Invoke();
         
         public void OnTriggerAttackFinishedEvent() =>
-            OnAttackFinishedEvent?.Invoke();
-        
-        public void OnTriggerScreamFinishedEvent() =>
             OnAttackFinishedEvent?.Invoke();
     }
 }

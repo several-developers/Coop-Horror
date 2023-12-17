@@ -25,17 +25,17 @@ namespace GameCore.Infrastructure.Services.Global
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void LoadScene(SceneName sceneName)
+        public void LoadScene(SceneName sceneName, Action callback = null)
         {
             if (_isSceneLoading)
                 return;
             
-            _coroutineRunner.StartCoroutine(SceneLoader(sceneName));
+            _coroutineRunner.StartCoroutine(SceneLoader(sceneName, callback));
         }
         
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
-        private IEnumerator SceneLoader(SceneName sceneName)
+        private IEnumerator SceneLoader(SceneName sceneName, Action callback = null)
         {
             // The Application loads the Scene in the background as the current Scene runs.
             // This is particularly good for creating loading screens.
@@ -52,6 +52,8 @@ namespace GameCore.Infrastructure.Services.Global
                 yield return null;
 
             _isSceneLoading = false;
+            
+            callback?.Invoke();
             OnSceneFinishedLoading?.Invoke();
         }
     }

@@ -80,8 +80,12 @@ namespace MetaEditor
 
             protected override void BuildSelectionTree(OdinMenuTree tree)
             {
+                // IEnumerable<Type> scriptableObjectTypes = AssemblyUtilities
+                //     .GetTypes(AssemblyTypeFlags.CustomTypes)
+                //     .Where(x => x.IsClass && !x.IsAbstract && x.InheritsFrom(typeof(T)));
+
                 IEnumerable<Type> scriptableObjectTypes = AssemblyUtilities
-                    .GetTypes(AssemblyTypeFlags.CustomTypes)
+                    .GetTypes(AssemblyCategory.All)
                     .Where(x => x.IsClass && !x.IsAbstract && x.InheritsFrom(typeof(T)));
 
                 tree.Selection.SupportsMultiSelect = false;

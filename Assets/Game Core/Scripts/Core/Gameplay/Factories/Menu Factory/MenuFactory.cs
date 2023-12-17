@@ -15,7 +15,7 @@ namespace GameCore.Gameplay.Factories
         public MenuFactory(DiContainer diContainer, IAssetsProvider assetsProvider)
         {
             _diContainer = diContainer;
-            _menusDictionary = new Dictionary<Type, MenuView>(capacity: 64);
+            _menusDictionary = new Dictionary<Type, MenuView>(capacity: 16);
 
             SetupMenuDictionary(assetsProvider);
         }
@@ -24,6 +24,7 @@ namespace GameCore.Gameplay.Factories
 
         private static DiContainer _diContainer;
         private static Dictionary<Type, MenuView> _menusDictionary;
+        private static Dictionary<Type, MenuView> _menusInstancesDictionary;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -48,16 +49,17 @@ namespace GameCore.Gameplay.Factories
                 component.Setup(param);
         }
 
-        public static void Create<TMenu>() where TMenu : MenuView =>
+        public static TMenu Create<TMenu>() where TMenu : MenuView =>
             Create<TMenu>(MainCanvas.Transform);
-        
+
         public static TMenu Create<TMenu>(DiContainer diContainer) where TMenu : MenuView =>
             Create<TMenu>(MainCanvas.Transform, diContainer);
 
-        public static void Create<TMenu>(Transform container) where TMenu : MenuView
+        public static TMenu Create<TMenu>(Transform container) where TMenu : MenuView
         {
-            TMenu menu = GetMenu<TMenu>();
-            InstantiatePrefabForComponent(menu, container, _diContainer);
+            TMenu menuPrefab = GetMenu<TMenu>();
+            TMenu menuInstance = InstantiatePrefabForComponent(menuPrefab, container, _diContainer);
+            return menuInstance;
         }
         
         public static TMenu Create<TMenu>(Transform container, DiContainer diContainer) where TMenu : MenuView

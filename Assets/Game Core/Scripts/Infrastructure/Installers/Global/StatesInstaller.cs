@@ -11,6 +11,7 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             BindBootstrapState();
             BindLoadDataState();
+            BindLoadMainMenuState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -27,6 +28,14 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .Bind<LoadDataState>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindLoadMainMenuState()
+        {
+            Container
+                .Bind<LoadMainMenuState>()
                 .AsSingle()
                 .NonLazy();
         }

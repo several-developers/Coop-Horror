@@ -22,13 +22,13 @@ namespace GameCore.Gameplay.Entities.Zombies.States
 
         public void Enter()
         {
-            _animationObserver.OnScreamFinishedEvent += OnScreamFinished;
 
             TriggerScream();
         }
 
-        public void Exit() =>
-            _animationObserver.OnScreamFinishedEvent -= OnScreamFinished;
+        public void Exit()
+        {
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

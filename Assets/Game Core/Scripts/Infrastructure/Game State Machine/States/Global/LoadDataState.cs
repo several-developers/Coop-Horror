@@ -1,5 +1,4 @@
 ﻿using GameCore.Gameplay;
-using GameCore.Infrastructure.Services.Global;
 using GameCore.Infrastructure.Services.Global.Data;
 
 namespace GameCore.Infrastructure.StateMachine
@@ -8,11 +7,9 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LoadDataState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService,
-            IGameSettingsDataService gameSettingsDataService)
+        public LoadDataState(IGameStateMachine gameStateMachine, IGameSettingsDataService gameSettingsDataService)
         {
             _gameStateMachine = gameStateMachine;
-            _scenesLoaderService = scenesLoaderService;
             _gameSettingsDataService = gameSettingsDataService;
 
             _gameStateMachine.AddState(this);
@@ -21,7 +18,6 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IScenesLoaderService _scenesLoaderService;
         private readonly IGameSettingsDataService _gameSettingsDataService;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -29,6 +25,7 @@ namespace GameCore.Infrastructure.StateMachine
         public void Enter()
         {
             SetupGameSettings();
+            //EnterLoadMainMenuState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -38,5 +35,8 @@ namespace GameCore.Infrastructure.StateMachine
             float soundVolume = _gameSettingsDataService.GetSoundVolume();
             float musicVolume = _gameSettingsDataService.GetMusicVolume();
         }
+
+        private void EnterLoadMainMenuState() =>
+            _gameStateMachine.ChangeState<LoadMainMenuState>();
     }
 }
