@@ -1,4 +1,5 @@
-﻿using MetaEditor;
+﻿using GameCore.Gameplay.Entities.Player;
+using MetaEditor;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -8,22 +9,17 @@ namespace GameCore.Core.Configs.Player
     {
         [Title(Constants.Settings)]
         [SerializeField, Min(0)]
-        private float _movementSpeed = 5f;
-
-        [SerializeField, Min(0)]
-        private float _crouchSpeed = 2.5f;
-
-        [SerializeField, Min(0)]
-        private float _jumpHeight = 15f;
+        private float _health = 100f;
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private GameObject _playerPrefab;
+        private PlayerMovementConfigMeta _playerMovementConfig;
 
-        public float MovementSpeed => _movementSpeed;
-        public float CrouchSpeed => _crouchSpeed;
-        public float JumpHeight => _jumpHeight;
-        public GameObject PlayerPrefab => _playerPrefab;
+        [SerializeField, Required]
+        private PlayerEntity _playerPrefab; // TEMP
+
+        public PlayerMovementConfigMeta PlayerMovementConfig => _playerMovementConfig;
+        public PlayerEntity PlayerPrefab => _playerPrefab;
 
         public override string GetMetaCategory() =>
             EditorConstants.PlayerConfigsCategory;

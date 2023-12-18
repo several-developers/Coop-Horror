@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameCore.Gameplay
+namespace GameCore
 {
     public class StateMachine
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player
@@ -14,6 +15,9 @@ namespace GameCore.Gameplay.Entities.Player
         private bool _isDead;
 
         [Title(Constants.References)]
+        [SerializeField, Required]
+        private NetworkObject _networkObject;
+
         [SerializeField, Required]
         private Animator _animator;
 
@@ -32,7 +36,7 @@ namespace GameCore.Gameplay.Entities.Player
             inputSystemListener.OnChangeCameraLockStateEvent += OnChangeCameraLockState;
         }
 
-        private void Start() => ChangeCursorState();
+        private void Start() => ChangeCursorLockState();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -52,23 +56,16 @@ namespace GameCore.Gameplay.Entities.Player
 
         public Transform GetTransform() => transform;
 
+        public NetworkObject GetNetworkObject() => _networkObject;
+
         public Animator GetAnimator() => _animator;
 
         public bool IsDead() => _isDead;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static void ChangeCursorState()
-        {
-            CursorLockMode lockState = Cursor.lockState;
-
-            Cursor.lockState = lockState switch
-            {
-                CursorLockMode.None => CursorLockMode.Locked,
-                CursorLockMode.Locked => CursorLockMode.None,
-                _ => Cursor.lockState
-            };
-        }
+        private static void ChangeCursorLockState() =>
+            GameUtilities.ChangeCursorLockState();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -83,6 +80,6 @@ namespace GameCore.Gameplay.Entities.Player
         {
         }
 
-        private static void OnChangeCursorState() => ChangeCursorState();
+        private static void OnChangeCursorState() => ChangeCursorLockState();
     }
 }

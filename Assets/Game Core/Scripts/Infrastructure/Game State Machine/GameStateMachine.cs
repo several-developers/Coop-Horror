@@ -1,5 +1,4 @@
 ﻿using System;
-using GameCore.Gameplay;
 using GameCore.Gameplay.Observers;
 using UnityEngine;
 
@@ -12,12 +11,12 @@ namespace GameCore.Infrastructure.StateMachine
         public GameStateMachine(IGameStateMachineObserver gameStateMachineObserver)
         {
             _gameStateMachineObserver = gameStateMachineObserver;
-            _stateMachine = new Gameplay.StateMachine();
+            _stateMachine = new GameCore.StateMachine();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly Gameplay.StateMachine _stateMachine;
+        private readonly GameCore.StateMachine _stateMachine;
         private readonly IGameStateMachineObserver _gameStateMachineObserver;
 
         private IState _currentState;

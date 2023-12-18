@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Player Config
   m_EditorClassIdentifier: 
   _metaName: Player Config
-  _movementSpeed: 5
-  _crouchSpeed: 2.5
-  _jumpHeight: 15
-  _playerPrefab: {fileID: 4628898490251457778, guid: a77369042e11ddd49be3f82d556be8a1,
+  _health: 100
+  _playerMovementConfig: {fileID: 11400000, guid: e4b2ff4b8cc1e134f915cc7121a0a7da,
+    type: 2}
+  _playerPrefab: {fileID: 5746002443945451132, guid: a77369042e11ddd49be3f82d556be8a1,
     type: 3}

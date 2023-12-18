@@ -1,4 +1,4 @@
-namespace GameCore.Gameplay
+namespace GameCore
 {
     public interface IFixedTickableState
     {

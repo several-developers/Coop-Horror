@@ -6,6 +6,18 @@ namespace GameCore.Utilities
 {
     public static class GameUtilities
     {
+        public static void ChangeCursorLockState()
+        {
+            CursorLockMode lockState = Cursor.lockState;
+
+            Cursor.lockState = lockState switch
+            {
+                CursorLockMode.None => CursorLockMode.Locked,
+                CursorLockMode.Locked => CursorLockMode.None,
+                _ => Cursor.lockState
+            };
+        }
+
         // Get Mouse Position in World with Z = 0f
         public static Vector3 GetMouseWorldPosition()
         {

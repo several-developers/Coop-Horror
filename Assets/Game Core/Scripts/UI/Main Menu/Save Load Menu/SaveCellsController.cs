@@ -20,7 +20,7 @@ namespace GameCore.UI.MainMenu.SaveSelectionMenu
 
         private void Awake()
         {
-            _lastSelectedCellIndex = GameSingleton.SelectedSaveIndex;
+            _lastSelectedCellIndex = GameStaticState.SelectedSaveIndex;
             
             SetupCellsView();
             SelectNewCellView();
@@ -59,7 +59,7 @@ namespace GameCore.UI.MainMenu.SaveSelectionMenu
             
             Debug.Log($"Save Cell ({cellIndex}) clicked.");
 
-            GameSingleton.SetSelectedSaveIndex(cellIndex);
+            GameStaticState.SetSelectedSaveIndex(cellIndex);
         }
     }
 }

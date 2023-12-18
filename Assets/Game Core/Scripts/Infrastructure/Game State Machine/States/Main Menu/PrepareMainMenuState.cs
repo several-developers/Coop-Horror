@@ -1,5 +1,5 @@
-﻿using GameCore.Gameplay;
-using GameCore.Gameplay.Factories;
+﻿using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Other;
 using GameCore.UI.MainMenu.PlayModeSelectionMenu;
 
 namespace GameCore.Infrastructure.StateMachine
@@ -42,6 +42,9 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreatePlayModeSelectionMenu() =>
             _playModeSelectionMenu = MenuFactory.Create<PlayModeSelectionMenuView>();
 
+        private void ToggleMultiplayer(bool isEnabled) =>
+            GameStaticState.ToggleMultiplayer(isEnabled);
+
         private void EnterOnlineMenuState() =>
             _gameStateMachine.ChangeState<OnlineMenuState>();
 
@@ -50,8 +53,16 @@ namespace GameCore.Infrastructure.StateMachine
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnOnlineClicked() => EnterOnlineMenuState();
+        private void OnOnlineClicked()
+        {
+            ToggleMultiplayer(isEnabled: true);
+            EnterOnlineMenuState();
+        }
 
-        private void OnOfflineClicked() => EnterOfflineMenuState();
+        private void OnOfflineClicked()
+        {
+            ToggleMultiplayer(isEnabled: false);
+            EnterOfflineMenuState();
+        }
     }
 }

@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-namespace GameCore.Gameplay
+namespace GameCore
 {
     public interface IState
     {
