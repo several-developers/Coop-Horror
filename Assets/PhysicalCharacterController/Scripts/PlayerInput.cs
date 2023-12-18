@@ -14,12 +14,14 @@ public class PlayerInput : MonoBehaviour
 
 	void Update()
 	{
-		if (physicalCC.isGround)
-		{
-			physicalCC.moveInput = Vector3.ClampMagnitude(transform.forward
+		physicalCC.moveInput = Vector3.ClampMagnitude(transform.forward
 							* Input.GetAxis("Vertical")
 							+ transform.right
 							* Input.GetAxis("Horizontal"), 1f) * speed;
+
+		if (physicalCC.isGround)
+		{
+			
 
 			if (Input.GetKeyDown(KeyCode.Space))
 			{

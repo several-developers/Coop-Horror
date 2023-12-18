@@ -37,11 +37,11 @@ public class PhysicalCC : MonoBehaviour
     public float pushForce = 55f;
 
     // PROPERTIES: ----------------------------------------------------------------------------
-    
+
     public CharacterController CharacterController { get; private set; }
 
     // FIELDS: --------------------------------------------------------------------------------
-    
+
     private const string Platform = "Platform";
 
     // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -55,11 +55,12 @@ public class PhysicalCC : MonoBehaviour
     {
         GroundCheck();
 
+        moveVelocity = ProjectMoveOnGround ? Vector3.ProjectOnPlane(moveInput, groundNormal) : moveInput;
+
         if (isGround)
         {
-            moveVelocity = ProjectMoveOnGround ? Vector3.ProjectOnPlane(moveInput, groundNormal) : moveInput;
-
-            if (groundAngle < slopeLimit && inertiaVelocity != Vector3.zero) InertiaDamping();
+            if (groundAngle < slopeLimit && inertiaVelocity != Vector3.zero)
+                InertiaDamping();
         }
 
         GravityUpdate();
