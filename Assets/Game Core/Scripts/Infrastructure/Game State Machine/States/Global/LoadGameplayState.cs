@@ -1,0 +1,38 @@
+﻿using GameCore.Enums;
+using GameCore.Gameplay;
+using GameCore.Infrastructure.Services.Global;
+
+namespace GameCore.Infrastructure.StateMachine
+{
+    public class LoadGameplayState : IEnterState
+    {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        public LoadGameplayState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
+        {
+            _gameStateMachine = gameStateMachine;
+            _scenesLoaderService = scenesLoaderService;
+
+            _gameStateMachine.AddState(this);
+        }
+
+        // FIELDS: --------------------------------------------------------------------------------
+
+        private readonly IGameStateMachine _gameStateMachine;
+        private readonly IScenesLoaderService _scenesLoaderService;
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void Enter() =>
+            _scenesLoaderService.LoadScene(SceneName.Gameplay, OnGameplaySceneLoaded);
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void EnterGameplayState() =>
+            _gameStateMachine.ChangeState<GameplayState>();
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void OnGameplaySceneLoaded() => EnterGameplayState();
+    }
+}

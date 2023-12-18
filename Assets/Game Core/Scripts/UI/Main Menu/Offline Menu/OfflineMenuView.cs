@@ -1,22 +1,13 @@
 ﻿using System;
-using GameCore.Enums;
-using GameCore.Infrastructure.Services.Global;
 using GameCore.UI.Global.MenuView;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
 
 namespace GameCore.UI.MainMenu.OfflineMenu
 {
     public class OfflineMenuView : MenuView
     {
-        // CONSTRUCTORS: --------------------------------------------------------------------------
-
-        [Inject]
-        private void Construct(IScenesLoaderService scenesLoaderService) =>
-            _scenesLoaderService = scenesLoaderService;
-
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
@@ -25,7 +16,7 @@ namespace GameCore.UI.MainMenu.OfflineMenu
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private IScenesLoaderService _scenesLoaderService;
+        public event Action OnStartButtonClickedEvent;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -38,13 +29,12 @@ namespace GameCore.UI.MainMenu.OfflineMenu
 
         private void Start() => Show();
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void LoadGameplayScene() =>
-            _scenesLoaderService.LoadScene(SceneName.Gameplay);
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnStartGameButtonClicked() => LoadGameplayScene();
+        private void OnStartGameButtonClicked()
+        {
+            OnStartButtonClickedEvent?.Invoke();
+            Hide();
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace GameCore.Infrastructure.Installers.Global
             BindBootstrapState();
             BindLoadDataState();
             BindLoadMainMenuState();
+            BindLoadGameplayState();
 
 #if UNITY_EDITOR
             BindGameSetupForEditorState();
@@ -40,6 +41,14 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .Bind<LoadMainMenuState>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindLoadGameplayState()
+        {
+            Container
+                .Bind<LoadGameplayState>()
                 .AsSingle()
                 .NonLazy();
         }

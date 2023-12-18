@@ -33,8 +33,8 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Exit()
         {
-            _playModeSelectionMenu.OnOnlineClickedEvent += OnOnlineClicked;
-            _playModeSelectionMenu.OnOfflineClickedEvent += OnOfflineClicked;
+            _playModeSelectionMenu.OnOnlineClickedEvent -= OnOnlineClicked;
+            _playModeSelectionMenu.OnOfflineClickedEvent -= OnOfflineClicked;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

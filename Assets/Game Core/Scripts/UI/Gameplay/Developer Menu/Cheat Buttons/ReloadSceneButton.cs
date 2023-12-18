@@ -1,6 +1,4 @@
-﻿using GameCore.Enums;
-using GameCore.Infrastructure.Services.Global;
-using GameCore.UI.Global.Buttons;
+﻿using GameCore.UI.Global.Buttons;
 using Zenject;
 
 namespace GameCore.UI.Gameplay.DeveloperMenu.CheatButtons
@@ -10,16 +8,17 @@ namespace GameCore.UI.Gameplay.DeveloperMenu.CheatButtons
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IScenesLoaderService scenesLoaderService) =>
-            _scenesLoaderService = scenesLoaderService;
+        private void Construct()
+        {
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
-        private IScenesLoaderService _scenesLoaderService;
+      
         
         // PROTECTED METHODS: ---------------------------------------------------------------------
         
-        protected override void ClickLogic() =>
-            _scenesLoaderService.LoadScene(SceneName.Gameplay);
+        protected override void ClickLogic()
+        {
+        }
     }
 }

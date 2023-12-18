@@ -1,5 +1,4 @@
 ﻿using DG.Tweening;
-using GameCore.Enums;
 using GameCore.Infrastructure.Services.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -34,7 +33,7 @@ namespace GameCore.Gameplay.Other
         private CanvasGroup _canvasGroup;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private IScenesLoaderService _scenesLoaderService;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -72,16 +71,5 @@ namespace GameCore.Gameplay.Other
 
         private void OnSceneFinishedLoading() =>
             FadeAnimation(fadeIn: false);
-
-        // DEBUG BUTTONS: -------------------------------------------------------------------------
-
-        [Title(Constants.DebugButtons)]
-        [Button(25), DisableInEditorMode]
-        private void DebugLoadMainMenu() =>
-            _scenesLoaderService.LoadScene(SceneName.MainMenu);
-
-        [Button(25), DisableInEditorMode]
-        private void DebugLoadBattle() =>
-            _scenesLoaderService.LoadScene(SceneName.Gameplay);
     }
 }

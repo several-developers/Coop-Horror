@@ -1,4 +1,5 @@
-﻿using GameCore.Configs.Game;
+﻿using System;
+using GameCore.Configs.Game;
 using GameCore.Enums;
 using GameCore.Gameplay;
 using GameCore.Infrastructure.Providers.Global;
@@ -39,10 +40,7 @@ namespace GameCore.Infrastructure.StateMachine
                 return;
             }
 
-            if (!IsCurrentSceneMainMenu())
-                return;
-
-            EnterPrepareMainMenuState();
+            CheckSceneState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -54,27 +52,52 @@ namespace GameCore.Infrastructure.StateMachine
             bool loadOnlyBootstrapScene = forceLoadBootstrapScene && startScene == SceneName.Bootstrap;
 
             if (forceLoadBootstrapScene)
-                _scenesLoaderService.LoadScene(SceneName.Bootstrap, OnSceneLoaded);
+                LoadScene(SceneName.Bootstrap, OnSceneLoaded);
             else
-                _scenesLoaderService.LoadScene(startScene);
+                LoadScene(startScene, CheckSceneState);
 
             void OnSceneLoaded()
             {
                 if (loadOnlyBootstrapScene)
                     return;
 
-                _scenesLoaderService.LoadScene(startScene);
+                LoadScene(startScene, CheckSceneState);
             }
         }
 
-        private bool IsCurrentSceneMainMenu()
+        private void CheckSceneState()
+        {
+            if (IsCurrentSceneMainMenu())
+            {
+                EnterPrepareMainMenuState();
+                return;
+            }
+
+            if (IsCurrentSceneGameplay())
+                EnterGameplayState();
+        }
+        
+        private void LoadScene(SceneName sceneName, Action callback = null) =>
+            _scenesLoaderService.LoadScene(sceneName, callback);
+
+        private void EnterPrepareMainMenuState() =>
+            _gameStateMachine.ChangeState<PrepareMainMenuState>();
+        
+        private void EnterGameplayState() =>
+            _gameStateMachine.ChangeState<GameplayState>();
+
+        private static bool IsCurrentSceneMainMenu()
         {
             string sceneName = SceneManager.GetActiveScene().name;
             bool isSceneMainMenu = string.Equals(sceneName, SceneName.MainMenu.ToString());
             return isSceneMainMenu;
         }
-
-        private void EnterPrepareMainMenuState() =>
-            _gameStateMachine.ChangeState<PrepareMainMenuState>();
+        
+        private static bool IsCurrentSceneGameplay()
+        {
+            string sceneName = SceneManager.GetActiveScene().name;
+            bool isSceneGameplay = string.Equals(sceneName, SceneName.Gameplay.ToString());
+            return isSceneGameplay;
+        }
     }
 }

@@ -5,7 +5,7 @@ using GameCore.UI.MainMenu.SaveSelectionMenu;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class OfflineMenuState : IEnterState
+    public class OfflineMenuState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -20,20 +20,34 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
 
+        private OfflineMenuView _offlineMenuView;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
             CreateSaveSelectionMenu();
             CreateOfflineMenu();
+
+            _offlineMenuView.OnStartButtonClickedEvent += OnStartButtonClicked;
         }
+        
+        public void Exit() =>
+            _offlineMenuView.OnStartButtonClickedEvent -= OnStartButtonClicked;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void CreateOfflineMenu() =>
+            _offlineMenuView = MenuFactory.Create<OfflineMenuView>();
+
+        private void EnterLoadGameplayState() =>
+            _gameStateMachine.ChangeState<LoadGameplayState>();
 
         private static void CreateSaveSelectionMenu() =>
             MenuFactory.Create<SaveSelectionMenuView>();
 
-        private static void CreateOfflineMenu() =>
-            MenuFactory.Create<OfflineMenuView>();
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnStartButtonClicked() => EnterLoadGameplayState();
     }
 }
