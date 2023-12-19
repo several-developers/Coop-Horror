@@ -19,7 +19,7 @@ namespace NetcodePlus.EditorTool
 
         void OnWizardCreate()
         {
-            SNetworkObject.editor_auto_gen_id = true; //Reset to true in case was off
+            SNetworkObject.EditorAutoGenID = true; //Reset to true in case was off
 
             NetworkObject[] nobjs = FindObjectsOfType<NetworkObject>();
             foreach (NetworkObject nobj in nobjs)

@@ -121,7 +121,7 @@ namespace NetcodePlus
 
         public void Spawn(SNetworkObject nobj)
         {
-            if (nobj == null || nobj.network_id == 0 || !IsServer)
+            if (nobj == null || nobj._networkID == 0 || !IsServer)
                 return;
 
             //Debug.Log("Spawn: " + nobj.name);
@@ -150,10 +150,10 @@ namespace NetcodePlus
             spawned_list.Remove(nobj.NetworkId);
 
             if(!destroy && !nobj.IsSceneObject)
-                despawned_list[nobj.network_id] = nobj;
+                despawned_list[nobj._networkID] = nobj;
 
             if (destroy && nobj.IsSceneObject)
-                destroyed_scene_list.Add(nobj.network_id); //Save destroyed scene objects to notify new connecting clients
+                destroyed_scene_list.Add(nobj._networkID); //Save destroyed scene objects to notify new connecting clients
 
             if (IsOnline)
             {
@@ -166,7 +166,7 @@ namespace NetcodePlus
         public void DestroyScene(SNetworkObject nobj)
         {
             if (IsServer && nobj.IsSceneObject)
-                destroyed_scene_list.Add(nobj.network_id); //Save destroyed scene objects to notify new connecting clients
+                destroyed_scene_list.Add(nobj._networkID); //Save destroyed scene objects to notify new connecting clients
         }
 
         public void ChangeOwner(SNetworkObject nobj)
@@ -260,9 +260,9 @@ namespace NetcodePlus
                 SNetworkObject nobj = obj.GetComponent<SNetworkObject>();
                 if (nobj != null)
                 {
-                    nobj.network_id = data.network_id;
-                    nobj.prefab_id = data.prefab_id;
-                    nobj.is_scene = false;
+                    nobj._networkID = data.network_id;
+                    nobj._prefabID = data.prefab_id;
+                    nobj._isScene = false;
                     spawned_list[nobj.NetworkId] = nobj;
                     nobj.SpawnLocal(data.owner, data.extra);
                 }
@@ -303,7 +303,7 @@ namespace NetcodePlus
                 nobj.DespawnLocal(destroy);
 
                 if (!destroy && !nobj.IsSceneObject)
-                    despawned_list[nobj.network_id] = nobj;
+                    despawned_list[nobj._networkID] = nobj;
             }
         }
 
@@ -392,8 +392,8 @@ namespace NetcodePlus
         public byte[] extra;
 
         public NetSpawnData(SNetworkObject nobj) { 
-            network_id = nobj.network_id; 
-            prefab_id = nobj.prefab_id;
+            network_id = nobj._networkID; 
+            prefab_id = nobj._prefabID;
             this.owner = nobj.OwnerId;
             pos = Vector3Data.Zero;
             rot = QuaternionData.Zero;

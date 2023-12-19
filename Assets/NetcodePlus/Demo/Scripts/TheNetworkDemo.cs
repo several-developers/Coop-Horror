@@ -74,7 +74,7 @@ namespace NetcodePlus.Demo
                 {
                     //Start based on connection data
                     ConnectionData connect = TheNetwork.Get().GetConnectionData();
-                    DemoConnectData ddata = NetworkTool.NetDeserialize<DemoConnectData>(connect.extra);
+                    DemoConnectData ddata = NetworkTool.NetDeserialize<DemoConnectData>(connect._extra);
                     GameModeData mdata = GameModeData.Get(ddata.mode);
                     GameData.Create(ddata.mode, mdata.players_max);
                 }
@@ -90,7 +90,7 @@ namespace NetcodePlus.Demo
                 return false; //Game not found
 
             //Find player id by username (for reconnections)
-            PlayerData user_player = gdata.GetPlayer(cdata.username);
+            PlayerData user_player = gdata.GetPlayer(cdata._username);
             if (user_player != null && TheNetwork.Get().GetClientByPlayerID(user_player.player_id) == null)
                 return true; //Already in data
 
@@ -111,7 +111,7 @@ namespace NetcodePlus.Demo
             DemoConnectData cdata = client.GetExtraData<DemoConnectData>();
 
             //Find player id by username (for reconnections)
-            PlayerData user_player = gdata.GetPlayer(client.username);
+            PlayerData user_player = gdata.GetPlayer(client.Username);
             if (user_player != null && user_player.player_id >= 0 && TheNetwork.Get().GetClientByPlayerID(user_player.player_id) == null)
             {
                 user_player.connected = true;
@@ -119,7 +119,7 @@ namespace NetcodePlus.Demo
             }
 
             //No player found, assign new player ID
-            PlayerData player = gdata.AddNewPlayer(client.username);
+            PlayerData player = gdata.AddNewPlayer(client.Username);
             if (player != null)
             {
                 player.connected = true;
@@ -233,9 +233,9 @@ namespace NetcodePlus.Demo
         {
             GameData gdata = GameData.Get();
             ClientData client = TheNetwork.Get().GetClient(client_id);
-            if (client != null && client.player_id >= 0)
+            if (client != null && client.PlayerID >= 0)
             {
-                PlayerData user_player = gdata.GetPlayer(client.player_id);
+                PlayerData user_player = gdata.GetPlayer(client.PlayerID);
                 if (user_player != null)
                     user_player.connected = false;
             }

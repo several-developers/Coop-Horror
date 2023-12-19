@@ -169,7 +169,7 @@ namespace NetcodePlus
                     ClientData client = pair.Value;
                     if (client != null && index < list.Length)
                     {
-                        list[index] = client.user_id;
+                        list[index] = client.UserID;
                         index++;
                     }
                 }

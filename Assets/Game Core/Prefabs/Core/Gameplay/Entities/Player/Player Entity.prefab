@@ -564,43 +564,6 @@ CharacterController:
   m_SkinWidth: 0.003
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &264049764990470737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74ff32c33b0c9b54d9e6f15c01e790b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 5
-  jumpHeight: 15
-  physicalCC: {fileID: 5553387855670466857}
-  bodyRender: {fileID: 7668468218148992628}
-  isSitting: 0
---- !u!114 &694924045423748876
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &5174800490687240705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -684,31 +647,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 7668468218393881510}
---- !u!114 &5553387855670466857
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50b25ae13abd83c4b90bc40e5182eecf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isGround: 0
-  groundAngle: 0
-  ProjectMoveOnGround: 0
-  moveInput: {x: 0, y: 0, z: 0}
-  slopeLimit: 40
-  inertiaDampingTime: 0.1
-  slopeStartForce: 3
-  slopeAcceleration: 3
-  inertiaVelocity: {x: 0, y: 0, z: 0}
-  platformAction: 0
-  platformVelocity: {x: 0, y: 0, z: 0}
-  applyCollision: 0
-  pushForce: 55
 --- !u!114 &5746002443945451132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -723,7 +661,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isDead: 0
   _animator: {fileID: 0}
---- !u!114 &7741388609615629196
+--- !u!114 &5896049000724007706
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -732,27 +670,42 @@ MonoBehaviour:
   m_GameObject: {fileID: 4628898490251457778}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0445756174f0834ba947f4d8a5cc640, type: 3}
+  m_Script: {fileID: 11500000, guid: 2a6b7ee78f1e43ad816d26166be67951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 0
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
+  _speed: 5
+  _jumpHeight: 10
+  _playerMovement: {fileID: 7464226445342076517}
+  _bodyRender: {fileID: 7668468218148992628}
+  _isSitting: 0
+--- !u!114 &7464226445342076517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4628898490251457778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05bae339c8b64b5fad4b8125529160b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isGround: 0
+  _platformVelocity: {x: 0, y: 0, z: 0}
+  _groundAngle: 0
+  _moveInput: {x: 0, y: 0, z: 0}
+  _moveVelocity: {x: 0, y: 0, z: 0}
+  _projectMoveOnGround: 0
+  slopeLimit: 45
+  inertiaDampingTime: 0.1
+  slopeStartForce: 3
+  slopeAcceleration: 3
+  inertiaVelocity: {x: 0, y: 0, z: 0}
+  platformAction: 0
+  _applyCollision: 1
+  _pushForce: 55
+  _playerMovementConfig: {fileID: 11400000, guid: e4b2ff4b8cc1e134f915cc7121a0a7da,
+    type: 2}
 --- !u!114 &8745325562456327625
 MonoBehaviour:
   m_ObjectHideFlags: 0

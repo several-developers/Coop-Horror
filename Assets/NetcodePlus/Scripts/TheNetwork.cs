@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
@@ -16,19 +16,20 @@ namespace NetcodePlus
 
         //Server & Client events
         public UnityAction onTick; //Every network tick
-        public UnityAction onReady;  //Event after connection fully established (save file sent, scene loaded...)
-        public UnityAction onConnect;  //Event when self connect, happens before onReady, before sending any data
+        public UnityAction onReady; //Event after connection fully established (save file sent, scene loaded...)
+        public UnityAction onConnect; //Event when self connect, happens before onReady, before sending any data
         public UnityAction onDisconnect; //Event when self disconnect
         public UnityAction<string> onBeforeChangeScene; //Before Changing Scene
         public UnityAction<string> onAfterChangeScene; //After Changing Scene
 
         public delegate bool ReadyCheckEvent();
+
         public ReadyCheckEvent checkReady; //Additional optional ready validations
 
-        public UnityAction<int, FastBufferReader> onReceivePlayer;    //Server receives data from client after connection
-        public UnityAction<int, FastBufferWriter> onSendPlayer;       //Client send data to server after connection
-        public UnityAction<FastBufferReader> onReceiveWorld;    //Client receives data from server after connection
-        public UnityAction<FastBufferWriter> onSendWorld;       //Server sends data to client after connection
+        public UnityAction<int, FastBufferReader> onReceivePlayer; //Server receives data from client after connection
+        public UnityAction<int, FastBufferWriter> onSendPlayer; //Client send data to server after connection
+        public UnityAction<FastBufferReader> onReceiveWorld; //Client receives data from server after connection
+        public UnityAction<FastBufferWriter> onSendWorld; //Server sends data to client after connection
 
         //Server only events
         public UnityAction<ulong> onClientJoin; //Server event when any client connect
@@ -37,54 +38,68 @@ namespace NetcodePlus
         public UnityAction<string> onSaveRequest; //Server event when a player asks to save
 
         public UnityAction<ulong, ConnectionData> onClientApproved; //Called when a new client was succesfully approved
-        public UnityAction<ulong, int> onAssignPlayerID;            //Server event after assigning id (client_id, player_id)
-        public UnityAction<int, SNetworkObject> onBeforePlayerSpawn; //Server event before a player spawn (player_id, player object)
-        public UnityAction<int, SNetworkObject> onSpawnPlayer; //Server event after a player is spawned (player_id, player object)
+        public UnityAction<ulong, int> onAssignPlayerID; //Server event after assigning id (client_id, player_id)
 
-        public delegate bool ApprovalEvent(ulong client_id, ConnectionData connect_data);
+        public UnityAction<int, SNetworkObject>
+            onBeforePlayerSpawn; //Server event before a player spawn (player_id, player object)
+
+        public UnityAction<int, SNetworkObject>
+            onSpawnPlayer; //Server event after a player is spawned (player_id, player object)
+
+        public delegate bool ApprovalEvent(ulong clientID, ConnectionData connectData);
+
         public ApprovalEvent checkApproval; //Additional approval validations for when a client connects
 
-        public delegate Vector3 Vector3Event(int player_id);
+        public delegate Vector3 Vector3Event(int playerID);
+
         public Vector3Event findPlayerSpawnPos; //Find player spawn position for client
 
-        public delegate GameObject PrefabEvent(int player_id);
+        public delegate GameObject PrefabEvent(int playerID);
+
         public PrefabEvent findPlayerPrefab; //Find player prefab for client
 
-        public delegate int IntEvent(ulong client_id);
+        public delegate int IntEvent(ulong clientID);
+
         public IntEvent findPlayerID; //Find player ID for client
 
         //---------
 
-        private NetworkManager network;
-        private UnityTransport transport;
-        private ConnectionData connection;
-        private NetworkMessaging messaging;
-        private Authenticator auth;
-        private UnityAction refresh_callback;
+        private NetworkManager _network;
+        private UnityTransport _transport;
+        private ConnectionData _connection;
+        private NetworkMessaging _messaging;
+        private Authenticator _auth;
+        private UnityAction _refreshCallback;
 
-        private Dictionary<ulong, ClientData> client_list = new Dictionary<ulong, ClientData>();
-        private Dictionary<ulong, GameObject> prefab_list = new Dictionary<ulong, GameObject>();
-        private Dictionary<ulong, SNetworkObject> players_list = new Dictionary<ulong, SNetworkObject>();
+        private readonly Dictionary<ulong, ClientData> _clientList = new();
+        private readonly Dictionary<ulong, GameObject> _prefabList = new();
+        private readonly Dictionary<ulong, SNetworkObject> _playersList = new();
 
-        private int player_id = -1;
-        private bool changing_scene = false;            //Is loading a new scene
-        private bool world_received = false;            //Save file has been received
-        private bool offline_mode = false;                 //If true, means its in singleplayer mode
-        private ClientState local_state = ClientState.Offline;
-        private ServerType server_type = ServerType.None; //This value is only accurate on the server (client doesnt know this)
-        private LobbyGame current_game = null;          //Saves lobby data for future ref
-        private float update_timer = 0f;
+        private int _playerID = -1;
+        private bool _changingScene; //Is loading a new scene
+        private bool _worldReceived; //Save file has been received
+        private bool _offlineMode; //If true, means its in singleplayer mode
+        private ClientState _localState = ClientState.Offline;
 
-        [System.NonSerialized]
-        private static bool inited = false;
-        private static TheNetwork instance;
+        private ServerType
+            _serverType = ServerType.None; //This value is only accurate on the server (client doesnt know this)
 
-        private const string listen_all = "0.0.0.0";
-        private const int msg_size = 1024 * 1024;
+        private LobbyGame _currentGame; //Saves lobby data for future ref
+        private float _updateTimer;
 
-        void Awake()
+        [NonSerialized]
+        private static bool _inited;
+
+        private static TheNetwork _instance;
+
+        private const string _listenAll = "0.0.0.0";
+        private const int _msgSize = 1024 * 1024;
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Awake()
         {
-            if (instance != null && instance != this)
+            if (_instance != null && _instance != this)
             {
                 Destroy(gameObject);
                 return; //Manager already exists, destroy this one
@@ -95,36 +110,38 @@ namespace NetcodePlus
             DontDestroyOnLoad(gameObject);
         }
 
-        public void Init()
+        private void Update()
         {
-            if (!inited || transport == null)
-            {
-                instance = this;
-                inited = true;
-                network = GetComponent<NetworkManager>();
-                transport = GetComponent<UnityTransport>();
-                connection = new ConnectionData();
-                messaging = new NetworkMessaging(this);
+            const float refreshDuration = 1f;
 
-                transport.ConnectionData.ServerListenAddress = listen_all;
-                transport.ConnectionData.Address = listen_all;
+            _updateTimer += Time.deltaTime;
 
-                network.ConnectionApprovalCallback += ApprovalCheck;
-                network.OnClientConnectedCallback += OnClientConnect;
-                network.OnClientDisconnectCallback += OnClientDisconnect;
-
-                InitAuthentication();
-            }
+            if (_updateTimer <= refreshDuration)
+                return;
+            
+            _updateTimer = 0f;
+            SlowUpdate(refreshDuration);
         }
 
-        void Update()
+        public void Init()
         {
-            float refresh_duration = 1f;
-            update_timer += Time.deltaTime;
-            if (update_timer > refresh_duration)
+            if (!_inited || _transport == null)
             {
-                update_timer = 0f;
-                SlowUpdate(refresh_duration);
+                _instance = this;
+                _inited = true;
+                _network = GetComponent<NetworkManager>();
+                _transport = GetComponent<UnityTransport>();
+                _connection = new ConnectionData();
+                _messaging = new NetworkMessaging(this);
+
+                _transport.ConnectionData.ServerListenAddress = _listenAll;
+                _transport.ConnectionData.Address = _listenAll;
+
+                _network.ConnectionApprovalCallback += ApprovalCheck;
+                _network.OnClientConnectedCallback += OnClientConnect;
+                _network.OnClientDisconnectCallback += OnClientDisconnect;
+
+                InitAuthentication();
             }
         }
 
@@ -132,16 +149,16 @@ namespace NetcodePlus
         {
             CheckIfPlayerAssigned();
             CheckIfReady();
-            auth?.Update(delta);
+            _auth?.Update(delta);
         }
 
         private async void InitAuthentication()
         {
-            auth = Authenticator.Create(data.auth_type);
-            await auth.Initialize();
+            _auth = Authenticator.Create(data.auth_type);
+            await _auth.Initialize();
 
             if (data.auth_auto_logout)
-                auth.Logout();
+                _auth.Logout();
         }
 
         //Start simulated host with all networking turned off
@@ -149,10 +166,10 @@ namespace NetcodePlus
         {
             Debug.Log("Host Offline");
             ResetValues();
-            offline_mode = true;
-            server_type = ServerType.None;
-            network.Shutdown();
-            CreateClient(ClientID, auth.UserID, auth.Username);
+            _offlineMode = true;
+            _serverType = ServerType.None;
+            _network.Shutdown();
+            CreateClient(ClientID, _auth.UserID, _auth.Username);
             AfterConnected();
             OnHostConnect(ClientID);
         }
@@ -160,23 +177,23 @@ namespace NetcodePlus
         //Start a host (client + server)
         public void StartHost(ushort port)
         {
-            if (local_state != ClientState.Offline)
+            if (_localState != ClientState.Offline)
                 return;
-            if (!auth.IsConnected())
+            if (!_auth.IsConnected())
                 return; //Not logged in
 
             Debug.Log("Host Game");
             ResetValues();
-            server_type = ServerType.PeerToPeer;
-            connection.user_id = auth.UserID;
-            connection.username = auth.Username;
-            connection.is_host = true;
+            _serverType = ServerType.PeerToPeer;
+            _connection._userID = _auth.UserID;
+            _connection._username = _auth.Username;
+            _connection._isHost = true;
 
-            transport.SetConnectionData(listen_all, port);
-            network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(connection);
+            _transport.SetConnectionData(_listenAll, port);
+            _network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(_connection);
 
-            network.StartHost();
-            CreateClient(ClientID, auth.UserID, auth.Username);
+            _network.StartHost();
+            CreateClient(ClientID, _auth.UserID, _auth.Username);
             AfterConnected();
             OnHostConnect(ClientID);
         }
@@ -184,20 +201,20 @@ namespace NetcodePlus
         //Start a dedicated server
         public void StartServer(ushort port)
         {
-            if (local_state != ClientState.Offline)
+            if (_localState != ClientState.Offline)
                 return;
 
             Debug.Log("Create Game Server");
 
             ResetValues();
-            server_type = ServerType.DedicatedServer;
-            connection.user_id = "";
-            connection.username = "";
+            _serverType = ServerType.DedicatedServer;
+            _connection._userID = "";
+            _connection._username = "";
 
-            transport.SetConnectionData(listen_all, port);
-            network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(connection);
+            _transport.SetConnectionData(_listenAll, port);
+            _network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(_connection);
 
-            network.StartServer();
+            _network.StartServer();
             AfterConnected();
             onConnect?.Invoke();
         }
@@ -206,71 +223,72 @@ namespace NetcodePlus
         //so its still a client (not server) but is the one who selected game settings
         public void StartClient(string server_url, ushort port, bool is_host = false)
         {
-            if (local_state != ClientState.Offline)
+            if (_localState != ClientState.Offline)
                 return;
-            if (!auth.IsConnected())
+            if (!_auth.IsConnected())
                 return; //Not logged in
 
             Debug.Log("Join Game: " + server_url);
             ResetValues();
-            server_type = ServerType.None; //Unknown, could be dedicated or peer2peer
-            connection.user_id = auth.UserID;
-            connection.username = auth.Username;
-            connection.is_host = is_host;
+            _serverType = ServerType.None; //Unknown, could be dedicated or peer2peer
+            _connection._userID = _auth.UserID;
+            _connection._username = _auth.Username;
+            _connection._isHost = is_host;
 
             string ip = NetworkTool.HostToIP(server_url);
-            transport.SetConnectionData(ip, port);
-            network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(connection);
+            _transport.SetConnectionData(ip, port);
+            _network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(_connection);
 
-            network.StartClient();
+            _network.StartClient();
             AfterConnected();
         }
 
         //Make sure the Unity Transport protocol is set to Relay when using Relay
         public void StartHostRelay(RelayConnectData relay)
         {
-            if (local_state != ClientState.Offline)
+            if (_localState != ClientState.Offline)
                 return;
             if (relay == null)
                 return;
-            if (!auth.IsConnected())
+            if (!_auth.IsConnected())
                 return; //Not logged in
 
             Debug.Log("Host Relay Game");
             ResetValues();
-            server_type = ServerType.RelayServer;
-            connection.user_id = auth.UserID;
-            connection.username = auth.Username;
-            connection.is_host = true;
+            _serverType = ServerType.RelayServer;
+            _connection._userID = _auth.UserID;
+            _connection._username = _auth.Username;
+            _connection._isHost = true;
 
-            transport.SetHostRelayData(relay.url, relay.port, relay.alloc_id, relay.alloc_key, relay.connect_data);
-            network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(connection);
+            _transport.SetHostRelayData(relay.url, relay.port, relay.alloc_id, relay.alloc_key, relay.connect_data);
+            _network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(_connection);
 
-            network.StartHost();
-            CreateClient(ClientID, auth.UserID, auth.Username);
+            _network.StartHost();
+            CreateClient(ClientID, _auth.UserID, _auth.Username);
             AfterConnected();
             OnHostConnect(ClientID);
         }
 
         public void StartClientRelay(RelayConnectData relay)
         {
-            if (local_state != ClientState.Offline)
+            if (_localState != ClientState.Offline)
                 return;
             if (relay == null)
                 return;
-            if (!auth.IsConnected())
+            if (!_auth.IsConnected())
                 return; //Not logged in
 
             Debug.Log("Join Relay Game: " + relay.url + " Join Code: " + relay.join_code);
             ResetValues();
-            server_type = ServerType.RelayServer;
-            connection.user_id = auth.UserID;
-            connection.username = auth.Username;
+            _serverType = ServerType.RelayServer;
+            _connection._userID = _auth.UserID;
+            _connection._username = _auth.Username;
 
-            transport.SetClientRelayData(relay.url, relay.port, relay.alloc_id, relay.alloc_key, relay.connect_data, relay.host_connect_data);
-            network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(connection);
+            _transport.SetClientRelayData(relay.url, relay.port, relay.alloc_id, relay.alloc_key, relay.connect_data,
+                relay.host_connect_data);
+            _network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(_connection);
 
-            network.StartClient();
+            _network.StartClient();
             AfterConnected();
         }
 
@@ -280,61 +298,60 @@ namespace NetcodePlus
                 return;
 
             Debug.Log("Disconnect");
-            network.Shutdown();
+            _network.Shutdown();
             AfterDisconnected();
         }
 
         private void AfterConnected()
         {
-            local_state = ClientState.Connecting;
-            if (network.SceneManager != null)
-                network.SceneManager.OnLoad += OnBeforeChangeScene;
-            if (network.SceneManager != null)
-                network.SceneManager.OnLoadComplete += OnAfterChangeScene;
-            if (network.NetworkTickSystem != null)
-                network.NetworkTickSystem.Tick += OnTick;
-            messaging.ListenMsg("id", OnReceivePlayerID);
-            messaging.ListenMsg("state", OnReceiveState);
+            _localState = ClientState.Connecting;
+            if (_network.SceneManager != null)
+                _network.SceneManager.OnLoad += OnBeforeChangeScene;
+            if (_network.SceneManager != null)
+                _network.SceneManager.OnLoadComplete += OnAfterChangeScene;
+            if (_network.NetworkTickSystem != null)
+                _network.NetworkTickSystem.Tick += OnTick;
+            _messaging.ListenMsg("id", OnReceivePlayerID);
+            _messaging.ListenMsg("state", OnReceiveState);
             Messaging.ListenMsg("save", OnReceiveSave);
             Messaging.ListenMsg("request", OnReceiveRequest);
             Messaging.ListenMsg("world", OnReceiveWorld);
             Messaging.ListenMsg("player", OnReceivePlayerData);
-
         }
 
         private void AfterDisconnected()
         {
-            if (local_state == ClientState.Offline)
+            if (_localState == ClientState.Offline)
                 return;
 
-            if (network.SceneManager != null)
-                network.SceneManager.OnLoad -= OnBeforeChangeScene;
-            if (network.SceneManager != null)
-                network.SceneManager.OnLoadComplete -= OnAfterChangeScene;
-            if (network.NetworkTickSystem != null)
-                network.NetworkTickSystem.Tick -= OnTick;
-            messaging.UnListenMsg("id");
-            messaging.UnListenMsg("state");
+            if (_network.SceneManager != null)
+                _network.SceneManager.OnLoad -= OnBeforeChangeScene;
+            if (_network.SceneManager != null)
+                _network.SceneManager.OnLoadComplete -= OnAfterChangeScene;
+            if (_network.NetworkTickSystem != null)
+                _network.NetworkTickSystem.Tick -= OnTick;
+            _messaging.UnListenMsg("id");
+            _messaging.UnListenMsg("state");
             Messaging.UnListenMsg("save");
             Messaging.UnListenMsg("request");
             Messaging.UnListenMsg("world");
             Messaging.UnListenMsg("player");
 
-            connection = new ConnectionData(); //Reset default
-            client_list.Clear();
-            current_game = null;
+            _connection = new ConnectionData(); //Reset default
+            _clientList.Clear();
+            _currentGame = null;
             ResetValues();
             onDisconnect?.Invoke();
         }
 
         private void ResetValues()
         {
-            local_state = ClientState.Offline;
-            server_type = ServerType.None;
-            offline_mode = false;
-            changing_scene = false;
-            world_received = false;
-            player_id = -1; //-1 means not a player
+            _localState = ClientState.Offline;
+            _serverType = ServerType.None;
+            _offlineMode = false;
+            _changingScene = false;
+            _worldReceived = false;
+            _playerID = -1; //-1 means not a player
         }
 
         private void OnHostConnect(ulong client_id)
@@ -344,9 +361,9 @@ namespace NetcodePlus
                 return;
 
             client.state = ClientState.Connecting;
-            client.is_host = true;
-            client.extra = connection.extra;
-            world_received = true; //Host already has data
+            client.IsHost = true;
+            client.extra = _connection._extra;
+            _worldReceived = true; //Host already has data
 
             onConnect?.Invoke();
         }
@@ -359,7 +376,7 @@ namespace NetcodePlus
                 if (client == null)
                     return;
 
-                Debug.Log("Client Connected: " + client.client_id);
+                Debug.Log("Client Connected: " + client.ClientID);
 
                 //Ask for save file on dedicated server
                 RequestWorldFrom(client);
@@ -390,7 +407,8 @@ namespace NetcodePlus
             onTick?.Invoke();
         }
 
-        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest req, NetworkManager.ConnectionApprovalResponse res)
+        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest req,
+            NetworkManager.ConnectionApprovalResponse res)
         {
             ConnectionData connect = NetworkTool.NetDeserialize<ConnectionData>(req.Payload);
             bool approved = ApproveClient(req.ClientNetworkId, connect);
@@ -402,13 +420,13 @@ namespace NetcodePlus
             if (client_id == ServerID)
                 return true; //Server always approve itself
 
-            if (offline_mode)
+            if (_offlineMode)
                 return false;
 
             if (connect == null)
                 return false; //Invalid data
 
-            if (string.IsNullOrEmpty(connect.username) || string.IsNullOrEmpty(connect.user_id))
+            if (string.IsNullOrEmpty(connect._username) || string.IsNullOrEmpty(connect._userID))
                 return false; //Invalid username
 
             if (NetworkGame.Get() == null)
@@ -417,20 +435,20 @@ namespace NetcodePlus
             if (checkApproval != null && !checkApproval.Invoke(client_id, connect))
                 return false; //Custom approval condition
 
-            ClientData client = GetClientByUserID(connect.user_id);
+            ClientData client = GetClientByUserID(connect._userID);
             if (client != null)
                 return false; //Client already connected with this user_id
 
             //Clear previous data
             RemoveClient(client_id);
 
-            if (client_list.Count >= NetworkData.Get().players_max)
+            if (_clientList.Count >= NetworkData.Get().players_max)
                 return false; //Maximum number of clients
 
-            Debug.Log("Approve connection: " + connect.user_id + " " + connect.username);
-            ClientData nclient = CreateClient(client_id, connect.user_id, connect.username);
-            nclient.is_host = connect.is_host;
-            nclient.extra = connect.extra;
+            Debug.Log("Approve connection: " + connect._userID + " " + connect._username);
+            ClientData nclient = CreateClient(client_id, connect._userID, connect._username);
+            nclient.IsHost = connect._isHost;
+            nclient.extra = connect._extra;
 
             onClientApproved?.Invoke(client_id, connect);
             return true; //New Client approved
@@ -438,27 +456,27 @@ namespace NetcodePlus
 
         public void SetLobbyGame(LobbyGame game)
         {
-            current_game = game;
+            _currentGame = game;
         }
 
         public void SetWorldReceived(bool received)
         {
-            world_received = received;
+            _worldReceived = received;
         }
 
         public void SetConnectionExtraData(byte[] bytes)
         {
-            connection.extra = bytes;
+            _connection._extra = bytes;
         }
 
         public void SetConnectionExtraData(string data)
         {
-            connection.extra = NetworkTool.SerializeString(data);
+            _connection._extra = NetworkTool.SerializeString(data);
         }
 
         public void SetConnectionExtraData<T>(T data) where T : INetworkSerializable, new()
         {
-            connection.extra = NetworkTool.NetSerialize(data);
+            _connection._extra = NetworkTool.NetSerialize(data);
         }
 
         private void RegisterDefaultPrefabs()
@@ -471,15 +489,15 @@ namespace NetcodePlus
             if (prefab != null)
             {
                 SNetworkObject sobject = prefab.GetComponent<SNetworkObject>();
-                if (sobject != null && !sobject.is_scene && !prefab_list.ContainsKey(sobject.prefab_id))
+                if (sobject != null && !sobject._isScene && !_prefabList.ContainsKey(sobject._prefabID))
                 {
-                    prefab_list[sobject.prefab_id] = prefab;
+                    _prefabList[sobject._prefabID] = prefab;
                 }
 
                 NetworkObject nobject = prefab.GetComponent<NetworkObject>();
                 if (nobject != null)
                 {
-                    network.PrefabHandler.AddHandler(prefab, new NetworkPrefabHandler(prefab));
+                    _network.PrefabHandler.AddHandler(prefab, new NetworkPrefabHandler(prefab));
                 }
             }
         }
@@ -489,15 +507,15 @@ namespace NetcodePlus
             if (prefab != null)
             {
                 SNetworkObject sobject = prefab.GetComponent<SNetworkObject>();
-                if (sobject != null && prefab_list.ContainsKey(sobject.prefab_id))
+                if (sobject != null && _prefabList.ContainsKey(sobject._prefabID))
                 {
-                    prefab_list.Remove(sobject.prefab_id);
+                    _prefabList.Remove(sobject._prefabID);
                 }
 
                 NetworkObject nobject = prefab.GetComponent<NetworkObject>();
                 if (nobject != null)
                 {
-                    network.PrefabHandler.RemoveHandler(prefab);
+                    _network.PrefabHandler.RemoveHandler(prefab);
                 }
             }
         }
@@ -511,22 +529,22 @@ namespace NetcodePlus
             ClientData client = GetClient(client_id);
             if (client == null)
                 return; //Client not found
-            if (client.player_id < 0)
+            if (client.PlayerID < 0)
                 return; //Just an observer
 
-            Vector3 pos = GetPlayerSpawnPos(client.player_id);
-            GameObject prefab = GetPlayerPrefab(client.player_id);
+            Vector3 pos = GetPlayerSpawnPos(client.PlayerID);
+            GameObject prefab = GetPlayerPrefab(client.PlayerID);
             if (prefab == null)
                 return;
 
-            Debug.Log("Spawn Player: " + client.user_id + " " + client.username + " " + client.player_id);
+            Debug.Log("Spawn Player: " + client.UserID + " " + client.Username + " " + client.PlayerID);
 
             GameObject player_obj = Instantiate(prefab, pos, prefab.transform.rotation);
             SNetworkObject player = player_obj.GetComponent<SNetworkObject>();
-            players_list[client_id] = player;
-            onBeforePlayerSpawn?.Invoke(client.player_id, player);
+            _playersList[client_id] = player;
+            onBeforePlayerSpawn?.Invoke(client.PlayerID, player);
             player.Spawn(client_id);
-            onSpawnPlayer?.Invoke(client.player_id, player);
+            onSpawnPlayer?.Invoke(client.PlayerID, player);
         }
 
         //Use this function to spawn player manually (return null from the findPlayerPrefab event to prevent spawning automatically)
@@ -540,20 +558,20 @@ namespace NetcodePlus
             if (client == null)
                 return; //Client not found
 
-            ulong client_id = client.client_id;
+            ulong client_id = client.ClientID;
             if (GetPlayerObject(client_id) != null)
                 return; //Already Spawned
-            if (client.player_id < 0)
+            if (client.PlayerID < 0)
                 return; //Just an observer
 
-            Debug.Log("Spawn Player: " + client.user_id + " " + client.username + " " + client.player_id);
+            Debug.Log("Spawn Player: " + client.UserID + " " + client.Username + " " + client.PlayerID);
 
             GameObject player_obj = Instantiate(prefab, pos, prefab.transform.rotation);
             SNetworkObject player = player_obj.GetComponent<SNetworkObject>();
-            players_list[client_id] = player;
-            onBeforePlayerSpawn?.Invoke(client.player_id, player);
+            _playersList[client_id] = player;
+            onBeforePlayerSpawn?.Invoke(client.PlayerID, player);
             player.Spawn(client_id);
-            onSpawnPlayer?.Invoke(client.player_id, player);
+            onSpawnPlayer?.Invoke(client.PlayerID, player);
         }
 
         private Vector3 GetPlayerSpawnPos(int player_id)
@@ -574,32 +592,32 @@ namespace NetcodePlus
             return NetworkData.Get().player_default;
         }
 
-        private int FindPlayerID(ulong client_id)
+        private int FindPlayerID(ulong clientID)
         {
-            int player_id = (int)client_id;
+            int player_id = (int)clientID;
             if (findPlayerID != null)
-                player_id = findPlayerID.Invoke(client_id);
+                player_id = findPlayerID.Invoke(clientID);
             return player_id;
         }
 
-        public void DespawnPlayer(ulong client_id)
+        public void DespawnPlayer(ulong clientID)
         {
             if (!IsServer)
                 return;
 
-            SNetworkObject player = GetPlayerObject(client_id);
+            SNetworkObject player = GetPlayerObject(clientID);
             if (player != null)
             {
-                players_list.Remove(client_id);
+                _playersList.Remove(clientID);
                 player.Despawn(true);
             }
         }
 
-        public void SpawnClientObjects(ulong client_id)
+        public void SpawnClientObjects(ulong clientID)
         {
-            if (IsServer && client_id != ServerID)
+            if (IsServer && clientID != ServerID)
             {
-                NetworkGame.Get().Spawner.SpawnClientObjects(client_id);
+                NetworkGame.Get().Spawner.SpawnClientObjects(clientID);
             }
         }
 
@@ -622,185 +640,201 @@ namespace NetcodePlus
 
         private void TriggerReadyPlayers()
         {
-            if (IsServer && local_state == ClientState.Ready)
+            if (IsServer && _localState == ClientState.Ready)
             {
-                foreach (KeyValuePair<ulong, ClientData> pair in client_list)
+                foreach (KeyValuePair<ulong, ClientData> pair in _clientList)
                 {
                     ClientData client = pair.Value;
                     if (client.state == ClientState.Ready)
-                        TriggerReadyPlayer(client.client_id);
+                        TriggerReadyPlayer(client.ClientID);
                 }
             }
         }
 
         //This will be triggered when both the server and the player are ready
-        private void TriggerReadyPlayer(ulong client_id)
+        private void TriggerReadyPlayer(ulong clientID)
         {
-            if (IsServer && local_state == ClientState.Ready)
-            {
-                Debug.Log("Client is Ready:" + client_id);
-                SpawnClientObjects(client_id);
-                SpawnPlayer(client_id);
-                onClientReady?.Invoke(client_id);
-            }
+            bool canTriggerReady = IsServer && _localState == ClientState.Ready;
+
+            if (!canTriggerReady)
+                return;
+
+            Debug.Log("Client is Ready:" + clientID);
+
+            SpawnClientObjects(clientID);
+            SpawnPlayer(clientID);
+            onClientReady?.Invoke(clientID);
         }
 
         private void CheckIfReady()
         {
-            if (local_state != ClientState.Connecting || !IsConnected())
+            if (_localState != ClientState.Connecting || !IsConnected())
                 return; //Wrong state, no need to check
 
-            bool rvalid = checkReady == null || checkReady.Invoke(); //Custom condition
-            bool pvalid = !IsClient || player_id >= 0; //Client has ID assigned
-            bool gvalid = NetworkGame.Get() != null; //Game scene is loaded
-            if (rvalid && pvalid && gvalid && !changing_scene && world_received)
-            {
-                Debug.Log("Ready!");
-                TriggerReady();
-            }
+            bool rvalid = checkReady == null || checkReady.Invoke(); // Custom condition
+            bool pvalid = !IsClient || _playerID >= 0; // Client has ID assigned
+            bool gvalid = NetworkGame.Get() != null; // Game scene is loaded
+            bool canTriggerReady = rvalid && pvalid && gvalid && !_changingScene && _worldReceived;
+
+            if (!canTriggerReady)
+                return;
+
+            Debug.Log("Ready!");
+            TriggerReady();
         }
 
         //Loop on connected player and assign a Player ID, will only work if the server is ready yet (world received)
         private void CheckIfPlayerAssigned()
         {
-            if (IsServer && world_received)
+            bool canAssign = IsServer && _worldReceived;
+
+            if (!canAssign)
+                return;
+
+            foreach (KeyValuePair<ulong, ClientData> pair in _clientList)
             {
-                foreach (KeyValuePair<ulong, ClientData> pair in client_list)
-                {
-                    ClientData client = pair.Value;
-                    if (client.player_id < 0)
-                        AssignPlayerID(client.client_id);
-                }
+                ClientData client = pair.Value;
+
+                if (client.PlayerID < 0)
+                    AssignPlayerID(client.ClientID);
             }
         }
 
         //This will be triggered when the server is ready and a player has joined
-        private void AssignPlayerID(ulong client_id)
+        private void AssignPlayerID(ulong clientID)
         {
+            bool canAssign = clientID == ServerID || _localState == ClientState.Ready;
+
+            if (!canAssign)
+                return;
+
             //Assign self before assigning other clients
-            if (client_id == ServerID || local_state == ClientState.Ready)
-            {
-                ClientData client = GetClient(client_id);
-                if (client != null && client.player_id < 0)
-                {
-                    int player_id = FindPlayerID(client_id);
-                    if (player_id >= 0)
-                    {
-                        client.player_id = player_id;
-                        Debug.Log("Player ID " + player_id + " assigned to: " + client.user_id + " " + client.username);
 
-                        //If self, change this.player_id
-                        if (client_id == ClientID)
-                            this.player_id = player_id;
+            ClientData client = GetClient(clientID);
+            bool isClientValid = client != null && client.PlayerID < 0;
 
-                        if (onAssignPlayerID != null)
-                            onAssignPlayerID.Invoke(client_id, player_id);
+            if (!isClientValid)
+                return;
 
-                        //If not self, send the ID to client
-                        if (client_id != ClientID)
-                        {
-                            messaging.SendInt("id", client_id, player_id, NetworkDelivery.ReliableSequenced);
-                        }
-                    }
-                }
-            }
+            int playerID = FindPlayerID(clientID);
+            bool isPlayerIDValid = playerID >= 0;
+
+            if (!isPlayerIDValid)
+                return;
+
+            client.PlayerID = playerID;
+            Debug.Log("Player ID " + playerID + " assigned to: " + client.UserID + " " + client.Username);
+
+            //If self, change this.player_id
+            if (clientID == ClientID)
+                _playerID = playerID;
+
+            onAssignPlayerID?.Invoke(clientID, playerID);
+
+            //If not self, send the ID to client
+            if (clientID != ClientID)
+                _messaging.SendInt("id", clientID, playerID, NetworkDelivery.ReliableSequenced);
         }
 
         //Call from server only
-        public void LoadScene(string scene, bool force_reload = false)
+        public void LoadScene(string scene, bool forceReload = false)
         {
-            bool reload = force_reload || scene != SceneManager.GetActiveScene().name;
-            if (IsServer && reload && !changing_scene)
-            {
-                if (offline_mode)
-                {
-                    OnBeforeChangeScene(ClientID, scene, LoadSceneMode.Single, null);
-                    SceneManager.LoadScene(scene);
-                    OnAfterChangeScene(ClientID, scene, LoadSceneMode.Single);
-                }
-                else
-                {
-                    changing_scene = true;
-                    local_state = ClientState.Connecting;
-                    network.SceneManager.LoadScene(scene, LoadSceneMode.Single);
+            bool reload = forceReload || scene != SceneManager.GetActiveScene().name;
+            bool canLoadScene = IsServer && reload && !_changingScene;
 
-                    foreach (KeyValuePair<ulong, ClientData> client in client_list)
-                        client.Value.state = ClientState.Connecting;
-                }
+            if (!canLoadScene)
+                return;
+
+            if (_offlineMode)
+            {
+                OnBeforeChangeScene(ClientID, scene, LoadSceneMode.Single, null);
+                SceneManager.LoadScene(scene);
+                OnAfterChangeScene(ClientID, scene, LoadSceneMode.Single);
+            }
+            else
+            {
+                _changingScene = true;
+                _localState = ClientState.Connecting;
+                _network.SceneManager.LoadScene(scene, LoadSceneMode.Single);
+
+                foreach (KeyValuePair<ulong, ClientData> client in _clientList)
+                    client.Value.state = ClientState.Connecting;
             }
         }
 
         public void RestartScene()
         {
-            if (IsServer)
-            {
-                string scene = SceneManager.GetActiveScene().name;
-                if (IsOnline)
-                    network.SceneManager.LoadScene(scene, LoadSceneMode.Single);
-                else
-                    SceneManager.LoadScene(scene);
-            }
+            if (!IsServer) return;
+
+            string scene = SceneManager.GetActiveScene().name;
+
+            if (IsOnline)
+                _network.SceneManager.LoadScene(scene, LoadSceneMode.Single);
+            else
+                SceneManager.LoadScene(scene);
         }
 
         public void SetState(ClientState state)
         {
-            local_state = state;
+            _localState = state;
+
             if (!IsServer)
-                messaging.SendInt("state", ServerID, (int)state, NetworkDelivery.Reliable);
+                _messaging.SendInt("state", ServerID, (int)state, NetworkDelivery.Reliable);
             else
-                ReceiveState(ServerID, local_state);
+                ReceiveState(ServerID, _localState);
         }
 
-        private void ReceiveState(ulong client_id, ClientState state)
+        private void ReceiveState(ulong clientID, ClientState state)
         {
-            if (IsServer)
-            {
-                ClientData client = GetClient(client_id);
-                if (client != null && client.player_id >= 0)
-                {
-                    client.state = state;
+            if (!IsServer)
+                return;
 
-                    if (local_state == ClientState.Ready && state == ClientState.Ready && client_id != ServerID)
-                    {
-                        TriggerReadyPlayer(client_id);
-                    }
-                }
-            }
+            ClientData client = GetClient(clientID);
+
+            if (client == null || client.PlayerID < 0)
+                return;
+
+            client.state = state;
+            bool triggerReadyPlayer =
+                _localState == ClientState.Ready && state == ClientState.Ready && clientID != ServerID;
+
+            if (triggerReadyPlayer)
+                TriggerReadyPlayer(clientID);
         }
 
-        private void OnReceiveState(ulong client_id, FastBufferReader reader)
+        private void OnReceiveState(ulong clientID, FastBufferReader reader)
         {
-            reader.ReadValueSafe(out int istate);
-            ClientState state = (ClientState)istate;
-            ReceiveState(client_id, state);
+            reader.ReadValueSafe(out int iState);
+            ClientState state = (ClientState)iState;
+            ReceiveState(clientID, state);
         }
 
         //Send save file to client_id (or to dedicated server)
-        public void SendWorld(ulong client_id)
+        public void SendWorld(ulong clientID)
         {
-            if (client_id == ClientID)
+            if (clientID == ClientID)
                 return;
 
-            Debug.Log("Send World Data to: " + client_id);
+            Debug.Log("Send World Data to: " + clientID);
             FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MsgSizeMax);
             onSendWorld?.Invoke(writer); //Write the save file in this callback
-            Messaging.Send("world", client_id, writer, NetworkDelivery.ReliableFragmentedSequenced);
+            Messaging.Send("world", clientID, writer, NetworkDelivery.ReliableFragmentedSequenced);
             writer.Dispose();
         }
 
-        private void OnReceiveWorld(ulong client_id, FastBufferReader reader)
+        private void OnReceiveWorld(ulong clientID, FastBufferReader reader)
         {
-            if (IsServer && server_type != ServerType.DedicatedServer)
+            if (IsServer && _serverType != ServerType.DedicatedServer)
                 return; //Servers cant receive world (except dedicated server)
-            if (world_received)
+            if (_worldReceived)
                 return; //Already received
 
-            Debug.Log("Receive World Data from: " + client_id);
-            world_received = true;
+            Debug.Log("Receive World Data from: " + clientID);
+            _worldReceived = true;
             onReceiveWorld?.Invoke(reader); //Read the save file in this callback
 
-            refresh_callback?.Invoke();
-            refresh_callback = null;
+            _refreshCallback?.Invoke();
+            _refreshCallback = null;
         }
 
         //Send player save file to server
@@ -811,331 +845,338 @@ namespace NetcodePlus
 
             Debug.Log("Send Player Data");
             FastBufferWriter writer = new FastBufferWriter(128, Allocator.Temp, MsgSizeMax);
-            onSendPlayer?.Invoke(player_id, writer); //Write the save file in this callback
+            onSendPlayer?.Invoke(_playerID, writer); //Write the save file in this callback
             Messaging.Send("player", ServerID, writer, NetworkDelivery.ReliableFragmentedSequenced);
             writer.Dispose();
         }
 
-        private void OnReceivePlayerData(ulong client_id, FastBufferReader reader)
+        private void OnReceivePlayerData(ulong clientID, FastBufferReader reader)
         {
             if (!IsServer)
                 return; //Clients cant receive player data 
 
-            ClientData client = GetClient(client_id);
-            if (client == null || client.data_received)
+            ClientData client = GetClient(clientID);
+            if (client == null || client.DataReceived)
                 return; //Already received, or client invalid
 
-            Debug.Log("Receive Player Data from: " + client_id);
-            client.data_received = true;
-            onReceivePlayer?.Invoke(client.player_id, reader); //Read the save file in this callback
+            Debug.Log("Receive Player Data from: " + clientID);
+            client.DataReceived = true;
+            onReceivePlayer?.Invoke(client.PlayerID, reader); //Read the save file in this callback
 
-            SendWorld(client_id); //Send back world
+            SendWorld(clientID); //Send back world
         }
 
         //Client asks the server to send back the up-to-date save file
         public void RequestWorld(UnityAction callback = null)
         {
-            if (!IsServer)
-            {
-                world_received = false;
-                refresh_callback = callback;
-                Messaging.SendEmpty("request", ServerID, NetworkDelivery.Reliable);
-            }
+            if (IsServer)
+                return;
+
+            _worldReceived = false;
+            _refreshCallback = callback;
+            Messaging.SendEmpty("request", ServerID, NetworkDelivery.Reliable);
         }
 
         public void RequestWorldFrom(ClientData client)
         {
-            if (!IsHost && ServerID != client.client_id && !world_received)
-            {
-                LobbyGame lgame = GetLobbyGame();
-                bool first_client = !lgame.IsValid() && CountClients() == 1; //For direct connect when game_id is 0
-                if (client.is_host || first_client)
-                    Messaging.SendEmpty("request", client.client_id, NetworkDelivery.Reliable);
-            }
+            if (IsHost || ServerID == client.ClientID || _worldReceived)
+                return;
+
+            LobbyGame lobbyGame = GetLobbyGame();
+            bool firstClient = !lobbyGame.IsValid() && CountClients() == 1; //For direct connect when game_id is 0
+
+            if (client.IsHost || firstClient)
+                Messaging.SendEmpty("request", client.ClientID, NetworkDelivery.Reliable);
         }
 
         //A "request" is asking for the save file
-        private void OnReceiveRequest(ulong client_id, FastBufferReader reader)
-        {
-            SendWorld(client_id); //Send back world file to client
-        }
+        private void OnReceiveRequest(ulong clientID, FastBufferReader reader) =>
+            SendWorld(clientID); //Send back world file to client
 
         //Client asks the server to save the world (will be saved on the server)
-        public void SaveWorld(string savefile)
+        public void SaveWorld(string saveFile)
         {
-            if (!IsServer)
-            {
-                Messaging.SendString("save", ServerID, savefile, NetworkDelivery.Reliable);
-            }
+            if (IsServer)
+                return;
+
+            Messaging.SendString("save", ServerID, saveFile, NetworkDelivery.Reliable);
         }
 
-        private void OnReceiveSave(ulong client_id, FastBufferReader reader)
+        private void OnReceiveSave(ulong clientID, FastBufferReader reader)
         {
-            if (IsServer && !IsClient)
-            {
-                reader.ReadValueSafe(out string savefile);
-                if (!string.IsNullOrEmpty(savefile))
-                    onSaveRequest?.Invoke(savefile);
-            }
+            if (!IsServer || IsClient)
+                return;
+
+            reader.ReadValueSafe(out string saveFile);
+
+            if (!string.IsNullOrEmpty(saveFile))
+                onSaveRequest?.Invoke(saveFile);
         }
 
-        private void OnReceivePlayerID(ulong client_id, FastBufferReader reader)
+        private void OnReceivePlayerID(ulong clientID, FastBufferReader reader)
         {
-            reader.ReadValueSafe(out player_id);
-            if (player_id >= 0)
-            {
+            reader.ReadValueSafe(out _playerID);
+
+            if (_playerID >= 0)
                 SendPlayerData();
-            }
         }
 
-        private void OnBeforeChangeScene(ulong client_id, string scene, LoadSceneMode loadSceneMode, AsyncOperation async)
+        private void OnBeforeChangeScene(ulong clientID, string scene, LoadSceneMode loadSceneMode,
+            AsyncOperation async)
         {
             Debug.Log("Change Scene: " + scene);
-            local_state = ClientState.Connecting;
-            changing_scene = true;
+            _localState = ClientState.Connecting;
+            _changingScene = true;
             onBeforeChangeScene?.Invoke(scene);
         }
 
-        private void OnAfterChangeScene(ulong client_id, string scene, LoadSceneMode loadSceneMode)
+        private void OnAfterChangeScene(ulong clientID, string scene, LoadSceneMode loadSceneMode)
         {
-            if (client_id == ClientID)
+            if (clientID == ClientID)
                 Debug.Log("Completed Load Scene: " + scene);
 
-            if (ClientID == client_id)
-            {
-                changing_scene = false;
-                onAfterChangeScene?.Invoke(scene);
-            }
+            if (ClientID != clientID)
+                return;
+
+            _changingScene = false;
+            onAfterChangeScene?.Invoke(scene);
         }
 
-        private ClientData CreateClient(ulong client_id, string user_id, string username)
+        private ClientData CreateClient(ulong clientID, string userID, string username)
         {
-            ClientData client = new ClientData(client_id);
-            client.user_id = user_id;
-            client.username = username;
-            client.client_id = client_id;
-            client.player_id = -1; //Not assigned yet
+            ClientData client = new(clientID);
+            client.UserID = userID;
+            client.Username = username;
+            client.ClientID = clientID;
+            client.PlayerID = -1; //Not assigned yet
             client.state = ClientState.Connecting;
-            client.data_received = client_id == ServerID;
-            client_list[client_id] = client;
+            client.DataReceived = clientID == ServerID;
+            _clientList[clientID] = client;
             return client;
         }
 
-        private void RemoveClient(ulong client_id)
+        private void RemoveClient(ulong clientID)
         {
-            if (client_list.ContainsKey(client_id))
-                client_list.Remove(client_id);
+            if (_clientList.ContainsKey(clientID))
+                _clientList.Remove(clientID);
         }
 
-        public ClientData GetClient(ulong client_id)
+        public ClientData GetClient(ulong clientID)
         {
-            if (client_list.ContainsKey(client_id))
-                return client_list[client_id];
+            if (_clientList.ContainsKey(clientID))
+                return _clientList[clientID];
+
             return null;
         }
 
-        public ClientData GetClientByUserID(string user_id)
+        public ClientData GetClientByUserID(string userID)
         {
-            foreach (ClientData client in client_list.Values)
+            foreach (ClientData client in _clientList.Values)
             {
-                if (client.user_id == user_id)
+                if (client.UserID == userID)
                     return client;
             }
+
             return null;
         }
 
-        public ClientData GetClientByPlayerID(int player_id)
+        public ClientData GetClientByPlayerID(int playerID)
         {
-            foreach (ClientData client in client_list.Values)
+            foreach (ClientData client in _clientList.Values)
             {
-                if (client.player_id == player_id)
+                if (client.PlayerID == playerID)
                     return client;
             }
+
             return null;
         }
 
-        public bool HasClient(ulong client_id)
-        {
-            return client_list.ContainsKey(client_id);
-        }
+        public bool HasClient(ulong clientID) =>
+            _clientList.ContainsKey(clientID);
 
-        public ClientState GetClientState(ulong client_id)
+        public ClientState GetClientState(ulong clientID)
         {
-            ClientData client = GetClient(client_id);
+            ClientData client = GetClient(clientID);
+
             if (client != null)
                 return client.state;
+
             return ClientState.Offline;
         }
 
-        public GameObject GetPrefab(ulong prefab_id)
+        public GameObject GetPrefab(ulong prefabID)
         {
-            if (prefab_list.ContainsKey(prefab_id))
-                return prefab_list[prefab_id];
+            if (_prefabList.ContainsKey(prefabID))
+                return _prefabList[prefabID];
+
             return null;
         }
 
-        public SNetworkObject GetNetworkObject(ulong net_id)
-        {
-            return NetworkGame.Get().Spawner.GetSpawnedObject(net_id);
-        }
+        public SNetworkObject GetNetworkObject(ulong netID) =>
+            NetworkGame.Get().Spawner.GetSpawnedObject(netID);
 
-        public SNetworkBehaviour GetNetworkBehaviour(ulong net_id, ushort behaviour_id)
+        public SNetworkBehaviour GetNetworkBehaviour(ulong netID, ushort behaviourID)
         {
-            SNetworkObject nobj = NetworkGame.Get().Spawner.GetSpawnedObject(net_id);
-            if (nobj != null)
-                return nobj.GetBehaviour(behaviour_id);
+            SNetworkObject sNetworkObject = NetworkGame.Get().Spawner.GetSpawnedObject(netID);
+
+            if (sNetworkObject != null)
+                return sNetworkObject.GetBehaviour(behaviourID);
+
             return null;
         }
 
-        public SNetworkObject GetPlayerObject(ulong client_id)
+        public SNetworkObject GetPlayerObject(ulong clientID)
         {
             //Works on server only
-            if (players_list.ContainsKey(client_id))
-                return players_list[client_id];
+            if (_playersList.ContainsKey(clientID))
+                return _playersList[clientID];
+
             return null;
         }
 
-        public int GetClientPlayerID(ulong client_id)
+        public int GetClientPlayerID(ulong clientID)
         {
-            if (client_list.ContainsKey(client_id))
-                return client_list[client_id].player_id;
+            if (_clientList.ContainsKey(clientID))
+                return _clientList[clientID].PlayerID;
+
             return -1;
         }
 
-        public Dictionary<ulong, ClientData> GetClientsData()
-        {
-            return client_list;
-        }
+        public Dictionary<ulong, ClientData> GetClientsData() => _clientList;
 
-        public IReadOnlyList<ulong> GetClientsIds()
-        {
-            return network.ConnectedClientsIds;
-        }
+        public IReadOnlyList<ulong> GetClientsIds() => _network.ConnectedClientsIds;
 
         public int CountClients()
         {
-            if (offline_mode)
+            if (_offlineMode)
                 return 1;
+
             if (IsServer && IsConnected())
-                return network.ConnectedClientsIds.Count;
+                return _network.ConnectedClientsIds.Count;
+
             return 0;
         }
 
-        public LobbyGame GetLobbyGame()
-        {
-            return current_game;
-        }
+        public LobbyGame GetLobbyGame() => _currentGame;
 
-        public ConnectionData GetConnectionData()
-        {
-            return connection;
-        }
+        public ConnectionData GetConnectionData() => _connection;
 
-        public bool HasAuthority(NetworkObject obj)
-        {
-            return IsServer || ClientID == obj.OwnerClientId;
-        }
+        public bool HasAuthority(NetworkObject obj) =>
+            IsServer || ClientID == obj.OwnerClientId;
 
         public bool IsGameScene()
         {
-            return !changing_scene && NetworkGame.Get() != null; //NetworkGame shouldnt be in menus, just in the game scenes
+            return
+                !_changingScene &&
+                NetworkGame.Get() != null; // NetworkGame shouldn't be in menus, just in the game scenes
         }
 
-        public bool IsChangingScene()
-        {
-            return changing_scene;
-        }
+        public bool IsChangingScene() => _changingScene;
 
-        public bool IsConnecting()
-        {
-            return IsActive() && !IsConnected(); //Trying to connect but not yet
-        }
+        //Trying to connect but not yet
+        public bool IsConnecting() =>
+            IsActive() && !IsConnected();
 
-        public bool IsConnected()
-        {
-            return offline_mode || network.IsServer || network.IsConnectedClient;
-        }
+        public bool IsConnected() =>
+            _offlineMode || _network.IsServer || _network.IsConnectedClient;
 
-        public bool IsActive()
-        {
-            return offline_mode || network.IsServer || network.IsClient;
-        }
+        public bool IsActive() =>
+            _offlineMode || _network.IsServer || _network.IsClient;
 
-        public bool IsReady()
-        {
-            return local_state == ClientState.Ready && IsConnected();
-        }
+        public bool IsReady() =>
+            _localState == ClientState.Ready && IsConnected();
 
         public string Address
         {
-            get { return transport.ConnectionData.Address; }
-            set { transport.ConnectionData.Address = value; }
+            get => _transport.ConnectionData.Address;
+            set => _transport.ConnectionData.Address = value;
         }
 
         public ushort Port
         {
-            get { return transport.ConnectionData.Port; }
-            set { transport.ConnectionData.Port = value; }
+            get => _transport.ConnectionData.Port;
+            set => _transport.ConnectionData.Port = value;
         }
 
-        public ulong ClientID { get { return offline_mode ? ServerID : network.LocalClientId; } } //ID of this client (if host, will be same than ServerID), changes for every reconnection, assigned by Netcode
-        public ulong ServerID { get { return NetworkManager.ServerClientId; } } //ID of the server
+        //ID of this client (if host, will be same than ServerID), changes for every reconnection, assigned by Netcode
+        public ulong ClientID => _offlineMode ? ServerID : _network.LocalClientId;
 
-        public int PlayerID { get { return player_id; } }         //Player ID is specific to this game only and stays the same for this user when reconnecting (unlike clientID), assigned by NetcodePlus
-        public string UserID { get { return auth.UserID; } }      //User ID is linked to authentication and not related to a specific game, assigned by the Authenticator
-        public string Username { get { return auth.Username; } }  //Display name of the player
+        public ulong ServerID => NetworkManager.ServerClientId; //ID of the server
 
-        public bool IsServer { get { return offline_mode || network.IsServer; } }
-        public bool IsClient { get { return offline_mode || network.IsClient; } }
-        public bool IsHost { get { return IsClient && IsServer; } }     //Host is both a client and server
-        public bool IsOnline { get { return !offline_mode && IsActive(); } }
+        //Player ID is specific to this game only and stays the same for this user when reconnecting (unlike clientID), assigned by NetcodePlus
+        public int PlayerID => _playerID;
 
-        public ClientState State { get { return local_state; } }
-        public ServerType ServerType { get { return server_type; } }
+        //User ID is linked to authentication and not related to a specific game, assigned by the Authenticator
+        public string UserID => _auth.UserID;
 
-        public NetworkTime LocalTime { get { return network.LocalTime; } }
-        public NetworkTime ServerTime { get { return network.ServerTime; } }
-        public float DeltaTick { get { return 1f / network.NetworkTickSystem.TickRate; } }
+        public string Username => _auth.Username; //Display name of the player
 
-        public NetworkManager NetworkManager { get { return network; } }
-        public UnityTransport Transport { get { return transport; } }
-        public NetworkMessaging Messaging { get { return messaging; } }
-        public Authenticator Auth { get { return auth; } }
-        public NetworkSpawner Spawner { get { return NetworkGame.Get().Spawner; } }
+        public bool IsServer => _offlineMode || _network.IsServer;
 
-        public static string ListenAll { get { return listen_all; } }
-        public static int MsgSizeMax { get { return msg_size; } }
+        public bool IsClient => _offlineMode || _network.IsClient;
+
+        public bool IsHost => IsClient && IsServer; //Host is both a client and server
+
+        public bool IsOnline => !_offlineMode && IsActive();
+
+        public ClientState State => _localState;
+
+        public ServerType ServerType => _serverType;
+
+        public NetworkTime LocalTime => _network.LocalTime;
+
+        public NetworkTime ServerTime => _network.ServerTime;
+
+        public float DeltaTick => 1f / _network.NetworkTickSystem.TickRate;
+
+        public NetworkManager NetworkManager => _network;
+
+        public UnityTransport Transport => _transport;
+
+        public NetworkMessaging Messaging => _messaging;
+
+        public Authenticator Auth => _auth;
+
+        public NetworkSpawner Spawner => NetworkGame.Get().Spawner;
+
+        public static string ListenAll => _listenAll;
+
+        public static int MsgSizeMax => _msgSize;
+
         public static int MsgSize => MsgSizeMax; //Old name
 
         public static TheNetwork Get()
         {
-            if (instance == null)
-            {
-                TheNetwork net = FindObjectOfType<TheNetwork>();
-                net?.Init();
-            }
-            return instance;
+            if (_instance != null)
+                return _instance;
+
+            TheNetwork net = FindObjectOfType<TheNetwork>();
+            net?.Init();
+
+            return _instance;
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class ConnectionData : INetworkSerializable
     {
-        public string user_id = "";
-        public string username = "";
-        public bool is_host = false; //Client created the game? (Could be true for client that created the game on dedicated server)
+        public string _userID = "";
+        public string _username = "";
 
-        public byte[] extra = new byte[0];
+        //Client created the game? (Could be true for client that created the game on dedicated server)
+        public bool _isHost;
+
+        public byte[] _extra = Array.Empty<byte>();
 
         //If you add extra data, make sure the total size of ConnectionData doesn't exceed Netcode max unfragmented msg (1400 bytes)
         //Fragmented msg are not possible for connection data, since connection is done in a single request
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref user_id);
-            serializer.SerializeValue(ref username);
-            serializer.SerializeValue(ref is_host);
-            serializer.SerializeValue(ref extra);
+            serializer.SerializeValue(ref _userID);
+            serializer.SerializeValue(ref _username);
+            serializer.SerializeValue(ref _isHost);
+            serializer.SerializeValue(ref _extra);
         }
     }
 
@@ -1149,36 +1190,33 @@ namespace NetcodePlus
 
     public enum ClientState
     {
-        Offline = 0,    //Not connected
+        Offline = 0, //Not connected
         Connecting = 5, //Waiting to change scene or receive world data
-        Ready = 10,       //Everything is loaded and spawned
+        Ready = 10, //Everything is loaded and spawned
     }
 
     public class ClientData
     {
-        public ulong client_id;
-        public int player_id;
-        public string user_id;
-        public string username;
-        public bool is_host;        //Doesn't necessarily mean its the server host, just that its the one that created the game
-        public bool data_received;  //Data was received from this user
+        public ulong ClientID;
+        public int PlayerID;
+        public string UserID;
+        public string Username;
+        public bool IsHost; //Doesn't necessarily mean its the server host, just that its the one that created the game
+        public bool DataReceived; //Data was received from this user
         public ClientState state = ClientState.Offline;
-        public byte[] extra = new byte[0];
+        public byte[] extra = Array.Empty<byte>();
 
-        public ClientData() { }
-        public ClientData(ulong client_id)
+        public ClientData()
         {
-            this.client_id = client_id;
         }
 
-        public string GetExtraString()
-        {
-            return NetworkTool.DeserializeString(extra);
-        }
+        public ClientData(ulong clientID) =>
+            ClientID = clientID;
 
-        public T GetExtraData<T>() where T : INetworkSerializable, new()
-        {
-            return NetworkTool.NetDeserialize<T>(extra);
-        }
+        public string GetExtraString() =>
+            NetworkTool.DeserializeString(extra);
+
+        public T GetExtraData<T>() where T : INetworkSerializable, new() =>
+            NetworkTool.NetDeserialize<T>(extra);
     }
 }

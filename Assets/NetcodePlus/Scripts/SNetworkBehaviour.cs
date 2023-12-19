@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Unity.Netcode;
-using UnityEngine.Events;
 
 namespace NetcodePlus
 {
@@ -12,19 +10,20 @@ namespace NetcodePlus
 
     public abstract class SNetworkBehaviour : MonoBehaviour
     {
-        private SNetworkObject nobj;        //If your script inherits from SNetworkBehaviour, it should have a SNetworkObject component on it
-        private ushort behaviour_id;        //ID of the behaviour
-        private byte[] extra = new byte[0];     //Extra data transfered from server to client when spawned
+        private SNetworkObject _sNetworkObject;        //If your script inherits from SNetworkBehaviour, it should have a SNetworkObject component on it
+        private ushort _behaviourID;        //ID of the behaviour
+        private byte[] _extra = Array.Empty<byte>();     //Extra data transfered from server to client when spawned
 
         protected virtual void Awake()
         {
-            nobj = GetComponentInParent<SNetworkObject>();
-            if (nobj != null)
+            _sNetworkObject = GetComponentInParent<SNetworkObject>();
+            
+            if (_sNetworkObject != null)
             {
-                nobj.onReady += OnReady;
-                nobj.onBeforeSpawn += OnBeforeSpawn;
-                nobj.onSpawn += OnSpawn;
-                nobj.onDespawn += OnDespawn;
+                _sNetworkObject.onReady += OnReady;
+                _sNetworkObject.onBeforeSpawn += OnBeforeSpawn;
+                _sNetworkObject.onSpawn += OnSpawn;
+                _sNetworkObject.onDespawn += OnDespawn;
             }
             else
             {
@@ -52,124 +51,101 @@ namespace NetcodePlus
             //Function will run before despawned
         }
 
-        public void SetBehaviourId(ushort id)
-        {
-            behaviour_id = id;
-        }
+        public void SetBehaviourId(ushort id) =>
+            _behaviourID = id;
 
-        public void SetSpawnData(byte[] data)
-        {
-            extra = data;
-        }
+        public void SetSpawnData(byte[] data) =>
+            _extra = data;
 
-        public byte[] GetSpawnData()
-        {
-            return extra;
-        }
+        public byte[] GetSpawnData() => _extra;
 
-        public void SetSpawnData(int data)
-        {
-            extra = NetworkTool.SerializeInt32(data);
-        }
+        public void SetSpawnData(int data) =>
+            _extra = NetworkTool.SerializeInt32(data);
 
-        public int GetSpawnDataInt32()
-        {
-            return NetworkTool.DeserializeInt32(extra);
-        }
+        public int GetSpawnDataInt32() =>
+            NetworkTool.DeserializeInt32(_extra);
 
-        public void SetSpawnData(ulong data)
-        {
-            extra = NetworkTool.SerializeUInt64(data);
-        }
+        public void SetSpawnData(ulong data) =>
+            _extra = NetworkTool.SerializeUInt64(data);
 
-        public ulong GetSpawnDataUInt64()
-        {
-            return NetworkTool.DeserializeUInt64(extra);
-        }
+        public ulong GetSpawnDataUInt64() =>
+            NetworkTool.DeserializeUInt64(_extra);
 
-        public void SetSpawnData(string data)
-        {
-            extra = NetworkTool.SerializeString(data);
-        }
+        public void SetSpawnData(string data) =>
+            _extra = NetworkTool.SerializeString(data);
 
-        public string GetSpawnDataString()
-        {
-            return NetworkTool.DeserializeString(extra);
-        }
+        public string GetSpawnDataString() =>
+            NetworkTool.DeserializeString(_extra);
 
         //Extra data transfered from server to client when spawned
-        public void SetSpawnData<T>(T data) where T : INetworkSerializable, new()
-        {
-            extra = NetworkTool.NetSerialize(data);
-        }
+        public void SetSpawnData<T>(T data) where T : INetworkSerializable, new() =>
+            _extra = NetworkTool.NetSerialize(data);
 
-        public T GetSpawnData<T>() where T : INetworkSerializable, new()
-        {
-            return NetworkTool.NetDeserialize<T>(extra);
-        }
+        public T GetSpawnData<T>() where T : INetworkSerializable, new() =>
+            NetworkTool.NetDeserialize<T>(_extra);
 
-        public T Get<T>() where T : SNetworkBehaviour
-        {
-            if (this is T)
-                return (T)this;
-            return null;
-        }
+        public T Get<T>() where T : SNetworkBehaviour =>
+            this as T;
 
-        public SNetworkObject NetObject { get { return nobj; } }
+        public SNetworkObject NetObject => _sNetworkObject;
 
-        public ulong NetworkId { get { return nobj != null ? nobj.NetworkId : 0; } }
-        public ulong OwnerId { get { return nobj != null ? nobj.OwnerId : 0; } }
-        public ushort BehaviourId { get { return behaviour_id; } }
+        public ulong NetworkId => _sNetworkObject != null ? _sNetworkObject.NetworkId : 0;
+        public ulong OwnerId => _sNetworkObject != null ? _sNetworkObject.OwnerId : 0;
+        public ushort BehaviourId => _behaviourID;
 
-        public bool IsServer { get { return nobj != null ? nobj.IsServer : false; } }
-        public bool IsClient { get { return nobj != null ? nobj.IsClient : false; } }
-        public bool IsOwner { get { return nobj != null ? nobj.IsOwner : false; } }
+        public bool IsServer => _sNetworkObject != null && _sNetworkObject.IsServer;
+        public bool IsClient => _sNetworkObject != null && _sNetworkObject.IsClient;
+        public bool IsOwner => _sNetworkObject != null && _sNetworkObject.IsOwner;
 
-        public bool IsSpawned { get { return nobj != null ? nobj.IsSpawned : false; } }
-        public bool IsReady { get { return nobj != null ? nobj.IsReady : false; } }
+        public bool IsSpawned => _sNetworkObject != null && _sNetworkObject.IsSpawned;
+        public bool IsReady => _sNetworkObject != null && _sNetworkObject.IsReady;
     }
 
-    [System.Serializable]
+    [Serializable]
     public struct SNetworkBehaviourRef : INetworkSerializable
     {
-        public ulong net_id;
-        public ushort behaviour_id;
+        public ulong _netID;
+        public ushort _behaviourID;
 
         public SNetworkBehaviourRef(SNetworkBehaviour behaviour)
         {
             if (behaviour != null)
             {
-                net_id = behaviour.NetworkId;
-                behaviour_id = behaviour.BehaviourId;
+                _netID = behaviour.NetworkId;
+                _behaviourID = behaviour.BehaviourId;
             }
             else
             {
-                net_id = 0;
-                behaviour_id = 0;
+                _netID = 0;
+                _behaviourID = 0;
             }
         }
 
         public SNetworkBehaviour Get()
         {
-            if (net_id == 0)
+            if (_netID == 0)
                 return null;
-            return NetworkSpawner.Get().GetSpawnedBehaviour(net_id, behaviour_id);
+            
+            return NetworkSpawner.Get().GetSpawnedBehaviour(_netID, _behaviourID);
         }
 
         public T Get<T>() where T : SNetworkBehaviour
         {
-            if (net_id == 0)
+            if (_netID == 0)
                 return null;
-            SNetworkBehaviour sb = NetworkSpawner.Get().GetSpawnedBehaviour(net_id, behaviour_id);
-            if (sb is T)
-                return (T)sb;
+            
+            SNetworkBehaviour sb = NetworkSpawner.Get().GetSpawnedBehaviour(_netID, _behaviourID);
+            
+            if (sb is T sNetworkBehaviour)
+                return sNetworkBehaviour;
+            
             return null;
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref net_id);
-            serializer.SerializeValue(ref behaviour_id);
+            serializer.SerializeValue(ref _netID);
+            serializer.SerializeValue(ref _behaviourID);
         }
     }
 }

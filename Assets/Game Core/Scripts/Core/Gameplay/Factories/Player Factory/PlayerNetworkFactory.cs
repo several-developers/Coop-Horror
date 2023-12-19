@@ -19,7 +19,8 @@ namespace GameCore.Gameplay.Factories.Player
         {
             PlayerEntity playerPrefab = _playerConfig.PlayerPrefab;
             PlayerEntity playerInstance = Object.Instantiate(playerPrefab, at, Quaternion.identity);
-            NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
+            //NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
+            NetworkObject playerNetworkObject = null;
 
             playerInstance.Setup();
             playerNetworkObject.Spawn();

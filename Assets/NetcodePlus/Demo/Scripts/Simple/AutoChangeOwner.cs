@@ -1,49 +1,46 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace NetcodePlus.Demo
 {
     public class AutoChangeOwner : SNetworkBehaviour
     {
-        public float refresh_rate = 0.2f;
+        // MEMBERS: -------------------------------------------------------------------------------
 
-        private float owner_timer = 0f;
+        public float _refreshRate = 0.2f;
 
-        protected override void Awake()
-        {
-            base.Awake();
+        // FIELDS: --------------------------------------------------------------------------------
 
-        }
+        private float _ownerTimer = 0f;
 
-        protected void Update()
-        {
-            UpdateServer();
-        }
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        protected void Update() => UpdateServer();
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void UpdateServer()
         {
             if (!IsServer)
                 return;
 
-            owner_timer += Time.fixedDeltaTime;
-            if (owner_timer > refresh_rate)
-            {
-                owner_timer = 0f;
+            _ownerTimer += Time.fixedDeltaTime;
+            
+            if (_ownerTimer <= _refreshRate)
+                return;
 
-                //Change owner to nearest player, for smoother pushing
-                SNetworkPlayer player = SNetworkPlayer.GetNearest(transform.position, 5f);
-                if (player != null)
-                {
-                    ClientData client = TheNetwork.Get().GetClientByPlayerID(player.PlayerID);
-                    if (client != null && client.client_id != NetObject.OwnerId)
-                    {
-                        NetObject.ChangeOwner(client.client_id);
-                    }
-                }
-            }
+            _ownerTimer = 0f;
+
+            //Change owner to nearest player, for smoother pushing
+            SNetworkPlayer player = SNetworkPlayer.GetNearest(transform.position, 5f);
+
+            if (player == null)
+                return;
+            
+            ClientData client = TheNetwork.Get().GetClientByPlayerID(player.PlayerID);
+            bool changeOwner = client != null && client.ClientID != NetObject.OwnerId; 
+            
+            if (changeOwner)
+                NetObject.ChangeOwner(client.ClientID);
         }
-
     }
 }

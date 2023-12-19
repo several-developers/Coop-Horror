@@ -16,25 +16,26 @@ namespace NetcodePlus.Demo
             base.Awake();
             Application.targetFrameRate = 60;
 
-            if (!TheNetwork.Get().IsActive())
-            {
-                //Start in test mode, when running directly from Unity Scene
-                Authenticator.Get().LoginTest("Player"); //May not work with more advanced auth system, works in Test mode
-                DemoConnectData cdata = new DemoConnectData(GameMode.Tank);
-                TheNetwork.Get().SetConnectionExtraData(cdata);
-                TheNetwork.Get().StartHost(NetworkData.Get().game_port);
-            }
+            if (TheNetwork.Get().IsActive())
+                return;
+            
+            //Start in test mode, when running directly from Unity Scene
+            Authenticator.Get().LoginTest("Player"); //May not work with more advanced auth system, works in Test mode
+            DemoConnectData cdata = new DemoConnectData(GameMode.Tank);
+            TheNetwork.Get().SetConnectionExtraData(cdata);
+            TheNetwork.Get().StartHost(NetworkData.Get().game_port);
         }
 
-        void Start()
+        private void Start()
         {
             //Shuffle PlayerSpawn ids
             if (TheNetwork.Get().IsServer)
             {
                 List<PlayerSpawn> spawns = PlayerSpawn.GetAll();
                 ListTool.Shuffle(spawns);
+                
                 for (int i = 0; i < spawns.Count; i++)
-                    spawns[i].player_id = i;
+                    spawns[i].SetPlayerID(i);
             }
 
             BlackPanel.Get().Show(true);
@@ -47,7 +48,7 @@ namespace NetcodePlus.Demo
             BlackPanel.Get().Hide();
         }
 
-        protected override void OnClientReady(ulong client_id)
+        protected override void OnClientReady(ulong clientID)
         {
             foreach (Tower tower in Tower.GetAll())
                 tower.Refresh();

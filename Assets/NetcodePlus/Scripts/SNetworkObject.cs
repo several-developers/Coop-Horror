@@ -1,9 +1,10 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Unity.Netcode;
-using UnityEngine.Events;
 using Unity.Collections;
+using Unity.Netcode;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace NetcodePlus
 {
@@ -14,42 +15,46 @@ namespace NetcodePlus
 
     public class SNetworkObject : MonoBehaviour
     {
-        public AutoSpawnType auto_spawn;        //Object will be spawned automatically when client is Ready
-        public ulong network_id = 0;            //ID to access the instantiated object, this id should match on all clients/server
-        public ulong prefab_id = 0;             //ID to access the prefab of this object, this id should match on all clients/server
-        public bool is_scene;                   //Object was placed in the scene and not instantiated, this means it already exists on both client and server
+        public AutoSpawnType _autoSpawn;        //Object will be spawned automatically when client is Ready
+        public ulong _networkID;                //ID to access the instantiated object, this id should match on all clients/server
+        public ulong _prefabID;                 //ID to access the prefab of this object, this id should match on all clients/server
+        public bool _isScene;                   //Object was placed in the scene and not instantiated, this means it already exists on both client and server
 
         public UnityAction onReady;             //Called after connection was fully established (and all data loaded)
         public UnityAction onBeforeSpawn;       //Called before the object is spawned (on the server only)
         public UnityAction onSpawn;             //Called when this object is spawned (means that the syncing with clients starts)
         public UnityAction onDespawn;           //Called when this object is despawned (means that the syncing with clients stop)
 
-        private ulong owner = 0;                //Owner of this object, 0 is usually the server
-        private bool is_ready = false;          //If the object is ready (connection was extablished and OnReady was called)
-        private bool is_spawned = false;        //If the object is spawned or not (spawn means it has been sent to clients for syncing)
-        private bool is_destroying = false;     //Object is being destroyed, prevent spawning
+        // FIELDS: --------------------------------------------------------------------------------
+        
+        private ulong _owner;                   //Owner of this object, 0 is usually the server
+        private bool _isReady;                  //If the object is ready (connection was extablished and OnReady was called)
+        private bool _isSpawned;                //If the object is spawned or not (spawn means it has been sent to clients for syncing)
+        private bool _isDestroying;             //Object is being destroyed, prevent spawning
 
-        private SNetworkOptimizer optimizer;    //Can be null, will automatically spawn/despawn this object based on distance to players
-        private SNetworkBehaviour[] behaviours; //List of behaviours
-        private bool registered = false;        //Prevent registering twice
+        private SNetworkOptimizer _optimizer;   //Can be null, will automatically spawn/despawn this object based on distance to players
+        private SNetworkBehaviour[] _behaviours;//List of behaviours
+        private bool _registered;               //Prevent registering twice
 
-        private static List<SNetworkObject> net_objects = new List<SNetworkObject>();
+        private static readonly List<SNetworkObject> NetObjects = new();
 
-        public static bool editor_auto_gen_id = true; //Set to off to turn off auto id generation
+        public static bool EditorAutoGenID = true; //Set to off to turn off auto id generation
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         protected virtual void Awake()
         {
-            net_objects.Add(this);
-            optimizer = GetComponent<SNetworkOptimizer>();
-            behaviours = GetComponentsInChildren<SNetworkBehaviour>();
+            NetObjects.Add(item: this);
+            _optimizer = GetComponent<SNetworkOptimizer>();
+            _behaviours = GetComponentsInChildren<SNetworkBehaviour>();
 
             //Set behaviours id
-            for (ushort i = 0; i < behaviours.Length; i++)
-                behaviours[i].SetBehaviourId(i);
+            for (ushort i = 0; i < _behaviours.Length; i++)
+                _behaviours[i].SetBehaviourId(i);
 
-            if (!is_scene)
+            if (!_isScene)
                 GenerateID(); //Generate ID for newly created objects
-            if(network_id == 0)
+            if(_networkID == 0)
                 Debug.Log("Network ID is 0 " + gameObject.name);
         }
 
@@ -61,110 +66,103 @@ namespace NetcodePlus
 
         public virtual void OnDestroy()
         {
-            is_destroying = true;
-            net_objects.Remove(this);
+            _isDestroying = true;
+            NetObjects.Remove(this);
         }
 
-        private void OnValidate()
-        {
-            if (editor_auto_gen_id)
-                GenerateEditorID();
-        }
-
-        public void GenerateID()
-        {
-            network_id = NetworkTool.GenerateRandomUInt64();
-        }
+        // PUBLIC METHODS: ------------------------------------------------------------------------
         
+        public void GenerateID() =>
+            _networkID = NetworkTool.GenerateRandomUInt64();
+
         public void GenerateEditorID()
         {
 #if UNITY_EDITOR
-            if (UnityEditor.EditorApplication.isPlaying || UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+            if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
                 return; //Ignore in play mode
 
-            UnityEditor.GlobalObjectId gobjid = UnityEditor.GlobalObjectId.GetGlobalObjectIdSlow(this);
+            GlobalObjectId gobjid = GlobalObjectId.GetGlobalObjectIdSlow(this);
             if (gobjid.targetObjectId == 0 || gobjid.assetGUID.Empty())
                 return; //Invalid id, ignore for now
 
-            ulong prev_nid = network_id;
-            ulong prev_pid = prefab_id;
-            bool pscene = is_scene;
+            ulong prevNid = _networkID;
+            ulong prevPid = _prefabID;
+            bool pscene = _isScene;
 
-            string string_id = gobjid.ToString();
-            ulong id = NetworkTool.Hash64(string_id);
-            network_id = id;
-            prefab_id = id;
-            is_scene = (gameObject.scene.rootCount > 0);
+            string stringID = gobjid.ToString();
+            ulong id = NetworkTool.Hash64(stringID);
+            _networkID = id;
+            _prefabID = id;
+            _isScene = (gameObject.scene.rootCount > 0);
 
-            if (is_scene)
+            if (_isScene)
             {
-                prefab_id = 0;
-                GameObject prefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromOriginalSource(gameObject);
+                _prefabID = 0;
+                GameObject prefab = PrefabUtility.GetCorrespondingObjectFromOriginalSource(gameObject);
                 SNetworkObject nprefab = prefab != null ? prefab.GetComponent<SNetworkObject>() : null;
+                
                 if (nprefab != null)
-                    prefab_id = nprefab.prefab_id;
+                    _prefabID = nprefab._prefabID;
             }
 
-            if (prefab_id != prev_pid || network_id != prev_nid || is_scene != pscene)
-                UnityEditor.EditorUtility.SetDirty(this);
+            if (_prefabID != prevPid || _networkID != prevNid || _isScene != pscene)
+                EditorUtility.SetDirty(this);
 #endif
         }
 
-        public virtual void Spawn()
-        {
+        public virtual void Spawn() =>
             Spawn(TheNetwork.Get().ServerID);
-        }
 
         public virtual void Spawn(ulong owner)
         {
-            if (is_destroying)
+            if (_isDestroying)
                 return; //Object already being destroyed
 
-            if (network_id == 0 && IsServer)
+            if (_networkID == 0 && IsServer)
                 GenerateID();
 
-            if (IsServer && !IsSpawned)
-            {
-                //Debug.Log("Spawn " +gameObject.name);
-                this.owner = owner;
-                is_spawned = true;
-                onBeforeSpawn?.Invoke();
-                NetworkSpawner.Get().Spawn(this);
-                onSpawn?.Invoke();
-            }
+            if (!IsServer || IsSpawned)
+                return;
+            
+            //Debug.Log("Spawn " +gameObject.name);
+            _owner = owner;
+            _isSpawned = true;
+            onBeforeSpawn?.Invoke();
+            NetworkSpawner.Get().Spawn(this);
+            onSpawn?.Invoke();
         }
 
         public virtual void Despawn(bool destroy = false)
         {
-            if (is_destroying)
+            if (_isDestroying)
                 return; //Object being destroyed
 
-            if (IsServer && IsSpawned)
-            {
-                //Debug.Log("Despawn " + gameObject.name);
-                is_spawned = false;
-                is_destroying = destroy;
-                NetworkSpawner.Get().Despawn(this, destroy);
-                onDespawn?.Invoke();
+            if (!IsServer || !IsSpawned)
+                return;
+            
+            //Debug.Log("Despawn " + gameObject.name);
+            _isSpawned = false;
+            _isDestroying = destroy;
+            NetworkSpawner.Get().Despawn(this, destroy);
+            onDespawn?.Invoke();
 
-                if (destroy)
-                    GameObject.Destroy(gameObject);
-            }
+            if (destroy)
+                Destroy(gameObject);
         }
 
         public virtual void DestroyUnspawned()
         {
-            if (!IsSpawned && !is_destroying)
-            {
-                is_destroying = true;
-                NetworkSpawner.Get().DestroyScene(this);
-                GameObject.Destroy(gameObject);
-            }
+            if (IsSpawned || _isDestroying)
+                return;
+            
+            _isDestroying = true;
+            NetworkSpawner.Get().DestroyScene(this);
+            Destroy(gameObject);
         }
 
         public virtual void Destroy()
         {
-            if (is_destroying)
+            if (_isDestroying)
                 return; //Object already being destroyed
 
             if (IsServer && IsSpawned)
@@ -187,10 +185,10 @@ namespace NetcodePlus
         {
             if (IsServer)
             {
-                if (!IsSceneObject && auto_spawn == AutoSpawnType.SceneOnly)
+                if (!IsSceneObject && _autoSpawn == AutoSpawnType.SceneOnly)
                     return;
 
-                if (auto_spawn == AutoSpawnType.Never)
+                if (_autoSpawn == AutoSpawnType.Never)
                     return;
 
                 if (IsActive())
@@ -205,13 +203,13 @@ namespace NetcodePlus
 
         public void SpawnLocal(ulong owner, byte[] extra)
         {
-			if (is_destroying)
+			if (_isDestroying)
                 return; //Object being destroyed
 			
-            if (!is_spawned)
+            if (!_isSpawned)
             {
-                is_spawned = true;
-                this.owner = owner;
+                _isSpawned = true;
+                this._owner = owner;
                 ReadBehaviorSpawnData(extra);
                 SetActive(true);
                 onSpawn?.Invoke();
@@ -220,50 +218,44 @@ namespace NetcodePlus
 
         public void DespawnLocal(bool destroy = false)
         {
-			if (is_destroying)
+			if (_isDestroying)
                 return; //Object being destroyed
 			
-            if (is_spawned)
+            if (_isSpawned)
             {
-                is_spawned = false;
+                _isSpawned = false;
                 SetActive(false);
                 onDespawn?.Invoke();
             }
 			
-			is_destroying = destroy;
+			_isDestroying = destroy;
 			if (destroy)
-                GameObject.Destroy(gameObject);
+                Destroy(gameObject);
         }
 
         public void ChangeOwner(ulong owner)
         {
-            if (IsSpawned && this.owner != owner)
+            if (IsSpawned && this._owner != owner)
             {
-                this.owner = owner;
+                this._owner = owner;
                 NetworkSpawner.Get().ChangeOwner(this);
             }
         }
-
-        private void SetActive(bool active)
-        {
-            if (!IsServer && optimizer != null)
-                optimizer.SetActive(active);
-        }
-
+        
         public void RegisterScene()
         {
-            if (is_scene && !registered)
+            if (_isScene && !_registered)
             {
-                registered = true;
+                _registered = true;
                 NetworkGame.Get().Spawner.RegisterSceneObject(this);
             }
         }
 
         public void TriggerReady()
         {
-            if (!is_ready && TheNetwork.Get().IsReady())
+            if (!_isReady && TheNetwork.Get().IsReady())
             {
-                is_ready = true;
+                _isReady = true;
                 onReady?.Invoke();
                 AutoSpawnOrDestroy();
             }
@@ -273,7 +265,7 @@ namespace NetcodePlus
         {
             //Check if any behavior have spawn data
             List<SNetworkBehaviour> beha_list = new List<SNetworkBehaviour>();
-            foreach (SNetworkBehaviour beha in behaviours)
+            foreach (SNetworkBehaviour beha in _behaviours)
             {
                 if (beha.GetSpawnData().Length > 0)
                     beha_list.Add(beha);
@@ -313,15 +305,15 @@ namespace NetcodePlus
                 byte[] beha_extra = new byte[byte_length];
                 reader.ReadBytesSafe(ref beha_extra, byte_length);
 
-                if (beha_id >= 0 && beha_id < behaviours.Length)
-                    behaviours[beha_id].SetSpawnData(beha_extra);
+                if (beha_id >= 0 && beha_id < _behaviours.Length)
+                    _behaviours[beha_id].SetSpawnData(beha_extra);
             }
             reader.Dispose();
         }
 
         public SNetworkBehaviour GetBehaviour(ushort id)
         {
-            foreach (SNetworkBehaviour beha in behaviours)
+            foreach (SNetworkBehaviour beha in _behaviours)
             {
                 if (beha.BehaviourId == id)
                     return beha;
@@ -340,8 +332,8 @@ namespace NetcodePlus
 
         public float GetActiveRange()
         {
-            if (optimizer != null)
-                return optimizer.active_range;
+            if (_optimizer != null)
+                return _optimizer.active_range;
             return 99999f;
         }
 
@@ -354,28 +346,41 @@ namespace NetcodePlus
 
         public bool IsActive()
         {
-            if(optimizer != null)
-                return optimizer.IsActive() && gameObject.activeSelf;
+            if(_optimizer != null)
+                return _optimizer.IsActive() && gameObject.activeSelf;
             return gameObject.activeSelf;
         }
 
-        public ulong NetworkId { get { return network_id; } }
-        public ulong PrefabId { get { return prefab_id; } }
-        public ulong OwnerId { get { return owner; } }
-
-        public bool IsServer { get { return TheNetwork.Get().IsServer; } }
-        public bool IsClient { get { return TheNetwork.Get().IsClient; } }
-        public bool IsOwner { get { return TheNetwork.Get().ClientID == owner; } }
-
-        public bool IsSpawned { get { return is_spawned; } }
-        public bool IsReady { get { return is_ready; } }
-        public bool IsSceneObject { get { return is_scene; } }
-        public bool IsDestroyed { get { return is_destroying; } }
-
-        public static List<SNetworkObject> GetAll()
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+        
+        private void SetActive(bool active)
         {
-            return net_objects;
+            if (!IsServer && _optimizer != null)
+                _optimizer.SetActive(active);
         }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        
+        private void OnValidate()
+        {
+            if (EditorAutoGenID)
+                GenerateEditorID();
+        }
+
+        public ulong NetworkId => _networkID;
+        public ulong PrefabId => _prefabID;
+        public ulong OwnerId => _owner;
+
+        public bool IsServer => TheNetwork.Get().IsServer;
+        public bool IsClient => TheNetwork.Get().IsClient;
+        public bool IsOwner => TheNetwork.Get().ClientID == _owner;
+
+        public bool IsSpawned => _isSpawned;
+        public bool IsReady => _isReady;
+        public bool IsSceneObject => _isScene;
+        public bool IsDestroyed => _isDestroying;
+
+        public static List<SNetworkObject> GetAll() => NetObjects;
 
         public static void GenerateAllInScene()
         {
@@ -387,10 +392,10 @@ namespace NetcodePlus
         public static void GenerateAll(SNetworkObject[] objs)
         {
 #if UNITY_EDITOR
-            editor_auto_gen_id = false;
+            EditorAutoGenID = false;
             foreach (SNetworkObject nobj in objs)
                 nobj.GenerateEditorID();
-            editor_auto_gen_id = true;
+            EditorAutoGenID = true;
 #endif
         }
 
@@ -412,28 +417,19 @@ namespace NetcodePlus
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public struct SNetworkObjectRef : INetworkSerializable
     {
-        public ulong net_id;
+        public ulong _netID;
 
-        public SNetworkObjectRef(SNetworkObject behaviour)
-        {
-            if (behaviour != null)
-                net_id = behaviour.NetworkId;
-            else
-                net_id = 0;
-        }
+        public SNetworkObjectRef(SNetworkObject behaviour) =>
+            _netID = behaviour != null ? behaviour.NetworkId : 0;
 
-        public SNetworkObject Get()
-        {
-            return NetworkSpawner.Get().GetSpawnedObject(net_id);
-        }
+        public SNetworkObject Get() =>
+            NetworkSpawner.Get().GetSpawnedObject(_netID);
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref net_id);
-        }
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter =>
+            serializer.SerializeValue(ref _netID);
     }
 
     public enum AutoSpawnType

@@ -100,9 +100,9 @@ namespace NetcodePlus.Demo
                 if (explorer != null)
                 {
                     ClientData client = TheNetwork.Get().GetClientByPlayerID(explorer.PlayerID);
-                    if (client != null && client.client_id != NetObject.OwnerId)
+                    if (client != null && client.ClientID != NetObject.OwnerId)
                     {
-                        NetObject.ChangeOwner(client.client_id);
+                        NetObject.ChangeOwner(client.ClientID);
                     }
                 }
             }

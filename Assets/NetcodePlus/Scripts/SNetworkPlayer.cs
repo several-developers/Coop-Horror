@@ -31,7 +31,7 @@ namespace NetcodePlus
         protected override void OnBeforeSpawn()
         {
             ClientData client = TheNetwork.Get().GetClient(OwnerId);
-            SetSpawnData(client.player_id); //Send player ID with the spawn
+            SetSpawnData(client.PlayerID); //Send player ID with the spawn
         }
 
         protected override void OnSpawn()

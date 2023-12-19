@@ -43,7 +43,7 @@ namespace NetcodePlus.Demo
         {
             //Assign Tower ID
             PlayerSpawn nearest = PlayerSpawn.GetNearest(transform.position);
-            player_id = nearest.player_id;
+            player_id = nearest.PlayerID;
 
             TowerRefreshData sdata = new TowerRefreshData();
             sdata.player_id = player_id;
