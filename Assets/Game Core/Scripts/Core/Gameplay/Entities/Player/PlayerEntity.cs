@@ -1,11 +1,12 @@
 ﻿using System;
 using GameCore.Utilities;
+using NetcodePlus;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player
 {
-    public class PlayerEntity : MonoBehaviour, IPlayerEntity
+    public class PlayerEntity : SNetworkPlayer, IPlayerEntity
     {
         // MEMBERS: -------------------------------------------------------------------------------
 

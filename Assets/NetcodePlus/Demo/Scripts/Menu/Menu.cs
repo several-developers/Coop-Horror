@@ -108,20 +108,20 @@ namespace NetcodePlus.Demo
         public void CreateGame(string user, GameMode mode, string character)
         {
             GameModeData mdata = GameModeData.Get(mode);
-            if (SceneNav.DoSceneExist(mdata._scene))
+            if (SceneNav.DoSceneExist(mdata.Scene))
             {
-                DemoConnectData cdata = new DemoConnectData(mode);
-                cdata.Character = character;
+                DemoConnectData cdata = new(mode);
+                cdata.SetCharacter(character);
                 TheNetwork.Get().SetConnectionExtraData(cdata);
                 SaveUser(user);
-                CreateTask(user, mdata._scene);
+                CreateTask(user, mdata.Scene);
             }
         }
 
         public void JoinGame(string user, string host, string character)
         {
-            DemoConnectData cdata = new DemoConnectData();
-            cdata.Character = character;
+            DemoConnectData cdata = new();
+            cdata.SetCharacter(character);
             TheNetwork.Get().SetConnectionExtraData(cdata);
             SaveUser(user);
             JoinTask(user, host);

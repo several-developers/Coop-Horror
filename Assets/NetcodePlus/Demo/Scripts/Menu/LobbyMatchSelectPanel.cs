@@ -24,7 +24,7 @@ namespace NetcodePlus.Demo
             ClientLobby.Get().SetConnectionExtraData(ddata);
             
             //Use Game Mode as group so that players of different game mode dont get matched
-            ClientLobby.Get().StartMatchmaking(mode.ToString(), mdata._scene, mdata._playersMax);
+            ClientLobby.Get().StartMatchmaking(mode.ToString(), mdata.Scene, mdata.PlayersMax);
             LobbyMatchmakingPanel.Get().Show();
             Hide();
         }

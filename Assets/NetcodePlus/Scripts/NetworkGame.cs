@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Collections;
 
 namespace NetcodePlus
 {
@@ -12,24 +10,24 @@ namespace NetcodePlus
 
     public class NetworkGame : MonoBehaviour
     {
-        private NetworkSpawner spawner;
-        private NetworkChat chat;
-        private float update_timer = 0f;
-        private float status_timer = 0f;
-        private float total_timer = 0f;
-        private bool keep_valid = false;
+        private NetworkSpawner _spawner;
+        private NetworkChat _chat;
+        private float _updateTimer = 0f;
+        private float _statusTimer = 0f;
+        private float _totalTimer = 0f;
+        private bool _keepValid = false;
 
-        private const float spawn_refresh_rate = 0.5f; //In seconds, interval at which SNetworkObjects are spawned/despawned
-        private const float status_refresh_rate = 10f; //Every 10 seconds, send refresh to lobby to keep the game listed
-        private const float wait_time_min = 30f; //Minimum wait time before it can self-shutdown
+        private const float _spawnRefreshRate = 0.5f; //In seconds, interval at which SNetworkObjects are spawned/despawned
+        private const float _statusRefreshRate = 10f; //Every 10 seconds, send refresh to lobby to keep the game listed
+        private const float _waitTimeMin = 30f; //Minimum wait time before it can self-shutdown
 
-        private static NetworkGame instance;
+        private static NetworkGame _instance;
 
         private void Awake()
         {
-            instance = this;
-            spawner = new NetworkSpawner();
-            chat = new NetworkChat();
+            _instance = this;
+            _spawner = new NetworkSpawner();
+            _chat = new NetworkChat();
         }
 
         private void Start()
@@ -41,7 +39,7 @@ namespace NetcodePlus
             Messaging.ListenMsg("despawn", ReceiveDespawnList);
             Messaging.ListenMsg("change_owner", ReceiveChangeList);
             InitLobbyKeep();
-            chat.Init();
+            _chat.Init();
         }
 
         private void OnDestroy()
@@ -54,7 +52,7 @@ namespace NetcodePlus
             Messaging?.UnListenMsg("change_owner");
             SNetworkActions.ClearAll();
             SNetworkVariableBase.ClearAll();
-            chat.Clear();
+            _chat.Clear();
         }
 
         private void Update()
@@ -67,7 +65,7 @@ namespace NetcodePlus
         {
             if (IsServer && IsReady)
             {
-                spawner.TickUpdate();
+                _spawner.TickUpdate();
             }
 
             if (IsReady)
@@ -91,7 +89,7 @@ namespace NetcodePlus
                 if (player != null)
                     client.SetClientID(player.client_id);
 
-                keep_valid = player != null || IsServer;
+                _keepValid = player != null || IsServer;
             }
         }
 
@@ -102,11 +100,11 @@ namespace NetcodePlus
                 return;
 
             //Slow update
-            update_timer += Time.deltaTime;
-            if (update_timer < spawn_refresh_rate)
+            _updateTimer += Time.deltaTime;
+            if (_updateTimer < _spawnRefreshRate)
                 return;
 
-            update_timer = 0f;
+            _updateTimer = 0f;
 
             //Optimization Loop
             List<SNetworkOptimizer> objs = SNetworkOptimizer.GetAll();
@@ -126,12 +124,12 @@ namespace NetcodePlus
         private void UpdateStatus()
         {
             //Slow update
-            total_timer += Time.deltaTime;
-            status_timer += Time.deltaTime;
-            if (status_timer < status_refresh_rate)
+            _totalTimer += Time.deltaTime;
+            _statusTimer += Time.deltaTime;
+            if (_statusTimer < _statusRefreshRate)
                 return;
 
-            status_timer = 0f;
+            _statusTimer = 0f;
 
             KeepAliveLobby();
             KeepAliveLobbyList();
@@ -141,7 +139,7 @@ namespace NetcodePlus
         //Send a keep alive to the lobby, to keep the current game listed on the lobby (otherwise it will get deleted if inactivity)
         private async void KeepAliveLobby()
         {
-            if (!keep_valid || IsServer)
+            if (!_keepValid || IsServer)
                 return; //Client only
 
             WebClient client = WebClient.Get();
@@ -155,7 +153,7 @@ namespace NetcodePlus
         //Servers sends a bit more info (like list of connected players)
         private async void KeepAliveLobbyList()
         {
-            if (!keep_valid || !IsServer)
+            if (!_keepValid || !IsServer)
                 return; //Server only
 
             WebClient web = WebClient.Get();
@@ -189,7 +187,7 @@ namespace NetcodePlus
             if (IsServer && game != null && game.type == ServerType.DedicatedServer && !game.permanent)
             {
                 int connected = TheNetwork.Get().CountClients();
-                bool can_shutdown = total_timer > wait_time_min;
+                bool can_shutdown = _totalTimer > _waitTimeMin;
                 if (can_shutdown && connected == 0)
                 {
                     Application.Quit();
@@ -231,7 +229,7 @@ namespace NetcodePlus
                 reader.ReadNetworkSerializable(out NetSpawnList list);
                 foreach (NetSpawnData data in list.data)
                 {
-                    spawner.SpawnClient(data);
+                    _spawner.SpawnClient(data);
                 }
             }
         }
@@ -244,7 +242,7 @@ namespace NetcodePlus
                 reader.ReadNetworkSerializable(out NetDespawnList list);
                 foreach (NetDespawnData data in list.data)
                 {
-                    spawner.DespawnClient(data.network_id, data.destroy);
+                    _spawner.DespawnClient(data.network_id, data.destroy);
                 }
             }
         }
@@ -257,13 +255,13 @@ namespace NetcodePlus
                 reader.ReadNetworkSerializable(out NetChangeList list);
                 foreach (NetChangeData data in list.data)
                 {
-                    spawner.ChangeOwnerClient(data.network_id, data.owner);
+                    _spawner.ChangeOwnerClient(data.network_id, data.owner);
                 }
             }
         }
 
-        public NetworkSpawner Spawner { get { return spawner; } }
-        public NetworkChat Chat { get { return chat; } }
+        public NetworkSpawner Spawner { get { return _spawner; } }
+        public NetworkChat Chat { get { return _chat; } }
         public NetworkMessaging Messaging { get { return TheNetwork.Get().Messaging; } }
 
         public bool IsOnline { get { return TheNetwork.Get().IsOnline; } }
@@ -273,9 +271,9 @@ namespace NetcodePlus
 
         public static NetworkGame Get()
         {
-            if (instance == null)
-                instance = FindObjectOfType<NetworkGame>();
-            return instance;
+            if (_instance == null)
+                _instance = FindObjectOfType<NetworkGame>();
+            return _instance;
         }
     }
 }

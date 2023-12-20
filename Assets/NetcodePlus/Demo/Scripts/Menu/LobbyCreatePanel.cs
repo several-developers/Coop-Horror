@@ -56,7 +56,7 @@ namespace NetcodePlus.Demo
         {
             GameMode mode = (GameMode)mode_field.GetSelectedValue();
             GameModeData mdata = GameModeData.Get(mode);
-            string scene = mdata._scene;
+            string scene = mdata.Scene;
 
             if (!SceneNav.DoSceneExist(scene))
                 return; //Scene invalid

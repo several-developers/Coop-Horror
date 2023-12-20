@@ -296,8 +296,11 @@ namespace NetcodePlus.Demo
         
         private GameMode _mode = GameMode.None;
         private string _character = "";
-        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void SetCharacter(string character) =>
+            _character = character;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
