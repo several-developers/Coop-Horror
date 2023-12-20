@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79769c4833ee2c04f84167e0d3a43c23, type: 3}
   m_Name: Tank
   m_EditorClassIdentifier: 
-  mode: 20
-  scene: DemoTank
+  _mode: 20
+  _scene: DemoTank
+  _playersMax: 4

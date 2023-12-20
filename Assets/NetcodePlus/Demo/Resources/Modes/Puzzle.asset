@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79769c4833ee2c04f84167e0d3a43c23, type: 3}
   m_Name: Puzzle
   m_EditorClassIdentifier: 
-  mode: 30
-  scene: DemoPuzzle
+  _mode: 30
+  _scene: DemoPuzzle
+  _playersMax: 4

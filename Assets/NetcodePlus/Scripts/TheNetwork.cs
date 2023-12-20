@@ -154,10 +154,10 @@ namespace NetcodePlus
 
         private async void InitAuthentication()
         {
-            _auth = Authenticator.Create(data.auth_type);
+            _auth = Authenticator.Create(data._authType);
             await _auth.Initialize();
 
-            if (data.auth_auto_logout)
+            if (data._authAutoLogout)
                 _auth.Logout();
         }
 
@@ -442,7 +442,7 @@ namespace NetcodePlus
             //Clear previous data
             RemoveClient(client_id);
 
-            if (_clientList.Count >= NetworkData.Get().players_max)
+            if (_clientList.Count >= NetworkData.Get()._playersMax)
                 return false; //Maximum number of clients
 
             Debug.Log("Approve connection: " + connect._userID + " " + connect._username);
@@ -481,7 +481,7 @@ namespace NetcodePlus
 
         private void RegisterDefaultPrefabs()
         {
-            RegisterPrefab(NetworkData.Get().player_default);
+            RegisterPrefab(NetworkData.Get()._playerDefault);
         }
 
         public void RegisterPrefab(GameObject prefab)
@@ -589,7 +589,7 @@ namespace NetcodePlus
         {
             if (findPlayerPrefab != null)
                 return findPlayerPrefab.Invoke(player_id);
-            return NetworkData.Get().player_default;
+            return NetworkData.Get()._playerDefault;
         }
 
         private int FindPlayerID(ulong clientID)

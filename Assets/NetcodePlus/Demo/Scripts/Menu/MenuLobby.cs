@@ -49,7 +49,7 @@ namespace NetcodePlus.Demo
 
             GameMode mode = (GameMode)NetworkTool.DeserializeInt32(game.extra);
             DemoConnectData ddata = new DemoConnectData(mode);
-            ddata.character = LobbyConnectPanel.Get().GetCharacter();
+            ddata.Character = LobbyConnectPanel.Get().GetCharacter();
             ClientLobby.Get().SetConnectionExtraData(ddata);
 
             bool host = game.IsHost(ClientLobby.Get().ClientID);

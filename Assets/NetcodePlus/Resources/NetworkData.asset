@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96b0e7c39b760a64da9c3da0140c2a9d, type: 3}
   m_Name: NetworkData
   m_EditorClassIdentifier: 
-  game_port: 7500
-  players_max: 8
-  player_default: {fileID: 1493282799323710604, guid: 8399023e8719c6544a0db179d306e083,
+  _gamePort: 7500
+  _playersMax: 4
+  _playerDefault: {fileID: 1493282799323710604, guid: 8399023e8719c6544a0db179d306e083,
     type: 3}
-  lobby_host: 127.0.0.1
-  lobby_port: 7600
-  lobby_game_type: 20
-  lobby_rooms_max: 10
-  game_port_min: 7501
-  game_port_max: 7599
-  game_path_windows: ../ServerGame/NetcodePlus.exe
-  game_path_linux: /server/game/ServerGame.x86_64
-  game_hosts: []
-  auth_type: 0
-  auth_auto_logout: 0
+  _lobbyHost: 127.0.0.1
+  _lobbyPort: 7600
+  _lobbyGameType: 10
+  _lobbyRoomsMax: 10
+  _gamePortMin: 7501
+  _gamePortMax: 7599
+  _gamePathWindows: ../ServerGame/NetcodePlus.exe
+  _gamePathLinux: /server/game/ServerGame.x86_64
+  _gameHosts: []
+  _authType: 0
+  _authAutoLogout: 0

@@ -31,19 +31,19 @@ namespace NetcodePlus
         public ServerLobbyConfig(NetworkData ndata)
         {
             //Load default values
-            lobby_game_type = ndata.lobby_game_type;
+            lobby_game_type = ndata._lobbyGameType;
             lobby_enabled = true;
-            lobby_host = ndata.lobby_host;
-            lobby_port = ndata.lobby_port;
-            lobby_rooms_max = ndata.lobby_rooms_max;
+            lobby_host = ndata._lobbyHost;
+            lobby_port = ndata._lobbyPort;
+            lobby_rooms_max = ndata._lobbyRoomsMax;
             game_path = ndata.GetExePath();
-            game_port = ndata.game_port;
-            game_port_min = ndata.game_port_min;
-            game_port_max = ndata.game_port_max;
-            game_players_max = ndata.players_max;
+            game_port = ndata._gamePort;
+            game_port_min = ndata._gamePortMin;
+            game_port_max = ndata._gamePortMax;
+            game_players_max = ndata._playersMax;
             game_wait_save = true;
 
-            game_hosts = ndata.game_hosts;
+            game_hosts = ndata._gameHosts;
             if (game_hosts == null || game_hosts.Length == 0)
                 game_hosts = new string[1] { lobby_host };
 

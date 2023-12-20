@@ -44,7 +44,7 @@ namespace NetcodePlus.Demo
         void Start()
         {
             main_panel.Show();
-            port = NetworkData.Get().game_port;
+            port = NetworkData.Get()._gamePort;
             create_ip.text = "LAN IP: " + NetworkTool.GetLocalIp();
             last_menu = SceneManager.GetActiveScene().name;
 
@@ -108,20 +108,20 @@ namespace NetcodePlus.Demo
         public void CreateGame(string user, GameMode mode, string character)
         {
             GameModeData mdata = GameModeData.Get(mode);
-            if (SceneNav.DoSceneExist(mdata.scene))
+            if (SceneNav.DoSceneExist(mdata._scene))
             {
                 DemoConnectData cdata = new DemoConnectData(mode);
-                cdata.character = character;
+                cdata.Character = character;
                 TheNetwork.Get().SetConnectionExtraData(cdata);
                 SaveUser(user);
-                CreateTask(user, mdata.scene);
+                CreateTask(user, mdata._scene);
             }
         }
 
         public void JoinGame(string user, string host, string character)
         {
             DemoConnectData cdata = new DemoConnectData();
-            cdata.character = character;
+            cdata.Character = character;
             TheNetwork.Get().SetConnectionExtraData(cdata);
             SaveUser(user);
             JoinTask(user, host);

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,23 +14,40 @@ namespace NetcodePlus.Demo
     [CreateAssetMenu(fileName = "GameMode", menuName = "Data/GameMode", order = 10)]
     public class GameModeData : ScriptableObject
     {
-        public GameMode mode;
-        public string scene;
-        public int players_max = 4;
+        // MEMBERS: -------------------------------------------------------------------------------
+        
+        [SerializeField]
+        private GameMode _mode;
+        
+        [SerializeField]
+        private string _scene;
+        
+        [SerializeField]
+        private int _playersMax = 4;
 
-        private static List<GameModeData> modes = new List<GameModeData>();
+        // PROPERTIES: ----------------------------------------------------------------------------
 
+        public GameMode Mode => _mode;
+        public string Scene => _scene;
+        public int PlayersMax => _playersMax;
+
+        // FIELDS: --------------------------------------------------------------------------------
+        
+        private static readonly List<GameModeData> Modes = new();
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
         public static void Load(string folder = "/")
         {
-            modes.Clear();
-            modes.AddRange(Resources.LoadAll<GameModeData>(folder));
+            Modes.Clear();
+            Modes.AddRange(collection: Resources.LoadAll<GameModeData>(folder));
         }
 
         public static GameModeData GetByScene(string scene)
         {
-            foreach (GameModeData choice in modes)
+            foreach (GameModeData choice in Modes)
             {
-                if (choice.scene == scene)
+                if (choice._scene == scene)
                     return choice;
             }
             return null;
@@ -39,17 +55,18 @@ namespace NetcodePlus.Demo
 
         public static GameModeData Get(GameMode mode)
         {
-            foreach (GameModeData choice in modes)
+            foreach (GameModeData gameModeData in Modes)
             {
-                if (choice.mode == mode)
-                    return choice;
+                if (gameModeData._mode == mode)
+                    return gameModeData;
             }
+            
             return null;
         }
 
         public static List<GameModeData> GetAll()
         {
-            return modes;
+            return Modes;
         }
     }
 }

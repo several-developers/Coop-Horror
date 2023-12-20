@@ -23,7 +23,7 @@ namespace NetcodePlus.Demo
                 Authenticator.Get().LoginTest("Player"); //May not work with more advanced auth system, works in Test mode
                 DemoConnectData cdata = new DemoConnectData(GameMode.Puzzle);
                 TheNetwork.Get().SetConnectionExtraData(cdata);
-                TheNetwork.Get().StartHost(NetworkData.Get().game_port);
+                TheNetwork.Get().StartHost(NetworkData.Get()._gamePort);
             }
         }
 

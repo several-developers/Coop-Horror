@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace NetcodePlus
@@ -11,43 +10,49 @@ namespace NetcodePlus
     [CreateAssetMenu(fileName = "NetworkData", menuName = "Netcode/NetworkData", order = 0)]
     public class NetworkData : ScriptableObject
     {
+        // MEMBERS: -------------------------------------------------------------------------------
+        
         [Header("Game Server")]
-        public ushort game_port = 7700;         //Port used by Netcode for game server (default)
-        public int players_max = 8;             //Maximum number of players in each game
-        public GameObject player_default;       //Default player prefab
+        public ushort _gamePort = 7700;         //Port used by Netcode for game server (default)
+        public int _playersMax = 4;             //Maximum number of players in each game
+        public GameObject _playerDefault;       //Default player prefab
         
         [Header("Lobby Server")]
-        public string lobby_host = "127.0.0.1";  //Default url (or IP) where the lobby is located
-        public ushort lobby_port = 7800;        //Port used by Netcode for Lobby Server
-        public ServerType lobby_game_type = ServerType.DedicatedServer; //Which type of game server will the lobby create ?  The lobby itself is always dedicated.
-        public int lobby_rooms_max = 10;                                   //Maximum number of rooms in lobby
+        public string _lobbyHost = "127.0.0.1";  //Default url (or IP) where the lobby is located
+        public ushort _lobbyPort = 7800;        //Port used by Netcode for Lobby Server
+        public ServerType _lobbyGameType = ServerType.DedicatedServer; //Which type of game server will the lobby create ?  The lobby itself is always dedicated.
+        public int _lobbyRoomsMax = 10;                                   //Maximum number of rooms in lobby
 
         [Header("Server Launcher")]            //For lobby in dedicated server mode only
-        public ushort game_port_min = 7700;     //If game server is created by lobby, port will be selected in this range (first game server is 7700, second is 7701...)
-        public ushort game_port_max = 7799;     //If game server is created by lobby, port will be selected in this range (first game server is 7700, second is 7701...)
-        public string game_path_windows = "../ServerGame/Survival Engine Online.exe"; //Absolute path, unless it starts with ./ or .. , then Relative to Application.dataPath
-        public string game_path_linux = "/server/game/ServerGame.x86_64"; //Absolute path, unless it starts with ./ or .. , then Relative to Application.dataPath
-        public string[] game_hosts;             //Url of available game servers, if this is empty, it will use the same as lobby_url instead
+        public ushort _gamePortMin = 7700;     //If game server is created by lobby, port will be selected in this range (first game server is 7700, second is 7701...)
+        public ushort _gamePortMax = 7799;     //If game server is created by lobby, port will be selected in this range (first game server is 7700, second is 7701...)
+        public string _gamePathWindows = "../ServerGame/Survival Engine Online.exe"; //Absolute path, unless it starts with ./ or .. , then Relative to Application.dataPath
+        public string _gamePathLinux = "/server/game/ServerGame.x86_64"; //Absolute path, unless it starts with ./ or .. , then Relative to Application.dataPath
+        public string[] _gameHosts;             //Url of available game servers, if this is empty, it will use the same as lobby_url instead
 
         [Header("Authentication")]
-        public AuthenticatorType auth_type = AuthenticatorType.Test; //Change this based on the platform you are building to
-        public bool auth_auto_logout = false;                       //If true, will auto-logout at start, useful to test different users on many windows of same PC 
+        public AuthenticatorType _authType = AuthenticatorType.Test; //Change this based on the platform you are building to
+        public bool _authAutoLogout;                       //If true, will auto-logout at start, useful to test different users on many windows of same PC 
 
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
         public string GetExePath()
         {
             string path = GetExePathSetting();
-            string fullpath = path;
+            string fullPath = path;
+            
             if (path.StartsWith(".."))
-                fullpath = System.IO.Path.Combine(Application.dataPath, path);
+                fullPath = Path.Combine(Application.dataPath, path);
             else if (path.StartsWith("./"))
-                fullpath = System.IO.Path.Combine(Application.dataPath, path.Remove(0, 1));
-            return fullpath;
+                fullPath = Path.Combine(Application.dataPath, path.Remove(0, 1));
+            
+            return fullPath;
         }
 
         public string GetExePathSetting()
         {
 #if UNITY_STANDALONE_WIN
-            return game_path_windows;
+            return _gamePathWindows;
 #elif UNITY_STANDALONE_LINUX
             return game_path_linux;
 #else
@@ -58,8 +63,10 @@ namespace NetcodePlus
         public static NetworkData Get()
         {
             TheNetwork net = TheNetwork.Get();
+            
             if (net != null && net.data)
                 return net.data;
+            
             return null;
         }
     }

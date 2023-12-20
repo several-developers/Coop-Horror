@@ -35,7 +35,7 @@ namespace NetcodePlus
 
         private void Start()
         {
-            Client.SetDefaultUrl(NetworkData.Get().lobby_host, NetworkData.Get().lobby_port);
+            Client.SetDefaultUrl(NetworkData.Get()._lobbyHost, NetworkData.Get()._lobbyPort);
         }
 
         void Update()
@@ -65,7 +65,7 @@ namespace NetcodePlus
 
         public async Task<bool> Connect()
         {
-            Debug.Log("Connect to Lobby: " + NetworkData.Get().lobby_host);
+            Debug.Log("Connect to Lobby: " + NetworkData.Get()._lobbyHost);
 
             LobbyPlayer player = new LobbyPlayer(UserID, Username);
             WebResponse res = await Client.Send("connect", player);
@@ -151,10 +151,10 @@ namespace NetcodePlus
             sdata.game_id = joined_game_id;
             sdata.join_code = "";
 
-            if (NetworkData.Get().lobby_game_type == ServerType.RelayServer)
+            if (NetworkData.Get()._lobbyGameType == ServerType.RelayServer)
             {
                 //Before starting the game, need to create it on the relay server to get the join_code
-                relay_data = await NetworkRelay.HostGame(NetworkData.Get().players_max);
+                relay_data = await NetworkRelay.HostGame(NetworkData.Get()._playersMax);
                 if (relay_data == null)
                     return; //Failed to create relay game
                 sdata.join_code = relay_data.join_code;
@@ -193,12 +193,12 @@ namespace NetcodePlus
         public void StartMatchmaking(string group)
         {
             //Scene will need to be defined by ServerMatchmaker with onMatchmaking
-            StartMatchmaking(group, "", NetworkData.Get().players_max);
+            StartMatchmaking(group, "", NetworkData.Get()._playersMax);
         }
         
         public void StartMatchmaking(string group, string scene)
         {
-            StartMatchmaking(group, scene, NetworkData.Get().players_max);
+            StartMatchmaking(group, scene, NetworkData.Get()._playersMax);
         }
 
         public void StartMatchmaking(string group, string scene, int nb_players)
@@ -327,7 +327,7 @@ namespace NetcodePlus
         public CreateGameData GetCreateData(string title, string filename, string scene)
         {
             CreateGameData cdata = new CreateGameData(title, filename, scene);
-            cdata.players_max = NetworkData.Get().players_max;
+            cdata.players_max = NetworkData.Get()._playersMax;
             cdata.hidden = false; //Game not hidden in lobby list
             return cdata;
         }

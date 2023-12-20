@@ -82,7 +82,7 @@ namespace NetcodePlus
                 return; //Not online
 
             WebClient client = WebClient.Get();
-            client?.SetDefaultUrl(NetworkData.Get().lobby_host, NetworkData.Get().lobby_port);
+            client?.SetDefaultUrl(NetworkData.Get()._lobbyHost, NetworkData.Get()._lobbyPort);
 
             LobbyGame game = TheNetwork.Get().GetLobbyGame(); //Make sure we are playing a lobby game
             if (client != null && game != null)

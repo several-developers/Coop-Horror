@@ -24,6 +24,12 @@ EditorBuildSettings:
     path: Assets/NetcodePlus/Demo/Scenes/DemoSimple.unity
     guid: 9581cb0e9630bc64492956e268b6abbe
   - enabled: 1
+    path: Assets/NetcodePlus/Demo/Scenes/DemoPuzzle.unity
+    guid: 11374a145c7740c478fec77ec17d7679
+  - enabled: 1
+    path: Assets/NetcodePlus/Demo/Scenes/DemoTank.unity
+    guid: fe81d954ca889b64a900a04abc084a58
+  - enabled: 1
     path: Assets/NetcodePlus/Demo/Scenes/ServerLobby.unity
     guid: 6850636c2775ea948b1fae8cfcc45e4a
   - enabled: 1
