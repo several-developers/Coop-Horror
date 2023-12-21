@@ -564,6 +564,18 @@ CharacterController:
   m_SkinWidth: 0.003
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4024203545241348872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4628898490251457778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 324c5cab76f6f6b43b18e0dafe4a6c5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &5174800490687240705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,6 +659,22 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 7668468218393881510}
+--- !u!114 &5233739658672396253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4628898490251457778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 443f570c4db857542985e140d264b155, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _autoSpawn: 0
+  _networkID: 15040735286311291151
+  _prefabID: 15040735286311291151
+  _isScene: 0
 --- !u!114 &5746002443945451132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -691,17 +719,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isGround: 0
-  _platformVelocity: {x: 0, y: 0, z: 0}
   _groundAngle: 0
+  _projectMoveOnGround: 0
   _moveInput: {x: 0, y: 0, z: 0}
   _moveVelocity: {x: 0, y: 0, z: 0}
-  _projectMoveOnGround: 0
-  slopeLimit: 45
-  inertiaDampingTime: 0.1
-  slopeStartForce: 3
-  slopeAcceleration: 3
-  inertiaVelocity: {x: 0, y: 0, z: 0}
-  platformAction: 0
+  _inertiaVelocity: {x: 0, y: 0, z: 0}
+  _platformAction: 0
+  _platformVelocity: {x: 0, y: 0, z: 0}
+  _slopeLimit: 45
+  _inertiaDampingTime: 0.1
+  _slopeStartForce: 3
+  _slopeAcceleration: 3
   _applyCollision: 1
   _pushForce: 55
   _playerMovementConfig: {fileID: 11400000, guid: e4b2ff4b8cc1e134f915cc7121a0a7da,

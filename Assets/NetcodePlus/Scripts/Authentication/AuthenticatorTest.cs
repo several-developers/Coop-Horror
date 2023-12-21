@@ -22,19 +22,19 @@ namespace NetcodePlus
 
         public override async Task<bool> Login()
         {
-            if (user_id == null)
-                user_id = NetworkTool.GenerateRandomID(12, 15);
-            username = user_id;
-            logged_in = true;
+            if (_userID == null)
+                _userID = NetworkTool.GenerateRandomID(12, 15);
+            _username = _userID;
+            _loggedIn = true;
             await Task.Yield(); //Do nothing
             return true;
         }
 
         public override async Task<bool> Login(string username)
         {
-            this.user_id = username;  //User username as ID for save file consistency when testing
-            this.username = username;
-            logged_in = true;
+            this._userID = username;  //User username as ID for save file consistency when testing
+            this._username = username;
+            _loggedIn = true;
             await Task.Yield(); //Do nothing
             return true;
         }

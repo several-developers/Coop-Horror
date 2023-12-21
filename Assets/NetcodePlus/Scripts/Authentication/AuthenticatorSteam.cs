@@ -48,9 +48,9 @@ namespace NetcodePlus
             try
             {
                 await AuthenticationService.Instance.SignInWithSteamAsync(session_ticket);
-                user_id = AuthenticationService.Instance.PlayerId;
-                if (username == null)
-                    username = user_id;
+                _userID = AuthenticationService.Instance.PlayerId;
+                if (_username == null)
+                    _username = _userID;
                 return true;
             }
             catch (AuthenticationException ex) { Debug.LogException(ex); }
@@ -67,7 +67,7 @@ namespace NetcodePlus
 
         public override string GetProviderId()
         {
-            return user_id; //Comment this line
+            return _userID; //Comment this line
             //SteamId sid = SteamClient.SteamId;
             //return sid.Value.ToString();
         }

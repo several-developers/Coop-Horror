@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 2295465685209393462, guid: 4482250353d7b7f48b56d0a27782215a,
         type: 3}
       propertyPath: m_text
-      value: Client
+      value: Join
       objectReference: {fileID: 0}
     - target: {fileID: 2295465685209393462, guid: 4482250353d7b7f48b56d0a27782215a,
         type: 3}
@@ -25,7 +25,7 @@ PrefabInstance:
     - target: {fileID: 2509737525535254366, guid: 4482250353d7b7f48b56d0a27782215a,
         type: 3}
       propertyPath: m_Name
-      value: Client (Button)
+      value: Join (Button)
       objectReference: {fileID: 0}
     - target: {fileID: 2509737525535254367, guid: 4482250353d7b7f48b56d0a27782215a,
         type: 3}

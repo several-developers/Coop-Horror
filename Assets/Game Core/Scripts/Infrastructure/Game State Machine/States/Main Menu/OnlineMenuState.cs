@@ -1,7 +1,5 @@
-﻿using GameCore.Gameplay;
-using GameCore.Gameplay.Factories;
+﻿using GameCore.Gameplay.Factories;
 using GameCore.UI.MainMenu.OnlineMenu;
-using Unity.Netcode;
 
 namespace GameCore.Infrastructure.StateMachine
 {
@@ -29,13 +27,13 @@ namespace GameCore.Infrastructure.StateMachine
             CreateOnlineMenu();
 
             _onlineMenuView.OnHostClickedEvent += OnHostClicked;
-            _onlineMenuView.OnClientClickedEvent += OnClientClicked;
+            _onlineMenuView.OnJoinClickedEvent += OnJoinClicked;
         }
 
         public void Exit()
         {
             _onlineMenuView.OnHostClickedEvent -= OnHostClicked;
-            _onlineMenuView.OnClientClickedEvent -= OnClientClicked;
+            _onlineMenuView.OnJoinClickedEvent -= OnJoinClicked;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -46,11 +44,13 @@ namespace GameCore.Infrastructure.StateMachine
         private void EnterCreateLobbyState() =>
             _gameStateMachine.ChangeState<CreateLobbyState>();
 
+        private void EnterJoinGameState() =>
+            _gameStateMachine.ChangeState<JoinGameState>();
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnHostClicked() => EnterCreateLobbyState();
 
-        private void OnClientClicked() =>
-            NetworkManager.Singleton.StartClient();
+        private void OnJoinClicked() => EnterJoinGameState();
     }
 }

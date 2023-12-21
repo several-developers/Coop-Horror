@@ -4,31 +4,26 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace GameCore.UI.MainMenu.OnlineMenu
+namespace GameCore.UI.MainMenu.ConnectingMenu
 {
-    public class OnlineMenuView : MenuView
+    public class ConnectingMenuView : MenuView
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private Button _hostButton;
-        
-        [SerializeField, Required]
-        private Button _joinButton;
+        private Button _quitButton;
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnHostClickedEvent;
-        public event Action OnJoinClickedEvent;
+        public event Action OnQuitClickedEvent;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
-            _hostButton.onClick.AddListener(OnHostClicked);
-            _joinButton.onClick.AddListener(OnJoinClicked);
-            
+            _quitButton.onClick.AddListener(OnQuitClicked);
+
             DestroyOnHide();
         }
 
@@ -36,15 +31,9 @@ namespace GameCore.UI.MainMenu.OnlineMenu
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnHostClicked()
+        private void OnQuitClicked()
         {
-            OnHostClickedEvent?.Invoke();
-            Hide();
-        }
-
-        private void OnJoinClicked()
-        {
-            OnJoinClickedEvent?.Invoke();
+            OnQuitClickedEvent?.Invoke();
             Hide();
         }
     }

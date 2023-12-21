@@ -238,10 +238,10 @@ namespace GameCore.Gameplay.Network
                 return networkData._playerDefault;
 
             //Specific color
-            PlayerChoiceData playerChoiceData = PlayerChoiceData.Get(gameData.mode, playerData.character);
-
-            if (playerChoiceData != null)
-                return playerChoiceData.prefab;
+            // PlayerChoiceData playerChoiceData = PlayerChoiceData.Get(gameData.mode, playerData.character);
+            //
+            // if (playerChoiceData != null)
+            //     return playerChoiceData.prefab;
 
             return networkData._playerDefault;
         }

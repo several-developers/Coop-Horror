@@ -30,10 +30,10 @@ namespace NetcodePlus
             try
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
-                user_id = AuthenticationService.Instance.PlayerId;
-                if (username == null)
-                    username = user_id;
-                Debug.Log("Unity Auth: " + user_id + " " + username);
+                _userID = AuthenticationService.Instance.PlayerId;
+                if (_username == null)
+                    _username = _userID;
+                Debug.Log("Unity Auth: " + _userID + " " + _username);
                 return true;
             }
             catch (AuthenticationException ex) { Debug.LogException(ex); }
@@ -43,7 +43,7 @@ namespace NetcodePlus
 
         public override async Task<bool> Login(string username)
         {
-            this.username = username;
+            this._username = username;
             return await Login();
         }
 
@@ -52,8 +52,8 @@ namespace NetcodePlus
             try
             {
                 AuthenticationService.Instance.SignOut(true);
-                user_id = null;
-                username = null;
+                _userID = null;
+                _username = null;
             }
             catch (System.Exception) { }
         }
@@ -80,12 +80,12 @@ namespace NetcodePlus
 
         public override string GetUsername()
         {
-            return username;
+            return _username;
         }
 
         public override string GetUserId()
         {
-            return user_id;
+            return _userID;
         }
     }
 }

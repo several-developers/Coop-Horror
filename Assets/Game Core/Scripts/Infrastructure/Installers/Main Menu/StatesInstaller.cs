@@ -13,6 +13,7 @@ namespace GameCore.Infrastructure.Installers.MainMenu
             BindOnlineMenuState();
             BindOfflineMenuState();
             BindCreateLobbyState();
+            BindJoinGameState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -45,6 +46,14 @@ namespace GameCore.Infrastructure.Installers.MainMenu
         {
             Container
                 .Bind<CreateLobbyState>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindJoinGameState()
+        {
+            Container
+                .Bind<JoinGameState>()
                 .AsSingle()
                 .NonLazy();
         }

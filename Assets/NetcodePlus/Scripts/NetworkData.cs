@@ -34,6 +34,17 @@ namespace NetcodePlus
         public AuthenticatorType _authType = AuthenticatorType.Test; //Change this based on the platform you are building to
         public bool _authAutoLogout;                       //If true, will auto-logout at start, useful to test different users on many windows of same PC 
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public ushort GamePort => _gamePort;
+        public int PlayersMax => _playersMax;
+        public GameObject PlayerDefault => _playerDefault;
+        
+        public string LobbyHost => _lobbyHost;
+        public ushort LobbyPort => _lobbyPort;
+        public ServerType LobbyGameType => _lobbyGameType;
+        public int LobbyRoomsMax => _lobbyRoomsMax;
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public string GetExePath()

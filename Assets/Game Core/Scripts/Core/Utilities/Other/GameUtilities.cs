@@ -18,6 +18,9 @@ namespace GameCore.Utilities
             };
         }
 
+        public static bool DoSceneExist(string scene) =>
+            Application.CanStreamedLevelBeLoaded(scene);
+
         // Get Mouse Position in World with Z = 0f
         public static Vector3 GetMouseWorldPosition()
         {

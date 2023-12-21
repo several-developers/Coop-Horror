@@ -20,7 +20,7 @@ namespace NetcodePlus.Demo
         void Start()
         {
             LobbyConnectPanel.Get().Show();
-			Menu.last_menu = SceneManager.GetActiveScene().name;
+			Menu.LastMenu = SceneManager.GetActiveScene().name;
         }
 
         public void HideAllPanels()

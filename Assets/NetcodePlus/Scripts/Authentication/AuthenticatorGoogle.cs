@@ -76,9 +76,9 @@ namespace NetcodePlus
                 if (token != null)
                 {
                     await AuthenticationService.Instance.SignInWithGoogleAsync(token);
-                    user_id = AuthenticationService.Instance.PlayerId;
-                    if (username == null)
-                        username = user_id;
+                    _userID = AuthenticationService.Instance.PlayerId;
+                    if (_username == null)
+                        _username = _userID;
                     return true;
                 }
             }

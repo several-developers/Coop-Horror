@@ -149,12 +149,12 @@ namespace GameCore.Gameplay.Entities.Player.Movement
                 _groundAngle = Vector3.Angle(Vector3.up, hit.normal);
                 GroundNormal = hit.normal;
 
-                if (hit.transform.CompareTag(Platform))
-                {
-                    _platformVelocity = hit.collider.attachedRigidbody == null | !_platformAction
-                        ? Vector3.zero
-                        : hit.collider.attachedRigidbody.velocity;
-                }
+                // if (hit.transform.CompareTag(Platform))
+                // {
+                //     _platformVelocity = hit.collider.attachedRigidbody == null | !_platformAction
+                //         ? Vector3.zero
+                //         : hit.collider.attachedRigidbody.velocity;
+                // }
 
                 if (Physics.BoxCast(transform.position,
                         new Vector3(CharacterController.radius / 2.5f, CharacterController.radius / 3f,

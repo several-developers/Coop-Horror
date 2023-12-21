@@ -1,10 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
-using NetcodePlus;
 using UnityEngine.SceneManagement;
 
 namespace NetcodePlus.Demo
@@ -29,36 +25,34 @@ namespace NetcodePlus.Demo
         public InputField join_host;
         public OptionSelector join_color;
 
-        private ushort port;
+        private ushort _port;
 
-        public static string username = null;
-        public static string last_menu = "Menu";
+        public static string Username;
+        public static string LastMenu = "Menu";
 
-        private static Menu instance;
+        private static Menu _instance;
 
         private void Awake()
         {
-            instance = this;
+            _instance = this;
         }
 
-        void Start()
+        private void Start()
         {
             main_panel.Show();
-            port = NetworkData.Get()._gamePort;
+            _port = NetworkData.Get()._gamePort;
             create_ip.text = "LAN IP: " + NetworkTool.GetLocalIp();
-            last_menu = SceneManager.GetActiveScene().name;
+            LastMenu = SceneManager.GetActiveScene().name;
 
             LoadUser();
         }
 
-        private void SaveUser(string user)
-        {
-            Menu.username = user;
-        }
+        private void SaveUser(string user) =>
+            Username = user;
 
         private void LoadUser()
         {
-            string name = Menu.username;
+            string name = Menu.Username;
             if (name == null && DemoData.Get() != null)
                 name = DemoData.Get().GetRandomName();
             if (name == null)
@@ -108,6 +102,7 @@ namespace NetcodePlus.Demo
         public void CreateGame(string user, GameMode mode, string character)
         {
             GameModeData mdata = GameModeData.Get(mode);
+            
             if (SceneNav.DoSceneExist(mdata.Scene))
             {
                 DemoConnectData cdata = new(mode);
@@ -133,7 +128,7 @@ namespace NetcodePlus.Demo
             BlackPanel.Get().Show();
             await Task.Yield(); //Wait a frame after the disconnect
             Authenticator.Get().LoginTest(user);
-            TheNetwork.Get().StartHost(port);
+            TheNetwork.Get().StartHost(_port);
             TheNetwork.Get().LoadScene(scene);
         }
 
@@ -143,7 +138,7 @@ namespace NetcodePlus.Demo
             ConnectingPanel.Get().Show();
             await Task.Yield(); //Wait a frame after the disconnect
             Authenticator.Get().LoginTest(user);
-            TheNetwork.Get().StartClient(host, port);
+            TheNetwork.Get().StartClient(host, _port);
         }
 
         public static void GoToSimpleMenu()
@@ -158,12 +153,12 @@ namespace NetcodePlus.Demo
 
         public static void GoToLastMenu()
         {
-            SceneManager.LoadScene(last_menu);
+            SceneManager.LoadScene(LastMenu);
         }
 
         public static Menu Get()
         {
-            return instance;
+            return _instance;
         }
     }
 }

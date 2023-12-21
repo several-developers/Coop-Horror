@@ -39,12 +39,12 @@ namespace NetcodePlus.Demo
 
         private void SaveUser()
         {
-            Menu.username = username_input.text;
+            Menu.Username = username_input.text;
         }
 
         private void LoadUser()
         {
-            string name = Menu.username;
+            string name = Menu.Username;
             if (name == null && DemoData.Get() != null)
                 name = DemoData.Get().GetRandomName();
             if (name == null)

@@ -2,10 +2,26 @@
 using GameCore.Utilities;
 using NetcodePlus;
 using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player
 {
+    [Serializable]
+    public struct PlayerState : INetworkSerializable
+    {
+        public ulong _timing; //Increased by 1 each frame
+        public Vector3 _position;
+        public Vector3 _move;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref _timing);
+            serializer.SerializeValue(ref _position);
+            serializer.SerializeValue(ref _move);
+        }
+    }
+    
     public class PlayerEntity : SNetworkPlayer, IPlayerEntity
     {
         // MEMBERS: -------------------------------------------------------------------------------
@@ -22,9 +38,11 @@ namespace GameCore.Gameplay.Entities.Player
 
         public event Action<Vector2> OnMovementVectorChangedEvent;
 
+        private PlayerState _playerState = new();
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
             var inputSystemListener = GetComponent<InputSystemListener>();
             inputSystemListener.OnMoveEvent += OnMove;

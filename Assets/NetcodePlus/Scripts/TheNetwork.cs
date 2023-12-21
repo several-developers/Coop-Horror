@@ -221,21 +221,22 @@ namespace NetcodePlus
 
         //If is_host is set to true, it means this player created the game on a dedicated server
         //so its still a client (not server) but is the one who selected game settings
-        public void StartClient(string server_url, ushort port, bool is_host = false)
+        public void StartClient(string serverURL, ushort port, bool isHost = false)
         {
             if (_localState != ClientState.Offline)
                 return;
+            
             if (!_auth.IsConnected())
                 return; //Not logged in
 
-            Debug.Log("Join Game: " + server_url);
+            Debug.Log("Join Game: " + serverURL);
             ResetValues();
             _serverType = ServerType.None; //Unknown, could be dedicated or peer2peer
             _connection._userID = _auth.UserID;
             _connection._username = _auth.Username;
-            _connection._isHost = is_host;
+            _connection._isHost = isHost;
 
-            string ip = NetworkTool.HostToIP(server_url);
+            string ip = NetworkTool.HostToIP(serverURL);
             _transport.SetConnectionData(ip, port);
             _network.NetworkConfig.ConnectionData = NetworkTool.NetSerialize(_connection);
 
@@ -354,9 +355,10 @@ namespace NetcodePlus
             _playerID = -1; //-1 means not a player
         }
 
-        private void OnHostConnect(ulong client_id)
+        private void OnHostConnect(ulong clientID)
         {
-            ClientData client = GetClient(client_id);
+            ClientData client = GetClient(clientID);
+            
             if (client == null)
                 return;
 
@@ -368,11 +370,11 @@ namespace NetcodePlus
             onConnect?.Invoke();
         }
 
-        private void OnClientConnect(ulong client_id)
+        private void OnClientConnect(ulong clientID)
         {
-            if (IsServer && client_id != ServerID)
+            if (IsServer && clientID != ServerID)
             {
-                ClientData client = GetClient(client_id);
+                ClientData client = GetClient(clientID);
                 if (client == null)
                     return;
 
@@ -382,7 +384,7 @@ namespace NetcodePlus
                 RequestWorldFrom(client);
 
                 //Trigger join
-                onClientJoin?.Invoke(client_id);
+                onClientJoin?.Invoke(clientID);
             }
 
             if (!IsServer)
@@ -391,14 +393,14 @@ namespace NetcodePlus
             }
         }
 
-        private void OnClientDisconnect(ulong client_id)
+        private void OnClientDisconnect(ulong clientID)
         {
-            Debug.Log("Disconnecting: " + client_id);
+            Debug.Log("Disconnecting: " + clientID);
             if (IsServer)
-                onClientQuit?.Invoke(client_id);
-            DespawnPlayer(client_id);
-            RemoveClient(client_id);
-            if (ClientID == client_id || client_id == ServerID)
+                onClientQuit?.Invoke(clientID);
+            DespawnPlayer(clientID);
+            RemoveClient(clientID);
+            if (ClientID == clientID || clientID == ServerID)
                 AfterDisconnected();
         }
 
@@ -737,7 +739,7 @@ namespace NetcodePlus
         }
 
         //Call from server only
-        public void LoadScene(string scene, bool forceReload = false)
+        public void LoadScene(string scene, bool forceReload = false, Action loadOfflineCallback = null)
         {
             bool reload = forceReload || scene != SceneManager.GetActiveScene().name;
             bool canLoadScene = IsServer && reload && !_changingScene;
@@ -749,6 +751,9 @@ namespace NetcodePlus
             {
                 OnBeforeChangeScene(ClientID, scene, LoadSceneMode.Single, null);
                 SceneManager.LoadScene(scene);
+                Debug.LogWarning("----------- BEFORE LOADING");
+                loadOfflineCallback?.Invoke();
+                Debug.LogWarning("----------- AFTER LOADING");
                 OnAfterChangeScene(ClientID, scene, LoadSceneMode.Single);
             }
             else

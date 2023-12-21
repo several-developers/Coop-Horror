@@ -1,5 +1,6 @@
 ﻿using System;
 using GameCore.Gameplay.Observers;
+using GameCore.Utilities;
 using UnityEngine;
 
 namespace GameCore.Infrastructure.StateMachine
@@ -29,7 +30,10 @@ namespace GameCore.Infrastructure.StateMachine
         public void ChangeState<T>() where T : IState
         {
             Type type = typeof(T);
-            Debug.Log($"New State: {type}");
+
+            string stateName = type.Name.GetNiceName();
+            string log = Log.HandleLog(tag: "Game State Machine", log: $"Enter ><cb>{stateName}</cb>");
+            Debug.Log(log);
             
             _stateMachine.ChangeState<T>();
             _gameStateMachineObserver.SendStateChanged();
