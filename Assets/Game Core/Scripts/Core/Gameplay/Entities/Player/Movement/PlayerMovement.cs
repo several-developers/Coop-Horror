@@ -55,8 +55,11 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         [SerializeField]
         private float _pushForce = 55f;
-        
+
         [Title(Constants.References)]
+        [SerializeField, Required]
+        private PlayerEntity _playerEntity;
+        
         [SerializeField, Required]
         private PlayerMovementConfigMeta _playerMovementConfig;
 

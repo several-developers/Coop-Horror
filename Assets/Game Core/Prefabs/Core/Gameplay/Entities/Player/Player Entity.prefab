@@ -672,8 +672,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _autoSpawn: 0
-  _networkID: 15040735286311291151
-  _prefabID: 15040735286311291151
+  _networkID: 0
+  _prefabID: 0
   _isScene: 0
 --- !u!114 &5746002443945451132
 MonoBehaviour:
@@ -732,6 +732,7 @@ MonoBehaviour:
   _slopeAcceleration: 3
   _applyCollision: 1
   _pushForce: 55
+  _playerEntity: {fileID: 5746002443945451132}
   _playerMovementConfig: {fileID: 11400000, guid: e4b2ff4b8cc1e134f915cc7121a0a7da,
     type: 2}
 --- !u!114 &8745325562456327625

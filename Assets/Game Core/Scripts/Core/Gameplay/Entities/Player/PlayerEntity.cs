@@ -53,6 +53,12 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void Start() => ChangeCursorLockState();
 
+        private void Update()
+        {
+            UpdateOwner();
+            UpdateNotOwner();
+        }
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Setup()
@@ -77,6 +83,20 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void UpdateOwner()
+        {
+            if (!IsOwner)
+                return;
+            
+            
+        }
+
+        private void UpdateNotOwner()
+        {
+            if (IsOwner)
+                return;
+        }
+        
         private static void ChangeCursorLockState() =>
             GameUtilities.ChangeCursorLockState();
 
