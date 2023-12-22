@@ -1,7 +1,7 @@
 ﻿using Unity.Netcode;
 using NetcodePlus.Demo;
 
-namespace GameCore.Gameplay.Network
+namespace GameCore.Gameplay.NetworkDepricated
 {
     [System.Serializable]
     public class HorrorConnectData : INetworkSerializable

@@ -1,15 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
-using GameCore.Enums;
-using GameCore.Gameplay;
+﻿using GameCore.Enums;
 using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Services.Global;
 using GameCore.UI.MainMenu.CreateLobbyMenu;
 using GameCore.UI.MainMenu.SaveSelectionMenu;
-using GameCore.Utilities;
-using NetcodePlus;
-using NetcodePlus.Demo;
-using Unity.Netcode;
-using UnityEngine;
 
 namespace GameCore.Infrastructure.StateMachine
 {
@@ -30,6 +24,7 @@ namespace GameCore.Infrastructure.StateMachine
         private readonly IScenesLoaderService _scenesLoaderService;
 
         private CreateLobbyMenuView _createLobbyMenuView;
+        private SaveSelectionMenuView _saveSelectionMenuView;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -49,44 +44,25 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateCreateLobbyMenu() =>
             _createLobbyMenuView = MenuFactory.Create<CreateLobbyMenuView>();
 
-        private void CreateGame()
+        private void CreateSaveSelectionMenuView() => 
+            _saveSelectionMenuView = MenuFactory.Create<SaveSelectionMenuView>();
+
+        private static void StartHost()
         {
-            //GameModeData gameModeData = GameModeData.Get(GameMode.Simple);
-            string character = "";
-            string username = "Player #" + Random.Range(0, 99999);
-            string scene = SceneName.Gameplay.ToString();
-            
-            DemoConnectData cdata = new(GameMode.Simple);
-            cdata.SetCharacter(character);
-            TheNetwork.Get().SetConnectionExtraData(cdata);
-            //SaveUser(user);
-            ConnectionTask(username, scene);
-        }
-        
-        private async void ConnectionTask(string username, string scene)
-        {
-            TheNetwork network = TheNetwork.Get();
-            ushort port = NetworkData.Get().GamePort;
-            
-            network.Disconnect();
-            
-            // Show black fade
-            
-            await UniTask.Yield(); //Wait a frame after the disconnect
-            
-            Authenticator.Get().LoginTest(username);
-            network.StartHost(port);
-            network.LoadScene(scene, loadOfflineCallback: LoadGameplayScene); // HERE MAYBE PROBLEM
+            TheNetworkHorror network = TheNetworkHorror.Get();
+            network.StartHost();
         }
 
         private void LoadGameplayScene() =>
             _scenesLoaderService.LoadSceneNetwork(SceneName.Gameplay);
 
-        private static void CreateSaveSelectionMenuView() =>
-           MenuFactory.Create<SaveSelectionMenuView>();
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnStartGameClicked() => CreateGame();
+        private void OnStartGameClicked()
+        {
+            StartHost();
+            LoadGameplayScene();
+            _saveSelectionMenuView.Hide();
+        }
     }
 }

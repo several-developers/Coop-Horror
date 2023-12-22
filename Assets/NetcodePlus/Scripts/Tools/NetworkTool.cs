@@ -72,7 +72,7 @@ namespace NetcodePlus
             }
         }
 
-        //Deserialize a INetworkSerializable from bytes
+        // Deserialize a INetworkSerializable from bytes
         public static T NetDeserialize<T>(byte[] bytes) where T : INetworkSerializable, new()
         {
             if (bytes == null || bytes.Length == 0)
@@ -126,6 +126,7 @@ namespace NetcodePlus
         {
             if (bytes != null)
                 return System.Text.Encoding.UTF8.GetString(bytes);
+            
             return null;
         }
 

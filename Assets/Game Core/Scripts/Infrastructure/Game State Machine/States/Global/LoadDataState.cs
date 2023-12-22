@@ -41,8 +41,10 @@ namespace GameCore.Infrastructure.StateMachine
             float musicVolume = _gameSettingsDataService.GetMusicVolume();
         }
 
+#if UNITY_EDITOR
         private void EnterGameSetupForEditorState() =>
             _gameStateMachine.ChangeState<GameSetupForEditorState>();
+#endif
 
         private void EnterLoadMainMenuState() =>
             _gameStateMachine.ChangeState<LoadMainMenuState>();

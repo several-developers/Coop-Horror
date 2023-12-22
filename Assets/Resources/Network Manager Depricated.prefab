@@ -10,10 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 8844102013162811520}
   - component: {fileID: 5939044999208608577}
-  - component: {fileID: -5501949434675126228}
-  - component: {fileID: 3365050788021433838}
+  - component: {fileID: 4917530702121802473}
+  - component: {fileID: 2272418059551173551}
+  - component: {fileID: 4359599504038546446}
   m_Layer: 0
-  m_Name: Network Manager
+  m_Name: Network Manager Depricated
   m_TagString: Untagged
   m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -48,7 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NetworkConfig:
     ProtocolVersion: 0
-    NetworkTransport: {fileID: -5501949434675126228}
+    NetworkTransport: {fileID: 4917530702121802473}
     PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists:
@@ -71,7 +72,7 @@ MonoBehaviour:
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
---- !u!114 &-5501949434675126228
+--- !u!114 &4917530702121802473
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -83,9 +84,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ProtocolType: 0
+  m_ProtocolType: 1
   m_MaxPacketQueueSize: 128
-  m_MaxPayloadSize: 6144
+  m_MaxPayloadSize: 1000000
   m_HeartbeatTimeoutMS: 500
   m_ConnectTimeoutMS: 1000
   m_MaxConnectAttempts: 60
@@ -98,7 +99,7 @@ MonoBehaviour:
     PacketDelayMS: 0
     PacketJitterMS: 0
     PacketDropRate: 0
---- !u!114 &3365050788021433838
+--- !u!114 &2272418059551173551
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -107,6 +108,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 563751841310132345}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 655211aaae2e427c8ba00a6fc3d60908, type: 3}
+  m_Script: {fileID: 11500000, guid: bbe5bb65445eda14794157ae42758a1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: e772747358da2e34d9398cc91ed6614c, type: 2}
+--- !u!114 &4359599504038546446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563751841310132345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ae054a595f942b0a5d3f7ba13516f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 3c0f51eb2ee0f59409be028cb0a5beb9, type: 2}

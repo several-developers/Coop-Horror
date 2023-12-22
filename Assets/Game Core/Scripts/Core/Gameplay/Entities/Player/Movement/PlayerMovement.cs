@@ -85,7 +85,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public Vector3 GetMoveDirection()
+        public void HandleMovement()
         {
             GroundCheck();
 
@@ -99,13 +99,11 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
             GravityUpdate();
 
-            Vector3 moveDirection = (_moveVelocity + _inertiaVelocity + _platformVelocity);
-            return moveDirection;
+            Vector3 moveDirection = _moveVelocity + _inertiaVelocity + _platformVelocity;
+            
+            CharacterController.Move(moveDirection * Time.deltaTime);
         }
-
-        public void Move(Vector3 direction) =>
-            CharacterController.Move(direction * Time.deltaTime);
-
+        
         public void SetMoveInput(Vector3 moveInput) =>
             _moveInput = moveInput;
 

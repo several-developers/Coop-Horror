@@ -417,9 +417,9 @@ namespace NetcodePlus
             res.Approved = approved;
         }
 
-        private bool ApproveClient(ulong client_id, ConnectionData connect)
+        private bool ApproveClient(ulong clientID, ConnectionData connect)
         {
-            if (client_id == ServerID)
+            if (clientID == ServerID)
                 return true; //Server always approve itself
 
             if (_offlineMode)
@@ -434,7 +434,7 @@ namespace NetcodePlus
             if (NetworkGame.Get() == null)
                 return false; //Dont accept connection if game scene not loaded yet
 
-            if (checkApproval != null && !checkApproval.Invoke(client_id, connect))
+            if (checkApproval != null && !checkApproval.Invoke(clientID, connect))
                 return false; //Custom approval condition
 
             ClientData client = GetClientByUserID(connect._userID);
@@ -442,17 +442,17 @@ namespace NetcodePlus
                 return false; //Client already connected with this user_id
 
             //Clear previous data
-            RemoveClient(client_id);
+            RemoveClient(clientID);
 
             if (_clientList.Count >= NetworkData.Get()._playersMax)
                 return false; //Maximum number of clients
 
             Debug.Log("Approve connection: " + connect._userID + " " + connect._username);
-            ClientData nclient = CreateClient(client_id, connect._userID, connect._username);
+            ClientData nclient = CreateClient(clientID, connect._userID, connect._username);
             nclient.IsHost = connect._isHost;
             nclient.extra = connect._extra;
 
-            onClientApproved?.Invoke(client_id, connect);
+            onClientApproved?.Invoke(clientID, connect);
             return true; //New Client approved
         }
 
@@ -488,20 +488,21 @@ namespace NetcodePlus
 
         public void RegisterPrefab(GameObject prefab)
         {
-            if (prefab != null)
+            if (prefab == null)
+                return;
+            
+            SNetworkObject sobject = prefab.GetComponent<SNetworkObject>();
+            if (sobject != null && !sobject._isScene && !_prefabList.ContainsKey(sobject._prefabID))
             {
-                SNetworkObject sobject = prefab.GetComponent<SNetworkObject>();
-                if (sobject != null && !sobject._isScene && !_prefabList.ContainsKey(sobject._prefabID))
-                {
-                    _prefabList[sobject._prefabID] = prefab;
-                }
-
-                NetworkObject nobject = prefab.GetComponent<NetworkObject>();
-                if (nobject != null)
-                {
-                    _network.PrefabHandler.AddHandler(prefab, new NetworkPrefabHandler(prefab));
-                }
+                _prefabList[sobject._prefabID] = prefab;
             }
+
+            NetworkObject nobject = prefab.GetComponent<NetworkObject>();
+
+            if (nobject == null)
+                return;
+            
+            _network.PrefabHandler.AddHandler(prefab, new NetworkPrefabHandler(prefab));
         }
 
         public void UnRegisterPrefab(GameObject prefab)

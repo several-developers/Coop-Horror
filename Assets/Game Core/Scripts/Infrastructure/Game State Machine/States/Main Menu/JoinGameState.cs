@@ -1,10 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.Factories;
+﻿using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Network;
 using GameCore.UI.MainMenu.ConnectingMenu;
-using GameCore.UI.MainMenu.OnlineMenu;
-using NetcodePlus;
-using NetcodePlus.Demo;
-using UnityEngine;
 
 namespace GameCore.Infrastructure.StateMachine
 {
@@ -27,55 +23,30 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Enter()
         {
-            ConnectingMenuView connectingMenuView = CreateConnectingMenu();
-            connectingMenuView.OnQuitClickedEvent += OnQuitConnecting;
+            // ConnectingMenuView connectingMenuView = CreateConnectingMenu();
+            // connectingMenuView.OnQuitClickedEvent += OnQuitConnecting;
+            //
+            // JoinGame();
 
-            JoinGame();
+            StartClient();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private static void StartClient()
+        {
+            TheNetworkHorror network = TheNetworkHorror.Get();
+            network.StartClient();
+        }
+
         private static ConnectingMenuView CreateConnectingMenu() =>
             MenuFactory.Create<ConnectingMenuView>();
-
-        private void JoinGame()
-        {
-            // 127.0.0.1
-            string user = "Player #" + Random.Range(0, 99999);
-            string character = "";
-            string host = "127.0.0.1";
-            
-            DemoConnectData cdata = new();
-            cdata.SetCharacter(character);
-            TheNetwork.Get().SetConnectionExtraData(cdata);
-            //SaveUser(user);
-            JoinTask(user, host);
-        }
-        
-        private async void JoinTask(string user, string host)
-        {
-            TheNetwork network = TheNetwork.Get();
-            ushort port = NetworkData.Get().GamePort;
-            
-            network.Disconnect();
-            //ConnectingPanel.Get().Show();
-
-            await UniTask.Yield(); //Wait a frame after the disconnect
-            
-            Authenticator.Get().LoginTest(user);
-            network.StartClient(host, port);
-        }
 
         private void EnterOnlineMenuState() =>
             _gameStateMachine.ChangeState<OnlineMenuState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
         
-        private void OnQuitConnecting()
-        {
-            TheNetwork.Get()?.Disconnect();
-            ClientLobby.Get()?.Disconnect();
-            EnterOnlineMenuState();
-        }
+        private void OnQuitConnecting() => EnterOnlineMenuState();
     }
 }

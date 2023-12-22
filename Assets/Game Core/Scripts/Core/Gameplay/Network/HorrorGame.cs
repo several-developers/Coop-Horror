@@ -1,28 +1,24 @@
-﻿using NetcodePlus;
-using NetcodePlus.Demo;
+﻿using UnityEngine;
 
 namespace GameCore.Gameplay.Network
 {
-    public class HorrorGame : SMonoBehaviour
+    public class HorrorGame : MonoBehaviour
     {
-        protected override void Awake()
-        {
-            base.Awake();
-            StartGame();
-        }
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void StartGame()
-        {
-            TheNetwork network = TheNetwork.Get();
+        private void Awake() => StartGame();
 
-            if (network.IsActive())
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private static void StartGame()
+        {
+            TheNetworkHorror network = TheNetworkHorror.Get();
+            bool isNetworkActive = network.IsActive();
+
+            if (isNetworkActive)
                 return;
 
-            //Start in test mode, when running directly from Unity Scene
-            Authenticator.Get().LoginTest("Player"); //May not work with more advanced auth system, works in Test mode
-            DemoConnectData cdata = new(GameMode.Simple);
-            network.SetConnectionExtraData(cdata);
-            network.StartHost(NetworkData.Get()._gamePort);
+            network.StartHost();
         }
     }
 }
