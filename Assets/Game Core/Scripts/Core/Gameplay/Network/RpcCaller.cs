@@ -16,6 +16,17 @@ namespace GameCore.Gameplay.Network
         private void Awake() =>
             _instance = this;
 
+        private void Start()
+        {
+            if (IsSpawned)
+                return;
+
+            if (!IsServer)
+                return;
+
+            NetworkObject.Spawn();
+        }
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void SendSetNetworkHorrorState(ulong clientID, ClientState state) =>

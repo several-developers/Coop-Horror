@@ -55,7 +55,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         public override void OnNetworkSpawn()
         {
-            PlayerCamera.Instance.SetTarget(transform);
+            if (IsOwner)
+                PlayerCamera.Instance.SetTarget(transform);
             
             base.OnNetworkSpawn();
         }

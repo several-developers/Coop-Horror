@@ -24,11 +24,33 @@ namespace GameCore.Gameplay.Network
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void SpawnPlayer()
-        {
-            
-        }
+        public void SpawnPlayer(ulong clientID) => SpawnPlayerServerRpc(clientID);
+
+        public void SpawnNetworkObject() =>
+            NetworkObject.Spawn();
+
+        public bool IsSpawnerReady() => IsSpawned;
 
         public static NetworkSpawner Get() => _instance;
+
+        [ServerRpc]
+        private void SpawnPlayerServerRpc(ulong clientID)
+        {
+            PlayerEntity playerInstance = Instantiate(_playerPrefab);
+            NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
+            playerNetworkObject.SpawnWithOwnership(clientID);
+
+            NetworkObjectReference playerNetworkObjectReference = new(playerNetworkObject);
+
+            SpawnPlayerClientRpc(playerNetworkObjectReference);
+        }
+
+        [ClientRpc]
+        private void SpawnPlayerClientRpc(NetworkObjectReference playerNetworkObjectReference)
+        {
+            //PlayerEntity playerInstance = Instantiate(_playerPrefab);
+            //NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
+            //playerNetworkObject.SpawnWithOwnership(clientID);
+        }
     }
 }
