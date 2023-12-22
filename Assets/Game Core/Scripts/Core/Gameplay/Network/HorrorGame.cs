@@ -4,9 +4,21 @@ namespace GameCore.Gameplay.Network
 {
     public class HorrorGame : MonoBehaviour
     {
+        // FIELDS: --------------------------------------------------------------------------------
+
+        private static HorrorGame _instance;
+        
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() => StartGame();
+        private void Awake()
+        {
+            _instance = this;
+            StartGame();
+        }
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public static HorrorGame Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
