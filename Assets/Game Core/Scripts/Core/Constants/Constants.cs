@@ -18,6 +18,9 @@
         public const string GamesDataKey = "GamesData";
         public const string GameSettingsDataKey = "GameSettingsData";
 
+        public const string PlayerActionMap = "Player";
+        public const string UIActionMap = "UI";
+        
         public const string UISoundBus = "UI";
 
         public const int SaveCellsAmount = 3;

@@ -18,6 +18,9 @@ namespace GameCore.UI.Global
         private bool _ignoreScaleTime;
 
         [SerializeField]
+        private bool _changeInteractableState;
+        
+        [SerializeField]
         private bool _changeCanvasState;
 
         [SerializeField, Required, ShowIf(nameof(_changeCanvasState))]
@@ -49,6 +52,9 @@ namespace GameCore.UI.Global
                 return;
 
             _targetCG.alpha = 0;
+            
+            if (_changeInteractableState)
+                DisableInteraction();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -80,19 +86,25 @@ namespace GameCore.UI.Global
                 .SetLink(gameObject)
                 .OnComplete(() =>
                 {
-                    if (!show)
+                    if (show)
                     {
-                        OnHideEvent?.Invoke();
-
+                        if (_changeInteractableState)
+                            EnableInteraction();
+                        
+                        OnShowEvent?.Invoke();
+                    }
+                    else
+                    {
+                        if (_changeInteractableState)
+                            DisableInteraction();
+                        
                         if (_changeCanvasState)
                             _canvas.enabled = false;
 
                         if (_destroyOnHide && !_ignoreDestroy)
                             DestroySelf();
-                    }
-                    else
-                    {
-                        OnShowEvent?.Invoke();
+                        
+                        OnHideEvent?.Invoke();
                     }
                 });
         }

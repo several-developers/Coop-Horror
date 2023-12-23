@@ -35,7 +35,7 @@ namespace GameCore.Infrastructure.Services.Global
             _coroutineRunner.StartCoroutine(SceneLoader(sceneName, callback));
         }
 
-        public void LoadSceneNetwork(SceneName sceneName)
+        public void LoadSceneNetwork(SceneName sceneName, Action callback = null)
         {
             if (_isSceneLoading)
                 return;
@@ -54,6 +54,7 @@ namespace GameCore.Infrastructure.Services.Global
             {
                 _isSceneLoading = false;
                 networkSceneManager.OnLoadEventCompleted -= OnSceneLoaded;
+                callback?.Invoke();
             }
         }
 

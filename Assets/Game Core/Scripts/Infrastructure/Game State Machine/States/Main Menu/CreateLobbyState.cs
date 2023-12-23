@@ -1,7 +1,5 @@
-﻿using GameCore.Enums;
-using GameCore.Gameplay.Factories;
+﻿using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.Network;
-using GameCore.Infrastructure.Services.Global;
 using GameCore.UI.MainMenu.CreateLobbyMenu;
 using GameCore.UI.MainMenu.SaveSelectionMenu;
 
@@ -11,17 +9,15 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CreateLobbyState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
+        public CreateLobbyState(IGameStateMachine gameStateMachine)
         {
             _gameStateMachine = gameStateMachine;
-            _scenesLoaderService = scenesLoaderService;
             _gameStateMachine.AddState(this);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IScenesLoaderService _scenesLoaderService;
 
         private CreateLobbyMenuView _createLobbyMenuView;
         private SaveSelectionMenuView _saveSelectionMenuView;
@@ -44,7 +40,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateCreateLobbyMenu() =>
             _createLobbyMenuView = MenuFactory.Create<CreateLobbyMenuView>();
 
-        private void CreateSaveSelectionMenuView() => 
+        private void CreateSaveSelectionMenuView() =>
             _saveSelectionMenuView = MenuFactory.Create<SaveSelectionMenuView>();
 
         private static void StartHost()
@@ -53,16 +49,16 @@ namespace GameCore.Infrastructure.StateMachine
             network.StartHost();
         }
 
-        private void LoadGameplayScene() =>
-            _scenesLoaderService.LoadSceneNetwork(SceneName.Gameplay);
+        private void EnterLoadGameplayState() =>
+            _gameStateMachine.ChangeState<LoadGameplayState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnStartGameClicked()
         {
-            StartHost();
-            LoadGameplayScene();
             _saveSelectionMenuView.Hide();
+            StartHost();
+            EnterLoadGameplayState();
         }
     }
 }

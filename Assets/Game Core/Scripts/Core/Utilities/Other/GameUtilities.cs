@@ -6,16 +6,10 @@ namespace GameCore.Utilities
 {
     public static class GameUtilities
     {
-        public static void ChangeCursorLockState()
+        public static void ChangeCursorLockState(bool isLocked)
         {
-            CursorLockMode lockState = Cursor.lockState;
-
-            Cursor.lockState = lockState switch
-            {
-                CursorLockMode.None => CursorLockMode.Locked,
-                CursorLockMode.Locked => CursorLockMode.None,
-                _ => Cursor.lockState
-            };
+            CursorLockMode cursorLockMode = isLocked ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.lockState = cursorLockMode;
         }
 
         public static bool DoSceneExist(string scene) =>

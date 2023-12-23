@@ -10,6 +10,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         public override void InstallBindings()
         {
             BindGameplayState();
+            BindQuitGameplayState();
             BindGameOverState();
         }
 
@@ -19,6 +20,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .Bind<GameplayState>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindQuitGameplayState()
+        {
+            Container
+                .Bind<QuitGameplayState>()
                 .AsSingle()
                 .NonLazy();
         }

@@ -39,18 +39,6 @@ namespace GameCore.Gameplay.Network
             PlayerEntity playerInstance = Instantiate(_playerPrefab);
             NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
             playerNetworkObject.SpawnWithOwnership(clientID);
-
-            NetworkObjectReference playerNetworkObjectReference = new(playerNetworkObject);
-
-            SpawnPlayerClientRpc(playerNetworkObjectReference);
-        }
-
-        [ClientRpc]
-        private void SpawnPlayerClientRpc(NetworkObjectReference playerNetworkObjectReference)
-        {
-            //PlayerEntity playerInstance = Instantiate(_playerPrefab);
-            //NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
-            //playerNetworkObject.SpawnWithOwnership(clientID);
         }
     }
 }

@@ -1,12 +1,15 @@
 ﻿using System;
 using GameCore.Gameplay.Entities.Player.Movement;
+using GameCore.Gameplay.Managers;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace GameCore.Gameplay.Entities.Player
 {
+    [RequireComponent(typeof(PlayerInput))]
     public class PlayerEntity : NetworkBehaviour, IPlayerEntity
     {
         // MEMBERS: -------------------------------------------------------------------------------
@@ -33,18 +36,7 @@ namespace GameCore.Gameplay.Entities.Player
         public event Action<Vector2> OnMovementVectorChangedEvent;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
-
-        private void Awake()
-        {
-            var inputSystemListener = GetComponent<InputSystemListener>();
-            inputSystemListener.OnMoveEvent += OnMove;
-            inputSystemListener.OnLookEvent += OnLook;
-            inputSystemListener.OnChangeCursorStateEvent += OnChangeCursorState;
-            inputSystemListener.OnChangeCameraLockStateEvent += OnChangeCameraLockState;
-        }
-
-        private void Start() => ChangeCursorLockState();
-
+        
         private void Update()
         {
             UpdateOwner();
@@ -55,12 +47,18 @@ namespace GameCore.Gameplay.Entities.Player
 
         public override void OnNetworkSpawn()
         {
-            if (IsOwner)
-                PlayerCamera.Instance.SetTarget(transform);
-            
+            Init();
             base.OnNetworkSpawn();
         }
-        
+
+        public override void OnNetworkDespawn()
+        {
+            if (IsOwner)
+                PlayerCamera.Instance.RemoveTarget();
+
+            base.OnNetworkDespawn();
+        }
+
         public void Setup()
         {
             float reloadTime = 1.5f;
@@ -85,6 +83,24 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void Init()
+        {
+            InitOwner();
+        }
+
+        private void InitOwner()
+        {
+            if (!IsOwner)
+                return;
+
+            var playerInput = GetComponent<PlayerInput>();
+            
+            InputSystemManager.Init(playerInput);
+            PlayerCamera.Instance.SetTarget(transform);
+            
+            InputSystemManager.OnMoveEvent += OnMove;
+        }
+
         private void UpdateOwner()
         {
             if (!IsOwner)
@@ -99,22 +115,10 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
         }
 
-        private static void ChangeCursorLockState() =>
-            GameUtilities.ChangeCursorLockState();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnMove(Vector2 movementVector) =>
             OnMovementVectorChangedEvent?.Invoke(movementVector);
-
-        private void OnLook(Vector2 lookVector)
-        {
-        }
-
-        private void OnChangeCameraLockState()
-        {
-        }
-
-        private static void OnChangeCursorState() => ChangeCursorLockState();
     }
 }

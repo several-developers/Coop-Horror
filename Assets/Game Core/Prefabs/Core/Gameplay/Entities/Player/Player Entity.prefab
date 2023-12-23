@@ -665,18 +665,6 @@ MonoBehaviour:
   _playerEntity: {fileID: 5746002443945451132}
   _playerMovementConfig: {fileID: 11400000, guid: e4b2ff4b8cc1e134f915cc7121a0a7da,
     type: 2}
---- !u!114 &8745325562456327625
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47f922ff31cd4a2a8e61501dcbce99e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &8684867425259486934 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,
