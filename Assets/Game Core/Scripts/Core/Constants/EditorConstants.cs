@@ -6,7 +6,8 @@
 
         public const string GlobalConfigsCategory = ConfigsCategory + "/Global";
         public const string PlayerConfigsCategory = ConfigsCategory + "/Player";
-        public const string CollectionsCategory = "Collections";
+        public const string GameplayConfigsCategory = ConfigsCategory + "/Gameplay";
+        public const string ItemsCategory = "Items";
 
         public const string GamesData = Settings + "GamesData";
         public const string GameSettings = Settings + "GameSettings";
