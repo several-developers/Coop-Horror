@@ -6,32 +6,63 @@ namespace GameCore.Gameplay.Items
 {
     public abstract class ItemMeta : EditorMeta
     {
-        [Title("Item Settings")]
-        [SerializeField]
-        private string _itemName = "item_name";
+        // MEMBERS: -------------------------------------------------------------------------------
+        
+        [TitleGroup(ItemSettings)]
+        [HorizontalGroup(Row, 57), VerticalGroup(RowLeft)]
+        [PreviewField(57, ObjectFieldAlignment.Left), SerializeField, HideLabel, AssetsOnly]
+        private Sprite _icon;
 
-        [SerializeField, Min(0), EnableIf(nameof(_canEditItemID))]
+        [VerticalGroup(RowRight), SerializeField]
+        private string _itemName = "item_name";
+        
+        [VerticalGroup(RowRight), SerializeField, EnableIf(nameof(_canEditItemID))]
         private int _itemID;
 
+        //[VerticalGroup(RowRight), SerializeField, Range(0.25f, 2f)]
+        //private float _iconScale = 1;
+        
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public Sprite Icon => _icon;
+        public int ItemID => _itemID;
+        
+        // FIELDS: --------------------------------------------------------------------------------
+        
+        private const string ItemSettings = "Item Settings";
+        private const string Row = ItemSettings + "/Row";
+        private const string RowLeft = Row + "/Left";
+        private const string RowRight = Row + "/Right";
+        
         private bool _canEditItemID;
 
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
         public override string GetMetaCategory() =>
             EditorConstants.ItemsCategory;
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
 #if UNITY_EDITOR
         [OnInspectorInit]
         private void ResetEditItemIDState() =>
             _canEditItemID = false;
 
-        [Button(25), DisableInPlayMode, HideIf(nameof(_canEditItemID))]
+        [VerticalGroup(RowRight)]
+        [Button(14), DisableInPlayMode, HideIf(nameof(_canEditItemID))]
         [GUIColor(0.7f, 0.2f, 0.2f)]
         private void EditItemID() =>
             _canEditItemID = true;
 
-        [Button(25), DisableInPlayMode, ShowIf(nameof(_canEditItemID))]
+        [VerticalGroup(RowRight)]
+        [Button(14), DisableInPlayMode, ShowIf(nameof(_canEditItemID))]
         [GUIColor(0.2f, 1f, 0.2f)]
-        private void StopEditItemID() =>
+        private void SaveItemID()
+        {
             _canEditItemID = false;
+            
+            UnityEditor.AssetDatabase.SaveAssetIfDirty(obj: this);
+        }
 #endif
     }
 }

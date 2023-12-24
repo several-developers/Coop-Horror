@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,9 +8,11 @@ namespace GameCore.Gameplay.Network
     public class TheNetworkHorror : MonoBehaviour
     {
         // PROPERTIES: ----------------------------------------------------------------------------
-
+        
         private static ulong ServerID => NetworkManager.ServerClientId; // ID of the server
 
+        // ID of this client (if host, will be same than ServerID), changes for every reconnection, assigned by Netcode
+        private ulong ClientID => _offlineMode ? ServerID : _networkManager.LocalClientId;
         private bool IsServer => _networkManager.IsServer;
         private bool IsClient => _networkManager.IsClient;
 
@@ -28,6 +29,7 @@ namespace GameCore.Gameplay.Network
 
         private ClientState _localState = ClientState.Offline;
         private float _updateTimer;
+        private bool _offlineMode;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -62,6 +64,16 @@ namespace GameCore.Gameplay.Network
         public void StartClient() =>
             _networkManager.StartClient();
 
+        public void Disconnect()
+        {
+            _spawnedPlayers.Remove(ClientID); // TEMP
+            
+            if (!IsClient && !IsServer)
+                return;
+            
+            _networkManager.Shutdown();
+        }
+
         public bool IsActive() =>
             _networkManager.IsServer || _networkManager.IsHost || _networkManager.IsClient;
 
@@ -95,7 +107,7 @@ namespace GameCore.Gameplay.Network
                 return;
 
             if (!networkSpawner.IsSpawnerReady())
-                networkSpawner.SpawnNetworkObject();
+                networkSpawner.Spawn();
 
             bool isGameSceneValid = HorrorGame.Get() != null; // Game scene is loaded
             bool isReady = isGameSceneValid;
@@ -159,6 +171,8 @@ namespace GameCore.Gameplay.Network
         private void OnClientDisconnect(ulong clientID)
         {
             Debug.Log("Disconnecting: " + clientID);
+            
+            _spawnedPlayers.Remove(ClientID);
 
             if (IsServer)
                 OnClientQuitEvent?.Invoke(clientID);

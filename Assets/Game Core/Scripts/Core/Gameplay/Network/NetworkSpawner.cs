@@ -1,12 +1,21 @@
 ﻿using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Items;
+using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Network
 {
     public class NetworkSpawner : NetworkBehaviour
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IItemsMetaProvider itemsMetaProvider) =>
+            _itemsMetaProvider = itemsMetaProvider;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
@@ -16,6 +25,8 @@ namespace GameCore.Gameplay.Network
         // FIELDS: --------------------------------------------------------------------------------
 
         private static NetworkSpawner _instance;
+        
+        private IItemsMetaProvider _itemsMetaProvider;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -26,7 +37,21 @@ namespace GameCore.Gameplay.Network
 
         public void SpawnPlayer(ulong clientID) => SpawnPlayerServerRpc(clientID);
 
-        public void SpawnNetworkObject() =>
+        public void SpawnItem(int itemID)
+        {
+            bool isItemExists = _itemsMetaProvider.TryGetItemMeta(itemID, out ItemMeta itemMeta);
+
+            if (!isItemExists)
+            {
+                string itemNotFoundLog = Log.HandleLog($"Item with ID <gb>({itemID})</gb> <rb>not found</rb>!");
+                Debug.Log(itemNotFoundLog);
+                return;
+            }
+            
+            
+        }
+
+        public void Spawn() =>
             NetworkObject.Spawn();
 
         public bool IsSpawnerReady() => IsSpawned;

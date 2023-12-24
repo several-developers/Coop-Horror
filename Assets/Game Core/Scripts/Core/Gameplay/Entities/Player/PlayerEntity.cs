@@ -53,9 +53,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         public override void OnNetworkDespawn()
         {
-            if (IsOwner)
-                PlayerCamera.Instance.RemoveTarget();
-
+            DespawnOwner();
             base.OnNetworkDespawn();
         }
 
@@ -115,6 +113,14 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
         }
 
+        private void DespawnOwner()
+        {
+            if (!IsOwner)
+                return;
+            
+            PlayerCamera.Instance.RemoveTarget();
+            InputSystemManager.OnMoveEvent -= OnMove;
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

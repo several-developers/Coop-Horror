@@ -12,6 +12,9 @@ namespace GameCore.UI.MainMenu.OnlineMenu
 
         [Title(Constants.References)]
         [SerializeField, Required]
+        private Button _backButton;
+        
+        [SerializeField, Required]
         private Button _hostButton;
         
         [SerializeField, Required]
@@ -19,6 +22,7 @@ namespace GameCore.UI.MainMenu.OnlineMenu
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnBackButtonClickedEvent;
         public event Action OnHostClickedEvent;
         public event Action OnJoinClickedEvent;
 
@@ -26,6 +30,7 @@ namespace GameCore.UI.MainMenu.OnlineMenu
 
         private void Awake()
         {
+            _backButton.onClick.AddListener(OnBackButtonClicked);
             _hostButton.onClick.AddListener(OnHostClicked);
             _joinButton.onClick.AddListener(OnJoinClicked);
             
@@ -36,16 +41,22 @@ namespace GameCore.UI.MainMenu.OnlineMenu
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnBackButtonClicked()
+        {
+            Hide();
+            OnBackButtonClickedEvent?.Invoke();
+        }
+        
         private void OnHostClicked()
         {
-            OnHostClickedEvent?.Invoke();
             Hide();
+            OnHostClickedEvent?.Invoke();
         }
 
         private void OnJoinClicked()
         {
-            OnJoinClickedEvent?.Invoke();
             Hide();
+            OnJoinClickedEvent?.Invoke();
         }
     }
 }

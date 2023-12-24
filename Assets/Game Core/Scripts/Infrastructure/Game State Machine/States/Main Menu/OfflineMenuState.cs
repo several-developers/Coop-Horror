@@ -1,5 +1,4 @@
-﻿using GameCore.Gameplay;
-using GameCore.Gameplay.Factories;
+﻿using GameCore.Gameplay.Factories;
 using GameCore.UI.MainMenu.OfflineMenu;
 using GameCore.UI.MainMenu.SaveSelectionMenu;
 
@@ -21,6 +20,7 @@ namespace GameCore.Infrastructure.StateMachine
         private readonly IGameStateMachine _gameStateMachine;
 
         private OfflineMenuView _offlineMenuView;
+        private SaveSelectionMenuView _saveSelectionMenuView;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -29,24 +29,40 @@ namespace GameCore.Infrastructure.StateMachine
             CreateSaveSelectionMenu();
             CreateOfflineMenu();
 
+            _offlineMenuView.OnBackButtonClickedEvent += OnBackButtonClicked;
             _offlineMenuView.OnStartButtonClickedEvent += OnStartButtonClicked;
         }
         
-        public void Exit() =>
+        public void Exit()
+        {
+            _offlineMenuView.OnBackButtonClickedEvent -= OnBackButtonClicked;
             _offlineMenuView.OnStartButtonClickedEvent -= OnStartButtonClicked;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CreateOfflineMenu() =>
             _offlineMenuView = MenuFactory.Create<OfflineMenuView>();
 
+        private void CreateSaveSelectionMenu() =>
+            _saveSelectionMenuView = MenuFactory.Create<SaveSelectionMenuView>();
+
+        private void HideSaveSelectionMenuView() =>
+            _saveSelectionMenuView.Hide();
+
+        private void EnterPrepareMainMenuState() =>
+            _gameStateMachine.ChangeState<PrepareMainMenuState>();
+        
         private void EnterLoadGameplayState() =>
             _gameStateMachine.ChangeState<LoadGameplayState>();
 
-        private static void CreateSaveSelectionMenu() =>
-            MenuFactory.Create<SaveSelectionMenuView>();
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnBackButtonClicked()
+        {
+            HideSaveSelectionMenuView();
+            EnterPrepareMainMenuState();
+        }
 
         private void OnStartButtonClicked() => EnterLoadGameplayState();
     }

@@ -12,16 +12,21 @@ namespace GameCore.UI.MainMenu.OfflineMenu
 
         [Title(Constants.References)]
         [SerializeField, Required]
+        private Button _backGameButton;
+        
+        [SerializeField, Required]
         private Button _startGameButton;
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnBackButtonClickedEvent;
         public event Action OnStartButtonClickedEvent;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
+            _backGameButton.onClick.AddListener(OnBackButtonClicked);
             _startGameButton.onClick.AddListener(OnStartGameButtonClicked);
 
             DestroyOnHide();
@@ -31,10 +36,16 @@ namespace GameCore.UI.MainMenu.OfflineMenu
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnBackButtonClicked()
+        {
+            Hide();
+            OnBackButtonClickedEvent?.Invoke();
+        }
+        
         private void OnStartGameButtonClicked()
         {
-            OnStartButtonClickedEvent?.Invoke();
             Hide();
+            OnStartButtonClickedEvent?.Invoke();
         }
     }
 }

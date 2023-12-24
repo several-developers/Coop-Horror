@@ -26,12 +26,14 @@ namespace GameCore.Infrastructure.StateMachine
         {
             CreateOnlineMenu();
 
+            _onlineMenuView.OnBackButtonClickedEvent += OnBackButtonClicked;
             _onlineMenuView.OnHostClickedEvent += OnHostClicked;
             _onlineMenuView.OnJoinClickedEvent += OnJoinClicked;
         }
 
         public void Exit()
         {
+            _onlineMenuView.OnBackButtonClickedEvent -= OnBackButtonClicked;
             _onlineMenuView.OnHostClickedEvent -= OnHostClicked;
             _onlineMenuView.OnJoinClickedEvent -= OnJoinClicked;
         }
@@ -41,6 +43,9 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateOnlineMenu() =>
             _onlineMenuView = MenuFactory.Create<OnlineMenuView>();
 
+        private void EnterPrepareMainMenuState() =>
+            _gameStateMachine.ChangeState<PrepareMainMenuState>();
+
         private void EnterCreateLobbyState() =>
             _gameStateMachine.ChangeState<CreateLobbyState>();
 
@@ -48,6 +53,8 @@ namespace GameCore.Infrastructure.StateMachine
             _gameStateMachine.ChangeState<JoinGameState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnBackButtonClicked() => EnterPrepareMainMenuState();
 
         private void OnHostClicked() => EnterCreateLobbyState();
 

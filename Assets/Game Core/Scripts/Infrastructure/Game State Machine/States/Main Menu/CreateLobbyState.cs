@@ -29,11 +29,15 @@ namespace GameCore.Infrastructure.StateMachine
             CreateCreateLobbyMenu();
             CreateSaveSelectionMenuView();
 
+            _createLobbyMenuView.OnBackButtonClickedEvent += OnBackButtonClicked;
             _createLobbyMenuView.OnStartGameClickedEvent += OnStartGameClicked;
         }
 
-        public void Exit() =>
+        public void Exit()
+        {
+            _createLobbyMenuView.OnBackButtonClickedEvent -= OnBackButtonClicked;
             _createLobbyMenuView.OnStartGameClickedEvent -= OnStartGameClicked;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -49,14 +53,26 @@ namespace GameCore.Infrastructure.StateMachine
             network.StartHost();
         }
 
+        private void HideSaveSelectionMenu() =>
+            _saveSelectionMenuView.Hide();
+
+        private void EnterOnlineMenuState() =>
+            _gameStateMachine.ChangeState<OnlineMenuState>();
+        
         private void EnterLoadGameplayState() =>
             _gameStateMachine.ChangeState<LoadGameplayState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnBackButtonClicked()
+        {
+            HideSaveSelectionMenu();
+            EnterOnlineMenuState();
+        }
+        
         private void OnStartGameClicked()
         {
-            _saveSelectionMenuView.Hide();
+            HideSaveSelectionMenu();
             StartHost();
             EnterLoadGameplayState();
         }

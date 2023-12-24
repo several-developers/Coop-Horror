@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System.IO;
 using System.Linq;
+using GameCore.Gameplay.Items;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
@@ -144,7 +145,7 @@ namespace MetaEditor
             tree.DefaultMenuStyle = OdinMenuStyle.TreeViewStyle;
             tree.DefaultMenuStyle.Height = 28;
             tree.DefaultMenuStyle.IndentAmount = 12;
-            tree.DefaultMenuStyle.IconSize = 26;
+            tree.DefaultMenuStyle.IconSize = 24;
             tree.DefaultMenuStyle.NotSelectedIconAlpha = 1;
             tree.DefaultMenuStyle.IconPadding = 4;
             tree.DefaultMenuStyle.SelectedColorDarkSkin = EditorDatabase.SelectedColor;
@@ -163,12 +164,12 @@ namespace MetaEditor
 
         private static void AddIconsToItems(OdinMenuTree tree)
         {
-            //tree.EnumerateTree().AddIcons<ItemMeta>(itemMeta => itemMeta.Icon);
+            tree.EnumerateTree().AddIcons<ItemMeta>(itemMeta => itemMeta.Icon);
         }
 
         private static void AddDraggableItems(OdinMenuTree tree)
         {
-            //AddDraggable<LevelMeta>(tree);
+            AddDraggable<ItemMeta>(tree);
         }
 
         private static void AddDraggable<T>(OdinMenuTree tree) where T : EditorMeta
