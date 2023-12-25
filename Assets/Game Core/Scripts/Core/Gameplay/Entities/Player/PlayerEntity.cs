@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player.Movement;
 using GameCore.Gameplay.Managers;
 using GameCore.Utilities;
@@ -34,7 +35,9 @@ namespace GameCore.Gameplay.Entities.Player
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<Vector2> OnMovementVectorChangedEvent;
-        
+
+        private Inventory<ItemData> _inventory;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
         private void Update()
@@ -91,8 +94,9 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
-            var playerInput = GetComponent<PlayerInput>();
+            _inventory = new Inventory<ItemData>(Constants.PlayerInventorySize);
             
+            var playerInput = GetComponent<PlayerInput>();
             InputSystemManager.Init(playerInput);
             PlayerCamera.Instance.SetTarget(transform);
             

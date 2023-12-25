@@ -25,5 +25,6 @@
 
         public const int SaveCellsAmount = 3;
         public const int MaxPlayers = 4;
+        public const int PlayerInventorySize = 6;
     }
 }
