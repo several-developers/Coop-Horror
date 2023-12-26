@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1038132760080413112
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 91750195740998113}
+  m_Layer: 6
+  m_Name: Item Hold Pivot
+  m_TagString: Untagged
+  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &91750195740998113
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038132760080413112}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.578, y: 0.053, z: 0.22}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8684867425259486934}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3210854158121557713
 GameObject:
   m_ObjectHideFlags: 0
@@ -388,6 +419,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player Entity
       objectReference: {fileID: 0}
+    - target: {fileID: 111205641803414154, guid: 4a078d8873b125146a7bc07d4059ec0a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,
         type: 3}
       propertyPath: m_RootOrder
@@ -591,7 +627,7 @@ MonoBehaviour:
   SyncRotAngleY: 1
   SyncRotAngleZ: 0
   SyncScaleX: 0
-  SyncScaleY: 1
+  SyncScaleY: 0
   SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
@@ -615,9 +651,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isDead: 0
+  _interactionMaxDistance: 2
+  _interactionLM:
+    serializedVersion: 2
+    m_Bits: 256
+  _interactionObstaclesLM:
+    serializedVersion: 2
+    m_Bits: 4294967295
   _animator: {fileID: 0}
   _networkObject: {fileID: -4117527861951101490}
   _playerMovement: {fileID: 7464226445342076517}
+  _itemHoldPivot: {fileID: 91750195740998113}
   _cameraPoint: {fileID: 1790303704853504677}
 --- !u!114 &5896049000724007706
 MonoBehaviour:

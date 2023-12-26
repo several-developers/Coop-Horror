@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.Observers;
+﻿using GameCore.Observers.Global.Graphy;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;

@@ -2,6 +2,5 @@
 {
     public interface IPlayerEntity : INetworkEntity, IDamageable
     {
-        void Setup();
     }
 }

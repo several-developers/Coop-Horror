@@ -1,5 +1,6 @@
-using GameCore.Gameplay.Observers;
-using GameCore.Gameplay.Observers.UI;
+using GameCore.Observers.Gameplay.PlayerInteraction;
+using GameCore.Observers.Gameplay.UI;
+using GameCore.Observers.Global.Graphy;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -11,6 +12,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         public override void InstallBindings()
         {
             BindUIObserver();
+            BindPlayerInteractionObserver();
             BindGraphyStateObserver();
         }
 
@@ -20,6 +22,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<UIObserver>()
+                .AsSingle();
+        }
+        
+        private void BindPlayerInteractionObserver()
+        {
+            Container
+                .BindInterfacesTo<PlayerInteractionObserver>()
                 .AsSingle();
         }
 

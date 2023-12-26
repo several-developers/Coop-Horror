@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Gameplay.Observers;
+using GameCore.Observers.Global.StateMachine;
 using GameCore.Utilities;
 using UnityEngine;
 

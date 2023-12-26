@@ -1,6 +1,5 @@
-using GameCore.Gameplay;
-using GameCore.Gameplay.Observers;
 using GameCore.Infrastructure.StateMachine;
+using GameCore.Observers.Global.StateMachine;
 using GameCore.UI.Global.Buttons;
 using Sirenix.OdinInspector;
 using UnityEngine;

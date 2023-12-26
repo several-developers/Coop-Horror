@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GameCore.Gameplay.Entities.Inventory
 {
@@ -14,8 +15,12 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action<int> OnSelectedSlotChangedEvent;
+        
         private readonly List<TItem> _items;
         private readonly int _size;
+
+        private int _selectedSlotIndex;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -29,6 +34,30 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         public void RemoveItem(TItem item) =>
             _items.Remove(item);
+        
+        public void SwitchToNextSlot()
+        {
+            int newSlotIndex = _selectedSlotIndex + 1;
+            bool resetIndex = newSlotIndex >= Constants.PlayerInventorySize;
+
+            if (resetIndex)
+                newSlotIndex = 0;
+
+            _selectedSlotIndex = newSlotIndex;
+            OnSelectedSlotChanged();
+        }
+
+        public void SwitchToLastSlot()
+        {
+            int newSlotIndex = _selectedSlotIndex - 1;
+            bool setLastIndex = newSlotIndex < 0;
+
+            if (setLastIndex)
+                newSlotIndex = Constants.PlayerInventorySize - 1;
+
+            _selectedSlotIndex = newSlotIndex;
+            OnSelectedSlotChanged();
+        }
 
         public void Clear() =>
             _items.Clear();
@@ -40,5 +69,10 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         public bool IsInventoryFull() =>
             _items.Count >= _size;
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void OnSelectedSlotChanged() =>
+            OnSelectedSlotChangedEvent?.Invoke(_selectedSlotIndex);
     }
 }

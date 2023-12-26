@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.Managers;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player
@@ -7,14 +8,21 @@ namespace GameCore.Gameplay.Entities.Player
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [Title(Constants.Settings)]
         [SerializeField, Min(0)]
         private float _maxVerticalAngle = 60f;
 
         [SerializeField, Min(0.1f)]
         private float _sensitivity = 1f;
 
+        [Title(Constants.References)]
+        [SerializeField, Required]
+        private Camera _camera;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public Camera Camera => _camera;
+        
         private float MouseVerticalValue
         {
             get => _mouseVerticalValue;
@@ -30,7 +38,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public static PlayerCamera Instance;
+        private static PlayerCamera _instance;
 
         private Transform _transform;
         private Transform _target;
@@ -43,7 +51,7 @@ namespace GameCore.Gameplay.Entities.Player
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() =>
-            Instance = this;
+            _instance = this;
 
         private void LateUpdate()
         {
@@ -79,6 +87,8 @@ namespace GameCore.Gameplay.Entities.Player
             _target = null;
             _isPlayerFound = false;
         }
+
+        public static PlayerCamera Get() => _instance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

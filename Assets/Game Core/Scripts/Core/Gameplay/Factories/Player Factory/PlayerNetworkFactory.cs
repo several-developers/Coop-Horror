@@ -22,7 +22,7 @@ namespace GameCore.Gameplay.Factories.Player
             //NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
             NetworkObject playerNetworkObject = null;
 
-            playerInstance.Setup();
+            //playerInstance.Setup();
             playerNetworkObject.Spawn();
         }
     }

@@ -1,6 +1,7 @@
 ﻿using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Observers.Gameplay.PlayerInteraction;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -13,8 +14,12 @@ namespace GameCore.Gameplay.Network
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsMetaProvider itemsMetaProvider) =>
+        private void Construct(IItemsMetaProvider itemsMetaProvider,
+            IPlayerInteractionObserver playerInteractionObserver)
+        {
             _itemsMetaProvider = itemsMetaProvider;
+            _playerInteractionObserver = playerInteractionObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -25,8 +30,9 @@ namespace GameCore.Gameplay.Network
         // FIELDS: --------------------------------------------------------------------------------
 
         private static NetworkSpawner _instance;
-        
+
         private IItemsMetaProvider _itemsMetaProvider;
+        private IPlayerInteractionObserver _playerInteractionObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -47,8 +53,6 @@ namespace GameCore.Gameplay.Network
                 Debug.Log(itemNotFoundLog);
                 return;
             }
-            
-            
         }
 
         public void Spawn() =>
@@ -62,6 +66,8 @@ namespace GameCore.Gameplay.Network
         private void SpawnPlayerServerRpc(ulong clientID)
         {
             PlayerEntity playerInstance = Instantiate(_playerPrefab);
+            playerInstance.Setup(_playerInteractionObserver); // REWORK, only need for Owner
+            
             NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
             playerNetworkObject.SpawnWithOwnership(clientID);
         }

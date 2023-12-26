@@ -11,6 +11,9 @@ namespace GameCore.Gameplay.Managers
         public static event Action OnOpenPauseMenuEvent;
         public static event Action<Vector2> OnMoveEvent;
         public static event Action<Vector2> OnLookEvent;
+        public static event Action<float> OnScrollEvent;
+        public static event Action OnInteractEvent;
+        public static event Action OnDropItemEvent;
 
         private static PlayerInputActions _playerInputActions;
         private static PlayerInput _playerInput;
@@ -27,6 +30,9 @@ namespace GameCore.Gameplay.Managers
             _playerInputActions.Player.OpenPauseMenu.performed += OpenPauseMenu;
             _playerInputActions.Player.Move.performed += OnMove;
             _playerInputActions.Player.Look.performed += OnLook;
+            _playerInputActions.Player.Scroll.performed += OnScroll;
+            _playerInputActions.Player.Interact.performed += OnInteract;
+            _playerInputActions.Player.DropItem.performed += OnDropItem;
         }
 
         public static void SwitchToPlayer()
@@ -55,10 +61,23 @@ namespace GameCore.Gameplay.Managers
             var movementVector = context.ReadValue<Vector2>();
             OnMoveEvent?.Invoke(movementVector);
         }
+        
         private static void OnLook(InputAction.CallbackContext context)
         {
             var lookVector = context.ReadValue<Vector2>();
             OnLookEvent?.Invoke(lookVector);
         }
+        
+        private static void OnScroll(InputAction.CallbackContext context)
+        {
+            var scrollValue = context.ReadValue<float>();
+            OnScrollEvent?.Invoke(scrollValue);
+        }
+        
+        private static void OnInteract(InputAction.CallbackContext context) =>
+            OnInteractEvent?.Invoke();
+        
+        private static void OnDropItem(InputAction.CallbackContext context) =>
+            OnDropItemEvent?.Invoke();
     }
 }

@@ -1,6 +1,6 @@
 using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.Managers;
-using GameCore.Gameplay.Observers.UI;
+using GameCore.Observers.Gameplay.UI;
 using GameCore.UI.Gameplay.PauseMenu;
 using GameCore.Utilities;
 

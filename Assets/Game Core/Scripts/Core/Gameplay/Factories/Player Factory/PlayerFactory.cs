@@ -19,7 +19,7 @@ namespace GameCore.Gameplay.Factories.Player
             PlayerEntity playerPrefab = _playerConfig.PlayerPrefab;
             PlayerEntity playerInstance = Object.Instantiate(playerPrefab, at, Quaternion.identity);
 
-            playerInstance.Setup();
+            //playerInstance.Setup();
         }
     }
 }

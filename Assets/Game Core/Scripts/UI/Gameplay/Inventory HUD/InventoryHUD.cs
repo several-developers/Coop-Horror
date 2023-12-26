@@ -1,4 +1,6 @@
-﻿using GameCore.UI.Global.MenuView;
+﻿using GameCore.Gameplay.Entities.Inventory;
+using GameCore.Gameplay.Entities.Player;
+using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -22,14 +24,19 @@ namespace GameCore.UI.Gameplay.Inventory
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private static InventoryHUD _instance; // TEMP
+        
         private InventoryFactory _inventoryFactory;
         private LayoutFixHelper _layoutFixHelper;
+        private PlayerEntity _playerEntity;
         private int _lastSlotIndex;
-        
+        private bool _isInitialized;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
+            _instance = this;
             _inventoryFactory = new InventoryFactory(_itemSlotViewPrefab, _slotsContainer);
             _layoutFixHelper = new LayoutFixHelper(coroutineRunner: this, _layoutGroup);
         }
@@ -41,6 +48,28 @@ namespace GameCore.UI.Gameplay.Inventory
             Show();
         }
 
+        private void OnDestroy()
+        {
+            if (!_isInitialized)
+                return;
+            
+            Inventory<ItemData> inventory = _playerEntity.GetInventory();
+            inventory.OnSelectedSlotChangedEvent -= OnSelectedSlotChanged;
+        }
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void Init(PlayerEntity playerEntity)
+        {
+            _playerEntity = playerEntity;
+            _isInitialized = true;
+
+            Inventory<ItemData> inventory = _playerEntity.GetInventory();
+            inventory.OnSelectedSlotChangedEvent += OnSelectedSlotChanged;
+        }
+        
+        public static InventoryHUD Get() => _instance;
+        
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CreateItemsSlots()
@@ -55,7 +84,7 @@ namespace GameCore.UI.Gameplay.Inventory
 
             if (!isSlotExists)
                 slotIndex = 0;
-            
+
             bool isItemSlotFound = GetItemSlot(slotIndex, out ItemSlotView itemSlotView);
 
             if (!isItemSlotFound)
@@ -63,7 +92,7 @@ namespace GameCore.UI.Gameplay.Inventory
 
             DeselectLastSlot();
             itemSlotView.Select();
-            
+
             _lastSlotIndex = slotIndex;
         }
 
@@ -73,11 +102,15 @@ namespace GameCore.UI.Gameplay.Inventory
 
             if (!isItemSlotFound)
                 return;
-            
+
             itemSlotView.Deselect();
         }
 
         private bool GetItemSlot(int slotIndex, out ItemSlotView itemSlotView) =>
             _inventoryFactory.GetItemSlot(slotIndex, out itemSlotView);
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnSelectedSlotChanged(int selectedSlotIndex) => SelectSlot(selectedSlotIndex);
     }
 }

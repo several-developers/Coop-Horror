@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.Observers;
+﻿using GameCore.Observers.Global.Graphy;
 using GameCore.UI.Global.Buttons;
 using Sirenix.OdinInspector;
 using TMPro;
