@@ -67,7 +67,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
                 return;
             }
             
-            Inventory<ItemData> inventory = _playerEntity.GetInventory();
+            PlayerInventory inventory = _playerEntity.GetInventory();
             bool isInventoryFull = inventory.IsInventoryFull();
 
             if (isInventoryFull)
@@ -82,9 +82,6 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             ItemData itemData = new(itemID);
             
             inventory.AddItem(itemData);
-            
-            string itemAddedLog = Log.HandleLog($"Picked up item with ID <gb>{itemID}</gb>.");
-            Debug.Log(itemAddedLog);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

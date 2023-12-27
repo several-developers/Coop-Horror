@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f46cb6615be2437bae77c1187c490d91, type: 3}
-  m_Name: Items List Config
+  m_Script: {fileID: 11500000, guid: 434153c02734f3a4e8fe12ea880a356b, type: 3}
+  m_Name: Test Flashlight
   m_EditorClassIdentifier: 
-  _metaName: Items List Config
-  _itemsMeta:
-  - {fileID: 11400000, guid: 289345df02710854b8b8e1fa4c2fb8fc, type: 2}
-  - {fileID: 11400000, guid: ac3352e7cdf12174bb3867716bdb54b4, type: 2}
+  _metaName: Test Flashlight
+  _icon: {fileID: 21300000, guid: 05c7216c78d4dd34ebe2bac9c1e274d7, type: 3}
+  _itemName: Test Flashlight
+  _itemID: 0

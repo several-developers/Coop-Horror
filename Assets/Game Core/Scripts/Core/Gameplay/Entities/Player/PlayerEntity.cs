@@ -52,7 +52,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private IPlayerInteractionObserver _playerInteractionObserver;
 
-        private Inventory<ItemData> _inventory;
+        private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
 
@@ -100,7 +100,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         public NetworkObject GetNetworkObject() => _networkObject;
 
-        public Inventory<ItemData> GetInventory() => _inventory;
+        public PlayerInventory GetInventory() => _inventory;
 
         public bool IsDead() => _isDead;
 
@@ -122,7 +122,7 @@ namespace GameCore.Gameplay.Entities.Player
             PlayerCamera playerCamera = PlayerCamera.Get();
             playerCamera.SetTarget(transform);
 
-            _inventory = new Inventory<ItemData>(Constants.PlayerInventorySize);
+            _inventory = new PlayerInventory();
             _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform, playerCamera.Camera,
                 _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);
 
@@ -169,9 +169,8 @@ namespace GameCore.Gameplay.Entities.Player
         private void Interact() =>
             _interactionHandler.Interact();
 
-        private void DropItem()
-        {
-        }
+        private void DropItem() =>
+            _inventory.DropItem();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -185,7 +184,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (switchToNextSlot)
                 _inventory.SwitchToNextSlot();
             else
-                _inventory.SwitchToLastSlot();
+                _inventory.SwitchToPreviousSlot();
         }
 
         private void OnInteract() => Interact();

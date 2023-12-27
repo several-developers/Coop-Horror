@@ -13,8 +13,19 @@ namespace GameCore.UI.Gameplay.Inventory
         private ItemSlotVisualizer _itemSlotVisualizer;
 
         [TitleGroup(Constants.Animation)]
-        [BoxGroup(Constants.AnimationIn, showLabel: false), SerializeField]
+        [BoxGroup(Constants.Animation + "/Selection Scale", showLabel: false), SerializeField]
         private ScaleAnimation _scaleAnimation;
+
+        [BoxGroup(Constants.Animation + "/Interaction Scale", showLabel: false), SerializeField]
+        private PunchScaleAnimation _punchScaleAnimation;
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Awake()
+        {
+            _scaleAnimation.SetOwner(gameObject);
+            _punchScaleAnimation.SetOwner(gameObject);
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -28,6 +39,18 @@ namespace GameCore.UI.Gameplay.Inventory
         {
             _itemSlotVisualizer.Deselect();
             _scaleAnimation.ScaleDown();
+        }
+
+        public void SetIcon(Sprite sprite)
+        {
+            _punchScaleAnimation.PlayAnimation();
+            _itemSlotVisualizer.SetIcon(sprite);
+        }
+
+        public void RemoveIcon()
+        {
+            _punchScaleAnimation.PlayAnimation();
+            _itemSlotVisualizer.RemoveIcon();
         }
     }
 }

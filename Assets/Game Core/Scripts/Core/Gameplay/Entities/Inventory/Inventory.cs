@@ -1,78 +1,134 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace GameCore.Gameplay.Entities.Inventory
+﻿namespace GameCore.Gameplay.Entities.Inventory
 {
-    public class Inventory<TItem>
+    public class Inventory<TItem> where TItem : class
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public Inventory(int size)
         {
-            _items = new List<TItem>();
-            _size = size;
+            _items = new TItem[size];
+            Size = size;
         }
+
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public int Size { get; }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<int> OnSelectedSlotChangedEvent;
-        
-        private readonly List<TItem> _items;
-        private readonly int _size;
+        private readonly TItem[] _items;
 
         private int _selectedSlotIndex;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void AddItem(TItem item)
+        public int AddItem(TItem item)
         {
+            int slotIndex = -1;
+
             if (IsInventoryFull())
+                return slotIndex;
+
+            for (int i = 0; i < Size; i++)
+            {
+                bool isEmpty = _items[i] == null;
+
+                if (!isEmpty)
+                    continue;
+
+                _items[i] = item;
+                slotIndex = i;
+
+                break;
+            }
+
+            return slotIndex;
+        }
+
+        public int AddItemInSelectedSlot(TItem item)
+        {
+            _items[_selectedSlotIndex] = item;
+            return _selectedSlotIndex;
+        }
+
+        public void RemoveItem(TItem item)
+        {
+            for (int i = 0; i < Size; i++)
+            {
+                bool isMatches = _items[i] == item;
+
+                if (isMatches)
+                    _items[i] = null;
+            }
+        }
+
+        public void RemoveItem(int slotIndex)
+        {
+            if (!IsIndexValid(slotIndex))
                 return;
-            
-            _items.Add(item);
+
+            _items[slotIndex] = null;
         }
 
-        public void RemoveItem(TItem item) =>
-            _items.Remove(item);
-        
-        public void SwitchToNextSlot()
+        public void SetSelectedSlotIndex(int index) =>
+            _selectedSlotIndex = index;
+
+        public int DropSelectedItem()
         {
-            int newSlotIndex = _selectedSlotIndex + 1;
-            bool resetIndex = newSlotIndex >= Constants.PlayerInventorySize;
-
-            if (resetIndex)
-                newSlotIndex = 0;
-
-            _selectedSlotIndex = newSlotIndex;
-            OnSelectedSlotChanged();
+            RemoveItem(_selectedSlotIndex);
+            return _selectedSlotIndex;
         }
 
-        public void SwitchToLastSlot()
+        public void Clear()
         {
-            int newSlotIndex = _selectedSlotIndex - 1;
-            bool setLastIndex = newSlotIndex < 0;
-
-            if (setLastIndex)
-                newSlotIndex = Constants.PlayerInventorySize - 1;
-
-            _selectedSlotIndex = newSlotIndex;
-            OnSelectedSlotChanged();
+            for (int i = 0; i < Size; i++)
+                _items[i] = null;
         }
 
-        public void Clear() =>
-            _items.Clear();
+        public int GetSelectedSlotIndex() => _selectedSlotIndex;
 
-        public IReadOnlyList<TItem> GetAllItems() => _items;
+        public int GetItemsAmount()
+        {
+            int amount = 0;
 
-        public int GetItemsAmount() =>
-            _items.Count;
+            foreach (TItem item in _items)
+            {
+                bool isItemExists = item != null;
 
-        public bool IsInventoryFull() =>
-            _items.Count >= _size;
+                if (isItemExists)
+                    amount++;
+            }
+
+            return amount;
+        }
+
+        public bool TryGetSelectedItem(out TItem item)
+        {
+            item = _items[_selectedSlotIndex];
+            bool isItemExists = IsItemExists(_selectedSlotIndex);
+            return isItemExists;
+        }
+
+        public bool IsInventoryFull()
+        {
+            int itemsAmount = GetItemsAmount();
+            return itemsAmount >= Size;
+        }
+
+        public bool IsItemInSelectedSlotExists() =>
+            _items[_selectedSlotIndex] != null;
+
+        public bool IsItemExists(int slotIndex)
+        {
+            if (!IsIndexValid(slotIndex))
+                return false;
+
+            return _items[slotIndex] != null;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnSelectedSlotChanged() =>
-            OnSelectedSlotChangedEvent?.Invoke(_selectedSlotIndex);
+        private bool IsIndexValid(int slotIndex) =>
+            slotIndex >= 0 && slotIndex < Size;
     }
 }
