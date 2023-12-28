@@ -2,13 +2,14 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 namespace GameCore.Gameplay.Network
 {
     public class TheNetworkHorror : MonoBehaviour
     {
         // PROPERTIES: ----------------------------------------------------------------------------
-        
+
         private static ulong ServerID => NetworkManager.ServerClientId; // ID of the server
 
         // ID of this client (if host, will be same than ServerID), changes for every reconnection, assigned by Netcode
@@ -18,14 +19,20 @@ namespace GameCore.Gameplay.Network
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        // Server & Client events
+        public UnityAction<string> OnBeforeChangeSceneEvent; // Before Changing Scene
+        public UnityAction<string> OnAfterChangeSceneEvent; // After Changing Scene
+
         // Server only events
         public event UnityAction<ulong> OnClientJoinEvent; // Server event when any client connect
+
         public event UnityAction<ulong> OnClientQuitEvent; // Server event when any client disconnect
 
         private static TheNetworkHorror _instance;
         private static List<ulong> _spawnedPlayers = new();
 
         private NetworkManager _networkManager;
+        private NetworkSceneManager _networkSceneManager;
 
         private ClientState _localState = ClientState.Offline;
         private float _updateTimer;
@@ -58,20 +65,27 @@ namespace GameCore.Gameplay.Network
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void StartHost() =>
+        public void StartHost()
+        {
             _networkManager.StartHost();
+            AfterConnected();
+        }
 
-        public void StartClient() =>
+        public void StartClient()
+        {
             _networkManager.StartClient();
+            AfterConnected();
+        }
 
         public void Disconnect()
         {
             _spawnedPlayers.Remove(ClientID); // TEMP
-            
+
             if (!IsClient && !IsServer)
                 return;
-            
+
             _networkManager.Shutdown();
+            AfterDisconnected();
         }
 
         public bool IsActive() =>
@@ -137,6 +151,24 @@ namespace GameCore.Gameplay.Network
             }
         }
 
+        private void AfterConnected()
+        {
+            if (_networkManager.SceneManager != null)
+                _networkManager.SceneManager.OnLoad += OnBeforeChangeScene;
+
+            if (_networkManager.SceneManager != null)
+                _networkManager.SceneManager.OnLoadComplete += OnAfterChangeScene;
+        }
+
+        private void AfterDisconnected()
+        {
+            if (_networkManager.SceneManager != null)
+                _networkManager.SceneManager.OnLoad -= OnBeforeChangeScene;
+
+            if (_networkManager.SceneManager != null)
+                _networkManager.SceneManager.OnLoadComplete -= OnAfterChangeScene;
+        }
+
         private bool IsConnected() =>
             _networkManager.IsServer || _networkManager.IsConnectedClient;
 
@@ -157,7 +189,6 @@ namespace GameCore.Gameplay.Network
 
                 // Trigger join
                 OnClientJoinEvent?.Invoke(clientID);
-
             }
             else
             {
@@ -171,11 +202,22 @@ namespace GameCore.Gameplay.Network
         private void OnClientDisconnect(ulong clientID)
         {
             Debug.Log("Disconnecting: " + clientID);
-            
+
             _spawnedPlayers.Remove(ClientID);
 
             if (IsServer)
                 OnClientQuitEvent?.Invoke(clientID);
+        }
+
+        private void OnBeforeChangeScene(ulong clientId, string sceneName, LoadSceneMode loadSceneMode,
+            AsyncOperation asyncOperation)
+        {
+            OnBeforeChangeSceneEvent?.Invoke(sceneName);
+        }
+
+        private void OnAfterChangeScene(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+        {
+            OnAfterChangeSceneEvent?.Invoke(sceneName);
         }
     }
 

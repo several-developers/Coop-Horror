@@ -1,10 +1,12 @@
-﻿using GameCore.Gameplay.Factories;
+﻿using GameCore.Enums;
+using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.Network;
 using GameCore.UI.MainMenu.ConnectingMenu;
+using UnityEngine;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class JoinGameState : IEnterState
+    public class JoinGameState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -18,6 +20,8 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
+        
+        private TheNetworkHorror _network;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -28,25 +32,45 @@ namespace GameCore.Infrastructure.StateMachine
             //
             // JoinGame();
 
+            _network = TheNetworkHorror.Get();
+            
             StartClient();
+
+            _network.OnAfterChangeSceneEvent += OnAfterChangeScene;
         }
+
+        public void Exit() =>
+            _network.OnAfterChangeSceneEvent -= OnAfterChangeScene;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static void StartClient()
-        {
-            TheNetworkHorror network = TheNetworkHorror.Get();
-            network.StartClient();
-        }
+        private void StartClient() =>
+            _network.StartClient();
 
         private static ConnectingMenuView CreateConnectingMenu() =>
             MenuFactory.Create<ConnectingMenuView>();
 
         private void EnterOnlineMenuState() =>
             _gameStateMachine.ChangeState<OnlineMenuState>();
+        
+        private void EnterGameplayState() =>
+            _gameStateMachine.ChangeState<GameplayState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-        
+
         private void OnQuitConnecting() => EnterOnlineMenuState();
+
+        private void OnAfterChangeScene(string sceneName)
+        {
+            bool isGameplayScene = string.Equals(sceneName, SceneName.Gameplay.ToString());
+
+            if (!isGameplayScene)
+            {
+                Debug.Log($"Loaded scene ({sceneName}), wrong!!!");
+                return;
+            }
+
+            EnterGameplayState();
+        }
     }
 }

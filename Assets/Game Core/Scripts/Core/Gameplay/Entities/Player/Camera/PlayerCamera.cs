@@ -42,6 +42,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private Transform _transform;
         private Transform _target;
+        private Transform _cameraPoint;
         private PlayerInputActions _playerInputActions;
 
         private Vector2 _lookVector;
@@ -64,7 +65,7 @@ namespace GameCore.Gameplay.Entities.Player
             float yRotation = _target.localRotation.eulerAngles.y + _lookVector.x * _sensitivity;
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
-            _transform.position = _target.position;
+            _transform.position = _cameraPoint.position;
             _transform.localRotation = finalRotation;
 
             _target.rotation = Quaternion.Euler(0, yRotation, 0);
@@ -72,9 +73,10 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void SetTarget(Transform target)
+        public void SetTarget(Transform target, Transform cameraPoint)
         {
             _transform = transform;
+            _cameraPoint = cameraPoint;
             _target = target;
             _playerInputActions = InputSystemManager.GetPlayerInputActions();
             _isPlayerFound = true;

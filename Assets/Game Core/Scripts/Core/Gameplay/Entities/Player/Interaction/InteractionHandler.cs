@@ -3,6 +3,7 @@ using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Items;
 using GameCore.Observers.Gameplay.PlayerInteraction;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player.Interaction
@@ -11,13 +12,15 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public InteractionHandler(PlayerEntity playerEntity, Transform itemHoldPivot,
-            IPlayerInteractionObserver playerInteractionObserver)
+        public InteractionHandler(PlayerEntity playerEntity, IPlayerInteractionObserver playerInteractionObserver)
         {
             _playerEntity = playerEntity;
-            _itemHoldPivot = itemHoldPivot;
+            _playerInventory = playerEntity.GetInventory();
             _playerInteractionObserver = playerInteractionObserver;
+            _interactableItems = new IInteractableItem[Constants.PlayerInventorySize];
 
+            _playerInventory.OnItemDroppedEvent += OnItemDropped;
+            
             _playerInteractionObserver.OnCanInteractEvent += OnCanInteract;
             _playerInteractionObserver.OnInteractionEndedEvent += OnInteractionEnded;
         }
@@ -25,8 +28,9 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly PlayerEntity _playerEntity;
-        private readonly Transform _itemHoldPivot;
+        private readonly PlayerInventory _playerInventory;
         private readonly IPlayerInteractionObserver _playerInteractionObserver;
+        private readonly IInteractableItem[] _interactableItems;
 
         private IInteractable _lastInteractable;
         private bool _canInteract;
@@ -35,6 +39,8 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
         public void Dispose()
         {
+            _playerInventory.OnItemDroppedEvent -= OnItemDropped;
+            
             _playerInteractionObserver.OnCanInteractEvent -= OnCanInteract;
             _playerInteractionObserver.OnInteractionEndedEvent -= OnInteractionEnded;
         }
@@ -58,30 +64,59 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
         private void HandlePickUpItem()
         {
-            bool isItem = _lastInteractable is IInteractableItem;
-
-            if (!isItem)
-            {
-                string log = Log.HandleLog("Interactable <rb>is not item</rb>.");
-                Debug.Log(log);
+            if (!IsItem())
                 return;
-            }
-            
+
             PlayerInventory inventory = _playerEntity.GetInventory();
-            bool isInventoryFull = inventory.IsInventoryFull();
 
-            if (isInventoryFull)
-            {
-                string log = Log.HandleLog("Player inventory <ob>is full</ob>.");
-                Debug.Log(log);
+            if (IsInventoryFull())
                 return;
-            }
 
             var interactableItem = (IInteractableItem)_lastInteractable;
+            
             int itemID = interactableItem.GetItemID();
             ItemData itemData = new(itemID);
+            bool isItemAdded = inventory.AddItem(itemData, out int slotIndex);
+
+            // Not added.
+            if (!isItemAdded)
+                return;
             
-            inventory.AddItem(itemData);
+            NetworkObject playerNetworkObject = _playerEntity.GetNetworkObject();
+            interactableItem.PickUp(playerNetworkObject);
+
+            _interactableItems[slotIndex] = interactableItem;
+
+            //NetworkObject itemNetworkObject = interactableItem.GetNetworkObject();
+            //_networkSpawner.DestroyObject(itemNetworkObject);
+
+            // LOCAL METHODS: -----------------------------
+
+            bool IsItem()
+            {
+                bool isItem = _lastInteractable is IInteractableItem;
+
+                if (isItem)
+                    return true;
+
+                string log = Log.HandleLog("Interactable <rb>is not item</rb>.");
+                Debug.Log(log);
+
+                return false;
+            }
+
+            bool IsInventoryFull()
+            {
+                bool isInventoryFull = inventory.IsInventoryFull();
+
+                if (!isInventoryFull)
+                    return false;
+
+                string log = Log.HandleLog("Player inventory <ob>is full</ob>.");
+                Debug.Log(log);
+
+                return true;
+            }
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
@@ -94,5 +129,13 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
         private void OnInteractionEnded() =>
             _canInteract = false;
+
+        private void OnItemDropped(int slotIndex)
+        {
+            IInteractableItem interactableItem = _interactableItems[slotIndex];
+            interactableItem?.Drop();
+
+            _interactableItems[slotIndex] = null;
+        }
     }
 }

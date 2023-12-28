@@ -2,7 +2,7 @@
 
 namespace GameCore.Gameplay.Entities
 {
-    public interface INetworkEntity : IEntity
+    public interface INetworkObject
     {
         NetworkObject GetNetworkObject();
     }

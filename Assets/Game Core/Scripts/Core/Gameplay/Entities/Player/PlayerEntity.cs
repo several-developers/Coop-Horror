@@ -3,6 +3,7 @@ using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.Movement;
 using GameCore.Gameplay.Managers;
+using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.UI.Gameplay.Inventory;
 using Sirenix.OdinInspector;
@@ -49,9 +50,7 @@ namespace GameCore.Gameplay.Entities.Player
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<Vector2> OnMovementVectorChangedEvent;
-
-        private IPlayerInteractionObserver _playerInteractionObserver;
-
+        
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
@@ -78,10 +77,8 @@ namespace GameCore.Gameplay.Entities.Player
             base.OnNetworkDespawn();
         }
 
-        public void Setup(IPlayerInteractionObserver playerInteractionObserver)
+        public void Setup()
         {
-            _playerInteractionObserver = playerInteractionObserver;
-
             //float reloadTime = 1.5f;
             //float reloadAnimationTime = _animator.GetAnimationTime(AnimatorHashes.ReloadingAnimation);
             //float reloadTimeMultiplier = reloadAnimationTime / reloadTime; // 1, 0.5, 1 / 0.5
@@ -95,6 +92,8 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         public Transform GetTransform() => transform;
+
+        public Transform GetItemHoldPivot() => _itemHoldPivot;
 
         public Animator GetAnimator() => _animator;
 
@@ -118,17 +117,19 @@ namespace GameCore.Gameplay.Entities.Player
 
             var playerInput = GetComponent<PlayerInput>();
             InputSystemManager.Init(playerInput);
+            
+            IPlayerInteractionObserver playerInteractionObserver = NetworkSpawner.Get().PlayerInteractionObserver;
 
             PlayerCamera playerCamera = PlayerCamera.Get();
-            playerCamera.SetTarget(transform);
+            playerCamera.SetTarget(transform, _cameraPoint);
 
             _inventory = new PlayerInventory();
-            _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform, playerCamera.Camera,
+            _interactionChecker = new InteractionChecker(playerInteractionObserver, transform, playerCamera.Camera,
                 _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);
 
             _interactionHandler =
-                new InteractionHandler(playerEntity: this, _itemHoldPivot, _playerInteractionObserver);
-            
+                new InteractionHandler(playerEntity: this, playerInteractionObserver);
+
             InventoryHUD.Get().Init(playerEntity: this); // TEMP
 
             InputSystemManager.OnMoveEvent += OnMove;

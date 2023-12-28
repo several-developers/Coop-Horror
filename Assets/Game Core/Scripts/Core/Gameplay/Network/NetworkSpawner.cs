@@ -34,6 +34,8 @@ namespace GameCore.Gameplay.Network
         private IItemsMetaProvider _itemsMetaProvider;
         private IPlayerInteractionObserver _playerInteractionObserver;
 
+        public IPlayerInteractionObserver PlayerInteractionObserver => _playerInteractionObserver; // TEMP
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() =>
@@ -55,6 +57,9 @@ namespace GameCore.Gameplay.Network
             }
         }
 
+        public void DestroyObject(NetworkObject networkObject) =>
+            DestroyObjectServerRpc(networkObject);
+
         public void Spawn() =>
             NetworkObject.Spawn();
 
@@ -62,14 +67,27 @@ namespace GameCore.Gameplay.Network
 
         public static NetworkSpawner Get() => _instance;
 
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
         [ServerRpc]
         private void SpawnPlayerServerRpc(ulong clientID)
         {
             PlayerEntity playerInstance = Instantiate(_playerPrefab);
-            playerInstance.Setup(_playerInteractionObserver); // REWORK, only need for Owner
-            
+            playerInstance.Setup(); // REWORK, only need for Owner
+
             NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
             playerNetworkObject.SpawnWithOwnership(clientID);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void DestroyObjectServerRpc(NetworkObjectReference networkObjectReference)
+        {
+            bool isNetworkObject = networkObjectReference.TryGet(out NetworkObject networkObject);
+
+            if (!isNetworkObject)
+                return;
+
+            networkObject.Despawn();
         }
     }
 }

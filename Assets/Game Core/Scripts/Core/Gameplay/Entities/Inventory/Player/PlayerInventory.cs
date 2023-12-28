@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Inventory
@@ -16,7 +15,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         public event Action<int> OnSelectedSlotChangedEvent;
         public event Action<int, ItemData> OnItemEquippedEvent;
         public event Action<int> OnItemDroppedEvent;
-        
+
         private readonly Inventory<ItemData> _inventory;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -47,11 +46,10 @@ namespace GameCore.Gameplay.Entities.Inventory
             SendSelectedSlotChangedEvent(newSlotIndex);
         }
 
-        public void AddItem(ItemData itemData)
+        public bool AddItem(ItemData itemData, out int slotIndex)
         {
             bool isItemInSelectedSlotExists = _inventory.IsItemInSelectedSlotExists();
-            int slotIndex;
-            
+
             //LogPickUpItem(itemData.ItemID);
             
             if (isItemInSelectedSlotExists)
@@ -59,8 +57,13 @@ namespace GameCore.Gameplay.Entities.Inventory
             else
                 slotIndex = _inventory.AddItemInSelectedSlot(itemData);
 
-            if (slotIndex >= 0)
-                OnItemEquippedEvent?.Invoke(slotIndex, itemData);
+            // Item wasn't equipped.
+            if (slotIndex < 0)
+                return false;
+            
+            OnItemEquippedEvent?.Invoke(slotIndex, itemData);
+
+            return true;
         }
 
         public void DropItem()
@@ -70,17 +73,27 @@ namespace GameCore.Gameplay.Entities.Inventory
             if (!isItemExists)
                 return;
 
-            LogItemDrop(itemData.ItemID);
+            //LogItemDrop(itemData.ItemID);
 
             int slotIndex = _inventory.DropSelectedItem();
             
             OnItemDroppedEvent?.Invoke(slotIndex);
         }
 
+        public void MoveItems()
+        {
+            
+        }
+        
         public bool IsInventoryFull() =>
             _inventory.IsInventoryFull();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void CreateItemInHand()
+        {
+            
+        }
         
         private void SendSelectedSlotChangedEvent(int selectedSlotIndex) =>
             OnSelectedSlotChangedEvent?.Invoke(selectedSlotIndex);

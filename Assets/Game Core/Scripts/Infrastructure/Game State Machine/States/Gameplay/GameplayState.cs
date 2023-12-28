@@ -33,7 +33,7 @@ namespace GameCore.Infrastructure.StateMachine
             LockCursor();
             CreatePauseMenu();
             CreateQuitConfirmMenuView();
-
+            
             InputSystemManager.OnOpenPauseMenuEvent += OnOpenPauseMenu;
             
             _pauseMenuView.OnContinueClickedEvent += OnContinueClicked;
