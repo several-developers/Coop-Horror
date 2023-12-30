@@ -130,10 +130,10 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private void OnInteractionEnded() =>
             _canInteract = false;
 
-        private void OnItemDropped(int slotIndex)
+        private void OnItemDropped(int slotIndex, bool randomPosition)
         {
             IInteractableItem interactableItem = _interactableItems[slotIndex];
-            interactableItem?.Drop();
+            interactableItem?.Drop(randomPosition);
 
             _interactableItems[slotIndex] = null;
         }

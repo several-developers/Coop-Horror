@@ -20,6 +20,7 @@ namespace GameCore.Gameplay.Managers
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        // НЕ РАБОТАЕТ НА СЕРВЕРЕ, У КАЖДОГО КЛИЕНТА ДОЛЖЕН БЫТЬ СВОЙ ИНПУТ
         public static void Init(PlayerInput playerInput)
         {
             _playerInput = playerInput;

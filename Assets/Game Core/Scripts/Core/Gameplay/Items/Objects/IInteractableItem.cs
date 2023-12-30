@@ -7,7 +7,7 @@ namespace GameCore.Gameplay.Items
     public interface IInteractableItem : IInteractable, INetworkObject
     {
         void PickUp(NetworkObject playerNetworkObject);
-        void Drop();
+        void Drop(bool randomPosition = false);
         int GetItemID();
     }
 }

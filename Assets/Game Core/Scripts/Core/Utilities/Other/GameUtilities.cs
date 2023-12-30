@@ -61,7 +61,6 @@ namespace GameCore.Utilities
         public static Vector3 GetRandomDirXZ() =>
             new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
 
-
         public static Vector3 GetVectorFromAngle(int angle)
         {
             // angle = 0 -> 360

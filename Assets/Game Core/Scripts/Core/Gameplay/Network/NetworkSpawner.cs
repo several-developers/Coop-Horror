@@ -1,8 +1,6 @@
-﻿using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Items;
+﻿using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using GameCore.Observers.Gameplay.PlayerInteraction;
-using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -20,13 +18,7 @@ namespace GameCore.Gameplay.Network
             _itemsMetaProvider = itemsMetaProvider;
             _playerInteractionObserver = playerInteractionObserver;
         }
-
-        // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title(Constants.References)]
-        [SerializeField, Required]
-        private PlayerEntity _playerPrefab;
-
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         private static NetworkSpawner _instance;
@@ -38,12 +30,13 @@ namespace GameCore.Gameplay.Network
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
+        private void Awake()
+        {
+            Debug.Log("Loading network spawner");
             _instance = this;
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void SpawnPlayer(ulong clientID) => SpawnPlayerServerRpc(clientID);
 
         public void SpawnItem(int itemID)
         {
@@ -68,16 +61,6 @@ namespace GameCore.Gameplay.Network
         public static NetworkSpawner Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        [ServerRpc]
-        private void SpawnPlayerServerRpc(ulong clientID)
-        {
-            PlayerEntity playerInstance = Instantiate(_playerPrefab);
-            playerInstance.Setup(); // REWORK, only need for Owner
-
-            NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
-            playerNetworkObject.SpawnWithOwnership(clientID);
-        }
 
         [ServerRpc(RequireOwnership = false)]
         private void DestroyObjectServerRpc(NetworkObjectReference networkObjectReference)

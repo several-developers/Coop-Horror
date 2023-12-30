@@ -158,6 +158,6 @@ namespace GameCore.UI.Gameplay.Inventory
 
         private void OnItemEquipped(int slotIndex, ItemData itemData) => SetIcon(slotIndex, itemData);
 
-        private void OnItemDropped(int slotIndex) => ClearSlot(slotIndex);
+        private void OnItemDropped(int slotIndex, bool randomPosition) => ClearSlot(slotIndex);
     }
 }

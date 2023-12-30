@@ -72,11 +72,13 @@
 
         public void SetSelectedSlotIndex(int index) =>
             _selectedSlotIndex = index;
+        
+        public int DropSelectedItem() => DropItem(_selectedSlotIndex);
 
-        public int DropSelectedItem()
+        public int DropItem(int slotIndex)
         {
-            RemoveItem(_selectedSlotIndex);
-            return _selectedSlotIndex;
+            RemoveItem(slotIndex);
+            return slotIndex;
         }
 
         public void Clear()

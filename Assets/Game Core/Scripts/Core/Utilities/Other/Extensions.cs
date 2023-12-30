@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using DG.Tweening;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GameCore.Utilities
 {
@@ -21,6 +22,18 @@ namespace GameCore.Utilities
         public static void VisibilityState(this GameObject gameObject, bool show) =>
             gameObject.SetActive(show);
 
+        public static Vector3 GetRandomPosition(this Transform transform, float radius = 1f)
+        {
+            if (radius <= 0.01f)
+                return transform.position;
+
+            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            float rad = Random.Range(0f, radius);
+            Vector3 offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * rad;
+            
+            return transform.position + offset;
+        }
+        
         /// <summary>
         /// Puts the string into the Clipboard.
         /// </summary>

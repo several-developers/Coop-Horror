@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Network;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -18,5 +19,6 @@ namespace GameCore.Infrastructure.Providers.Global
         GameObject GetScenesLoaderPrefab(); // TEMP
         MenuPrefabsListMeta GetMenuPrefabsList(); // TEMP
         NetworkManager GetNetworkManager();
+        TheNetworkHorror GetNetworkHorror();
     }
 }

@@ -14,7 +14,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         
         public event Action<int> OnSelectedSlotChangedEvent;
         public event Action<int, ItemData> OnItemEquippedEvent;
-        public event Action<int> OnItemDroppedEvent;
+        public event Action<int, bool> OnItemDroppedEvent;
 
         private readonly Inventory<ItemData> _inventory;
 
@@ -76,8 +76,21 @@ namespace GameCore.Gameplay.Entities.Inventory
             //LogItemDrop(itemData.ItemID);
 
             int slotIndex = _inventory.DropSelectedItem();
+            const bool randomPosition = false;
             
-            OnItemDroppedEvent?.Invoke(slotIndex);
+            OnItemDroppedEvent?.Invoke(slotIndex, randomPosition);
+        }
+        
+        public void DropAllItems()
+        {
+            int iterations = _inventory.Size;
+            const bool randomPosition = true;
+
+            for (int i = 0; i < iterations; i++)
+            {
+                _inventory.DropItem(i);
+                OnItemDroppedEvent?.Invoke(i, randomPosition);
+            }
         }
 
         public void MoveItems()

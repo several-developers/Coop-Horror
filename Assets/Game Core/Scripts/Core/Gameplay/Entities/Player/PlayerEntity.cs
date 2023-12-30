@@ -10,6 +10,7 @@ using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace GameCore.Gameplay.Entities.Player
 {
@@ -54,11 +55,15 @@ namespace GameCore.Gameplay.Entities.Player
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
+        private bool _isInitialized;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Update()
         {
+            if (!_isInitialized)
+                return;
+            
             UpdateOwner();
             UpdateNotOwner();
         }
@@ -67,7 +72,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         public override void OnNetworkSpawn()
         {
-            Init();
             base.OnNetworkSpawn();
         }
 
@@ -84,6 +88,11 @@ namespace GameCore.Gameplay.Entities.Player
             //float reloadTimeMultiplier = reloadAnimationTime / reloadTime; // 1, 0.5, 1 / 0.5
 
             //_animator.SetFloat(id: AnimatorHashes.ReloadMultiplier, reloadTimeMultiplier);
+            
+            
+            InitOwner();
+            
+            _isInitialized = true;
         }
 
         public void TakeDamage(IEntity source, float damage)
@@ -104,22 +113,18 @@ namespace GameCore.Gameplay.Entities.Player
         public bool IsDead() => _isDead;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void Init()
-        {
-            InitOwner();
-        }
-
+        
         private void InitOwner()
         {
             if (!IsOwner)
                 return;
 
+            Debug.Log($"Player #{OwnerClientId} setup.");
+            IPlayerInteractionObserver playerInteractionObserver = NetworkSpawner.Get().PlayerInteractionObserver;
+            
             var playerInput = GetComponent<PlayerInput>();
             InputSystemManager.Init(playerInput);
             
-            IPlayerInteractionObserver playerInteractionObserver = NetworkSpawner.Get().PlayerInteractionObserver;
-
             PlayerCamera playerCamera = PlayerCamera.Get();
             playerCamera.SetTarget(transform, _cameraPoint);
 
@@ -158,6 +163,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
+            _inventory.DropAllItems();
             _interactionHandler.Dispose();
             PlayerCamera.Get().RemoveTarget();
 

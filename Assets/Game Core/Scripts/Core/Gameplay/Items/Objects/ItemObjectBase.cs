@@ -1,6 +1,8 @@
-﻿using GameCore.Enums;
+﻿using System;
+using GameCore.Enums;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.Other;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -35,7 +37,7 @@ namespace GameCore.Gameplay.Items
             //if (!IsSpawned)
                 //NetworkObject.Spawn();
         }
-        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Setup(int itemID) =>
@@ -49,7 +51,7 @@ namespace GameCore.Gameplay.Items
         public void PickUp(NetworkObject playerNetworkObject) =>
             PickUpServerRpc(playerNetworkObject);
 
-        public void Drop() => DropItemServerRpc();
+        public void Drop(bool randomPosition = false) => DropItemServerRpc(randomPosition);
 
         public NetworkObject GetNetworkObject() => NetworkObject;
 
@@ -70,15 +72,20 @@ namespace GameCore.Gameplay.Items
             _followParent.SetTarget(target);
         }
 
-        private void DropItem()
+        private void DropItem(bool randomPosition)
         {
             _rigidbody.isKinematic = false;
             _rigidbody.velocity = Vector3.zero;
+
+            if (randomPosition)
+                transform.position = transform.GetRandomPosition(radius: 0.5f);
 
             _collider.enabled = true;
             
             _followParent.RemoveTarget();
         }
+
+        // RPC: -----------------------------------------------------------------------------------
         
         [ServerRpc(RequireOwnership = false)]
         private void PickUpServerRpc(NetworkObjectReference playerNetworkObjectReference) =>
@@ -102,9 +109,9 @@ namespace GameCore.Gameplay.Items
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void DropItemServerRpc() => DropItemClientRpc();
+        private void DropItemServerRpc(bool randomPosition) => DropItemClientRpc(randomPosition);
 
         [ClientRpc]
-        private void DropItemClientRpc() => DropItem();
+        private void DropItemClientRpc(bool randomPosition) => DropItem(randomPosition);
     }
 }

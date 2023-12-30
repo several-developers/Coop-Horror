@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay;
+﻿using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Global;
 using Unity.Netcode;
 using UnityEngine;
@@ -33,12 +33,15 @@ namespace GameCore.Infrastructure.StateMachine
         private readonly IAssetsProvider _assetsProvider;
         private readonly DiContainer _diContainer;
 
+        private NetworkManager _networkManager;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
             CreateScenesLoader();
             CreateNetworkManager();
+            CreateNetworkHorror();
             EnterLoadDataState();
         }
 
@@ -53,7 +56,14 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateNetworkManager()
         {
             NetworkManager networkManagerPrefab = _assetsProvider.GetNetworkManager();
-            Object.Instantiate(networkManagerPrefab);
+            _networkManager = Object.Instantiate(networkManagerPrefab);
+        }
+
+        private void CreateNetworkHorror()
+        {
+            TheNetworkHorror networkHorror = _assetsProvider.GetNetworkHorror();
+            TheNetworkHorror networkHorrorInstance = Object.Instantiate(networkHorror);
+            networkHorrorInstance.Init(_networkManager);
         }
 
         private void EnterLoadDataState() =>
