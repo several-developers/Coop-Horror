@@ -51,7 +51,8 @@ namespace GameCore.Gameplay.Entities.Player
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<Vector2> OnMovementVectorChangedEvent;
-        
+
+        private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
@@ -72,6 +73,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         public override void OnNetworkSpawn()
         {
+            TheNetworkHorror networkHorror = TheNetworkHorror.Get();
+            networkHorror.OnDisconnectEvent -= OnDisconnect;
+            
             base.OnNetworkSpawn();
         }
 
@@ -89,8 +93,11 @@ namespace GameCore.Gameplay.Entities.Player
 
             //_animator.SetFloat(id: AnimatorHashes.ReloadMultiplier, reloadTimeMultiplier);
             
+            TheNetworkHorror networkHorror = TheNetworkHorror.Get();
+            networkHorror.OnDisconnectEvent += OnDisconnect;
             
             InitOwner();
+            InitNotOwner();
             
             _isInitialized = true;
         }
@@ -129,11 +136,11 @@ namespace GameCore.Gameplay.Entities.Player
             playerCamera.SetTarget(transform, _cameraPoint);
 
             _inventory = new PlayerInventory();
+            _inventoryManager = new PlayerInventoryManager(playerEntity: this);
             _interactionChecker = new InteractionChecker(playerInteractionObserver, transform, playerCamera.Camera,
                 _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);
 
-            _interactionHandler =
-                new InteractionHandler(playerEntity: this, playerInteractionObserver);
+            _interactionHandler = new InteractionHandler(_inventoryManager, playerInteractionObserver);
 
             InventoryHUD.Get().Init(playerEntity: this); // TEMP
 
@@ -143,6 +150,12 @@ namespace GameCore.Gameplay.Entities.Player
             InputSystemManager.OnDropItemEvent += OnDropItem;
         }
 
+        private void InitNotOwner()
+        {
+            if (IsOwner)
+                return;
+        }
+        
         private void UpdateOwner()
         {
             if (!IsOwner)
@@ -163,7 +176,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
-            _inventory.DropAllItems();
+            _inventoryManager.Dispose();
             _interactionHandler.Dispose();
             PlayerCamera.Get().RemoveTarget();
 
@@ -180,6 +193,9 @@ namespace GameCore.Gameplay.Entities.Player
             _inventory.DropItem();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnDisconnect() =>
+            _inventory.DropAllItems();
 
         private void OnMove(Vector2 movementVector) =>
             OnMovementVectorChangedEvent?.Invoke(movementVector);

@@ -19,7 +19,6 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             _interactionLm = interactionLM;
             _interactionObstaclesLM = interactionObstaclesLM;
             _screenCenterPoint = new Vector3(x: 0.5f, y: 0.5f);
-            _screenCenterPoint = new Vector3(x: Screen.width / 2f, y: Screen.height / 2f);
             _hits = new RaycastHit[24];
         }
 
@@ -54,7 +53,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
                 SendInteractionEndedEvent();
                 return;
             }
-            
+
             SendCanInteract(interactableItemIndex);
         }
 
@@ -76,7 +75,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
             _isInteractionFound = true;
             var interactable = _hits[interactableItemIndex].transform.GetComponent<IInteractable>();
-            
+
             _playerInteractionObserver.SendCanInteract(interactable);
         }
 
@@ -129,7 +128,10 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             return isObstacle;
         }
 
-        private Ray GetRay() =>
-            _camera.ScreenPointToRay(_screenCenterPoint);
+        private Ray GetRay()
+        {
+            var screenCenterPoint = new Vector3(x: Screen.width * 0.5f, y: Screen.height * 0.5f);
+            return _camera.ScreenPointToRay(screenCenterPoint);
+        }
     }
 }

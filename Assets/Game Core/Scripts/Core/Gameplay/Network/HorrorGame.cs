@@ -33,6 +33,9 @@ namespace GameCore.Gameplay.Network
 
         private void OnDestroy()
         {
+            _networkHorror.OnConnectEvent -= OnConnect;
+            _networkHorror.OnCheckApprovalEvent -= OnApprove;
+            _networkHorror.OnFindPlayerSpawnPositionEvent -= FindPlayerPos;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

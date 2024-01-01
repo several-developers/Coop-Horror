@@ -21,13 +21,13 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Enter()
         {
-            TryCloseServer();
+            Disconnect();
             EnterLoadMainMenuState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static void TryCloseServer()
+        private static void Disconnect()
         {
             TheNetworkHorror network = TheNetworkHorror.Get();
             network.Disconnect();

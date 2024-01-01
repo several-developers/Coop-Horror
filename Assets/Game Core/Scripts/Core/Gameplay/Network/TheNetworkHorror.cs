@@ -28,6 +28,7 @@ namespace GameCore.Gameplay.Network
 
         // Server & Client events
         public UnityAction OnConnectEvent; // Event when self connect, happens before onReady, before sending any data
+        public UnityAction OnDisconnectEvent; // Event when self disconnect
         public UnityAction<string> OnBeforeChangeSceneEvent; // Before Changing Scene
         public UnityAction<string> OnAfterChangeSceneEvent; // After Changing Scene
 
@@ -96,11 +97,9 @@ namespace GameCore.Gameplay.Network
 
         public void Disconnect()
         {
-            SpawnedPlayers.Remove(ClientID); // TEMP
-
             if (!IsClient && !IsServer)
                 return;
-
+            
             _networkManager.Shutdown();
             AfterDisconnected();
         }
@@ -193,6 +192,7 @@ namespace GameCore.Gameplay.Network
             }
         }
 
+        // Client side
         private void AfterConnected()
         {
             if (_networkManager.SceneManager != null)
@@ -202,6 +202,7 @@ namespace GameCore.Gameplay.Network
                 _networkManager.SceneManager.OnLoadComplete += OnAfterChangeScene;
         }
 
+        // Client side
         private void AfterDisconnected()
         {
             if (_networkManager.SceneManager != null)
@@ -209,6 +210,10 @@ namespace GameCore.Gameplay.Network
 
             if (_networkManager.SceneManager != null)
                 _networkManager.SceneManager.OnLoadComplete -= OnAfterChangeScene;
+
+            ReadyPlayersDictionary.Remove(ClientID);
+            SpawnedPlayers.Remove(ClientID);
+            OnDisconnectEvent?.Invoke();
         }
 
         private bool IsConnected() =>
@@ -280,11 +285,12 @@ namespace GameCore.Gameplay.Network
         private void OnClientDisconnect(ulong clientID)
         {
             Debug.Log("Disconnecting: " + clientID);
-
-            SpawnedPlayers.Remove(ClientID);
-
+            
             if (IsServer)
                 OnClientQuitEvent?.Invoke(clientID);
+
+            ReadyPlayersDictionary.Remove(clientID);
+            SpawnedPlayers.Remove(clientID);
         }
 
         private void OnBeforeChangeScene(ulong clientId, string sceneName, LoadSceneMode loadSceneMode,

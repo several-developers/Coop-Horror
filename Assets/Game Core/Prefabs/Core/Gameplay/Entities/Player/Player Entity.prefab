@@ -437,7 +437,7 @@ PrefabInstance:
     - target: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.003
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,
         type: 3}
@@ -705,7 +705,7 @@ MonoBehaviour:
   _slopeStartForce: 3
   _slopeAcceleration: 3
   _applyCollision: 1
-  _pushForce: 55
+  _pushForce: 2
   _playerEntity: {fileID: 5746002443945451132}
   _playerMovementConfig: {fileID: 11400000, guid: e4b2ff4b8cc1e134f915cc7121a0a7da,
     type: 2}

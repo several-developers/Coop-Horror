@@ -10,6 +10,10 @@ namespace GameCore.Gameplay.Entities.Inventory
         public PlayerInventory() =>
             _inventory = new Inventory<ItemData>(Constants.PlayerInventorySize);
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public int Size => _inventory.Size;
+
         // FIELDS: --------------------------------------------------------------------------------
         
         public event Action<int> OnSelectedSlotChangedEvent;
@@ -97,6 +101,9 @@ namespace GameCore.Gameplay.Entities.Inventory
         {
             
         }
+
+        public int GetSelectedSlotIndex() =>
+            _inventory.GetSelectedSlotIndex();
         
         public bool IsInventoryFull() =>
             _inventory.IsInventoryFull();

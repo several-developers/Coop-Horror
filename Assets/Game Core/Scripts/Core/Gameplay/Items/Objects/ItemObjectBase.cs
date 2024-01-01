@@ -1,5 +1,4 @@
-﻿using System;
-using GameCore.Enums;
+﻿using GameCore.Enums;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Utilities;
@@ -11,7 +10,6 @@ namespace GameCore.Gameplay.Items
 {
     [RequireComponent(typeof(FollowParent))]
     [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(Collider))]
     public abstract class ItemObjectBase : NetworkBehaviour, IInteractableItem
     {
         // FIELDS: --------------------------------------------------------------------------------
@@ -19,6 +17,9 @@ namespace GameCore.Gameplay.Items
         private FollowParent _followParent;
         private Rigidbody _rigidbody;
         private Collider _collider;
+        private GameObject _child; // Model container
+        
+        private bool _isPickedUp;
         
         [ShowInInspector]
         private int _itemID;
@@ -30,6 +31,7 @@ namespace GameCore.Gameplay.Items
             _followParent = GetComponent<FollowParent>();
             _rigidbody = GetComponent<Rigidbody>();
             _collider = GetComponent<Collider>();
+            _child = transform.GetChild(0).gameObject;
         }
 
         protected virtual void Start()
@@ -51,7 +53,34 @@ namespace GameCore.Gameplay.Items
         public void PickUp(NetworkObject playerNetworkObject) =>
             PickUpServerRpc(playerNetworkObject);
 
-        public void Drop(bool randomPosition = false) => DropItemServerRpc(randomPosition);
+        public void DropServer(bool randomPosition = false) => DropServerRpc(randomPosition);
+        
+        public void Drop(bool randomPosition = false)
+        {
+            if (!_isPickedUp)
+                return;
+
+            _isPickedUp = false;
+            _rigidbody.isKinematic = false;
+            _rigidbody.velocity = Vector3.zero;
+
+            if (randomPosition)
+                transform.position = transform.GetRandomPosition(radius: 0.5f);
+
+            _collider.enabled = true;
+            
+            _followParent.RemoveTarget();
+        }
+
+        public void ShowServer() => ShowServerRpc();
+
+        public void Show() =>
+            _child.SetActive(true);
+        
+        public void HideServer() => HideServerRpc();
+
+        public void Hide() =>
+            _child.SetActive(false);
 
         public NetworkObject GetNetworkObject() => NetworkObject;
 
@@ -64,25 +93,16 @@ namespace GameCore.Gameplay.Items
 
         private void PickUp(Transform target)
         {
+            if (_isPickedUp)
+                return;
+
+            _isPickedUp = true;
             _rigidbody.isKinematic = true;
             _rigidbody.velocity = Vector3.zero;
             
             _collider.enabled = false;
             
             _followParent.SetTarget(target);
-        }
-
-        private void DropItem(bool randomPosition)
-        {
-            _rigidbody.isKinematic = false;
-            _rigidbody.velocity = Vector3.zero;
-
-            if (randomPosition)
-                transform.position = transform.GetRandomPosition(radius: 0.5f);
-
-            _collider.enabled = true;
-            
-            _followParent.RemoveTarget();
         }
 
         // RPC: -----------------------------------------------------------------------------------
@@ -109,9 +129,21 @@ namespace GameCore.Gameplay.Items
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void DropItemServerRpc(bool randomPosition) => DropItemClientRpc(randomPosition);
+        private void DropServerRpc(bool randomPosition) => DropClientRpc(randomPosition);
 
         [ClientRpc]
-        private void DropItemClientRpc(bool randomPosition) => DropItem(randomPosition);
+        private void DropClientRpc(bool randomPosition) => Drop(randomPosition);
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ShowServerRpc() => ShowClientRpc();
+
+        [ClientRpc]
+        private void ShowClientRpc() => Show();
+
+        [ServerRpc(RequireOwnership = false)]
+        private void HideServerRpc() => HideClientRpc();
+
+        [ClientRpc]
+        private void HideClientRpc() => Hide();
     }
 }
