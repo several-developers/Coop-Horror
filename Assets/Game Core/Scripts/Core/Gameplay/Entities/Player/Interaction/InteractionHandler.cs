@@ -50,6 +50,11 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
                 case InteractionType.PickUpItem:
                     HandlePickUpItem();
                     break;
+                
+                default:
+                    if (_lastInteractable.CanInteract())
+                        _lastInteractable.Interact();
+                    break;
             }
         }
 

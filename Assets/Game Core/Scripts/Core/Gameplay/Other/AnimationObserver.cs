@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Entities.Other
+namespace GameCore.Gameplay.Other
 {
     public class AnimationObserver : MonoBehaviour
     {
@@ -9,6 +9,10 @@ namespace GameCore.Gameplay.Entities.Other
 
         public event Action OnAttackEvent;
         public event Action OnAttackFinishedEvent;
+        public event Action OnEnabledEvent;
+        public event Action OnDisabledEvent;
+        public event Action OnDoorOpenedEvent;
+        public event Action OnDoorClosedEvent;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -17,5 +21,17 @@ namespace GameCore.Gameplay.Entities.Other
         
         public void OnTriggerAttackFinishedEvent() =>
             OnAttackFinishedEvent?.Invoke();
+        
+        public void OnTriggerEnabledEvent() =>
+            OnEnabledEvent?.Invoke();
+
+        public void OnTriggerDisabledEvent() =>
+            OnDisabledEvent?.Invoke();
+        
+        public void OnTriggerDoorOpenedEvent() =>
+            OnDoorOpenedEvent?.Invoke();
+
+        public void OnTriggerDoorClosedEvent() =>
+            OnDoorClosedEvent?.Invoke();
     }
 }

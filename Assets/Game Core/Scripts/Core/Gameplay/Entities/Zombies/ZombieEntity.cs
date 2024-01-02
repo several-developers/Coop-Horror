@@ -1,9 +1,9 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Entities.Other;
-using GameCore.Gameplay.Entities.Other.DamageReceivers;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Zombies.States;
+using GameCore.Gameplay.Other;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;

@@ -15,6 +15,8 @@ namespace GameCore
         public static readonly int Reload = Animator.StringToHash("Reload");
         public static readonly int ReloadMultiplier = Animator.StringToHash("ReloadMultiplier");
         public static readonly int Scream = Animator.StringToHash("Scream");
+        public static readonly int IsOn = Animator.StringToHash("IsOn");
+        public static readonly int IsOpen = Animator.StringToHash("IsOpen");
         
         public const string ReloadingAnimation = "Reloading";
     }

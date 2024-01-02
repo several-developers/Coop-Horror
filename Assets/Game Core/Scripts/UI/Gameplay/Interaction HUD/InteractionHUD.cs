@@ -1,7 +1,9 @@
-﻿using GameCore.Gameplay.Interactable;
+﻿using GameCore.Enums;
+using GameCore.Gameplay.Interactable;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.UI.Global.Animations;
 using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 using Zenject;
 
@@ -17,6 +19,14 @@ namespace GameCore.UI.Gameplay.Interaction
 
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [Title(Constants.Settings)]
+        [SerializeField]
+        private InteractionTextSettings _interactionTextSettings;
+
+        [Title(Constants.References)]
+        [SerializeField, Required]
+        private TextMeshProUGUI _textTMP;
+
         [TitleGroup(Constants.Animation)]
         [BoxGroup(Constants.AnimationIn, showLabel: false), SerializeField]
         private TMPFadeAnimation _fadeAnimation;
@@ -24,11 +34,14 @@ namespace GameCore.UI.Gameplay.Interaction
         // FIELDS: --------------------------------------------------------------------------------
 
         private IPlayerInteractionObserver _playerInteractionObserver;
+        private IInteractable _lastInteractable;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
+            _interactionTextSettings.Setup(_textTMP);
+
             _playerInteractionObserver.OnCanInteractEvent += OnCanInteract;
             _playerInteractionObserver.OnInteractionEndedEvent += OnInteractionEnded;
         }
@@ -43,14 +56,42 @@ namespace GameCore.UI.Gameplay.Interaction
 
         private void ShowInteractionInfo(IInteractable interactable)
         {
-            _fadeAnimation.Show();
+            InteractionType interactionType = interactable.GetInteractionType();
+            bool canInteract = interactable.CanInteract();
+
+            _interactionTextSettings.UpdateText(interactionType, canInteract);
         }
-        
+
+        private void SubscribeLastInteractable(IInteractable interactable)
+        {
+            _lastInteractable = interactable;
+            _lastInteractable.OnInteractionStateChangedEvent += OnInteractionStateChanged;
+        }
+
+        private void UnsubscribeLastInteractable()
+        {
+            if (_lastInteractable == null)
+                return;
+
+            _lastInteractable.OnInteractionStateChangedEvent -= OnInteractionStateChanged;
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnCanInteract(IInteractable interactable) => ShowInteractionInfo(interactable);
+        private void OnCanInteract(IInteractable interactable)
+        {
+            UnsubscribeLastInteractable();
+            SubscribeLastInteractable(interactable);
+            ShowInteractionInfo(interactable);
+            _fadeAnimation.Show();
+        }
 
-        private void OnInteractionEnded() =>
+        private void OnInteractionEnded()
+        {
+            UnsubscribeLastInteractable();
             _fadeAnimation.Hide();
+        }
+
+        private void OnInteractionStateChanged() => ShowInteractionInfo(_lastInteractable);
     }
 }

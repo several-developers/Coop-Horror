@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.Entities.Other;
+using GameCore.Gameplay.Other;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Zombies.States

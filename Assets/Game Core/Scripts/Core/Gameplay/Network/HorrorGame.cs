@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using GameCore.Gameplay.Network.Other;
 using GameCore.Utilities;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ namespace GameCore.Gameplay.Network
         private void Awake()
         {
             _instance = this;
-            //StartGame();
+            StartGame();
         }
 
         private void Start()
@@ -93,7 +94,14 @@ namespace GameCore.Gameplay.Network
 
         // Step 3, select player starting position
         // Optional, if not defined, will spawn at the PlayerSpawn with the same player_id (or at Vector3.zero if none)
-        private Vector3 FindPlayerPos(int playerID) =>
-            transform.GetRandomPosition(); // TEMP, тут берётся transform HorrorGame, а надо спавнер.
+        private Vector3 FindPlayerPos(int playerID)
+        {
+            PlayerSpawnPoint playerSpawnPoint = PlayerSpawnPoint.GetRandomSpawnPoint();
+
+            if (playerSpawnPoint != null)
+                return playerSpawnPoint.GetRandomPosition();
+
+            return transform.GetRandomPosition();
+        }
     }
 }

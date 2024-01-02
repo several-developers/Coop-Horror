@@ -1,4 +1,5 @@
-﻿using GameCore.Enums;
+﻿using System;
+using GameCore.Enums;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Utilities;
@@ -13,6 +14,8 @@ namespace GameCore.Gameplay.Items
     public abstract class ItemObjectBase : NetworkBehaviour, IInteractableItem
     {
         // FIELDS: --------------------------------------------------------------------------------
+        
+        public event Action OnInteractionStateChangedEvent;
 
         private FollowParent _followParent;
         private Rigidbody _rigidbody;
@@ -44,10 +47,14 @@ namespace GameCore.Gameplay.Items
 
         public void Setup(int itemID) =>
             _itemID = itemID;
-
+        
         public virtual void Interact()
         {
             Debug.Log("Interacting with: " + name);
+        }
+
+        public void ToggleInteract(bool canInteract)
+        {
         }
 
         public void PickUp(NetworkObject playerNetworkObject) =>
@@ -55,6 +62,7 @@ namespace GameCore.Gameplay.Items
 
         public void DropServer(bool randomPosition = false) => DropServerRpc(randomPosition);
         
+        // ПРОТЕСТИТЬ С ЛАГАМИ
         public void Drop(bool randomPosition = false)
         {
             if (!_isPickedUp)
@@ -74,11 +82,13 @@ namespace GameCore.Gameplay.Items
 
         public void ShowServer() => ShowServerRpc();
 
+        // ПРОТЕСТИТЬ С ЛАГАМИ
         public void Show() =>
             _child.SetActive(true);
         
         public void HideServer() => HideServerRpc();
 
+        // ПРОТЕСТИТЬ С ЛАГАМИ
         public void Hide() =>
             _child.SetActive(false);
 
@@ -88,6 +98,8 @@ namespace GameCore.Gameplay.Items
             InteractionType.PickUpItem;
         
         public int GetItemID() => _itemID;
+
+        public bool CanInteract() => true;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
