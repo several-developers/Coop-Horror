@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.ItemsList;
+using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using UnityEngine;

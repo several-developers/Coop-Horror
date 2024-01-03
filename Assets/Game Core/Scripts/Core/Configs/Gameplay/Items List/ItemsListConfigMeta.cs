@@ -4,7 +4,7 @@ using MetaEditor;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Configs.ItemsList
+namespace GameCore.Configs.Gameplay.ItemsList
 {
     public class ItemsListConfigMeta : EditorMeta
     {

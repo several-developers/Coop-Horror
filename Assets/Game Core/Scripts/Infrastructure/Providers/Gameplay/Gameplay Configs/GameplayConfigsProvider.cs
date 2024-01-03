@@ -1,5 +1,5 @@
 ﻿using GameCore.Configs.Gameplay;
-using GameCore.Configs.ItemsList;
+using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Core.Configs.Player;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;

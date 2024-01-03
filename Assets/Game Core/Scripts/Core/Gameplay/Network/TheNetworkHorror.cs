@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameCore.Gameplay.Entities.Player;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -31,6 +30,7 @@ namespace GameCore.Gameplay.Network
         public UnityAction OnDisconnectEvent; // Event when self disconnect
         public UnityAction<string> OnBeforeChangeSceneEvent; // Before Changing Scene
         public UnityAction<string> OnAfterChangeSceneEvent; // After Changing Scene
+        public UnityAction<float> OnGameTimerUpdatedEvent;
 
         // Server only events
         public event UnityAction<ulong> OnClientJoinEvent; // Server event when any client connect
@@ -46,13 +46,16 @@ namespace GameCore.Gameplay.Network
         private static readonly List<ulong> SpawnedPlayers = new();
         
         private static TheNetworkHorror _instance;
+        
+        private readonly NetworkVariable<float> _gameTimer = new();
 
         private NetworkManager _networkManager;
         private NetworkSceneManager _networkSceneManager;
 
         private ClientState _localState = ClientState.Offline;
-        private float _updateTimer;
+        private float _slowUpdateTimer;
         private bool _offlineMode;
+        private bool _isGameTimerOn;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -62,13 +65,24 @@ namespace GameCore.Gameplay.Network
         private void Update()
         {
             const float refreshDuration = 1f;
-            _updateTimer += Time.deltaTime;
+            _slowUpdateTimer += Time.deltaTime;
 
-            if (_updateTimer <= refreshDuration)
+            if (_slowUpdateTimer <= refreshDuration)
                 return;
 
-            _updateTimer = 0f;
+            _slowUpdateTimer = 0f;
             SlowUpdate();
+        }
+
+        public override void OnDestroy()
+        {
+            _networkManager.ConnectionApprovalCallback -= OnApprovalCheck;
+            _networkManager.OnClientConnectedCallback -= OnClientConnected;
+            _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
+
+            _gameTimer.OnValueChanged -= OnGameTimerUpdated;
+            
+            base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -81,8 +95,10 @@ namespace GameCore.Gameplay.Network
             _networkManager.ConnectionApprovalCallback += OnApprovalCheck;
             _networkManager.OnClientConnectedCallback += OnClientConnected;
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
-        }
 
+            _gameTimer.OnValueChanged += OnGameTimerUpdated;
+        }
+        
         public void StartHost()
         {
             _networkManager.StartHost();
@@ -99,6 +115,9 @@ namespace GameCore.Gameplay.Network
         {
             if (!IsClient && !IsServer)
                 return;
+            
+            if (IsServer)
+                StopGameTimer();
             
             _networkManager.Shutdown();
             AfterDisconnected();
@@ -127,6 +146,7 @@ namespace GameCore.Gameplay.Network
 
             CheckIfReady();
             CheckIfCanSpawnPlayers();
+            UpdateGameTimer();
         }
 
         private void UpdateClient()
@@ -151,6 +171,9 @@ namespace GameCore.Gameplay.Network
 
             if (isReady)
                 return;
+            
+            if (IsServer)
+                StartGameTimer();
 
             SetPlayerReadyServerRpc();
 
@@ -191,8 +214,7 @@ namespace GameCore.Gameplay.Network
                 SpawnPlayerServerRpc(spawnPosition, clientID);
             }
         }
-
-        // Client side
+        
         private void AfterConnected()
         {
             if (_networkManager.SceneManager != null)
@@ -201,8 +223,7 @@ namespace GameCore.Gameplay.Network
             if (_networkManager.SceneManager != null)
                 _networkManager.SceneManager.OnLoadComplete += OnAfterChangeScene;
         }
-
-        // Client side
+        
         private void AfterDisconnected()
         {
             if (_networkManager.SceneManager != null)
@@ -214,6 +235,30 @@ namespace GameCore.Gameplay.Network
             ReadyPlayersDictionary.Remove(ClientID);
             SpawnedPlayers.Remove(ClientID);
             OnDisconnectEvent?.Invoke();
+        }
+
+        private void StartGameTimer()
+        {
+            if (_isGameTimerOn)
+                return;
+            
+            _isGameTimerOn = true;
+        }
+
+        private void StopGameTimer()
+        {
+            if (!_isGameTimerOn)
+                return;
+            
+            _isGameTimerOn = false;
+        }
+
+        private void UpdateGameTimer()
+        {
+            if (!_isGameTimerOn)
+                return;
+            
+            _gameTimer.Value += 1f;
         }
 
         private bool IsConnected() =>
@@ -303,6 +348,9 @@ namespace GameCore.Gameplay.Network
         {
             OnAfterChangeSceneEvent?.Invoke(sceneName);
         }
+
+        private void OnGameTimerUpdated(float oldValue, float newValue) =>
+            OnGameTimerUpdatedEvent?.Invoke(newValue);
     }
 
     public enum ClientState

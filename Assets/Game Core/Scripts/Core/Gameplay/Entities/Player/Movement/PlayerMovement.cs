@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using GameCore.Core.Configs.Player;
+using GameCore.Gameplay.Entities.MobileHeadquarters;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -85,10 +86,12 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void HandleMovement()
+        public void HandleMovement(MobileHeadquartersEntity mobileHeadquartersEntity)
         {
             GroundCheck();
 
+            Vector3 mobileHeadquarterVelocity = mobileHeadquartersEntity.GetVelocity();
+            
             _moveVelocity = _projectMoveOnGround ? Vector3.ProjectOnPlane(_moveInput, GroundNormal) : _moveInput;
 
             if (_isGround)
@@ -99,7 +102,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
             GravityUpdate();
 
-            Vector3 moveDirection = _moveVelocity + _inertiaVelocity + _platformVelocity;
+            Vector3 moveDirection = _moveVelocity + _inertiaVelocity + _platformVelocity + mobileHeadquarterVelocity;
             
             CharacterController.Move(moveDirection * Time.deltaTime);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using GameCore.Gameplay.Entities.Inventory;
+using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.Movement;
 using GameCore.Gameplay.Managers;
@@ -56,6 +57,8 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
         private bool _isInitialized;
+
+        private MobileHeadquartersEntity _mobileHeadquartersEntity;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -141,6 +144,8 @@ namespace GameCore.Gameplay.Entities.Player
 
             _interactionHandler = new InteractionHandler(_inventoryManager, playerInteractionObserver);
 
+            _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
+
             InventoryHUD.Get().Init(playerEntity: this); // TEMP
 
             InputSystemManager.OnMoveEvent += OnMove;
@@ -160,7 +165,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
-            _playerMovement.HandleMovement();
+            _playerMovement.HandleMovement(_mobileHeadquartersEntity);
             _interactionChecker.Check();
         }
 

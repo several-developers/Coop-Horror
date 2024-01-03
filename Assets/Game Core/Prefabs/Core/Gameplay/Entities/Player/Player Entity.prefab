@@ -657,7 +657,7 @@ MonoBehaviour:
     m_Bits: 256
   _interactionObstaclesLM:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 503
   _animator: {fileID: 0}
   _networkObject: {fileID: -4117527861951101490}
   _playerMovement: {fileID: 7464226445342076517}

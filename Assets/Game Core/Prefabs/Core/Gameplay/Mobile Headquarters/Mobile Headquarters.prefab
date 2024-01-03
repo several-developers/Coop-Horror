@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 1830334093793617745}
   - component: {fileID: 7144477240461052206}
   - component: {fileID: 2871681218726240799}
+  - component: {fileID: 1435509824869955947}
   m_Layer: 0
   m_Name: Mobile Headquarters
   m_TagString: Untagged
@@ -200,11 +201,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43a4806faf6c4d239abe26fcfecb57fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mobileHeadquartersConfig: {fileID: 11400000, guid: 42fa32de715f30247b6994951dad2972,
+    type: 2}
   _animator: {fileID: 1830334093793617745}
   _animationObserver: {fileID: 7144477240461052206}
+  _dollyCart: {fileID: 1435509824869955947}
   _networkObject: {fileID: 4446837613166490103}
   _toggleMobileDoorLever: {fileID: 8067631092820087447}
   _launchMobileLever: {fileID: 3905741392167710577}
+  _cinemachinePath: {fileID: 0}
+--- !u!114 &1435509824869955947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195987239533786563}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99a9c787e5d1bbf48a389834c4a9641c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Path: {fileID: 0}
+  m_UpdateMethod: 0
+  m_PositionUnits: 1
+  m_Speed: 0
+  m_Position: 0
 --- !u!1 &6195987239724444557
 GameObject:
   m_ObjectHideFlags: 0

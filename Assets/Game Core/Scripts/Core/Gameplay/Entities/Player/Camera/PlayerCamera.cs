@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.Managers;
+﻿using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Managers;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -43,16 +44,22 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _transform;
         private Transform _target;
         private Transform _cameraPoint;
+        private Transform _mobileHeadquartersTransform;
         private PlayerInputActions _playerInputActions;
 
+        private Vector3 _lastFrameMobileHeadquartersRotation;
         private Vector2 _lookVector;
         private float _mouseVerticalValue;
         private bool _isPlayerFound;
-
+        
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
+        private void Awake()
+        {
             _instance = this;
+            _mobileHeadquartersTransform = MobileHeadquartersEntity.Get().transform;
+            _lastFrameMobileHeadquartersRotation = _mobileHeadquartersTransform.rotation.eulerAngles;
+        }
 
         private void LateUpdate()
         {
@@ -61,14 +68,19 @@ namespace GameCore.Gameplay.Entities.Player
             
             _lookVector = _playerInputActions.Player.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
-            
-            float yRotation = _target.localRotation.eulerAngles.y + _lookVector.x * _sensitivity;
+
+            Vector3 mobileHeadquartersRotation = _mobileHeadquartersTransform.rotation.eulerAngles;
+            Vector3 difference = mobileHeadquartersRotation - _lastFrameMobileHeadquartersRotation;
+
+            float yRotation = _target.rotation.eulerAngles.y + difference.y + _lookVector.x * _sensitivity;
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
             _transform.position = _cameraPoint.position;
             _transform.localRotation = finalRotation;
 
             _target.rotation = Quaternion.Euler(0, yRotation, 0);
+
+            _lastFrameMobileHeadquartersRotation = mobileHeadquartersRotation;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
