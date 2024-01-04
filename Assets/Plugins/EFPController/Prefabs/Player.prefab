@@ -1033,9 +1033,9 @@ MonoBehaviour:
     type: 2}
   stayPhysMaterial: {fileID: 13400000, guid: 06ba6000d9388384aace480640202531, type: 2}
   flyPhysMaterial: {fileID: 13400000, guid: 8b2468123ae8e784ab4d467d13e97943, type: 2}
-  gravityMultiplier: 2
-  gravityMax: 30
-  airSpeedMultiplier: 1
+  _gravityMultiplier: 2
+  _gravityMax: 30
+  _airSpeedMultiplier: 1
   walkSpeed: 5
   diagonalStrafeAmt: 0.75
   backwardSpeedPercentage: 0.9
@@ -1084,10 +1084,7 @@ MonoBehaviour:
   crouchingCamHeight: 0.58
   crouchCapsuleHeight: 1.25
   crouchCapsuleCastHeight: 0.75
-  allowJumping: 1
-  jumpSpeed: 6
-  jumpCancelsSprint: 0
-  antiBunnyHopFactor: 0.02
+  _playerJumpingConfig: {fileID: 0}
   allowSprinting: 1
   sprintSpeed: 8
   sprintMode: 2

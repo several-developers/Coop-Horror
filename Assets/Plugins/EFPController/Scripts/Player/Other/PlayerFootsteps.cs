@@ -92,7 +92,7 @@ namespace EFPController
 		void Update() 
 		{
 			if (!inited || player.controller.IsSwimming) return;
-			isCrouch = player.controller.IsCrouching;
+			isCrouch = player.controller.CrouchingComponent.IsCrouching;
 			isSprint = player.controller.sprint;
 			isDash = player.controller.dashActive;
 			CheckGround();

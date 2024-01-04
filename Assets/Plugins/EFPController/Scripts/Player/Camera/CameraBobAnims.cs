@@ -120,8 +120,8 @@ namespace EFPController
 			if(controller.IsMoving)
 			{
 				// check for sprinting
-				if((((controller.sprint || controller.dashActive) && !controller.IsCrouching && controller.midPos >= controller.standingCamHeight) 
-					|| (!controller.IsCrouching && (controller.sprint || controller.dashActive)))
+				if((((controller.sprint || controller.dashActive) && !controller.CrouchingComponent.IsCrouching && controller.midPos >= controller.standingCamHeight) 
+					|| (!controller.CrouchingComponent.IsCrouching && (controller.sprint || controller.dashActive)))
 					&& controller.fallingDistance < 0.75f && !controller.JumpingComponent.IsJumping)
 				{
 					// actually sprinting now
@@ -197,7 +197,7 @@ namespace EFPController
 			if ((controller.sprint || controller.dashActive)
 			&& !(controller.forwardSprintOnly && (Mathf.Abs(horizontal) != 0f) && (Mathf.Abs(vertical) < 0.75f))
 			&& (Mathf.Abs(vertical) != 0f || (!controller.forwardSprintOnly && controller.IsMoving))
-			&& !controller.IsCrouching
+			&& !controller.CrouchingComponent.IsCrouching
 			&& controller.midPos >= controller.standingCamHeight)
 			{
 				// scale up bob speeds slowly to prevent jerky transition
@@ -208,7 +208,7 @@ namespace EFPController
 			} else {
 				// scale up bob speeds slowly to prevent jerky transition
 
-				if (controller.IsCrouching)
+				if (controller.CrouchingComponent.IsCrouching)
 				{
 					// crouching bob amounts
 					camPositionBobAmt = Vector2.MoveTowards(camPositionBobAmt, crouchPositionBob, Time.smoothDeltaTime * 16f);

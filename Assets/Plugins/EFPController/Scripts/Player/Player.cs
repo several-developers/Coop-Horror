@@ -108,7 +108,6 @@ namespace EFPController
             cameraControl.SetEffectFilter(CameraControl.ScreenEffectProfileType.Fade, 1f, 1f);
             cameraControl.enabled = true;
             controller.speedMult = 1f;
-            controller.allowCrouch = true;
             audioSources.SetParent(cameraRoot.transform);
             inited = true;
             this.WaitAndCall(0.5f, () => {

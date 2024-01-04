@@ -21,9 +21,15 @@ namespace EFPController
         public PhysicMaterial groundedPhysMaterial;
         public PhysicMaterial stayPhysMaterial;
         public PhysicMaterial flyPhysMaterial;
-        public float gravityMultiplier = 2f;
-        public float gravityMax = 30f;
-        public float airSpeedMultiplier = 0.5f;
+        
+        [SerializeField]
+        private float _gravityMultiplier = 2f;
+        
+        [SerializeField]
+        private float _gravityMax = 30f;
+        
+        [SerializeField]
+        private float _airSpeedMultiplier = 0.5f;
 
         [Tooltip("Speed that player moves when walking.")]
         public float walkSpeed = 4f;
@@ -61,35 +67,8 @@ namespace EFPController
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [Header("Crouching")]
-        [Tooltip("True if player should be allowed to crouch.")]
-        public bool allowCrouch = true;
-
-        [Tooltip("Percentage to decrease movement speed when crouching.")]
-        public float crouchSpeedMult = 0.55f; // percentage to decrease movement speed while crouchin
-
-        public float crouchCooldown = 0.57f;
-
-        [Tooltip("Y position/height of camera when crouched.")]
-        public float crouchingCamHeight = 0.45f;
-
-        [Tooltip("Height of player capsule while crouching.")]
-        public float crouchCapsuleHeight = 1.25f; // height of capsule while crouching
-
-        public float
-            crouchCapsuleCastHeight =
-                0.80f; // height of capsule cast above player to check for obstacles before standing from crouch
-
-        // True when player is crouching.
-        public bool IsCrouching { get; set; }
-        public bool crouchRisen { get; set; } // player has risen from crouch postition
-        public bool crouchState { get; set; }
-
-        public float playerHeightMod { get; private set; } =
-            0f; // amount to add to player height (proportionately increases player height, radius, and capsule cast/raycast heights)
-        
-        public float lastCrouchTime { get; set; } // Vlad
-        private float crouchCapsuleCheckRadius = 0.5f;
-
+        [SerializeField, Required]
+        private PlayerCrouchingConfig _playerCrouchingConfig;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Jumping
@@ -99,17 +78,11 @@ namespace EFPController
         [SerializeField, Required]
         private PlayerJumpingConfig _playerJumpingConfig;
 
-        [Tooltip("True if player can Jump while sprinting and not cancel sprint.")]
-        public bool jumpCancelsSprint;
-        
-        private float jumpTimer = 0f; // track the time player began jump
-        private float landStartTime = -999f; // time that player landed from jump
-
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Sprinting
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public enum sprintType
+        public enum SprintType
         {
             Hold = 0,
             Toggle = 1,
@@ -125,7 +98,7 @@ namespace EFPController
 
         [Tooltip(
             "User may set sprint mode to toggle, hold, or both (toggle on sprint button press, hold on sprint button hold).")]
-        public sprintType sprintMode = sprintType.Both;
+        public SprintType sprintMode = SprintType.Both;
 
         public bool forwardSprintOnly = true;
 
@@ -372,8 +345,9 @@ namespace EFPController
         public bool IsMoving { get; private set; }
         public float speedMult { get; set; } = 1f;
 
+        // Vlad, set was private
         public float
-            camDampSpeed { get; private set; } // variable damp speed for vertical camera smoothing for stance changes
+            camDampSpeed { get; set; } // variable damp speed for vertical camera smoothing for stance changes
 
         public Vector3 camPos { get; private set; }
         public Vector3 eyePos { get; private set; }
@@ -443,10 +417,12 @@ namespace EFPController
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public PlayerJumpingComponent JumpingComponent => _jumpingComponent;
+        public PlayerCrouchingComponent CrouchingComponent => _crouchingComponent;
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private PlayerJumpingComponent _jumpingComponent;
+        private PlayerCrouchingComponent _crouchingComponent;
         private Transform _transform;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -466,35 +442,32 @@ namespace EFPController
             inputManager = InputManager.instance;
             
             _jumpingComponent = new PlayerJumpingComponent(player, inputManager, this, _playerJumpingConfig);
+            _crouchingComponent = new PlayerCrouchingComponent(player, inputManager, this, _playerCrouchingConfig);
 
             // clamp movement modifier percentages
-            Mathf.Clamp01(backwardSpeedPercentage);
-            Mathf.Clamp01(crouchSpeedMult);
-            Mathf.Clamp01(strafeSpeedPercentage);
+            backwardSpeedPercentage = Mathf.Clamp01(backwardSpeedPercentage); // Vlad
+            strafeSpeedPercentage = Mathf.Clamp01(strafeSpeedPercentage); // Vlad
 
             moveSpeedMult = 1f;
 
             capsule.height = standingCapsuleHeight;
 
             // add to reach distances if capsule cast height is larger than default
-            playerHeightMod = standingCapsuleHeight - 2.24f;
+            _crouchingComponent.PlayerHeightMod = standingCapsuleHeight - 2.24f;
 
             // initialize player height variables
-            crouchCapsuleCheckRadius = capsule.radius * 0.9f;
-
-            // initialize rayCast and capsule cast heights
-            crouchCapsuleCastHeight = capsule.height * 0.45f;
-
+            _crouchingComponent.CrouchCapsuleCheckRadius = capsule.radius * 0.9f;
+            
             // set sprint mode to toggle, hold, or both, based on inspector setting
             switch (sprintMode)
             {
-                case sprintType.Both:
+                case SprintType.Both:
                     sprintDelay = 0.4f;
                     break;
-                case sprintType.Hold:
+                case SprintType.Hold:
                     sprintDelay = 0f;
                     break;
-                case sprintType.Toggle:
+                case SprintType.Toggle:
                     sprintDelay = 999f; // time allowed between button down and release to activate toggle
                     break;
             }
@@ -510,11 +483,11 @@ namespace EFPController
             Vector3 currentPosition = _transform.position;
             float t = Time.time;
             
-            crouchCapsuleCheckRadius = capsule.radius * 0.9f;
+            _crouchingComponent.CrouchCapsuleCheckRadius = capsule.radius * 0.9f;
 
             bool canStandUpOrJump = CanStandUpOrJump(currentPosition, out Vector3 p2);
 
-            CrouchLogic(t, canStandUpOrJump, currentPosition, p2);
+            _crouchingComponent.CrouchUpdateLogic(t, canStandUpOrJump, currentPosition, p2);
             DetermineIfMoving();
             _jumpingComponent.JumpingUpdateLogic(t, canStandUpOrJump);
             ClimbingLogic();
@@ -534,11 +507,12 @@ namespace EFPController
 
         private void FixedUpdate()
         {
-            if (!Player.canControl) return;
+            if (!Player.canControl)
+                return;
 
-            var t = Time.time;
-            var fdt = Time.fixedDeltaTime;
-            var dt = Time.deltaTime;
+            float t = Time.time;
+            float fdt = Time.fixedDeltaTime;
+            float dt = Time.deltaTime;
 
             if (IsSwimming && JumpingComponent.IsJumping)
                 JumpingComponent.IsJumping = false;
@@ -563,7 +537,8 @@ namespace EFPController
             }
             else
             {
-                inputXLerpSpeed = inputYLerpSpeed = 3f; // player accelerates and decelerates slower in water
+                // player accelerates and decelerates slower in water.
+                inputXLerpSpeed = inputYLerpSpeed = 3f;
             }
 
             if (sprint)
@@ -609,11 +584,11 @@ namespace EFPController
             {
                 if (!IsSwimming)
                 {
-                    if (speed > (walkSpeed * moveSpeedMult) + 0.1f)
+                    if (speed > walkSpeed * moveSpeedMult + 0.1f)
                     {
                         speed -= 15f * dt; // gradually decelerate to walk speed
                     }
-                    else if (speed < (walkSpeed * moveSpeedMult) - 0.1f)
+                    else if (speed < walkSpeed * moveSpeedMult - 0.1f)
                     {
                         speed += 15f * dt; // gradually accelerate to walk speed
                     }
@@ -632,28 +607,28 @@ namespace EFPController
                 }
             }
 
-            float speedMod = playerHeightMod / 2.24f + 1f;
+            float speedMod = _crouchingComponent.PlayerHeightMod / 2.24f + 1f;
 
             // also lower to crouch position if player dies
             if (IsSwimming)
             {
                 midPos = swimmingCamHeight;
                 // gradually increase capsule height
-                var nh = Mathf.Min(capsule.height + 4f * (dt * speedMod), swimmingCapsuleHeight);
+                float nh = Mathf.Min(capsule.height + 4f * (dt * speedMod), swimmingCapsuleHeight);
                 capsule.height = nh;
             }
-            else if (IsCrouching)
+            else if (_crouchingComponent.IsCrouching)
             {
-                midPos = crouchingCamHeight;
+                midPos = _crouchingComponent.CrouchingConfig.crouchingCamHeight;
                 // gradually decrease capsule height
-                var nh = Mathf.Max(capsule.height - 4f * (dt * speedMod), crouchCapsuleHeight);
+                float nh = Mathf.Max(capsule.height - 4f * (dt * speedMod), _crouchingComponent.CrouchingConfig.crouchCapsuleHeight);
                 capsule.height = nh;
             }
             else
             {
                 midPos = standingCamHeight;
                 // gradually increase capsule height
-                var nh = Mathf.Min(capsule.height + 4f * (dt * (0.9f * speedMod)), standingCapsuleHeight);
+                float nh = Mathf.Min(capsule.height + 4f * (dt * (0.9f * speedMod)), standingCapsuleHeight);
                 capsule.height = nh;
             }
 
@@ -673,15 +648,15 @@ namespace EFPController
                 if (falling)
                 {
                     playerAirVelocity = Vector3.zero;
-                    landStartTime = t; // track the time when player landed
+                    JumpingComponent.LandStartTime = t; // track the time when player landed
 
-                    if ((fallStartLevel - transform.position.y) > 2f)
+                    if (fallStartLevel - transform.position.y > 2f)
                     {
                         player.cameraAnimator.SetTrigger(CameraAnimNames.Land);
                         OnLand?.Invoke();
                     }
 
-                    var dist = fallStartLevel - transform.position.y;
+                    float dist = fallStartLevel - transform.position.y;
 
                     // track the distance of the fall and apply damage if over falling threshold
                     if (allowFallDamage && transform.position.y < fallStartLevel - fallDamageThreshold && !InWater)
@@ -694,6 +669,7 @@ namespace EFPController
                     if (currentGroundCollider != null)
                     {
                         Rigidbody groundRB = currentGroundCollider.attachedRigidbody;
+                        
                         if (groundRB != null && !groundRB.isKinematic)
                         {
                             groundRB.AddForceAtPosition(Vector3.down * rigidbody.mass, groundPoint,
@@ -769,7 +745,7 @@ namespace EFPController
                      forwardSprintOnly) // cancel sprint if player sprints into a wall and strafes left or right
                     || (move.y <= 0f && forwardSprintOnly) // cancel sprint if joystick is released
                     || (inputY < 0f && forwardSprintOnly) // cancel sprint if player moves backwards
-                    || (JumpingComponent.IsJumping && jumpCancelsSprint)
+                    || (JumpingComponent.IsJumping && JumpingComponent.JumpingConfig.jumpCancelsSprint)
                     || IsSwimming
                     || climbing // cancel sprint if player runs out of breath
                    )
@@ -780,7 +756,7 @@ namespace EFPController
                 // determine if player can run
                 if (((inputY > 0f && forwardSprintOnly) || (IsMoving && !forwardSprintOnly))
                     && sprint
-                    && !IsCrouching
+                    && !_crouchingComponent.IsCrouching
                     && IsGrounded
                    )
                 {
@@ -800,9 +776,9 @@ namespace EFPController
 
                 // check that player can crouch and set speed
                 // also check midpos because player can still be under obstacle when crouch button is released 
-                if (IsCrouching || midPos < standingCamHeight)
+                if (_crouchingComponent.IsCrouching || midPos < standingCamHeight)
                 {
-                    if (crouchSpeedAmt > crouchSpeedMult)
+                    if (crouchSpeedAmt > _crouchingComponent.CrouchingConfig.crouchSpeedMult)
                     {
                         crouchSpeedAmt -= dt; // gradually decrease crouchSpeedAmt to crouch limit value
                     }
@@ -882,6 +858,7 @@ namespace EFPController
 
                 if (allowLeaning)
                 {
+                    float crouchCapsuleCheckRadius = _crouchingComponent.CrouchCapsuleCheckRadius;
                     if (leanDistance > 0f)
                     {
                         if (Time.timeSinceLevelLoad > 0.5f
@@ -894,7 +871,7 @@ namespace EFPController
                                 !inputManager.GetActionKey(InputManager.Action.LeanRight)) // lean left
                             {
                                 // set up horizontal capsule cast to check if player would be leaning into an object
-                                if (!IsCrouching)
+                                if (!_crouchingComponent.IsCrouching)
                                 {
                                     // move up bottom of lean capsule check when standing to allow player to lean over short objects like boxes 
                                     leanCheckPos = transform.position + Vector3.up * crouchCapsuleCheckRadius;
@@ -908,7 +885,7 @@ namespace EFPController
 
                                 // define upper point of capsule (1/2 height minus radius)
                                 leanCheckPos2 = transform.position +
-                                                Vector3.up * ((capsule.height / 2f) - crouchCapsuleCheckRadius);
+                                                Vector3.up * (capsule.height / 2f - crouchCapsuleCheckRadius);
                                 if (!Physics.CapsuleCast(leanCheckPos, leanCheckPos2, crouchCapsuleCheckRadius * 0.8f,
                                         -transform.right, out _, leanDistance * leanFactorAmt, groundMask.value))
                                 {
@@ -926,7 +903,7 @@ namespace EFPController
                             {
                                 // lean right
                                 // set up horizontal capsule cast to check if player would be leaning into an object
-                                if (!IsCrouching)
+                                if (!_crouchingComponent.IsCrouching)
                                 {
                                     // move up bottom of lean capsule check when standing to allow player to lean over short objects like boxes 
                                     leanCheckPos = transform.position + Vector3.up * crouchCapsuleCheckRadius;
@@ -940,7 +917,7 @@ namespace EFPController
 
                                 // define upper point of capsule (1/2 height minus radius)
                                 leanCheckPos2 = transform.position +
-                                                Vector3.up * ((capsule.height / 2f) - crouchCapsuleCheckRadius);
+                                                Vector3.up * (capsule.height / 2f - crouchCapsuleCheckRadius);
                                 if (!Physics.CapsuleCast(leanCheckPos, leanCheckPos2, crouchCapsuleCheckRadius * 0.5f,
                                         transform.right, out _, leanDistance * leanFactorAmt, groundMask.value))
                                 {
@@ -1051,10 +1028,10 @@ namespace EFPController
                 }
                 else
                 {
-                    if (!yVelocity.IsEquals(gravityMax) && !IsSwimming)
+                    if (!yVelocity.IsEquals(_gravityMax) && !IsSwimming)
                     {
-                        yVelocity = Mathf.Clamp(yVelocity + (Physics.gravity.y * gravityMultiplier) * fdt, -gravityMax,
-                            gravityMax);
+                        yVelocity = Mathf.Clamp(yVelocity + (Physics.gravity.y * _gravityMultiplier) * fdt, -_gravityMax,
+                            _gravityMax);
                     }
 
                     if (InWater)
@@ -1074,7 +1051,7 @@ namespace EFPController
                     {
                         if (moveDirection.magnitude > 0f)
                         {
-                            playerAirVelocity = moveDirection * airSpeedMultiplier;
+                            playerAirVelocity = moveDirection * _airSpeedMultiplier;
                         }
                         else
                         {
@@ -1146,10 +1123,10 @@ namespace EFPController
                     {
                         // dont make player sink if they are close to bottom
                         // make sure that player doesn't try to sink into the ground if wading into water
-                        if (landStartTime + 0.3f > t)
+                        if (JumpingComponent.LandStartTime + 0.3f > t)
                         {
-                            if (!Physics.CapsuleCast(playerMiddlePos, playerTopPos, crouchCapsuleCheckRadius * 0.9f,
-                                    -transform.up, out _, crouchCapsuleCastHeight, groundMask.value))
+                            if (!Physics.CapsuleCast(playerMiddlePos, playerTopPos, _crouchingComponent.CrouchCapsuleCheckRadius * 0.9f,
+                                    -transform.up, out _, _crouchingComponent.CrouchCapsuleCastHeight, groundMask.value))
                             {
                                 // make player sink into water after jump
                                 rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f),
@@ -1258,10 +1235,15 @@ namespace EFPController
         public void SendOnLandEvent() =>
             OnLand?.Invoke();
 
+        public void SendOnCrouchEvent(bool isCrouching) =>
+            OnCrouch?.Invoke(isCrouching);
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private bool CanStandUpOrJump(Vector3 currentPosition, out Vector3 p2)
         {
+            float crouchCapsuleCheckRadius = _crouchingComponent.CrouchCapsuleCheckRadius;
+            
             // set the vertical bounds of the capsule used to detect player collisions
             Vector3 p1 = currentPosition - Vector3.up *
                 (currentPosition.y - 0.1f - (capsule.bounds.min.y + crouchCapsuleCheckRadius));
@@ -1281,81 +1263,6 @@ namespace EFPController
             return canStandUpOrJump;
         }
         
-        private void CrouchLogic(float t, bool canStandUpOrJump, Vector3 currentPosition, Vector3 p2)
-        {
-            // set crouched variable that other scripts will access to check for crouching
-            // do this in Update() instead of FixedUpdate to prevent missed button presses between fixed updates
-            if (allowCrouch)
-            {
-                if (IsCrouching && inputManager.GetActionKeyDown(InputManager.Action.Jump))
-                {
-                    // only uncrouch if the player has room above them to stand up
-                    if (canStandUpOrJump)
-                    {
-                        IsCrouching = false;
-                        lastCrouchTime = t;
-                        OnCrouch?.Invoke(false);
-                    }
-                }
-
-                if (inputManager.GetActionKeyDown(InputManager.Action.Crouch) && !IsSwimming && !climbing)
-                {
-                    if (!crouchState)
-                    {
-                        if (lastCrouchTime + crouchCooldown < t)
-                        {
-                            if (!IsCrouching && crouchRisen)
-                            {
-                                camDampSpeed = 0.1f; // faster moving down to crouch (not moving up against gravity)
-                                IsCrouching = true;
-                                lastCrouchTime = t;
-                                sprint = false; // cancel sprint if crouch button is pressed
-                                OnCrouch?.Invoke(true);
-                            }
-                            else
-                            {
-                                // only uncrouch if the player has room above them to stand up
-                                if (canStandUpOrJump)
-                                {
-                                    camDampSpeed = 0.2f;
-                                    IsCrouching = false;
-                                    lastCrouchTime = t;
-                                    OnCrouch?.Invoke(false);
-                                }
-                            }
-
-                            crouchState = true;
-                        }
-                    }
-                }
-                else
-                {
-                    crouchState = false;
-                    
-                    if ((sprint || climbing || IsSwimming || dashActive)
-                        && !Physics.CheckCapsule(transform.position + transform.up * 0.75f, p2,
-                            crouchCapsuleCheckRadius * 0.9f, groundMask.value, QueryTriggerInteraction.Ignore)
-                       )
-                    {
-                        camDampSpeed = 0.2f;
-                        
-                        // cancel crouch if sprint button is pressed and there is room above the player to stand up
-                        IsCrouching = false;
-                    }
-                }
-            }
-
-            // determine if player has risen from crouch state
-            if (mainCameraTransform.position.y - currentPosition.y > crouchingCamHeight * 0.5f)
-            {
-                if (!crouchRisen)
-                {
-                    camDampSpeed = 0.1f;
-                    crouchRisen = true;
-                }
-            }
-        }
-
         private void DetermineIfMoving()
         {
             // Determine if player is moving. This var is accessed by other scripts.
