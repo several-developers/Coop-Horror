@@ -38,10 +38,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         [SerializeField, Required]
         private NetworkObject _networkObject;
-
-        [SerializeField, Required]
-        private PlayerMovement _playerMovement;
-
+        
         [SerializeField, Required]
         private Transform _itemHoldPivot;
 
@@ -165,7 +162,6 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
-            _playerMovement.HandleMovement(_mobileHeadquartersEntity);
             _interactionChecker.Check();
         }
 

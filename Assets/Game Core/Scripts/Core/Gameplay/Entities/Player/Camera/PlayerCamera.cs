@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.Entities.MobileHeadquarters;
+﻿using System;
+using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Managers;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -54,9 +55,11 @@ namespace GameCore.Gameplay.Entities.Player
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
-        {
+        private void Awake() =>
             _instance = this;
+
+        private void Start()
+        {
             _mobileHeadquartersTransform = MobileHeadquartersEntity.Get().transform;
             _lastFrameMobileHeadquartersRotation = _mobileHeadquartersTransform.rotation.eulerAngles;
         }

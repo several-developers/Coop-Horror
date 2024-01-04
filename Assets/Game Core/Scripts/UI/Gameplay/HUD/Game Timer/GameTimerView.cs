@@ -17,13 +17,13 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        private void Start()
         {
             TheNetworkHorror networkHorror = TheNetworkHorror.Get();
             networkHorror.OnGameTimerUpdatedEvent += OnGameTimerUpdated;
+            
+            Show();
         }
-
-        private void Start() => Show();
 
         private void OnDestroy()
         {
