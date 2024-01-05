@@ -98,7 +98,7 @@ namespace EFPController
 
             isCrouch = player.controller.CrouchingComponent.IsCrouching;
             isSprint = player.controller.sprint;
-            isDash = player.controller.dashActive;
+            isDash = player.controller.DashComponent.DashActive;
             CheckGround();
 
             if (isGrounded && previouslyGrounded && (player.controller.IsMoving || isDash))

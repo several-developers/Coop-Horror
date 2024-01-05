@@ -118,7 +118,7 @@ namespace EFPController
                     bool checkOne = _playerMovement.sprint
                                     || _playerMovement.ClimbingComponent.IsClimbing
                                     || _playerMovement.SwimmingComponent.IsSwimming
-                                    || _playerMovement.dashActive;
+                                    || _playerMovement.DashComponent.DashActive;
 
                     if (checkOne)
                     {

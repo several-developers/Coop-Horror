@@ -2582,7 +2582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f543f872233b79c4c9490054806d3e4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debug: 1
+  _debug: 0
   capsule: {fileID: 1967799250354909116}
   groundMask:
     serializedVersion: 2
@@ -2645,6 +2645,7 @@ MonoBehaviour:
   sprintSpeed: 8
   sprintMode: 2
   forwardSprintOnly: 0
+  _playerDashConfig: {fileID: 11400000, guid: 841c2715f45806e42a8cbf3e8235bb51, type: 2}
   allowDash: 1
   dashSpeed: 15
   dashSpeedCurve:
@@ -2718,11 +2719,6 @@ MonoBehaviour:
   dashSoundVolume: 0.25
   _playerSwimmingConfig: {fileID: 11400000, guid: 69169975db7dbbd42a4b12df17f0b532,
     type: 2}
-  swimSpeed: 3
-  holdBreathDuration: 30
-  drownDamage: 7
-  swimmingCamHeight: 0.5
-  swimmingCapsuleHeight: 1.25
   underwaterAudioSource: {fileID: 7338709719172407751}
   swimmingAudioSource: {fileID: 2194984066656819122}
   swimOnSurfaceSound: {fileID: 8300000, guid: c9a80ddb1c99f1e44aeece60296f77b2, type: 3}

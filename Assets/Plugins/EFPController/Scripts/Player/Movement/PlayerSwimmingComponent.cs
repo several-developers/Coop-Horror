@@ -22,17 +22,7 @@ namespace EFPController
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public PlayerSwimmingConfig SwimmingConfig => _swimmingConfig;
-
-        // FIELDS: --------------------------------------------------------------------------------
-
-        private readonly Player _player;
-        private readonly PlayerMovement _playerMovement;
-        private readonly InputManager _inputManager;
-        private readonly Transform _transform;
-        private readonly PlayerSwimmingConfig _swimmingConfig;
-
-        // True when player is touching water collider/trigger.
-        private bool _inWater;
+        public Vector3 PlayerWaterInitVelocity { get; set; } // Vlad, was private field
 
         public bool InWater
         {
@@ -43,13 +33,7 @@ namespace EFPController
                 _playerMovement.SendOnWaterEvent(_inWater);
             }
         }
-
-        // true when player view/camera is under the waterline
-        public bool holdingBreath { get; set; }
-
-        // true when player is below water movement threshold and is not treading water (camera/view slightly above waterline)
-        private bool _isBelowWater;
-
+        
         public bool IsBelowWater
         {
             get => _isBelowWater;
@@ -63,9 +47,7 @@ namespace EFPController
                         : _playerMovement.swimOnSurfaceSound;
             }
         }
-
-        private bool _isSwimming;
-
+        
         // Vlad, set was private
         public bool IsSwimming
         {
@@ -87,23 +69,45 @@ namespace EFPController
                 }
             }
         }
-
+        
         // To make player release and press jump button again to jump if surfacing from water by holding jump button.
-        public bool CanWaterJump { get; set; } = true;
+        public bool CanWaterJump { get; private set; } = true;
 
-        public float swimStartTime { get; set; }
-        public float diveStartTime { get; set; }
-        public bool drowning { get; set; } // true when player has stayed under water for longer than holdBreathDuration
-        public Vector3 playerWaterInitVelocity { get; set; }
+        // FIELDS: --------------------------------------------------------------------------------
 
-        private float drownStartTime = 0f;
-        private float swimmingVerticalSpeed;
+        private readonly Player _player;
+        private readonly PlayerMovement _playerMovement;
+        private readonly InputManager _inputManager;
+        private readonly Transform _transform;
+        private readonly PlayerSwimmingConfig _swimmingConfig;
+        private readonly List<Collider> _allWaterColliders = new();
 
-        private Collider currentWaterCollider;
-        private List<Collider> allWaterColliders = new();
-        private float enterWaterTime;
-        private bool swimTimeState = false;
+        private Collider _currentWaterCollider;
 
+        private float _swimStartTime;
+        private float _diveStartTime;
+        private float _enterWaterTime;
+
+        // True when player is touching water collider/trigger.
+        private bool _inWater;
+
+        // true when player view/camera is under the waterline
+        private bool _holdingBreath;
+
+        // True when player is below water movement threshold and is not treading water
+        // (camera/view slightly above waterline).
+        private bool _isBelowWater;
+
+        private bool _isSwimming;
+        
+        // True when player has stayed under water for longer than holdBreathDuration.
+        private bool _isDowning;
+        
+        private bool _swimTimeState;
+
+        private float _drownStartTime;
+        private float _swimmingVerticalSpeed;
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void InWaterUpdateLogic()
@@ -112,18 +116,18 @@ namespace EFPController
                 return;
 
             // check if player is at wading depth in water (water line at chest) after wading into water
-            if (_player.capsule.bounds.center.y <= currentWaterCollider.bounds.max.y)
+            if (_player.capsule.bounds.center.y <= _currentWaterCollider.bounds.max.y)
             {
                 IsSwimming = true;
 
-                if (!swimTimeState)
+                if (!_swimTimeState)
                 {
-                    swimStartTime = Time.time; // track time that swimming started
-                    swimTimeState = true;
+                    _swimStartTime = Time.time; // track time that swimming started
+                    _swimTimeState = true;
                 }
 
                 // check if player is at treading water depth (water line at shoulders/neck) after surfacing from dive
-                IsBelowWater = _playerMovement.camPos.y <= currentWaterCollider.bounds.max.y;
+                IsBelowWater = _playerMovement.camPos.y <= _currentWaterCollider.bounds.max.y;
             }
             else
             {
@@ -131,14 +135,14 @@ namespace EFPController
             }
 
             // check if view height is under water line
-            if (_playerMovement.camPos.y <= currentWaterCollider.bounds.max.y)
+            if (_playerMovement.camPos.y <= _currentWaterCollider.bounds.max.y)
             {
-                if (!holdingBreath)
+                if (!_holdingBreath)
                 {
-                    diveStartTime = Time.time;
-                    holdingBreath = true;
+                    _diveStartTime = Time.time;
+                    _holdingBreath = true;
 
-                    if (enterWaterTime + 0.3f > Time.time && _playerMovement.fallInDeepWaterSound != null)
+                    if (_enterWaterTime + 0.3f > Time.time && _playerMovement.fallInDeepWaterSound != null)
                         _player.effectsAudioSource.PlayOneShot(_playerMovement.fallInDeepWaterSound);
 
                     if (_playerMovement.underwaterAudioSource != null)
@@ -149,19 +153,19 @@ namespace EFPController
                         _playerMovement.underwaterAudioSource.UnPause();
                     }
 
-                    if (_playerMovement.divingInSounds.Length > 0 && enterWaterTime > 1f)
+                    if (_playerMovement.divingInSounds.Length > 0 && _enterWaterTime > 1f)
                         AudioManager.CreateSFX(_playerMovement.divingInSounds.Random(), _playerMovement.camPos);
                 }
             }
             else
             {
-                if (holdingBreath && _playerMovement.divingOutSounds.Length > 0 && diveStartTime + 0.2f < Time.time)
+                if (_holdingBreath && _playerMovement.divingOutSounds.Length > 0 && _diveStartTime + 0.2f < Time.time)
                     AudioManager.CreateSFX(_playerMovement.divingOutSounds.Random(), _playerMovement.camPos);
 
                 if (_playerMovement.underwaterAudioSource != null)
                     _playerMovement.underwaterAudioSource.Pause();
 
-                holdingBreath = false;
+                _holdingBreath = false;
             }
 
             if (!IsSwimming && !_playerMovement.ClimbingComponent.IsClimbing && _playerMovement.IsGrounded)
@@ -173,31 +177,31 @@ namespace EFPController
             float drownDamage = _swimmingConfig.drownDamage;
             float holdBreathDuration = _swimmingConfig.holdBreathDuration;
 
-            if (holdingBreath)
+            if (_holdingBreath)
             {
                 // determine if player will gasp for air when surfacing
-                if (t - diveStartTime > holdBreathDuration / 1.5f)
+                if (t - _diveStartTime > holdBreathDuration / 1.5f)
                 {
-                    drowning = true;
+                    _isDowning = true;
                 }
 
                 // determine if player is drowning
-                if (t - diveStartTime > holdBreathDuration)
+                if (t - _diveStartTime > holdBreathDuration)
                 {
-                    if (drownStartTime < t)
+                    if (_drownStartTime < t)
                     {
                         if (debug) Debug.Log("ApplyDamage: " + drownDamage);
-                        drownStartTime = t + 1.75f;
+                        _drownStartTime = t + 1.75f;
                     }
                 }
             }
             else
             {
                 // play gasping sound if player needed air when surfacing
-                if (drowning)
+                if (_isDowning)
                 {
                     // Play Audio gasp
-                    drowning = false;
+                    _isDowning = false;
                 }
             }
         }
@@ -208,20 +212,22 @@ namespace EFPController
                 return;
             
             // make player sink under surface for a short time if they jumped in deep water
-            if (enterWaterTime + 0.2f > t)
+            if (_enterWaterTime + 0.2f > t)
             {
-                // dont make player sink if they are close to bottom
-                // make sure that player doesn't try to sink into the ground if wading into water
-                if (_playerMovement.JumpingComponent.LandStartTime + 0.3f > t)
+                // Don't make player sink if they are close to bottom.
+                // Make sure that player doesn't try to sink into the ground if wading into water.
+                bool stopSinking = _playerMovement.JumpingComponent.LandStartTime + 0.3f > t;
+
+                if (!stopSinking)
+                    return;
+                
+                if (!Physics.CapsuleCast(_playerMovement.playerMiddlePos, _playerMovement.playerTopPos,
+                        _playerMovement.CrouchingComponent.CrouchCapsuleCheckRadius * 0.9f,
+                        -_transform.up, out _, _playerMovement.CrouchingComponent.CrouchCapsuleCastHeight, _playerMovement.groundMask.value))
                 {
-                    if (!Physics.CapsuleCast(_playerMovement.playerMiddlePos, _playerMovement.playerTopPos,
-                            _playerMovement.CrouchingComponent.CrouchCapsuleCheckRadius * 0.9f,
-                            -_transform.up, out _, _playerMovement.CrouchingComponent.CrouchCapsuleCastHeight, _playerMovement.groundMask.value))
-                    {
-                        // make player sink into water after jump
-                        _playerMovement.Rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f),
-                            ForceMode.VelocityChange);
-                    }
+                    // make player sink into water after jump
+                    _playerMovement.Rigidbody.AddForce(new Vector3(0f, _swimmingVerticalSpeed, 0f),
+                        ForceMode.VelocityChange);
                 }
             }
             else
@@ -231,31 +237,31 @@ namespace EFPController
                 {
                     if (IsBelowWater)
                     {
-                        swimmingVerticalSpeed = Mathf.MoveTowards(swimmingVerticalSpeed, 3f, dt * 4f);
-                        if (holdingBreath)
+                        _swimmingVerticalSpeed = Mathf.MoveTowards(_swimmingVerticalSpeed, 3f, dt * 4f);
+                        if (_holdingBreath)
                             CanWaterJump =
                                 false; // don't also jump if player just surfaced by holding jump button
                     }
                     else
                     {
-                        swimmingVerticalSpeed = 0f;
+                        _swimmingVerticalSpeed = 0f;
                     }
                     // make player dive downwards if they hold the crouch button
                 }
                 else if (_inputManager.GetActionKey(InputManager.Action.Crouch))
                 {
-                    swimmingVerticalSpeed = Mathf.MoveTowards(swimmingVerticalSpeed, -3f, dt * 4f);
+                    _swimmingVerticalSpeed = Mathf.MoveTowards(_swimmingVerticalSpeed, -3f, dt * 4f);
                 }
                 else
                 {
                     // make player sink slowly when underwater due to the weight of their gear
                     if (IsBelowWater)
                     {
-                        swimmingVerticalSpeed = Mathf.MoveTowards(swimmingVerticalSpeed, -0.1f, dt * 4f);
+                        _swimmingVerticalSpeed = Mathf.MoveTowards(_swimmingVerticalSpeed, -0.1f, dt * 4f);
                     }
                     else
                     {
-                        swimmingVerticalSpeed = 0f;
+                        _swimmingVerticalSpeed = 0f;
                     }
                 }
 
@@ -290,7 +296,7 @@ namespace EFPController
                 }
 
                 // apply the vertical swimming speed to the player rigidbody
-                _playerMovement.Rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f),
+                _playerMovement.Rigidbody.AddForce(new Vector3(0f, _swimmingVerticalSpeed, 0f),
                     ForceMode.VelocityChange);
             }
         }
@@ -302,8 +308,8 @@ namespace EFPController
             if (!inWater)
                 return false;
 
-            if (!allWaterColliders.Contains(other))
-                allWaterColliders.Add(other);
+            if (!_allWaterColliders.Contains(other))
+                _allWaterColliders.Add(other);
 
             if (_playerMovement.falling && _playerMovement.fallingDistance > 1f && !InWater)
             {
@@ -311,8 +317,8 @@ namespace EFPController
                     AudioManager.CreateSFX(_playerMovement.fallInWaterSounds.Random(), _transform.position);
             }
 
-            enterWaterTime = Time.time;
-            currentWaterCollider = other;
+            _enterWaterTime = Time.time;
+            _currentWaterCollider = other;
             InWater = true;
             _playerMovement.falling = false;
 
@@ -326,23 +332,23 @@ namespace EFPController
             if (!inWater)
                 return false;
 
-            if (allWaterColliders.Contains(other))
-                allWaterColliders.Remove(other);
+            if (_allWaterColliders.Contains(other))
+                _allWaterColliders.Remove(other);
 
-            if (other == currentWaterCollider)
+            if (other == _currentWaterCollider)
             {
-                if (allWaterColliders.Count > 0)
+                if (_allWaterColliders.Count > 0)
                 {
-                    currentWaterCollider = allWaterColliders.First();
+                    _currentWaterCollider = _allWaterColliders.First();
                 }
                 else
                 {
-                    swimTimeState = false;
+                    _swimTimeState = false;
                     InWater = false;
                     IsSwimming = false;
                     IsBelowWater = false;
                     CanWaterJump = true;
-                    holdingBreath = false;
+                    _holdingBreath = false;
 
                     if (_playerMovement.underwaterAudioSource != null)
                         _playerMovement.underwaterAudioSource.Pause();

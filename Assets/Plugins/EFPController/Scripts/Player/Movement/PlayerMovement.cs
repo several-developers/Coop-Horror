@@ -119,24 +119,10 @@ namespace EFPController
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [Header("Dash")]
-        public bool allowDash = false;
-
-        public float dashSpeed = 15f;
-
-        public AnimationCurve dashSpeedCurve = new AnimationCurve()
-            { keys = new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(1f, 0f) } };
-
-        public float dashTime = 1f;
-        public float dashActiveTime = 0.75f;
-        public float dashCooldown = 1f;
+        [SerializeField, Required]
+        private PlayerDashConfig _playerDashConfig;
+     
         public AudioClip[] dashSounds;
-        public float dashSoundVolume = 0.5f;
-
-        public bool dashActive { get; private set; }
-
-        private bool dashState = false;
-        private float dashCurrentForce;
-        private Vector3 dashDirection;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Swimming
@@ -266,10 +252,10 @@ namespace EFPController
         // Player Input
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public float inputXSmoothed { get; private set; } = 0f; // inputs smoothed using lerps
-        public float inputYSmoothed { get; private set; } = 0f;
-        public float inputX { get; set; } = 0f; // 1 = button pressed 0 = button released
-        public float inputY { get; set; } = 0f;
+        public float inputXSmoothed { get; private set; } // inputs smoothed using lerps
+        public float inputYSmoothed { get; private set; }
+        public float inputX { get; set; } // 1 = button pressed 0 = button released
+        public float inputY { get; set; }
 
         private float inputYLerpSpeed;
         private float inputXLerpSpeed;
@@ -300,6 +286,7 @@ namespace EFPController
         public PlayerClimbingComponent ClimbingComponent => _climbingComponent;
         public PlayerLeaningComponent LeaningComponent => _leaningComponent;
         public PlayerSwimmingComponent SwimmingComponent => _swimmingComponent;
+        public PlayerDashComponent DashComponent => _dashComponent;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -308,6 +295,7 @@ namespace EFPController
         private PlayerClimbingComponent _climbingComponent;
         private PlayerLeaningComponent _leaningComponent;
         private PlayerSwimmingComponent _swimmingComponent;
+        private PlayerDashComponent _dashComponent;
         private Transform _transform;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -331,6 +319,7 @@ namespace EFPController
             _climbingComponent = new PlayerClimbingComponent(Player, _playerClimbingConfig);
             _leaningComponent = new PlayerLeaningComponent(Player, _playerLeaningConfig);
             _swimmingComponent = new PlayerSwimmingComponent(Player, _playerSwimmingConfig);
+            _dashComponent = new PlayerDashComponent(Player, _playerDashConfig);
 
             // clamp movement modifier percentages
             backwardSpeedPercentage = Mathf.Clamp01(backwardSpeedPercentage); // Vlad
@@ -359,8 +348,6 @@ namespace EFPController
                     sprintDelay = 999f; // time allowed between button down and release to activate toggle
                     break;
             }
-
-            dashActiveTime = Mathf.Min(dashActiveTime, dashTime);
         }
 
         private void Update()
@@ -633,7 +620,8 @@ namespace EFPController
                     }
                 }
 
-                if (dashActive) sprint = false;
+                if (_dashComponent.DashActive)
+                    sprint = false;
 
                 // cancel a sprint in certain situations
                 if ((inputY <= 0f && Mathf.Abs(inputX) > 0f &&
@@ -800,15 +788,15 @@ namespace EFPController
 
                     if (_swimmingComponent.InWater)
                     {
-                        if (_swimmingComponent.playerWaterInitVelocity.magnitude > 0.1f)
+                        if (_swimmingComponent.PlayerWaterInitVelocity.magnitude > 0.1f)
                         {
-                            _swimmingComponent.playerWaterInitVelocity = Vector3.Lerp(_swimmingComponent.playerWaterInitVelocity, Vector3.zero, fdt);
-                            moveDirection += new Vector3(_swimmingComponent.playerWaterInitVelocity.x, 0f, _swimmingComponent.playerWaterInitVelocity.z) *
+                            _swimmingComponent.PlayerWaterInitVelocity = Vector3.Lerp(_swimmingComponent.PlayerWaterInitVelocity, Vector3.zero, fdt);
+                            moveDirection += new Vector3(_swimmingComponent.PlayerWaterInitVelocity.x, 0f, _swimmingComponent.PlayerWaterInitVelocity.z) *
                                              fdt;
                         }
                         else
                         {
-                            _swimmingComponent.playerWaterInitVelocity = Vector3.zero;
+                            _swimmingComponent.PlayerWaterInitVelocity = Vector3.zero;
                         }
                     }
                     else
@@ -850,8 +838,8 @@ namespace EFPController
                 // Dash
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                bool canDash = allowDash
-                               &&!dashState
+                bool canDash = _dashComponent.DashConfig.allowDash
+                               && !_dashComponent.DashState
                                && InputManager.GetActionKey(InputManager.Action.Dash)
                                && IsGrounded
                                && !isSwimming
@@ -860,10 +848,7 @@ namespace EFPController
                                && IsMoving;
                 
                 if (canDash)
-                {
-                    StopCoroutine(nameof(DashCoroutine));
-                    StartCoroutine(nameof(DashCoroutine));
-                }
+                    _dashComponent.StartDashCoroutine();
 
                 // apply speed limits to moveDirection vector
                 float currSpeed = speed * speedAmtX * speedAmtY * crouchSpeedAmt * zoomSpeedAmt * currSpeedMult *
@@ -901,13 +886,15 @@ namespace EFPController
                     Rigidbody.velocity += groundHitInfo.rigidbody.GetVelocityAtPoint(groundPoint);
                 }
 
-                if (dashActive)
+                if (_dashComponent.DashActive)
                 {
-                    moveDirection = (moveDirection.IsZero() ? dashDirection : moveDirection.normalized) *
-                                    (currSpeed + dashCurrentForce);
+                    moveDirection = (moveDirection.IsZero() ? _dashComponent.DashDirection : moveDirection.normalized) *
+                                    (currSpeed + _dashComponent.DashCurrentForce);
                     moveDirection += Vector3.up * yVelocity;
                     velocityChange = moveDirection - velocity;
-                    if (!velocityChange.IsZero()) Rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+                    
+                    if (!velocityChange.IsZero())
+                        Rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
                 }
             }
 
@@ -956,47 +943,16 @@ namespace EFPController
         private void DetermineIfMoving()
         {
             // Determine if player is moving. This var is accessed by other scripts.
-            IsMoving = Mathf.Abs(inputY) > 0.01f || Mathf.Abs(inputX) > 0.01f || dashActive;
+            IsMoving = Mathf.Abs(inputY) > 0.01f || Mathf.Abs(inputX) > 0.01f || _dashComponent.DashActive;
         }
 
         public void Stop()
         {
-            dashActive = false;
+            _dashComponent.DashActive = false;
             IsMoving = false;
             velocity = Vector3.zero;
             velocityChange = Vector3.zero;
             sprint = false;
-        }
-
-        private IEnumerator DashCoroutine()
-        {
-            dashActive = true;
-            dashState = true;
-
-            sprint = false;
-            dashDirection = moveDirection.normalized;
-
-            yield return new WaitForEndOfFrame();
-
-            if (dashSounds.Length > 0) Player.effectsAudioSource.PlayOneShot(dashSounds.Random(), dashSoundVolume);
-            Player.cameraControl.SetEffectFilter(CameraControl.ScreenEffectProfileType.Dash, 1f, dashTime - 0.2f, 0.2f);
-
-            float elapsed = 0f;
-            float time = dashTime;
-            while (elapsed < time)
-            {
-                float curveTime = elapsed / time;
-                dashCurrentForce = dashSpeed * dashSpeedCurve.Evaluate(curveTime);
-                elapsed += Time.deltaTime;
-                if (elapsed > dashActiveTime) dashActive = false;
-                yield return null;
-            }
-
-            dashCurrentForce = 0f;
-            dashActive = false;
-
-            yield return new WaitForSeconds(dashCooldown);
-            dashState = false;
         }
 
         private void CheckGround(Vector3 direction)
