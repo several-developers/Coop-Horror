@@ -196,10 +196,11 @@ namespace EFPController
 
         private bool _isSwimming;
 
+        // Vlad, set was private
         public bool IsSwimming
         {
             get => _isSwimming;
-            private set
+            set
             {
                 _isSwimming = value;
                 
@@ -265,18 +266,10 @@ namespace EFPController
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [Header("Climbing")]
-        public bool allowClimbing = true;
-
-        [Tooltip("Speed that player moves vertically when climbing.")]
-        public float climbingSpeed = 5.0f;
-
-        public float angleToClimb = 45f;
-        public float grabbingTime = 0.25f;
-        public bool clampClimbingCameraRotate = true;
-        public float clampClimbingCameraAngle = 45f;
-        public bool rotateClibbingCamera = true;
-        public bool climbOnInteract = true;
-        public AudioSource climbingAudioSource;
+        [SerializeField, Required]
+        private PlayerClimbingConfig _playerClimbingConfig;
+        
+        public AudioSource _climbingAudioSource;
 
         public enum ClimbingState
         {
@@ -285,22 +278,6 @@ namespace EFPController
             Grabbed,
             Releasing
         }
-
-        public bool climbing =>
-            climbingState !=
-            ClimbingState.None; // true when playing is in contact with ladder trigger or edge climbing trigger
-
-        private float climbingTargetVolume;
-        private Ladder activeLadder;
-        private float ladderPathPosition;
-        private float ladderPathTargetPosition;
-        private Vector3 ladderStartPosition;
-        private Vector3 ladderTargetPosition;
-        private Quaternion ladderStartRotation;
-        private Quaternion ladderTargetRotation;
-        private float ladderTime;
-        public ClimbingState climbingState { get; set; } = ClimbingState.None;
-        public bool climbInteract { get; set; }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Fall Damage
@@ -361,7 +338,7 @@ namespace EFPController
         public Vector3 playerTopPos { get; private set; }
         public Vector3 lastOnGroundPosition { get; private set; }
         public RaycastHit groundHitInfo { get; private set; }
-        public bool hoverClimbable { get; private set; }
+        public bool hoverClimbable { get; set; } // Vlad, set was private
 
         private bool canStep;
         public float yVelocity { get; set; } // Vlad
@@ -418,11 +395,13 @@ namespace EFPController
 
         public PlayerJumpingComponent JumpingComponent => _jumpingComponent;
         public PlayerCrouchingComponent CrouchingComponent => _crouchingComponent;
+        public PlayerClimbingComponent ClimbingComponent => _climbingComponent;
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private PlayerJumpingComponent _jumpingComponent;
         private PlayerCrouchingComponent _crouchingComponent;
+        private PlayerClimbingComponent _climbingComponent;
         private Transform _transform;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -443,6 +422,7 @@ namespace EFPController
             
             _jumpingComponent = new PlayerJumpingComponent(player, inputManager, this, _playerJumpingConfig);
             _crouchingComponent = new PlayerCrouchingComponent(player, inputManager, this, _playerCrouchingConfig);
+            _climbingComponent = new PlayerClimbingComponent(player, this, inputManager, _playerClimbingConfig);
 
             // clamp movement modifier percentages
             backwardSpeedPercentage = Mathf.Clamp01(backwardSpeedPercentage); // Vlad
@@ -490,7 +470,7 @@ namespace EFPController
             _crouchingComponent.CrouchUpdateLogic(t, canStandUpOrJump, currentPosition, p2);
             DetermineIfMoving();
             _jumpingComponent.JumpingUpdateLogic(t, canStandUpOrJump);
-            ClimbingLogic();
+            _climbingComponent.ClimbingUpdateLogic();
             InWaterLogic();
         }
 
@@ -747,7 +727,7 @@ namespace EFPController
                     || (inputY < 0f && forwardSprintOnly) // cancel sprint if player moves backwards
                     || (JumpingComponent.IsJumping && JumpingComponent.JumpingConfig.jumpCancelsSprint)
                     || IsSwimming
-                    || climbing // cancel sprint if player runs out of breath
+                    || _climbingComponent.IsClimbing // cancel sprint if player runs out of breath
                    )
                 {
                     sprint = false;
@@ -838,10 +818,10 @@ namespace EFPController
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // subtract height we began falling from current position to get falling distance
-                if (!IsSwimming && !climbing)
+                if (!IsSwimming && !_climbingComponent.IsClimbing)
                     fallingDistance = fallStartLevel - transform.position.y; // this value referenced in other scripts
 
-                if (!falling && !climbing && !IsSwimming)
+                if (!falling && !_climbingComponent.IsClimbing && !IsSwimming)
                 {
                     // playerAirInitVelocity = playerAirVelocity = new Vector3(velocity.x, 0f, velocity.z);
                     falling = true;
@@ -850,7 +830,7 @@ namespace EFPController
                 }
             }
 
-            if (IsGrounded || climbing)
+            if (IsGrounded || _climbingComponent.IsClimbing)
             {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Leaning
@@ -1007,9 +987,10 @@ namespace EFPController
 
             CheckGround(moveDirection.normalized);
 
-            if (climbing)
+            if (_climbingComponent.IsClimbing)
             {
-                if (climbingState == ClimbingState.Grabbed) Climbing();
+                if (_climbingComponent.climbingState == ClimbingState.Grabbed)
+                    _climbingComponent.Climbing();
             }
             else
             {
@@ -1268,16 +1249,7 @@ namespace EFPController
             // Determine if player is moving. This var is accessed by other scripts.
             IsMoving = Mathf.Abs(inputY) > 0.01f || Mathf.Abs(inputX) > 0.01f || dashActive;
         }
-        
-        private void ClimbingLogic()
-        {
-            if (climbInteract && !inputManager.GetActionKey(InputManager.Action.Jump))
-                climbInteract = false;
 
-            if (climbing && climbingState != ClimbingState.Grabbed)
-                Climbing();
-        }
-        
         private void InWaterLogic()
         {
             if (!InWater)
@@ -1336,7 +1308,7 @@ namespace EFPController
                 holdingBreath = false;
             }
 
-            if (!IsSwimming && !climbing && IsGrounded)
+            if (!IsSwimming && !_climbingComponent.IsClimbing && IsGrounded)
                 rigidbody.useGravity = true;
         }
         
@@ -1380,7 +1352,7 @@ namespace EFPController
             dashState = false;
         }
 
-        public void CheckGround(Vector3 direction)
+        private void CheckGround(Vector3 direction)
         {
             var r = capsule.radius;
             var origin = playerBottomPos + Vector3.up * (r + 0.2f);
@@ -1405,7 +1377,7 @@ namespace EFPController
 
                 CheckSlope(direction);
                 if (playerBottomPos.y - hit.point.y > 0.01f && rigidbody.velocity.y <= 0.01f && !IsBelowWater &&
-                    !climbing)
+                    !_climbingComponent.IsClimbing)
                 {
                     Vector3 newForce = 30f * Physics.gravity.y * Time.fixedDeltaTime * transform.up;
                     if (!newForce.IsZero()) rigidbody.AddForce(newForce, ForceMode.VelocityChange);
@@ -1421,7 +1393,7 @@ namespace EFPController
             if (debug) Debug.DrawLine(playerBottomPos, playerBottomPos + futureDirection, Color.blue, 5f);
         }
 
-        public Vector3 GetMoveDir(Vector3 direction)
+        private Vector3 GetMoveDir(Vector3 direction)
         {
             float r = capsule.radius * 2f;
             float dist = r + 0.2f;
@@ -1453,12 +1425,12 @@ namespace EFPController
             return dir;
         }
 
-        public Vector3 GetPlayerBottomPosition()
+        private Vector3 GetPlayerBottomPosition()
         {
             return transform.position + -transform.up * (capsule.height * 0.5f);
         }
 
-        public bool CanMoveToSlope()
+        private bool CanMoveToSlope()
         {
             if (IsSwimming) return true;
             if (futureDirection.magnitude > 0f && futureDirection.y <= 0f) return true;
@@ -1505,7 +1477,7 @@ namespace EFPController
             return false;
         }
 
-        void CalculateFallingDamage(float fallDistance)
+        private void CalculateFallingDamage(float fallDistance)
         {
             if (fallDamageMultiplier >= 1f)
             {
@@ -1514,217 +1486,15 @@ namespace EFPController
             }
         }
 
-        public void Climb(Ladder ladder)
-        {
-            if (climbing) return;
-            ladderTime = 0f;
-            activeLadder = ladder;
-            climbingState = ClimbingState.Grabbing;
-
-            Transform closestPoint = ladder.GetClosestPointByPosition(playerBottomPos);
-            Vector3 dir = ladder.transform.up;
-            if (closestPoint == ladder.topPoint) dir = -ladder.transform.up;
-
-            ladderStartPosition = transform.position;
-            ladderTargetPosition =
-                (activeLadder.ClosestPointOnPath(playerBottomPos, out ladderPathPosition) + dir * 0.4f) +
-                transform.up * (capsule.height * 0.5f);
-
-            ladderStartRotation = player.smoothLook.transform.rotation;
-            ladderTargetRotation = closestPoint.rotation;
-
-            rigidbody.useGravity = false;
-            if (clampClimbingCameraRotate) player.smoothLook.maxXAngle = clampClimbingCameraAngle;
-            if (rotateClibbingCamera) player.smoothLook.enabled = false;
-
-            JumpingComponent.IsJumping = false;
-            falling = false;
-            sprint = sprintActive = false;
-            IsSwimming = false;
-
-            if (player.cameraAnimator.HasParameter(CameraAnimNames.Climb))
-            {
-                player.cameraAnimator.SetTrigger(CameraAnimNames.Climb);
-            }
-
-            if (climbingAudioSource != null && ladder.climbSound != null)
-            {
-                climbingAudioSource.volume = 1f;
-                climbingAudioSource.PlayOneShot(ladder.climbSound, Random.Range(0.5f, 1f));
-            }
-
-            Stop();
-        }
-
-        public void StopClimbing()
-        {
-            if (climbingState != ClimbingState.Grabbed) return;
-            climbingState = ClimbingState.None;
-            Unclimb();
-        }
-
-        private void Unclimb()
-        {
-            rigidbody.useGravity = true;
-            if (clampClimbingCameraRotate) player.smoothLook.maxXAngle = player.smoothLook.maxXAngleDef;
-            if (rotateClibbingCamera) player.smoothLook.enabled = true;
-            if (climbingAudioSource != null && activeLadder.climbingSound != null)
-            {
-                this.SmoothVolume(climbingAudioSource, 0f, 0.5f, () => climbingAudioSource.Stop());
-            }
-        }
-
-        private void TryClimbing(Ladder ladder)
-        {
-            Vector3 ladderPos = ladder.centerPoint.position;
-            ladderPos.y = 0f;
-            Vector3 playerPos = transform.position;
-            playerPos.y = 0f;
-            Vector3 dirToLadder = (ladderPos - playerPos).normalized;
-            Vector3 forwardPlayer = transform.forward;
-            float angle = Vector3.Angle(forwardPlayer, dirToLadder);
-            if (angle < angleToClimb)
-            {
-                if (climbOnInteract) hoverClimbable = true;
-                if (!climbOnInteract || inputManager.GetActionKey(InputManager.Action.Interact)) Climb(ladder);
-            }
-        }
-
-        private void Climbing()
-        {
-            switch (climbingState)
-            {
-                case ClimbingState.Releasing:
-                    ladderTime += Time.deltaTime;
-                    if (ladderTime < grabbingTime)
-                    {
-                        transform.position = Vector3.Lerp(ladderStartPosition, ladderTargetPosition,
-                            ladderTime / grabbingTime);
-                    }
-                    else
-                    {
-                        rigidbody.isKinematic = false;
-                        ladderTime = 0f;
-                        climbingState = ClimbingState.None;
-                        Unclimb();
-                    }
-
-                    break;
-                case ClimbingState.Grabbing:
-                    ladderTime += Time.deltaTime;
-                    if (ladderTime < grabbingTime)
-                    {
-                        if (rotateClibbingCamera)
-                        {
-                            player.smoothLook.transform.rotation = Quaternion.Lerp(ladderStartRotation,
-                                ladderTargetRotation, ladderTime / grabbingTime);
-                        }
-
-                        transform.position = Vector3.Lerp(ladderStartPosition, ladderTargetPosition,
-                            ladderTime / grabbingTime);
-                    }
-                    else
-                    {
-                        rigidbody.isKinematic = false;
-                        if (rotateClibbingCamera)
-                        {
-                            player.Rotate(ladderTargetRotation);
-                            player.smoothLook.enabled = true;
-                        }
-
-                        ladderTime = 0f;
-                        climbingState = ClimbingState.Grabbed;
-                        if (climbingAudioSource != null && activeLadder.climbingSound != null)
-                        {
-                            climbingAudioSource.clip = activeLadder.climbingSound;
-                            climbingAudioSource.loop = true;
-                            climbingAudioSource.Play();
-                            climbingAudioSource.Pause();
-                            climbingTargetVolume = 0f;
-                            climbingAudioSource.volume = 0f;
-                        }
-                    }
-
-                    break;
-                case ClimbingState.Grabbed:
-                    // Get the path position from character's current position
-                    Vector3 p1 = activeLadder.ClosestPointOnPath(playerBottomPos, out ladderPathPosition);
-                    Transform closestPoint = activeLadder.GetClosestPointByPosition(playerBottomPos);
-                    Vector3 p2 = activeLadder.ClosestPointOnPath(closestPoint.position, out ladderPathTargetPosition);
-                    float dist = Vector3.Distance(p1, p2);
-                    if (dist > 0.2f)
-                    {
-                        // Move the character along the ladder path
-                        rigidbody.velocity = activeLadder.transform.up * inputY * climbingSpeed * Time.fixedDeltaTime;
-                        if (climbingAudioSource != null && activeLadder.climbingSound != null)
-                        {
-                            if (inputY.IsZero())
-                            {
-                                climbingTargetVolume = 0f;
-                            }
-                            else
-                            {
-                                climbingTargetVolume = 1f;
-                            }
-
-                            climbingAudioSource.volume = Mathf.Lerp(climbingAudioSource.volume, climbingTargetVolume,
-                                10f * Time.deltaTime);
-                            if (climbingAudioSource.volume.IsZero())
-                            {
-                                climbingAudioSource.Pause();
-                            }
-                            else
-                            {
-                                climbingAudioSource.UnPause();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // If reached on of the ladder path extremes, change to releasing phase
-                        ladderTime = 0f;
-                        climbingState = ClimbingState.Releasing;
-                        Transform currPoint = activeLadder.GetClosestPointByPosition(playerBottomPos);
-                        ladderStartPosition = transform.position;
-                        ladderTargetPosition = currPoint.position + transform.up * (capsule.height * 0.5f);
-                    }
-
-                    break;
-            }
-        }
-
-        private void OnTriggerStay(Collider other)
-        {
-            if (other.gameObject.CompareTag(Game.Tags.Climbable)) // Climbing
-            {
-                if (climbingState == ClimbingState.Grabbed)
-                {
-                    if (!climbInteract && (inputManager.GetActionKey(InputManager.Action.Interact) ||
-                                           inputManager.GetActionKey(InputManager.Action.Jump)))
-                    {
-                        climbInteract = true;
-                        StopClimbing();
-                    }
-                }
-                else if (!climbing && climbOnInteract && !climbInteract)
-                {
-                    Ladder ladder = other.gameObject.GetComponent<Ladder>();
-                    if (ladder != null) TryClimbing(ladder);
-                }
-            }
-        }
-
         private void OnTriggerEnter(Collider other)
         {
-            if (allowClimbing && !climbing && !climbOnInteract &&
-                other.gameObject.CompareTag(Game.Tags.Climbable)) // Climbing
+            // Climbing
+            if (_climbingComponent.TriggerEnterLogic(other))
+                return;
+
+            // Water
+            if (other.gameObject.IsLayer(Game.Layer.Water))
             {
-                Ladder ladder = other.gameObject.GetComponent<Ladder>();
-                if (ladder != null) TryClimbing(ladder);
-            }
-            else if (other.gameObject.IsLayer(Game.Layer.Water))
-            {
-                // Water
                 if (!allWaterColliders.Contains(other)) allWaterColliders.Add(other);
 
                 if (falling && fallingDistance > 1f && !InWater)
@@ -1738,6 +1508,12 @@ namespace EFPController
                 InWater = true;
                 falling = false;
             }
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            // Climbing
+            _climbingComponent.TriggerStayLogic(other);
         }
 
         private void OnTriggerExit(Collider other)

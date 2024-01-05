@@ -2639,10 +2639,6 @@ MonoBehaviour:
   standingCapsuleHeight: 1.9
   _playerCrouchingConfig: {fileID: 11400000, guid: eb0ebccfd4fb997468add322b97a3b48,
     type: 2}
-  crouchSpeedMult: 0.55
-  crouchingCamHeight: 0.58
-  crouchCapsuleHeight: 1.25
-  crouchCapsuleCastHeight: 0.75
   _playerJumpingConfig: {fileID: 11400000, guid: b12e2f737ece9704884d7f49837c19f9,
     type: 2}
   allowSprinting: 1
@@ -2743,15 +2739,9 @@ MonoBehaviour:
   standLeanAmt: 1
   crouchLeanAmt: 0.7
   rotationLeanAmt: 16
-  allowClimbing: 1
-  climbingSpeed: 80
-  angleToClimb: 60
-  grabbingTime: 0.4
-  clampClimbingCameraRotate: 1
-  clampClimbingCameraAngle: 60
-  rotateClibbingCamera: 1
-  climbOnInteract: 1
-  climbingAudioSource: {fileID: 4333079308843996799}
+  _playerClimbingConfig: {fileID: 11400000, guid: bcda0f5451f87e949a8adef0726b64e2,
+    type: 2}
+  _climbingAudioSource: {fileID: 4333079308843996799}
   allowFallDamage: 1
   fallDamageThreshold: 0
   fallDamageMultiplier: 0

@@ -15,7 +15,7 @@ namespace EFPController
         public float grabbingTime = 0.25f;
         public bool clampClimbingCameraRotate = true;
         public float clampClimbingCameraAngle = 45f;
-        public bool rotateClibbingCamera = true;
+        public bool rotateClimbingCamera = true;
         public bool climbOnInteract = true;
     }
 }

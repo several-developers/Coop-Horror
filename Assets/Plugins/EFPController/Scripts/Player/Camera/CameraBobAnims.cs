@@ -148,7 +148,7 @@ namespace EFPController
 					}
 				} else { // walking
 					nextFov = defaultFov;
-					if (controller.climbing) {
+					if (controller.ClimbingComponent.IsClimbing) {
 						PlayClimbingAnim();
 					} else if (controller.IsGrounded) {
 						PlayWalkAnim();

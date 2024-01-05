@@ -78,7 +78,7 @@ namespace EFPController
                     }
                 }
 
-                if (_inputManager.GetActionKeyDown(InputManager.Action.Crouch) && !_playerMovement.IsSwimming && !_playerMovement.climbing)
+                if (_inputManager.GetActionKeyDown(InputManager.Action.Crouch) && !_playerMovement.IsSwimming && !_playerMovement.ClimbingComponent.IsClimbing)
                 {
                     if (!_crouchState)
                     {
@@ -114,7 +114,7 @@ namespace EFPController
                 {
                     _crouchState = false;
                     
-                    if ((_playerMovement.sprint || _playerMovement.climbing || _playerMovement.IsSwimming || _playerMovement.dashActive)
+                    if ((_playerMovement.sprint || _playerMovement.ClimbingComponent.IsClimbing || _playerMovement.IsSwimming || _playerMovement.dashActive)
                         && !Physics.CheckCapsule(_transform.position + _transform.up * 0.75f, p2,
                             CrouchCapsuleCheckRadius * 0.9f, _playerMovement.groundMask.value, QueryTriggerInteraction.Ignore)
                        )
