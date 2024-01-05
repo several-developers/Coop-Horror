@@ -279,7 +279,7 @@ namespace EFPController
             _playerMovement.JumpingComponent.IsJumping = false;
             _playerMovement.falling = false;
             _playerMovement.sprint = _playerMovement.sprintActive = false;
-            _playerMovement.IsSwimming = false;
+            _playerMovement.SwimmingComponent.IsSwimming = false;
 
             if (_player.cameraAnimator.HasParameter(CameraAnimNames.Climb))
                 _player.cameraAnimator.SetTrigger(CameraAnimNames.Climb);

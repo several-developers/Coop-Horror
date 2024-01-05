@@ -2716,6 +2716,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e01dea02745fe304dbed63fa76315106, type: 3}
   - {fileID: 8300000, guid: de47ff573723904408f4d5ed2af88048, type: 3}
   dashSoundVolume: 0.25
+  _playerSwimmingConfig: {fileID: 11400000, guid: 69169975db7dbbd42a4b12df17f0b532,
+    type: 2}
   swimSpeed: 3
   holdBreathDuration: 30
   drownDamage: 7
@@ -2736,11 +2738,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1e7c19ce150491e48b32f097790f9cb0, type: 3}
   _playerLeaningConfig: {fileID: 11400000, guid: 9dbc99562909f524a9b1e3c62523eefa,
     type: 2}
-  allowLeaning: 1
-  leanDistance: 0.6
-  standLeanAmt: 1
-  crouchLeanAmt: 0.7
-  rotationLeanAmt: 16
   _playerClimbingConfig: {fileID: 11400000, guid: bcda0f5451f87e949a8adef0726b64e2,
     type: 2}
   _climbingAudioSource: {fileID: 4333079308843996799}

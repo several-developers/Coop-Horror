@@ -1,17 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
-using System.Linq;
 using System.Collections.Generic;
 using EFPController.Utils;
-using EFPController.Extras;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace EFPController
 {
     [DefaultExecutionOrder(-10)]
     public class PlayerMovement : MonoBehaviour
     {
-        public bool debug = false;
+        public bool _debug;
         public CapsuleCollider capsule;
 
         [Tooltip("Mask of layers that player will detect collisions with.")]
@@ -144,17 +143,9 @@ namespace EFPController
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [Header("Swimming")]
-        [Tooltip("Speed that player moves when swimming.")]
-        public float swimSpeed = 4f;
-
-        [Tooltip("Amount of time before player starts drowning.")]
-        public float holdBreathDuration = 15f;
-
-        [Tooltip("Rate of damage to player while drowning.")]
-        public float drownDamage = 7f;
-
-        public float swimmingCamHeight = -0.2f;
-        public float swimmingCapsuleHeight = 1.25f; // height of capsule while crouching
+        [SerializeField, Required]
+        private PlayerSwimmingConfig _playerSwimmingConfig;
+        
         public AudioSource underwaterAudioSource;
         public AudioSource swimmingAudioSource;
         public AudioClip swimOnSurfaceSound;
@@ -163,75 +154,6 @@ namespace EFPController
         public AudioClip fallInDeepWaterSound;
         public AudioClip[] divingInSounds;
         public AudioClip[] divingOutSounds;
-
-        // True when player is touching water collider/trigger.
-        private bool _inWater;
-
-        public bool InWater
-        {
-            get => _inWater;
-            private set
-            {
-                _inWater = value;
-                OnWater?.Invoke(_inWater);
-            }
-        }
-
-        public bool holdingBreath { get; set; } // true when player view/camera is under the waterline
-
-        // true when player is below water movement threshold and is not treading water (camera/view slightly above waterline)
-        private bool _isBelowWater;
-
-        public bool IsBelowWater
-        {
-            get => _isBelowWater;
-            private set
-            {
-                _isBelowWater = value;
-                
-                if (swimmingAudioSource != null)
-                    swimmingAudioSource.clip = _isBelowWater ? swimUnderSurfaceSound : swimOnSurfaceSound;
-            }
-        }
-
-        private bool _isSwimming;
-
-        // Vlad, set was private
-        public bool IsSwimming
-        {
-            get => _isSwimming;
-            set
-            {
-                _isSwimming = value;
-                
-                if (_isSwimming)
-                {
-                    Rigidbody.useGravity = false;
-                    sprint = sprintActive = false;
-                }
-                else
-                {
-                    if (swimmingAudioSource != null)
-                        this.SmoothVolume(swimmingAudioSource, 0f, 0.25f, () => swimmingAudioSource.Pause());
-                }
-            }
-        }
-
-        // To make player release and press jump button again to jump if surfacing from water by holding jump button.
-        public bool CanWaterJump { get; set; } = true;
-
-        public float swimStartTime { get; set; }
-        public float diveStartTime { get; set; }
-        public bool drowning { get; set; } // true when player has stayed under water for longer than holdBreathDuration
-
-        private float drownStartTime = 0f;
-        private Vector3 playerWaterInitVelocity;
-        private float swimmingVerticalSpeed;
-
-        private Collider currentWaterCollider;
-        private List<Collider> allWaterColliders = new List<Collider>();
-        private float enterWaterTime;
-        private bool swimTimeState = false;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Leaning
@@ -365,11 +287,11 @@ namespace EFPController
         // Events
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public event System.Action<bool> OnWater;
-        public event System.Action OnJump;
-        public event System.Action OnLand;
-        public event System.Action<bool> OnCrouch;
-        public event System.Action<int> OnFallDamage;
+        public event Action<bool> OnWater;
+        public event Action OnJump;
+        public event Action OnLand;
+        public event Action<bool> OnCrouch;
+        public event Action<int> OnFallDamage;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -377,6 +299,7 @@ namespace EFPController
         public PlayerCrouchingComponent CrouchingComponent => _crouchingComponent;
         public PlayerClimbingComponent ClimbingComponent => _climbingComponent;
         public PlayerLeaningComponent LeaningComponent => _leaningComponent;
+        public PlayerSwimmingComponent SwimmingComponent => _swimmingComponent;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -384,6 +307,7 @@ namespace EFPController
         private PlayerCrouchingComponent _crouchingComponent;
         private PlayerClimbingComponent _climbingComponent;
         private PlayerLeaningComponent _leaningComponent;
+        private PlayerSwimmingComponent _swimmingComponent;
         private Transform _transform;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -406,6 +330,7 @@ namespace EFPController
             _crouchingComponent = new PlayerCrouchingComponent(Player, _playerCrouchingConfig);
             _climbingComponent = new PlayerClimbingComponent(Player, _playerClimbingConfig);
             _leaningComponent = new PlayerLeaningComponent(Player, _playerLeaningConfig);
+            _swimmingComponent = new PlayerSwimmingComponent(Player, _playerSwimmingConfig);
 
             // clamp movement modifier percentages
             backwardSpeedPercentage = Mathf.Clamp01(backwardSpeedPercentage); // Vlad
@@ -454,7 +379,7 @@ namespace EFPController
             DetermineIfMoving();
             _jumpingComponent.JumpingUpdateLogic(t, canStandUpOrJump);
             _climbingComponent.ClimbingUpdateLogic();
-            InWaterLogic();
+            _swimmingComponent.InWaterUpdateLogic();
         }
 
         private void LateUpdate()
@@ -477,7 +402,7 @@ namespace EFPController
             float fdt = Time.fixedDeltaTime;
             float dt = Time.deltaTime;
 
-            if (IsSwimming && JumpingComponent.IsJumping)
+            if (_swimmingComponent.IsSwimming && JumpingComponent.IsJumping)
                 JumpingComponent.IsJumping = false;
 
             playerBottomPos = GetPlayerBottomPosition();
@@ -485,16 +410,18 @@ namespace EFPController
             Vector2 move = InputManager.GetMovementInput();
             inputY = move.y;
 
+            bool isSwimming = _swimmingComponent.IsSwimming;
+
             // manage the CapsuleCast size and distance for frontal collision check based on player stance
             // set the vertical bounds of the capsule used to detect player collisions
-            playerMiddlePos = transform.position; // middle of player capsule
-            playerTopPos = playerMiddlePos + transform.up * (capsule.height * 0.45f); // top of player capsule
+            playerMiddlePos = _transform.position; // middle of player capsule
+            playerTopPos = playerMiddlePos + _transform.up * (capsule.height * 0.45f); // top of player capsule
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Player Input
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            if (!IsSwimming)
+            if (!isSwimming)
             {
                 inputXLerpSpeed = inputYLerpSpeed = inputLerpSpeed;
             }
@@ -545,7 +472,7 @@ namespace EFPController
             }
             else
             {
-                if (!IsSwimming)
+                if (!isSwimming)
                 {
                     if (speed > walkSpeed * moveSpeedMult + 0.1f)
                     {
@@ -558,8 +485,10 @@ namespace EFPController
                 }
             }
 
-            if (IsSwimming)
+            if (_swimmingComponent.IsSwimming)
             {
+                float swimSpeed = _swimmingComponent.SwimmingConfig.swimSpeed;
+                
                 if (speed > swimSpeed + 0.1f)
                 {
                     speed -= 30f * dt; // gradually decelerate to swim speed
@@ -573,11 +502,11 @@ namespace EFPController
             float speedMod = _crouchingComponent.PlayerHeightMod / 2.24f + 1f;
 
             // also lower to crouch position if player dies
-            if (IsSwimming)
+            if (_swimmingComponent.IsSwimming)
             {
-                midPos = swimmingCamHeight;
+                midPos = _swimmingComponent.SwimmingConfig.swimmingCamHeight;
                 // gradually increase capsule height
-                float nh = Mathf.Min(capsule.height + 4f * (dt * speedMod), swimmingCapsuleHeight);
+                float nh = Mathf.Min(capsule.height + 4f * (dt * speedMod), _swimmingComponent.SwimmingConfig.swimmingCapsuleHeight);
                 capsule.height = nh;
             }
             else if (_crouchingComponent.IsCrouching)
@@ -595,7 +524,7 @@ namespace EFPController
                 capsule.height = nh;
             }
 
-            camPos = transform.position + transform.up * midPos;
+            camPos = _transform.position + _transform.up * midPos;
 
             // This is the start of the large block that performs all movement actions while grounded	
             if (IsGrounded)
@@ -622,10 +551,12 @@ namespace EFPController
                     float dist = fallStartLevel - transform.position.y;
 
                     // track the distance of the fall and apply damage if over falling threshold
-                    if (allowFallDamage && transform.position.y < fallStartLevel - fallDamageThreshold && !InWater)
-                    {
+                    bool doFallDamage = allowFallDamage
+                                        && _transform.position.y < fallStartLevel - fallDamageThreshold
+                                        && !_swimmingComponent.InWater;
+                    
+                    if (doFallDamage)
                         CalculateFallingDamage(dist);
-                    }
 
                     // active platform
                     Collider currentGroundCollider = groundHitInfo.collider;
@@ -697,7 +628,8 @@ namespace EFPController
                     }
                     else
                     {
-                        if (!InputManager.GetActionKey(InputManager.Action.Sprint)) sprint = false;
+                        if (!InputManager.GetActionKey(InputManager.Action.Sprint))
+                            sprint = false;
                     }
                 }
 
@@ -709,7 +641,7 @@ namespace EFPController
                     || (move.y <= 0f && forwardSprintOnly) // cancel sprint if joystick is released
                     || (inputY < 0f && forwardSprintOnly) // cancel sprint if player moves backwards
                     || (JumpingComponent.IsJumping && JumpingComponent.JumpingConfig.jumpCancelsSprint)
-                    || IsSwimming
+                    || isSwimming
                     || _climbingComponent.IsClimbing // cancel sprint if player runs out of breath
                    )
                 {
@@ -742,48 +674,36 @@ namespace EFPController
                 if (_crouchingComponent.IsCrouching || midPos < standingCamHeight)
                 {
                     if (crouchSpeedAmt > _crouchingComponent.CrouchingConfig.crouchSpeedMult)
-                    {
                         crouchSpeedAmt -= dt; // gradually decrease crouchSpeedAmt to crouch limit value
-                    }
                 }
                 else
                 {
                     if (crouchSpeedAmt < 1f)
-                    {
                         crouchSpeedAmt += dt; // gradually increase crouchSpeedAmt to neutral
-                    }
                 }
 
                 // limit move speed if backpedaling
                 if (inputY >= 0)
                 {
                     if (speedAmtY < 1f)
-                    {
                         speedAmtY += dt; // gradually increase speedAmtY to neutral
-                    }
                 }
                 else
                 {
                     if (speedAmtY > backwardSpeedPercentage)
-                    {
                         speedAmtY -= dt; // gradually decrease speedAmtY to backpedal limit value
-                    }
                 }
 
                 // allow limiting of move speed if strafing directly sideways and not diagonally
                 if (inputX == 0f || inputY != 0f)
                 {
                     if (speedAmtX < 1f)
-                    {
                         speedAmtX += dt; // gradually increase speedAmtX to neutral
-                    }
                 }
                 else
                 {
                     if (speedAmtX > strafeSpeedPercentage)
-                    {
                         speedAmtX -= dt; // gradually decrease speedAmtX to strafe limit value
-                    }
                 }
             }
             else
@@ -801,10 +721,10 @@ namespace EFPController
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // subtract height we began falling from current position to get falling distance
-                if (!IsSwimming && !_climbingComponent.IsClimbing)
+                if (!isSwimming && !_climbingComponent.IsClimbing)
                     fallingDistance = fallStartLevel - transform.position.y; // this value referenced in other scripts
 
-                if (!falling && !_climbingComponent.IsClimbing && !IsSwimming)
+                if (!falling && !_climbingComponent.IsClimbing && !isSwimming)
                 {
                     // playerAirInitVelocity = playerAirVelocity = new Vector3(velocity.x, 0f, velocity.z);
                     falling = true;
@@ -826,46 +746,20 @@ namespace EFPController
             // Swimming
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            if (holdingBreath)
-            {
-                // determine if player will gasp for air when surfacing
-                if (t - diveStartTime > holdBreathDuration / 1.5f)
-                {
-                    drowning = true;
-                }
-
-                // determine if player is drowning
-                if (t - diveStartTime > holdBreathDuration)
-                {
-                    if (drownStartTime < t)
-                    {
-                        if (debug) Debug.Log("ApplyDamage: " + drownDamage);
-                        drownStartTime = t + 1.75f;
-                    }
-                }
-            }
-            else
-            {
-                // play gasping sound if player needed air when surfacing
-                if (drowning)
-                {
-                    // Play Audio gasp
-                    drowning = false;
-                }
-            }
+            _swimmingComponent.FixedUpdateLogic(t, _debug);
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Player Velocity
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             // limit speed if strafing diagonally
-            limitStrafeSpeed = (Mathf.Abs(inputX) > 0.5f && Mathf.Abs(inputY) > 0.5f) ? diagonalStrafeAmt : 1f;
+            limitStrafeSpeed = Mathf.Abs(inputX) > 0.5f && Mathf.Abs(inputY) > 0.5f ? diagonalStrafeAmt : 1f;
 
             // We are grounded, so recalculate movedirection directly from axes	
             moveDirection = new Vector3(inputXSmoothed * limitStrafeSpeed, 0f, inputYSmoothed * limitStrafeSpeed);
 
             // realign moveDirection vector to world space
-            if (IsSwimming)
+            if (isSwimming)
             {
                 moveDirection = MainCameraTransform.TransformDirection(moveDirection);
             }
@@ -883,38 +777,38 @@ namespace EFPController
             }
             else
             {
-                capsule.material = IsGrounded
-                    ? (moveDirection.magnitude > 0.1f ? groundedPhysMaterial : stayPhysMaterial)
-                    : flyPhysMaterial;
+                PhysicMaterial physMaterial = moveDirection.magnitude > 0.1f ? groundedPhysMaterial : stayPhysMaterial;
+                capsule.material = IsGrounded ? physMaterial : flyPhysMaterial;
+                
                 canStep = CanStep(moveDirection.normalized);
 
                 if (IsGrounded)
                 {
-                    if (!JumpingComponent.IsJumping && !IsSwimming)
+                    if (!JumpingComponent.IsJumping && !isSwimming)
                         yVelocity = 0f;
                     
-                    if (!IsSwimming)
+                    if (!isSwimming)
                         moveDirection = sprint ? futureDirection : Vector3.Project(moveDirection, futureDirection);
                 }
                 else
                 {
-                    if (!yVelocity.IsEquals(_gravityMax) && !IsSwimming)
+                    if (!yVelocity.IsEquals(_gravityMax) && !isSwimming)
                     {
                         yVelocity = Mathf.Clamp(yVelocity + (Physics.gravity.y * _gravityMultiplier) * fdt, -_gravityMax,
                             _gravityMax);
                     }
 
-                    if (InWater)
+                    if (_swimmingComponent.InWater)
                     {
-                        if (playerWaterInitVelocity.magnitude > 0.1f)
+                        if (_swimmingComponent.playerWaterInitVelocity.magnitude > 0.1f)
                         {
-                            playerWaterInitVelocity = Vector3.Lerp(playerWaterInitVelocity, Vector3.zero, fdt);
-                            moveDirection += new Vector3(playerWaterInitVelocity.x, 0f, playerWaterInitVelocity.z) *
+                            _swimmingComponent.playerWaterInitVelocity = Vector3.Lerp(_swimmingComponent.playerWaterInitVelocity, Vector3.zero, fdt);
+                            moveDirection += new Vector3(_swimmingComponent.playerWaterInitVelocity.x, 0f, _swimmingComponent.playerWaterInitVelocity.z) *
                                              fdt;
                         }
                         else
                         {
-                            playerWaterInitVelocity = Vector3.zero;
+                            _swimmingComponent.playerWaterInitVelocity = Vector3.zero;
                         }
                     }
                     else
@@ -932,7 +826,7 @@ namespace EFPController
                     }
                 }
 
-                if (IsBelowWater)
+                if (_swimmingComponent.IsBelowWater)
                 {
                     if (Mathf.Abs(yVelocity) > 0.1f)
                     {
@@ -946,7 +840,7 @@ namespace EFPController
 
                 currSpeedMult = 1f;
 
-                if (IsGrounded && !IsSwimming && !canStep)
+                if (IsGrounded && !isSwimming && !canStep)
                 {
                     currSpeedMult = slopeSpeed.Evaluate(slopeAngle / slopeLimit);
                     currSpeedMult *= CanMoveToSlope() ? 1f : 0f;
@@ -955,10 +849,17 @@ namespace EFPController
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Dash
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ///
-                if (allowDash && !dashState && InputManager.GetActionKey(InputManager.Action.Dash) && IsGrounded &&
-                    !IsSwimming && !falling && !JumpingComponent.IsJumping
-                    && IsMoving)
+
+                bool canDash = allowDash
+                               &&!dashState
+                               && InputManager.GetActionKey(InputManager.Action.Dash)
+                               && IsGrounded
+                               && !isSwimming
+                               && !falling 
+                               && !JumpingComponent.IsJumping
+                               && IsMoving;
+                
+                if (canDash)
                 {
                     StopCoroutine(nameof(DashCoroutine));
                     StartCoroutine(nameof(DashCoroutine));
@@ -985,100 +886,16 @@ namespace EFPController
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Swimming
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if (IsSwimming)
-                {
-                    // make player sink under surface for a short time if they jumped in deep water
-                    if (enterWaterTime + 0.2f > t)
-                    {
-                        // dont make player sink if they are close to bottom
-                        // make sure that player doesn't try to sink into the ground if wading into water
-                        if (JumpingComponent.LandStartTime + 0.3f > t)
-                        {
-                            if (!Physics.CapsuleCast(playerMiddlePos, playerTopPos, _crouchingComponent.CrouchCapsuleCheckRadius * 0.9f,
-                                    -transform.up, out _, _crouchingComponent.CrouchCapsuleCastHeight, groundMask.value))
-                            {
-                                // make player sink into water after jump
-                                Rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f),
-                                    ForceMode.VelocityChange);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // make player rise to water surface if they hold the jump button
-                        if (InputManager.GetActionKey(InputManager.Action.Jump))
-                        {
-                            if (IsBelowWater)
-                            {
-                                swimmingVerticalSpeed = Mathf.MoveTowards(swimmingVerticalSpeed, 3f, dt * 4f);
-                                if (holdingBreath)
-                                    CanWaterJump =
-                                        false; // don't also jump if player just surfaced by holding jump button
-                            }
-                            else
-                            {
-                                swimmingVerticalSpeed = 0f;
-                            }
-                            // make player dive downwards if they hold the crouch button
-                        }
-                        else if (InputManager.GetActionKey(InputManager.Action.Crouch))
-                        {
-                            swimmingVerticalSpeed = Mathf.MoveTowards(swimmingVerticalSpeed, -3f, dt * 4f);
-                        }
-                        else
-                        {
-                            // make player sink slowly when underwater due to the weight of their gear
-                            if (IsBelowWater)
-                            {
-                                swimmingVerticalSpeed = Mathf.MoveTowards(swimmingVerticalSpeed, -0.1f, dt * 4f);
-                            }
-                            else
-                            {
-                                swimmingVerticalSpeed = 0f;
-                            }
-                        }
-
-                        // allow jumping when treading water if player has released the jump button after surfacing 
-                        // by holding jump button down to prevent player from surfacing and immediately jumping
-                        if (!IsBelowWater && !InputManager.GetActionKey(InputManager.Action.Jump))
-                        {
-                            CanWaterJump = true;
-                        }
-
-                        if (swimmingAudioSource != null)
-                        {
-                            if (IsMoving)
-                            {
-                                if (swimmingAudioSource != null)
-                                {
-                                    if (!swimmingAudioSource.isPlaying) swimmingAudioSource.Play();
-                                    swimmingAudioSource.UnPause();
-                                    this.SmoothVolume(swimmingAudioSource, 1f, 0.25f);
-                                }
-                            }
-                            else
-                            {
-                                if (swimmingAudioSource != null)
-                                {
-                                    this.SmoothVolume(swimmingAudioSource, 0f, 0.25f,
-                                        () => swimmingAudioSource.Pause());
-                                }
-                            }
-                        }
-
-                        // apply the vertical swimming speed to the player rigidbody
-                        Rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f), ForceMode.VelocityChange);
-                    }
-                }
-
+                
+                _swimmingComponent.FixedUpdateLogic2(t, dt);
+                
                 if (IsGrounded && Vector3.Angle(groundNormal, Vector3.up) > slopeLimit && Rigidbody.velocity.y <= 0f &&
-                    !IsBelowWater)
+                    !_swimmingComponent.IsBelowWater)
                 {
                     Rigidbody.velocity += transform.up * (Physics.gravity.y * (30f * fdt));
                 }
 
-                if (IsGrounded && !IsSwimming && !JumpingComponent.IsJumping && groundHitInfo.rigidbody != null &&
+                if (IsGrounded && !isSwimming && !JumpingComponent.IsJumping && groundHitInfo.rigidbody != null &&
                     groundHitInfo.rigidbody.isKinematic)
                 {
                     Rigidbody.velocity += groundHitInfo.rigidbody.GetVelocityAtPoint(groundPoint);
@@ -1099,6 +916,9 @@ namespace EFPController
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void SendOnWaterEvent(bool inWater) =>
+            OnWater?.Invoke(inWater);
+        
         public void SendOnJumpEvent() =>
             OnJump?.Invoke();
         
@@ -1139,68 +959,6 @@ namespace EFPController
             IsMoving = Mathf.Abs(inputY) > 0.01f || Mathf.Abs(inputX) > 0.01f || dashActive;
         }
 
-        private void InWaterLogic()
-        {
-            if (!InWater)
-                return;
-            
-            // check if player is at wading depth in water (water line at chest) after wading into water
-            if (capsule.bounds.center.y <= currentWaterCollider.bounds.max.y)
-            {
-                IsSwimming = true;
-                
-                if (!swimTimeState)
-                {
-                    swimStartTime = Time.time; // track time that swimming started
-                    swimTimeState = true;
-                }
-
-                // check if player is at treading water depth (water line at shoulders/neck) after surfacing from dive
-                IsBelowWater = camPos.y <= currentWaterCollider.bounds.max.y;
-            }
-            else
-            {
-                IsSwimming = false;
-            }
-
-            // check if view height is under water line
-            if (camPos.y <= currentWaterCollider.bounds.max.y)
-            {
-                if (!holdingBreath)
-                {
-                    diveStartTime = Time.time;
-                    holdingBreath = true;
-                    
-                    if (enterWaterTime + 0.3f > Time.time && fallInDeepWaterSound != null)
-                        Player.effectsAudioSource.PlayOneShot(fallInDeepWaterSound);
-
-                    if (underwaterAudioSource != null)
-                    {
-                        if (!underwaterAudioSource.isPlaying)
-                            underwaterAudioSource.Play();
-                        
-                        underwaterAudioSource.UnPause();
-                    }
-
-                    if (divingInSounds.Length > 0 && enterWaterTime > 1f)
-                        AudioManager.CreateSFX(divingInSounds.Random(), camPos);
-                }
-            }
-            else
-            {
-                if (holdingBreath && divingOutSounds.Length > 0 && diveStartTime + 0.2f < Time.time)
-                    AudioManager.CreateSFX(divingOutSounds.Random(), camPos);
-
-                if (underwaterAudioSource != null)
-                    underwaterAudioSource.Pause();
-                
-                holdingBreath = false;
-            }
-
-            if (!IsSwimming && !_climbingComponent.IsClimbing && IsGrounded)
-                Rigidbody.useGravity = true;
-        }
-        
         public void Stop()
         {
             dashActive = false;
@@ -1243,21 +1001,26 @@ namespace EFPController
 
         private void CheckGround(Vector3 direction)
         {
-            var r = capsule.radius;
-            var origin = playerBottomPos + Vector3.up * (r + 0.2f);
+            float radius = capsule.radius;
+            Vector3 origin = playerBottomPos + Vector3.up * (radius + 0.2f);
 
             slopeAngle = 0f;
             IsGrounded = false;
 
-            if (IsBelowWater) return;
+            if (_swimmingComponent.IsBelowWater)
+                return;
 
-            if (Physics.SphereCast(origin, r, -transform.up, out RaycastHit hit,
-                    JumpingComponent.IsJumping || falling ? 0.3f : 0.75f, groundMask.value, QueryTriggerInteraction.Ignore))
+            Vector3 castDirection = -_transform.up;
+            float maxDistance = JumpingComponent.IsJumping || falling ? 0.3f : 0.75f;
+            
+            if (Physics.SphereCast(origin, radius, castDirection, out RaycastHit hit, maxDistance,
+                    groundMask.value, QueryTriggerInteraction.Ignore))
             {
                 IsGrounded = true;
                 groundHitInfo = hit;
                 groundNormal = hit.normal;
                 groundPoint = hit.point;
+                
                 if (lastOnGroundPositionTime < Time.time)
                 {
                     lastOnGroundPosition = groundPoint;
@@ -1265,37 +1028,50 @@ namespace EFPController
                 }
 
                 CheckSlope(direction);
-                if (playerBottomPos.y - hit.point.y > 0.01f && Rigidbody.velocity.y <= 0.01f && !IsBelowWater &&
-                    !_climbingComponent.IsClimbing)
-                {
-                    Vector3 newForce = 30f * Physics.gravity.y * Time.fixedDeltaTime * transform.up;
-                    if (!newForce.IsZero()) Rigidbody.AddForce(newForce, ForceMode.VelocityChange);
-                }
+
+                bool applyForce = playerBottomPos.y - hit.point.y > 0.01f
+                                  && Rigidbody.velocity.y <= 0.01f
+                                  && !_swimmingComponent.IsBelowWater
+                                  && !_climbingComponent.IsClimbing;
+
+                if (!applyForce)
+                    return;
+                
+                Vector3 newForce = 30f * Physics.gravity.y * Time.fixedDeltaTime * transform.up;
+
+                if (newForce.IsZero())
+                    return;
+                
+                Rigidbody.AddForce(newForce, ForceMode.VelocityChange);
             }
         }
 
         private void CheckSlope(Vector3 direction)
         {
-            futureDirection = direction.magnitude > 0f ? GetMoveDir(direction).normalized : Vector3.zero;
+            futureDirection = direction.magnitude > 0f ? GetMoveDirection(direction).normalized : Vector3.zero;
             slopeAngle = Vector3.Angle(futureDirection, transform.up);
-            if (direction.magnitude > 0f) slopeAngle = 90f - slopeAngle;
-            if (debug) Debug.DrawLine(playerBottomPos, playerBottomPos + futureDirection, Color.blue, 5f);
+            
+            if (direction.magnitude > 0f)
+                slopeAngle = 90f - slopeAngle;
+            
+            if (_debug)
+                Debug.DrawLine(playerBottomPos, playerBottomPos + futureDirection, Color.blue, 5f);
         }
 
-        private Vector3 GetMoveDir(Vector3 direction)
+        private Vector3 GetMoveDirection(Vector3 direction)
         {
-            float r = capsule.radius * 2f;
-            float dist = r + 0.2f;
+            float radius = capsule.radius * 2f;
+            float dist = radius + 0.2f;
             Vector3 origin = playerBottomPos + Vector3.up * dist;
             Vector3 newGroundNormal = groundNormal;
 
             bool groundIsStatic = true;
 
-            if (Physics.SphereCast(origin, r, -transform.up, out RaycastHit hit, dist + 0.5f, groundMask.value,
+            if (Physics.SphereCast(origin, radius, -transform.up, out RaycastHit hit, dist + 0.5f, groundMask.value,
                     QueryTriggerInteraction.Ignore))
             {
-                Rigidbody rb = hit.collider.gameObject.GetComponent<Rigidbody>();
-                groundIsStatic = rb == null || rb.isKinematic;
+                Rigidbody rbody = hit.collider.gameObject.GetComponent<Rigidbody>();
+                groundIsStatic = rbody == null || rbody.isKinematic;
                 newGroundNormal = hit.normal;
             }
 
@@ -1305,10 +1081,10 @@ namespace EFPController
             if (Vector3.Angle(Vector3.up, newGroundNormal) > 89f)
                 return direction + newGroundNormal;
 
-            Vector3 dir = -Vector3.Cross(direction, newGroundNormal).normalized;
-            dir = Vector3.Cross(dir, newGroundNormal).normalized;
+            Vector3 finalDirection = -Vector3.Cross(direction, newGroundNormal).normalized;
+            finalDirection = Vector3.Cross(finalDirection, newGroundNormal).normalized;
 
-            return dir;
+            return finalDirection;
         }
 
         private Vector3 GetPlayerBottomPosition() =>
@@ -1316,15 +1092,22 @@ namespace EFPController
 
         private bool CanMoveToSlope()
         {
-            if (IsSwimming) return true;
-            if (futureDirection.magnitude > 0f && futureDirection.y <= 0f) return true;
-            if (debug)
+            if (_swimmingComponent.IsSwimming)
+                return true;
+            
+            if (futureDirection.magnitude > 0f && futureDirection.y <= 0f)
+                return true;
+            
+            if (_debug)
                 Debug.DrawLine(groundPoint + (Vector3.up * 0.1f),
                     groundPoint + (Vector3.up * 0.1f) + (-Vector3.up * 0.2f), Color.magenta, 10f);
+            
             if (Physics.Raycast(groundPoint + (Vector3.up * 0.1f), -Vector3.up, out RaycastHit rh, 0.2f,
                     groundMask.value, QueryTriggerInteraction.Ignore))
             {
-                if (rh.point.y < playerBottomPos.y) return true;
+                if (rh.point.y < playerBottomPos.y)
+                    return true;
+                
                 return Vector3.Angle(rh.normal, Vector3.up) < slopeLimit;
             }
 
@@ -1333,28 +1116,30 @@ namespace EFPController
 
         private bool CanStep(Vector3 direction)
         {
-            if (IsSwimming) return true;
-            if (IsGrounded)
+            if (_swimmingComponent.IsSwimming)
+                return true;
+
+            if (!IsGrounded)
+                return false;
+            
+            float radius = capsule.radius;
+            float stepDistance = radius + radius * stepHeightRadius;
+            Vector3 maxStepPos = playerBottomPos + direction * -0.1f + Vector3.up * (maxStepHeight + radius);
+            
+            if (!Physics.SphereCast(maxStepPos, radius, direction.normalized, out _, stepDistance, groundMask.value,
+                    QueryTriggerInteraction.Ignore))
             {
-                float radius = capsule.radius;
-                float stepDist = radius + radius * stepHeightRadius;
-                Vector3 maxStepPos = playerBottomPos + (direction * -0.1f) + (Vector3.up * (maxStepHeight + radius));
-                if (!Physics.SphereCast(maxStepPos, radius, direction.normalized, out _, stepDist, groundMask.value,
-                        QueryTriggerInteraction.Ignore))
+                Vector3 slopeOrigin = maxStepPos + direction * stepDistance;
+                
+                if (Physics.Raycast(slopeOrigin, -Vector3.up, out RaycastHit rh,
+                        (maxStepPos.y - playerBottomPos.y) * 2f, groundMask.value, QueryTriggerInteraction.Ignore))
                 {
-                    Vector3 slopeOrigin = maxStepPos + (direction * stepDist);
-                    if (Physics.Raycast(slopeOrigin, -Vector3.up, out RaycastHit rh,
-                            (maxStepPos.y - playerBottomPos.y) * 2f, groundMask.value, QueryTriggerInteraction.Ignore))
-                    {
-                        if (Vector3.Angle(rh.normal, Vector3.up) < slopeLimit)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
+                    if (Vector3.Angle(rh.normal, Vector3.up) < slopeLimit)
                         return true;
-                    }
+                }
+                else
+                {
+                    return true;
                 }
             }
 
@@ -1377,21 +1162,7 @@ namespace EFPController
                 return;
 
             // Water
-            if (other.gameObject.IsLayer(Game.Layer.Water))
-            {
-                if (!allWaterColliders.Contains(other)) allWaterColliders.Add(other);
-
-                if (falling && fallingDistance > 1f && !InWater)
-                {
-                    if (fallInWaterSounds.Length > 0)
-                        AudioManager.CreateSFX(fallInWaterSounds.Random(), transform.position);
-                }
-
-                enterWaterTime = Time.time;
-                currentWaterCollider = other;
-                InWater = true;
-                falling = false;
-            }
+            _swimmingComponent.TriggerEnterLogic(other);
         }
 
         private void OnTriggerStay(Collider other)
@@ -1402,27 +1173,8 @@ namespace EFPController
 
         private void OnTriggerExit(Collider other)
         {
-            if (other.gameObject.IsLayer(Game.Layer.Water)) // Water
-            {
-                if (allWaterColliders.Contains(other)) allWaterColliders.Remove(other);
-                if (other == currentWaterCollider)
-                {
-                    if (allWaterColliders.Count > 0)
-                    {
-                        currentWaterCollider = allWaterColliders.First();
-                    }
-                    else
-                    {
-                        swimTimeState = false;
-                        InWater = false;
-                        IsSwimming = false;
-                        IsBelowWater = false;
-                        CanWaterJump = true;
-                        holdingBreath = false;
-                        if (underwaterAudioSource != null) underwaterAudioSource.Pause();
-                    }
-                }
-            }
+            // Water
+            _swimmingComponent.TriggerExitLogic(other);
         }
     }
 }

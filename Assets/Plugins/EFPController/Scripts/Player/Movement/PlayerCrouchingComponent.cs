@@ -74,7 +74,11 @@ namespace EFPController
                     }
                 }
 
-                if (_inputManager.GetActionKeyDown(InputManager.Action.Crouch) && !_playerMovement.IsSwimming && !_playerMovement.ClimbingComponent.IsClimbing)
+                bool canCrouch = _inputManager.GetActionKeyDown(InputManager.Action.Crouch)
+                                 && !_playerMovement.SwimmingComponent.IsSwimming
+                                 && !_playerMovement.ClimbingComponent.IsClimbing;
+                
+                if (canCrouch)
                 {
                     if (!_crouchState)
                     {
@@ -109,29 +113,43 @@ namespace EFPController
                 else
                 {
                     _crouchState = false;
-                    
-                    if ((_playerMovement.sprint || _playerMovement.ClimbingComponent.IsClimbing || _playerMovement.IsSwimming || _playerMovement.dashActive)
-                        && !Physics.CheckCapsule(_transform.position + _transform.up * 0.75f, p2,
-                            CrouchCapsuleCheckRadius * 0.9f, _playerMovement.groundMask.value, QueryTriggerInteraction.Ignore)
-                       )
+
+                    bool cancelCrouch = false;
+                    bool checkOne = _playerMovement.sprint
+                                    || _playerMovement.ClimbingComponent.IsClimbing
+                                    || _playerMovement.SwimmingComponent.IsSwimming
+                                    || _playerMovement.dashActive;
+
+                    if (checkOne)
+                    {
+                        bool checkTwo = !Physics.CheckCapsule(_transform.position + _transform.up * 0.75f, p2,
+                            CrouchCapsuleCheckRadius * 0.9f, _playerMovement.groundMask.value,
+                            QueryTriggerInteraction.Ignore);
+
+                        cancelCrouch = checkTwo;
+                    }
+
+                    // Cancel crouch if sprint button is pressed and there is room above the player to stand up.
+                    if (cancelCrouch)
                     {
                         _playerMovement.camDampSpeed = 0.2f;
-                        
-                        // cancel crouch if sprint button is pressed and there is room above the player to stand up
                         IsCrouching = false;
                     }
                 }
             }
 
-            // determine if player has risen from crouch state
-            if (_playerMovement.MainCameraTransform.position.y - currentPosition.y > crouchingCamHeight * 0.5f)
-            {
-                if (!_crouchRisen)
-                {
-                    _playerMovement.camDampSpeed = 0.1f;
-                    _crouchRisen = true;
-                }
-            }
+            // Determine if player has risen from crouch state.
+            Vector3 mainCameraPosition = _playerMovement.MainCameraTransform.position;
+            bool hasRisen = mainCameraPosition.y - currentPosition.y > crouchingCamHeight * 0.5f;
+
+            if (!hasRisen)
+                return;
+
+            if (_crouchRisen)
+                return;
+            
+            _playerMovement.camDampSpeed = 0.1f;
+            _crouchRisen = true;
         }
     }
 }

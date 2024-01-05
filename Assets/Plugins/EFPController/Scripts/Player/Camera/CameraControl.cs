@@ -164,7 +164,7 @@ namespace EFPController
             }
             else
             {
-                if (controller.IsBelowWater)
+                if (controller.SwimmingComponent.IsBelowWater)
                 {
                     returnSpeedAmt = cameraBobAnims.rollReturnSpeedSwim;
                 }
@@ -184,7 +184,8 @@ namespace EFPController
             else
             {
                 rollAmt = cameraBobAnims.walkStrafeRoll;
-                if (controller.IsBelowWater)
+                
+                if (controller.SwimmingComponent.IsBelowWater)
                 {
                     lookRollAmt = -100f * cameraBobAnims.swimLookRoll;
                 }

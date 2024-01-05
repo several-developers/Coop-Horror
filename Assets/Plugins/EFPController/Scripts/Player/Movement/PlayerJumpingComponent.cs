@@ -79,11 +79,11 @@ namespace EFPController
                         // determine if player is jumping and set jumping variable
                         if (_inputManager.GetActionKeyDown(InputManager.Action.Jump)
                             && _jumpButton // check that jump button is not being held
-                            && !_playerMovement.IsBelowWater
-                            && _playerMovement.CanWaterJump
+                            && !_playerMovement.SwimmingComponent.IsBelowWater
+                            && _playerMovement.SwimmingComponent.CanWaterJump
                             && canStandUpOrJump
                             && LandStartTime + antiBunnyHopFactor < t // check for bunnyhop delay before jumping
-                            && (_playerMovement.slopeAngle < _playerMovement.slopeLimit || _playerMovement.InWater)
+                            && (_playerMovement.slopeAngle < _playerMovement.slopeLimit || _playerMovement.SwimmingComponent.InWater)
                            )
                         {
                             // do not jump if ground normal is greater than slopeLimit and not in water
@@ -122,26 +122,30 @@ namespace EFPController
             }
             else
             {
-                if (allowJumping && _playerMovement.IsSwimming &&
-                    _inputManager.GetActionKeyDown(InputManager.Action.Jump) &&
-                    !_playerMovement.IsBelowWater && _playerMovement.CanWaterJump)
+                bool canJump = allowJumping
+                               && _playerMovement.SwimmingComponent.IsSwimming
+                               && _inputManager.GetActionKeyDown(InputManager.Action.Jump)
+                               && !_playerMovement.SwimmingComponent.IsBelowWater
+                               && _playerMovement.SwimmingComponent.CanWaterJump;
+
+                if (!canJump)
+                    return;
+                
+                _jumpTimer = t;
+                _player.cameraAnimator.SetTrigger(CameraAnimNames.Jump);
+                
+                if (_jumpfxstate)
                 {
-                    _jumpTimer = t;
-                    _player.cameraAnimator.SetTrigger(CameraAnimNames.Jump);
-                    if (_jumpfxstate)
-                    {
-                        // Play Audio jump sfx
-                        _jumpfxstate = false;
-                    }
-
-                    _playerMovement.yVelocity = jumpSpeed;
-
-                    // apply the jump velocity to the player rigidbody
-                    _rigidbody.AddForce(Vector3.up * Mathf.Sqrt(2f * jumpSpeed * -Physics.gravity.y),
-                        ForceMode.VelocityChange);
-
-                    IsJumping = true;
+                    // Play Audio jump SFX.
+                    _jumpfxstate = false;
                 }
+
+                _playerMovement.yVelocity = jumpSpeed;
+
+                // Apply the jump velocity to the player rigidbody.
+                Vector3 force = Vector3.up * Mathf.Sqrt(2f * jumpSpeed * -Physics.gravity.y);
+                _rigidbody.AddForce(force, ForceMode.VelocityChange);
+                IsJumping = true;
             }
         }
     }

@@ -166,7 +166,7 @@ namespace EFPController
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			// use this variable to slow down bobbing speeds or increase forward bobbing amount if player is swimming
-			if (controller.IsSwimming)
+			if (controller.SwimmingComponent.IsSwimming)
 			{
 				swimBobSpeedAmt = Mathf.Max(0.01f, swimBobSpeedFactor); // actual swim bobbing factor, don't allow divide by zero
 			} else {
