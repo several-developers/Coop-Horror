@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace EFPController
 {
@@ -7,12 +6,10 @@ namespace EFPController
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PlayerCrouchingComponent(Player player, InputManager inputManager, PlayerMovement playerMovement,
-            PlayerCrouchingConfig crouchingConfig)
+        public PlayerCrouchingComponent(Player player, PlayerCrouchingConfig crouchingConfig)
         {
-            _player = player;
-            _inputManager = inputManager;
-            _playerMovement = playerMovement;
+            _inputManager = player.inputManager;
+            _playerMovement = player.controller;
             _crouchingConfig = crouchingConfig;
 
             _transform = player.transform;
@@ -45,7 +42,6 @@ namespace EFPController
         
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly Player _player;
         private readonly InputManager _inputManager;
         private readonly PlayerMovement _playerMovement;
         private readonly PlayerCrouchingConfig _crouchingConfig;
@@ -128,7 +124,7 @@ namespace EFPController
             }
 
             // determine if player has risen from crouch state
-            if (_playerMovement.mainCameraTransform.position.y - currentPosition.y > crouchingCamHeight * 0.5f)
+            if (_playerMovement.MainCameraTransform.position.y - currentPosition.y > crouchingCamHeight * 0.5f)
             {
                 if (!_crouchRisen)
                 {

@@ -69,7 +69,7 @@ namespace EFPController
 
         public bool dead { get; set; }
         public bool hidden { get; set; }
-        public float leaning => controller.leanAmt / controller.leanDistance;
+        public float leaning => controller.LeaningComponent.LeanAmt / controller.LeaningComponent.LeaningConfig.leanDistance;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -225,7 +225,7 @@ namespace EFPController
             controller.inputX = 0f;
             controller.inputY = 0f;
 
-            controller.rigidbody.velocity = Vector3.zero;
+            controller.Rigidbody.velocity = Vector3.zero;
 
             cameraBobAnims.PlayIdleAnim();
 

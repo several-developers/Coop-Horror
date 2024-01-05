@@ -147,7 +147,7 @@ namespace EFPController
 
 			rotationX = GameUtils.ClampAngle(rotationX, -maxXAngle, maxXAngle);
 			rotationY = GameUtils.ClampAngle(rotationY, minimumYAngle - recoilY, maximumYAngle - recoilY);
-			rotationZ = -player.controller.leanPos * player.controller.rotationLeanAmt;
+			rotationZ = -player.controller.LeaningComponent.LeanPos * player.controller.LeaningComponent.LeaningConfig.rotationLeanAmt;
 
 			inputY = rotationY + recoilY; // set public inputY value for use in other scripts
 			xQuaternion = Quaternion.AngleAxis(rotationX + recoilX, Vector3.up);

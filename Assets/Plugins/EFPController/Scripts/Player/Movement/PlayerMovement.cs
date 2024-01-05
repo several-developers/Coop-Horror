@@ -206,7 +206,7 @@ namespace EFPController
                 
                 if (_isSwimming)
                 {
-                    rigidbody.useGravity = false;
+                    Rigidbody.useGravity = false;
                     sprint = sprintActive = false;
                 }
                 else
@@ -238,29 +238,9 @@ namespace EFPController
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [Header("Leaning")]
-        [Tooltip("True if player should be allowed to lean.")]
-        public bool allowLeaning = true;
-
-        [Tooltip("Distance left or right the player can lean.")]
-        public float leanDistance = 0.75f;
-
-        [Tooltip("Pecentage the player can lean while standing.")]
-        public float standLeanAmt = 1f;
-
-        [Tooltip("Pecentage the player can lean while crouching.")]
-        public float crouchLeanAmt = 1f;
-
-        public float rotationLeanAmt = 20f;
-
-        public float leanAmt { get; set; } = 0f;
-        public float leanPos { get; set; }
-        public bool leanState { get; set; }
-
-        private float leanFactorAmt = 1f;
-        private float leanVel;
-        private Vector3 leanCheckPos;
-        private Vector3 leanCheckPos2;
-
+        [SerializeField, Required]
+        private PlayerLeaningConfig _playerLeaningConfig;
+        
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Climbing
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -376,10 +356,10 @@ namespace EFPController
         // References
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public InputManager inputManager { get; set; }
-        public new Rigidbody rigidbody { get; set; }
-        public Player player { get; set; }
-        public Transform mainCameraTransform { get; set; }
+        public InputManager InputManager { get; set; }
+        public Rigidbody Rigidbody { get; set; }
+        public Player Player { get; set; }
+        public Transform MainCameraTransform { get; set; }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Events
@@ -396,33 +376,36 @@ namespace EFPController
         public PlayerJumpingComponent JumpingComponent => _jumpingComponent;
         public PlayerCrouchingComponent CrouchingComponent => _crouchingComponent;
         public PlayerClimbingComponent ClimbingComponent => _climbingComponent;
+        public PlayerLeaningComponent LeaningComponent => _leaningComponent;
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private PlayerJumpingComponent _jumpingComponent;
         private PlayerCrouchingComponent _crouchingComponent;
         private PlayerClimbingComponent _climbingComponent;
+        private PlayerLeaningComponent _leaningComponent;
         private Transform _transform;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
         private void OnEnable()
         {
-            rigidbody = GetComponent<Rigidbody>();
-            rigidbody.freezeRotation = true;
+            Rigidbody = GetComponent<Rigidbody>();
+            Rigidbody.freezeRotation = true;
         }
 
         private void Start()
         {
             _transform = transform;
             
-            player = GetComponent<Player>();
-            mainCameraTransform = player.playerCamera.transform;
-            inputManager = InputManager.instance;
+            Player = GetComponent<Player>();
+            MainCameraTransform = Player.playerCamera.transform;
+            InputManager = InputManager.instance;
             
-            _jumpingComponent = new PlayerJumpingComponent(player, inputManager, this, _playerJumpingConfig);
-            _crouchingComponent = new PlayerCrouchingComponent(player, inputManager, this, _playerCrouchingConfig);
-            _climbingComponent = new PlayerClimbingComponent(player, this, inputManager, _playerClimbingConfig);
+            _jumpingComponent = new PlayerJumpingComponent(Player, _playerJumpingConfig);
+            _crouchingComponent = new PlayerCrouchingComponent(Player, _playerCrouchingConfig);
+            _climbingComponent = new PlayerClimbingComponent(Player, _playerClimbingConfig);
+            _leaningComponent = new PlayerLeaningComponent(Player, _playerLeaningConfig);
 
             // clamp movement modifier percentages
             backwardSpeedPercentage = Mathf.Clamp01(backwardSpeedPercentage); // Vlad
@@ -477,7 +460,7 @@ namespace EFPController
         private void LateUpdate()
         {
             if (!Player.canControl) return;
-            transform.eulerAngles = Vector3.up * player.smoothLook.transform.eulerAngles.y;
+            transform.eulerAngles = Vector3.up * Player.smoothLook.transform.eulerAngles.y;
 /*#if UNITY_2022_1_OR_NEWER
 			transform.eulerAngles = Vector3.up * player.smoothLook.transform.eulerAngles.y;
 #else
@@ -498,8 +481,8 @@ namespace EFPController
                 JumpingComponent.IsJumping = false;
 
             playerBottomPos = GetPlayerBottomPosition();
-            velocity = rigidbody.velocity;
-            Vector2 move = inputManager.GetMovementInput();
+            velocity = Rigidbody.velocity;
+            Vector2 move = InputManager.GetMovementInput();
             inputY = move.y;
 
             // manage the CapsuleCast size and distance for frontal collision check based on player stance
@@ -632,7 +615,7 @@ namespace EFPController
 
                     if (fallStartLevel - transform.position.y > 2f)
                     {
-                        player.cameraAnimator.SetTrigger(CameraAnimNames.Land);
+                        Player.cameraAnimator.SetTrigger(CameraAnimNames.Land);
                         OnLand?.Invoke();
                     }
 
@@ -652,7 +635,7 @@ namespace EFPController
                         
                         if (groundRB != null && !groundRB.isKinematic)
                         {
-                            groundRB.AddForceAtPosition(Vector3.down * rigidbody.mass, groundPoint,
+                            groundRB.AddForceAtPosition(Vector3.down * Rigidbody.mass, groundPoint,
                                 ForceMode.Acceleration);
                         }
                     }
@@ -670,8 +653,8 @@ namespace EFPController
                     if ((Mathf.Abs(inputY) > 0f && forwardSprintOnly) ||
                         (!forwardSprintOnly && (Mathf.Abs(inputX) > 0f) || Mathf.Abs(inputY) > 0f))
                     {
-                        if ((inputManager.GetActionKey(InputManager.Action.Sprint) ||
-                             inputManager.GetActionKeyDown(InputManager.Action.Sprint)))
+                        if ((InputManager.GetActionKey(InputManager.Action.Sprint) ||
+                             InputManager.GetActionKeyDown(InputManager.Action.Sprint)))
                         {
                             if (!sprintStartState)
                             {
@@ -714,7 +697,7 @@ namespace EFPController
                     }
                     else
                     {
-                        if (!inputManager.GetActionKey(InputManager.Action.Sprint)) sprint = false;
+                        if (!InputManager.GetActionKey(InputManager.Action.Sprint)) sprint = false;
                     }
                 }
 
@@ -836,101 +819,7 @@ namespace EFPController
                 // Leaning
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                if (allowLeaning)
-                {
-                    float crouchCapsuleCheckRadius = _crouchingComponent.CrouchCapsuleCheckRadius;
-                    if (leanDistance > 0f)
-                    {
-                        if (Time.timeSinceLevelLoad > 0.5f
-                            && !player.dead
-                            && !sprint
-                            && IsGrounded
-                            && Mathf.Abs(move.y) < 0.2f)
-                        {
-                            if (inputManager.GetActionKey(InputManager.Action.LeanLeft) &&
-                                !inputManager.GetActionKey(InputManager.Action.LeanRight)) // lean left
-                            {
-                                // set up horizontal capsule cast to check if player would be leaning into an object
-                                if (!_crouchingComponent.IsCrouching)
-                                {
-                                    // move up bottom of lean capsule check when standing to allow player to lean over short objects like boxes 
-                                    leanCheckPos = transform.position + Vector3.up * crouchCapsuleCheckRadius;
-                                    leanFactorAmt = standLeanAmt;
-                                }
-                                else
-                                {
-                                    leanCheckPos = transform.position;
-                                    leanFactorAmt = crouchLeanAmt;
-                                }
-
-                                // define upper point of capsule (1/2 height minus radius)
-                                leanCheckPos2 = transform.position +
-                                                Vector3.up * (capsule.height / 2f - crouchCapsuleCheckRadius);
-                                if (!Physics.CapsuleCast(leanCheckPos, leanCheckPos2, crouchCapsuleCheckRadius * 0.8f,
-                                        -transform.right, out _, leanDistance * leanFactorAmt, groundMask.value))
-                                {
-                                    leanAmt = -leanDistance * leanFactorAmt;
-                                    leanState = true;
-                                }
-                                else
-                                {
-                                    leanAmt = 0f;
-                                    leanState = false;
-                                }
-                            }
-                            else if (inputManager.GetActionKey(InputManager.Action.LeanRight) &&
-                                     !inputManager.GetActionKey(InputManager.Action.LeanLeft))
-                            {
-                                // lean right
-                                // set up horizontal capsule cast to check if player would be leaning into an object
-                                if (!_crouchingComponent.IsCrouching)
-                                {
-                                    // move up bottom of lean capsule check when standing to allow player to lean over short objects like boxes 
-                                    leanCheckPos = transform.position + Vector3.up * crouchCapsuleCheckRadius;
-                                    leanFactorAmt = standLeanAmt;
-                                }
-                                else
-                                {
-                                    leanCheckPos = transform.position;
-                                    leanFactorAmt = crouchLeanAmt;
-                                }
-
-                                // define upper point of capsule (1/2 height minus radius)
-                                leanCheckPos2 = transform.position +
-                                                Vector3.up * (capsule.height / 2f - crouchCapsuleCheckRadius);
-                                if (!Physics.CapsuleCast(leanCheckPos, leanCheckPos2, crouchCapsuleCheckRadius * 0.5f,
-                                        transform.right, out _, leanDistance * leanFactorAmt, groundMask.value))
-                                {
-                                    leanAmt = leanDistance * leanFactorAmt;
-                                    leanState = true;
-                                }
-                                else
-                                {
-                                    leanAmt = 0f;
-                                    leanState = false;
-                                }
-                            }
-                            else
-                            {
-                                leanAmt = 0f;
-                                leanState = false;
-                            }
-                        }
-                        else
-                        {
-                            leanAmt = 0f;
-                            leanState = false;
-                        }
-
-                        // smooth position between leanAmt values
-                        leanPos = Mathf.SmoothDamp(leanPos, leanAmt, ref leanVel, 0.1f, Mathf.Infinity, Time.deltaTime);
-                    }
-                }
-                else
-                {
-                    leanState = false;
-                    leanAmt = 0f;
-                }
+                _leaningComponent.FixedUpdateLogic(move);
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -978,7 +867,7 @@ namespace EFPController
             // realign moveDirection vector to world space
             if (IsSwimming)
             {
-                moveDirection = mainCameraTransform.TransformDirection(moveDirection);
+                moveDirection = MainCameraTransform.TransformDirection(moveDirection);
             }
             else
             {
@@ -989,7 +878,7 @@ namespace EFPController
 
             if (_climbingComponent.IsClimbing)
             {
-                if (_climbingComponent.climbingState == ClimbingState.Grabbed)
+                if (_climbingComponent.ClimbingState == ClimbingState.Grabbed)
                     _climbingComponent.Climbing();
             }
             else
@@ -1067,7 +956,7 @@ namespace EFPController
                 // Dash
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 ///
-                if (allowDash && !dashState && inputManager.GetActionKey(InputManager.Action.Dash) && IsGrounded &&
+                if (allowDash && !dashState && InputManager.GetActionKey(InputManager.Action.Dash) && IsGrounded &&
                     !IsSwimming && !falling && !JumpingComponent.IsJumping
                     && IsMoving)
                 {
@@ -1091,7 +980,7 @@ namespace EFPController
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
 
                 // finally, add movement velocity to player rigidbody velocity
-                if (!velocityChange.IsZero()) rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+                if (!velocityChange.IsZero()) Rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Swimming
@@ -1110,7 +999,7 @@ namespace EFPController
                                     -transform.up, out _, _crouchingComponent.CrouchCapsuleCastHeight, groundMask.value))
                             {
                                 // make player sink into water after jump
-                                rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f),
+                                Rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f),
                                     ForceMode.VelocityChange);
                             }
                         }
@@ -1118,7 +1007,7 @@ namespace EFPController
                     else
                     {
                         // make player rise to water surface if they hold the jump button
-                        if (inputManager.GetActionKey(InputManager.Action.Jump))
+                        if (InputManager.GetActionKey(InputManager.Action.Jump))
                         {
                             if (IsBelowWater)
                             {
@@ -1133,7 +1022,7 @@ namespace EFPController
                             }
                             // make player dive downwards if they hold the crouch button
                         }
-                        else if (inputManager.GetActionKey(InputManager.Action.Crouch))
+                        else if (InputManager.GetActionKey(InputManager.Action.Crouch))
                         {
                             swimmingVerticalSpeed = Mathf.MoveTowards(swimmingVerticalSpeed, -3f, dt * 4f);
                         }
@@ -1152,7 +1041,7 @@ namespace EFPController
 
                         // allow jumping when treading water if player has released the jump button after surfacing 
                         // by holding jump button down to prevent player from surfacing and immediately jumping
-                        if (!IsBelowWater && !inputManager.GetActionKey(InputManager.Action.Jump))
+                        if (!IsBelowWater && !InputManager.GetActionKey(InputManager.Action.Jump))
                         {
                             CanWaterJump = true;
                         }
@@ -1179,20 +1068,20 @@ namespace EFPController
                         }
 
                         // apply the vertical swimming speed to the player rigidbody
-                        rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f), ForceMode.VelocityChange);
+                        Rigidbody.AddForce(new Vector3(0f, swimmingVerticalSpeed, 0f), ForceMode.VelocityChange);
                     }
                 }
 
-                if (IsGrounded && Vector3.Angle(groundNormal, Vector3.up) > slopeLimit && rigidbody.velocity.y <= 0f &&
+                if (IsGrounded && Vector3.Angle(groundNormal, Vector3.up) > slopeLimit && Rigidbody.velocity.y <= 0f &&
                     !IsBelowWater)
                 {
-                    rigidbody.velocity += transform.up * (Physics.gravity.y * (30f * fdt));
+                    Rigidbody.velocity += transform.up * (Physics.gravity.y * (30f * fdt));
                 }
 
                 if (IsGrounded && !IsSwimming && !JumpingComponent.IsJumping && groundHitInfo.rigidbody != null &&
                     groundHitInfo.rigidbody.isKinematic)
                 {
-                    rigidbody.velocity += groundHitInfo.rigidbody.GetVelocityAtPoint(groundPoint);
+                    Rigidbody.velocity += groundHitInfo.rigidbody.GetVelocityAtPoint(groundPoint);
                 }
 
                 if (dashActive)
@@ -1201,7 +1090,7 @@ namespace EFPController
                                     (currSpeed + dashCurrentForce);
                     moveDirection += Vector3.up * yVelocity;
                     velocityChange = moveDirection - velocity;
-                    if (!velocityChange.IsZero()) rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+                    if (!velocityChange.IsZero()) Rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
                 }
             }
 
@@ -1283,7 +1172,7 @@ namespace EFPController
                     holdingBreath = true;
                     
                     if (enterWaterTime + 0.3f > Time.time && fallInDeepWaterSound != null)
-                        player.effectsAudioSource.PlayOneShot(fallInDeepWaterSound);
+                        Player.effectsAudioSource.PlayOneShot(fallInDeepWaterSound);
 
                     if (underwaterAudioSource != null)
                     {
@@ -1309,7 +1198,7 @@ namespace EFPController
             }
 
             if (!IsSwimming && !_climbingComponent.IsClimbing && IsGrounded)
-                rigidbody.useGravity = true;
+                Rigidbody.useGravity = true;
         }
         
         public void Stop()
@@ -1331,8 +1220,8 @@ namespace EFPController
 
             yield return new WaitForEndOfFrame();
 
-            if (dashSounds.Length > 0) player.effectsAudioSource.PlayOneShot(dashSounds.Random(), dashSoundVolume);
-            player.cameraControl.SetEffectFilter(CameraControl.ScreenEffectProfileType.Dash, 1f, dashTime - 0.2f, 0.2f);
+            if (dashSounds.Length > 0) Player.effectsAudioSource.PlayOneShot(dashSounds.Random(), dashSoundVolume);
+            Player.cameraControl.SetEffectFilter(CameraControl.ScreenEffectProfileType.Dash, 1f, dashTime - 0.2f, 0.2f);
 
             float elapsed = 0f;
             float time = dashTime;
@@ -1376,11 +1265,11 @@ namespace EFPController
                 }
 
                 CheckSlope(direction);
-                if (playerBottomPos.y - hit.point.y > 0.01f && rigidbody.velocity.y <= 0.01f && !IsBelowWater &&
+                if (playerBottomPos.y - hit.point.y > 0.01f && Rigidbody.velocity.y <= 0.01f && !IsBelowWater &&
                     !_climbingComponent.IsClimbing)
                 {
                     Vector3 newForce = 30f * Physics.gravity.y * Time.fixedDeltaTime * transform.up;
-                    if (!newForce.IsZero()) rigidbody.AddForce(newForce, ForceMode.VelocityChange);
+                    if (!newForce.IsZero()) Rigidbody.AddForce(newForce, ForceMode.VelocityChange);
                 }
             }
         }
@@ -1411,13 +1300,10 @@ namespace EFPController
             }
 
             if (!groundIsStatic)
-            {
                 return direction;
-            }
-            else if (Vector3.Angle(Vector3.up, newGroundNormal) > 89f)
-            {
+            
+            if (Vector3.Angle(Vector3.up, newGroundNormal) > 89f)
                 return direction + newGroundNormal;
-            }
 
             Vector3 dir = -Vector3.Cross(direction, newGroundNormal).normalized;
             dir = Vector3.Cross(dir, newGroundNormal).normalized;
@@ -1425,10 +1311,8 @@ namespace EFPController
             return dir;
         }
 
-        private Vector3 GetPlayerBottomPosition()
-        {
-            return transform.position + -transform.up * (capsule.height * 0.5f);
-        }
+        private Vector3 GetPlayerBottomPosition() =>
+            _transform.position + -_transform.up * (capsule.height * 0.5f);
 
         private bool CanMoveToSlope()
         {

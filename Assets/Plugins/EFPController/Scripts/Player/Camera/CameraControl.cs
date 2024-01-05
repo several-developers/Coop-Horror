@@ -109,7 +109,7 @@ namespace EFPController
             }
 
             // set up camera position with horizontal lean amount
-            targetPos = playerTransform.position + (playerTransform.right * controller.leanPos);
+            targetPos = playerTransform.position + playerTransform.right * controller.LeaningComponent.LeanPos;
 
             // if world has just been recentered, don't lerp camera position to prevent lagging behind player object position
             if (movingTime + 0.75f > Time.time)
@@ -231,7 +231,7 @@ namespace EFPController
                 transform.localEulerAngles.z -
                 (cameraRootAnimations.camAngleAnim.z * cameraBobAnims.camAngleBobAmt.z * deltaAmt)
                 + (CameraAnglesAnimTemp.z * deltaAmt) // camera roll modifiers 
-                - (controller.leanAmt * 3f * Time.deltaTime * returnSpeedAmt)
+                - (controller.LeaningComponent.LeanAmt * 3f * Time.deltaTime * returnSpeedAmt)
                 - (controller.inputX * rollAmt * Time.deltaTime * returnSpeedAmt)
                 - (cameraBobAnims.side * lookRollAmt * Time.deltaTime * returnSpeedAmt));
 

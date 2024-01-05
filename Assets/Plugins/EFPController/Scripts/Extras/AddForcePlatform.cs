@@ -32,9 +32,9 @@ namespace EFPController.Extras
             {
                 eventFlag = false;
                 currentSpeed = 0f;
-                if (!continuous && (!matchDirection || MatchDir(pm.rigidbody.velocity)))
+                if (!continuous && (!matchDirection || MatchDir(pm.Rigidbody.velocity)))
                 {
-                    pm.rigidbody.AddForce(transform.TransformVector(force), mode);
+                    pm.Rigidbody.AddForce(transform.TransformVector(force), mode);
                     OnAddForce?.Invoke();
                 }
             }
@@ -45,10 +45,10 @@ namespace EFPController.Extras
             if (!continuous) return;
             if (other.gameObject.TryGetComponent(out PlayerMovement pm))
             {
-                if (!matchDirection || MatchDir(pm.rigidbody.velocity))
+                if (!matchDirection || MatchDir(pm.Rigidbody.velocity))
                 {
                     currentSpeed = Mathf.MoveTowards(currentSpeed, 1f, smoothSpeed * Time.deltaTime);
-                    pm.rigidbody.AddForce(transform.TransformVector(force * currentSpeed), mode);
+                    pm.Rigidbody.AddForce(transform.TransformVector(force * currentSpeed), mode);
                     if (!eventFlag)
                     {
                         eventFlag = true;

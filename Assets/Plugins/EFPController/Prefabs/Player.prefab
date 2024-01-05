@@ -1175,6 +1175,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1283084076639bb468831c0ce929b90f, type: 3}
   divingOutSounds:
   - {fileID: 8300000, guid: 1e7c19ce150491e48b32f097790f9cb0, type: 3}
+  _playerLeaningConfig: {fileID: 11400000, guid: 9dbc99562909f524a9b1e3c62523eefa,
+    type: 2}
   allowLeaning: 1
   leanDistance: 0.6
   standLeanAmt: 1

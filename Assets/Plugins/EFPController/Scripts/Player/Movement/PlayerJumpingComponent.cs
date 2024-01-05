@@ -6,14 +6,13 @@ namespace EFPController
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PlayerJumpingComponent(Player player, InputManager inputManager, PlayerMovement playerMovement,
-            PlayerJumpingConfig jumpingConfig)
+        public PlayerJumpingComponent(Player player, PlayerJumpingConfig jumpingConfig)
         {
             _player = player;
-            _inputManager = inputManager;
-            _playerMovement = playerMovement;
             JumpingConfig = jumpingConfig;
 
+            _inputManager = player.inputManager;
+            _playerMovement = player.controller;
             _rigidbody = player.rigidbody;
         }
 

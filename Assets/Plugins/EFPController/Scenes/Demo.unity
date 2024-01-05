@@ -14854,6 +14854,12 @@ PrefabInstance:
       propertyPath: m_CullingMask.m_Bits
       value: 2039
       objectReference: {fileID: 0}
+    - target: {fileID: 6691763709877072134, guid: 6823701c0a1b57d4b9b08f3afa059c09,
+        type: 3}
+      propertyPath: _playerLeaningConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 9dbc99562909f524a9b1e3c62523eefa,
+        type: 2}
     - target: {fileID: 8395825253574119177, guid: 6823701c0a1b57d4b9b08f3afa059c09,
         type: 3}
       propertyPath: m_RootOrder
