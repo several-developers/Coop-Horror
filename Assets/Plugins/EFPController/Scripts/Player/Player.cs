@@ -55,7 +55,7 @@ namespace EFPController
         public AudioSource effectsAudioSource;
         public float returnToGroundAltitude = -100f;
         [SerializeField]
-        public List<Collider> colliders = new List<Collider>();
+        public List<Collider> colliders = new();
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -88,6 +88,8 @@ namespace EFPController
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+        
         private void Awake()
         {
             rigidbody = GetComponent<Rigidbody>();
@@ -107,7 +109,7 @@ namespace EFPController
             cameraControl.RemoveEffectFilter();
             cameraControl.SetEffectFilter(CameraControl.ScreenEffectProfileType.Fade, 1f, 1f);
             cameraControl.enabled = true;
-            controller.speedMult = 1f;
+            controller.SpeedMult = 1f;
             audioSources.SetParent(cameraRoot.transform);
             inited = true;
             this.WaitAndCall(0.5f, () => {
@@ -117,9 +119,9 @@ namespace EFPController
             });
         }
 
-        void Update()
+        private void Update()
         {
-            if (controller.falling && transform.position.y < deadlyHeight)
+            if (controller.IsFalling && transform.position.y < deadlyHeight)
             {
                 //Kill();
                 return;
@@ -179,7 +181,7 @@ namespace EFPController
 
         public void ReturnToLastGroundPosition()
         {
-            Vector3 lastPosOnNavmesh = controller.lastOnGroundPosition;
+            Vector3 lastPosOnNavmesh = controller.LastOnGroundPosition;
             if (NavMesh.SamplePosition(lastPosOnNavmesh, out NavMeshHit hit, 3f, NavMesh.AllAreas))
             {
                 lastPosOnNavmesh = hit.position;
@@ -222,8 +224,8 @@ namespace EFPController
         void Kill()
         {
             // disable player control and sprinting on death
-            controller.inputX = 0f;
-            controller.inputY = 0f;
+            controller.InputX = 0f;
+            controller.InputY = 0f;
 
             controller.Rigidbody.velocity = Vector3.zero;
 
@@ -244,7 +246,7 @@ namespace EFPController
         {
             cameraControl.smooth = false;
             smoothLook.smooth = false;
-            controller.falling = false;
+            controller.IsFalling = false;
             transform.position = position;
 
             if (rotation != null) Rotate((Quaternion)rotation);

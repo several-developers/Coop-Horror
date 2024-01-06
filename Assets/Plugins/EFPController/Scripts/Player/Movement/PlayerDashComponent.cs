@@ -60,8 +60,8 @@ namespace EFPController
             DashActive = true;
             DashState = true;
 
-            _playerMovement.sprint = false;
-            _dashDirection = _playerMovement.moveDirection.normalized;
+            _playerMovement.SprintComponent.Sprint = false;
+            _dashDirection = _playerMovement.MoveDirection.normalized;
 
             yield return new WaitForEndOfFrame();
 

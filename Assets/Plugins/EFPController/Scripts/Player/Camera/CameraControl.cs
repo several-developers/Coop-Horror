@@ -140,12 +140,12 @@ namespace EFPController
             // with camera/mouselook and only moves on the world axis.
             if (smooth)
             {
-                dampOrg = Mathf.SmoothDamp(dampOrg, controller.midPos, ref dampVelocity, controller.camDampSpeed,
+                dampOrg = Mathf.SmoothDamp(dampOrg, controller.MidPos, ref dampVelocity, controller.CamDampSpeed,
                     Mathf.Infinity, Time.smoothDeltaTime);
             }
             else
             {
-                dampOrg = controller.midPos;
+                dampOrg = controller.MidPos;
             }
 
             camPos = tempLerpPos + (playerTransform.right *
@@ -175,7 +175,7 @@ namespace EFPController
             }
 
             // caculate camera roll angle amounts
-            if (controller.sprint || controller.DashComponent.DashActive)
+            if (controller.SprintComponent.Sprint || controller.DashComponent.DashActive)
             {
                 rollAmt = cameraBobAnims.sprintStrafeRoll;
                 // view rolls more with horizontal looking during bullet time for dramatic effect
@@ -233,14 +233,14 @@ namespace EFPController
                 (cameraRootAnimations.camAngleAnim.z * cameraBobAnims.camAngleBobAmt.z * deltaAmt)
                 + (CameraAnglesAnimTemp.z * deltaAmt) // camera roll modifiers 
                 - (controller.LeaningComponent.LeanAmt * 3f * Time.deltaTime * returnSpeedAmt)
-                - (controller.inputX * rollAmt * Time.deltaTime * returnSpeedAmt)
+                - (controller.InputX * rollAmt * Time.deltaTime * returnSpeedAmt)
                 - (cameraBobAnims.side * lookRollAmt * Time.deltaTime * returnSpeedAmt));
 
             // apply tempCamAngles to camera angles
             transform.localRotation = tempCamAngles;
 
             // Track time that player has landed from jump or fall for gun kicks
-            if (controller.fallingDistance < 1.25f && !controller.JumpingComponent.IsJumping)
+            if (controller.FallingDistance < 1.25f && !controller.JumpingComponent.IsJumping)
             {
                 if (!landState)
                 {

@@ -127,18 +127,18 @@ namespace EFPController
                 case PlayerMovement.ClimbingState.Grabbed:
                     // Get the path position from character's current position
                     Vector3 p1 =
-                        _activeLadder.ClosestPointOnPath(_playerMovement.playerBottomPos, out _ladderPathPosition);
-                    Transform closestPoint = _activeLadder.GetClosestPointByPosition(_playerMovement.playerBottomPos);
+                        _activeLadder.ClosestPointOnPath(_playerMovement.PlayerBottomPos, out _ladderPathPosition);
+                    Transform closestPoint = _activeLadder.GetClosestPointByPosition(_playerMovement.PlayerBottomPos);
                     Vector3 p2 = _activeLadder.ClosestPointOnPath(closestPoint.position, out _ladderPathTargetPosition);
                     float dist = Vector3.Distance(p1, p2);
                     if (dist > 0.2f)
                     {
                         // Move the character along the ladder path
-                        _rigidbody.velocity = _activeLadder.transform.up * (_playerMovement.inputY * climbingSpeed * Time.fixedDeltaTime);
+                        _rigidbody.velocity = _activeLadder.transform.up * (_playerMovement.InputY * climbingSpeed * Time.fixedDeltaTime);
 
                         if (climbingAudioSource != null && _activeLadder.climbingSound != null)
                         {
-                            if (_playerMovement.inputY.IsZero())
+                            if (_playerMovement.InputY.IsZero())
                             {
                                 _climbingTargetVolume = 0f;
                             }
@@ -164,7 +164,7 @@ namespace EFPController
                         // If reached on of the ladder path extremes, change to releasing phase
                         _ladderTime = 0f;
                         ClimbingState = PlayerMovement.ClimbingState.Releasing;
-                        Transform currPoint = _activeLadder.GetClosestPointByPosition(_playerMovement.playerBottomPos);
+                        Transform currPoint = _activeLadder.GetClosestPointByPosition(_playerMovement.PlayerBottomPos);
                         _ladderStartPosition = _transform.position;
                         _ladderTargetPosition =
                             currPoint.position + _transform.up * (_playerMovement.capsule.height * 0.5f);
@@ -235,7 +235,8 @@ namespace EFPController
             if (angle < angleToClimb)
             {
                 if (climbOnInteract)
-                    _playerMovement.hoverClimbable = true;
+                {
+                }
 
                 if (!climbOnInteract || _inputManager.GetActionKey(InputManager.Action.Interact))
                     _playerMovement.ClimbingComponent.Climb(ladder);
@@ -250,7 +251,7 @@ namespace EFPController
             float clampClimbingCameraAngle = _climbingConfig.clampClimbingCameraAngle;
             bool clampClimbingCameraRotate = _climbingConfig.clampClimbingCameraRotate;
             bool rotateClimbingCamera = _climbingConfig.rotateClimbingCamera;
-            Vector3 playerBottomPos = _playerMovement.playerBottomPos;
+            Vector3 playerBottomPos = _playerMovement.PlayerBottomPos;
 
             _ladderTime = 0f;
             _activeLadder = ladder;
@@ -277,8 +278,8 @@ namespace EFPController
                 _player.smoothLook.enabled = false;
 
             _playerMovement.JumpingComponent.IsJumping = false;
-            _playerMovement.falling = false;
-            _playerMovement.sprint = _playerMovement.sprintActive = false;
+            _playerMovement.IsFalling = false;
+            _playerMovement.SprintComponent.Sprint = _playerMovement.SprintComponent.SprintActive = false;
             _playerMovement.SwimmingComponent.IsSwimming = false;
 
             if (_player.cameraAnimator.HasParameter(CameraAnimNames.Climb))

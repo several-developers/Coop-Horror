@@ -21,15 +21,10 @@ namespace EFPController
         private Vector3 offset;
         private Vector3 newPos;
 
-        private void Start()
-        {
+        private void Start() =>
             offset = transform.localPosition;
-        }
 
-        private void Update()
-        {
-            Bob();
-        }
+        private void Update() => Bob();
 
         private void Bob()
         {
@@ -37,7 +32,8 @@ namespace EFPController
 
             if (playerController.IsGrounded)
             {
-                characterMovementFactor = Mathf.Clamp01(playerController.velocity.magnitude / playerController.sprintSpeed);
+                float sprintSpeed = playerController.SprintComponent.SprintConfig.sprintSpeed;
+                characterMovementFactor = Mathf.Clamp01(playerController.Velocity.magnitude / sprintSpeed);
             }
 
             bobFactor = Mathf.Lerp(bobFactor, characterMovementFactor, bobSharpness * Time.deltaTime);

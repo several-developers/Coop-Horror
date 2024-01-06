@@ -59,7 +59,7 @@ namespace EFPController
                 if (_isSwimming)
                 {
                     _playerMovement.Rigidbody.useGravity = false;
-                    _playerMovement.sprint = _playerMovement.sprintActive = false;
+                    _playerMovement.SprintComponent.Sprint = _playerMovement.SprintComponent.SprintActive = false;
                 }
                 else
                 {
@@ -127,7 +127,7 @@ namespace EFPController
                 }
 
                 // check if player is at treading water depth (water line at shoulders/neck) after surfacing from dive
-                IsBelowWater = _playerMovement.camPos.y <= _currentWaterCollider.bounds.max.y;
+                IsBelowWater = _playerMovement.CamPos.y <= _currentWaterCollider.bounds.max.y;
             }
             else
             {
@@ -135,7 +135,7 @@ namespace EFPController
             }
 
             // check if view height is under water line
-            if (_playerMovement.camPos.y <= _currentWaterCollider.bounds.max.y)
+            if (_playerMovement.CamPos.y <= _currentWaterCollider.bounds.max.y)
             {
                 if (!_holdingBreath)
                 {
@@ -154,13 +154,13 @@ namespace EFPController
                     }
 
                     if (_playerMovement.divingInSounds.Length > 0 && _enterWaterTime > 1f)
-                        AudioManager.CreateSFX(_playerMovement.divingInSounds.Random(), _playerMovement.camPos);
+                        AudioManager.CreateSFX(_playerMovement.divingInSounds.Random(), _playerMovement.CamPos);
                 }
             }
             else
             {
                 if (_holdingBreath && _playerMovement.divingOutSounds.Length > 0 && _diveStartTime + 0.2f < Time.time)
-                    AudioManager.CreateSFX(_playerMovement.divingOutSounds.Random(), _playerMovement.camPos);
+                    AudioManager.CreateSFX(_playerMovement.divingOutSounds.Random(), _playerMovement.CamPos);
 
                 if (_playerMovement.underwaterAudioSource != null)
                     _playerMovement.underwaterAudioSource.Pause();
@@ -221,7 +221,7 @@ namespace EFPController
                 if (!stopSinking)
                     return;
                 
-                if (!Physics.CapsuleCast(_playerMovement.playerMiddlePos, _playerMovement.playerTopPos,
+                if (!Physics.CapsuleCast(_playerMovement.PlayerMiddlePos, _playerMovement.PlayerTopPos,
                         _playerMovement.CrouchingComponent.CrouchCapsuleCheckRadius * 0.9f,
                         -_transform.up, out _, _playerMovement.CrouchingComponent.CrouchCapsuleCastHeight, _playerMovement.groundMask.value))
                 {
@@ -311,7 +311,7 @@ namespace EFPController
             if (!_allWaterColliders.Contains(other))
                 _allWaterColliders.Add(other);
 
-            if (_playerMovement.falling && _playerMovement.fallingDistance > 1f && !InWater)
+            if (_playerMovement.IsFalling && _playerMovement.FallingDistance > 1f && !InWater)
             {
                 if (_playerMovement.fallInWaterSounds.Length > 0)
                     AudioManager.CreateSFX(_playerMovement.fallInWaterSounds.Random(), _transform.position);
@@ -320,7 +320,7 @@ namespace EFPController
             _enterWaterTime = Time.time;
             _currentWaterCollider = other;
             InWater = true;
-            _playerMovement.falling = false;
+            _playerMovement.IsFalling = false;
 
             return true;
         }

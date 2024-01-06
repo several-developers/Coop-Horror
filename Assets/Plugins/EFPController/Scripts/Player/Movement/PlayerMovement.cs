@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using EFPController.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -16,7 +14,7 @@ namespace EFPController
         [Tooltip("Mask of layers that player will detect collisions with.")]
         public LayerMask groundMask = Game.LayerMask.Default;
 
-        public float inputLerpSpeed = 90f; // movement lerp speed
+        public float _inputLerpSpeed = 90f; // movement lerp speed
         public PhysicMaterial groundedPhysMaterial;
         public PhysicMaterial stayPhysMaterial;
         public PhysicMaterial flyPhysMaterial;
@@ -39,16 +37,16 @@ namespace EFPController
         [Tooltip("Percentage to decrease movement speed when moving backwards.")]
         public float backwardSpeedPercentage = 0.6f; // percentage to decrease movement speed while moving backwards
 
+        // percentage to decrease movement speed while strafing directly left or right
         [Tooltip("Percentage to decrease movement speed when strafing directly left or right.")]
-        public float
-            strafeSpeedPercentage = 0.8f; // percentage to decrease movement speed while strafing directly left or right
+        public float strafeSpeedPercentage = 0.8f;
 
         [Tooltip("Angle of ground surface that player won't be allowed to move over."), Range(0f, 90f)]
         public int
             slopeLimit = 40; // the maximum allowed ground surface/normal angle that the player is allowed to climb
 
-        public AnimationCurve slopeSpeed = new AnimationCurve()
-            { keys = new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(1f, 0f) } };
+        public AnimationCurve slopeSpeed = new()
+            { keys = new Keyframe[] { new(0f, 1f), new(1f, 0f) } };
 
         [Tooltip("Maximum height of step that will be climbed.")]
         public float maxStepHeight = 0.8f;
@@ -89,31 +87,9 @@ namespace EFPController
         }
 
         [Header("Sprinting")]
-        [Tooltip("True if player should be allowed to sprint.")]
-        public bool allowSprinting = true;
-
-        [Tooltip("Speed that player moves when sprinting.")]
-        public float sprintSpeed = 9f;
-
-        [Tooltip(
-            "User may set sprint mode to toggle, hold, or both (toggle on sprint button press, hold on sprint button hold).")]
-        public SprintType sprintMode = SprintType.Both;
-
-        public bool forwardSprintOnly = true;
-
-        public bool sprintActive { get; set; } = true; // true when player is allowed to sprint
-        public bool sprint { get; set; } // true when sprint button is ready
-
-        public float sprintStopTime { get; set; } // track when sprinting stopped for control of item pickup time in Player script
-
-        public float sprintEnd { get; set; }
-
-        private float sprintDelay = 0.4f;
-        private float sprintStart = -2f;
-        private bool sprintEndState;
-        private bool sprintStartState;
-        private bool sprintStopState = true;
-
+        [SerializeField, Required]
+        private PlayerSprintConfig _playerSprintConfig;
+        
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Dash
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,93 +148,80 @@ namespace EFPController
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         [Header("Fall Damage")]
-        public bool allowFallDamage = true;
-
-        [Tooltip("Number of units the player can fall before taking damage.")]
-        public float fallDamageThreshold = 5.5f;
-
-        [Tooltip("Multiplier of unit distance fallen to convert to hitpoint damage for the player.")]
-        public float fallDamageMultiplier = 2f;
+        [SerializeField, Required]
+        private PlayerFallDamageConfig _playerFallDamageConfig;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public bool IsGrounded { get; private set; } // true when capsule cast hits ground surface
-        public Vector3 velocity { get; private set; } = Vector3.zero; // total movement velocity vector
-        public float airTime { get; private set; } = 0f; // total time that player is airborn
+        public bool IsGrounded { get; private set; } // True when capsule cast hits ground surface.
+        public Vector3 Velocity { get; private set; } = Vector3.zero; // Total movement velocity vector.
+        public float FallingDistance { get; private set; } // total distance that player has fallen
 
-        public float
-            fallStartLevel { get; private set; } // the y coordinate that the player lost grounding and started to fall
-
-        public float fallingDistance { get; private set; } // total distance that player has fallen
-
-        // true when player is losing altitude
-        public bool _falling;
-
-        public bool falling
+        public bool IsFalling
         {
-            get => _falling;
+            get => _isFalling;
             set
             {
-                _falling = value;
-                fallingDistance = 0f;
+                _isFalling = value;
+                FallingDistance = 0f;
             }
         }
 
-        public float midPos { get; private set; } =
-            0.9f; // camera vertical position which is passed to VerticalBob and HorizontalBob
+        // Camera vertical position which is passed to VerticalBob and HorizontalBob.
+        public float MidPos { get; private set; } = 0.9f;
 
         public bool IsMoving { get; private set; }
-        public float speedMult { get; set; } = 1f;
+        public float SpeedMult { get; set; } = 1f;
 
         // Vlad, set was private
         public float
-            camDampSpeed { get; set; } // variable damp speed for vertical camera smoothing for stance changes
+            CamDampSpeed { get; set; } // variable damp speed for vertical camera smoothing for stance changes
 
-        public Vector3 camPos { get; private set; }
-        public Vector3 eyePos { get; private set; }
+        public Vector3 CamPos { get; private set; }
+        public Vector3 EyePos { get; private set; }
 
-        public Vector3 moveDirection { get; private set; } =
+        public Vector3 MoveDirection { get; private set; } =
             Vector3.zero; // movement velocity vector, modified by other speed factors like walk, zoom, and crouch states
 
-        public Vector3 moveDirection2D { get; private set; } = Vector3.zero;
-        public Vector3 playerBottomPos { get; private set; }
-        public Vector3 playerMiddlePos { get; private set; }
-        public Vector3 playerTopPos { get; private set; }
-        public Vector3 lastOnGroundPosition { get; private set; }
-        public RaycastHit groundHitInfo { get; private set; }
-        public bool hoverClimbable { get; set; } // Vlad, set was private
+        public Vector3 MoveDirection2D { get; private set; } = Vector3.zero;
+        public Vector3 PlayerBottomPos { get; private set; }
+        public Vector3 PlayerMiddlePos { get; private set; }
+        public Vector3 PlayerTopPos { get; private set; }
+        public Vector3 LastOnGroundPosition { get; private set; }
+        public RaycastHit GroundHitInfo { get; private set; }
+        public bool HoverClimbable { get; set; } // Vlad, set was private
+        public float YVelocity { get; set; } // Vlad, was private field mb
 
-        private bool canStep;
-        public float yVelocity { get; set; } // Vlad
-        private Vector3 playerAirVelocity;
-        private float crouchSpeedAmt = 1f;
-        private float speedAmtY = 1f; // current player speed per axis which is applied to rigidbody velocity vector
-        private float speedAmtX = 1f;
-        private float zoomSpeedAmt = 1f;
-        private float speed; // combined axis speed of player movement
-        private float limitStrafeSpeed = 0f;
-        private bool airTimeState;
-        private float moveSpeedMult = 1f;
-        private float currSpeedMult = 1f;
-        private int maxVelocityChange = 5; // maximum rate that player velocity can change
-        private Vector3 velocityChange = Vector3.zero;
-        private Vector3 futureDirection = Vector3.zero;
-        private Vector3 groundNormal;
-        private Vector3 groundPoint;
-        public float slopeAngle { get; private set; } // Vlad
-        private float lastOnGroundPositionTime;
+        private bool _canStep;
+        private Vector3 _playerAirVelocity;
+        private float _crouchSpeedAmt = 1f;
+        private float _speedAmtY = 1f; // current player speed per axis which is applied to rigidbody velocity vector
+        private float _speedAmtX = 1f;
+        private float _zoomSpeedAmt = 1f;
+        private float _speed; // combined axis speed of player movement
+        private float _limitStrafeSpeed = 0f;
+        private bool _airTimeState;
+        private float _moveSpeedMult = 1f;
+        private float _currSpeedMult = 1f;
+        private int _maxVelocityChange = 5; // maximum rate that player velocity can change
+        private Vector3 _velocityChange = Vector3.zero;
+        private Vector3 _futureDirection = Vector3.zero;
+        private Vector3 _groundNormal;
+        private Vector3 _groundPoint;
+        public float SlopeAngle { get; private set; } // Vlad, was private field mb
+        private float _lastOnGroundPositionTime;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Player Input
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public float inputXSmoothed { get; private set; } // inputs smoothed using lerps
-        public float inputYSmoothed { get; private set; }
-        public float inputX { get; set; } // 1 = button pressed 0 = button released
-        public float inputY { get; set; }
+        public float InputX { get; set; } // 1 = button pressed 0 = button released.
+        public float InputY { get; set; }
 
-        private float inputYLerpSpeed;
-        private float inputXLerpSpeed;
+        private float _inputXSmoothed; // Inputs smoothed using lerps.
+        private float _inputYSmoothed;
+        private float _inputYLerpSpeed;
+        private float _inputXLerpSpeed;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // References
@@ -287,6 +250,7 @@ namespace EFPController
         public PlayerLeaningComponent LeaningComponent => _leaningComponent;
         public PlayerSwimmingComponent SwimmingComponent => _swimmingComponent;
         public PlayerDashComponent DashComponent => _dashComponent;
+        public PlayerSprintComponent SprintComponent => _sprintComponent;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -296,8 +260,16 @@ namespace EFPController
         private PlayerLeaningComponent _leaningComponent;
         private PlayerSwimmingComponent _swimmingComponent;
         private PlayerDashComponent _dashComponent;
+        private PlayerSprintComponent _sprintComponent;
+        private PlayerFallDamageComponent _fallDamageComponent;
         private Transform _transform;
         
+        // The y coordinate that the player lost grounding and started to fall.
+        private float _fallStartLevel;
+        
+        private float _airTime; // Total time that player is airborn.
+        private bool _isFalling; // True when player is losing altitude.
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
         private void OnEnable()
@@ -320,12 +292,14 @@ namespace EFPController
             _leaningComponent = new PlayerLeaningComponent(Player, _playerLeaningConfig);
             _swimmingComponent = new PlayerSwimmingComponent(Player, _playerSwimmingConfig);
             _dashComponent = new PlayerDashComponent(Player, _playerDashConfig);
+            _sprintComponent = new PlayerSprintComponent(Player, _playerSprintConfig);
+            _fallDamageComponent = new PlayerFallDamageComponent(Player, _playerFallDamageConfig);
 
             // clamp movement modifier percentages
             backwardSpeedPercentage = Mathf.Clamp01(backwardSpeedPercentage); // Vlad
             strafeSpeedPercentage = Mathf.Clamp01(strafeSpeedPercentage); // Vlad
 
-            moveSpeedMult = 1f;
+            _moveSpeedMult = 1f;
 
             capsule.height = standingCapsuleHeight;
 
@@ -334,20 +308,6 @@ namespace EFPController
 
             // initialize player height variables
             _crouchingComponent.CrouchCapsuleCheckRadius = capsule.radius * 0.9f;
-            
-            // set sprint mode to toggle, hold, or both, based on inspector setting
-            switch (sprintMode)
-            {
-                case SprintType.Both:
-                    sprintDelay = 0.4f;
-                    break;
-                case SprintType.Hold:
-                    sprintDelay = 0f;
-                    break;
-                case SprintType.Toggle:
-                    sprintDelay = 999f; // time allowed between button down and release to activate toggle
-                    break;
-            }
         }
 
         private void Update()
@@ -392,17 +352,17 @@ namespace EFPController
             if (_swimmingComponent.IsSwimming && JumpingComponent.IsJumping)
                 JumpingComponent.IsJumping = false;
 
-            playerBottomPos = GetPlayerBottomPosition();
-            velocity = Rigidbody.velocity;
+            PlayerBottomPos = GetPlayerBottomPosition();
+            Velocity = Rigidbody.velocity;
             Vector2 move = InputManager.GetMovementInput();
-            inputY = move.y;
+            InputY = move.y;
 
             bool isSwimming = _swimmingComponent.IsSwimming;
 
             // manage the CapsuleCast size and distance for frontal collision check based on player stance
             // set the vertical bounds of the capsule used to detect player collisions
-            playerMiddlePos = _transform.position; // middle of player capsule
-            playerTopPos = playerMiddlePos + _transform.up * (capsule.height * 0.45f); // top of player capsule
+            PlayerMiddlePos = _transform.position; // middle of player capsule
+            PlayerTopPos = PlayerMiddlePos + _transform.up * (capsule.height * 0.45f); // top of player capsule
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Player Input
@@ -410,64 +370,66 @@ namespace EFPController
 
             if (!isSwimming)
             {
-                inputXLerpSpeed = inputYLerpSpeed = inputLerpSpeed;
+                _inputXLerpSpeed = _inputYLerpSpeed = _inputLerpSpeed;
             }
             else
             {
                 // player accelerates and decelerates slower in water.
-                inputXLerpSpeed = inputYLerpSpeed = 3f;
+                _inputXLerpSpeed = _inputYLerpSpeed = 3f;
             }
 
-            if (sprint)
+            if (_sprintComponent.Sprint)
             {
                 // only strafe when sprinting after pressing the joystick horizontally further than 0.4, for better control and less zig-zagging
                 if (Mathf.Abs(move.x) > 0.4f)
                 {
-                    inputX = Mathf.Sign(move.x);
+                    InputX = Mathf.Sign(move.x);
                 }
                 else
                 {
-                    inputX = 0f;
+                    InputX = 0f;
                 }
             }
             else
             {
                 // cancel horizontal movement if player is looking up while prone
-                inputX = move.x;
+                InputX = move.x;
             }
 
             // Smooth our movement inputs using Mathf.Lerp
-            inputXSmoothed = Mathf.Lerp(inputXSmoothed, inputX, dt * inputXLerpSpeed);
-            inputYSmoothed = Mathf.Lerp(inputYSmoothed, inputY, dt * inputYLerpSpeed);
+            _inputXSmoothed = Mathf.Lerp(_inputXSmoothed, InputX, dt * _inputXLerpSpeed);
+            _inputYSmoothed = Mathf.Lerp(_inputYSmoothed, InputY, dt * _inputYLerpSpeed);
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Player Movement Speeds
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             // check that player can run and set speed 
-            if (sprintActive)
+            if (_sprintComponent.SprintActive)
             {
+                float sprintSpeed = _sprintComponent.SprintConfig.sprintSpeed;
+                
                 // offset speeds by 0.1f to prevent small oscillation of speed value
-                if (speed < sprintSpeed - 0.1f)
+                if (_speed < sprintSpeed - 0.1f)
                 {
-                    speed += 15f * dt; // gradually accelerate to run speed
+                    _speed += 15f * dt; // gradually accelerate to run speed
                 }
-                else if (speed > sprintSpeed + 0.1f)
+                else if (_speed > sprintSpeed + 0.1f)
                 {
-                    speed -= 15f * dt; // gradually decelerate to run speed
+                    _speed -= 15f * dt; // gradually decelerate to run speed
                 }
             }
             else
             {
                 if (!isSwimming)
                 {
-                    if (speed > walkSpeed * moveSpeedMult + 0.1f)
+                    if (_speed > walkSpeed * _moveSpeedMult + 0.1f)
                     {
-                        speed -= 15f * dt; // gradually decelerate to walk speed
+                        _speed -= 15f * dt; // gradually decelerate to walk speed
                     }
-                    else if (speed < walkSpeed * moveSpeedMult - 0.1f)
+                    else if (_speed < walkSpeed * _moveSpeedMult - 0.1f)
                     {
-                        speed += 15f * dt; // gradually accelerate to walk speed
+                        _speed += 15f * dt; // gradually accelerate to walk speed
                     }
                 }
             }
@@ -476,13 +438,13 @@ namespace EFPController
             {
                 float swimSpeed = _swimmingComponent.SwimmingConfig.swimSpeed;
                 
-                if (speed > swimSpeed + 0.1f)
+                if (_speed > swimSpeed + 0.1f)
                 {
-                    speed -= 30f * dt; // gradually decelerate to swim speed
+                    _speed -= 30f * dt; // gradually decelerate to swim speed
                 }
-                else if (speed < swimSpeed - 0.1f)
+                else if (_speed < swimSpeed - 0.1f)
                 {
-                    speed += 15f * dt; // gradually accelerate to swim speed
+                    _speed += 15f * dt; // gradually accelerate to swim speed
                 }
             }
 
@@ -491,27 +453,27 @@ namespace EFPController
             // also lower to crouch position if player dies
             if (_swimmingComponent.IsSwimming)
             {
-                midPos = _swimmingComponent.SwimmingConfig.swimmingCamHeight;
+                MidPos = _swimmingComponent.SwimmingConfig.swimmingCamHeight;
                 // gradually increase capsule height
                 float nh = Mathf.Min(capsule.height + 4f * (dt * speedMod), _swimmingComponent.SwimmingConfig.swimmingCapsuleHeight);
                 capsule.height = nh;
             }
             else if (_crouchingComponent.IsCrouching)
             {
-                midPos = _crouchingComponent.CrouchingConfig.crouchingCamHeight;
+                MidPos = _crouchingComponent.CrouchingConfig.crouchingCamHeight;
                 // gradually decrease capsule height
                 float nh = Mathf.Max(capsule.height - 4f * (dt * speedMod), _crouchingComponent.CrouchingConfig.crouchCapsuleHeight);
                 capsule.height = nh;
             }
             else
             {
-                midPos = standingCamHeight;
+                MidPos = standingCamHeight;
                 // gradually increase capsule height
                 float nh = Mathf.Min(capsule.height + 4f * (dt * (0.9f * speedMod)), standingCapsuleHeight);
                 capsule.height = nh;
             }
 
-            camPos = _transform.position + _transform.up * midPos;
+            CamPos = _transform.position + _transform.up * MidPos;
 
             // This is the start of the large block that performs all movement actions while grounded	
             if (IsGrounded)
@@ -521,187 +483,98 @@ namespace EFPController
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // reset airTimeState var so that airTime will only be set once when player looses grounding
-                airTimeState = true;
+                _airTimeState = true;
 
                 // reset falling state and perform actions if player has landed from a fall
-                if (falling)
+                if (IsFalling)
                 {
-                    playerAirVelocity = Vector3.zero;
+                    _playerAirVelocity = Vector3.zero;
                     JumpingComponent.LandStartTime = t; // track the time when player landed
 
-                    if (fallStartLevel - transform.position.y > 2f)
+                    if (_fallStartLevel - transform.position.y > 2f)
                     {
                         Player.cameraAnimator.SetTrigger(CameraAnimNames.Land);
                         OnLand?.Invoke();
                     }
 
-                    float dist = fallStartLevel - transform.position.y;
+                    float dist = _fallStartLevel - transform.position.y;
 
                     // track the distance of the fall and apply damage if over falling threshold
-                    bool doFallDamage = allowFallDamage
-                                        && _transform.position.y < fallStartLevel - fallDamageThreshold
+                    bool doFallDamage = _fallDamageComponent.FallDamageConfig.allowFallDamage
+                                        && _transform.position.y < _fallStartLevel - _fallDamageComponent.FallDamageConfig.fallDamageThreshold
                                         && !_swimmingComponent.InWater;
                     
                     if (doFallDamage)
-                        CalculateFallingDamage(dist);
+                        _fallDamageComponent.CalculateFallingDamage(dist);
 
                     // active platform
-                    Collider currentGroundCollider = groundHitInfo.collider;
+                    Collider currentGroundCollider = GroundHitInfo.collider;
+                    
                     if (currentGroundCollider != null)
                     {
-                        Rigidbody groundRB = currentGroundCollider.attachedRigidbody;
+                        Rigidbody groundRigidbody = currentGroundCollider.attachedRigidbody;
                         
-                        if (groundRB != null && !groundRB.isKinematic)
+                        if (groundRigidbody != null && !groundRigidbody.isKinematic)
                         {
-                            groundRB.AddForceAtPosition(Vector3.down * Rigidbody.mass, groundPoint,
+                            groundRigidbody.AddForceAtPosition(Vector3.down * Rigidbody.mass, _groundPoint,
                                 ForceMode.Acceleration);
                         }
                     }
 
-                    falling = false;
+                    IsFalling = false;
                 }
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Sprinting
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                if (allowSprinting)
-                {
-                    // toggle or hold sprinting state by determining if sprint button is pressed or held
-                    if ((Mathf.Abs(inputY) > 0f && forwardSprintOnly) ||
-                        (!forwardSprintOnly && (Mathf.Abs(inputX) > 0f) || Mathf.Abs(inputY) > 0f))
-                    {
-                        if ((InputManager.GetActionKey(InputManager.Action.Sprint) ||
-                             InputManager.GetActionKeyDown(InputManager.Action.Sprint)))
-                        {
-                            if (!sprintStartState)
-                            {
-                                sprintStart = t; // track time that sprint button was pressed
-                                sprintStartState = true; // perform these actions only once
-                                sprintEndState = false;
-                                // if button is tapped, toggle sprint state
-                                if (sprintEnd - sprintStart < sprintDelay * Time.timeScale)
-                                {
-                                    if (!sprint)
-                                    {
-                                        // only allow sprint to start or cancel crouch if player is not under obstacle
-                                        if (!sprint)
-                                        {
-                                            sprint = true;
-                                        }
-                                        else
-                                        {
-                                            sprint = false; // pressing sprint button again while sprinting stops sprint
-                                        }
-                                    }
-                                    else
-                                    {
-                                        sprint = false;
-                                    }
-                                }
-                            }
-                        }
-                        else if (!sprintEndState)
-                        {
-                            sprintEnd = t; // track time that sprint button was released
-                            sprintEndState = true;
-                            sprintStartState = false;
-                            // if releasing sprint button after holding it down, stop sprinting
-                            if (sprintEnd - sprintStart > sprintDelay * Time.timeScale)
-                            {
-                                sprint = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (!InputManager.GetActionKey(InputManager.Action.Sprint))
-                            sprint = false;
-                    }
-                }
-
-                if (_dashComponent.DashActive)
-                    sprint = false;
-
-                // cancel a sprint in certain situations
-                if ((inputY <= 0f && Mathf.Abs(inputX) > 0f &&
-                     forwardSprintOnly) // cancel sprint if player sprints into a wall and strafes left or right
-                    || (move.y <= 0f && forwardSprintOnly) // cancel sprint if joystick is released
-                    || (inputY < 0f && forwardSprintOnly) // cancel sprint if player moves backwards
-                    || (JumpingComponent.IsJumping && JumpingComponent.JumpingConfig.jumpCancelsSprint)
-                    || isSwimming
-                    || _climbingComponent.IsClimbing // cancel sprint if player runs out of breath
-                   )
-                {
-                    sprint = false;
-                }
-
-                // determine if player can run
-                if (((inputY > 0f && forwardSprintOnly) || (IsMoving && !forwardSprintOnly))
-                    && sprint
-                    && !_crouchingComponent.IsCrouching
-                    && IsGrounded
-                   )
-                {
-                    sprintActive = true;
-                    sprintStopState = true;
-                }
-                else
-                {
-                    if (sprintStopState)
-                    {
-                        sprintStopTime = t;
-                        sprintStopState = false;
-                    }
-
-                    sprintActive = false;
-                }
+                _sprintComponent.FixedUpdateLogic(t, move, isSwimming);
 
                 // check that player can crouch and set speed
                 // also check midpos because player can still be under obstacle when crouch button is released 
-                if (_crouchingComponent.IsCrouching || midPos < standingCamHeight)
+                if (_crouchingComponent.IsCrouching || MidPos < standingCamHeight)
                 {
-                    if (crouchSpeedAmt > _crouchingComponent.CrouchingConfig.crouchSpeedMult)
-                        crouchSpeedAmt -= dt; // gradually decrease crouchSpeedAmt to crouch limit value
+                    if (_crouchSpeedAmt > _crouchingComponent.CrouchingConfig.crouchSpeedMult)
+                        _crouchSpeedAmt -= dt; // gradually decrease crouchSpeedAmt to crouch limit value
                 }
                 else
                 {
-                    if (crouchSpeedAmt < 1f)
-                        crouchSpeedAmt += dt; // gradually increase crouchSpeedAmt to neutral
+                    if (_crouchSpeedAmt < 1f)
+                        _crouchSpeedAmt += dt; // gradually increase crouchSpeedAmt to neutral
                 }
 
                 // limit move speed if backpedaling
-                if (inputY >= 0)
+                if (InputY >= 0)
                 {
-                    if (speedAmtY < 1f)
-                        speedAmtY += dt; // gradually increase speedAmtY to neutral
+                    if (_speedAmtY < 1f)
+                        _speedAmtY += dt; // gradually increase speedAmtY to neutral
                 }
                 else
                 {
-                    if (speedAmtY > backwardSpeedPercentage)
-                        speedAmtY -= dt; // gradually decrease speedAmtY to backpedal limit value
+                    if (_speedAmtY > backwardSpeedPercentage)
+                        _speedAmtY -= dt; // gradually decrease speedAmtY to backpedal limit value
                 }
 
                 // allow limiting of move speed if strafing directly sideways and not diagonally
-                if (inputX == 0f || inputY != 0f)
+                if (InputX == 0f || InputY != 0f)
                 {
-                    if (speedAmtX < 1f)
-                        speedAmtX += dt; // gradually increase speedAmtX to neutral
+                    if (_speedAmtX < 1f)
+                        _speedAmtX += dt; // gradually increase speedAmtX to neutral
                 }
                 else
                 {
-                    if (speedAmtX > strafeSpeedPercentage)
-                        speedAmtX -= dt; // gradually decrease speedAmtX to strafe limit value
+                    if (_speedAmtX > strafeSpeedPercentage)
+                        _speedAmtX -= dt; // gradually decrease speedAmtX to strafe limit value
                 }
             }
             else
             {
                 // Player is airborn
                 // keep track of the time that player lost grounding for air manipulation and moving gun while jumping
-                if (airTimeState)
+                if (_airTimeState)
                 {
-                    airTime = t;
-                    airTimeState = false;
+                    _airTime = t;
+                    _airTimeState = false;
                 }
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -710,14 +583,14 @@ namespace EFPController
 
                 // subtract height we began falling from current position to get falling distance
                 if (!isSwimming && !_climbingComponent.IsClimbing)
-                    fallingDistance = fallStartLevel - transform.position.y; // this value referenced in other scripts
+                    FallingDistance = _fallStartLevel - transform.position.y; // this value referenced in other scripts
 
-                if (!falling && !_climbingComponent.IsClimbing && !isSwimming)
+                if (!IsFalling && !_climbingComponent.IsClimbing && !isSwimming)
                 {
                     // playerAirInitVelocity = playerAirVelocity = new Vector3(velocity.x, 0f, velocity.z);
-                    falling = true;
+                    IsFalling = true;
                     // start tracking altitude (y position) for fall check
-                    fallStartLevel = transform.position.y;
+                    _fallStartLevel = transform.position.y;
                 }
             }
 
@@ -741,22 +614,22 @@ namespace EFPController
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             // limit speed if strafing diagonally
-            limitStrafeSpeed = Mathf.Abs(inputX) > 0.5f && Mathf.Abs(inputY) > 0.5f ? diagonalStrafeAmt : 1f;
+            _limitStrafeSpeed = Mathf.Abs(InputX) > 0.5f && Mathf.Abs(InputY) > 0.5f ? diagonalStrafeAmt : 1f;
 
             // We are grounded, so recalculate movedirection directly from axes	
-            moveDirection = new Vector3(inputXSmoothed * limitStrafeSpeed, 0f, inputYSmoothed * limitStrafeSpeed);
+            MoveDirection = new Vector3(_inputXSmoothed * _limitStrafeSpeed, 0f, _inputYSmoothed * _limitStrafeSpeed);
 
             // realign moveDirection vector to world space
             if (isSwimming)
             {
-                moveDirection = MainCameraTransform.TransformDirection(moveDirection);
+                MoveDirection = MainCameraTransform.TransformDirection(MoveDirection);
             }
             else
             {
-                moveDirection = transform.TransformDirection(moveDirection);
+                MoveDirection = transform.TransformDirection(MoveDirection);
             }
 
-            CheckGround(moveDirection.normalized);
+            CheckGround(MoveDirection.normalized);
 
             if (_climbingComponent.IsClimbing)
             {
@@ -765,24 +638,24 @@ namespace EFPController
             }
             else
             {
-                PhysicMaterial physMaterial = moveDirection.magnitude > 0.1f ? groundedPhysMaterial : stayPhysMaterial;
+                PhysicMaterial physMaterial = MoveDirection.magnitude > 0.1f ? groundedPhysMaterial : stayPhysMaterial;
                 capsule.material = IsGrounded ? physMaterial : flyPhysMaterial;
                 
-                canStep = CanStep(moveDirection.normalized);
+                _canStep = CanStep(MoveDirection.normalized);
 
                 if (IsGrounded)
                 {
                     if (!JumpingComponent.IsJumping && !isSwimming)
-                        yVelocity = 0f;
+                        YVelocity = 0f;
                     
                     if (!isSwimming)
-                        moveDirection = sprint ? futureDirection : Vector3.Project(moveDirection, futureDirection);
+                        MoveDirection = _sprintComponent.Sprint ? _futureDirection : Vector3.Project(MoveDirection, _futureDirection);
                 }
                 else
                 {
-                    if (!yVelocity.IsEquals(_gravityMax) && !isSwimming)
+                    if (!YVelocity.IsEquals(_gravityMax) && !isSwimming)
                     {
-                        yVelocity = Mathf.Clamp(yVelocity + (Physics.gravity.y * _gravityMultiplier) * fdt, -_gravityMax,
+                        YVelocity = Mathf.Clamp(YVelocity + (Physics.gravity.y * _gravityMultiplier) * fdt, -_gravityMax,
                             _gravityMax);
                     }
 
@@ -791,7 +664,7 @@ namespace EFPController
                         if (_swimmingComponent.PlayerWaterInitVelocity.magnitude > 0.1f)
                         {
                             _swimmingComponent.PlayerWaterInitVelocity = Vector3.Lerp(_swimmingComponent.PlayerWaterInitVelocity, Vector3.zero, fdt);
-                            moveDirection += new Vector3(_swimmingComponent.PlayerWaterInitVelocity.x, 0f, _swimmingComponent.PlayerWaterInitVelocity.z) *
+                            MoveDirection += new Vector3(_swimmingComponent.PlayerWaterInitVelocity.x, 0f, _swimmingComponent.PlayerWaterInitVelocity.z) *
                                              fdt;
                         }
                         else
@@ -801,37 +674,37 @@ namespace EFPController
                     }
                     else
                     {
-                        if (moveDirection.magnitude > 0f)
+                        if (MoveDirection.magnitude > 0f)
                         {
-                            playerAirVelocity = moveDirection * _airSpeedMultiplier;
+                            _playerAirVelocity = MoveDirection * _airSpeedMultiplier;
                         }
                         else
                         {
-                            playerAirVelocity = Vector3.Lerp(playerAirVelocity, Vector3.zero, 5f * fdt);
+                            _playerAirVelocity = Vector3.Lerp(_playerAirVelocity, Vector3.zero, 5f * fdt);
                         }
 
-                        moveDirection = playerAirVelocity;
+                        MoveDirection = _playerAirVelocity;
                     }
                 }
 
                 if (_swimmingComponent.IsBelowWater)
                 {
-                    if (Mathf.Abs(yVelocity) > 0.1f)
+                    if (Mathf.Abs(YVelocity) > 0.1f)
                     {
-                        yVelocity = Mathf.Lerp(yVelocity, 0f, 5f * fdt);
+                        YVelocity = Mathf.Lerp(YVelocity, 0f, 5f * fdt);
                     }
                     else
                     {
-                        yVelocity = 0f;
+                        YVelocity = 0f;
                     }
                 }
 
-                currSpeedMult = 1f;
+                _currSpeedMult = 1f;
 
-                if (IsGrounded && !isSwimming && !canStep)
+                if (IsGrounded && !isSwimming && !_canStep)
                 {
-                    currSpeedMult = slopeSpeed.Evaluate(slopeAngle / slopeLimit);
-                    currSpeedMult *= CanMoveToSlope() ? 1f : 0f;
+                    _currSpeedMult = slopeSpeed.Evaluate(SlopeAngle / slopeLimit);
+                    _currSpeedMult *= CanMoveToSlope() ? 1f : 0f;
                 }
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -843,7 +716,7 @@ namespace EFPController
                                && InputManager.GetActionKey(InputManager.Action.Dash)
                                && IsGrounded
                                && !isSwimming
-                               && !falling 
+                               && !IsFalling 
                                && !JumpingComponent.IsJumping
                                && IsMoving;
                 
@@ -851,22 +724,22 @@ namespace EFPController
                     _dashComponent.StartDashCoroutine();
 
                 // apply speed limits to moveDirection vector
-                float currSpeed = speed * speedAmtX * speedAmtY * crouchSpeedAmt * zoomSpeedAmt * currSpeedMult *
-                                  speedMult;
+                float currSpeed = _speed * _speedAmtX * _speedAmtY * _crouchSpeedAmt * _zoomSpeedAmt * _currSpeedMult *
+                                  SpeedMult;
 
-                moveDirection = moveDirection * currSpeed;
-                moveDirection += Vector3.up * yVelocity;
-                moveDirection2D = new Vector3(moveDirection.x, 0f, moveDirection.y);
+                MoveDirection = MoveDirection * currSpeed;
+                MoveDirection += Vector3.up * YVelocity;
+                MoveDirection2D = new Vector3(MoveDirection.x, 0f, MoveDirection.y);
 
                 // apply a force that attempts to reach target velocity
-                velocityChange = moveDirection - velocity;
+                _velocityChange = MoveDirection - Velocity;
 
                 // limit max speed
-                velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVelocityChange, maxVelocityChange);
-                velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVelocityChange, maxVelocityChange);
+                _velocityChange.x = Mathf.Clamp(_velocityChange.x, -_maxVelocityChange, _maxVelocityChange);
+                _velocityChange.z = Mathf.Clamp(_velocityChange.z, -_maxVelocityChange, _maxVelocityChange);
 
                 // finally, add movement velocity to player rigidbody velocity
-                if (!velocityChange.IsZero()) Rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+                if (!_velocityChange.IsZero()) Rigidbody.AddForce(_velocityChange, ForceMode.VelocityChange);
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Swimming
@@ -874,31 +747,31 @@ namespace EFPController
                 
                 _swimmingComponent.FixedUpdateLogic2(t, dt);
                 
-                if (IsGrounded && Vector3.Angle(groundNormal, Vector3.up) > slopeLimit && Rigidbody.velocity.y <= 0f &&
+                if (IsGrounded && Vector3.Angle(_groundNormal, Vector3.up) > slopeLimit && Rigidbody.velocity.y <= 0f &&
                     !_swimmingComponent.IsBelowWater)
                 {
                     Rigidbody.velocity += transform.up * (Physics.gravity.y * (30f * fdt));
                 }
 
-                if (IsGrounded && !isSwimming && !JumpingComponent.IsJumping && groundHitInfo.rigidbody != null &&
-                    groundHitInfo.rigidbody.isKinematic)
+                if (IsGrounded && !isSwimming && !JumpingComponent.IsJumping && GroundHitInfo.rigidbody != null &&
+                    GroundHitInfo.rigidbody.isKinematic)
                 {
-                    Rigidbody.velocity += groundHitInfo.rigidbody.GetVelocityAtPoint(groundPoint);
+                    Rigidbody.velocity += GroundHitInfo.rigidbody.GetVelocityAtPoint(_groundPoint);
                 }
 
                 if (_dashComponent.DashActive)
                 {
-                    moveDirection = (moveDirection.IsZero() ? _dashComponent.DashDirection : moveDirection.normalized) *
+                    MoveDirection = (MoveDirection.IsZero() ? _dashComponent.DashDirection : MoveDirection.normalized) *
                                     (currSpeed + _dashComponent.DashCurrentForce);
-                    moveDirection += Vector3.up * yVelocity;
-                    velocityChange = moveDirection - velocity;
+                    MoveDirection += Vector3.up * YVelocity;
+                    _velocityChange = MoveDirection - Velocity;
                     
-                    if (!velocityChange.IsZero())
-                        Rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+                    if (!_velocityChange.IsZero())
+                        Rigidbody.AddForce(_velocityChange, ForceMode.VelocityChange);
                 }
             }
 
-            hoverClimbable = false;
+            HoverClimbable = false;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -914,6 +787,9 @@ namespace EFPController
 
         public void SendOnCrouchEvent(bool isCrouching) =>
             OnCrouch?.Invoke(isCrouching);
+
+        public void SendFallDamageEvent(int damage) =>
+            OnFallDamage?.Invoke(damage);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -943,49 +819,49 @@ namespace EFPController
         private void DetermineIfMoving()
         {
             // Determine if player is moving. This var is accessed by other scripts.
-            IsMoving = Mathf.Abs(inputY) > 0.01f || Mathf.Abs(inputX) > 0.01f || _dashComponent.DashActive;
+            IsMoving = Mathf.Abs(InputY) > 0.01f || Mathf.Abs(InputX) > 0.01f || _dashComponent.DashActive;
         }
 
         public void Stop()
         {
             _dashComponent.DashActive = false;
             IsMoving = false;
-            velocity = Vector3.zero;
-            velocityChange = Vector3.zero;
-            sprint = false;
+            Velocity = Vector3.zero;
+            _velocityChange = Vector3.zero;
+            _sprintComponent.Sprint = false;
         }
 
         private void CheckGround(Vector3 direction)
         {
             float radius = capsule.radius;
-            Vector3 origin = playerBottomPos + Vector3.up * (radius + 0.2f);
+            Vector3 origin = PlayerBottomPos + Vector3.up * (radius + 0.2f);
 
-            slopeAngle = 0f;
+            SlopeAngle = 0f;
             IsGrounded = false;
 
             if (_swimmingComponent.IsBelowWater)
                 return;
 
             Vector3 castDirection = -_transform.up;
-            float maxDistance = JumpingComponent.IsJumping || falling ? 0.3f : 0.75f;
+            float maxDistance = JumpingComponent.IsJumping || IsFalling ? 0.3f : 0.75f;
             
             if (Physics.SphereCast(origin, radius, castDirection, out RaycastHit hit, maxDistance,
                     groundMask.value, QueryTriggerInteraction.Ignore))
             {
                 IsGrounded = true;
-                groundHitInfo = hit;
-                groundNormal = hit.normal;
-                groundPoint = hit.point;
+                GroundHitInfo = hit;
+                _groundNormal = hit.normal;
+                _groundPoint = hit.point;
                 
-                if (lastOnGroundPositionTime < Time.time)
+                if (_lastOnGroundPositionTime < Time.time)
                 {
-                    lastOnGroundPosition = groundPoint;
-                    lastOnGroundPositionTime = Time.time + 1f;
+                    LastOnGroundPosition = _groundPoint;
+                    _lastOnGroundPositionTime = Time.time + 1f;
                 }
 
                 CheckSlope(direction);
 
-                bool applyForce = playerBottomPos.y - hit.point.y > 0.01f
+                bool applyForce = PlayerBottomPos.y - hit.point.y > 0.01f
                                   && Rigidbody.velocity.y <= 0.01f
                                   && !_swimmingComponent.IsBelowWater
                                   && !_climbingComponent.IsClimbing;
@@ -1004,22 +880,22 @@ namespace EFPController
 
         private void CheckSlope(Vector3 direction)
         {
-            futureDirection = direction.magnitude > 0f ? GetMoveDirection(direction).normalized : Vector3.zero;
-            slopeAngle = Vector3.Angle(futureDirection, transform.up);
+            _futureDirection = direction.magnitude > 0f ? GetMoveDirection(direction).normalized : Vector3.zero;
+            SlopeAngle = Vector3.Angle(_futureDirection, transform.up);
             
             if (direction.magnitude > 0f)
-                slopeAngle = 90f - slopeAngle;
+                SlopeAngle = 90f - SlopeAngle;
             
             if (_debug)
-                Debug.DrawLine(playerBottomPos, playerBottomPos + futureDirection, Color.blue, 5f);
+                Debug.DrawLine(PlayerBottomPos, PlayerBottomPos + _futureDirection, Color.blue, 5f);
         }
 
         private Vector3 GetMoveDirection(Vector3 direction)
         {
             float radius = capsule.radius * 2f;
             float dist = radius + 0.2f;
-            Vector3 origin = playerBottomPos + Vector3.up * dist;
-            Vector3 newGroundNormal = groundNormal;
+            Vector3 origin = PlayerBottomPos + Vector3.up * dist;
+            Vector3 newGroundNormal = _groundNormal;
 
             bool groundIsStatic = true;
 
@@ -1051,17 +927,17 @@ namespace EFPController
             if (_swimmingComponent.IsSwimming)
                 return true;
             
-            if (futureDirection.magnitude > 0f && futureDirection.y <= 0f)
+            if (_futureDirection.magnitude > 0f && _futureDirection.y <= 0f)
                 return true;
             
             if (_debug)
-                Debug.DrawLine(groundPoint + (Vector3.up * 0.1f),
-                    groundPoint + (Vector3.up * 0.1f) + (-Vector3.up * 0.2f), Color.magenta, 10f);
+                Debug.DrawLine(_groundPoint + (Vector3.up * 0.1f),
+                    _groundPoint + (Vector3.up * 0.1f) + (-Vector3.up * 0.2f), Color.magenta, 10f);
             
-            if (Physics.Raycast(groundPoint + (Vector3.up * 0.1f), -Vector3.up, out RaycastHit rh, 0.2f,
+            if (Physics.Raycast(_groundPoint + (Vector3.up * 0.1f), -Vector3.up, out RaycastHit rh, 0.2f,
                     groundMask.value, QueryTriggerInteraction.Ignore))
             {
-                if (rh.point.y < playerBottomPos.y)
+                if (rh.point.y < PlayerBottomPos.y)
                     return true;
                 
                 return Vector3.Angle(rh.normal, Vector3.up) < slopeLimit;
@@ -1080,7 +956,7 @@ namespace EFPController
             
             float radius = capsule.radius;
             float stepDistance = radius + radius * stepHeightRadius;
-            Vector3 maxStepPos = playerBottomPos + direction * -0.1f + Vector3.up * (maxStepHeight + radius);
+            Vector3 maxStepPos = PlayerBottomPos + direction * -0.1f + Vector3.up * (maxStepHeight + radius);
             
             if (!Physics.SphereCast(maxStepPos, radius, direction.normalized, out _, stepDistance, groundMask.value,
                     QueryTriggerInteraction.Ignore))
@@ -1088,7 +964,7 @@ namespace EFPController
                 Vector3 slopeOrigin = maxStepPos + direction * stepDistance;
                 
                 if (Physics.Raycast(slopeOrigin, -Vector3.up, out RaycastHit rh,
-                        (maxStepPos.y - playerBottomPos.y) * 2f, groundMask.value, QueryTriggerInteraction.Ignore))
+                        (maxStepPos.y - PlayerBottomPos.y) * 2f, groundMask.value, QueryTriggerInteraction.Ignore))
                 {
                     if (Vector3.Angle(rh.normal, Vector3.up) < slopeLimit)
                         return true;
@@ -1100,15 +976,6 @@ namespace EFPController
             }
 
             return false;
-        }
-
-        private void CalculateFallingDamage(float fallDistance)
-        {
-            if (fallDamageMultiplier >= 1f)
-            {
-                int dmg = (int)(fallDistance * fallDamageMultiplier);
-                OnFallDamage?.Invoke(dmg);
-            }
         }
 
         private void OnTriggerEnter(Collider other)

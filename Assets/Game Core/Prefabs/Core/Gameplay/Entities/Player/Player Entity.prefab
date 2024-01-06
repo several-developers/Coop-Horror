@@ -2587,7 +2587,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 1
-  inputLerpSpeed: 90
+  _inputLerpSpeed: 90
   groundedPhysMaterial: {fileID: 13400000, guid: 8b2468123ae8e784ab4d467d13e97943,
     type: 2}
   stayPhysMaterial: {fileID: 13400000, guid: 06ba6000d9388384aace480640202531, type: 2}
@@ -2641,82 +2641,14 @@ MonoBehaviour:
     type: 2}
   _playerJumpingConfig: {fileID: 11400000, guid: b12e2f737ece9704884d7f49837c19f9,
     type: 2}
-  allowSprinting: 1
-  sprintSpeed: 8
-  sprintMode: 2
-  forwardSprintOnly: 0
+  _playerSprintConfig: {fileID: 11400000, guid: aaa68f7ddb2b7304d8bfaa64a7896d61,
+    type: 2}
   _playerDashConfig: {fileID: 11400000, guid: 841c2715f45806e42a8cbf3e8235bb51, type: 2}
-  allowDash: 1
-  dashSpeed: 15
-  dashSpeedCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.07969779
-      value: 0.7114649
-      inSlope: 9.901475
-      outSlope: 9.901475
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.15
-      value: 1
-      inSlope: 0.29342005
-      outSlope: -0.0000069621874
-      tangentMode: 65
-      weightedMode: 0
-      inWeight: 0.60878056
-      outWeight: 0.07553553
-    - serializedVersion: 3
-      time: 0.3383463
-      value: 0.9999987
-      inSlope: -0.0000069621874
-      outSlope: -0.023339858
-      tangentMode: 5
-      weightedMode: 0
-      inWeight: 0.18569942
-      outWeight: 0.13725495
-    - serializedVersion: 3
-      time: 0.39133528
-      value: 0.94541544
-      inSlope: -2.6122568
-      outSlope: -3.4055533
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.04285988
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  dashTime: 1.9
-  dashActiveTime: 1
-  dashCooldown: 0.1
   dashSounds:
   - {fileID: 8300000, guid: e747c9bcafccd084d8ab47d35760082e, type: 3}
   - {fileID: 8300000, guid: 1a5827a00ac926b4cab71e9383ac24e6, type: 3}
   - {fileID: 8300000, guid: e01dea02745fe304dbed63fa76315106, type: 3}
   - {fileID: 8300000, guid: de47ff573723904408f4d5ed2af88048, type: 3}
-  dashSoundVolume: 0.25
   _playerSwimmingConfig: {fileID: 11400000, guid: 69169975db7dbbd42a4b12df17f0b532,
     type: 2}
   underwaterAudioSource: {fileID: 7338709719172407751}
@@ -2737,6 +2669,8 @@ MonoBehaviour:
   _playerClimbingConfig: {fileID: 11400000, guid: bcda0f5451f87e949a8adef0726b64e2,
     type: 2}
   _climbingAudioSource: {fileID: 4333079308843996799}
+  _playerFallDamageConfig: {fileID: 11400000, guid: f34197d58923dc24ba3fd6a829a0b671,
+    type: 2}
   allowFallDamage: 1
   fallDamageThreshold: 0
   fallDamageMultiplier: 0

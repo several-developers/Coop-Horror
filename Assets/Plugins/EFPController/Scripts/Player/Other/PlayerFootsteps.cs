@@ -84,7 +84,7 @@ namespace EFPController
 
             PlayerMovement playerMovement = player.controller;
 
-            if (playerMovement.IsGrounded && !playerMovement.falling && !playerMovement.JumpingComponent.IsJumping)
+            if (playerMovement.IsGrounded && !playerMovement.IsFalling && !playerMovement.JumpingComponent.IsJumping)
             {
                 stepCycleProgress = 0f;
                 PlayFootstep();
@@ -97,12 +97,12 @@ namespace EFPController
                 return;
 
             isCrouch = player.controller.CrouchingComponent.IsCrouching;
-            isSprint = player.controller.sprint;
+            isSprint = player.controller.SprintComponent.Sprint;
             isDash = player.controller.DashComponent.DashActive;
             CheckGround();
 
             if (isGrounded && previouslyGrounded && (player.controller.IsMoving || isDash))
-                AdvanceStepCycle(player.controller.velocity.magnitude * Time.deltaTime);
+                AdvanceStepCycle(player.controller.Velocity.magnitude * Time.deltaTime);
         }
 
         public void Footstep(AnimationEvent evt)
@@ -144,10 +144,10 @@ namespace EFPController
         private void CheckGround()
         {
             previouslyGrounded = isGrounded;
-            currentGroundInfo = player.controller.groundHitInfo;
+            currentGroundInfo = player.controller.GroundHitInfo;
             isGrounded = player.controller.IsGrounded
                          && !player.controller.JumpingComponent.IsJumping
-                         && !player.controller.falling
+                         && !player.controller.IsFalling
                          && !player.controller.SwimmingComponent.IsSwimming;
 
             if (previouslyGrounded || !isGrounded)

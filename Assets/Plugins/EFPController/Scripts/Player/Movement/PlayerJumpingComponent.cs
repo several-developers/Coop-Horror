@@ -83,7 +83,7 @@ namespace EFPController
                             && _playerMovement.SwimmingComponent.CanWaterJump
                             && canStandUpOrJump
                             && LandStartTime + antiBunnyHopFactor < t // check for bunnyhop delay before jumping
-                            && (_playerMovement.slopeAngle < _playerMovement.slopeLimit || _playerMovement.SwimmingComponent.InWater)
+                            && (_playerMovement.SlopeAngle < _playerMovement.slopeLimit || _playerMovement.SwimmingComponent.InWater)
                            )
                         {
                             // do not jump if ground normal is greater than slopeLimit and not in water
@@ -103,7 +103,7 @@ namespace EFPController
                                 _jumpfxstate = false;
                             }
 
-                            _playerMovement.yVelocity = jumpSpeed;
+                            _playerMovement.YVelocity = jumpSpeed;
 
                             // apply the jump velocity to the player rigidbody
                             _rigidbody.AddForce(Vector3.up * Mathf.Sqrt(2f * jumpSpeed * -Physics.gravity.y),
@@ -140,7 +140,7 @@ namespace EFPController
                     _jumpfxstate = false;
                 }
 
-                _playerMovement.yVelocity = jumpSpeed;
+                _playerMovement.YVelocity = jumpSpeed;
 
                 // Apply the jump velocity to the player rigidbody.
                 Vector3 force = Vector3.up * Mathf.Sqrt(2f * jumpSpeed * -Physics.gravity.y);

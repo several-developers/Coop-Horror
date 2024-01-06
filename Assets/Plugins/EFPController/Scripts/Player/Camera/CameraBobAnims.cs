@@ -132,21 +132,22 @@ namespace EFPController
             CameraControlComponent.mainCamera.fieldOfView = newFov;
 
             // Get input from player movement script
-            float horizontal = controller.inputX;
-            float vertical = controller.inputY;
+            float horizontal = controller.InputX;
+            float vertical = controller.InputY;
+            bool forwardSprintOnly = controller.SprintComponent.SprintConfig.forwardSprintOnly;
 
             if (controller.IsMoving)
             {
-                bool isSprintingOrDashing = controller.sprint || controller.DashComponent.DashActive;
+                bool isSprintingOrDashing = controller.SprintComponent.Sprint || controller.DashComponent.DashActive;
                 bool isCrouching = controller.CrouchingComponent.IsCrouching;
                 
                 bool checkOne = isSprintingOrDashing
                                 && !isCrouching
-                                && controller.midPos >= controller.standingCamHeight;
+                                && controller.MidPos >= controller.standingCamHeight;
 
                 bool checkTwo = !isCrouching && isSprintingOrDashing;
                 
-                bool checkThree = controller.fallingDistance < 0.75f
+                bool checkThree = controller.FallingDistance < 0.75f
                                 && !controller.JumpingComponent.IsJumping;
                 
                 // Vlad, redone this checking from above
@@ -156,7 +157,7 @@ namespace EFPController
                 if (isSprinting)
                 {
                     // Actually sprinting now.
-                    if (controller.fallingDistance < 0.75f && !controller.JumpingComponent.IsJumping)
+                    if (controller.FallingDistance < 0.75f && !controller.JumpingComponent.IsJumping)
                     {
                         if (controller.IsGrounded)
                         {
@@ -166,10 +167,10 @@ namespace EFPController
                         {
                             PlayIdleAnim();
                         }
-
+                        
                         // set the camera's fov back to normal if the player has sprinted into a wall, but the sprint is still active
-                        if (((controller.inputY != 0f && controller.forwardSprintOnly) ||
-                             (!controller.forwardSprintOnly && controller.IsMoving)))
+                        if (((controller.InputY != 0f && forwardSprintOnly) ||
+                             (!forwardSprintOnly && controller.IsMoving)))
                         {
                             nextFov = sprintFov;
                         }
@@ -227,13 +228,13 @@ namespace EFPController
             }
 
             // scale the weapon and camera animation speeds with the amount the joystick is pressed
-            if (controller.sprintActive || controller.DashComponent.DashActive)
+            if (controller.SprintComponent.SprintActive || controller.DashComponent.DashActive)
             {
                 moveInputSpeed = 1f;
             }
             else
             {
-                moveInputSpeed = Mathf.Clamp01(Mathf.Max(Mathf.Abs(controller.inputX), Mathf.Abs(controller.inputY)));
+                moveInputSpeed = Mathf.Clamp01(Mathf.Max(Mathf.Abs(controller.InputX), Mathf.Abs(controller.InputY)));
             }
 
             // gradually set the animation speed multiplier (moveInputAmt) to prevent jerky transitions between moving and stopping
@@ -247,21 +248,21 @@ namespace EFPController
 
             // Return mouse sensitivity to normal
             smoothLook.sensitivityAmt = sensitivity;
-
+            
             // Set weapon and view bobbing amounts
-            if ((controller.sprint || controller.DashComponent.DashActive)
-                && !(controller.forwardSprintOnly && (Mathf.Abs(horizontal) != 0f) && (Mathf.Abs(vertical) < 0.75f))
-                && (Mathf.Abs(vertical) != 0f || (!controller.forwardSprintOnly && controller.IsMoving))
+            if ((controller.SprintComponent.Sprint || controller.DashComponent.DashActive)
+                && !(forwardSprintOnly && (Mathf.Abs(horizontal) != 0f) && (Mathf.Abs(vertical) < 0.75f))
+                && (Mathf.Abs(vertical) != 0f || (!forwardSprintOnly && controller.IsMoving))
                 && !controller.CrouchingComponent.IsCrouching
-                && controller.midPos >= controller.standingCamHeight)
+                && controller.MidPos >= controller.standingCamHeight)
             {
                 // scale up bob speeds slowly to prevent jerky transition
                 camPositionBobAmt =
                     Vector2.MoveTowards(camPositionBobAmt, sprintPositionBob, Time.smoothDeltaTime * 16f);
                 camAngleBobAmt = Vector3.MoveTowards(camAngleBobAmt, sprintAngleBob, Time.smoothDeltaTime * 16f);
 
-                cameraRootAnimations.animator.speed = Mathf.MoveTowards(
-                    cameraRootAnimations.animator.speed * moveInputAmt, sprintBobSpeed, Time.smoothDeltaTime * 16f);
+                cameraRootAnimations.Animator.speed = Mathf.MoveTowards(
+                    cameraRootAnimations.Animator.speed * moveInputAmt, sprintBobSpeed, Time.smoothDeltaTime * 16f);
             }
             else
             {
@@ -274,8 +275,8 @@ namespace EFPController
                         Vector2.MoveTowards(camPositionBobAmt, crouchPositionBob, Time.smoothDeltaTime * 16f);
                     camAngleBobAmt = Vector3.MoveTowards(camAngleBobAmt, crouchAngleBob, Time.smoothDeltaTime * 16f);
 
-                    cameraRootAnimations.animator.speed = Mathf.MoveTowards(
-                        cameraRootAnimations.animator.speed * moveInputAmt,
+                    cameraRootAnimations.Animator.speed = Mathf.MoveTowards(
+                        cameraRootAnimations.Animator.speed * moveInputAmt,
                         crouchBobSpeed, Time.smoothDeltaTime * 16f);
                 }
                 else
@@ -291,7 +292,7 @@ namespace EFPController
                         Time.smoothDeltaTime * 16f);
 
                     // walk bobbing speed, slower if swimming
-                    cameraRootAnimations.animator.speed = Mathf.MoveTowards(cameraRootAnimations.animator.speed,
+                    cameraRootAnimations.Animator.speed = Mathf.MoveTowards(cameraRootAnimations.Animator.speed,
                         walkBobSpeed * swimBobSpeedAmt * moveInputAmt, Time.smoothDeltaTime * 16f);
                 }
             }
@@ -299,50 +300,50 @@ namespace EFPController
 
         public void PlayIdleAnim()
         {
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Walk))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Walk);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Sprint))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Sprint);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Climbing))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Climbing);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Idle))
-                cameraRootAnimations.animator.SetTrigger(CameraRootAnimNames.Idle);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Walk))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Walk);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Sprint))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Sprint);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Climbing))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Climbing);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Idle))
+                cameraRootAnimations.Animator.SetTrigger(CameraRootAnimNames.Idle);
         }
 
         public void PlayWalkAnim()
         {
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Idle))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Idle);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Sprint))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Sprint);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Climbing))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Climbing);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Walk))
-                cameraRootAnimations.animator.SetTrigger(CameraRootAnimNames.Walk);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Idle))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Idle);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Sprint))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Sprint);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Climbing))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Climbing);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Walk))
+                cameraRootAnimations.Animator.SetTrigger(CameraRootAnimNames.Walk);
         }
 
         public void PlaySprintAnim()
         {
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Walk))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Walk);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Idle))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Idle);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Climbing))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Climbing);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Sprint))
-                cameraRootAnimations.animator.SetTrigger(CameraRootAnimNames.Sprint);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Walk))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Walk);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Idle))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Idle);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Climbing))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Climbing);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Sprint))
+                cameraRootAnimations.Animator.SetTrigger(CameraRootAnimNames.Sprint);
         }
 
         public void PlayClimbingAnim()
         {
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Walk))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Walk);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Idle))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Idle);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Sprint))
-                cameraRootAnimations.animator.ResetTrigger(CameraRootAnimNames.Sprint);
-            if (cameraRootAnimations.animator.HasParameter(CameraRootAnimNames.Climbing))
-                cameraRootAnimations.animator.SetTrigger(CameraRootAnimNames.Climbing);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Walk))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Walk);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Idle))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Idle);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Sprint))
+                cameraRootAnimations.Animator.ResetTrigger(CameraRootAnimNames.Sprint);
+            if (cameraRootAnimations.Animator.HasParameter(CameraRootAnimNames.Climbing))
+                cameraRootAnimations.Animator.SetTrigger(CameraRootAnimNames.Climbing);
         }
     }
 }

@@ -1028,7 +1028,7 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 1
-  inputLerpSpeed: 90
+  _inputLerpSpeed: 90
   groundedPhysMaterial: {fileID: 13400000, guid: 8b2468123ae8e784ab4d467d13e97943,
     type: 2}
   stayPhysMaterial: {fileID: 13400000, guid: 06ba6000d9388384aace480640202531, type: 2}
@@ -1082,13 +1082,9 @@ MonoBehaviour:
     type: 2}
   _playerJumpingConfig: {fileID: 11400000, guid: b12e2f737ece9704884d7f49837c19f9,
     type: 2}
-  allowSprinting: 1
-  sprintSpeed: 8
-  sprintMode: 2
-  forwardSprintOnly: 1
+  _playerSprintConfig: {fileID: 11400000, guid: aaa68f7ddb2b7304d8bfaa64a7896d61,
+    type: 2}
   _playerDashConfig: {fileID: 11400000, guid: 841c2715f45806e42a8cbf3e8235bb51, type: 2}
-  dashTime: 1.9
-  dashActiveTime: 1
   dashSounds:
   - {fileID: 8300000, guid: e747c9bcafccd084d8ab47d35760082e, type: 3}
   - {fileID: 8300000, guid: 1a5827a00ac926b4cab71e9383ac24e6, type: 3}
@@ -1114,6 +1110,8 @@ MonoBehaviour:
   _playerClimbingConfig: {fileID: 11400000, guid: bcda0f5451f87e949a8adef0726b64e2,
     type: 2}
   _climbingAudioSource: {fileID: 8516867145502203732}
+  _playerFallDamageConfig: {fileID: 11400000, guid: f34197d58923dc24ba3fd6a829a0b671,
+    type: 2}
   allowFallDamage: 1
   fallDamageThreshold: 0
   fallDamageMultiplier: 0

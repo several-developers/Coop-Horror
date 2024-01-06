@@ -87,11 +87,11 @@ namespace EFPController
                             if (!IsCrouching && _crouchRisen)
                             {
                                 // faster moving down to crouch (not moving up against gravity)
-                                _playerMovement.camDampSpeed = 0.1f;
+                                _playerMovement.CamDampSpeed = 0.1f;
                                 
                                 IsCrouching = true;
                                 _lastCrouchTime = t;
-                                _playerMovement.sprint = false; // cancel sprint if crouch button is pressed
+                                _playerMovement.SprintComponent.Sprint = false; // cancel sprint if crouch button is pressed
                                 _playerMovement.SendOnCrouchEvent(isCrouching: true);
                             }
                             else
@@ -99,7 +99,7 @@ namespace EFPController
                                 // only uncrouch if the player has room above them to stand up
                                 if (canStandUpOrJump)
                                 {
-                                    _playerMovement.camDampSpeed = 0.2f;
+                                    _playerMovement.CamDampSpeed = 0.2f;
                                     IsCrouching = false;
                                     _lastCrouchTime = t;
                                     _playerMovement.SendOnCrouchEvent(isCrouching: false);
@@ -115,7 +115,7 @@ namespace EFPController
                     _crouchState = false;
 
                     bool cancelCrouch = false;
-                    bool checkOne = _playerMovement.sprint
+                    bool checkOne = _playerMovement.SprintComponent.Sprint
                                     || _playerMovement.ClimbingComponent.IsClimbing
                                     || _playerMovement.SwimmingComponent.IsSwimming
                                     || _playerMovement.DashComponent.DashActive;
@@ -132,7 +132,7 @@ namespace EFPController
                     // Cancel crouch if sprint button is pressed and there is room above the player to stand up.
                     if (cancelCrouch)
                     {
-                        _playerMovement.camDampSpeed = 0.2f;
+                        _playerMovement.CamDampSpeed = 0.2f;
                         IsCrouching = false;
                     }
                 }
@@ -148,7 +148,7 @@ namespace EFPController
             if (_crouchRisen)
                 return;
             
-            _playerMovement.camDampSpeed = 0.1f;
+            _playerMovement.CamDampSpeed = 0.1f;
             _crouchRisen = true;
         }
     }
