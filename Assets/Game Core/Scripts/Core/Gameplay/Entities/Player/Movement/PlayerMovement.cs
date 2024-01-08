@@ -61,9 +61,6 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         [SerializeField, Required]
         private PlayerEntity _playerEntity;
         
-        [SerializeField, Required]
-        private PlayerMovementConfigMeta _playerMovementConfig;
-
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public CharacterController CharacterController { get; private set; }

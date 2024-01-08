@@ -54,11 +54,11 @@ MonoBehaviour:
   _interactionTextSettings:
     _interactionEnabledTextSettings:
     - _interactionType: 1
-      _text: Press 'E' to pick up
+      _text: Press 'F' to pick up
     - _interactionType: 4
-      _text: Press 'E' to start the game
+      _text: Press 'F' to start the game
     - _interactionType: 5
-      _text: Press 'E' to open/close the door
+      _text: Press 'F' to open/close the door
     _interactionDisabledTextSettings:
     - _interactionType: 1
       _text: Can't pick up item now

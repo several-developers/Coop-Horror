@@ -112,7 +112,8 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             {
                 RaycastHit hitInfo = _hits[i];
                 float distance = Vector3.Distance(_playerTransform.position, hitInfo.point);
-
+                Debug.Log($"Hit: '{hitInfo.transform.name}',  Distance: '{distance:F2}'");
+                
                 if (distance >= minDistance)
                     continue;
 

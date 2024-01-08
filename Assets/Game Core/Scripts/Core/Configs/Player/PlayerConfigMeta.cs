@@ -13,12 +13,8 @@ namespace GameCore.Core.Configs.Player
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private PlayerMovementConfigMeta _playerMovementConfig;
-
-        [SerializeField, Required]
         private PlayerEntity _playerPrefab; // TEMP
 
-        public PlayerMovementConfigMeta PlayerMovementConfig => _playerMovementConfig;
         public PlayerEntity PlayerPrefab => _playerPrefab;
 
         public override string GetMetaCategory() =>

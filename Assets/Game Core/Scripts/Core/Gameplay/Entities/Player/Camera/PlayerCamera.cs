@@ -1,4 +1,4 @@
-﻿using System;
+﻿using EFPController;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Managers;
 using Sirenix.OdinInspector;
@@ -21,10 +21,39 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField, Required]
         private Camera _camera;
 
+        [SerializeField, Required]
+        private GameObject _weaponRoot;
+
+        [SerializeField, Required]
+        private AudioListener _audioListener;
+
+        [SerializeField, Required]
+        private SmoothLook _smoothLook;
+        
+        [SerializeField, Required]
+        private CameraRootAnimations _cameraRootAnimations;
+        
+        [SerializeField, Required]
+        private CameraControl _cameraControl;
+        
+        [SerializeField, Required]
+        private Animator _cameraAnimator;
+
+        [SerializeField, Required]
+        private Transform _itemPivot;
+        
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public Camera Camera => _camera;
-        
+        public GameObject WeaponRoot => _weaponRoot;
+        public GameObject CameraRoot => gameObject;
+        public AudioListener AudioListener => _audioListener;
+        public SmoothLook SmoothLook => _smoothLook;
+        public CameraRootAnimations CameraRootAnimations => _cameraRootAnimations;
+        public CameraControl CameraControl => _cameraControl;
+        public Animator CameraAnimator => _cameraAnimator;
+        public Transform ItemPivot => _itemPivot;
+
         private float MouseVerticalValue
         {
             get => _mouseVerticalValue;
@@ -52,7 +81,7 @@ namespace GameCore.Gameplay.Entities.Player
         private Vector2 _lookVector;
         private float _mouseVerticalValue;
         private bool _isPlayerFound;
-        
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() =>
@@ -66,9 +95,10 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void LateUpdate()
         {
+            return;
             if (!_isPlayerFound)
                 return;
-            
+
             _lookVector = _playerInputActions.Player.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
 

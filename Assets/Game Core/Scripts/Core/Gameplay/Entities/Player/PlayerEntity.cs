@@ -1,4 +1,5 @@
 ﻿using System;
+using EFPController;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.Interaction;
@@ -18,6 +19,13 @@ namespace GameCore.Gameplay.Entities.Player
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [Title("TEMP ------------------")]
+        [SerializeField, Required]
+        private EFPController.Player _player;
+
+        [SerializeField, Required]
+        private PlayerMovement _playerMovement;
+        
         [Title(Constants.Settings)]
         [SerializeField]
         private bool _isDead;
@@ -39,9 +47,6 @@ namespace GameCore.Gameplay.Entities.Player
         private NetworkObject _networkObject;
         
         [SerializeField, Required]
-        private Transform _itemHoldPivot;
-
-        [SerializeField, Required]
         private Transform _cameraPoint;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -52,6 +57,7 @@ namespace GameCore.Gameplay.Entities.Player
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
+        private Transform _itemHoldPivot;
         private bool _isInitialized;
 
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
@@ -133,6 +139,23 @@ namespace GameCore.Gameplay.Entities.Player
             PlayerCamera playerCamera = PlayerCamera.Get();
             playerCamera.SetTarget(transform, _cameraPoint);
 
+            _playerMovement.Init(_player, playerCamera.Camera.transform);
+            
+            SmoothLook smoothLook = playerCamera.SmoothLook;
+            smoothLook.Init(_player);
+
+            CameraRootAnimations cameraRootAnimations = playerCamera.CameraRootAnimations;
+            
+            CameraControl cameraControl = playerCamera.CameraControl;
+            cameraControl.Init(_player, cameraRootAnimations);
+            
+            _player.Init(smoothLook, cameraControl, playerCamera.Camera, playerCamera.WeaponRoot,
+                playerCamera.CameraRoot, playerCamera.CameraAnimator);
+
+            CameraBobAnims cameraBobAnims = _player.cameraBobAnims;
+            cameraBobAnims.Init(_player, cameraRootAnimations);
+
+            _itemHoldPivot = playerCamera.ItemPivot;
             _inventory = new PlayerInventory();
             _inventoryManager = new PlayerInventoryManager(playerEntity: this);
             _interactionChecker = new InteractionChecker(playerInteractionObserver, transform, playerCamera.Camera,
@@ -161,7 +184,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
-            _interactionChecker.Check();
+            _interactionChecker.Check(true);
         }
 
         private void UpdateNotOwner()
