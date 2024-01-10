@@ -280,7 +280,39 @@ namespace EFPController
         private void Awake() =>
             _transform = transform;
 
-        private void Update()
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void Init(Player player, Transform playerCameraTransform)
+        {
+            Player = player;
+            MainCameraTransform = playerCameraTransform;
+            InputManager = InputManager.instance;
+            
+            _jumpingComponent = new PlayerJumpingComponent(Player, _playerJumpingConfig);
+            _crouchingComponent = new PlayerCrouchingComponent(Player, _playerCrouchingConfig);
+            _climbingComponent = new PlayerClimbingComponent(Player, _playerClimbingConfig);
+            _leaningComponent = new PlayerLeaningComponent(Player, _playerLeaningConfig);
+            _swimmingComponent = new PlayerSwimmingComponent(Player, _playerSwimmingConfig);
+            _dashComponent = new PlayerDashComponent(Player, _playerDashConfig);
+            _sprintComponent = new PlayerSprintComponent(Player, _playerSprintConfig);
+            _fallDamageComponent = new PlayerFallDamageComponent(Player, _playerFallDamageConfig);
+
+            // clamp movement modifier percentages
+            backwardSpeedPercentage = Mathf.Clamp01(backwardSpeedPercentage); // Vlad
+            strafeSpeedPercentage = Mathf.Clamp01(strafeSpeedPercentage); // Vlad
+
+            _moveSpeedMult = 1f;
+
+            capsule.height = standingCapsuleHeight;
+
+            // add to reach distances if capsule cast height is larger than default
+            _crouchingComponent.PlayerHeightMod = standingCapsuleHeight - 2.24f;
+
+            // initialize player height variables
+            _crouchingComponent.CrouchCapsuleCheckRadius = capsule.radius * 0.9f;
+        }
+
+        public void UpdateLogic()
         {
             if (!Player.canControl)
                 return;
@@ -298,8 +330,8 @@ namespace EFPController
             _climbingComponent.ClimbingUpdateLogic();
             _swimmingComponent.InWaterUpdateLogic();
         }
-
-        private void LateUpdate()
+        
+        public void LateUpdateLogic()
         {
             if (!Player.canControl)
                 return;
@@ -312,7 +344,7 @@ namespace EFPController
 #endif*/
         }
 
-        private void FixedUpdate()
+        public void FixedUpdateLogic()
         {
             if (!Player.canControl)
                 return;
@@ -744,38 +776,6 @@ namespace EFPController
             }
 
             HoverClimbable = false;
-        }
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void Init(Player player, Transform playerCameraTransform)
-        {
-            Player = player;
-            MainCameraTransform = playerCameraTransform;
-            InputManager = InputManager.instance;
-            
-            _jumpingComponent = new PlayerJumpingComponent(Player, _playerJumpingConfig);
-            _crouchingComponent = new PlayerCrouchingComponent(Player, _playerCrouchingConfig);
-            _climbingComponent = new PlayerClimbingComponent(Player, _playerClimbingConfig);
-            _leaningComponent = new PlayerLeaningComponent(Player, _playerLeaningConfig);
-            _swimmingComponent = new PlayerSwimmingComponent(Player, _playerSwimmingConfig);
-            _dashComponent = new PlayerDashComponent(Player, _playerDashConfig);
-            _sprintComponent = new PlayerSprintComponent(Player, _playerSprintConfig);
-            _fallDamageComponent = new PlayerFallDamageComponent(Player, _playerFallDamageConfig);
-
-            // clamp movement modifier percentages
-            backwardSpeedPercentage = Mathf.Clamp01(backwardSpeedPercentage); // Vlad
-            strafeSpeedPercentage = Mathf.Clamp01(strafeSpeedPercentage); // Vlad
-
-            _moveSpeedMult = 1f;
-
-            capsule.height = standingCapsuleHeight;
-
-            // add to reach distances if capsule cast height is larger than default
-            _crouchingComponent.PlayerHeightMod = standingCapsuleHeight - 2.24f;
-
-            // initialize player height variables
-            _crouchingComponent.CrouchCapsuleCheckRadius = capsule.radius * 0.9f;
         }
         
         public void SendOnWaterEvent(bool inWater) =>

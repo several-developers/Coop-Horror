@@ -3,6 +3,8 @@ using EFPController;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.Interaction;
+using GameCore.Gameplay.Entities.Player.Other;
+using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.Managers;
 using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.PlayerInteraction;
@@ -25,7 +27,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         [SerializeField, Required]
         private PlayerMovement _playerMovement;
-        
+
         [Title(Constants.Settings)]
         [SerializeField]
         private bool _isDead;
@@ -45,9 +47,15 @@ namespace GameCore.Gameplay.Entities.Player
 
         [SerializeField, Required]
         private NetworkObject _networkObject;
+
+        [SerializeField, Required]
+        private CapsuleCollider _capsuleCollider;
         
         [SerializeField, Required]
         private Transform _cameraPoint;
+
+        [SerializeField, Required]
+        private Transform _itemFollowPivot;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -58,6 +66,7 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
         private Transform _itemHoldPivot;
+
         private bool _isInitialized;
 
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
@@ -68,10 +77,14 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isInitialized)
                 return;
-            
+
             UpdateOwner();
             UpdateNotOwner();
         }
+
+        private void FixedUpdate() => FixedUpdateOwner();
+
+        private void LateUpdate() => LateUpdateOwner();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -79,7 +92,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             TheNetworkHorror networkHorror = TheNetworkHorror.Get();
             networkHorror.OnDisconnectEvent -= OnDisconnect;
-            
+
             base.OnNetworkSpawn();
         }
 
@@ -96,13 +109,13 @@ namespace GameCore.Gameplay.Entities.Player
             //float reloadTimeMultiplier = reloadAnimationTime / reloadTime; // 1, 0.5, 1 / 0.5
 
             //_animator.SetFloat(id: AnimatorHashes.ReloadMultiplier, reloadTimeMultiplier);
-            
+
             TheNetworkHorror networkHorror = TheNetworkHorror.Get();
             networkHorror.OnDisconnectEvent += OnDisconnect;
-            
+
             InitOwner();
             InitNotOwner();
-            
+
             _isInitialized = true;
         }
 
@@ -115,6 +128,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         public Transform GetItemHoldPivot() => _itemHoldPivot;
 
+        public Transform GetItemFollowPivot() => _itemFollowPivot;
+
         public Animator GetAnimator() => _animator;
 
         public NetworkObject GetNetworkObject() => _networkObject;
@@ -124,31 +139,34 @@ namespace GameCore.Gameplay.Entities.Player
         public bool IsDead() => _isDead;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
         private void InitOwner()
         {
             if (!IsOwner)
                 return;
 
             Debug.Log($"Player #{OwnerClientId} setup.");
+
+            PlayerSetupHelper playerSetupHelper = PlayerSetupHelper.Get();
+
             IPlayerInteractionObserver playerInteractionObserver = NetworkSpawner.Get().PlayerInteractionObserver;
-            
+
             var playerInput = GetComponent<PlayerInput>();
             InputSystemManager.Init(playerInput);
-            
+
             PlayerCamera playerCamera = PlayerCamera.Get();
             playerCamera.SetTarget(transform, _cameraPoint);
 
             _playerMovement.Init(_player, playerCamera.Camera.transform);
-            
+
             SmoothLook smoothLook = playerCamera.SmoothLook;
             smoothLook.Init(_player);
 
             CameraRootAnimations cameraRootAnimations = playerCamera.CameraRootAnimations;
-            
+
             CameraControl cameraControl = playerCamera.CameraControl;
             cameraControl.Init(_player, cameraRootAnimations);
-            
+
             _player.Init(smoothLook, cameraControl, playerCamera.Camera, playerCamera.WeaponRoot,
                 playerCamera.CameraRoot, playerCamera.CameraAnimator);
 
@@ -157,7 +175,10 @@ namespace GameCore.Gameplay.Entities.Player
 
             _itemHoldPivot = playerCamera.ItemPivot;
             _inventory = new PlayerInventory();
-            _inventoryManager = new PlayerInventoryManager(playerEntity: this);
+
+            IItemsPreviewFactory itemsPreviewFactory = playerSetupHelper.GetItemsPreviewFactory();
+            _inventoryManager = new PlayerInventoryManager(playerEntity: this, itemsPreviewFactory);
+
             _interactionChecker = new InteractionChecker(playerInteractionObserver, transform, playerCamera.Camera,
                 _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);
 
@@ -178,13 +199,14 @@ namespace GameCore.Gameplay.Entities.Player
             if (IsOwner)
                 return;
         }
-        
+
         private void UpdateOwner()
         {
             if (!IsOwner)
                 return;
 
             _interactionChecker.Check(true);
+            _playerMovement.UpdateLogic();
         }
 
         private void UpdateNotOwner()
@@ -193,6 +215,22 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
         }
 
+        private void FixedUpdateOwner()
+        {
+            if (!IsOwner)
+                return;
+            
+            _playerMovement.FixedUpdateLogic();
+        }
+        
+        private void LateUpdateOwner()
+        {
+            if (!IsOwner)
+                return;
+
+            _playerMovement.LateUpdateLogic();
+        }
+        
         private void DespawnOwner()
         {
             if (!IsOwner)

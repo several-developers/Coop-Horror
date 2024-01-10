@@ -19,6 +19,20 @@ namespace GameCore.Gameplay.Items
         [VerticalGroup(RowRight), SerializeField, EnableIf(nameof(_canEditItemID))]
         private int _itemID;
 
+        [Title("Item Preview Settings")]
+        [SerializeField]
+        private Vector3 _itemPreviewPosition;
+        
+        [SerializeField]
+        private Vector3 _itemPreviewRotation;
+        
+        [SerializeField]
+        private Vector3 _itemPreviewScale = Vector3.zero;
+
+        [Title(Constants.References)]
+        [SerializeField, Required]
+        private ItemPreviewObject _itemPreviewPrefab;
+
         //[VerticalGroup(RowRight), SerializeField, Range(0.25f, 2f)]
         //private float _iconScale = 1;
         
@@ -26,7 +40,11 @@ namespace GameCore.Gameplay.Items
 
         public Sprite Icon => _icon;
         public int ItemID => _itemID;
-        
+        public Vector3 ItemPreviewPosition => _itemPreviewPosition;
+        public Vector3 ItemPreviewRotation => _itemPreviewRotation;
+        public Vector3 ItemPreviewScale => _itemPreviewScale;
+        public ItemPreviewObject ItemPreviewPrefab => _itemPreviewPrefab;
+
         // FIELDS: --------------------------------------------------------------------------------
         
         private const string ItemSettings = "Item Settings";

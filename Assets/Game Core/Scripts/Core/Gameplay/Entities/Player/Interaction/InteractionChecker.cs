@@ -112,7 +112,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             {
                 RaycastHit hitInfo = _hits[i];
                 float distance = Vector3.Distance(_playerTransform.position, hitInfo.point);
-                Debug.Log($"Hit: '{hitInfo.transform.name}',  Distance: '{distance:F2}'");
+                //Debug.Log($"Hit: '{hitInfo.transform.name}',  Distance: '{distance:F2}'");
                 
                 if (distance >= minDistance)
                     continue;
@@ -131,7 +131,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
         private Ray GetRay()
         {
-            var screenCenterPoint = new Vector3(x: Screen.width * 0.5f, y: Screen.height * 0.5f);
+            Vector3 screenCenterPoint = new(x: Screen.width * 0.5f, y: Screen.height * 0.5f);
             return _camera.ScreenPointToRay(screenCenterPoint);
         }
     }

@@ -53,7 +53,7 @@ namespace EFPController {
             };
             gameViewWindow.SendEvent(fakeMouseClick);
 #endif
-            InputManager.ShowCursor(false);
+            //InputManager.ShowCursor(false);
         }
 
     }

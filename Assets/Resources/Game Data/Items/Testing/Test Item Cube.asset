@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 434153c02734f3a4e8fe12ea880a356b, type: 3}
-  m_Name: Test Flashlight
+  m_Name: Test Item Cube
   m_EditorClassIdentifier: 
-  _metaName: Test Flashlight
-  _icon: {fileID: 21300000, guid: 05c7216c78d4dd34ebe2bac9c1e274d7, type: 3}
-  _itemName: Test Flashlight
-  _itemID: 0
-  _itemPreviewPosition: {x: 0.612, y: -0.28, z: 0.619}
-  _itemPreviewRotation: {x: 0, y: 14.5, z: 45}
+  _metaName: Test Item Cube
+  _icon: {fileID: 21300000, guid: d1546f8db185caf4dafcfa58efa3ba2c, type: 3}
+  _itemName: Test Item Cube
+  _itemID: -2
+  _itemPreviewPosition: {x: 0.45, y: -0.24, z: 0.6}
+  _itemPreviewRotation: {x: 0, y: 0, z: 0}
   _itemPreviewScale: {x: 1, y: 1, z: 1}
-  _itemPreviewPrefab: {fileID: 8255347702447654125, guid: af5e517ad69b2ad4bb70d1d319afdcea,
+  _itemPreviewPrefab: {fileID: 8255347702447654125, guid: e8f4dd848ed42d34a95114e6f60f950e,
     type: 3}

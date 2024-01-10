@@ -128,9 +128,9 @@ MonoBehaviour:
   preset: {fileID: 11400000, guid: 0fcdd472bd6a8ec429fc1e9bc978c4fa, type: 2}
   showCirrusCloudsControls: 0
   show2DCloudsControls: 0
-  cloudFlatBaseAnim: {x: -0.310697, y: -0.378355}
-  cloudFlatDetailAnim: {x: 0.4522725, y: 0.25237}
-  cirrusAnim: {x: 0.842, y: -0.18961984}
+  cloudFlatBaseAnim: {x: -0.06911679, y: -0.378355}
+  cloudFlatDetailAnim: {x: -0.3420396, y: 0.25237}
+  cirrusAnim: {x: 0.9627949, y: -0.18961984}
 --- !u!114 &-1033463005042072443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2120,7 +2120,7 @@ MonoBehaviour:
   showDensityControls: 0
   showTextureControls: 0
   showWindControls: 0
-  cloudAnimLayer1: {x: 0.8193655, y: -0.16799916, z: -0.71216184}
+  cloudAnimLayer1: {x: 0.9401604, y: -0.16799916, z: -0.63906246}
   cloudAnimLayer2: {x: 0.4995961, y: -0.7353438, z: 0.82806736}
   cloudAnimNonScaledLayer1: {x: 0.99872607, y: -0.9660904, z: -13.657647}
   cloudAnimNonScaledLayer2: {x: -0.71681553, y: 0.68417805, z: -14.015859}
@@ -2253,9 +2253,9 @@ MonoBehaviour:
     latitude: 0
     longitude: 0
     utcOffset: 0
-    cycleLengthInMinutes: 5
-    dayLengthModifier: 0.25
-    nightLengthModifier: 3
+    cycleLengthInMinutes: 1
+    dayLengthModifier: 1
+    nightLengthModifier: 1
   preset: {fileID: 11400000, guid: 82acdd278499d74498ad37dd931734d1, type: 2}
   showTimeControls: 1
   showLocationControls: 0
@@ -2370,6 +2370,28 @@ MonoBehaviour:
   showFogControls: 0
   showVolumetricsControls: 0
   fogLights:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}

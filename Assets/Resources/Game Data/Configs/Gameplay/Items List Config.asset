@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Items List Config
   _itemsMeta:
+  - {fileID: 11400000, guid: 34cfffc1b38f7c44d932257631339161, type: 2}
   - {fileID: 11400000, guid: 289345df02710854b8b8e1fa4c2fb8fc, type: 2}
   - {fileID: 11400000, guid: ac3352e7cdf12174bb3867716bdb54b4, type: 2}

@@ -18,6 +18,8 @@
 
         public const string DataTitle = "Data";
 
+        public const string Debug = "Debug";
+        
         private const string ConfigsCategory = "Configs";
         private const string Settings = "Settings/";
     }

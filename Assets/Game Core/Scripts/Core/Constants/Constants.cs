@@ -23,6 +23,8 @@
         
         public const string UISoundBus = "UI";
 
+        public const string PlayerTag = "Player";
+
         public const int SaveCellsAmount = 3;
         public const int MaxPlayers = 4;
         public const int PlayerInventorySize = 6;

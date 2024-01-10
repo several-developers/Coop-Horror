@@ -38,16 +38,16 @@ public class CameraController : MonoBehaviour
             body.localRotation.eulerAngles.y + Input.GetAxis("Mouse X") * sensitivity,
             0);
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+        // if (Input.GetMouseButtonDown(0))
+        // {
+        //     Cursor.lockState = CursorLockMode.Locked;
+        //     Cursor.visible = false;
+        // }
+        //
+        // if (Input.GetKeyDown(KeyCode.Escape))
+        // {
+        //     Cursor.lockState = CursorLockMode.None;
+        //     Cursor.visible = true;
+        // }
     }
 }

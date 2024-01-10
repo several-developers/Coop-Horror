@@ -8,9 +8,13 @@ namespace GameCore.Gameplay.Network.Other
 
         private Transform _transform;
         private Transform _target;
+        private Vector3 _rotationOffset;
         private bool _isTargetFound;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Awake() =>
+            _transform = transform;
 
         private void LateUpdate()
         {
@@ -22,11 +26,10 @@ namespace GameCore.Gameplay.Network.Other
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void SetTarget(Transform target)
+        
+        public void SetTarget(Transform followTarget)
         {
-            _transform = transform;
-            _target = target;
+            _target = followTarget;
             _isTargetFound = true;
         }
 

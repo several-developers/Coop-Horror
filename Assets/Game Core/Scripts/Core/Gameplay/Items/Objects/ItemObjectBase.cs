@@ -13,10 +13,21 @@ namespace GameCore.Gameplay.Items
     [RequireComponent(typeof(Rigidbody))]
     public abstract class ItemObjectBase : NetworkBehaviour, IInteractableItem
     {
+        // MEMBERS: -------------------------------------------------------------------------------
+
+        [Title(EditorConstants.Debug)]
+        [SerializeField]
+        private bool _changeItemIDAtAwake;
+
+        [SerializeField]
+        [ShowIf(nameof(_changeItemIDAtAwake))]
+        private int _startItemID;
+        
         // FIELDS: --------------------------------------------------------------------------------
         
         public event Action OnInteractionStateChangedEvent;
 
+        private Transform _transform;
         private FollowParent _followParent;
         private Rigidbody _rigidbody;
         private Collider _collider;
@@ -31,10 +42,14 @@ namespace GameCore.Gameplay.Items
 
         protected virtual void Awake()
         {
+            _transform = transform;
             _followParent = GetComponent<FollowParent>();
             _rigidbody = GetComponent<Rigidbody>();
             _collider = GetComponent<Collider>();
             _child = transform.GetChild(0).gameObject;
+
+            if (_changeItemIDAtAwake)
+                _itemID = _startItemID;
         }
 
         protected virtual void Start()
@@ -42,6 +57,8 @@ namespace GameCore.Gameplay.Items
             //if (!IsSpawned)
                 //NetworkObject.Spawn();
         }
+
+        private void OnCollisionEnter(Collision collision) => IgnorePlayerCollision(collision);
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -62,6 +79,11 @@ namespace GameCore.Gameplay.Items
 
         public void DropServer(bool randomPosition = false) => DropServerRpc(randomPosition);
         
+        public void DropServer(Vector3 position, Quaternion rotation, bool randomPosition = false)
+        {
+            
+        }
+
         // ПРОТЕСТИТЬ С ЛАГАМИ
         public void Drop(bool randomPosition = false)
         {
@@ -73,12 +95,16 @@ namespace GameCore.Gameplay.Items
             _rigidbody.velocity = Vector3.zero;
 
             if (randomPosition)
-                transform.position = transform.GetRandomPosition(radius: 0.5f);
+                _transform.position = _transform.GetRandomPosition(radius: 0.5f);
 
             _collider.enabled = true;
             
             _followParent.RemoveTarget();
+            Show();
         }
+
+        public void ChangeFollowTarget(Transform followTarget) =>
+            _followParent.SetTarget(followTarget);
 
         public void ShowServer() => ShowServerRpc();
 
@@ -103,7 +129,7 @@ namespace GameCore.Gameplay.Items
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void PickUp(Transform target)
+        private void PickUp(Transform followTarget)
         {
             if (_isPickedUp)
                 return;
@@ -114,9 +140,17 @@ namespace GameCore.Gameplay.Items
             
             _collider.enabled = false;
             
-            _followParent.SetTarget(target);
+            _followParent.SetTarget(followTarget);
         }
 
+        private void IgnorePlayerCollision(Collision collision)
+        {
+            if (!collision.gameObject.CompareTag(Constants.PlayerTag))
+                return;
+            
+            Physics.IgnoreCollision(collision.collider, _collider);
+        }
+        
         // RPC: -----------------------------------------------------------------------------------
         
         [ServerRpc(RequireOwnership = false)]
@@ -136,8 +170,8 @@ namespace GameCore.Gameplay.Items
             if (!isPlayerEntityFound)
                 return;
 
-            Transform target = playerEntity.GetItemHoldPivot();
-            PickUp(target);
+            Transform followTarget = playerEntity.GetItemFollowPivot();
+            PickUp(followTarget);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -147,10 +181,23 @@ namespace GameCore.Gameplay.Items
         private void DropClientRpc(bool randomPosition) => Drop(randomPosition);
 
         [ServerRpc(RequireOwnership = false)]
-        private void ShowServerRpc() => ShowClientRpc();
+        private void ShowServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
+            ShowClientRpc(senderClientId);
+        }
 
         [ClientRpc]
-        private void ShowClientRpc() => Show();
+        private void ShowClientRpc(ulong senderClientID)
+        {
+            ulong receiverClientID = OwnerClientId;
+            bool show = senderClientID != receiverClientID;
+            
+            if (!show)
+                return;
+            
+            Show();
+        }
 
         [ServerRpc(RequireOwnership = false)]
         private void HideServerRpc() => HideClientRpc();
