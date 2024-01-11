@@ -42,6 +42,9 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField, Required]
         private Transform _itemPivot;
         
+        [SerializeField, Required]
+        private Transform _lookAtObject;
+        
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public Camera Camera => _camera;
@@ -53,6 +56,7 @@ namespace GameCore.Gameplay.Entities.Player
         public CameraControl CameraControl => _cameraControl;
         public Animator CameraAnimator => _cameraAnimator;
         public Transform ItemPivot => _itemPivot;
+        public Transform LookAtObject => _lookAtObject;
 
         private float MouseVerticalValue
         {

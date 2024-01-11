@@ -57,33 +57,40 @@ namespace GameCore.Gameplay.Entities.Player
         private NetworkObject _networkObject;
 
         [SerializeField, Required]
-        private CapsuleCollider _capsuleCollider;
-        
+        private GameObject _playerModel;
+
         [SerializeField, Required]
         private Transform _cameraPoint;
 
         [SerializeField, Required]
         private Transform _itemFollowPivot;
 
+        [SerializeField, Required]
+        private Transform _headLookObject;
+
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<Vector2> OnMovementVectorChangedEvent;
+
+        private readonly NetworkVariable<Vector3>
+            _lookAtPosition = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        private readonly NetworkVariable<bool> _isInitialized = new(writePerm: NetworkVariableWritePermission.Owner);
 
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
         private Transform _itemHoldPivot;
-
-        private bool _isInitialized;
+        private Transform _lookAtObject;
 
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
-
+        
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Update()
         {
-            if (!_isInitialized)
+            if (!_isInitialized.Value)
                 return;
 
             UpdateOwner();
@@ -110,6 +117,7 @@ namespace GameCore.Gameplay.Entities.Player
             base.OnNetworkDespawn();
         }
 
+#warning НЕ ВЫЗЫВАЕТСЯ У НОВЫХ ПОДКЛЮЧЁННЫХ ИГРОКОВ ДЛЯ СТАРЫХ ПОДКЛЮЧЁННЫХ
         public void Setup()
         {
             //float reloadTime = 1.5f;
@@ -124,7 +132,7 @@ namespace GameCore.Gameplay.Entities.Player
             InitOwner();
             InitNotOwner();
 
-            _isInitialized = true;
+            _isInitialized.Value = true;
         }
 
         public void TakeDamage(IEntity source, float damage)
@@ -166,6 +174,7 @@ namespace GameCore.Gameplay.Entities.Player
             playerCamera.SetTarget(transform, _cameraPoint);
 
             _playerMovement.Init(_player, playerCamera.Camera.transform);
+            _lookAtObject = playerCamera.LookAtObject;
 
             SmoothLook smoothLook = playerCamera.SmoothLook;
             smoothLook.Init(_player);
@@ -197,12 +206,9 @@ namespace GameCore.Gameplay.Entities.Player
 
             InventoryHUD.Get().Init(playerEntity: this); // TEMP
 
-            _playerMovement.OnJump += () =>
-            {
-                _networkAnimator.SetTrigger(AnimatorHashes.Jump);
-            };
+            _playerMovement.OnJump += () => { _networkAnimator.SetTrigger(AnimatorHashes.Jump); };
 
-            transform.GetChild(0).gameObject.SetActive(false);
+            _playerModel.SetActive(false);
 
             InputSystemManager.OnMoveEvent += OnMove;
             InputSystemManager.OnScrollEvent += OnScroll;
@@ -232,12 +238,12 @@ namespace GameCore.Gameplay.Entities.Player
             float maxClamp = isSprinting ? 1f : 0.5f;
             float movementSpeed = _playerMovement.Velocity.magnitude;
             float modifiedMovementSpeed = movementSpeed * (isGoingBackwards ? -1f : 1f);
-            
+
             float divider = isSprinting ? 6f : 3f;
             float blend = Mathf.Clamp(value: modifiedMovementSpeed / divider, -1f, maxClamp);
 
             bool canMove = movementSpeed > 0.05f;
-            
+
             _animator.SetBool(id: AnimatorHashes.CanMove, canMove);
             _animator.SetFloat(AnimatorHashes.MoveSpeedBlend, blend);
         }
@@ -246,24 +252,28 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (IsOwner)
                 return;
+            
+            _headLookObject.position = _lookAtPosition.Value;
         }
 
         private void FixedUpdateOwner()
         {
             if (!IsOwner)
                 return;
-            
+
             _playerMovement.FixedUpdateLogic();
         }
-        
+
         private void LateUpdateOwner()
         {
-            if (!IsOwner || !_isInitialized)
+            if (!IsOwner)
                 return;
-            
+
             _playerMovement.LateUpdateLogic();
+
+            _lookAtPosition.Value = _lookAtObject.position;
         }
-        
+
         private void DespawnOwner()
         {
             if (!IsOwner)
