@@ -1305,7 +1305,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7793256985427898599
 Transform:
   m_ObjectHideFlags: 0
@@ -1933,6 +1933,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player: {fileID: 6516424174033649999}
   _playerMovement: {fileID: 5237258084370620171}
+  _playerFootsteps: {fileID: 430461550739394689}
   _isDead: 0
   _interactionMaxDistance: 2.2
   _interactionLM:
@@ -1946,6 +1947,18 @@ MonoBehaviour:
   _capsuleCollider: {fileID: 1967799250354909116}
   _cameraPoint: {fileID: 91750195740998113}
   _itemFollowPivot: {fileID: 91750195740998113}
+--- !u!114 &5967601048658187761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4628898490251457778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6516424174033649999
 MonoBehaviour:
   m_ObjectHideFlags: 0

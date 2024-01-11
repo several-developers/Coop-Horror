@@ -91,20 +91,6 @@ namespace EFPController
             }
         }
 
-        private void Update()
-        {
-            if (!inited || player.controller.SwimmingComponent.IsSwimming)
-                return;
-
-            isCrouch = player.controller.CrouchingComponent.IsCrouching;
-            isSprint = player.controller.SprintComponent.Sprint;
-            isDash = player.controller.DashComponent.DashActive;
-            CheckGround();
-
-            if (isGrounded && previouslyGrounded && (player.controller.IsMoving || isDash))
-                AdvanceStepCycle(player.controller.Velocity.magnitude * Time.deltaTime);
-        }
-
         public void Footstep(AnimationEvent evt)
         {
             if (!allowAnimEvent) return;
@@ -159,6 +145,22 @@ namespace EFPController
                 firstGrounded = true;
         }
 
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void UpdateLogic()
+        {
+            if (!inited || player.controller.SwimmingComponent.IsSwimming)
+                return;
+
+            isCrouch = player.controller.CrouchingComponent.IsCrouching;
+            isSprint = player.controller.SprintComponent.Sprint;
+            isDash = player.controller.DashComponent.DashActive;
+            CheckGround();
+
+            if (isGrounded && previouslyGrounded && (player.controller.IsMoving || isDash))
+                AdvanceStepCycle(player.controller.Velocity.magnitude * Time.deltaTime);
+        }
+        
         public AudioClip GetFootstep(Collider groundCollider, Vector3 worldPosition)
         {
             if (player.controller.SwimmingComponent.InWater)

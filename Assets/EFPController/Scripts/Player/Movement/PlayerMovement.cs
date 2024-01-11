@@ -268,6 +268,7 @@ namespace EFPController
         
         private float _airTime; // Total time that player is airborn.
         private bool _isFalling; // True when player is losing altitude.
+        private bool _isInitialized;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
@@ -284,6 +285,7 @@ namespace EFPController
 
         public void Init(Player player, Transform playerCameraTransform)
         {
+            _isInitialized = true;
             Player = player;
             MainCameraTransform = playerCameraTransform;
             InputManager = InputManager.instance;
@@ -982,6 +984,10 @@ namespace EFPController
 
         private void OnTriggerEnter(Collider other)
         {
+            // TEMP
+            if (!_isInitialized)
+                return;
+            
             // Climbing
             if (_climbingComponent.TriggerEnterLogic(other))
                 return;
@@ -992,12 +998,20 @@ namespace EFPController
 
         private void OnTriggerStay(Collider other)
         {
+            // TEMP
+            if (!_isInitialized)
+                return;
+            
             // Climbing
             _climbingComponent.TriggerStayLogic(other);
         }
 
         private void OnTriggerExit(Collider other)
         {
+            // TEMP
+            if (!_isInitialized)
+                return;
+            
             // Water
             _swimmingComponent.TriggerExitLogic(other);
         }

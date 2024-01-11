@@ -45,15 +45,17 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
             InteractionType interactionType = _lastInteractable.GetInteractionType();
 
+            if (!_lastInteractable.CanInteract())
+                return;
+
             switch (interactionType)
             {
                 case InteractionType.PickUpItem:
                     HandlePickUpItem();
                     break;
-                
+
                 default:
-                    if (_lastInteractable.CanInteract())
-                        _lastInteractable.Interact();
+                    _lastInteractable.Interact();
                     break;
             }
         }

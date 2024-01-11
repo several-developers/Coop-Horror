@@ -118,7 +118,21 @@ namespace EFPController
         private void Awake() =>
             _inputManager = InputManager.instance;
 
-        private void Update()
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void Init(Player player, CameraRootAnimations cameraRootAnimations)
+        {
+            _isInitialized = true;
+            _player = player;
+            _smoothLook = _player.SmoothLook;
+            _controller = _player.controller;
+            _cameraRootAnimations = cameraRootAnimations;
+            CameraControlComponent = _player.CameraControl;
+            
+            PlayIdleAnim();
+        }
+
+        public void UpdateLogic()
         {
             if (!_isInitialized)
                 return;
@@ -294,20 +308,6 @@ namespace EFPController
                         walkBobSpeed * swimBobSpeedAmt * moveInputAmt, Time.smoothDeltaTime * 16f);
                 }
             }
-        }
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void Init(Player player, CameraRootAnimations cameraRootAnimations)
-        {
-            _isInitialized = true;
-            _player = player;
-            _smoothLook = _player.SmoothLook;
-            _controller = _player.controller;
-            _cameraRootAnimations = cameraRootAnimations;
-            CameraControlComponent = _player.CameraControl;
-            
-            PlayIdleAnim();
         }
         
         public void PlayIdleAnim()

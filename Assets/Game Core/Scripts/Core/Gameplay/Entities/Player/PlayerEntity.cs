@@ -28,6 +28,11 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField, Required]
         private PlayerMovement _playerMovement;
 
+        [SerializeField, Required]
+        private PlayerFootsteps _playerFootsteps;
+
+        private CameraBobAnims _cameraBobAnims;
+
         [Title(Constants.Settings)]
         [SerializeField]
         private bool _isDead;
@@ -172,6 +177,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             CameraBobAnims cameraBobAnims = _player.cameraBobAnims;
             cameraBobAnims.Init(_player, cameraRootAnimations);
+            _cameraBobAnims = cameraBobAnims;
 
             _itemHoldPivot = playerCamera.ItemPivot;
             _inventory = new PlayerInventory();
@@ -187,6 +193,8 @@ namespace GameCore.Gameplay.Entities.Player
             _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
 
             InventoryHUD.Get().Init(playerEntity: this); // TEMP
+            
+            transform.GetChild(0).gameObject.SetActive(false);
 
             InputSystemManager.OnMoveEvent += OnMove;
             InputSystemManager.OnScrollEvent += OnScroll;
@@ -206,7 +214,10 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             _interactionChecker.Check(true);
+            _player.UpdateLogic();
             _playerMovement.UpdateLogic();
+            _playerFootsteps.UpdateLogic();
+            _cameraBobAnims.UpdateLogic();
         }
 
         private void UpdateNotOwner()

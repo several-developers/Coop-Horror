@@ -89,9 +89,20 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         {
             Ray ray = GetRay();
             bool isInteractableObjectFound =
-                Physics.Raycast(ray, out RaycastHit _, _interactionMaxDistance, _interactionLm);
+                Physics.Raycast(ray, out RaycastHit hitInfo, _interactionMaxDistance, _interactionLm);
 
-            return isInteractableObjectFound;
+            if (!isInteractableObjectFound)
+                return false;
+            
+            bool isInteractableComponentExists = hitInfo.transform.TryGetComponent(out IInteractable interactable);
+
+            if (!isInteractableComponentExists)
+                return false;
+            
+            if (!interactable.CanInteract())
+                return false;
+
+            return true;
         }
 
         private bool IsObstaclesFound(out int interactableItemIndex)

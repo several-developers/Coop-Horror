@@ -105,26 +105,7 @@ namespace EFPController
             InputManager = InputManager.instance;
             _transform = transform;
         }
-
-        private void Update()
-        {
-            if (controller.IsFalling && _transform.position.y < deadlyHeight)
-            {
-                //Kill();
-                return;
-            }
-
-            if (_transform.position.y < returnToGroundAltitude)
-            {
-                ReturnToLastGroundPosition();
-            }
-
-            if (canInteractable)
-            {
-                Interactable();
-            }
-        }
-
+        
         private void OnDestroy()
         {
             OnPlayerInited = null;
@@ -198,6 +179,25 @@ namespace EFPController
             _smoothLook.InputY = 0f;
 
             _smoothLook.OriginalRotation = Quaternion.Euler(tempEulerAngles2);
+        }
+
+        public void UpdateLogic()
+        {
+            if (controller.IsFalling && _transform.position.y < deadlyHeight)
+            {
+                //Kill();
+                return;
+            }
+
+            if (_transform.position.y < returnToGroundAltitude)
+            {
+                ReturnToLastGroundPosition();
+            }
+
+            if (canInteractable)
+            {
+                Interactable();
+            }
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

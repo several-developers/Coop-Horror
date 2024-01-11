@@ -22,9 +22,9 @@ namespace GameCore.Gameplay.Items
         [SerializeField]
         [ShowIf(nameof(_changeItemIDAtAwake))]
         private int _startItemID;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         public event Action OnInteractionStateChangedEvent;
 
         private Transform _transform;
@@ -32,9 +32,13 @@ namespace GameCore.Gameplay.Items
         private Rigidbody _rigidbody;
         private Collider _collider;
         private GameObject _child; // Model container
-        
+
+        [ShowInInspector]
         private bool _isPickedUp;
-        
+
+        [ShowInInspector]
+        private ulong _ownerID;
+
         [ShowInInspector]
         private int _itemID;
 
@@ -55,7 +59,7 @@ namespace GameCore.Gameplay.Items
         protected virtual void Start()
         {
             //if (!IsSpawned)
-                //NetworkObject.Spawn();
+            //NetworkObject.Spawn();
         }
 
         private void OnCollisionEnter(Collision collision) => IgnorePlayerCollision(collision);
@@ -64,7 +68,9 @@ namespace GameCore.Gameplay.Items
 
         public void Setup(int itemID) =>
             _itemID = itemID;
-        
+
+        public void ChangeOwnership() => ChangeOwnershipServerRpc(NetworkObject);
+
         public virtual void Interact()
         {
             Debug.Log("Interacting with: " + name);
@@ -74,14 +80,30 @@ namespace GameCore.Gameplay.Items
         {
         }
 
-        public void PickUp(NetworkObject playerNetworkObject) =>
-            PickUpServerRpc(playerNetworkObject);
+        public void PickUp(NetworkObject playerNetworkObject)
+        {
+            _ownerID = playerNetworkObject.OwnerClientId;
+            Debug.Log($"Pick Up: ID " + _ownerID);
 
-        public void DropServer(bool randomPosition = false) => DropServerRpc(randomPosition);
+            PickUpServerRpc(playerNetworkObject);
+        }
+
+        public void PickUp(ulong ownerID, Transform followTarget)
+        {
+            if (_isPickedUp)
+                return;
+
+            _ownerID = ownerID;
+            _isPickedUp = true;
+
+            TogglePhysics(isEnabled: false);
+            _followParent.SetTarget(followTarget);
+        }
         
+        public void DropServer(bool randomPosition = false) => DropServerRpc(randomPosition);
+
         public void DropServer(Vector3 position, Quaternion rotation, bool randomPosition = false)
         {
-            
         }
 
         // ПРОТЕСТИТЬ С ЛАГАМИ
@@ -91,27 +113,24 @@ namespace GameCore.Gameplay.Items
                 return;
 
             _isPickedUp = false;
-            _rigidbody.isKinematic = false;
-            _rigidbody.velocity = Vector3.zero;
 
             if (randomPosition)
                 _transform.position = _transform.GetRandomPosition(radius: 0.5f);
-
-            _collider.enabled = true;
             
+            TogglePhysics(isEnabled: true);
             _followParent.RemoveTarget();
             Show();
         }
 
         public void ChangeFollowTarget(Transform followTarget) =>
-            _followParent.SetTarget(followTarget);
+            _followParent.ChangeTarget(followTarget);
 
         public void ShowServer() => ShowServerRpc();
 
         // ПРОТЕСТИТЬ С ЛАГАМИ
         public void Show() =>
             _child.SetActive(true);
-        
+
         public void HideServer() => HideServerRpc();
 
         // ПРОТЕСТИТЬ С ЛАГАМИ
@@ -122,37 +141,44 @@ namespace GameCore.Gameplay.Items
 
         public InteractionType GetInteractionType() =>
             InteractionType.PickUpItem;
-        
+
         public int GetItemID() => _itemID;
 
-        public bool CanInteract() => true;
+        public bool CanInteract() => !_isPickedUp;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void PickUp(Transform followTarget)
+        private void TogglePhysics(bool isEnabled)
         {
-            if (_isPickedUp)
-                return;
-
-            _isPickedUp = true;
-            _rigidbody.isKinematic = true;
+            _rigidbody.isKinematic = !isEnabled;
             _rigidbody.velocity = Vector3.zero;
-            
-            _collider.enabled = false;
-            
-            _followParent.SetTarget(followTarget);
-        }
 
+            _collider.enabled = isEnabled;
+        }
+        
         private void IgnorePlayerCollision(Collision collision)
         {
             if (!collision.gameObject.CompareTag(Constants.PlayerTag))
                 return;
-            
+
             Physics.IgnoreCollision(collision.collider, _collider);
         }
-        
+
         // RPC: -----------------------------------------------------------------------------------
-        
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ChangeOwnershipServerRpc(NetworkObjectReference networkObjectReference,
+            ServerRpcParams serverRpcParams = default)
+        {
+            bool isNetworkObjectExists = networkObjectReference.TryGet(out NetworkObject networkObject);
+
+            if (!isNetworkObjectExists)
+                return;
+
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+            networkObject.ChangeOwnership(senderClientID);
+        }
+
         [ServerRpc(RequireOwnership = false)]
         private void PickUpServerRpc(NetworkObjectReference playerNetworkObjectReference) =>
             PickUpClientRpc(playerNetworkObjectReference);
@@ -171,7 +197,7 @@ namespace GameCore.Gameplay.Items
                 return;
 
             Transform followTarget = playerEntity.GetItemFollowPivot();
-            PickUp(followTarget);
+            PickUp(playerNetworkObject.OwnerClientId, followTarget);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -190,12 +216,11 @@ namespace GameCore.Gameplay.Items
         [ClientRpc]
         private void ShowClientRpc(ulong senderClientID)
         {
-            ulong receiverClientID = OwnerClientId;
-            bool show = senderClientID != receiverClientID;
-            
+            bool show = senderClientID != _ownerID;
+
             if (!show)
                 return;
-            
+
             Show();
         }
 

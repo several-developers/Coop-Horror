@@ -62,7 +62,9 @@ namespace GameCore.Gameplay.Entities.Inventory
                 return;
 
             NetworkObject playerNetworkObject = _playerEntity.GetNetworkObject();
-            interactableItem.PickUp(playerNetworkObject);
+            //interactableItem.PickUp(playerNetworkObject);
+            interactableItem.ChangeOwnership();
+            interactableItem.PickUp(playerNetworkObject.OwnerClientId, _playerEntity.GetItemFollowPivot());
 
             _interactableItems[slotIndex] = interactableItem;
 

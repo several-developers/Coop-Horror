@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 namespace GameCore.Gameplay.Network.Other
 {
-    public class FollowParent : MonoBehaviour
+    public class FollowParent : NetworkBehaviour
     {
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -18,6 +19,9 @@ namespace GameCore.Gameplay.Network.Other
 
         private void LateUpdate()
         {
+            if (!IsOwner)
+                return;
+
             if (!_isTargetFound)
                 return;
 
@@ -26,12 +30,16 @@ namespace GameCore.Gameplay.Network.Other
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void SetTarget(Transform followTarget)
         {
-            _target = followTarget;
+            ChangeTarget(followTarget);
+
             _isTargetFound = true;
         }
+
+        public void ChangeTarget(Transform followTarget) =>
+            _target = followTarget;
 
         public void RemoveTarget()
         {
