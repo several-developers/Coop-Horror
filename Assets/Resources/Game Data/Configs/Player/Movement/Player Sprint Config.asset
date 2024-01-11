@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dcc3243651441ea9d93a50d05b2aaf6, type: 3}
   m_Name: Player Sprint Config
   m_EditorClassIdentifier: 
+  _metaName: Player Sprint Config
   allowSprinting: 1
-  sprintSpeed: 8
+  sprintSpeed: 6
   sprintMode: 2
   forwardSprintOnly: 1

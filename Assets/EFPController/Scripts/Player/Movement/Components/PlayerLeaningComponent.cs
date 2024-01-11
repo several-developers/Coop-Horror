@@ -53,7 +53,7 @@ namespace EFPController
                 {
                     if (Time.timeSinceLevelLoad > 0.5f
                         && !_player.IsDead
-                        && !_playerMovement.SprintComponent.Sprint
+                        && !_playerMovement.SprintComponent.IsSprinting
                         && _playerMovement.IsGrounded
                         && Mathf.Abs(move.y) < 0.2f)
                     {

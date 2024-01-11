@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91a5d2e550364ef2943b01698fa3844a, type: 3}
   m_Name: Player Jumping Config
   m_EditorClassIdentifier: 
+  _metaName: Player Jumping Config
   allowJumping: 1
   jumpSpeed: 6
   jumpCancelsSprint: 0

@@ -91,7 +91,7 @@ namespace EFPController
                                 
                                 IsCrouching = true;
                                 _lastCrouchTime = t;
-                                _playerMovement.SprintComponent.Sprint = false; // cancel sprint if crouch button is pressed
+                                _playerMovement.SprintComponent.IsSprinting = false; // cancel sprint if crouch button is pressed
                                 _playerMovement.SendOnCrouchEvent(isCrouching: true);
                             }
                             else
@@ -115,7 +115,7 @@ namespace EFPController
                     _crouchState = false;
 
                     bool cancelCrouch = false;
-                    bool checkOne = _playerMovement.SprintComponent.Sprint
+                    bool checkOne = _playerMovement.SprintComponent.IsSprinting
                                     || _playerMovement.ClimbingComponent.IsClimbing
                                     || _playerMovement.SwimmingComponent.IsSwimming
                                     || _playerMovement.DashComponent.DashActive;

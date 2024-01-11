@@ -384,7 +384,7 @@ namespace EFPController
                 _inputXLerpSpeed = _inputYLerpSpeed = 3f;
             }
 
-            if (_sprintComponent.Sprint)
+            if (_sprintComponent.IsSprinting)
             {
                 // only strafe when sprinting after pressing the joystick horizontally further than 0.4, for better control and less zig-zagging
                 if (Mathf.Abs(move.x) > 0.4f)
@@ -411,7 +411,7 @@ namespace EFPController
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             // check that player can run and set speed 
-            if (_sprintComponent.SprintActive)
+            if (_sprintComponent.IsSprintAllowed)
             {
                 float sprintSpeed = _sprintComponent.SprintConfig.sprintSpeed;
                 
@@ -655,7 +655,7 @@ namespace EFPController
                         YVelocity = 0f;
                     
                     if (!isSwimming)
-                        MoveDirection = _sprintComponent.Sprint ? _futureDirection : Vector3.Project(MoveDirection, _futureDirection);
+                        MoveDirection = _sprintComponent.IsSprinting ? _futureDirection : Vector3.Project(MoveDirection, _futureDirection);
                 }
                 else
                 {
@@ -832,7 +832,7 @@ namespace EFPController
             IsMoving = false;
             Velocity = Vector3.zero;
             _velocityChange = Vector3.zero;
-            _sprintComponent.Sprint = false;
+            _sprintComponent.IsSprinting = false;
         }
 
         private void CheckGround(Vector3 direction)

@@ -170,7 +170,7 @@ namespace EFPController
             }
 
             // caculate camera roll angle amounts
-            if (_controller.SprintComponent.Sprint || _controller.DashComponent.DashActive)
+            if (_controller.SprintComponent.IsSprinting || _controller.DashComponent.DashActive)
             {
                 rollAmt = _cameraBobAnims.sprintStrafeRoll;
                 // view rolls more with horizontal looking during bullet time for dramatic effect

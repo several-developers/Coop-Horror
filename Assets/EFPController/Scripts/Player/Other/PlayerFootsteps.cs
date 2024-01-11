@@ -153,7 +153,7 @@ namespace EFPController
                 return;
 
             isCrouch = player.controller.CrouchingComponent.IsCrouching;
-            isSprint = player.controller.SprintComponent.Sprint;
+            isSprint = player.controller.SprintComponent.IsSprinting;
             isDash = player.controller.DashComponent.DashActive;
             CheckGround();
 

@@ -31,8 +31,9 @@ namespace EFPController
 
         public PlayerSprintConfig SprintConfig => _sprintConfig;
         
-        public bool SprintActive { get; set; } = true; // True when player is allowed to sprint.
-        public bool Sprint { get; set; } // True when sprint button is ready.
+        // Vlad, last name was SprintActive
+        public bool IsSprintAllowed { get; set; } = true; // True when player is allowed to sprint.
+        public bool IsSprinting { get; set; } // True when sprint button is ready.
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -78,21 +79,21 @@ namespace EFPController
                         // if button is tapped, toggle sprint state
                         if (_sprintEnd - _sprintStart < _sprintDelay * Time.timeScale)
                         {
-                            if (!Sprint)
+                            if (!IsSprinting)
                             {
                                 // only allow sprint to start or cancel crouch if player is not under obstacle
-                                if (!Sprint)
+                                if (!IsSprinting)
                                 {
-                                    Sprint = true;
+                                    IsSprinting = true;
                                 }
                                 else
                                 {
-                                    Sprint = false; // pressing sprint button again while sprinting stops sprint
+                                    IsSprinting = false; // pressing sprint button again while sprinting stops sprint
                                 }
                             }
                             else
                             {
-                                Sprint = false;
+                                IsSprinting = false;
                             }
                         }
                     }
@@ -106,18 +107,18 @@ namespace EFPController
                     // if releasing sprint button after holding it down, stop sprinting
                     if (_sprintEnd - _sprintStart > _sprintDelay * Time.timeScale)
                     {
-                        Sprint = false;
+                        IsSprinting = false;
                     }
                 }
             }
             else
             {
                 if (!_inputManager.GetActionKey(InputManager.Action.Sprint))
-                    Sprint = false;
+                    IsSprinting = false;
             }
             
             if (_playerMovement.DashComponent.DashActive)
-                Sprint = false;
+                IsSprinting = false;
 
             // cancel a sprint in certain situations
             if ((inputY <= 0f && Mathf.Abs(inputX) > 0f &&
@@ -129,17 +130,17 @@ namespace EFPController
                 || _playerMovement.ClimbingComponent.IsClimbing // cancel sprint if player runs out of breath
                )
             {
-                Sprint = false;
+                IsSprinting = false;
             }
 
             // determine if player can run
             if (((inputY > 0f && forwardSprintOnly) || (_playerMovement.IsMoving && !forwardSprintOnly))
-                && Sprint
+                && IsSprinting
                 && !_playerMovement.CrouchingComponent.IsCrouching
                 && _playerMovement.IsGrounded
                )
             {
-                SprintActive = true;
+                IsSprintAllowed = true;
                 _sprintStopState = true;
             }
             else
@@ -150,7 +151,7 @@ namespace EFPController
                     _sprintStopState = false;
                 }
 
-                SprintActive = false;
+                IsSprintAllowed = false;
             }
         }
     }

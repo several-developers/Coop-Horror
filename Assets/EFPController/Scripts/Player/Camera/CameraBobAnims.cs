@@ -150,7 +150,7 @@ namespace EFPController
 
             if (_controller.IsMoving)
             {
-                bool isSprintingOrDashing = _controller.SprintComponent.Sprint || _controller.DashComponent.DashActive;
+                bool isSprintingOrDashing = _controller.SprintComponent.IsSprinting || _controller.DashComponent.DashActive;
                 bool isCrouching = _controller.CrouchingComponent.IsCrouching;
                 
                 bool checkOne = isSprintingOrDashing
@@ -240,7 +240,7 @@ namespace EFPController
             }
 
             // scale the weapon and camera animation speeds with the amount the joystick is pressed
-            if (_controller.SprintComponent.SprintActive || _controller.DashComponent.DashActive)
+            if (_controller.SprintComponent.IsSprintAllowed || _controller.DashComponent.DashActive)
             {
                 moveInputSpeed = 1f;
             }
@@ -262,7 +262,7 @@ namespace EFPController
             _smoothLook.SensitivityAmt = sensitivity;
             
             // Set weapon and view bobbing amounts
-            if ((_controller.SprintComponent.Sprint || _controller.DashComponent.DashActive)
+            if ((_controller.SprintComponent.IsSprinting || _controller.DashComponent.DashActive)
                 && !(forwardSprintOnly && (Mathf.Abs(horizontal) != 0f) && (Mathf.Abs(vertical) < 0.75f))
                 && (Mathf.Abs(vertical) != 0f || (!forwardSprintOnly && _controller.IsMoving))
                 && !_controller.CrouchingComponent.IsCrouching

@@ -51,6 +51,9 @@ namespace GameCore.Gameplay.Entities.Player
         private Animator _animator;
 
         [SerializeField, Required]
+        private OwnerNetworkAnimator _networkAnimator;
+
+        [SerializeField, Required]
         private NetworkObject _networkObject;
 
         [SerializeField, Required]
@@ -193,7 +196,12 @@ namespace GameCore.Gameplay.Entities.Player
             _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
 
             InventoryHUD.Get().Init(playerEntity: this); // TEMP
-            
+
+            _playerMovement.OnJump += () =>
+            {
+                _networkAnimator.SetTrigger(AnimatorHashes.Jump);
+            };
+
             transform.GetChild(0).gameObject.SetActive(false);
 
             InputSystemManager.OnMoveEvent += OnMove;
@@ -218,6 +226,20 @@ namespace GameCore.Gameplay.Entities.Player
             _playerMovement.UpdateLogic();
             _playerFootsteps.UpdateLogic();
             _cameraBobAnims.UpdateLogic();
+
+            bool isSprinting = _playerMovement.SprintComponent.IsSprinting;
+            bool isGoingBackwards = _playerMovement.InputY < 0f;
+            float maxClamp = isSprinting ? 1f : 0.5f;
+            float movementSpeed = _playerMovement.Velocity.magnitude;
+            float modifiedMovementSpeed = movementSpeed * (isGoingBackwards ? -1f : 1f);
+            
+            float divider = isSprinting ? 6f : 3f;
+            float blend = Mathf.Clamp(value: modifiedMovementSpeed / divider, -1f, maxClamp);
+
+            bool canMove = movementSpeed > 0.05f;
+            
+            _animator.SetBool(id: AnimatorHashes.CanMove, canMove);
+            _animator.SetFloat(AnimatorHashes.MoveSpeedBlend, blend);
         }
 
         private void UpdateNotOwner()
@@ -236,9 +258,9 @@ namespace GameCore.Gameplay.Entities.Player
         
         private void LateUpdateOwner()
         {
-            if (!IsOwner)
+            if (!IsOwner || !_isInitialized)
                 return;
-
+            
             _playerMovement.LateUpdateLogic();
         }
         

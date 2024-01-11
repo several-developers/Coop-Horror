@@ -59,7 +59,7 @@ namespace EFPController
                 if (_isSwimming)
                 {
                     _playerMovement.Rigidbody.useGravity = false;
-                    _playerMovement.SprintComponent.Sprint = _playerMovement.SprintComponent.SprintActive = false;
+                    _playerMovement.SprintComponent.IsSprinting = _playerMovement.SprintComponent.IsSprintAllowed = false;
                 }
                 else
                 {
