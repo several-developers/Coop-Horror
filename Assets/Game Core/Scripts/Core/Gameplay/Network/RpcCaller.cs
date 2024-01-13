@@ -7,7 +7,8 @@ namespace GameCore.Gameplay.Network
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<ulong, ClientState> OnSetNetworkHorrorStateEvent;
+        public event Action<int, int> OnCreateItemPreviewEvent;
+        public event Action<int> OnDestroyItemPreviewEvent;
         
         private static RpcCaller _instance;
 
@@ -17,20 +18,31 @@ namespace GameCore.Gameplay.Network
             _instance = this;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+        
+        public void CreateItemPreview(int slotIndex, int itemID) =>
+            CreateItemPreviewServerRpc(slotIndex, itemID);
 
-        public void SendSetNetworkHorrorState(ulong clientID, ClientState state) =>
-            SetNetworkHorrorStateServerRpc(clientID, (int)state);
+        public void DestroyItemPreview(int slotIndex) =>
+            DestroyItemPreviewServerRpc(slotIndex);
 
         public static RpcCaller Get() => _instance;
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
+        // RPC: -----------------------------------------------------------------------------------
+        
         [ServerRpc(RequireOwnership = false)]
-        private void SetNetworkHorrorStateServerRpc(ulong clientID, int stateIndex) =>
-            SetNetworkHorrorStateClientRpc(clientID, stateIndex);
+        private void CreateItemPreviewServerRpc(int slotIndex, int itemID) =>
+            CreateItemPreviewClientRpc(slotIndex, itemID);
 
         [ClientRpc]
-        private void SetNetworkHorrorStateClientRpc(ulong clientID, int stateIndex) =>
-            OnSetNetworkHorrorStateEvent?.Invoke(clientID, (ClientState)stateIndex);
+        private void CreateItemPreviewClientRpc(int slotIndex, int itemID) =>
+            OnCreateItemPreviewEvent?.Invoke(slotIndex, itemID);
+        
+        [ServerRpc(RequireOwnership = false)]
+        private void DestroyItemPreviewServerRpc(int slotIndex) =>
+            DestroyItemPreviewClientRpc(slotIndex);
+
+        [ClientRpc]
+        private void DestroyItemPreviewClientRpc(int slotIndex) =>
+            OnDestroyItemPreviewEvent?.Invoke(slotIndex);
     }
 }

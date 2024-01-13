@@ -80,7 +80,7 @@ namespace GameCore.Gameplay.Items
         {
         }
 
-        public void PickUp(NetworkObject playerNetworkObject)
+        public void PickUpServer(NetworkObject playerNetworkObject)
         {
             _ownerID = playerNetworkObject.OwnerClientId;
             Debug.Log($"Pick Up: ID " + _ownerID);
@@ -88,7 +88,7 @@ namespace GameCore.Gameplay.Items
             PickUpServerRpc(playerNetworkObject);
         }
 
-        public void PickUp(ulong ownerID, Transform followTarget)
+        public void PickUpClient(ulong ownerID)
         {
             if (_isPickedUp)
                 return;
@@ -97,9 +97,9 @@ namespace GameCore.Gameplay.Items
             _isPickedUp = true;
 
             TogglePhysics(isEnabled: false);
-            _followParent.SetTarget(followTarget);
+            HideClient();
         }
-        
+
         public void DropServer(bool randomPosition = false) => DropServerRpc(randomPosition);
 
         public void DropServer(Vector3 position, Quaternion rotation, bool randomPosition = false)
@@ -107,7 +107,7 @@ namespace GameCore.Gameplay.Items
         }
 
         // ПРОТЕСТИТЬ С ЛАГАМИ
-        public void Drop(bool randomPosition = false)
+        public void DropClient(bool randomPosition = false)
         {
             if (!_isPickedUp)
                 return;
@@ -119,22 +119,19 @@ namespace GameCore.Gameplay.Items
             
             TogglePhysics(isEnabled: true);
             _followParent.RemoveTarget();
-            Show();
+            ShowClient();
         }
-
-        public void ChangeFollowTarget(Transform followTarget) =>
-            _followParent.ChangeTarget(followTarget);
 
         public void ShowServer() => ShowServerRpc();
 
         // ПРОТЕСТИТЬ С ЛАГАМИ
-        public void Show() =>
+        public void ShowClient() =>
             _child.SetActive(true);
 
         public void HideServer() => HideServerRpc();
 
         // ПРОТЕСТИТЬ С ЛАГАМИ
-        public void Hide() =>
+        public void HideClient() =>
             _child.SetActive(false);
 
         public NetworkObject GetNetworkObject() => NetworkObject;
@@ -191,20 +188,19 @@ namespace GameCore.Gameplay.Items
             if (!isNetworkObjectFound)
                 return;
 
-            bool isPlayerEntityFound = playerNetworkObject.TryGetComponent(out PlayerEntity playerEntity);
+            //bool isPlayerEntityFound = playerNetworkObject.TryGetComponent(out PlayerEntity playerEntity);
 
-            if (!isPlayerEntityFound)
-                return;
+            //if (!isPlayerEntityFound)
+                //return;
 
-            Transform followTarget = playerEntity.GetItemFollowPivot();
-            PickUp(playerNetworkObject.OwnerClientId, followTarget);
+            PickUpClient(playerNetworkObject.OwnerClientId);
         }
 
         [ServerRpc(RequireOwnership = false)]
         private void DropServerRpc(bool randomPosition) => DropClientRpc(randomPosition);
 
         [ClientRpc]
-        private void DropClientRpc(bool randomPosition) => Drop(randomPosition);
+        private void DropClientRpc(bool randomPosition) => DropClient(randomPosition);
 
         [ServerRpc(RequireOwnership = false)]
         private void ShowServerRpc(ServerRpcParams serverRpcParams = default)
@@ -221,13 +217,13 @@ namespace GameCore.Gameplay.Items
             if (!show)
                 return;
 
-            Show();
+            ShowClient();
         }
 
         [ServerRpc(RequireOwnership = false)]
         private void HideServerRpc() => HideClientRpc();
 
         [ClientRpc]
-        private void HideClientRpc() => Hide();
+        private void HideClientRpc() => HideClient();
     }
 }

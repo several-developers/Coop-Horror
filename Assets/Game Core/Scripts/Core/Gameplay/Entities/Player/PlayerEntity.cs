@@ -75,7 +75,9 @@ namespace GameCore.Gameplay.Entities.Player
         private readonly NetworkVariable<Vector3>
             _lookAtPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
-        private readonly NetworkVariable<bool> _isInitialized = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        private TheNetworkHorror _networkHorror;
+        private RpcCaller _rpcCaller;
 
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
@@ -84,13 +86,15 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _itemHoldPivot;
         private Transform _lookAtObject;
 
+        private bool _isInitialized;
+
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
-        
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Update()
         {
-            if (!_isInitialized.Value)
+            if (!_isInitialized)
                 return;
 
             UpdateOwner();
@@ -101,18 +105,28 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void LateUpdate() => LateUpdateOwner();
 
+        public override void OnDestroy()
+        {
+            if (_isInitialized && IsOwner)
+            {
+                _rpcCaller.OnCreateItemPreviewEvent -= OnCreateItemPreview;
+                _rpcCaller.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
+            }
+
+            base.OnDestroy();
+        }
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
         {
-            TheNetworkHorror networkHorror = TheNetworkHorror.Get();
-            networkHorror.OnDisconnectEvent -= OnDisconnect;
-
             base.OnNetworkSpawn();
         }
 
         public override void OnNetworkDespawn()
         {
+            _networkHorror.OnDisconnectEvent -= OnDisconnect;
+
             DespawnOwner();
             base.OnNetworkDespawn();
         }
@@ -126,13 +140,19 @@ namespace GameCore.Gameplay.Entities.Player
 
             //_animator.SetFloat(id: AnimatorHashes.ReloadMultiplier, reloadTimeMultiplier);
 
-            TheNetworkHorror networkHorror = TheNetworkHorror.Get();
-            networkHorror.OnDisconnectEvent += OnDisconnect;
+            if (_isInitialized)
+            {
+                Debug.Log($"Player #{OwnerClientId} already initialized.");
+                return;
+            }
+            
+            _networkHorror = TheNetworkHorror.Get();
+            _networkHorror.OnDisconnectEvent += OnDisconnect;
 
             InitOwner();
             InitNotOwner();
-
-            _isInitialized.Value = true;
+            
+            _isInitialized = true;
         }
 
         public void TakeDamage(IEntity source, float damage)
@@ -143,8 +163,6 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform GetTransform() => transform;
 
         public Transform GetItemHoldPivot() => _itemHoldPivot;
-
-        public Transform GetItemFollowPivot() => _itemFollowPivot;
 
         public Animator GetAnimator() => _animator;
 
@@ -161,52 +179,10 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
-            Debug.Log($"Player #{OwnerClientId} setup.");
+            Debug.Log($"Player #{OwnerClientId} setup Owner.");
 
-            PlayerSetupHelper playerSetupHelper = PlayerSetupHelper.Get();
-
-            IPlayerInteractionObserver playerInteractionObserver = NetworkSpawner.Get().PlayerInteractionObserver;
-
-            var playerInput = GetComponent<PlayerInput>();
-            InputSystemManager.Init(playerInput);
-
-            PlayerCamera playerCamera = PlayerCamera.Get();
-            playerCamera.SetTarget(transform, _cameraPoint);
-
-            _playerMovement.Init(_player, playerCamera.Camera.transform);
-            _lookAtObject = playerCamera.LookAtObject;
-
-            SmoothLook smoothLook = playerCamera.SmoothLook;
-            smoothLook.Init(_player);
-
-            CameraRootAnimations cameraRootAnimations = playerCamera.CameraRootAnimations;
-
-            CameraControl cameraControl = playerCamera.CameraControl;
-            cameraControl.Init(_player, cameraRootAnimations);
-
-            _player.Init(smoothLook, cameraControl, playerCamera.Camera, playerCamera.WeaponRoot,
-                playerCamera.CameraRoot, playerCamera.CameraAnimator);
-
-            CameraBobAnims cameraBobAnims = _player.cameraBobAnims;
-            cameraBobAnims.Init(_player, cameraRootAnimations);
-            _cameraBobAnims = cameraBobAnims;
-
-            _itemHoldPivot = playerCamera.ItemPivot;
-            _inventory = new PlayerInventory();
-
-            IItemsPreviewFactory itemsPreviewFactory = playerSetupHelper.GetItemsPreviewFactory();
-            _inventoryManager = new PlayerInventoryManager(playerEntity: this, itemsPreviewFactory);
-
-            _interactionChecker = new InteractionChecker(playerInteractionObserver, transform, playerCamera.Camera,
-                _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);
-
-            _interactionHandler = new InteractionHandler(_inventoryManager, playerInteractionObserver);
-
-            _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
-
-            InventoryHUD.Get().Init(playerEntity: this); // TEMP
-
-            _playerMovement.OnJump += () => { _networkAnimator.SetTrigger(AnimatorHashes.Jump); };
+            RpcCallerInit();
+            BasicInit();
 
             _playerModel.SetActive(false);
 
@@ -214,12 +190,72 @@ namespace GameCore.Gameplay.Entities.Player
             InputSystemManager.OnScrollEvent += OnScroll;
             InputSystemManager.OnInteractEvent += OnInteract;
             InputSystemManager.OnDropItemEvent += OnDropItem;
+
+            // LOCAL METHODS: -----------------------------
+
+            void RpcCallerInit()
+            {
+                _rpcCaller = RpcCaller.Get();
+
+                _rpcCaller.OnCreateItemPreviewEvent += OnCreateItemPreview;
+                _rpcCaller.OnDestroyItemPreviewEvent += OnDestroyItemPreview;
+            }
+
+            void BasicInit()
+            {
+                PlayerSetupHelper playerSetupHelper = PlayerSetupHelper.Get();
+
+                IPlayerInteractionObserver playerInteractionObserver = NetworkSpawner.Get().PlayerInteractionObserver;
+
+                var playerInput = GetComponent<PlayerInput>();
+                InputSystemManager.Init(playerInput);
+
+                PlayerCamera playerCamera = PlayerCamera.Get();
+                playerCamera.SetTarget(transform, _cameraPoint);
+
+                _playerMovement.Init(_player, playerCamera.Camera.transform);
+                _lookAtObject = playerCamera.LookAtObject;
+
+                SmoothLook smoothLook = playerCamera.SmoothLook;
+                smoothLook.Init(_player);
+
+                CameraRootAnimations cameraRootAnimations = playerCamera.CameraRootAnimations;
+
+                CameraControl cameraControl = playerCamera.CameraControl;
+                cameraControl.Init(_player, cameraRootAnimations);
+
+                _player.Init(smoothLook, cameraControl, playerCamera.Camera, playerCamera.WeaponRoot,
+                    playerCamera.CameraRoot, playerCamera.CameraAnimator);
+
+                CameraBobAnims cameraBobAnims = _player.cameraBobAnims;
+                cameraBobAnims.Init(_player, cameraRootAnimations);
+                _cameraBobAnims = cameraBobAnims;
+
+                _itemHoldPivot = playerCamera.ItemPivot;
+                _inventory = new PlayerInventory();
+
+                IItemsPreviewFactory itemsPreviewFactory = playerSetupHelper.GetItemsPreviewFactory();
+                _inventoryManager = new PlayerInventoryManager(playerEntity: this, _rpcCaller, itemsPreviewFactory);
+
+                _interactionChecker = new InteractionChecker(playerInteractionObserver, transform, playerCamera.Camera,
+                    _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);
+
+                _interactionHandler = new InteractionHandler(_inventoryManager, playerInteractionObserver);
+
+                _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
+
+                InventoryHUD.Get().Init(playerEntity: this); // TEMP
+
+                _playerMovement.OnJump += () => { _networkAnimator.SetTrigger(AnimatorHashes.Jump); };
+            }
         }
 
         private void InitNotOwner()
         {
             if (IsOwner)
                 return;
+            
+            Debug.Log($"Player #{OwnerClientId} setup Client.");
         }
 
         private void UpdateOwner()
@@ -252,7 +288,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (IsOwner)
                 return;
-            
+
             _headLookObject.position = _lookAtPosition.Value;
         }
 
@@ -316,5 +352,11 @@ namespace GameCore.Gameplay.Entities.Player
         private void OnInteract() => Interact();
 
         private void OnDropItem() => DropItem();
+
+        private void OnCreateItemPreview(int slotIndex, int itemID) =>
+            _inventoryManager.CreateItemPreview(slotIndex, itemID);
+
+        private void OnDestroyItemPreview(int slotIndex) =>
+            _inventoryManager.DestroyItemPreview(slotIndex);
     }
 }

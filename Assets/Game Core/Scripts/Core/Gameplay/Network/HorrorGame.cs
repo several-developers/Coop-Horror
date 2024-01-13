@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Utilities;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace GameCore.Gameplay.Network
         private const float CheckDelay = 0.25f;
 
         private static HorrorGame _instance;
+
+        private Dictionary<ulong, bool> _playersInitializeDictionary = new();
 
         private TheNetworkHorror _networkHorror;
 

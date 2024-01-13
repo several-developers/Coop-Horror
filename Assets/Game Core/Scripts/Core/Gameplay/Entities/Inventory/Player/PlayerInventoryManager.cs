@@ -2,6 +2,7 @@
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Items;
+using GameCore.Gameplay.Network;
 using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -12,9 +13,11 @@ namespace GameCore.Gameplay.Entities.Inventory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PlayerInventoryManager(PlayerEntity playerEntity, IItemsPreviewFactory itemsPreviewFactory)
+        public PlayerInventoryManager(PlayerEntity playerEntity, RpcCaller rpcCaller,
+            IItemsPreviewFactory itemsPreviewFactory)
         {
             _playerEntity = playerEntity;
+            _rpcCaller = rpcCaller;
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInventory = playerEntity.GetInventory();
             _itemHoldPivot = playerEntity.GetItemHoldPivot();
@@ -28,6 +31,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly PlayerEntity _playerEntity;
+        private readonly RpcCaller _rpcCaller;
         private readonly PlayerInventory _playerInventory;
         private readonly Transform _itemHoldPivot;
         private readonly IItemsPreviewFactory _itemsPreviewFactory;
@@ -62,13 +66,13 @@ namespace GameCore.Gameplay.Entities.Inventory
                 return;
 
             NetworkObject playerNetworkObject = _playerEntity.GetNetworkObject();
-            //interactableItem.PickUp(playerNetworkObject);
-            interactableItem.ChangeOwnership();
-            interactableItem.PickUp(playerNetworkObject.OwnerClientId, _playerEntity.GetItemFollowPivot());
-
+            
+            interactableItem.PickUpClient(playerNetworkObject.OwnerClientId);
+            interactableItem.PickUpServer(playerNetworkObject);
+            
             _interactableItems[slotIndex] = interactableItem;
 
-            CreateItemPreview(slotIndex, itemID);
+            _rpcCaller.CreateItemPreview(slotIndex, itemID);
             ToggleItemsState();
 
             // LOCAL METHODS: -----------------------------
@@ -87,9 +91,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             }
         }
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void CreateItemPreview(int slotIndex, int itemID)
+        public void CreateItemPreview(int slotIndex, int itemID)
         {
             bool isItemFound = _itemsPreviewFactory.Create(itemID, _itemHoldPivot, out ItemPreviewObject itemPreview);
 
@@ -98,7 +100,19 @@ namespace GameCore.Gameplay.Entities.Inventory
 
             _itemsPreviewObjects[slotIndex] = itemPreview;
         }
+        
+        public void DestroyItemPreview(int slotIndex)
+        {
+            ItemPreviewObject itemPreviewObject = _itemsPreviewObjects[slotIndex];
+            
+            if (itemPreviewObject != null)
+                itemPreviewObject.Drop();
+            
+            _itemsPreviewObjects[slotIndex] = null;
+        }
 
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+        
         private void ToggleItemsState()
         {
             int selectedSlotIndex = _playerInventory.GetSelectedSlotIndex();
@@ -112,16 +126,16 @@ namespace GameCore.Gameplay.Entities.Inventory
 
                 if (isInteractableItemExists)
                 {
-                    interactableItem.Hide();
+                    //interactableItem.HideClient();
 
                     if (show)
                     {
-                        //interactableItem.Show();
-                        interactableItem.ShowServer();
+                        //interactableItem.ShowClient();
+                        //interactableItem.ShowServer();
                     }
                     else
                     {
-                        interactableItem.HideServer();
+                        //interactableItem.HideServer();
                     }
                 }
 
@@ -131,12 +145,7 @@ namespace GameCore.Gameplay.Entities.Inventory
                     continue;
 
                 if (show)
-                {
-                    if (isInteractableItemExists)
-                        interactableItem.ChangeFollowTarget(itemPreviewObject.transform);
-
                     itemPreviewObject.Show();
-                }
                 else
                     itemPreviewObject.Hide();
             }
@@ -145,16 +154,13 @@ namespace GameCore.Gameplay.Entities.Inventory
         private void DropItem(int slotIndex, bool randomPosition)
         {
             IInteractableItem interactableItem = _interactableItems[slotIndex];
-            ItemPreviewObject itemPreviewObject = _itemsPreviewObjects[slotIndex];
             
             interactableItem?.DropServer(randomPosition); // Server RPC
-            interactableItem?.Drop(randomPosition);
-
-            if (itemPreviewObject != null)
-                itemPreviewObject.Drop();
+            interactableItem?.DropClient(randomPosition);
 
             _interactableItems[slotIndex] = null;
-            _itemsPreviewObjects[slotIndex] = null;
+            
+            _rpcCaller.DestroyItemPreview(slotIndex);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
