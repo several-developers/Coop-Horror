@@ -21,18 +21,27 @@ namespace GameCore.Gameplay.Items
 
         [Title("Item Preview Settings")]
         [SerializeField]
-        private Vector3 _itemPreviewPosition;
+        private Vector3 _itemCameraPreviewPosition;
         
         [SerializeField]
-        private Vector3 _itemPreviewRotation;
+        private Vector3 _itemCameraPreviewRotation;
         
         [SerializeField]
-        private Vector3 _itemPreviewScale = Vector3.zero;
+        private Vector3 _itemCameraPreviewScale = Vector3.one;
+        
+        [SerializeField, Space(height: 5)]
+        private Vector3 _itemPlayerPreviewPosition;
+        
+        [SerializeField]
+        private Vector3 _itemPlayerPreviewRotation;
+        
+        [SerializeField]
+        private Vector3 _itemPlayerPreviewScale = Vector3.one;
 
         [Title(Constants.References)]
         [SerializeField, Required]
         private ItemPreviewObject _itemPreviewPrefab;
-
+        
         //[VerticalGroup(RowRight), SerializeField, Range(0.25f, 2f)]
         //private float _iconScale = 1;
         
@@ -40,9 +49,12 @@ namespace GameCore.Gameplay.Items
 
         public Sprite Icon => _icon;
         public int ItemID => _itemID;
-        public Vector3 ItemPreviewPosition => _itemPreviewPosition;
-        public Vector3 ItemPreviewRotation => _itemPreviewRotation;
-        public Vector3 ItemPreviewScale => _itemPreviewScale;
+        public Vector3 ItemCameraPreviewPosition => _itemCameraPreviewPosition;
+        public Vector3 ItemCameraPreviewRotation => _itemCameraPreviewRotation;
+        public Vector3 ItemCameraPreviewScale => _itemCameraPreviewScale;
+        public Vector3 ItemPlayerPreviewPosition => _itemPlayerPreviewPosition;
+        public Vector3 ItemPlayerPreviewRotation => _itemPlayerPreviewRotation;
+        public Vector3 ItemPlayerPreviewScale => _itemPlayerPreviewScale;
         public ItemPreviewObject ItemPreviewPrefab => _itemPreviewPrefab;
 
         // FIELDS: --------------------------------------------------------------------------------

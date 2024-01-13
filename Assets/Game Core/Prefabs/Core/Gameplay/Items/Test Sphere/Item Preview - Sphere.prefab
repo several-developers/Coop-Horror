@@ -67,11 +67,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Sphere Model
       objectReference: {fileID: 0}
-    - target: {fileID: 2432348549856043644, guid: 405077ed695f55b479a03742621bdf7c,
-        type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 405077ed695f55b479a03742621bdf7c, type: 3}
 --- !u!1001 &8032765366670227844

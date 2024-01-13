@@ -67,11 +67,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube Model
       objectReference: {fileID: 0}
-    - target: {fileID: 6627622325091723810, guid: d19603a5ce68083419c3060be02c0182,
-        type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d19603a5ce68083419c3060be02c0182, type: 3}
 --- !u!1001 &8032765366670227844
@@ -139,7 +134,7 @@ PrefabInstance:
     - target: {fileID: 916334882912916377, guid: 0a053073ec8717943abb9b2eaf844b45,
         type: 3}
       propertyPath: m_Name
-      value: Item Preview - Cube
+      value: Item Camera Preview - Cube
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a053073ec8717943abb9b2eaf844b45, type: 3}

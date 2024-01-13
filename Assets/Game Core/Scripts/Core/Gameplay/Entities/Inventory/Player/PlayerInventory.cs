@@ -24,6 +24,9 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void SetSelectedSlotIndex(int slotIndex) =>
+            _inventory.SetSelectedSlotIndex(slotIndex);
+
         public void SwitchToNextSlot()
         {
             int selectedSlotIndex = _inventory.GetSelectedSlotIndex();
@@ -33,7 +36,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             if (resetIndex)
                 newSlotIndex = 0;
 
-            _inventory.SetSelectedSlotIndex(newSlotIndex);
+            SetSelectedSlotIndex(newSlotIndex);
             SendSelectedSlotChangedEvent(newSlotIndex);
         }
 
@@ -46,7 +49,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             if (setLastIndex)
                 newSlotIndex = _inventory.Size - 1;
 
-            _inventory.SetSelectedSlotIndex(newSlotIndex);
+            SetSelectedSlotIndex(newSlotIndex);
             SendSelectedSlotChangedEvent(newSlotIndex);
         }
 

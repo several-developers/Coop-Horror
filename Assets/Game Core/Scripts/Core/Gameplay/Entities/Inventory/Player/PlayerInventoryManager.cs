@@ -20,7 +20,8 @@ namespace GameCore.Gameplay.Entities.Inventory
             _rpcCaller = rpcCaller;
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInventory = playerEntity.GetInventory();
-            _itemHoldPivot = playerEntity.GetItemHoldPivot();
+            _cameraItemPivot = playerEntity.GetCameraItemPivot();
+            _playerItemPivot = playerEntity.GetPlayerItemPivot();
             _interactableItems = new IInteractableItem[Constants.PlayerInventorySize];
             _itemsPreviewObjects = new ItemPreviewObject[Constants.PlayerInventorySize];
 
@@ -33,7 +34,8 @@ namespace GameCore.Gameplay.Entities.Inventory
         private readonly PlayerEntity _playerEntity;
         private readonly RpcCaller _rpcCaller;
         private readonly PlayerInventory _playerInventory;
-        private readonly Transform _itemHoldPivot;
+        private readonly Transform _cameraItemPivot;
+        private readonly Transform _playerItemPivot;
         private readonly IItemsPreviewFactory _itemsPreviewFactory;
         private readonly IInteractableItem[] _interactableItems;
         private readonly ItemPreviewObject[] _itemsPreviewObjects;
@@ -72,6 +74,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             
             _interactableItems[slotIndex] = interactableItem;
 
+            CreateItemPreview(slotIndex, itemID, cameraPivot: true);
             _rpcCaller.CreateItemPreview(slotIndex, itemID);
             ToggleItemsState();
 
@@ -91,12 +94,26 @@ namespace GameCore.Gameplay.Entities.Inventory
             }
         }
 
-        public void CreateItemPreview(int slotIndex, int itemID)
+        public void CreateItemPreview(int slotIndex, int itemID, bool cameraPivot)
         {
-            bool isItemFound = _itemsPreviewFactory.Create(itemID, _itemHoldPivot, out ItemPreviewObject itemPreview);
+            bool isItemPreviewExists = _itemsPreviewObjects[slotIndex] != null;
 
-            if (!isItemFound)
+            // Prevent creation of the second preview item for the item owner.
+            if (isItemPreviewExists)
                 return;
+            
+            Transform itemPivot = cameraPivot ? _cameraItemPivot : _playerItemPivot;
+            
+            bool isItemCreated = _itemsPreviewFactory.Create(itemID, itemPivot, cameraPivot,
+                out ItemPreviewObject itemPreview);
+
+            if (!isItemCreated)
+                return;
+
+            bool isSelected = _playerInventory.GetSelectedSlotIndex() == slotIndex;
+            
+            if (!isSelected)
+                itemPreview.Hide();
 
             _itemsPreviewObjects[slotIndex] = itemPreview;
         }
@@ -111,9 +128,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             _itemsPreviewObjects[slotIndex] = null;
         }
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-        
-        private void ToggleItemsState()
+        public void ToggleItemsState()
         {
             int selectedSlotIndex = _playerInventory.GetSelectedSlotIndex();
             int iterations = _playerInventory.Size;
@@ -151,6 +166,8 @@ namespace GameCore.Gameplay.Entities.Inventory
             }
         }
 
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+        
         private void DropItem(int slotIndex, bool randomPosition)
         {
             IInteractableItem interactableItem = _interactableItems[slotIndex];

@@ -3104,7 +3104,7 @@ MonoBehaviour:
   _networkObject: {fileID: -4117527861951101490}
   _playerModel: {fileID: 147102560534255457}
   _cameraPoint: {fileID: 91750195740998113}
-  _itemFollowPivot: {fileID: 91750195740998113}
+  _playerItemPivot: {fileID: 8186703484883488036}
   _headLookObject: {fileID: 9205309517001490629}
 --- !u!114 &5967601048658187761
 MonoBehaviour:
@@ -3329,6 +3329,12 @@ Transform:
 --- !u!4 &7372152982110514939 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3962112420206460874, guid: 24bb6111ca762434d853d99400df2af0,
+    type: 3}
+  m_PrefabInstance: {fileID: 5815104050367631665}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8186703484883488036 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2390959654251781141, guid: 24bb6111ca762434d853d99400df2af0,
     type: 3}
   m_PrefabInstance: {fileID: 5815104050367631665}
   m_PrefabAsset: {fileID: 0}

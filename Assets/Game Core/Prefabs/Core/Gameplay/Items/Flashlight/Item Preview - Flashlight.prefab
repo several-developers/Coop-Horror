@@ -82,11 +82,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Flashlight Model
       objectReference: {fileID: 0}
-    - target: {fileID: 2012158433178632386, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
-      propertyPath: m_Layer
-      value: 11
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eea9190f3abd68440aa1670d2821d28c, type: 3}
 --- !u!1001 &8032765366670227844
@@ -154,7 +149,7 @@ PrefabInstance:
     - target: {fileID: 916334882912916377, guid: 0a053073ec8717943abb9b2eaf844b45,
         type: 3}
       propertyPath: m_Name
-      value: Item Preview - Flashlight
+      value: Item Camera Preview - Flashlight
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a053073ec8717943abb9b2eaf844b45, type: 3}

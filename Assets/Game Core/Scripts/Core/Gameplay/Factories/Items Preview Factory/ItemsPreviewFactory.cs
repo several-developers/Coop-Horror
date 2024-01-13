@@ -12,12 +12,12 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
             _itemsMetaProvider = itemsMetaProvider;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly IItemsMetaProvider _itemsMetaProvider;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
-        public bool Create(int itemID, Transform parent, out ItemPreviewObject itemPreviewObject)
+
+        public bool Create(int itemID, Transform parent, bool cameraPivot, out ItemPreviewObject itemPreviewObject)
         {
             bool isItemMetaExists = _itemsMetaProvider.TryGetItemMeta(itemID, out ItemMeta itemMeta);
 
@@ -36,14 +36,21 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
                 LogItemPrefabNotFound(itemID);
                 return false;
             }
-            
+
             itemPreviewObject = Object.Instantiate(itemPreviewPrefab, parent);
-            
+
+            Vector3 position = cameraPivot ? itemMeta.ItemCameraPreviewPosition : itemMeta.ItemPlayerPreviewPosition;
+            Vector3 rotation = cameraPivot ? itemMeta.ItemCameraPreviewRotation : itemMeta.ItemPlayerPreviewRotation;
+            Vector3 scale = cameraPivot ? itemMeta.ItemCameraPreviewScale : itemMeta.ItemPlayerPreviewScale;
+
             Transform itemTransform = itemPreviewObject.transform;
-            itemTransform.localPosition = itemMeta.ItemPreviewPosition;
-            itemTransform.localRotation = Quaternion.Euler(itemMeta.ItemPreviewRotation);
-            itemTransform.localScale = itemMeta.ItemPreviewScale;
-            
+            itemTransform.localPosition = position;
+            itemTransform.localRotation = Quaternion.Euler(rotation);
+            itemTransform.localScale = scale;
+
+            if (cameraPivot)
+                itemPreviewObject.ChangeLayer();
+
             return true;
         }
 
@@ -54,7 +61,7 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
             string log = Log.HandleLog($"Item with ID <gb>({itemID})</gb> <rb>not found</rb>!");
             Debug.Log(log);
         }
-        
+
         private static void LogItemPrefabNotFound(int itemID)
         {
             string log = Log.HandleLog($"Item Prefab with ID <gb>({itemID})</gb> <rb>not found</rb>!");

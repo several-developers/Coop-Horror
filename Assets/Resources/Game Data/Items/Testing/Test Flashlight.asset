@@ -16,8 +16,11 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: 05c7216c78d4dd34ebe2bac9c1e274d7, type: 3}
   _itemName: Test Flashlight
   _itemID: 0
-  _itemPreviewPosition: {x: 0.612, y: -0.28, z: 0.619}
-  _itemPreviewRotation: {x: 0, y: 14.5, z: 45}
-  _itemPreviewScale: {x: 1, y: 1, z: 1}
+  _itemCameraPreviewPosition: {x: 0.612, y: -0.28, z: 0.619}
+  _itemCameraPreviewRotation: {x: 0, y: 14.5, z: 45}
+  _itemCameraPreviewScale: {x: 1, y: 1, z: 1}
+  _itemPlayerPreviewPosition: {x: 0, y: 0, z: 0}
+  _itemPlayerPreviewRotation: {x: 0, y: 0, z: 0}
+  _itemPlayerPreviewScale: {x: 1, y: 1, z: 1}
   _itemPreviewPrefab: {fileID: 8255347702447654125, guid: af5e517ad69b2ad4bb70d1d319afdcea,
     type: 3}
