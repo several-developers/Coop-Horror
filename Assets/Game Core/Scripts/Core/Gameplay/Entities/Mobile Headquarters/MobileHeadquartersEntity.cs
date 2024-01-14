@@ -43,7 +43,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private static MobileHeadquartersEntity _instance;
         
-        private PathMovement _pathMovement;
+        private RigidbodyPathMovement _pathMovement;
         private Vector3 _lastFramePosition;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -64,9 +64,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void Update()
         {
-            _pathMovement.Movement();
+            //_pathMovement.Movement();
         }
 
+        private void FixedUpdate()
+        {
+            _pathMovement.Movement2();
+        }
 
         public override void OnDestroy()
         {
@@ -102,7 +106,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _lastFramePosition = transform.position;
             _instance = this;
-            _pathMovement = new PathMovement(transform, _animator, _dollyCart, _cinemachinePath, _mobileHeadquartersConfig);
+            _pathMovement = new RigidbodyPathMovement(transform, _animator, _dollyCart, _cinemachinePath,
+                _mobileHeadquartersConfig);
         }
 
         private void ToggleMovement(bool canMove) =>

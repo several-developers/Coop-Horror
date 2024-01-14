@@ -280,6 +280,40 @@ namespace EFPController
 
         private void Awake() =>
             _transform = transform;
+        
+        private void OnTriggerEnter(Collider other)
+        {
+            // TEMP
+            if (!_isInitialized)
+                return;
+            
+            // Climbing
+            if (_climbingComponent.TriggerEnterLogic(other))
+                return;
+
+            // Water
+            _swimmingComponent.TriggerEnterLogic(other);
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            // TEMP
+            if (!_isInitialized)
+                return;
+            
+            // Climbing
+            _climbingComponent.TriggerStayLogic(other);
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            // TEMP
+            if (!_isInitialized)
+                return;
+            
+            // Water
+            _swimmingComponent.TriggerExitLogic(other);
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -314,6 +348,15 @@ namespace EFPController
             _crouchingComponent.CrouchCapsuleCheckRadius = capsule.radius * 0.9f;
         }
 
+        public void Stop()
+        {
+            _dashComponent.DashActive = false;
+            IsMoving = false;
+            Velocity = Vector3.zero;
+            _velocityChange = Vector3.zero;
+            _sprintComponent.IsSprinting = false;
+        }
+        
         public void UpdateLogic()
         {
             if (!Player.canControl)
@@ -733,7 +776,7 @@ namespace EFPController
                 float currSpeed = _speed * _speedAmtX * _speedAmtY * _crouchSpeedAmt * _zoomSpeedAmt * _currSpeedMult *
                                   SpeedMult;
 
-                MoveDirection = MoveDirection * currSpeed;
+                MoveDirection *= currSpeed;
                 MoveDirection += Vector3.up * YVelocity;
                 MoveDirection2D = new Vector3(MoveDirection.x, 0f, MoveDirection.y);
 
@@ -745,7 +788,8 @@ namespace EFPController
                 _velocityChange.z = Mathf.Clamp(_velocityChange.z, -_maxVelocityChange, _maxVelocityChange);
 
                 // finally, add movement velocity to player rigidbody velocity
-                if (!_velocityChange.IsZero()) Rigidbody.AddForce(_velocityChange, ForceMode.VelocityChange);
+                //if (!_velocityChange.IsZero())
+                    //Rigidbody.AddForce(_velocityChange, ForceMode.VelocityChange);
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Swimming
@@ -759,10 +803,16 @@ namespace EFPController
                     Rigidbody.velocity += transform.up * (Physics.gravity.y * (30f * fdt));
                 }
 
-                if (IsGrounded && !isSwimming && !JumpingComponent.IsJumping && GroundHitInfo.rigidbody != null &&
-                    GroundHitInfo.rigidbody.isKinematic)
+                bool hitPlatform = IsGrounded && !isSwimming && !JumpingComponent.IsJumping &&
+                                   GroundHitInfo.rigidbody != null &&
+                                   GroundHitInfo.rigidbody.isKinematic;
+                
+                if (hitPlatform)
                 {
-                    Rigidbody.velocity += GroundHitInfo.rigidbody.GetVelocityAtPoint(_groundPoint);
+                    //Rigidbody.velocity += GroundHitInfo.rigidbody.GetVelocityAtPoint(_groundPoint);
+                    var velo = GroundHitInfo.rigidbody.GetVelocityAtPoint(_groundPoint);
+                    Debug.Log("Velocity: " + velo);
+                    Rigidbody.velocity += velo;
                 }
 
                 if (_dashComponent.DashActive)
@@ -824,15 +874,6 @@ namespace EFPController
         {
             // Determine if player is moving. This var is accessed by other scripts.
             IsMoving = Mathf.Abs(InputY) > 0.01f || Mathf.Abs(InputX) > 0.01f || _dashComponent.DashActive;
-        }
-
-        public void Stop()
-        {
-            _dashComponent.DashActive = false;
-            IsMoving = false;
-            Velocity = Vector3.zero;
-            _velocityChange = Vector3.zero;
-            _sprintComponent.IsSprinting = false;
         }
 
         private void CheckGround(Vector3 direction)
@@ -980,40 +1021,6 @@ namespace EFPController
             }
 
             return false;
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            // TEMP
-            if (!_isInitialized)
-                return;
-            
-            // Climbing
-            if (_climbingComponent.TriggerEnterLogic(other))
-                return;
-
-            // Water
-            _swimmingComponent.TriggerEnterLogic(other);
-        }
-
-        private void OnTriggerStay(Collider other)
-        {
-            // TEMP
-            if (!_isInitialized)
-                return;
-            
-            // Climbing
-            _climbingComponent.TriggerStayLogic(other);
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            // TEMP
-            if (!_isInitialized)
-                return;
-            
-            // Water
-            _swimmingComponent.TriggerExitLogic(other);
         }
     }
 }

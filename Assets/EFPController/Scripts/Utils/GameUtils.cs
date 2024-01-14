@@ -276,12 +276,18 @@ namespace EFPController.Utils
         public static Vector3 GetVelocityAtPoint(this Rigidbody rigidbody, Vector3 worldPoint)
         {
             Vector3 angularVelocity = rigidbody.angularVelocity;
-            if (angularVelocity.IsZero()) return rigidbody.velocity;
+
+            if (angularVelocity.IsZero())
+                return rigidbody.velocity;
+
             Vector3 centerOfMass = rigidbody.worldCenterOfMass;
-            Quaternion q = Quaternion.Euler(angularVelocity * Mathf.Rad2Deg * Time.deltaTime);
+            Quaternion q = Quaternion.Euler(angularVelocity * Time.fixedDeltaTime);
             Vector3 rotatedPoint = centerOfMass + q * (worldPoint - centerOfMass);
-            Vector3 tangentialVelocity = (rotatedPoint - worldPoint) / Time.deltaTime;
-            return rigidbody.velocity + tangentialVelocity;
+            Vector3 tangentialVelocity = (rotatedPoint - worldPoint) / Time.fixedDeltaTime;
+
+            rigidbody.MovePosition(rigidbody.position + tangentialVelocity * Time.fixedDeltaTime);
+
+            return rigidbody.velocity;
         }
 
         public static float EaseInOut(float time, float duration)
