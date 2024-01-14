@@ -788,8 +788,8 @@ namespace EFPController
                 _velocityChange.z = Mathf.Clamp(_velocityChange.z, -_maxVelocityChange, _maxVelocityChange);
 
                 // finally, add movement velocity to player rigidbody velocity
-                //if (!_velocityChange.IsZero())
-                    //Rigidbody.AddForce(_velocityChange, ForceMode.VelocityChange);
+                if (!_velocityChange.IsZero())
+                    Rigidbody.AddForce(_velocityChange, ForceMode.VelocityChange);
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Swimming
@@ -810,9 +810,9 @@ namespace EFPController
                 if (hitPlatform)
                 {
                     //Rigidbody.velocity += GroundHitInfo.rigidbody.GetVelocityAtPoint(_groundPoint);
-                    var velo = GroundHitInfo.rigidbody.GetVelocityAtPoint(_groundPoint);
-                    Debug.Log("Velocity: " + velo);
-                    Rigidbody.velocity += velo;
+                    Vector3 velocity = GroundHitInfo.rigidbody.GetVelocityAtPoint(_groundPoint);
+                    
+                    Rigidbody.velocity += velocity;
                 }
 
                 if (_dashComponent.DashActive)

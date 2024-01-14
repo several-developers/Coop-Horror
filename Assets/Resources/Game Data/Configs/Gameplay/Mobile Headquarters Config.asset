@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Mobile Headquarters Config
   m_EditorClassIdentifier: 
   _metaName: Mobile Headquarters Config
-  _movementSpeed: 6
+  _movementSpeed: 3
   _motionSpeed: 0.8
   _speedChangeRate: 1

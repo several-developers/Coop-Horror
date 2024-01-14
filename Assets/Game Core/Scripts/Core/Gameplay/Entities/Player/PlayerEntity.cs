@@ -285,6 +285,8 @@ namespace GameCore.Gameplay.Entities.Player
             _playerFootsteps.UpdateLogic();
             _cameraBobAnims.UpdateLogic();
 
+            Vector2 movementInput = _playerMovement.InputManager.GetMovementInput();
+            bool isMovingByPlayer = movementInput.magnitude > 0.05f;
             bool isSprinting = _playerMovement.SprintComponent.IsSprinting;
             bool isGoingBackwards = _playerMovement.InputY < 0f;
             float maxClamp = isSprinting ? 1f : 0.5f;
@@ -294,7 +296,7 @@ namespace GameCore.Gameplay.Entities.Player
             float divider = isSprinting ? 6f : 3f;
             float blend = Mathf.Clamp(value: modifiedMovementSpeed / divider, -1f, maxClamp);
 
-            bool canMove = movementSpeed > 0.05f;
+            bool canMove = isMovingByPlayer && movementSpeed > 0.05f;
 
             _animator.SetBool(id: AnimatorHashes.CanMove, canMove);
             _animator.SetFloat(AnimatorHashes.MoveSpeedBlend, blend);

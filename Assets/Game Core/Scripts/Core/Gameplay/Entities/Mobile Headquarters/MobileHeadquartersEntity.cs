@@ -62,15 +62,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _launchMobileLever.OnDisabledEvent += OnDisableVehicle;
         }
 
-        private void Update()
-        {
-            //_pathMovement.Movement();
-        }
-
-        private void FixedUpdate()
-        {
-            _pathMovement.Movement2();
-        }
+        private void FixedUpdate() =>
+            _pathMovement.Movement();
 
         public override void OnDestroy()
         {
