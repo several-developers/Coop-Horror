@@ -1,5 +1,5 @@
 ﻿using GameCore.Gameplay.Entities.Player;
-using MetaEditor;
+using CustomEditors;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

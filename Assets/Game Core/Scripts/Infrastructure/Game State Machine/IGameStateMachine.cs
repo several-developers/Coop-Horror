@@ -1,5 +1,3 @@
-using GameCore.Gameplay;
-
 namespace GameCore.Infrastructure.StateMachine
 {
     public interface IGameStateMachine

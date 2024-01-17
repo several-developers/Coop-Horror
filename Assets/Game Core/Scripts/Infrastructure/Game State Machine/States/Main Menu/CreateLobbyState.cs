@@ -49,8 +49,8 @@ namespace GameCore.Infrastructure.StateMachine
 
         private static void StartHost()
         {
-            TheNetworkHorror network = TheNetworkHorror.Get();
-            network.StartHost();
+            TheNetworkHorror networkHorror = TheNetworkHorror.Get();
+            networkHorror.StartHost();
         }
 
         private void HideSaveSelectionMenu() =>
@@ -58,7 +58,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void EnterOnlineMenuState() =>
             _gameStateMachine.ChangeState<OnlineMenuState>();
-        
+
         private void EnterLoadGameplayState() =>
             _gameStateMachine.ChangeState<LoadGameplayState>();
 
@@ -69,7 +69,7 @@ namespace GameCore.Infrastructure.StateMachine
             HideSaveSelectionMenu();
             EnterOnlineMenuState();
         }
-        
+
         private void OnStartGameClicked()
         {
             HideSaveSelectionMenu();

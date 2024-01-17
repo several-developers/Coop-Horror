@@ -2,7 +2,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace MetaEditor
+namespace CustomEditors
 {
     public abstract class EditorMeta : ScriptableObject
     {

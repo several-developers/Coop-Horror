@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace MetaEditor
+namespace CustomEditors
 {
     public class CustomToolkitEditor
     {

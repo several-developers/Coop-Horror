@@ -14,8 +14,8 @@ namespace GameCore.Utilities
             if (string.IsNullOrWhiteSpace(data))
                 return;
 
-            t ??= (T)Activator.CreateInstance(typeof(T));
-            t = JsonUtility.FromJson<T>(data);
+            t ??= (T)Activator.CreateInstance(t.GetType());
+            JsonUtility.FromJsonOverwrite(data, t);
         }
 
         public void TryLoadData<T>(ref T t) where T : DataBase
@@ -25,7 +25,7 @@ namespace GameCore.Utilities
 
             if (!isFileExists)
             {
-                t = (T)Activator.CreateInstance(typeof(T));
+                t = (T)Activator.CreateInstance(t.GetType());
                 string json = JsonUtility.ToJson(t);
                 File.WriteAllText(path, json);
             }
@@ -36,7 +36,8 @@ namespace GameCore.Utilities
 
         public void TrySaveData<T>(T t) where T : DataBase
         {
-            t ??= (T)Activator.CreateInstance(typeof(T));
+            if (t == null)
+                return;
 
             string path = t.GetDataPath();
             string data = JsonUtility.ToJson(t);
@@ -46,14 +47,17 @@ namespace GameCore.Utilities
 
         public void TryDeleteData<T>(ref T t) where T : DataBase
         {
-            t ??= (T)Activator.CreateInstance(typeof(T));
+            t ??= (T)Activator.CreateInstance(t.GetType());
 
             string path = t.GetDataPath();
 
             if (File.Exists(path))
                 File.Delete(path);
-
-            t = (T)Activator.CreateInstance(typeof(T));
+            
+            var newT = (T)Activator.CreateInstance(t.GetType());
+            string data = JsonUtility.ToJson(newT);
+            
+            TrySetData(data, ref t);
         }
     }
 }

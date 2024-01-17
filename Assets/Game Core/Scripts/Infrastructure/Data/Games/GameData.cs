@@ -9,11 +9,9 @@ namespace GameCore.Infrastructure.Data
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameData()
-        {
+        public GameData() =>
             _playersData = new List<PlayerData>();
-        }
-        
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField, Min(0)]
@@ -23,7 +21,7 @@ namespace GameCore.Infrastructure.Data
         private List<PlayerData> _playersData;
 
         // PROPERTIES: ----------------------------------------------------------------------------
-
+        
         public int SaveCellIndex => _saveCellIndex;
         
         private string Label => $"Game Data #{_saveCellIndex}";

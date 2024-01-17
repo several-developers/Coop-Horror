@@ -8,10 +8,8 @@
         public const string PlayerConfigsCategory = ConfigsCategory + "/Player";
         public const string GameplayConfigsCategory = ConfigsCategory + "/Gameplay";
         public const string ItemsCategory = "Items";
+        public const string LocationsCategory = "Locations";
 
-        public const string GamesData = Settings + "GamesData";
-        public const string GameSettings = Settings + "GameSettings";
-        
         public const string MetaSettings = "Meta Settings";
         public const string MetaSettingsIn = "Meta Settings/In";
         public const string NoCategory = "No category";

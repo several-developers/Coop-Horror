@@ -8,7 +8,7 @@ using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace MetaEditor
+namespace CustomEditors
 {
     // ------------------------------------------------------------------------------------------
     //      Be sure to check out OdinMenuStyleExample.cs as well.

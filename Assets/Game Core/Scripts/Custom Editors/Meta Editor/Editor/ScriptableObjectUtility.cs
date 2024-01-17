@@ -3,7 +3,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace MetaEditor
+namespace CustomEditors
 {
     public static class ScriptableObjectUtility
     {

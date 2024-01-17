@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MetaEditor
+namespace CustomEditors
 {
     public static class EditorDatabase
     {

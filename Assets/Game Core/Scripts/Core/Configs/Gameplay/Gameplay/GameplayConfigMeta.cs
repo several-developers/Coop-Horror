@@ -1,4 +1,4 @@
-﻿using MetaEditor;
+﻿using CustomEditors;
 
 namespace GameCore.Configs.Gameplay
 {

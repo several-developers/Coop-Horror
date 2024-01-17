@@ -19,7 +19,7 @@ namespace GameCore.UI.MainMenu.OnlineMenu
         
         [SerializeField, Required]
         private Button _joinButton;
-
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnBackButtonClickedEvent;

@@ -55,6 +55,8 @@ namespace GameCore.Infrastructure.StateMachine
                 LoadScene(SceneName.Bootstrap, OnSceneLoaded);
             else
                 LoadScene(startScene, CheckSceneState);
+            
+            // LOCAL METHODS: -----------------------------
 
             void OnSceneLoaded()
             {
@@ -67,37 +69,39 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void CheckSceneState()
         {
-            if (IsCurrentSceneMainMenu())
+            if (IsSceneMatches(SceneName.Bootstrap))
+            {
+                EnterLoadMainMenuState();
+                return;
+            }
+            
+            if (IsSceneMatches(SceneName.MainMenu))
             {
                 EnterPrepareMainMenuState();
                 return;
             }
 
-            if (IsCurrentSceneGameplay())
+            if (IsSceneMatches(SceneName.Gameplay))
                 EnterGameplayState();
         }
         
         private void LoadScene(SceneName sceneName, Action callback = null) =>
             _scenesLoaderService.LoadScene(sceneName, callback);
 
+        private void EnterLoadMainMenuState() =>
+            _gameStateMachine.ChangeState<LoadMainMenuState>();
+        
         private void EnterPrepareMainMenuState() =>
             _gameStateMachine.ChangeState<PrepareMainMenuState>();
         
         private void EnterGameplayState() =>
             _gameStateMachine.ChangeState<GameplayState>();
 
-        private static bool IsCurrentSceneMainMenu()
+        private static bool IsSceneMatches(SceneName sceneName)
         {
-            string sceneName = SceneManager.GetActiveScene().name;
-            bool isSceneMainMenu = string.Equals(sceneName, SceneName.MainMenu.ToString());
+            string name = SceneManager.GetActiveScene().name;
+            bool isSceneMainMenu = string.Equals(name, sceneName.ToString());
             return isSceneMainMenu;
-        }
-        
-        private static bool IsCurrentSceneGameplay()
-        {
-            string sceneName = SceneManager.GetActiveScene().name;
-            bool isSceneGameplay = string.Equals(sceneName, SceneName.Gameplay.ToString());
-            return isSceneGameplay;
         }
     }
 }

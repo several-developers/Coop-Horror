@@ -1,4 +1,6 @@
-﻿namespace GameCore.Infrastructure.Services.Global.Data
+﻿using GameCore.Gameplay.Events;
+
+namespace GameCore.Infrastructure.Services.Global.Data
 {
     public abstract class DataService
     {
@@ -15,10 +17,21 @@
         
         protected void SaveLocalData(bool autoSave = true)
         {
+#if UNITY_EDITOR
+            SendDataChangedEvent();
+#endif
+            
             if (!autoSave)
                 return;
             
             _saveLoadService.Save();
         }
+        
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+#if UNITY_EDITOR
+        private static void SendDataChangedEvent() =>
+            EditorEvents.SendDataChanged();
+#endif
     }
 }

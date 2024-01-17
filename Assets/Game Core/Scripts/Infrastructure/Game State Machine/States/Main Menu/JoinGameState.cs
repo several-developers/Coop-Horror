@@ -20,7 +20,7 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        
+
         private TheNetworkHorror _network;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -33,7 +33,7 @@ namespace GameCore.Infrastructure.StateMachine
             // JoinGame();
 
             _network = TheNetworkHorror.Get();
-            
+
             StartClient();
 
             _network.OnAfterChangeSceneEvent += OnAfterChangeScene;
@@ -52,7 +52,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void EnterOnlineMenuState() =>
             _gameStateMachine.ChangeState<OnlineMenuState>();
-        
+
         private void EnterGameplayState() =>
             _gameStateMachine.ChangeState<GameplayState>();
 

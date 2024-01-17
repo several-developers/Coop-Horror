@@ -121,7 +121,7 @@ namespace GameCore.Gameplay.Network
             _networkManager.StartClient();
             AfterConnected();
         }
-
+        
         public void Disconnect()
         {
             if (!IsClient && !IsServer)
@@ -291,7 +291,7 @@ namespace GameCore.Gameplay.Network
 
             NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
             playerNetworkObject.SpawnAsPlayerObject(clientID, destroyWithScene: true);
-            
+
             PlayersEntities.Add(clientID, playerInstance);
 
             SetupPlayerClientRpc(playerNetworkObject);
@@ -318,7 +318,7 @@ namespace GameCore.Gameplay.Network
         {
             PlayerEntity playerEntity = PlayersEntities[clientID];
             NetworkObject playerNetworkObject = playerEntity.GetNetworkObject();
-            
+
             SendInitializePlayerClientRpc(playerNetworkObject);
         }
 
@@ -329,12 +329,12 @@ namespace GameCore.Gameplay.Network
 
             if (!isNetworkObjectFound)
                 return;
-            
+
             bool isPlayerEntityFound = networkObject.TryGetComponent(out PlayerEntity playerEntity);
 
             if (!isPlayerEntityFound)
                 return;
-            
+
             playerEntity.Setup();
         }
 
@@ -364,11 +364,11 @@ namespace GameCore.Gameplay.Network
             if (IsServer)
             {
                 IReadOnlyList<ulong> connectedClientsIds = _networkManager.ConnectedClientsIds;
-                
+
                 foreach (ulong id in connectedClientsIds)
                 {
                     bool isSpawned = SpawnedPlayers.Contains(id);
-                    
+
                     if (!isSpawned)
                         continue;
 

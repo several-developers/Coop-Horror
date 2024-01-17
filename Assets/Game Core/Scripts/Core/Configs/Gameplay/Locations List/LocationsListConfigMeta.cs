@@ -1,22 +1,19 @@
-﻿using System.Collections.Generic;
-using GameCore.Gameplay.Items;
+﻿using GameCore.Gameplay.Locations;
 using CustomEditors;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Configs.Gameplay.ItemsList
+namespace GameCore.Configs.Gameplay.LocationsList
 {
-    public class ItemsListConfigMeta : EditorMeta
+    public class LocationsListConfigMeta : EditorMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private ItemMeta[] _itemsMeta;
+        private LocationMeta[] _locationsMeta;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public IEnumerable<ItemMeta> GetAllItems() => _itemsMeta;
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
