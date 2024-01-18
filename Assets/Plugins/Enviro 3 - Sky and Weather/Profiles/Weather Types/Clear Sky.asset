@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   showEditor: 0
   showEffectControls: 0
-  showCloudControls: 0
+  showCloudControls: 1
   showFlatCloudControls: 0
   showFogControls: 0
   showLightingControls: 0
@@ -32,17 +32,17 @@ MonoBehaviour:
     dilateTypeLayer1: 1
     typeModifierLayer1: 1
     anvilBiasLayer1: 0.398
-    scatteringIntensityLayer1: 1.05
-    multiScatteringALayer1: 0.575
-    multiScatteringBLayer1: 0.227
-    multiScatteringCLayer1: 0
+    scatteringIntensityLayer1: 2
+    multiScatteringALayer1: 1
+    multiScatteringBLayer1: 0.892
+    multiScatteringCLayer1: 1
     powderIntensityLayer1: 0.848
-    silverLiningSpreadLayer1: 0.8
-    ligthAbsorbtionLayer1: 1.01
-    densityLayer1: 0.55
+    silverLiningSpreadLayer1: 0
+    ligthAbsorbtionLayer1: 2
+    densityLayer1: 0.468
     densitySmoothnessLayer1: 1
     baseErosionIntensityLayer1: 0.184
-    detailErosionIntensityLayer1: 0.3
+    detailErosionIntensityLayer1: 0.664
     curlIntensityLayer1: 0.1
     showLayer2: 0
     coverageLayer2: -1

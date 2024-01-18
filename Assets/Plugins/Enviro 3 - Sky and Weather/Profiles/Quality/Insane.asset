@@ -12,26 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfcd10a1b99270a488a19072f6176530, type: 3}
   m_Name: Insane
   m_EditorClassIdentifier: 
-  showEditor: 1
-  showVolumeClouds: 1
-  showFog: 0
+  showEditor: 0
+  showVolumeClouds: 0
+  showFog: 1
   showFlatClouds: 0
   showEffects: 0
   showAurora: 0
   volumetricCloudsOverride:
     volumetricClouds: 1
     dualLayer: 1
-    downsampling: 1
-    stepsLayer1: 196
-    stepsLayer2: 128
+    downsampling: 6
+    stepsLayer1: 245
+    stepsLayer2: 224
     blueNoiseIntensity: 2
-    reprojectionBlendTime: 2
+    reprojectionBlendTime: 15.89
     lodDistance: 1
   fogOverride:
     fog: 1
     volumetrics: 1
     quality: 1
-    steps: 64
+    steps: 96
   flatCloudsOverride:
     cirrusClouds: 1
     flatClouds: 0
