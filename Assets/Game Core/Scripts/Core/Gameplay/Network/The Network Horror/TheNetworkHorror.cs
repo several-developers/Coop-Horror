@@ -86,7 +86,7 @@ namespace GameCore.Gameplay.Network
         {
             // Common Update Logic
             {
-                _timeCycleDecorator.UpdateLogic();
+                _timeCycleDecorator.Tick();
             }
 
             if (IsServer)

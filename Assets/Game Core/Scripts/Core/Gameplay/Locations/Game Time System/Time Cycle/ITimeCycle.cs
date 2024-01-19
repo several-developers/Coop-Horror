@@ -6,11 +6,13 @@ namespace GameCore.Gameplay.Locations.GameTime
     {
         event Action<DateTime> OnTimeUpdatedEvent;
         event Action OnHourPassedEvent;
-        void UpdateLogic();
+        void Tick();
+        void SetDateTime(int second, int dateTimeMinute, int dateTimeHour);
         void SyncDateTime(MyDateTime dateTime);
         void SetMidnight();
         void SetSunrise();
         void ToggleSimulate(bool simulate);
         DateTime GetDateTime();
+        bool GetSimulateState();
     }
 }

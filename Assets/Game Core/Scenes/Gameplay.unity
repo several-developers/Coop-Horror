@@ -20320,11 +20320,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1235291792}
     m_Modifications:
-    - target: {fileID: 968233566062404754, guid: 104019bdb327b1546a8cb1c968503d76,
-        type: 3}
-      propertyPath: _sun
-      value: 
-      objectReference: {fileID: 410087040}
     - target: {fileID: 7210286626485362953, guid: 104019bdb327b1546a8cb1c968503d76,
         type: 3}
       propertyPath: m_RootOrder
@@ -20383,12 +20378,7 @@ PrefabInstance:
     - target: {fileID: 7210286626485362954, guid: 104019bdb327b1546a8cb1c968503d76,
         type: 3}
       propertyPath: m_Name
-      value: Game Time System
-      objectReference: {fileID: 0}
-    - target: {fileID: 7210286626485362954, guid: 104019bdb327b1546a8cb1c968503d76,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
+      value: Time Cycle Editor
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 104019bdb327b1546a8cb1c968503d76, type: 3}

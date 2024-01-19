@@ -17,7 +17,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private Sun _sun;
         
         [SerializeField, Required]
-        private GameTimeSystem _gameTimeSystem;
+        private TimeCycleEditor _gameTimeSystem;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

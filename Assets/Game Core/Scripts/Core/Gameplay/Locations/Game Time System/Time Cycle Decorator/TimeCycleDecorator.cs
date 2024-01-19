@@ -6,15 +6,15 @@ namespace GameCore.Gameplay.Locations.GameTime
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnUpdateLogicEvent;
+        public event Action OnTickEvent;
         public event Action<MyDateTime> OnSyncDateTimeEvent;
         public event Func<DateTime> OnGetDateTimeEvent;
         public event Action OnHourPassedEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void UpdateLogic() =>
-            OnUpdateLogicEvent?.Invoke();
+        public void Tick() =>
+            OnTickEvent?.Invoke();
 
         public void SyncDateTime(MyDateTime dateTime) =>
             OnSyncDateTimeEvent?.Invoke(dateTime);

@@ -26,7 +26,7 @@ namespace GameCore.Gameplay.Locations.GameTime
 
             OnHourPassedEvent += _timeCycleDecorator.SendHourPassedEvent;
             
-            _timeCycleDecorator.OnUpdateLogicEvent += UpdateLogic;
+            _timeCycleDecorator.OnTickEvent += Tick;
             _timeCycleDecorator.OnSyncDateTimeEvent += SyncDateTime;
             _timeCycleDecorator.OnGetDateTimeEvent += GetDateTime;
         }
@@ -76,12 +76,12 @@ namespace GameCore.Gameplay.Locations.GameTime
         {
             OnHourPassedEvent -= _timeCycleDecorator.SendHourPassedEvent;
             
-            _timeCycleDecorator.OnUpdateLogicEvent -= UpdateLogic;
+            _timeCycleDecorator.OnTickEvent -= Tick;
             _timeCycleDecorator.OnSyncDateTimeEvent -= SyncDateTime;
             _timeCycleDecorator.OnGetDateTimeEvent -= GetDateTime;
         }
         
-        public void UpdateLogic()
+        public void Tick()
         {
             if (!_simulate)
                 return;
@@ -96,8 +96,34 @@ namespace GameCore.Gameplay.Locations.GameTime
             }
 
             UpdateModule();
+            SendTimeUpdatedEvent();
         }
 
+        public void SetDateTime(int second, int minute, int hour)
+        {
+            _second = second;
+            _minute = minute;
+            _hour = hour;
+
+            DateTime currentTime = new();
+            currentTime = currentTime.AddHours(hour);
+            currentTime = currentTime.AddMinutes(minute);
+            currentTime = currentTime.AddSeconds(second);
+
+            if (_date.Hour != currentTime.Hour)
+            {
+                // Hour passed
+            }
+
+            if (_date.Minute != currentTime.Minute)
+                SendHourPassedEvent();
+
+            _date = currentTime;
+            _second = _date.Second;
+            _minute = _date.Minute;
+            _hour = _date.Hour;
+        }
+        
         public void SyncDateTime(MyDateTime dateTime)
         {
             SetDateTime(dateTime.Second, dateTime.Minute, dateTime.Hour);
@@ -127,6 +153,8 @@ namespace GameCore.Gameplay.Locations.GameTime
 
         public DateTime GetDateTime() => _date;
 
+        public bool GetSimulateState() => _simulate;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void UpdateModule()
@@ -148,31 +176,6 @@ namespace GameCore.Gameplay.Locations.GameTime
 
             SetDateTime(_second, _minute, _hour);
             UpdateVisual();
-        }
-
-        private void SetDateTime(int second, int minute, int hour)
-        {
-            _second = second;
-            _minute = minute;
-            _hour = hour;
-
-            DateTime currentTime = new();
-            currentTime = currentTime.AddHours(hour);
-            currentTime = currentTime.AddMinutes(minute);
-            currentTime = currentTime.AddSeconds(second);
-
-            if (_date.Hour != currentTime.Hour)
-            {
-                // Hour passed
-            }
-
-            if (_date.Minute != currentTime.Minute)
-                SendHourPassedEvent();
-
-            _date = currentTime;
-            _second = _date.Second;
-            _minute = _date.Minute;
-            _hour = _date.Hour;
         }
 
         private void UpdateVisual()

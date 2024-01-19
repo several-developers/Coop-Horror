@@ -4,12 +4,12 @@ namespace GameCore.Gameplay.Locations.GameTime
 {
     public interface ITimeCycleDecorator
     {
-        event Action OnUpdateLogicEvent; 
+        event Action OnTickEvent; 
         event Action<MyDateTime> OnSyncDateTimeEvent;
         event Func<DateTime> OnGetDateTimeEvent;
         event Action OnHourPassedEvent;
         
-        void UpdateLogic();
+        void Tick();
         void SyncDateTime(MyDateTime dateTime);
         void SendHourPassedEvent();
         DateTime GetDateTime();
