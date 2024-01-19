@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Locations.GameTime;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using Zenject;
 
 namespace GameCore.Gameplay.Network
 {
@@ -30,7 +33,6 @@ namespace GameCore.Gameplay.Network
         public UnityAction OnDisconnectEvent; // Event when self disconnect
         public UnityAction<string> OnBeforeChangeSceneEvent; // Before Changing Scene
         public UnityAction<string> OnAfterChangeSceneEvent; // After Changing Scene
-        public UnityAction<float> OnGameTimerUpdatedEvent;
 
         // Server only events
         public event UnityAction<ulong> OnClientJoinEvent; // Server event when any client connect
@@ -51,7 +53,7 @@ namespace GameCore.Gameplay.Network
 
         private static TheNetworkHorror _instance;
 
-        private readonly NetworkVariable<float> _gameTimer = new();
+        private readonly NetworkVariable<MyDateTime> _gameTimer = new();
 
         private NetworkManager _networkManager;
         private NetworkSceneManager _networkSceneManager;
@@ -63,6 +65,10 @@ namespace GameCore.Gameplay.Network
         private bool _offlineMode;
         private bool _isGameTimerOn;
 
+        // TEMP
+
+        private ITimeCycleDecorator _timeCycleDecorator;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
@@ -73,8 +79,21 @@ namespace GameCore.Gameplay.Network
             DontDestroyOnLoad(gameObject);
         }
 
+        private void Start() =>
+            _timeCycleDecorator.OnHourPassedEvent += OnHourPassed;
+
         private void Update()
         {
+            // Common Update Logic
+            {
+                _timeCycleDecorator.UpdateLogic();
+            }
+
+            if (IsServer)
+                _serverLogic.Update();
+            else
+                _clientLogic.Update();
+
             const float refreshDuration = 1f;
             _slowUpdateTimer += Time.deltaTime;
 
@@ -91,23 +110,27 @@ namespace GameCore.Gameplay.Network
             _networkManager.OnClientConnectedCallback -= OnClientConnected;
             _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
 
-            _gameTimer.OnValueChanged -= OnGameTimerUpdated;
+            if (IsServer)
+                _serverLogic.Dispose();
+            else
+                _clientLogic.Dispose();
+            
+            _timeCycleDecorator.OnHourPassedEvent -= OnHourPassed;
 
             base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Init(NetworkManager networkManager)
+        public void Init(NetworkManager networkManager, ITimeCycleDecorator timeCycleDecorator)
         {
             _instance = this;
             _networkManager = networkManager;
+            _timeCycleDecorator = timeCycleDecorator;
 
             _networkManager.ConnectionApprovalCallback += OnApprovalCheck;
             _networkManager.OnClientConnectedCallback += OnClientConnected;
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
-
-            _gameTimer.OnValueChanged += OnGameTimerUpdated;
         }
 
         public void StartHost()
@@ -121,7 +144,7 @@ namespace GameCore.Gameplay.Network
             _networkManager.StartClient();
             AfterConnected();
         }
-        
+
         public void Disconnect()
         {
             if (!IsClient && !IsServer)
@@ -143,11 +166,11 @@ namespace GameCore.Gameplay.Network
 
         private void SlowUpdate()
         {
-            UpdateHost();
-            UpdateClient();
+            SlowUpdateServer();
+            SlowUpdateClient();
         }
 
-        private void UpdateHost()
+        private void SlowUpdateServer()
         {
             if (!IsHost && !IsServer)
                 return;
@@ -157,10 +180,9 @@ namespace GameCore.Gameplay.Network
 
             CheckIfReady();
             CheckIfCanSpawnPlayers();
-            UpdateGameTimer();
         }
 
-        private void UpdateClient()
+        private void SlowUpdateClient()
         {
             if (IsHost || IsServer)
                 return;
@@ -182,9 +204,6 @@ namespace GameCore.Gameplay.Network
 
             if (isReady)
                 return;
-
-            if (IsServer)
-                StartGameTimer();
 
             SetPlayerReadyServerRpc();
 
@@ -233,6 +252,11 @@ namespace GameCore.Gameplay.Network
 
             if (_networkManager.SceneManager != null)
                 _networkManager.SceneManager.OnLoadComplete += OnAfterChangeScene;
+            
+            if (IsServer)
+                _serverLogic.Init();
+            else
+                _clientLogic.Init();
         }
 
         private void AfterDisconnected()
@@ -264,17 +288,9 @@ namespace GameCore.Gameplay.Network
             _isGameTimerOn = false;
         }
 
-        private void UpdateGameTimer()
-        {
-            if (!_isGameTimerOn)
-                return;
-
-            _gameTimer.Value += 1f;
-        }
-
         private bool IsConnected() =>
             _networkManager.IsServer || _networkManager.IsConnectedClient;
-
+        
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
@@ -397,13 +413,14 @@ namespace GameCore.Gameplay.Network
             OnBeforeChangeSceneEvent?.Invoke(sceneName);
         }
 
-        private void OnAfterChangeScene(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
-        {
+        private void OnAfterChangeScene(ulong clientId, string sceneName, LoadSceneMode loadSceneMode) =>
             OnAfterChangeSceneEvent?.Invoke(sceneName);
-        }
 
-        private void OnGameTimerUpdated(float oldValue, float newValue) =>
-            OnGameTimerUpdatedEvent?.Invoke(newValue);
+        private void OnHourPassed()
+        {
+            if (IsServer)
+                _serverLogic.UpdateGameTimer();
+        }
     }
 
     public enum ClientState

@@ -3,27 +3,25 @@ using GameCore.Enums;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Locations
+namespace GameCore.Gameplay.Locations.GameTime
 {
-    public class TimeManager : MonoBehaviour
+    public class GameTimeSystem : MonoBehaviour
     {
-        // CONSTRUCTORS: --------------------------------------------------------------------------
-
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
         [SerializeField]
         private float _cycleDurationInMinutes = 5f;
-        
+
         [SerializeField, Range(0.1f, 10f)]
         private float _cycleLengthModifier = 1f;
-        
+
         [SerializeField, Range(0, 60)]
         private int _second;
-        
+
         [SerializeField, Range(0, 60)]
         private int _minute;
-        
+
         [SerializeField, Range(0, 23)]
         private int _hour = 12;
 
@@ -35,16 +33,16 @@ namespace GameCore.Gameplay.Locations
 
         [SerializeField]
         private AnimationCurve _sunIntensityCurve;
-        
+
         [SerializeField]
         private Gradient _skyColor;
-        
+
         [SerializeField]
         private Gradient _equatorColor;
-        
+
         [SerializeField]
         private Gradient _sunColor;
-        
+
         [Title(Constants.References)]
         [SerializeField, Required]
         private Light _sun;
@@ -56,7 +54,7 @@ namespace GameCore.Gameplay.Locations
             get => _second;
             set => SetDateTime(second: value, _minute, _hour);
         }
-        
+
         private int Minute
         {
             get => _minute;
@@ -68,14 +66,17 @@ namespace GameCore.Gameplay.Locations
             get => _hour;
             set => SetDateTime(_second, _minute, hour: value);
         }
-        
+
         // FIELDS: --------------------------------------------------------------------------------
+
+        public event Action<DateTime> OnTimeUpdatedEvent;
+        public event Action OnHourPassedEvent;
 
         private Transform _sunTransform;
         private DayTime _dayTime;
         private DateTime _date;
         private float _internalTimeOverflow;
-        
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() =>
@@ -84,20 +85,59 @@ namespace GameCore.Gameplay.Locations
         private void Start()
         {
             SetDateTime(_second, _minute, _hour);
-            UpdateDayTime();
+            UpdateVisual();
+            SendTimeUpdatedEvent();
         }
 
-        private void Update() => UpdateModule();
+        private void Update()
+        {
+            if (!_simulate)
+                return;
+
+            if (_stopAtNight && _hour == 0)
+            {
+                _second = 0;
+                _minute = 0;
+
+                UpdateVisual();
+                return;
+            }
+
+            UpdateModule();
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void UpdateLogic()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetMidnight()
+        {
+            _second = 0;
+            _minute = 0;
+            _hour = 0;
+
+            UpdateModule();
+        }
+
+        public void SetSunrise()
+        {
+            _second = 0;
+            _minute = 0;
+            _hour = 6;
+
+            UpdateModule();
+        }
+
+        public void ToggleSimulate(bool simulate) =>
+            _simulate = simulate;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void UpdateModule()
         {
-            if (!_simulate)
-                return;
-            
             float t = 24f / 60f / (_cycleDurationInMinutes * _cycleLengthModifier);
             t = t * 3600f * Time.deltaTime;
 
@@ -112,42 +152,7 @@ namespace GameCore.Gameplay.Locations
                 _internalTimeOverflow = 0f;
 
             SetDateTime(_second, _minute, _hour);
-
-            float timeOfDay = GetTimeOfDay();
-            
-            UpdateDayTime();
-            UpdateLighting(timeOfDay);
-            UpdateSunRotation(timeOfDay);
-        }
-        
-        private void UpdateDayTime()
-        {
-            switch (_hour)
-            {
-                case >= 6 and <= 8: _dayTime = DayTime.Sunrise; return;
-                case > 8 and < 18: _dayTime = DayTime.Day; return;
-                case >= 18 and < 22: _dayTime = DayTime.Sunset; return;
-                case >= 22 or < 6: _dayTime = DayTime.Night; break;
-            }
-        }
-
-        private void UpdateLighting(float timeOfDay)
-        {
-            RenderSettings.ambientEquatorColor = _equatorColor.Evaluate(timeOfDay);
-            RenderSettings.ambientSkyColor = _skyColor.Evaluate(timeOfDay);
-                
-            _sun.color = _sunColor.Evaluate(timeOfDay);
-            //_sun.intensity = _sunIntensityCurve.Evaluate(timeOfDay);
-        }
-
-        private void UpdateSunRotation(float timeOfDay)
-        {
-            Quaternion sunRotation = _sunTransform.rotation;
-            float x = Mathf.Lerp(-90f, 270f, timeOfDay);
-            float y = sunRotation.y;
-            float z = sunRotation.z;
-            
-            _sunTransform.rotation = Quaternion.Euler(x, y, z);
+            UpdateVisual();
         }
 
         private void SetDateTime(int second, int minute, int hour)
@@ -166,10 +171,60 @@ namespace GameCore.Gameplay.Locations
                 // Hour passed
             }
 
+            if (_date.Minute != currentTime.Minute)
+                SendTimeUpdatedEvent();
+
             _date = currentTime;
             _second = _date.Second;
             _minute = _date.Minute;
             _hour = _date.Hour;
+        }
+
+        private void UpdateVisual()
+        {
+            float timeOfDay = GetTimeOfDay();
+
+            UpdateDayTime();
+            UpdateLighting(timeOfDay);
+            UpdateSunRotation(timeOfDay);
+        }
+
+        private void UpdateDayTime()
+        {
+            switch (_hour)
+            {
+                case >= 6 and <= 8:
+                    _dayTime = DayTime.Sunrise;
+                    return;
+                case > 8 and < 18:
+                    _dayTime = DayTime.Day;
+                    return;
+                case >= 18 and < 22:
+                    _dayTime = DayTime.Sunset;
+                    return;
+                case >= 22 or < 6:
+                    _dayTime = DayTime.Night;
+                    break;
+            }
+        }
+
+        private void UpdateLighting(float timeOfDay)
+        {
+            RenderSettings.ambientEquatorColor = _equatorColor.Evaluate(timeOfDay);
+            RenderSettings.ambientSkyColor = _skyColor.Evaluate(timeOfDay);
+
+            _sun.color = _sunColor.Evaluate(timeOfDay);
+            //_sun.intensity = _sunIntensityCurve.Evaluate(timeOfDay);
+        }
+
+        private void UpdateSunRotation(float timeOfDay)
+        {
+            Quaternion sunRotation = _sunTransform.rotation;
+            float x = Mathf.Lerp(-90f, 270f, timeOfDay);
+            float y = sunRotation.y;
+            float z = sunRotation.z;
+
+            _sunTransform.rotation = Quaternion.Euler(x, y, z);
         }
 
         private float GetTimeOfDay()
@@ -181,9 +236,18 @@ namespace GameCore.Gameplay.Locations
             float totalSeconds = _hour * secondsInHour +
                                  _minute * secondsInMinute +
                                  _second;
-            
+
             float timeOfDay = Mathf.Clamp01(totalSeconds / (float)secondsInDay);
             return timeOfDay;
         }
+
+        private void SendTimeUpdatedEvent() =>
+            OnTimeUpdatedEvent?.Invoke(_date);
+
+        // DEBUG BUTTONS: -------------------------------------------------------------------------
+
+        [Title(Constants.DebugButtons)]
+        [Button(buttonSize: 25), DisableInEditorMode]
+        private void DebugUpdateVisual() => UpdateVisual();
     }
 }

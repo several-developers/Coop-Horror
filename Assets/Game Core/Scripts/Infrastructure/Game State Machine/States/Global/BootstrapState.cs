@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.Network;
+﻿using GameCore.Gameplay.Locations.GameTime;
+using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Global;
 using Unity.Netcode;
 using UnityEngine;
@@ -18,19 +19,21 @@ namespace GameCore.Infrastructure.StateMachine
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public BootstrapState(IGameStateMachine gameStateMachine, IAssetsProvider assetsProvider,
-            DiContainer diContainer)
+            ITimeCycleDecorator timeCycleDecorator, DiContainer diContainer)
         {
             _gameStateMachine = gameStateMachine;
             _assetsProvider = assetsProvider;
+            _timeCycleDecorator = timeCycleDecorator; // TEMP
             _diContainer = diContainer;
 
             _gameStateMachine.AddState(this);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IAssetsProvider _assetsProvider;
+        private readonly ITimeCycleDecorator _timeCycleDecorator; // TEMP
         private readonly DiContainer _diContainer;
 
         private NetworkManager _networkManager;
@@ -63,7 +66,7 @@ namespace GameCore.Infrastructure.StateMachine
         {
             TheNetworkHorror networkHorror = _assetsProvider.GetNetworkHorror();
             TheNetworkHorror networkHorrorInstance = Object.Instantiate(networkHorror);
-            networkHorrorInstance.Init(_networkManager);
+            networkHorrorInstance.Init(_networkManager, _timeCycleDecorator);
         }
 
         private void EnterLoadDataState() =>

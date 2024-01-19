@@ -1,4 +1,5 @@
-﻿using GameCore.Infrastructure.Services.Global.Decorators.CollectionsService;
+﻿using GameCore.Gameplay.Locations.GameTime;
+using GameCore.Infrastructure.Services.Global.Decorators.CollectionsService;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Global
@@ -10,6 +11,7 @@ namespace GameCore.Infrastructure.Installers.Global
         public override void InstallBindings()
         {
             BindCollectionsServiceDecorator();
+            BindTimeCycleDecorator();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -18,6 +20,13 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .BindInterfacesTo<CollectionsServiceDecorator>()
+                .AsSingle();
+        }
+
+        private void BindTimeCycleDecorator()
+        {
+            Container
+                .BindInterfacesTo<TimeCycleDecorator>()
                 .AsSingle();
         }
     }

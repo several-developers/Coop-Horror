@@ -1,6 +1,7 @@
 ﻿using GameCore.Configs.Gameplay;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.LocationsList;
+using GameCore.Configs.Gameplay.Time;
 using GameCore.Core.Configs.Player;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
@@ -11,5 +12,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         PlayerConfigMeta GetPlayerConfig();
         ItemsListConfigMeta GetItemsListConfig();
         LocationsListConfigMeta GetLocationsListConfig();
+        TimeConfigMeta GetTimeConfig();
     }
 }

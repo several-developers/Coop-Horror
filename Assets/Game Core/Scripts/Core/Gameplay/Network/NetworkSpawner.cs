@@ -30,11 +30,8 @@ namespace GameCore.Gameplay.Network
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
-        {
-            Debug.Log("Loading network spawner");
+        private void Awake() =>
             _instance = this;
-        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
