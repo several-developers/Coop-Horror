@@ -2,6 +2,7 @@
 using GameCore.Infrastructure.Services.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace GameCore.Gameplay.Other
@@ -66,10 +67,20 @@ namespace GameCore.Gameplay.Other
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnSceneStartLoading() =>
+        private void OnSceneStartLoading(LoadSceneMode loadSceneMode)
+        {
+            if (loadSceneMode == LoadSceneMode.Additive)
+                return;
+            
             FadeAnimation(fadeIn: true);
+        }
 
-        private void OnSceneFinishedLoading() =>
+        private void OnSceneFinishedLoading(LoadSceneMode loadSceneMode)
+        {
+            if (loadSceneMode == LoadSceneMode.Additive)
+                return;
+            
             FadeAnimation(fadeIn: false);
+        }
     }
 }

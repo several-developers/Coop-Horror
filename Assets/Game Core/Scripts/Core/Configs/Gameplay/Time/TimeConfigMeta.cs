@@ -30,6 +30,7 @@ namespace GameCore.Configs.Gameplay.Time
         [SerializeField]
         private bool _stopAtNight;
 
+        [Title("Visual Settings")]
         [SerializeField]
         private AnimationCurve _sunIntensityCurve;
 

@@ -51,32 +51,11 @@ MonoBehaviour:
     width: 0.2
   m_Looped: 1
   m_Waypoints:
-  - position: {x: 33.47605, y: 0, z: 0}
-    tangent: {x: 0.20653534, y: 0, z: 14.183186}
+  - position: {x: 0, y: 0, z: 0}
+    tangent: {x: 0, y: 0, z: 1}
     roll: 0
-  - position: {x: 23.189098, y: 0, z: 32.204113}
-    tangent: {x: -10.2997, y: 0, z: 6.4402275}
-    roll: 0
-  - position: {x: -17.486162, y: 0, z: 36.689964}
-    tangent: {x: -10.63405, y: 0, z: -4.007538}
-    roll: 0
-  - position: {x: -30.557978, y: 0.09914446, z: 23.979078}
-    tangent: {x: -4.3151608, y: 0.053603172, z: -5.790407}
-    roll: 0
-  - position: {x: -35.252544, y: 0.39802504, z: 13.58573}
-    tangent: {x: -0.7486458, y: 0.5178474, z: -3.352913}
-    roll: 0
-  - position: {x: -37.523415, y: 2.095989, z: 6.135248}
-    tangent: {x: 0.037124634, y: 0.024838686, z: -3.6258206}
-    roll: 0
-  - position: {x: -37.2052, y: 1.8968006, z: -2.1192966}
-    tangent: {x: 0.08708954, y: -0.28508687, z: -3.6167736}
-    roll: 0
-  - position: {x: -36.007023, y: 0, z: -14.716257}
-    tangent: {x: 1.5824585, y: 0, z: -9.552118}
-    roll: 0
-  - position: {x: -13.163264, y: 0, z: -35.245495}
-    tangent: {x: 7.598521, y: 0, z: 0.14071274}
+  - position: {x: 0, y: 0, z: 5}
+    tangent: {x: 0, y: 0, z: 1}
     roll: 0
 --- !u!1 &2189888883882043061
 GameObject:
@@ -88,7 +67,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2189888883882043060}
   m_Layer: 0
-  m_Name: Mobile Headquarters Path
+  m_Name: Mobile Headquarters - Path
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
-    public class MobileHeadquartersEntity : NetworkBehaviour, IEntity, INetworkObject
+    public class MobileHeadquartersEntity : NetworkBehaviour, IMobileHeadquartersEntity
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -35,16 +35,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [SerializeField, Required]
         private LaunchMobileLever _launchMobileLever;
-
-        [SerializeField, Required]
-        private CinemachinePathBase _cinemachinePath; // TEMP
-
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         private static MobileHeadquartersEntity _instance;
         
         private RigidbodyPathMovement _pathMovement;
-        private Vector3 _lastFramePosition;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -81,8 +77,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public static MobileHeadquartersEntity Get() => _instance;
-        
+        public void ChangePath(CinemachinePath path) =>
+            _pathMovement.ChangePath(path);
+
         public Transform GetTransform() => transform;
 
         public NetworkObject GetNetworkObject() => _networkObject;
@@ -93,14 +90,14 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             return direction;
         }
 
+        public static MobileHeadquartersEntity Get() => _instance;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void Init()
         {
-            _lastFramePosition = transform.position;
             _instance = this;
-            _pathMovement = new RigidbodyPathMovement(transform, _animator, _dollyCart, _cinemachinePath,
-                _mobileHeadquartersConfig);
+            _pathMovement = new RigidbodyPathMovement(transform, _animator, _dollyCart, _mobileHeadquartersConfig);
         }
 
         private void ToggleMovement(bool canMove) =>

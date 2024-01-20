@@ -1,4 +1,5 @@
 using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Managers;
 using GameCore.Observers.Gameplay.UI;
 using GameCore.UI.Gameplay.PauseMenu;
@@ -10,9 +11,11 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameplayState(IGameStateMachine gameStateMachine, IUIObserver uiObserver)
+        public GameplayState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
+            IUIObserver uiObserver)
         {
             _gameStateMachine = gameStateMachine;
+            _horrorStateMachine = horrorStateMachine;
             _uiObserver = uiObserver;
 
             _gameStateMachine.AddState(this);
@@ -21,6 +24,7 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
+        private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly IUIObserver _uiObserver;
 
         private PauseMenuView _pauseMenuView;
@@ -33,6 +37,7 @@ namespace GameCore.Infrastructure.StateMachine
             LockCursor();
             CreatePauseMenu();
             CreateQuitConfirmMenuView();
+            InitHorrorStateMachine();
             
             InputSystemManager.OnOpenPauseMenuEvent += OnOpenPauseMenu;
             
@@ -75,6 +80,9 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void ShowQuitConfirmMenu() =>
             _quitConfirmMenuView.Show();
+
+        private void InitHorrorStateMachine() =>
+            _horrorStateMachine.ChangeState<PrepareGameState>();
 
         private void EnterQuitGameplayState() =>
             _gameStateMachine.ChangeState<QuitGameplayState>();

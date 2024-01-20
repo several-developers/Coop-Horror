@@ -9,14 +9,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public RigidbodyPathMovement(Transform transform, Animator animator, CinemachineDollyCart dollyCart,
-            CinemachinePathBase path, MobileHeadquartersConfigMeta mobileHeadquartersConfig)
+            MobileHeadquartersConfigMeta mobileHeadquartersConfig)
         {
             _transform = transform;
             _rigidbody = transform.GetComponent<Rigidbody>();
             _animator = animator;
-            _dollyCart = dollyCart;
-            _path = path;
-            _dollyCart.m_Path = path;
+            _path = dollyCart.m_Path;
             _mobileHeadquartersConfig = mobileHeadquartersConfig;
 
             //_dollyCart.enabled = true;
@@ -26,12 +24,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private readonly Transform _transform;
         private readonly Rigidbody _rigidbody;
-        private readonly CinemachineDollyCart _dollyCart;
-        private readonly CinemachinePathBase _path;
         private readonly Animator _animator;
         private readonly MobileHeadquartersConfigMeta _mobileHeadquartersConfig;
         
-        private CinemachinePathBase _nextPath;
+        private CinemachinePathBase _path;
         private float _animationBlend;
         private bool _canMove;
 
@@ -67,20 +63,18 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void ToggleMovement(bool canMove) =>
             _canMove = canMove;
 
+        public void ChangePath(CinemachinePath path)
+        {
+            _path = path;
+            
+            Vector3 position = _path.EvaluatePositionAtUnit(pos: 0, CinemachinePathBase.PositionUnits.Distance);
+            Quaternion rotation = _path.EvaluateOrientationAtUnit(pos: 0, CinemachinePathBase.PositionUnits.Distance);
+            
+            _rigidbody.MovePosition(position);
+            _rigidbody.MoveRotation(rotation);
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void ChangeToNextPath()
-        {
-            ChangePath(_nextPath);
-
-            _nextPath = null;
-        }
-
-        private void ChangePath(CinemachinePathBase path)
-        {
-            _dollyCart.m_Position = 0;
-            _dollyCart.m_Path = path;
-        }
 
         private void ToggleMoveAnimation(bool canMove) =>
             _animator.SetBool(id: AnimatorHashes.CanMove, value: canMove);

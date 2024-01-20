@@ -3,10 +3,11 @@ using GameCore.Configs.Gameplay.Time;
 using GameCore.Enums;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Locations.GameTime
 {
-    public class TimeCycle : ITimeCycle, IDisposable
+    public class TimeCycle : ITimeCycle, IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -19,10 +20,6 @@ namespace GameCore.Gameplay.Locations.GameTime
             _sunTransform = _sun.transform;
             _simulate = _timeConfig.Simulate;
             _stopAtNight = _timeConfig.StopAtNight;
-
-            SetDateTime(_timeConfig.Second, _timeConfig.Minute, _timeConfig.Hour);
-            UpdateVisual();
-            SendTimeUpdatedEvent();
 
             OnHourPassedEvent += _timeCycleDecorator.SendHourPassedEvent;
             
@@ -72,6 +69,13 @@ namespace GameCore.Gameplay.Locations.GameTime
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void Initialize()
+        {
+            SetDateTime(_timeConfig.Second, _timeConfig.Minute, _timeConfig.Hour);
+            UpdateVisual();
+            SendTimeUpdatedEvent();
+        }
+        
         public void Dispose()
         {
             OnHourPassedEvent -= _timeCycleDecorator.SendHourPassedEvent;

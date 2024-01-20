@@ -93,8 +93,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void Start()
         {
-            _mobileHeadquartersTransform = MobileHeadquartersEntity.Get().transform;
-            _lastFrameMobileHeadquartersRotation = _mobileHeadquartersTransform.rotation.eulerAngles;
+            //_mobileHeadquartersTransform = MobileHeadquartersEntity.Get().transform;
+            //_lastFrameMobileHeadquartersRotation = _mobileHeadquartersTransform.rotation.eulerAngles;
         }
 
         private void LateUpdate()

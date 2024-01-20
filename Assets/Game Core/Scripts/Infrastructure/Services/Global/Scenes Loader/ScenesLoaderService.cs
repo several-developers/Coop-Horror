@@ -18,8 +18,8 @@ namespace GameCore.Infrastructure.Services.Global
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnSceneStartLoading;
-        public event Action OnSceneFinishedLoading;
+        public event Action<LoadSceneMode> OnSceneStartLoading;
+        public event Action<LoadSceneMode> OnSceneFinishedLoading;
 
         private readonly ICoroutineRunner _coroutineRunner;
 
@@ -32,10 +32,36 @@ namespace GameCore.Infrastructure.Services.Global
             if (_isSceneLoading)
                 return;
 
-            _coroutineRunner.StartCoroutine(SceneLoader(sceneName, callback));
+            _coroutineRunner.StartCoroutine(SceneLoader(sceneName, LoadSceneMode.Single, callback));
+        }
+        
+        public void LoadSceneAdditive(SceneName sceneName, Action callback = null)
+        {
+            if (_isSceneLoading)
+                return;
+
+            _coroutineRunner.StartCoroutine(SceneLoader(sceneName, LoadSceneMode.Additive, callback));
         }
 
-        public void LoadSceneNetwork(SceneName sceneName, Action callback = null)
+        public void LoadSceneNetwork(SceneName sceneName, Action callback = null) =>
+            LoadSceneNetwork(sceneName, LoadSceneMode.Single, callback);
+
+        public void LoadSceneNetworkAdditive(SceneName sceneName, Action callback = null) =>
+            LoadSceneNetwork(sceneName, LoadSceneMode.Additive, callback);
+
+        public void UnloadScene(SceneName sceneName, Action callback = null) =>
+            SceneManager.UnloadSceneAsync(sceneName.ToString());
+
+        public void UnloadSceneNetwork(SceneName sceneName, Action callback = null)
+        {
+            Scene scene = SceneManager.GetSceneByName(sceneName.ToString());
+            NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
+            networkSceneManager.UnloadScene(scene);
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void LoadSceneNetwork(SceneName sceneName, LoadSceneMode loadSceneMode, Action callback = null)
         {
             if (_isSceneLoading)
                 return;
@@ -43,13 +69,13 @@ namespace GameCore.Infrastructure.Services.Global
             _isSceneLoading = true;
 
             NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
-            networkSceneManager.LoadScene(sceneName.ToString(), LoadSceneMode.Single);
+            networkSceneManager.LoadScene(sceneName.ToString(), loadSceneMode);
             
             networkSceneManager.OnLoadEventCompleted += OnSceneLoaded;
 
             // LOCAL METHODS: -----------------------------
 
-            void OnSceneLoaded(string localSceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,
+            void OnSceneLoaded(string localSceneName, LoadSceneMode sceneMode, List<ulong> clientsCompleted,
                 List<ulong> clientsTimedOut)
             {
                 _isSceneLoading = false;
@@ -57,20 +83,18 @@ namespace GameCore.Infrastructure.Services.Global
                 callback?.Invoke();
             }
         }
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private IEnumerator SceneLoader(SceneName sceneName, Action callback = null)
+        
+        private IEnumerator SceneLoader(SceneName sceneName, LoadSceneMode loadSceneMode, Action callback = null)
         {
             // The Application loads the Scene in the background as the current Scene runs.
             // This is particularly good for creating loading screens.
             // You could also load the Scene by using sceneBuildIndex. In this case Scene2 has
             // a sceneBuildIndex of 1 as shown in Build Settings.
 
-            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName.ToString());
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName.ToString(), loadSceneMode);
 
             _isSceneLoading = true;
-            OnSceneStartLoading?.Invoke();
+            OnSceneStartLoading?.Invoke(loadSceneMode);
 
             // Wait until the asynchronous scene fully loads
             while (!asyncLoad.isDone)
@@ -79,7 +103,7 @@ namespace GameCore.Infrastructure.Services.Global
             _isSceneLoading = false;
 
             callback?.Invoke();
-            OnSceneFinishedLoading?.Invoke();
+            OnSceneFinishedLoading?.Invoke(loadSceneMode);
         }
     }
 }

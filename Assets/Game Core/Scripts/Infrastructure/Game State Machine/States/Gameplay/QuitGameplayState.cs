@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.Network;
+﻿using GameCore.Gameplay.HorrorStateMachineSpace;
+using GameCore.Gameplay.Network;
 
 namespace GameCore.Infrastructure.StateMachine
 {
@@ -6,9 +7,10 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public QuitGameplayState(IGameStateMachine gameStateMachine)
+        public QuitGameplayState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine)
         {
             _gameStateMachine = gameStateMachine;
+            _horrorStateMachine = horrorStateMachine;
 
             _gameStateMachine.AddState(this);
         }
@@ -16,12 +18,14 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
+        private readonly IHorrorStateMachine _horrorStateMachine;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
             Disconnect();
+            QuitHorrorStateMachine();
             EnterLoadMainMenuState();
         }
 
@@ -32,6 +36,9 @@ namespace GameCore.Infrastructure.StateMachine
             TheNetworkHorror network = TheNetworkHorror.Get();
             network.Disconnect();
         }
+
+        private void QuitHorrorStateMachine() =>
+            _horrorStateMachine.ChangeState<QuitState>();
 
         private void EnterLoadMainMenuState() =>
             _gameStateMachine.ChangeState<LoadMainMenuState>();

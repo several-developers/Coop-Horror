@@ -1,3 +1,5 @@
+using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Locations;
 using GameCore.Gameplay.Locations.GameTime;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.Observers.Gameplay.UI;
@@ -15,9 +17,12 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         [Title(Constants.References)]
         [SerializeField, Required]
         private Sun _sun;
+
+        [SerializeField, Required]
+        private MobileHeadquartersEntity _mobileHeadquartersEntity;
         
         [SerializeField, Required]
-        private TimeCycleEditor _gameTimeSystem;
+        private RoadLocationManager _roadLocationManager;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -26,8 +31,11 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindUIObserver();
             BindPlayerInteractionObserver();
             BindGraphyStateObserver();
+            BindMobileHeadquartersEntity();
             BindSun();
-            BindGameTimeSystem();
+            BindTimeCycle();
+            BindLocationsLoader();
+            BindRoadLocationManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -53,6 +61,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle();
         }
 
+        private void BindMobileHeadquartersEntity()
+        {
+            Container
+                .Bind<IMobileHeadquartersEntity>()
+                .FromInstance(_mobileHeadquartersEntity)
+                .AsSingle();
+        }
+
         private void BindSun()
         {
             Container
@@ -61,10 +77,25 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle();
         }
 
-        private void BindGameTimeSystem()
+        private void BindTimeCycle()
         {
             Container
                 .BindInterfacesTo<TimeCycle>()
+                .AsSingle();
+        }
+
+        private void BindLocationsLoader()
+        {
+            Container
+                .BindInterfacesTo<LocationsLoader>()
+                .AsSingle();
+        }
+
+        private void BindRoadLocationManager()
+        {
+            Container
+                .Bind<IRoadLocationManager>()
+                .FromInstance(_roadLocationManager)
                 .AsSingle();
         }
     }

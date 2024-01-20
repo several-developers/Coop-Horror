@@ -225,7 +225,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Path: {fileID: 0}
   m_UpdateMethod: 0
-  m_PositionUnits: 1
+  m_PositionUnits: 0
   m_Speed: 0
   m_Position: 0
 --- !u!54 &1956820334519849814
