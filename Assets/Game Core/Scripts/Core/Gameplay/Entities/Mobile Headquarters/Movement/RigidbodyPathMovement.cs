@@ -1,4 +1,5 @@
-﻿using Cinemachine;
+﻿using System;
+using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using UnityEngine;
 
@@ -22,6 +23,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnDestinationReachedEvent;
+        
         private readonly Transform _transform;
         private readonly Rigidbody _rigidbody;
         private readonly Animator _animator;
@@ -70,7 +73,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             Vector3 position = _path.EvaluatePositionAtUnit(pos: 0, CinemachinePathBase.PositionUnits.Distance);
             Quaternion rotation = _path.EvaluateOrientationAtUnit(pos: 0, CinemachinePathBase.PositionUnits.Distance);
 
-            _transform.position = position;
             _rigidbody.MovePosition(position);
             _rigidbody.MoveRotation(rotation);
         }

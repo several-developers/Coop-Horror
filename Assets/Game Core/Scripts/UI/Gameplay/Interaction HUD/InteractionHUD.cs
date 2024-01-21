@@ -42,13 +42,13 @@ namespace GameCore.UI.Gameplay.Interaction
         {
             _interactionTextSettings.Setup(_textTMP);
 
-            _playerInteractionObserver.OnCanInteractEvent += OnCanInteract;
+            _playerInteractionObserver.OnInteractionStartedEvent += OnCanInteract;
             _playerInteractionObserver.OnInteractionEndedEvent += OnInteractionEnded;
         }
 
         private void OnDestroy()
         {
-            _playerInteractionObserver.OnCanInteractEvent -= OnCanInteract;
+            _playerInteractionObserver.OnInteractionStartedEvent -= OnCanInteract;
             _playerInteractionObserver.OnInteractionEndedEvent -= OnInteractionEnded;
         }
 

@@ -99,8 +99,8 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             if (!isInteractableComponentExists)
                 return false;
             
-            if (!interactable.CanInteract())
-                return false;
+            //if (!interactable.CanInteract())
+                //return false;
 
             return true;
         }

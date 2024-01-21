@@ -30,6 +30,7 @@ namespace GameCore.Gameplay.Interactable
         public event Action OnEnabledEvent;
         public event Action OnDisabledEvent;
 
+        private bool _ignoreAnimationEvents;
         private bool _canInteract = true;
         private bool _isEnabled;
 
@@ -39,6 +40,9 @@ namespace GameCore.Gameplay.Interactable
         {
             _canInteract = _canInteractFromStart;
             _isEnabled = _isEnabledFromStart;
+            
+            if (_isEnabledFromStart)
+                _ignoreAnimationEvents = true;
 
             ChangeAnimationState();
 
@@ -60,6 +64,14 @@ namespace GameCore.Gameplay.Interactable
             _canInteract = false;
 
             SendInteractionStateChangedEvent();
+            ChangeAnimationState();
+        }
+
+        public void InteractWithoutEvents(bool isEnabled)
+        {
+            _ignoreAnimationEvents = true;
+            _isEnabled = isEnabled;
+            
             ChangeAnimationState();
         }
 
@@ -87,10 +99,31 @@ namespace GameCore.Gameplay.Interactable
         private void SendDisabledEvent() =>
             OnDisabledEvent?.Invoke();
 
+        private bool IsIgnoringAnimationEvents()
+        {
+            if (!_ignoreAnimationEvents)
+                return false;
+            
+            _ignoreAnimationEvents = false;
+            return true;
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        protected virtual void OnLeverEnabled() => SendEnabledEvent();
+        protected virtual void OnLeverEnabled()
+        {
+            if (IsIgnoringAnimationEvents())
+                return;
+            
+            SendEnabledEvent();
+        }
 
-        protected virtual void OnLeverDisabled() => SendDisabledEvent();
+        protected virtual void OnLeverDisabled()
+        {
+            if (IsIgnoringAnimationEvents())
+                return;
+            
+            SendDisabledEvent();
+        }
     }
 }

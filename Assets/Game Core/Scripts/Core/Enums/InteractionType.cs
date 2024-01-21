@@ -6,7 +6,8 @@
         PickUpItem = 1,
         Open = 2,
         Close = 3,
-        LaunchMobile = 4,
-        ToggleMobileDoor = 5
+        ToggleMobileDoor = 4,
+        LoadLocationMobileLever = 5,
+        LeaveLocationMobileLever = 6
     }
 }

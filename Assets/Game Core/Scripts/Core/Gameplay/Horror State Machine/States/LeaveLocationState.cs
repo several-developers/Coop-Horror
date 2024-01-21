@@ -17,6 +17,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
             _roadLocationManager = roadLocationManager;
+            _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _cancellationTokenSource = new CancellationTokenSource();
 
             _mobileHeadquartersUtilities = new MobileHeadquartersUtilities(mobileHeadquartersEntity,
@@ -30,6 +31,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
         private readonly IRoadLocationManager _roadLocationManager;
+        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
         private readonly MobileHeadquartersUtilities _mobileHeadquartersUtilities;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
@@ -54,6 +56,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         {
             CinemachinePath path = _roadLocationManager.GetPath();
             await _mobileHeadquartersUtilities.MoveMobileHQToThePath(path);
+            _mobileHeadquartersEntity.LeftLocation();
         }
 
         private void EnterGameLoopState() =>

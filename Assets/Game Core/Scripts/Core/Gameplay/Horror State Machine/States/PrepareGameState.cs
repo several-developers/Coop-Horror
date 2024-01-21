@@ -1,10 +1,12 @@
-﻿using Cinemachine;
+﻿using System.Threading;
+using Cinemachine;
+using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Locations;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
-    public class PrepareGameState : IEnterState
+    public class PrepareGameState : IEnterStateAsync
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -13,7 +15,9 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         {
             _horrorStateMachine = horrorStateMachine;
             _roadLocationManager = roadLocationManager;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _cancellationTokenSource = new CancellationTokenSource();
+            _mobileHeadquartersUtilities = new MobileHeadquartersUtilities(mobileHeadquartersEntity,
+                _cancellationTokenSource);
 
             horrorStateMachine.AddState(this);
         }
@@ -22,22 +26,23 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly IRoadLocationManager _roadLocationManager;
-        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private readonly MobileHeadquartersUtilities _mobileHeadquartersUtilities;
+        private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void Enter()
+        public async UniTaskVoid Enter()
         {
-            MoveMobileHQToTheRoad();
+            await MoveMobileHQToTheRoad();
             EnterGameLoopState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void MoveMobileHQToTheRoad()
+        private async UniTask MoveMobileHQToTheRoad()
         {
             CinemachinePath path = _roadLocationManager.GetPath();
-            _mobileHeadquartersEntity.ChangePath(path);
+            await _mobileHeadquartersUtilities.MoveMobileHQToThePath(path);
         }
 
         private void EnterGameLoopState() =>

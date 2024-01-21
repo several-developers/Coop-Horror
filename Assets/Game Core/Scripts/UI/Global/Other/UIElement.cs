@@ -80,7 +80,7 @@ namespace GameCore.UI.Global
             if (show && _changeCanvasState)
                 _canvas.enabled = true;
             
-            _fadeTN.Kill();
+            _fadeTN.Kill(complete: true);
             _fadeTN = _targetCG
                 .VisibilityState(show, _fadeTime, _ignoreScaleTime)
                 .SetLink(gameObject)

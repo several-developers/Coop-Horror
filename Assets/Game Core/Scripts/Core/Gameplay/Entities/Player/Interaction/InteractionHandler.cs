@@ -17,7 +17,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             _playerInteractionObserver = playerInteractionObserver;
             _interactableItems = new IInteractableItem[Constants.PlayerInventorySize];
 
-            _playerInteractionObserver.OnCanInteractEvent += OnCanInteract;
+            _playerInteractionObserver.OnInteractionStartedEvent += OnInteractionStarted;
             _playerInteractionObserver.OnInteractionEndedEvent += OnInteractionEnded;
         }
 
@@ -28,19 +28,19 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private readonly IInteractableItem[] _interactableItems;
 
         private IInteractable _lastInteractable;
-        private bool _canInteract;
+        private bool _isInteractableFound;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Dispose()
         {
-            _playerInteractionObserver.OnCanInteractEvent -= OnCanInteract;
+            _playerInteractionObserver.OnInteractionStartedEvent -= OnInteractionStarted;
             _playerInteractionObserver.OnInteractionEndedEvent -= OnInteractionEnded;
         }
 
         public void Interact()
         {
-            if (!_canInteract)
+            if (!_isInteractableFound)
                 return;
 
             InteractionType interactionType = _lastInteractable.GetInteractionType();
@@ -67,13 +67,13 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnCanInteract(IInteractable interactable)
+        private void OnInteractionStarted(IInteractable interactable)
         {
-            _canInteract = true;
+            _isInteractableFound = true;
             _lastInteractable = interactable;
         }
 
         private void OnInteractionEnded() =>
-            _canInteract = false;
+            _isInteractableFound = false;
     }
 }

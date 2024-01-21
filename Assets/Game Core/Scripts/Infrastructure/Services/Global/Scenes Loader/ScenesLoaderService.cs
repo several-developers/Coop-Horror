@@ -57,6 +57,7 @@ namespace GameCore.Infrastructure.Services.Global
             Scene scene = SceneManager.GetSceneByName(sceneName.ToString());
             NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
             networkSceneManager.UnloadScene(scene);
+            
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

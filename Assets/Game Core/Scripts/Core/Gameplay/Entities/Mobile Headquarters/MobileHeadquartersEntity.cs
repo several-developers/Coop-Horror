@@ -2,7 +2,7 @@
 using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums;
-using GameCore.Gameplay.Interactable;
+using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -33,9 +33,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [SerializeField, Required]
         private ToggleMobileDoorLever _toggleMobileDoorLever;
+        
+        [SerializeField, Required]
+        private LoadLocationLever _loadLocationLever;
 
         [SerializeField, Required]
-        private LaunchMobileLever _launchMobileLever;
+        private LeaveLocationLever _leaveLocationLever;
         
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -51,30 +54,39 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void Awake()
         {
             Init();
+
+            _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
             
             _animationObserver.OnDoorOpenedEvent += OnDoorOpened;
             _animationObserver.OnDoorClosedEvent += OnDoorClosed;
             
             _toggleMobileDoorLever.OnEnabledEvent += OnDoorLeverEnabled;
             _toggleMobileDoorLever.OnDisabledEvent += OnDoorLeverDisabled;
+            
+            _loadLocationLever.OnEnabledEvent += OnLoadLocation;
 
-            _launchMobileLever.OnEnabledEvent += OnEnableVehicle;
-            _launchMobileLever.OnDisabledEvent += OnDisableVehicle;
+            _leaveLocationLever.OnEnabledEvent += OnLeaveLocation;
         }
 
-        private void FixedUpdate() =>
-            _pathMovement.Movement();
+        private void FixedUpdate()
+        {
+            if (IsOwner)
+                _pathMovement.Movement();
+        }
 
         public override void OnDestroy()
         {
+            _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
+            
             _animationObserver.OnDoorOpenedEvent -= OnDoorOpened;
             _animationObserver.OnDoorClosedEvent -= OnDoorClosed;
             
             _toggleMobileDoorLever.OnEnabledEvent -= OnDoorLeverEnabled;
             _toggleMobileDoorLever.OnDisabledEvent -= OnDoorLeverDisabled;
             
-            _launchMobileLever.OnEnabledEvent -= OnEnableVehicle;
-            _launchMobileLever.OnDisabledEvent -= OnDisableVehicle;
+            _loadLocationLever.OnEnabledEvent -= OnLoadLocation;
+            
+            _leaveLocationLever.OnEnabledEvent -= OnLeaveLocation;
             
             base.OnDestroy();
         }
@@ -83,6 +95,17 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public void ChangePath(CinemachinePath path) =>
             _pathMovement.ChangePath(path);
+
+        public void ArrivedAtLocation()
+        {
+            OnDestinationReached();
+        }
+
+        public void LeftLocation()
+        {
+            _loadLocationLever.InteractWithoutEvents(isEnabled: false);
+            _loadLocationLever.ToggleInteract(canInteract: true);
+        }
 
         public Transform GetTransform() => transform;
 
@@ -107,8 +130,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [Button]
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
-
-        private void ChangeDoorState(bool isOpen) =>
+        
+        private void ToggleDoorState(bool isOpen) =>
             _animator.SetBool(id: AnimatorHashes.IsOpen, isOpen);
 
         private void EnableDoorLever() =>
@@ -116,24 +139,25 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        [Button]
+        private void OnDestinationReached()
+        {
+            _leaveLocationLever.InteractWithoutEvents(isEnabled: false);
+            _leaveLocationLever.ToggleInteract(canInteract: true);
+        }
+        
         private void OnDoorOpened() => EnableDoorLever();
 
         private void OnDoorClosed() => EnableDoorLever();
 
-        private void OnDoorLeverEnabled() => ChangeDoorState(isOpen: true);
+        private void OnDoorLeverEnabled() => ToggleDoorState(isOpen: true);
 
-        private void OnDoorLeverDisabled() => ChangeDoorState(isOpen: false);
-
-        private void OnEnableVehicle()
-        {
+        private void OnDoorLeverDisabled() => ToggleDoorState(isOpen: false);
+        
+        private void OnLoadLocation() =>
             OnLoadLocationEvent?.Invoke(SceneName.Desert);
-            //ToggleMovement(canMove: true);
-        }
 
-        private void OnDisableVehicle()
-        {
+        private void OnLeaveLocation() =>
             OnLocationLeftEvent?.Invoke();
-            //ToggleMovement(canMove: false);
-        }
     }
 }

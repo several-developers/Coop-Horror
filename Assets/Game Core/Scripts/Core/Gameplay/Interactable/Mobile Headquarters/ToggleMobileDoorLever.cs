@@ -1,6 +1,6 @@
 ﻿using GameCore.Enums;
 
-namespace GameCore.Gameplay.Interactable
+namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 {
     public class ToggleMobileDoorLever : LeverBase
     {

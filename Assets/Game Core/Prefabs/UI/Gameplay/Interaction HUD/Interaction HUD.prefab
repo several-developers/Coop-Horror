@@ -52,19 +52,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interactionTextSettings:
+    _defaultDisabledInteractionText: Can't interact
     _interactionEnabledTextSettings:
     - _interactionType: 1
       _text: Press 'F' to pick up
     - _interactionType: 4
-      _text: Press 'F' to start the game
-    - _interactionType: 5
       _text: Press 'F' to open/close the door
+    - _interactionType: 5
+      _text: Press 'F' to start the game
+    - _interactionType: 6
+      _text: Press 'F' to leave the location
     _interactionDisabledTextSettings:
     - _interactionType: 1
       _text: Can't pick up item now
     - _interactionType: 4
-      _text: Can't start game now
-    - _interactionType: 5
       _text: Can't open/close right now
   _textTMP: {fileID: 1650463360097365807}
   _fadeAnimation:

@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using GameCore.Enums;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Locations;
-using GameCore.Gameplay.Network;
 using UnityEngine;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
@@ -19,6 +18,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
+            _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _cancellationTokenSource = new CancellationTokenSource();
             
             _mobileHeadquartersUtilities = new MobileHeadquartersUtilities(mobileHeadquartersEntity,
@@ -31,6 +31,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
+        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
         private readonly MobileHeadquartersUtilities _mobileHeadquartersUtilities;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
@@ -85,6 +86,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         {
             CinemachinePath path = locationManager.GetPath();
             await _mobileHeadquartersUtilities.MoveMobileHQToThePath(path);
+            _mobileHeadquartersEntity.ArrivedAtLocation();
         }
 
         private void EnterGameLoopState() =>

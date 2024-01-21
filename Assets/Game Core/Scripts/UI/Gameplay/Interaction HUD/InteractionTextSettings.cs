@@ -11,6 +11,9 @@ namespace GameCore.UI.Gameplay.Interaction
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField]
+        private string _defaultDisabledInteractionText = "Can't interact";
+        
+        [SerializeField, Space(height: 5)]
         private TextSettings[] _interactionEnabledTextSettings;
 
         [SerializeField]
@@ -47,7 +50,10 @@ namespace GameCore.UI.Gameplay.Interaction
                     return settings.Text;
             }
 
-            return "No Text Found.";
+            if (canInteract)
+                return "No Text Found.";
+            
+            return _defaultDisabledInteractionText;
         }
 
         [Serializable]

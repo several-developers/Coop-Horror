@@ -33,7 +33,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersEntity.ChangePath(path);
 
             bool isCanceled = await UniTask
-                .DelayFrame(delayFrameCount: 1, cancellationToken: _cancellationTokenSource.Token)
+                .DelayFrame(delayFrameCount: 4, cancellationToken: _cancellationTokenSource.Token)
                 .SuppressCancellationThrow();
 
             if (isCanceled)

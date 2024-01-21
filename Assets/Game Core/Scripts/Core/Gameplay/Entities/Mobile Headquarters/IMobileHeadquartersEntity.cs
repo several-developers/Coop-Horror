@@ -9,5 +9,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         event Action<SceneName> OnLoadLocationEvent;
         event Action OnLocationLeftEvent;
         void ChangePath(CinemachinePath path);
+        void ArrivedAtLocation();
+        void LeftLocation();
     }
 }
