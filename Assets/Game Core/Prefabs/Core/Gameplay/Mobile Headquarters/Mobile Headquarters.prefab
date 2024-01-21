@@ -100,6 +100,8 @@ GameObject:
   - component: {fileID: 2871681218726240799}
   - component: {fileID: 1435509824869955947}
   - component: {fileID: 1956820334519849814}
+  - component: {fileID: 6659262628099773767}
+  - component: {fileID: 5886289170632087111}
   m_Layer: 0
   m_Name: Mobile Headquarters
   m_TagString: Untagged
@@ -210,7 +212,6 @@ MonoBehaviour:
   _networkObject: {fileID: 4446837613166490103}
   _toggleMobileDoorLever: {fileID: 8067631092820087447}
   _launchMobileLever: {fileID: 3905741392167710577}
-  _cinemachinePath: {fileID: 0}
 --- !u!114 &1435509824869955947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,6 +245,48 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &6659262628099773767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195987239533786563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0445756174f0834ba947f4d8a5cc640, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &5886289170632087111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195987239533786563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6195987239724444557
 GameObject:
   m_ObjectHideFlags: 0

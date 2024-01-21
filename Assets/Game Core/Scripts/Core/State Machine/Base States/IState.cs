@@ -10,6 +10,11 @@ namespace GameCore
     {
         void Enter();
     }
+    
+    public interface IEnterState<TEnterParams> : IState
+    {
+        void Enter(TEnterParams sceneName);
+    }
 
     public interface IExitState : IState
     {

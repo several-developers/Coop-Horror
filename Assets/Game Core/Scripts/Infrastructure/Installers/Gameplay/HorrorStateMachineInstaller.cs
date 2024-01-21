@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.HorrorStateMachineSpace;
+﻿using System;
+using GameCore.Gameplay.HorrorStateMachineSpace;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -12,6 +13,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindHorrorStateMachine();
             BindPrepareGameState();
             BindGameLoopState();
+            BindLoadLocationState();
+            BindLeaveLocationState();
             BindQuitState();
         }
 
@@ -36,6 +39,24 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .Bind<GameLoopState>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindLoadLocationState()
+        {
+            Container
+                .Bind(typeof(LoadLocationState), typeof(IDisposable))
+                .To<LoadLocationState>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindLeaveLocationState()
+        {
+            Container
+                .Bind(typeof(LeaveLocationState), typeof(IDisposable))
+                .To<LeaveLocationState>()
                 .AsSingle()
                 .NonLazy();
         }

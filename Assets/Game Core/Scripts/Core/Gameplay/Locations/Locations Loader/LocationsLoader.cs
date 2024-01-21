@@ -28,6 +28,8 @@ namespace GameCore.Gameplay.Locations
                 return;
 
             _isLocationLoaded = true;
+            _lastLoadedLocation = sceneName;
+            
             _scenesLoaderService.LoadSceneNetworkAdditive(sceneName, callback);
         }
 

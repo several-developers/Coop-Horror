@@ -109,7 +109,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         public override void OnDestroy()
         {
-            if (_isInitialized && IsOwner)
+            if (_isInitialized)
             {
                 if (IsOwner)
                 {
@@ -123,6 +123,7 @@ namespace GameCore.Gameplay.Entities.Player
                 
                 _rpcCaller.OnCreateItemPreviewEvent -= OnCreateItemPreview;
                 _rpcCaller.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
+                _rpcCaller.OnTeleportPlayerWithOffsetEvent -= OnTeleportPlayerWithOffset;
             }
 
             base.OnDestroy();
@@ -143,7 +144,6 @@ namespace GameCore.Gameplay.Entities.Player
             base.OnNetworkDespawn();
         }
 
-#warning НЕ ВЫЗЫВАЕТСЯ У НОВЫХ ПОДКЛЮЧЁННЫХ ИГРОКОВ ДЛЯ СТАРЫХ ПОДКЛЮЧЁННЫХ
         public void Setup()
         {
             //float reloadTime = 1.5f;
@@ -204,6 +204,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             _rpcCaller.OnCreateItemPreviewEvent += OnCreateItemPreview;
             _rpcCaller.OnDestroyItemPreviewEvent += OnDestroyItemPreview;
+            _rpcCaller.OnTeleportPlayerWithOffsetEvent += OnTeleportPlayerWithOffset;
         }
 
         private void InitOwner()
@@ -383,6 +384,13 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnDestroyItemPreview(int slotIndex) =>
             _inventoryManager.DestroyItemPreview(slotIndex);
+        
+        private void OnTeleportPlayerWithOffset(Vector3 offset)
+        {
+            Vector3 currentPosition = transform.position;
+            Vector3 newPosition = currentPosition + offset;
+            transform.position = newPosition;
+        }
 
         private void OnOwnerSelectedSlotChanged(int slotIndex) =>
             _currentSelectedSlotIndex.Value = slotIndex;

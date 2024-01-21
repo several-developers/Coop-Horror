@@ -1620,6 +1620,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mobile Headquarters - Test Path
       objectReference: {fileID: 0}
+    - target: {fileID: 6023900665784323567, guid: c3853b5d7b8c30d4b833f64e63e263a8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3853b5d7b8c30d4b833f64e63e263a8, type: 3}
 --- !u!4 &500839246 stripped
@@ -18644,7 +18649,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1692818894
 Transform:
   m_ObjectHideFlags: 0
@@ -20312,16 +20317,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1435509824869955947, guid: b573e9cfef954b44eb72d3d379112c48,
-        type: 3}
-      propertyPath: m_Path
-      value: 
-      objectReference: {fileID: 500839247}
-    - target: {fileID: 1435509824869955947, guid: b573e9cfef954b44eb72d3d379112c48,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2871681218726240799, guid: b573e9cfef954b44eb72d3d379112c48,
         type: 3}
       propertyPath: _cinemachinePath

@@ -1,6 +1,7 @@
 ﻿using System;
 using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
+using GameCore.Enums;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
@@ -38,6 +39,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action<SceneName> OnLoadLocationEvent;
+        public event Action OnLocationLeftEvent;
+        
         private static MobileHeadquartersEntity _instance;
         
         private RigidbodyPathMovement _pathMovement;
@@ -100,6 +104,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _pathMovement = new RigidbodyPathMovement(transform, _animator, _dollyCart, _mobileHeadquartersConfig);
         }
 
+        [Button]
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
 
@@ -119,8 +124,16 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void OnDoorLeverDisabled() => ChangeDoorState(isOpen: false);
 
-        private void OnEnableVehicle() => ToggleMovement(canMove: true);
+        private void OnEnableVehicle()
+        {
+            OnLoadLocationEvent?.Invoke(SceneName.Desert);
+            //ToggleMovement(canMove: true);
+        }
 
-        private void OnDisableVehicle() => ToggleMovement(canMove: false);
+        private void OnDisableVehicle()
+        {
+            OnLocationLeftEvent?.Invoke();
+            //ToggleMovement(canMove: false);
+        }
     }
 }

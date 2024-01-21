@@ -52,9 +52,9 @@ namespace GameCore
             _states.Add(type, state);
         }
 
-        public void ChangeState<T>() where T : IState
+        public void ChangeState<TState>() where TState : IState
         {
-            Type type = typeof(T);
+            Type type = typeof(TState);
 
             if (!IsStateExists(type))
                 return;
@@ -82,6 +82,41 @@ namespace GameCore
             }
         }
 
+        public void ChangeState<TState, TEnterParams>(TEnterParams enterParams) where TState : IState
+        {
+            Type type = typeof(TState);
+
+            if (!IsStateExists(type))
+                return;
+
+            switch (_currentState)
+            {
+                case IExitState exitState:
+                    exitState.Exit();
+                    break;
+                case IExitStateAsync exitStateAsync:
+                    exitStateAsync.Exit();
+                    break;
+            }
+
+            _currentState = _states[type];
+
+            switch (_currentState)
+            {
+                case IEnterState enterState:
+                    enterState.Enter();
+                    break;
+                
+                case IEnterState<TEnterParams> enterState:
+                    enterState.Enter(enterParams);
+                    break;
+
+                case IEnterStateAsync enterStateAsync:
+                    enterStateAsync.Enter();
+                    break;
+            }
+        }
+        
         public bool TryGetCurrentState(out IState state)
         {
             state = _currentState;

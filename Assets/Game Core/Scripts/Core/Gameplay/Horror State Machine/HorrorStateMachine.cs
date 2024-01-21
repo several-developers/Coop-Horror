@@ -22,11 +22,19 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         public void AddState(IState state) =>
             _stateMachine.AddStateWithRemove(state);
 
-        public void ChangeState<T>() where T : IState
+        public void ChangeState<TState>() where TState : IState
         {
-            //LogStateChange<T>();
+            //LogStateChange<TState>();
             
-            _stateMachine.ChangeState<T>();
+            _stateMachine.ChangeState<TState>();
+            //_gameStateMachineObserver.SendStateChanged();
+        }
+
+        public void ChangeState<TState, TEnterParams>(TEnterParams enterParams) where TState : IState
+        {
+            //LogStateChange<TState>();
+          
+            _stateMachine.ChangeState<TState, TEnterParams>(enterParams);
             //_gameStateMachineObserver.SendStateChanged();
         }
 

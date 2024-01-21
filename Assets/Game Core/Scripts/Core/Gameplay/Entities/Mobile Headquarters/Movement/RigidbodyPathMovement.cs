@@ -69,7 +69,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             
             Vector3 position = _path.EvaluatePositionAtUnit(pos: 0, CinemachinePathBase.PositionUnits.Distance);
             Quaternion rotation = _path.EvaluateOrientationAtUnit(pos: 0, CinemachinePathBase.PositionUnits.Distance);
-            
+
+            _transform.position = position;
             _rigidbody.MovePosition(position);
             _rigidbody.MoveRotation(rotation);
         }

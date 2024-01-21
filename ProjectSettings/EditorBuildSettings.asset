@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game Core/Scenes/Gameplay.unity
     guid: b2bf899e600d75e44bc1a8e1dd9f2c50
+  - enabled: 1
+    path: Assets/Game Core/Scenes/Locations/Desert.unity
+    guid: 7bb0b14dc8183a74699c123d29eadaaa
   - enabled: 0
     path: Assets/NetcodePlus/Demo/Scenes/Menu.unity
     guid: 8688a61676144da46aa4feda588f6873
