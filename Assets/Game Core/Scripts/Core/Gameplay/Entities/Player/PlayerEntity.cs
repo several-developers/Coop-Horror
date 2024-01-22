@@ -57,6 +57,9 @@ namespace GameCore.Gameplay.Entities.Player
         private NetworkObject _networkObject;
 
         [SerializeField, Required]
+        private Rigidbody _rigidbody;
+        
+        [SerializeField, Required]
         private GameObject _playerModel;
 
         [SerializeField, Required]
@@ -258,6 +261,9 @@ namespace GameCore.Gameplay.Entities.Player
                 _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
 
                 InventoryHUD.Get().Init(playerEntity: this); // TEMP
+
+                _rigidbody.isKinematic = true;
+                _rigidbody.isKinematic = false;
 
                 _playerMovement.OnJump += () => { _networkAnimator.SetTrigger(AnimatorHashes.Jump); };
 

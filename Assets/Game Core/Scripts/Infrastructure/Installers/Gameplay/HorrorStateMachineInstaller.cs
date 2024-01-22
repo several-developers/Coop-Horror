@@ -30,7 +30,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private void BindPrepareGameState()
         {
             Container
-                .Bind<PrepareGameState>()
+                .Bind(typeof(PrepareGameState), typeof(IDisposable))
+                .To<PrepareGameState>()
                 .AsSingle()
                 .NonLazy();
         }
@@ -55,8 +56,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private void BindLeaveLocationState()
         {
             Container
-                .Bind(typeof(LeaveLocationState), typeof(IDisposable))
-                .To<LeaveLocationState>()
+                .Bind<LeaveLocationState>()
                 .AsSingle()
                 .NonLazy();
         }

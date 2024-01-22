@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Locations
 {
-    public class RoadLocationManager : MonoBehaviour, IRoadLocationManager
+    public class RoadLocationManager : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -12,8 +12,19 @@ namespace GameCore.Gameplay.Locations
         [SerializeField, Required]
         private CinemachinePath _path;
 
+        // FIELDS: --------------------------------------------------------------------------------
+
+        private static RoadLocationManager _instance;
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Awake() =>
+            _instance = this;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public CinemachinePath GetPath() => _path;
+
+        public static RoadLocationManager Get() => _instance;
     }
 }

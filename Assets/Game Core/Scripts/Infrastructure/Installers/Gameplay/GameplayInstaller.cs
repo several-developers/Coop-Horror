@@ -21,9 +21,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         [SerializeField, Required]
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
         
-        [SerializeField, Required]
-        private RoadLocationManager _roadLocationManager;
-        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void InstallBindings()
@@ -35,7 +32,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindSun();
             BindTimeCycle();
             BindLocationsLoader();
-            BindRoadLocationManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -88,14 +84,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<LocationsLoader>()
-                .AsSingle();
-        }
-
-        private void BindRoadLocationManager()
-        {
-            Container
-                .Bind<IRoadLocationManager>()
-                .FromInstance(_roadLocationManager)
                 .AsSingle();
         }
     }

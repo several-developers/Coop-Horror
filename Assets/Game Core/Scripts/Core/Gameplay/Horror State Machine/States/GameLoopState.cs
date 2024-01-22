@@ -24,28 +24,10 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         public void Enter()
         {
-            _mobileHeadquartersEntity.OnLoadLocationEvent += OnLoadLocation;
-            _mobileHeadquartersEntity.OnLocationLeftEvent += OnLocationLeft;
         }
 
         public void Exit()
         {
-            _mobileHeadquartersEntity.OnLoadLocationEvent -= OnLoadLocation;
-            _mobileHeadquartersEntity.OnLocationLeftEvent -= OnLocationLeft;
         }
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void EnterLoadLocationState(SceneName sceneName) =>
-            _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
-
-        private void EnterLeaveLocationState() =>
-            _horrorStateMachine.ChangeState<LeaveLocationState>();
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnLoadLocation(SceneName sceneName) => EnterLoadLocationState(sceneName);
-
-        private void OnLocationLeft() => EnterLeaveLocationState();
     }
 }

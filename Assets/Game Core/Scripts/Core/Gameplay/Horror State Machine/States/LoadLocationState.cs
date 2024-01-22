@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading;
-using Cinemachine;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Locations;
+using GameCore.Gameplay.Network;
 using UnityEngine;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
@@ -13,17 +12,12 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LoadLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader,
-            IMobileHeadquartersEntity mobileHeadquartersEntity)
+        public LoadLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader)
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _cancellationTokenSource = new CancellationTokenSource();
             
-            _mobileHeadquartersUtilities = new MobileHeadquartersUtilities(mobileHeadquartersEntity,
-                _cancellationTokenSource);
-
             horrorStateMachine.AddState(this);
         }
 
@@ -31,8 +25,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
-        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
-        private readonly MobileHeadquartersUtilities _mobileHeadquartersUtilities;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -74,19 +66,14 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 if (!isExists)
                     continue;
 
-                Debug.Log("Iterations amount: " + iterations);
+                Debug.Log("Find Location Manager iterations amount: " + iterations);
 
-                await MoveMobileHQToTheRoad(locationManager);
+                RpcCaller rpcCaller = RpcCaller.Get();
+                rpcCaller.SendLocationLoaded();
+                
                 EnterGameLoopState();
                 break;
             }
-        }
-
-        private async UniTask MoveMobileHQToTheRoad(LocationManager locationManager)
-        {
-            CinemachinePath path = locationManager.GetPath();
-            await _mobileHeadquartersUtilities.MoveMobileHQToThePath(path);
-            _mobileHeadquartersEntity.ArrivedAtLocation();
         }
 
         private void EnterGameLoopState() =>

@@ -26,6 +26,7 @@ namespace GameCore.Gameplay.Interactable
         
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnInteractEvent; 
         public event Action OnInteractionStateChangedEvent;
         public event Action OnEnabledEvent;
         public event Action OnDisabledEvent;
@@ -60,13 +61,19 @@ namespace GameCore.Gameplay.Interactable
         
         public void Interact()
         {
+            _canInteract = false;
+            OnInteractEvent?.Invoke();
+        }
+
+        public void InteractLogic()
+        {
             _isEnabled = !_isEnabled;
             _canInteract = false;
 
             SendInteractionStateChangedEvent();
             ChangeAnimationState();
         }
-
+        
         public void InteractWithoutEvents(bool isEnabled)
         {
             _ignoreAnimationEvents = true;

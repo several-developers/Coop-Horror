@@ -64,6 +64,7 @@ namespace GameCore.Gameplay.Network
         private float _slowUpdateTimer;
         private bool _offlineMode;
         private bool _isGameTimerOn;
+        private bool _isRoadLocationLoaded; // TEMP
 
         // TEMP
 
@@ -157,6 +158,10 @@ namespace GameCore.Gameplay.Network
             AfterDisconnected();
         }
 
+        // TEMP
+        public void SetRoadLocationLoaded() =>
+            _isRoadLocationLoaded = true;
+
         public bool IsActive() =>
             _networkManager.IsServer || _networkManager.IsHost || _networkManager.IsClient;
 
@@ -198,6 +203,9 @@ namespace GameCore.Gameplay.Network
             bool isGameplaySceneLoaded = HorrorGame.Get() != null;
 
             if (!isGameplaySceneLoaded)
+                return;
+
+            if (!_isRoadLocationLoaded)
                 return;
 
             bool isReady = ReadyPlayersDictionary.ContainsKey(ClientID) && ReadyPlayersDictionary[ClientID];

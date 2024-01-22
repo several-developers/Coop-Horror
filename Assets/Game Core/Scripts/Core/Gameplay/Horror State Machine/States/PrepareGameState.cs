@@ -1,49 +1,76 @@
-﻿using System.Threading;
-using Cinemachine;
+﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
-using GameCore.Gameplay.Locations;
+using GameCore.Gameplay.Network;
+using Unity.Netcode;
+using UnityEngine;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
-    public class PrepareGameState : IEnterStateAsync
+    public class PrepareGameState : IEnterStateAsync, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PrepareGameState(IHorrorStateMachine horrorStateMachine, IRoadLocationManager roadLocationManager,
+        public PrepareGameState(IHorrorStateMachine horrorStateMachine,
             IMobileHeadquartersEntity mobileHeadquartersEntity)
         {
             _horrorStateMachine = horrorStateMachine;
-            _roadLocationManager = roadLocationManager;
+            _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _cancellationTokenSource = new CancellationTokenSource();
-            _mobileHeadquartersUtilities = new MobileHeadquartersUtilities(mobileHeadquartersEntity,
-                _cancellationTokenSource);
 
             horrorStateMachine.AddState(this);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly IHorrorStateMachine _horrorStateMachine;
-        private readonly IRoadLocationManager _roadLocationManager;
-        private readonly MobileHeadquartersUtilities _mobileHeadquartersUtilities;
+        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public async UniTaskVoid Enter()
         {
-            await MoveMobileHQToTheRoad();
+            int iterations = 0;
+
+            while (iterations < 1000)
+            {
+                iterations++;
+                
+                bool isCanceled = await UniTask
+                    .DelayFrame(1)
+                    .SuppressCancellationThrow();
+
+                if (isCanceled)
+                    return;
+
+                NetworkObject networkObject = _mobileHeadquartersEntity.GetNetworkObject();
+                bool isSpawned = networkObject.IsSpawned;
+
+                if (!isSpawned)
+                    continue;
+                
+                //RpcCaller rpcCaller = RpcCaller.Get();
+                //rpcCaller.SendRoadLocationLoaded();
+                
+                _mobileHeadquartersEntity.ArriveAtRoadLocation();
+                
+                TheNetworkHorror networkHorror = TheNetworkHorror.Get(); // TEMP
+                networkHorror.SetRoadLocationLoaded(); // TEMP
+
+                break;
+            }
+            
+            Debug.Log($"Prepared with {iterations} iterations.");
+
             EnterGameLoopState();
         }
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
+        public void Dispose() =>
+            _cancellationTokenSource?.Dispose();
 
-        private async UniTask MoveMobileHQToTheRoad()
-        {
-            CinemachinePath path = _roadLocationManager.GetPath();
-            await _mobileHeadquartersUtilities.MoveMobileHQToThePath(path);
-        }
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void EnterGameLoopState() =>
             _horrorStateMachine.ChangeState<GameLoopState>();

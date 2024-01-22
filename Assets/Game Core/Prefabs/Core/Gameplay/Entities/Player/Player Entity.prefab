@@ -3102,6 +3102,7 @@ MonoBehaviour:
   _animator: {fileID: 112505025958984634}
   _networkAnimator: {fileID: 3165830425533676757}
   _networkObject: {fileID: -4117527861951101490}
+  _rigidbody: {fileID: 7127189264355523618}
   _playerModel: {fileID: 147102560534255457}
   _cameraPoint: {fileID: 91750195740998113}
   _playerItemPivot: {fileID: 8186703484883488036}

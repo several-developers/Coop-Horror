@@ -17,7 +17,7 @@ namespace GameCore.Gameplay.Entities.Player.Other
         private static PlayerSetupHelper _instance;
         
         private IItemsPreviewFactory _itemsPreviewFactory;
-
+      
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() =>
@@ -26,7 +26,7 @@ namespace GameCore.Gameplay.Entities.Player.Other
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public IItemsPreviewFactory GetItemsPreviewFactory() => _itemsPreviewFactory;
-        
+
         public static PlayerSetupHelper Get() => _instance;
     }
 }

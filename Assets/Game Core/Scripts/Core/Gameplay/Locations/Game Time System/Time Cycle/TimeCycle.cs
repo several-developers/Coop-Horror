@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Time;
 using GameCore.Enums;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -20,6 +21,8 @@ namespace GameCore.Gameplay.Locations.GameTime
             _sunTransform = _sun.transform;
             _simulate = _timeConfig.Simulate;
             _stopAtNight = _timeConfig.StopAtNight;
+            
+            SetDateTime(_timeConfig.Second, _timeConfig.Minute, _timeConfig.Hour);
 
             OnHourPassedEvent += _timeCycleDecorator.SendHourPassedEvent;
             
@@ -71,7 +74,6 @@ namespace GameCore.Gameplay.Locations.GameTime
 
         public void Initialize()
         {
-            SetDateTime(_timeConfig.Second, _timeConfig.Minute, _timeConfig.Hour);
             UpdateVisual();
             SendTimeUpdatedEvent();
         }
