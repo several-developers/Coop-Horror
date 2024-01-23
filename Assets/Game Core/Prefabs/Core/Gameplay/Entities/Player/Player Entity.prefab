@@ -2770,98 +2770,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &-3872963492568310094
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98d12855017d43aca6c3dd4131aea557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &430461550739394689
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9976d2616fb9f214e8200359e6b7c686, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  waterFootsteps:
-  - {fileID: 8300000, guid: 459285efe9d02114a8ca470bbe40ed6e, type: 3}
-  - {fileID: 8300000, guid: f73448abf1f56c448820d7c15574f110, type: 3}
-  - {fileID: 8300000, guid: 7d63963b5ae50fe458910b734b51a3ad, type: 3}
-  - {fileID: 8300000, guid: 4a9a188508c73f24bb73ee4e10c81526, type: 3}
-  - {fileID: 8300000, guid: 7cc116cca6b292c4aa0014051eecc465, type: 3}
-  definedSurfaces:
-  - surfaceIndex: 0
-    footsteps:
-    - {fileID: 8300000, guid: 440c7f5c92bac234586c775537825d16, type: 3}
-    - {fileID: 8300000, guid: 1f6ef89dce2fc6a4aa08a3eefdbbc6e6, type: 3}
-    - {fileID: 8300000, guid: a584d602ae4dea745bfd1b3567ad7bd7, type: 3}
-    - {fileID: 8300000, guid: f77c201850341bc45ab1d8e258fd59b1, type: 3}
-    - {fileID: 8300000, guid: db9eb02ca4b5f6b498ba17568686734b, type: 3}
-    landing: []
-  allowAnimEvent: 0
-  animationsInBlend: 1
-  distanceBetweenStepsWalk: 2.4
-  distanceBetweenStepsSlow: 2
-  distanceBetweenStepsSprint: 2.9
-  distanceBetweenStepsDash: 4.8
-  defaultSurfaceIndex: 0
-  audioSource: {fileID: 1301900433640509376}
-  volume: {x: 0.25, y: 0.5}
-  landVolumeMult: 2
-  silentVolumeMult: 0.5
-  sprintVolumeMult: 1.2
-  dashVolumeMult: 1.8
---- !u!114 &1075499280315567856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c45dee91e62209489f0ed8eee291f79, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  defaultFov: 65
-  sprintFov: 75
-  weaponCamFovDiff: 0
-  nextFov: 75
-  newFov: 75
-  walkPositionBob: {x: -1, y: 1}
-  walkAngleBob: {x: -0.005, y: -0.06, z: 0.03}
-  walkBobSpeed: 1.35
-  sprintPositionBob: {x: -1, y: -1}
-  sprintAngleBob: {x: -0.05, y: -0.03, z: 0.3}
-  sprintBobSpeed: 1.8
-  crouchPositionBob: {x: -1, y: 1}
-  crouchAngleBob: {x: -0.01, y: -0.1, z: 0.2}
-  crouchBobSpeed: 0.95
-  swimBobSpeedFactor: 0.6
-  camPositionBobAmt: {x: 0, y: 0}
-  camAngleBobAmt: {x: 0, y: 0, z: 0}
-  sprintStrafeRoll: 2
-  walkStrafeRoll: 1
-  lookRoll: 0.2
-  swimLookRoll: 9
-  rollReturnSpeed: 4
-  rollReturnSpeedSwim: 1.5
-  switchMove: 0
-  climbMove: 0
-  jumpAmt: 0
-  side: 0
-  raise: 0
 --- !u!114 &5174800490687240705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2942,110 +2850,9 @@ MonoBehaviour:
     m_ActionName: UI/TrackedDeviceOrientation
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
-  m_DefaultActionMap: Player
+  m_DefaultActionMap: Gameplay
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &5237258084370620171
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f543f872233b79c4c9490054806d3e4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _debug: 0
-  capsule: {fileID: 1967799250354909116}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 1
-  _inputLerpSpeed: 90
-  groundedPhysMaterial: {fileID: 13400000, guid: f5a8bbec1686b9b44b216e231f529413,
-    type: 2}
-  stayPhysMaterial: {fileID: 13400000, guid: 5c5c10cd23cfcd244af9ef060e8e372d, type: 2}
-  flyPhysMaterial: {fileID: 13400000, guid: f5a8bbec1686b9b44b216e231f529413, type: 2}
-  _gravityMultiplier: 2
-  _gravityMax: 30
-  _airSpeedMultiplier: 1
-  walkSpeed: 3
-  diagonalStrafeAmt: 0.75
-  backwardSpeedPercentage: 0.9
-  strafeSpeedPercentage: 1
-  slopeLimit: 55
-  slopeSpeed:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: -0.002223433
-      tangentMode: 65
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.6987639
-      value: 0.99844635
-      inSlope: -0.002223433
-      outSlope: -0.026184037
-      tangentMode: 5
-      weightedMode: 0
-      inWeight: 0.08454482
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  maxStepHeight: 0.6
-  stepHeightRadius: 0.6
-  standingCamHeight: 0.9
-  standingCapsuleHeight: 1.9
-  _playerCrouchingConfig: {fileID: 11400000, guid: eb0ebccfd4fb997468add322b97a3b48,
-    type: 2}
-  _playerJumpingConfig: {fileID: 11400000, guid: b12e2f737ece9704884d7f49837c19f9,
-    type: 2}
-  _playerSprintConfig: {fileID: 11400000, guid: aaa68f7ddb2b7304d8bfaa64a7896d61,
-    type: 2}
-  _playerDashConfig: {fileID: 11400000, guid: 841c2715f45806e42a8cbf3e8235bb51, type: 2}
-  dashSounds:
-  - {fileID: 8300000, guid: e747c9bcafccd084d8ab47d35760082e, type: 3}
-  - {fileID: 8300000, guid: 1a5827a00ac926b4cab71e9383ac24e6, type: 3}
-  - {fileID: 8300000, guid: e01dea02745fe304dbed63fa76315106, type: 3}
-  - {fileID: 8300000, guid: de47ff573723904408f4d5ed2af88048, type: 3}
-  _playerSwimmingConfig: {fileID: 11400000, guid: 69169975db7dbbd42a4b12df17f0b532,
-    type: 2}
-  underwaterAudioSource: {fileID: 7338709719172407751}
-  swimmingAudioSource: {fileID: 2194984066656819122}
-  swimOnSurfaceSound: {fileID: 8300000, guid: c9a80ddb1c99f1e44aeece60296f77b2, type: 3}
-  swimUnderSurfaceSound: {fileID: 8300000, guid: ab607a22c8a9b5c4988a926403e028f6,
-    type: 3}
-  fallInWaterSounds:
-  - {fileID: 8300000, guid: 4006b1b90180f5e418235cbb095e4800, type: 3}
-  fallInDeepWaterSound: {fileID: 8300000, guid: 9adec922dedeaf340b49e767a25b1a07,
-    type: 3}
-  divingInSounds:
-  - {fileID: 8300000, guid: 1283084076639bb468831c0ce929b90f, type: 3}
-  divingOutSounds:
-  - {fileID: 8300000, guid: 1e7c19ce150491e48b32f097790f9cb0, type: 3}
-  _playerLeaningConfig: {fileID: 11400000, guid: 9dbc99562909f524a9b1e3c62523eefa,
-    type: 2}
-  _playerClimbingConfig: {fileID: 11400000, guid: bcda0f5451f87e949a8adef0726b64e2,
-    type: 2}
-  _climbingAudioSource: {fileID: 4333079308843996799}
-  _playerFallDamageConfig: {fileID: 11400000, guid: f34197d58923dc24ba3fd6a829a0b671,
-    type: 2}
 --- !u!114 &5356547518013829562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3088,9 +2895,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44a6423fb52a47a689e6534bba62a694, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 6516424174033649999}
-  _playerMovement: {fileID: 5237258084370620171}
-  _playerFootsteps: {fileID: 430461550739394689}
   _isDead: 0
   _interactionMaxDistance: 2.2
   _interactionLM:
@@ -3099,6 +2903,7 @@ MonoBehaviour:
   _interactionObstaclesLM:
     serializedVersion: 2
     m_Bits: 439
+  _inputReader: {fileID: 11400000, guid: 7489e65eb9ef65948896268ef22c23cd, type: 2}
   _animator: {fileID: 112505025958984634}
   _networkAnimator: {fileID: 3165830425533676757}
   _networkObject: {fileID: -4117527861951101490}
@@ -3138,9 +2943,9 @@ MonoBehaviour:
   interactDistance: 2
   interactCastRadius: 0.2
   audioSources: {fileID: 1916549900642507524}
-  controller: {fileID: 5237258084370620171}
-  cameraBobAnims: {fileID: 1075499280315567856}
-  footsteps: {fileID: 430461550739394689}
+  controller: {fileID: 0}
+  cameraBobAnims: {fileID: 0}
+  footsteps: {fileID: 0}
   deadlyHeight: -1000
   effectsAudioSource: {fileID: 2194461843507448856}
   returnToGroundAltitude: -500

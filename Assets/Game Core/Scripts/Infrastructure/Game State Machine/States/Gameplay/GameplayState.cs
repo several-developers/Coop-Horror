@@ -1,6 +1,7 @@
 using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.HorrorStateMachineSpace;
-using GameCore.Gameplay.Managers;
+using GameCore.Gameplay.InputHandlerTEMP;
+using GameCore.Infrastructure.Providers.Global;
 using GameCore.Observers.Gameplay.UI;
 using GameCore.UI.Gameplay.PauseMenu;
 using GameCore.Utilities;
@@ -12,10 +13,11 @@ namespace GameCore.Infrastructure.StateMachine
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public GameplayState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
-            IUIObserver uiObserver)
+            IConfigsProvider configsProvider, IUIObserver uiObserver)
         {
             _gameStateMachine = gameStateMachine;
             _horrorStateMachine = horrorStateMachine;
+            _inputReader = configsProvider.GetInputReader();
             _uiObserver = uiObserver;
 
             _gameStateMachine.AddState(this);
@@ -25,6 +27,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IHorrorStateMachine _horrorStateMachine;
+        private readonly InputReader _inputReader;
         private readonly IUIObserver _uiObserver;
 
         private PauseMenuView _pauseMenuView;
@@ -38,8 +41,8 @@ namespace GameCore.Infrastructure.StateMachine
             CreatePauseMenu();
             CreateQuitConfirmMenuView();
             InitHorrorStateMachine();
-            
-            InputSystemManager.OnOpenPauseMenuEvent += OnOpenPauseMenu;
+
+            _inputReader.OnPauseEvent += OnOpenPauseMenu;
             
             _pauseMenuView.OnContinueClickedEvent += OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent += OnQuitClicked;
@@ -49,8 +52,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Exit()
         {
-            InputSystemManager.OnOpenPauseMenuEvent -= OnOpenPauseMenu;
-            InputSystemManager.OnOpenPauseMenuEvent -= OnOpenPauseMenu;
+            _inputReader.OnPauseEvent -= OnOpenPauseMenu;
             
             _pauseMenuView.OnContinueClickedEvent -= OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent -= OnQuitClicked;
@@ -96,14 +98,14 @@ namespace GameCore.Infrastructure.StateMachine
         {
             UnlockCursor();
             ShowPauseMenu();
-            InputSystemManager.SwitchToUI();
+            _inputReader.EnableUIInput();
         }
 
         private void OnContinueClicked()
         {
             LockCursor();
             HidePauseMenu();
-            InputSystemManager.SwitchToPlayer();
+            _inputReader.EnableGameplayInput();
         }
 
         private void OnQuitClicked() => ShowQuitConfirmMenu();

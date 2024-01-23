@@ -1,11 +1,10 @@
 ﻿using System;
-using EFPController;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.Other;
 using GameCore.Gameplay.Factories.ItemsPreview;
-using GameCore.Gameplay.Managers;
+using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.UI.Gameplay.Inventory;
@@ -20,19 +19,7 @@ namespace GameCore.Gameplay.Entities.Player
     public class PlayerEntity : NetworkBehaviour, IPlayerEntity
     {
         // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title("TEMP ------------------")]
-        [SerializeField, Required]
-        private EFPController.Player _player;
-
-        [SerializeField, Required]
-        private PlayerMovement _playerMovement;
-
-        [SerializeField, Required]
-        private PlayerFootsteps _playerFootsteps;
-
-        private CameraBobAnims _cameraBobAnims;
-
+        
         [Title(Constants.Settings)]
         [SerializeField]
         private bool _isDead;
@@ -47,6 +34,9 @@ namespace GameCore.Gameplay.Entities.Player
         private LayerMask _interactionObstaclesLM;
 
         [Title(Constants.References)]
+        [SerializeField, Required]
+        private InputReader _inputReader;
+        
         [SerializeField, Required]
         private Animator _animator;
 
@@ -88,6 +78,7 @@ namespace GameCore.Gameplay.Entities.Player
         private TheNetworkHorror _networkHorror;
         private RpcCaller _rpcCaller;
         private PlayerCamera _playerCamera;
+        private Gameplay.PlayerCamera.CameraController _cameraController;
 
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
@@ -201,8 +192,9 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _rpcCaller = RpcCaller.Get();
             _playerCamera = PlayerCamera.Get();
-            
-            _cameraItemPivot = _playerCamera.ItemPivot;
+            _cameraController = Gameplay.PlayerCamera.CameraController.Get();
+
+            _cameraItemPivot = _cameraController.CameraReferences.ItemPivot;
 
             PlayerSetupHelper playerSetupHelper = PlayerSetupHelper.Get();
             IItemsPreviewFactory itemsPreviewFactory = playerSetupHelper.GetItemsPreviewFactory();
@@ -228,40 +220,24 @@ namespace GameCore.Gameplay.Entities.Player
 
             _playerModel.SetActive(false);
 
-            InputSystemManager.OnMoveEvent += OnMove;
-            InputSystemManager.OnScrollEvent += OnScroll;
-            InputSystemManager.OnInteractEvent += OnInteract;
-            InputSystemManager.OnDropItemEvent += OnDropItem;
+            _inputReader.OnMoveEvent += OnMove;
+            _inputReader.OnScrollEvent += OnScroll;
+            _inputReader.OnInteractEvent += OnInteract;
+            _inputReader.OnDropItemEvent += OnDropItem;
 
             // LOCAL METHODS: -----------------------------
 
             void BasicInit()
             {
                 IPlayerInteractionObserver playerInteractionObserver = NetworkSpawner.Get().PlayerInteractionObserver;
-
-                var playerInput = GetComponent<PlayerInput>();
-                InputSystemManager.Init(playerInput);
                 
-                _playerMovement.Init(_player, _playerCamera.Camera.transform);
-                _lookAtObject = _playerCamera.LookAtObject;
-
-                SmoothLook smoothLook = _playerCamera.SmoothLook;
-                smoothLook.Init(_player);
-
-                CameraRootAnimations cameraRootAnimations = _playerCamera.CameraRootAnimations;
-
-                CameraControl cameraControl = _playerCamera.CameraControl;
-                cameraControl.Init(_player, cameraRootAnimations);
-
-                _player.Init(smoothLook, cameraControl, _playerCamera.Camera, _playerCamera.WeaponRoot,
-                    _playerCamera.CameraRoot, _playerCamera.CameraAnimator);
-
-                CameraBobAnims cameraBobAnims = _player.cameraBobAnims;
-                cameraBobAnims.Init(_player, cameraRootAnimations);
-                _cameraBobAnims = cameraBobAnims;
+                _cameraController.Init(target: transform, _cameraPoint);
                 
-                _interactionChecker = new InteractionChecker(playerInteractionObserver, transform, _playerCamera.Camera,
-                    _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);
+                _lookAtObject = _cameraController.CameraReferences.LookAtObject;
+                
+                _interactionChecker = new InteractionChecker(playerInteractionObserver, transform,
+                    _cameraController.CameraReferences.MainCamera, _interactionMaxDistance,
+                    interactionLM: _interactionLM, _interactionObstaclesLM);
 
                 _interactionHandler = new InteractionHandler(_inventoryManager, playerInteractionObserver);
 
@@ -271,9 +247,7 @@ namespace GameCore.Gameplay.Entities.Player
 
                 _rigidbody.isKinematic = true;
                 _rigidbody.isKinematic = false;
-
-                _playerMovement.OnJump += () => { _networkAnimator.SetTrigger(AnimatorHashes.Jump); };
-
+                
                 _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
 
                 _mobileHeadquartersEntity.OnTeleportedEvent += OnMobileHQTeleported;
@@ -295,13 +269,9 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
-            _interactionChecker.Check(true);
-            _player.UpdateLogic();
-            _playerMovement.UpdateLogic();
-            _playerFootsteps.UpdateLogic();
-            _cameraBobAnims.UpdateLogic();
+            _interactionChecker.Check();
 
-            Vector2 movementInput = _playerMovement.InputManager.GetMovementInput();
+            /*Vector2 movementInput = _playerMovement.InputManager.GetMovementInput();
             bool isMovingByPlayer = movementInput.magnitude > 0.05f;
             bool isSprinting = _playerMovement.SprintComponent.IsSprinting;
             bool isGoingBackwards = _playerMovement.InputY < 0f;
@@ -315,7 +285,7 @@ namespace GameCore.Gameplay.Entities.Player
             bool canMove = isMovingByPlayer && movementSpeed > 0.05f;
 
             _animator.SetBool(id: AnimatorHashes.CanMove, canMove);
-            _animator.SetFloat(AnimatorHashes.MoveSpeedBlend, blend);
+            _animator.SetFloat(AnimatorHashes.MoveSpeedBlend, blend);*/
         }
 
         private void UpdateClient()
@@ -330,16 +300,12 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!IsOwner)
                 return;
-
-            _playerMovement.FixedUpdateLogic();
         }
 
         private void LateUpdateServer()
         {
             if (!IsOwner || !_isInitialized)
                 return;
-
-            _playerMovement.LateUpdateLogic();
 
             _lookAtPosition.Value = _lookAtObject.position;
         }
@@ -355,10 +321,10 @@ namespace GameCore.Gameplay.Entities.Player
             
             _mobileHeadquartersEntity.OnTeleportedEvent -= OnMobileHQTeleported;
 
-            InputSystemManager.OnMoveEvent -= OnMove;
-            InputSystemManager.OnScrollEvent -= OnScroll;
-            InputSystemManager.OnInteractEvent -= OnInteract;
-            InputSystemManager.OnDropItemEvent -= OnDropItem;
+            _inputReader.OnMoveEvent -= OnMove;
+            _inputReader.OnScrollEvent -= OnScroll;
+            _inputReader.OnInteractEvent -= OnInteract;
+            _inputReader.OnDropItemEvent -= OnDropItem;
         }
 
         private void Interact() =>

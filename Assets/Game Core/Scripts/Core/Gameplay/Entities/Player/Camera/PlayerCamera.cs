@@ -1,6 +1,4 @@
 ﻿using EFPController;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
-using GameCore.Gameplay.Managers;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -79,7 +77,7 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _target;
         private Transform _cameraPoint;
         private Transform _mobileHeadquartersTransform;
-        private PlayerInputActions _playerInputActions;
+        private GameInput _playerInputActions;
 
         private Vector3 _lastFrameMobileHeadquartersRotation;
         private Vector2 _lookVector;
@@ -103,7 +101,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!_isPlayerFound)
                 return;
 
-            _lookVector = _playerInputActions.Player.Look.ReadValue<Vector2>();
+            _lookVector = _playerInputActions.Gameplay.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
 
             Vector3 mobileHeadquartersRotation = _mobileHeadquartersTransform.rotation.eulerAngles;
@@ -127,10 +125,8 @@ namespace GameCore.Gameplay.Entities.Player
             _transform = transform;
             _cameraPoint = cameraPoint;
             _target = target;
-            _playerInputActions = InputSystemManager.GetPlayerInputActions();
             _isPlayerFound = true;
 
-            InputSystemManager.OnLookEvent += OnLook;
         }
 
         public void RemoveTarget()

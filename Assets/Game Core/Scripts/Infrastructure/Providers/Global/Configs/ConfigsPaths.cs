@@ -4,6 +4,8 @@
     {
         // FIELDS: --------------------------------------------------------------------------------
         
+        public const string InputReader = "Input Reader"; // TEMP
+        
         public const string GameConfig = GlobalConfigs + "Game Config";
         public const string GameplayConfig = GlobalConfigs + "Gameplay Config";
         

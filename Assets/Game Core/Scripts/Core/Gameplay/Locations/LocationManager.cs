@@ -21,9 +21,6 @@ namespace GameCore.Gameplay.Locations
         private void Awake() =>
             _instance = this;
 
-        private void OnDestroy() =>
-            _instance = null;
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public CinemachinePath GetPath() => _path;
