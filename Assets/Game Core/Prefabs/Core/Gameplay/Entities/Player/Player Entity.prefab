@@ -3104,6 +3104,7 @@ MonoBehaviour:
   _networkObject: {fileID: -4117527861951101490}
   _rigidbody: {fileID: 7127189264355523618}
   _playerModel: {fileID: 147102560534255457}
+  _networkTransform: {fileID: 5356547518013829562}
   _cameraPoint: {fileID: 91750195740998113}
   _playerItemPivot: {fileID: 8186703484883488036}
   _headLookObject: {fileID: 9205309517001490629}
@@ -3140,9 +3141,9 @@ MonoBehaviour:
   controller: {fileID: 5237258084370620171}
   cameraBobAnims: {fileID: 1075499280315567856}
   footsteps: {fileID: 430461550739394689}
-  deadlyHeight: -100
+  deadlyHeight: -1000
   effectsAudioSource: {fileID: 2194461843507448856}
-  returnToGroundAltitude: -30
+  returnToGroundAltitude: -500
   colliders:
   - {fileID: 1967799250354909116}
 --- !u!4 &8684867425259486934 stripped

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Threading;
-using Cinemachine;
 using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Locations;
 using GameCore.Gameplay.Network;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
-    public class LeaveLocationState : IEnterState
+    public class LeaveLocationState : IEnterStateAsync, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -16,6 +14,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
+            _cancellationTokenSource = new CancellationTokenSource();
             
             horrorStateMachine.AddState(this);
         }
@@ -24,16 +23,29 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
+        private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
+        public async UniTaskVoid Enter()
         {
             RpcCaller rpcCaller = RpcCaller.Get();
+            rpcCaller.SendLeftLocation();
 
+            // TEMP
+            bool isCanceled = await UniTask
+                .Delay(millisecondsDelay: 500, cancellationToken: _cancellationTokenSource.Token)
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+            
             UnloadLastLocation();
             EnterGameLoopState();
         }
+        
+        public void Dispose() =>
+            _cancellationTokenSource?.Dispose();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

@@ -67,8 +67,9 @@ namespace GameCore.Gameplay.Interactable
 
         public void InteractLogic()
         {
-            _isEnabled = !_isEnabled;
+            _ignoreAnimationEvents = false;
             _canInteract = false;
+            _isEnabled = !_isEnabled;
 
             SendInteractionStateChangedEvent();
             ChangeAnimationState();

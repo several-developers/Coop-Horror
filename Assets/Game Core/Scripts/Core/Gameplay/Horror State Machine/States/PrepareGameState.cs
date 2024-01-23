@@ -54,7 +54,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 //RpcCaller rpcCaller = RpcCaller.Get();
                 //rpcCaller.SendRoadLocationLoaded();
                 
-                _mobileHeadquartersEntity.ArriveAtRoadLocation();
+                _mobileHeadquartersEntity.ArriveAtRoadLocation(sendTeleportEvent: false);
                 
                 TheNetworkHorror networkHorror = TheNetworkHorror.Get(); // TEMP
                 networkHorror.SetRoadLocationLoaded(); // TEMP

@@ -2313,18 +2313,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 776333095}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &776333097 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4623372197060208224, guid: 85bc69be632c93d41a05e86cf91f7b92,
-    type: 3}
-  m_PrefabInstance: {fileID: 776333095}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8866f22197244f528ba8d3c1dfa4ff77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &776949626
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8432,7 +8420,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sun: {fileID: 3599611373000801}
   _mobileHeadquartersEntity: {fileID: 6195987239777192163}
-  _roadLocationManager: {fileID: 776333097}
 --- !u!1 &1486383308
 GameObject:
   m_ObjectHideFlags: 0
@@ -20427,6 +20414,11 @@ PrefabInstance:
     - target: {fileID: 2979834549431494046, guid: 4d491019dd05bd0418aa82f037cda7f5,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2979834550175237657, guid: 4d491019dd05bd0418aa82f037cda7f5,
+        type: 3}
+      propertyPath: camSmoothSpeed
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2979834550421071748, guid: 4d491019dd05bd0418aa82f037cda7f5,

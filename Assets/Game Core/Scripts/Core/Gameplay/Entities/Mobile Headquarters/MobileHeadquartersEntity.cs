@@ -1,11 +1,15 @@
-﻿using Cinemachine;
+﻿using System;
+using Cinemachine;
+using EFPController;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -25,12 +29,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [SerializeField, Required]
         private AnimationObserver _animationObserver;
-
-        [SerializeField, Required]
-        private CinemachineDollyCart _dollyCart;
-
+        
         [SerializeField, Required]
         private NetworkObject _networkObject;
+
+        [SerializeField, Required]
+        private Transform _playerPoint;
 
         [SerializeField, Required]
         private ToggleMobileDoorLever _toggleMobileDoorLever;
@@ -42,6 +46,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private LeaveLocationLever _leaveLocationLever;
 
         // FIELDS: --------------------------------------------------------------------------------
+
+        public event Action OnTeleportedEvent; 
 
         private static MobileHeadquartersEntity _instance;
 
@@ -56,7 +62,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _instance = this;
             
-            _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _animator, _dollyCart,
+            _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _animator,
                 _mobileHeadquartersConfig);
 
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
@@ -107,49 +113,34 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             base.OnDestroy();
         }
 
-        private void FixedUpdate()
-        {
-            if (IsOwner)
-                _pathMovement.Movement();
-        }
+        private void FixedUpdate() =>
+            _pathMovement.Movement();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void ArriveAtRoadLocation()
+        public void ArriveAtRoadLocation(bool sendTeleportEvent = true)
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
             CinemachinePath path = roadLocationManager.GetPath();
             
-            ChangePath(path);
-        }
-
-        public void LeftLocation()
-        {
+            ChangePath(path, sendTeleportEvent);
+            
             _loadLocationLever.InteractWithoutEvents(isEnabled: false);
             _loadLocationLever.ToggleInteract(canInteract: true);
         }
 
-        public void SetPathPosition(float position)
-        {
-            if (!IsServer)
-                return;
-
-            _pathPosition.Value = position;
-        }
-
         public Transform GetTransform() => transform;
+
+        public Transform GetPlayerPoint() => _playerPoint;
 
         public NetworkObject GetNetworkObject() => _networkObject;
 
         public Vector3 GetVelocity()
         {
-            Vector3 direction = transform.forward * _dollyCart.m_Speed;
+            Vector3 direction = transform.forward;
             return direction;
         }
-
-        public float GetPathPosition() =>
-            _pathPosition.Value;
-
+        
         public static MobileHeadquartersEntity Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -167,20 +158,19 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             _rpcCaller.OnRoadLocationLoadedEvent += OnRoadLocationLoaded;
             _rpcCaller.OnLocationLoadedEvent += OnLocationLoaded;
+            _rpcCaller.OnLocationLeftEvent += OnLocationLeft;
         }
         
         private void InitServer()
         {
-            if (!IsServer)
+            if (!IsOwner)
                 return;
         }
 
         private void InitClient()
         {
-            if (IsServer)
+            if (IsOwner)
                 return;
-            
-            _pathPosition.OnValueChanged += OnPathPositionChanged;
         }
 
         private void Despawn()
@@ -194,28 +184,58 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _rpcCaller.OnRoadLocationLoadedEvent -= OnRoadLocationLoaded;
             _rpcCaller.OnLocationLoadedEvent -= OnLocationLoaded;
+            _rpcCaller.OnLocationLeftEvent -= OnLocationLeft;
         }
 
         private void DespawnServer()
         {
-            if (!IsServer)
+            if (!IsOwner)
                 return;
         }
 
         private void DespawnClient()
         {
-            if (IsServer)
+            if (IsOwner)
                 return;
-            
-            _pathPosition.OnValueChanged -= OnPathPositionChanged;
         }
 
-        private void ChangePath(CinemachinePath path) =>
+        private void ChangePath(CinemachinePath path, bool sendTeleportEvent = true)
+        {
+            PlayerEntity playerEntity = PlayerEntity.Instance;
+
+            if (sendTeleportEvent)
+            {
+                _playerPoint.position = playerEntity.transform.position;
+            }
+
+            Quaternion startRotation = transform.rotation;
+            
             _pathMovement.ChangePath(path);
-        
+            
+            if (!sendTeleportEvent)
+                return;
+            
+            Quaternion newRotation = transform.rotation;
+            
+            Transform playerTransform = playerEntity.transform;
+            playerTransform.position = _playerPoint.position;
+            
+            var player = playerEntity.GetComponent<EFPController.Player>();
+            SmoothLook smoothLook = player.SmoothLook;
+
+            Vector3 difference = newRotation.eulerAngles - startRotation.eulerAngles;
+            
+            smoothLook.RotationX += difference.y;
+
+            OnTeleportedEvent?.Invoke();
+        }
+
         [Button]
-        private void ToggleMovement(bool canMove) =>
+        private void ToggleMovement(bool canMove)
+        {
             _pathMovement.ToggleMovement(canMove);
+            //_pathMovement.ToggleMoveAnimation(canMove);
+        }
 
         private void ToggleDoorState(bool isOpen) =>
             _animator.SetBool(id: AnimatorHashes.IsOpen, isOpen);
@@ -226,17 +246,20 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // RPC: -----------------------------------------------------------------------------------
         
         [ServerRpc(RequireOwnership = false)]
-        private void InteractWithMobileDoorLeverServerRpc() =>
-            InteractWithMobileDoorLeverClientRpc();
+        private void InteractWithMobileDoorLeverServerRpc() => InteractWithMobileDoorLeverClientRpc();
+
+        [ServerRpc(RequireOwnership = false)]
+        private void InteractWithLoadLocationLeverServerRpc() => InteractWithLoadLocationLeverClientRpc();
 
         [ClientRpc]
         private void InteractWithMobileDoorLeverClientRpc() =>
             _toggleMobileDoorLever.InteractLogic();
 
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        [ClientRpc]
+        private void InteractWithLoadLocationLeverClientRpc() =>
+            _loadLocationLever.InteractLogic();
 
-        private void OnPathPositionChanged(float previousValue, float newValue) =>
-            _pathMovement.SetPosition(newValue);
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         [Button]
         private void OnDestinationReached()
@@ -255,8 +278,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void OnDoorLeverDisabled() => ToggleDoorState(isOpen: false);
 
-        private void OnInteractWithLoadLocationLever() =>
-            _loadLocationLever.InteractLogic();
+        private void OnInteractWithLoadLocationLever() => InteractWithLoadLocationLeverServerRpc();
 
         private void OnLoadLocation() =>
             _rpcCaller.LoadLocation(SceneName.Desert);
@@ -264,11 +286,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void OnInteractWithLeaveLocationLever() =>
             _leaveLocationLever.InteractLogic();
 
-        private void OnLeaveLocation()
-        {
-            ToggleMovement(canMove: false);
+        private void OnLeaveLocation() =>
             _rpcCaller.LeaveLocation();
-        }
 
         private void OnRoadLocationLoaded()
         {
@@ -283,6 +302,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             ChangePath(path);
             OnDestinationReached(); // TEMP
             ToggleMovement(canMove: true);
+        }
+
+        private void OnLocationLeft()
+        {
+            ToggleMovement(canMove: false);
+            ArriveAtRoadLocation();
         }
     }
 }

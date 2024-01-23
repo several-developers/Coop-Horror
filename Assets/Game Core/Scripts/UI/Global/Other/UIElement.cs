@@ -115,9 +115,12 @@ namespace GameCore.UI.Global
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
-        private void SetInteractableState(bool isInteractable) =>
+        private void SetInteractableState(bool isInteractable)
+        {
+            _targetCG.interactable = isInteractable;
             _targetCG.blocksRaycasts = isInteractable;
-        
+        }
+
         private void DestroySelf()
         {
             OnHideEvent = null;

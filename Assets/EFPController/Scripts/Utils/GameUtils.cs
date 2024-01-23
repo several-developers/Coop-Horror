@@ -148,7 +148,7 @@ namespace EFPController.Utils
             return UnityEngine.Random.Range(vector.x, vector.y);
         }
 
-        public static Coroutine WaitAndCall(this MonoBehaviour objectRef, float time, System.Action callback)
+        public static Coroutine WaitAndCall(this MonoBehaviour objectRef, float time, Action callback)
 	    {
             if (objectRef == null) return null;
             if (time <= 0f)
@@ -159,43 +159,43 @@ namespace EFPController.Utils
 		    return objectRef.StartCoroutine(WaitAndCallCoroutine(time, callback));
 	    }
 
-	    public static IEnumerator WaitAndCallCoroutine(float time, System.Action callback)
+	    public static IEnumerator WaitAndCallCoroutine(float time, Action callback)
 	    {
 		    yield return new WaitForSeconds(time);
 		    callback();
 	    }
 
-        public static Coroutine WaitForEndOfFrameAndCall(this MonoBehaviour objectRef, System.Action callback)
+        public static Coroutine WaitForEndOfFrameAndCall(this MonoBehaviour objectRef, Action callback)
         {
             if (objectRef == null) return null;
             return objectRef.StartCoroutine(WaitForEndOfFrameCoroutine(callback));
         }
 
-        public static IEnumerator WaitForEndOfFrameCoroutine(System.Action callback)
+        public static IEnumerator WaitForEndOfFrameCoroutine(Action callback)
         {
             yield return new WaitForEndOfFrame();
             callback();
         }
 
-        public static Coroutine WaitUntilAndCall(this MonoBehaviour objectRef, System.Func<bool> predicate, System.Action callback)
+        public static Coroutine WaitUntilAndCall(this MonoBehaviour objectRef, Func<bool> predicate, Action callback)
         {
             if (objectRef == null) return null;
             return objectRef.StartCoroutine(WaitUntilCoroutine(predicate, callback));
         }
 
-        public static IEnumerator WaitUntilCoroutine(System.Func<bool> predicate, System.Action callback)
+        public static IEnumerator WaitUntilCoroutine(Func<bool> predicate, Action callback)
         {
             yield return new WaitUntil(predicate);
             callback();
         }
 
-        public static Coroutine WaitWhileAndCall(this MonoBehaviour objectRef, System.Func<bool> predicate, System.Action callback)
+        public static Coroutine WaitWhileAndCall(this MonoBehaviour objectRef, Func<bool> predicate, Action callback)
         {
             if (objectRef == null) return null;
             return objectRef.StartCoroutine(WaitWhileCoroutine(predicate, callback));
         }
 
-        public static IEnumerator WaitWhileCoroutine(System.Func<bool> predicate, System.Action callback)
+        public static IEnumerator WaitWhileCoroutine(Func<bool> predicate, Action callback)
         {
             yield return new WaitWhile(predicate);
             callback();
@@ -220,13 +220,13 @@ namespace EFPController.Utils
             return animator.IsPlaying() && animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
         }
 
-        public static Coroutine SmoothVolume(this MonoBehaviour objectRef, AudioSource asrc, float volume, float time, System.Action callback = null)
+        public static Coroutine SmoothVolume(this MonoBehaviour objectRef, AudioSource asrc, float volume, float time, Action callback = null)
         {
             if (objectRef == null) return null;
             return objectRef.StartCoroutine(SmoothVolumeCoroutine(asrc, volume, time, callback));
         }
 
-        public static IEnumerator SmoothVolumeCoroutine(AudioSource asrc, float volume, float time, System.Action callback = null)
+        public static IEnumerator SmoothVolumeCoroutine(AudioSource asrc, float volume, float time, Action callback = null)
         {
             float startVolume = asrc.volume;
             float elapsedTime = 0f;
@@ -276,15 +276,15 @@ namespace EFPController.Utils
         public static Vector3 GetVelocityAtPoint(this Rigidbody rigidbody, Vector3 worldPoint)
         {
             Vector3 angularVelocity = rigidbody.angularVelocity;
-            
+
             if (angularVelocity.IsZero())
                 return rigidbody.velocity;
-            
+
             Vector3 centerOfMass = rigidbody.worldCenterOfMass;
             Quaternion q = Quaternion.Euler(angularVelocity * (Mathf.Rad2Deg * Time.deltaTime));
             Vector3 rotatedPoint = centerOfMass + q * (worldPoint - centerOfMass);
             Vector3 tangentialVelocity = (rotatedPoint - worldPoint) / Time.deltaTime;
-            
+
             return rigidbody.velocity + tangentialVelocity;
         }
 

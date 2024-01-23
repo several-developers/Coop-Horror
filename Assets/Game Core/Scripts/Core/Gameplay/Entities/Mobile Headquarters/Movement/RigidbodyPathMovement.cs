@@ -9,13 +9,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public RigidbodyPathMovement(MobileHeadquartersEntity mobileHeadquartersEntity, Animator animator, CinemachineDollyCart dollyCart,
+        public RigidbodyPathMovement(MobileHeadquartersEntity mobileHeadquartersEntity, Animator animator,
             MobileHeadquartersConfigMeta mobileHeadquartersConfig)
         {
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _transform = mobileHeadquartersEntity.transform;
             _rigidbody = mobileHeadquartersEntity.GetComponent<Rigidbody>();
             _animator = animator;
-            _path = dollyCart.m_Path;
             _mobileHeadquartersConfig = mobileHeadquartersConfig;
 
             //_dollyCart.enabled = true;
@@ -25,16 +24,16 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public event Action OnDestinationReachedEvent;
 
-        private readonly MobileHeadquartersEntity _mobileHeadquartersEntity;
+        private readonly Transform _transform;
         private readonly Rigidbody _rigidbody;
         private readonly Animator _animator;
         private readonly MobileHeadquartersConfigMeta _mobileHeadquartersConfig;
 
         private CinemachinePathBase _path;
         private float _animationBlend;
+        private float _distance;
+        private float _syncCurrentTime;
         private bool _canMove;
-
-        private float distance;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -42,17 +41,16 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             if (_path == null)
                 return;
-            
+
             float targetSpeed = _canMove ? _mobileHeadquartersConfig.MovementSpeed : 0f;
             float speedChangeRate = _mobileHeadquartersConfig.SpeedChangeRate;
 
-            distance += targetSpeed * Time.fixedDeltaTime;
+            _distance += targetSpeed * Time.fixedDeltaTime;
 
-            if (distance > _path.PathLength)
-                distance -= _path.PathLength;
+            if (_distance > _path.PathLength)
+                _distance = _path.PathLength;
             
-            _mobileHeadquartersEntity.SetPathPosition(distance);
-            MoveRigidbody(distance);
+            MoveRigidbody(_distance);
 
             float inputMagnitude = _mobileHeadquartersConfig.MotionSpeed; // 1f
 
@@ -65,27 +63,40 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public void ToggleMovement(bool canMove) =>
             _canMove = canMove;
+        
+        public void ToggleMoveAnimation(bool canMove) =>
+            _animator.SetBool(id: AnimatorHashes.CanMove, value: canMove);
 
         public void ChangePath(CinemachinePath path)
         {
             _path = path;
-            MoveRigidbody(pos: 0);
+            _distance = 0;
+
+            _rigidbody.velocity = Vector3.zero;
+            _rigidbody.angularVelocity = Vector3.zero;
+            
+            Vector3 position = EvaluatePositionAtUnit(distance: 0f);
+            Quaternion rotation = EvaluateOrientationAtUnit(distance: 0f);
+
+            _transform.position = position;
+            _transform.rotation = rotation;
         }
-
-        public void SetPosition(float position) => MoveRigidbody(position);
-
+        
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void ToggleMoveAnimation(bool canMove) =>
-            _animator.SetBool(id: AnimatorHashes.CanMove, value: canMove);
-
-        private void MoveRigidbody(float pos)
+        private void MoveRigidbody(float distance)
         {
-            Vector3 position = _path.EvaluatePositionAtUnit(pos, CinemachinePathBase.PositionUnits.Distance);
-            Quaternion rotation = _path.EvaluateOrientationAtUnit(pos, CinemachinePathBase.PositionUnits.Distance);
+            Vector3 position = EvaluatePositionAtUnit(distance);
+            Quaternion rotation = EvaluateOrientationAtUnit(distance);
 
             _rigidbody.MovePosition(position);
             _rigidbody.MoveRotation(rotation);
         }
+
+        public Vector3 EvaluatePositionAtUnit(float distance) =>
+            _path.EvaluatePositionAtUnit(distance, CinemachinePathBase.PositionUnits.Distance);
+
+        public Quaternion EvaluateOrientationAtUnit(float distance) =>
+            _path.EvaluateOrientationAtUnit(distance, CinemachinePathBase.PositionUnits.Distance);
     }
 }

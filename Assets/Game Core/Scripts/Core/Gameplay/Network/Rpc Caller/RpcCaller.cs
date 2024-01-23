@@ -49,6 +49,8 @@ namespace GameCore.Gameplay.Network
 
         public void SendLocationLoaded() => SendLocationLoadedServerRpc();
 
+        public void SendLeftLocation() => SendLeftLocationServerRpc();
+
         public static RpcCaller Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -58,7 +60,7 @@ namespace GameCore.Gameplay.Network
             NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
             IHorrorStateMachine horrorStateMachine = networkServiceLocator.GetHorrorStateMachine();
 
-            if (IsServer)
+            if (IsOwner)
             {
                 var sceneName = (SceneName)sceneNameIndex;
                 horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
@@ -71,17 +73,13 @@ namespace GameCore.Gameplay.Network
 
         private void LeaveLocationLogic()
         {
+            if (!IsServer)
+                return;
+            
             NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
             IHorrorStateMachine horrorStateMachine = networkServiceLocator.GetHorrorStateMachine();
-            
-            if (IsServer)
-            {
-                horrorStateMachine.ChangeState<LeaveLocationState>();
-            }
-            else
-            {
-                
-            }
+
+            horrorStateMachine.ChangeState<LeaveLocationState>();
         }
 
         // RPC: -----------------------------------------------------------------------------------
@@ -115,6 +113,9 @@ namespace GameCore.Gameplay.Network
         [ServerRpc(RequireOwnership = false)]
         private void SendLocationLoadedServerRpc() => SendLocationLoadedClientRpc();
 
+        [ServerRpc(RequireOwnership = false)]
+        private void SendLeftLocationServerRpc() => SendLeftLocationClientRpc();
+
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong clientID, int slotIndex, int itemID)
         {
@@ -147,5 +148,9 @@ namespace GameCore.Gameplay.Network
         [ClientRpc]
         private void SendLocationLoadedClientRpc() =>
             OnLocationLoadedEvent?.Invoke();
+
+        [ClientRpc]
+        private void SendLeftLocationClientRpc() =>
+            OnLocationLeftEvent?.Invoke();
     }
 }

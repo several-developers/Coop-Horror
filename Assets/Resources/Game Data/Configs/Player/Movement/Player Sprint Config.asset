@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Player Sprint Config
   allowSprinting: 1
-  sprintSpeed: 6
+  sprintSpeed: 9
   sprintMode: 2
   forwardSprintOnly: 1

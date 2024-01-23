@@ -56,7 +56,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private void BindLeaveLocationState()
         {
             Container
-                .Bind<LeaveLocationState>()
+                .Bind(typeof(LeaveLocationState), typeof(IDisposable))
+                .To<LeaveLocationState>()
                 .AsSingle()
                 .NonLazy();
         }

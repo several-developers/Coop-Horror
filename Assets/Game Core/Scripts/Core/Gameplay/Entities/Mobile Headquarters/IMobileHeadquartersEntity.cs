@@ -2,7 +2,6 @@
 {
     public interface IMobileHeadquartersEntity : IEntity, INetworkObject
     {
-        void ArriveAtRoadLocation();
-        void LeftLocation();
+        void ArriveAtRoadLocation(bool sendTeleportEvent = true);
     }
 }

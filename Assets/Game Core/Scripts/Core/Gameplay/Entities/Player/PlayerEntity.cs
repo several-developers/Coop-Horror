@@ -63,6 +63,9 @@ namespace GameCore.Gameplay.Entities.Player
         private GameObject _playerModel;
 
         [SerializeField, Required]
+        private ClientNetworkTransform _networkTransform;
+        
+        [SerializeField, Required]
         private Transform _cameraPoint;
 
         [SerializeField, Required]
@@ -73,6 +76,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        public static PlayerEntity Instance;
+        
         public event Action<Vector2> OnMovementVectorChangedEvent;
 
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
@@ -97,19 +102,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Update()
-        {
-            if (!_isInitialized)
-                return;
-
-            UpdateOwner();
-            UpdateNotOwner();
-        }
-
-        private void FixedUpdate() => FixedUpdateOwner();
-
-        private void LateUpdate() => LateUpdateOwner();
-
         public override void OnDestroy()
         {
             if (_isInitialized)
@@ -132,6 +124,19 @@ namespace GameCore.Gameplay.Entities.Player
             base.OnDestroy();
         }
 
+        private void Update()
+        {
+            if (!_isInitialized)
+                return;
+
+            UpdateServer();
+            UpdateClient();
+        }
+
+        private void FixedUpdate() => FixedUpdateServer();
+
+        private void LateUpdate() => LateUpdateServer();
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
@@ -143,7 +148,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _networkHorror.OnDisconnectEvent -= OnDisconnect;
 
-            DespawnOwner();
+            DespawnServer();
             base.OnNetworkDespawn();
         }
 
@@ -164,9 +169,9 @@ namespace GameCore.Gameplay.Entities.Player
             _networkHorror = TheNetworkHorror.Get();
             _networkHorror.OnDisconnectEvent += OnDisconnect;
 
-            CommonInit();
-            InitOwner();
-            InitNotOwner();
+            InitServerAndClient();
+            InitServer();
+            InitClient();
 
             _isInitialized = true;
         }
@@ -192,7 +197,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void CommonInit()
+        private void InitServerAndClient()
         {
             _rpcCaller = RpcCaller.Get();
             _playerCamera = PlayerCamera.Get();
@@ -210,13 +215,15 @@ namespace GameCore.Gameplay.Entities.Player
             _rpcCaller.OnTeleportPlayerWithOffsetEvent += OnTeleportPlayerWithOffset;
         }
 
-        private void InitOwner()
+        private void InitServer()
         {
             if (!IsOwner)
                 return;
 
             Debug.Log($"Player #{OwnerClientId} setup Owner.");
 
+            Instance = this;
+            
             BasicInit();
 
             _playerModel.SetActive(false);
@@ -268,10 +275,12 @@ namespace GameCore.Gameplay.Entities.Player
                 _playerMovement.OnJump += () => { _networkAnimator.SetTrigger(AnimatorHashes.Jump); };
 
                 _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
+
+                _mobileHeadquartersEntity.OnTeleportedEvent += OnMobileHQTeleported;
             }
         }
 
-        private void InitNotOwner()
+        private void InitClient()
         {
             if (IsOwner)
                 return;
@@ -281,7 +290,7 @@ namespace GameCore.Gameplay.Entities.Player
             Debug.Log($"Player #{OwnerClientId} setup Client.");
         }
 
-        private void UpdateOwner()
+        private void UpdateServer()
         {
             if (!IsOwner)
                 return;
@@ -309,7 +318,7 @@ namespace GameCore.Gameplay.Entities.Player
             _animator.SetFloat(AnimatorHashes.MoveSpeedBlend, blend);
         }
 
-        private void UpdateNotOwner()
+        private void UpdateClient()
         {
             if (IsOwner)
                 return;
@@ -317,7 +326,7 @@ namespace GameCore.Gameplay.Entities.Player
             _headLookObject.position = _lookAtPosition.Value;
         }
 
-        private void FixedUpdateOwner()
+        private void FixedUpdateServer()
         {
             if (!IsOwner)
                 return;
@@ -325,7 +334,7 @@ namespace GameCore.Gameplay.Entities.Player
             _playerMovement.FixedUpdateLogic();
         }
 
-        private void LateUpdateOwner()
+        private void LateUpdateServer()
         {
             if (!IsOwner || !_isInitialized)
                 return;
@@ -335,7 +344,7 @@ namespace GameCore.Gameplay.Entities.Player
             _lookAtPosition.Value = _lookAtObject.position;
         }
 
-        private void DespawnOwner()
+        private void DespawnServer()
         {
             if (!IsOwner)
                 return;
@@ -343,6 +352,8 @@ namespace GameCore.Gameplay.Entities.Player
             _inventoryManager.Dispose();
             _interactionHandler.Dispose();
             PlayerCamera.Get().RemoveTarget();
+            
+            _mobileHeadquartersEntity.OnTeleportedEvent -= OnMobileHQTeleported;
 
             InputSystemManager.OnMoveEvent -= OnMove;
             InputSystemManager.OnScrollEvent -= OnScroll;
@@ -405,6 +416,12 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _inventory.SetSelectedSlotIndex(newValue);
             _inventoryManager.ToggleItemsState();
+        }
+
+        [Button]
+        private void OnMobileHQTeleported()
+        {
+            _networkTransform.Teleport(transform.position, transform.rotation, transform.localScale);
         }
     }
 }
