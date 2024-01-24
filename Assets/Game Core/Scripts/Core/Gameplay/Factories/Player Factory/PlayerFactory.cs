@@ -1,4 +1,4 @@
-﻿using GameCore.Core.Configs.Player;
+﻿using GameCore.Configs.Gameplay.Player;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using UnityEngine;

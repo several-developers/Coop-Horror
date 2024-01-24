@@ -334,7 +334,7 @@ namespace GameCore.Gameplay.Network
             if (!isPlayerEntityFound)
                 return;
 
-            playerEntity.Setup();
+            playerEntity.Init();
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -359,7 +359,7 @@ namespace GameCore.Gameplay.Network
             if (!isPlayerEntityFound)
                 return;
 
-            playerEntity.Setup();
+            playerEntity.Init();
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

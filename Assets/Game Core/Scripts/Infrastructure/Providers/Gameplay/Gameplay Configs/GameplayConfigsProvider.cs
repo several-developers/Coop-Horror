@@ -2,7 +2,7 @@
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Configs.Gameplay.Time;
-using GameCore.Core.Configs.Player;
+using GameCore.Configs.Gameplay.Player;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
 

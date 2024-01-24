@@ -2,6 +2,8 @@
 {
     public interface IMovementBehaviour
     {
-        void Movement();
+        void Tick();
+        void FixedTick();
+        void Dispose();
     }
 }

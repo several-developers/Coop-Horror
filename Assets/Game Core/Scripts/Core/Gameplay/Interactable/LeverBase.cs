@@ -15,7 +15,7 @@ namespace GameCore.Gameplay.Interactable
         private bool _canInteractFromStart;
         
         [SerializeField]
-        private bool _isEnabledFromStart;
+        private bool _isLeverPulledFromStart;
 
         [Title(Constants.References)]
         [SerializeField, Required]
@@ -33,16 +33,16 @@ namespace GameCore.Gameplay.Interactable
 
         private bool _ignoreAnimationEvents;
         private bool _canInteract = true;
-        private bool _isEnabled;
+        private bool _isLeverPulled;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
             _canInteract = _canInteractFromStart;
-            _isEnabled = _isEnabledFromStart;
+            _isLeverPulled = _isLeverPulledFromStart;
             
-            if (_isEnabledFromStart)
+            if (_isLeverPulledFromStart)
                 _ignoreAnimationEvents = true;
 
             ChangeAnimationState();
@@ -69,16 +69,16 @@ namespace GameCore.Gameplay.Interactable
         {
             _ignoreAnimationEvents = false;
             _canInteract = false;
-            _isEnabled = !_isEnabled;
+            _isLeverPulled = !_isLeverPulled;
 
             SendInteractionStateChangedEvent();
             ChangeAnimationState();
         }
         
-        public void InteractWithoutEvents(bool isEnabled)
+        public void InteractWithoutEvents(bool isLeverPulled)
         {
             _ignoreAnimationEvents = true;
-            _isEnabled = isEnabled;
+            _isLeverPulled = isLeverPulled;
             
             ChangeAnimationState();
         }
@@ -96,7 +96,7 @@ namespace GameCore.Gameplay.Interactable
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void ChangeAnimationState() =>
-            _animator.SetBool(id: AnimatorHashes.IsOn, _isEnabled);
+            _animator.SetBool(id: AnimatorHashes.IsOn, _isLeverPulled);
 
         private void SendInteractionStateChangedEvent() =>
             OnInteractionStateChangedEvent?.Invoke();

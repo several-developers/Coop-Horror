@@ -76,37 +76,6 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
---- !u!1 &1038132760080413112
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 91750195740998113}
-  m_Layer: 6
-  m_Name: Item Follow Pivot
-  m_TagString: Untagged
-  m_Icon: {fileID: -5397416234189338067, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &91750195740998113
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1038132760080413112}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.578, y: 0.278, z: 0.442}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8684867425259486934}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1208133988275666712
 GameObject:
   m_ObjectHideFlags: 0
@@ -2450,6 +2419,37 @@ Transform:
   m_Father: {fileID: 8684867425259486934}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8980368578081466805
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 260123221838165337}
+  m_Layer: 6
+  m_Name: Head Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 7866945982896999795, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &260123221838165337
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8980368578081466805}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.8, z: 0.545}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8684867425259486934}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8992215321970831601
 GameObject:
   m_ObjectHideFlags: 0
@@ -2728,12 +2728,12 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4628898490251457778}
   serializedVersion: 2
-  m_Mass: 5
+  m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0
-  m_UseGravity: 1
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &1967799250354909116
@@ -2747,7 +2747,7 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.4
-  m_Height: 1.9
+  m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-4117527861951101490
@@ -2903,14 +2903,21 @@ MonoBehaviour:
   _interactionObstaclesLM:
     serializedVersion: 2
     m_Bits: 439
-  _inputReader: {fileID: 11400000, guid: 7489e65eb9ef65948896268ef22c23cd, type: 2}
-  _animator: {fileID: 112505025958984634}
-  _networkAnimator: {fileID: 3165830425533676757}
+  _references:
+    _playerConfig: {fileID: 11400000, guid: 623c9235cd286bb45b0104795538e690, type: 2}
+    _inputReader: {fileID: 11400000, guid: 7489e65eb9ef65948896268ef22c23cd, type: 2}
+    _animator: {fileID: 112505025958984634}
+    _networkAnimator: {fileID: 3165830425533676757}
+    _networkObject: {fileID: -4117527861951101490}
+    _rigidbody: {fileID: 7127189264355523618}
+    _collider: {fileID: 1967799250354909116}
+    _playerModel: {fileID: 147102560534255457}
+    _networkTransform: {fileID: 5356547518013829562}
+    _headPoint: {fileID: 260123221838165337}
+    _playerItemPivot: {fileID: 8186703484883488036}
+    _headLookObject: {fileID: 9205309517001490629}
   _networkObject: {fileID: -4117527861951101490}
-  _rigidbody: {fileID: 7127189264355523618}
-  _playerModel: {fileID: 147102560534255457}
   _networkTransform: {fileID: 5356547518013829562}
-  _cameraPoint: {fileID: 91750195740998113}
   _playerItemPivot: {fileID: 8186703484883488036}
   _headLookObject: {fileID: 9205309517001490629}
 --- !u!114 &5967601048658187761

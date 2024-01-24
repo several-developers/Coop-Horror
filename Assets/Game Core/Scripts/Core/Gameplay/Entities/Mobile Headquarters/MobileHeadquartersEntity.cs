@@ -125,7 +125,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             
             ChangePath(path, sendTeleportEvent);
             
-            _loadLocationLever.InteractWithoutEvents(isEnabled: false);
+            _loadLocationLever.InteractWithoutEvents(isLeverPulled: false);
             _loadLocationLever.ToggleInteract(canInteract: true);
         }
 
@@ -264,7 +264,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [Button]
         private void OnDestinationReached()
         {
-            _leaveLocationLever.InteractWithoutEvents(isEnabled: false);
+            _leaveLocationLever.InteractWithoutEvents(isLeverPulled: false);
             _leaveLocationLever.ToggleInteract(canInteract: true);
         }
 

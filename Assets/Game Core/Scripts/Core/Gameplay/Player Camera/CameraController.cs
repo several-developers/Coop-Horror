@@ -62,6 +62,7 @@ namespace GameCore.Gameplay.PlayerCamera
         private Vector2 _lookVector;
         private float _mouseVerticalValue;
         private bool _isInitialized;
+        private bool _insideMobileHq;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
@@ -83,11 +84,18 @@ namespace GameCore.Gameplay.PlayerCamera
             
             _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
-
             Vector3 mobileHeadquartersRotation = _mobileHqTransform.rotation.eulerAngles;
-            Vector3 difference = mobileHeadquartersRotation - _lastFrameMobileHqRotation;
 
-            float yRotation = _target.rotation.eulerAngles.y + difference.y + _lookVector.x * _sensitivity;
+            float yRotationTemp = _target.rotation.eulerAngles.y;
+
+            if (_insideMobileHq)
+            {
+                Vector3 difference = mobileHeadquartersRotation - _lastFrameMobileHqRotation;
+                yRotationTemp += difference.y;
+            }
+            
+            float yRotation = yRotationTemp + _lookVector.x * _sensitivity;
+            
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
             _transform.position = _cameraPoint.position;

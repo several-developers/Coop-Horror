@@ -13,8 +13,60 @@ MonoBehaviour:
   m_Name: Player Config
   m_EditorClassIdentifier: 
   _metaName: Player Config
+  _groundMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _movementSpeed: 9
+  _crouchSpeedMultiplier: 0.248
+  _movementThreshold: 0.01
+  _dampSpeedUp: 0.2
+  _dampSpeedDown: 0.1
+  _jumpVelocity: 20
+  _fallMultiplier: 1
+  _holdJumpMultiplier: 5
+  _frictionAgainstFloor: 0.189
+  _frictionAgainstWall: 0.082
+  _canLongJump: 1
+  _groundCheckerThreshold: 0.1
+  _slopeCheckerThreshold: 0.51
+  stepCheckerThreshold: 0.6
+  _maxClimbableSlopeAngle: 53.6
+  _maxStepHeight: 0.74
+  _speedMultiplierOnAngle:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _canSlideMultiplierCurve: 0.061
+  _cantSlideMultiplierCurve: 0.039
+  _climbingStairsMultiplierCurve: 0.637
+  _gravityMultiplier: 5
+  _gravityMultiplierOnSlideChange: 3
+  _gravityMultiplierIfUnclimbableSlope: 30
+  _lockOnSlope: 1
+  _sprintSpeed: 20
+  _crouchHeightMultiplier: 0.5
+  _povNormalHeadHeight: {x: 0, y: 0.5, z: -0.1}
+  _povCrouchHeadHeight: {x: 0, y: -0.1, z: -0.1}
   _health: 100
-  _playerMovementConfig: {fileID: 11400000, guid: e4b2ff4b8cc1e134f915cc7121a0a7da,
-    type: 2}
   _playerPrefab: {fileID: 5746002443945451132, guid: a77369042e11ddd49be3f82d556be8a1,
     type: 3}
