@@ -9,6 +9,13 @@ namespace GameCore.Utilities
 {
     public static class Extensions
     {
+        // FIELDS: --------------------------------------------------------------------------------
+        
+        private const float FloatMinTolerance = 0.0000000001f;
+        private const double DoubleMinTolerance = 9.99999943962493E-11;
+        
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
         public static Tweener VisibilityState(this CanvasGroup canvasGroup, bool show, float fadeTime = 0,
             bool ignoreScaleTime = false)
         {
@@ -105,8 +112,29 @@ namespace GameCore.Utilities
 
             return 0;
         }
-        
+
+        public static Vector3 GetVelocityAtPoint(this Rigidbody rigidbody, Vector3 worldPoint)
+        {
+            Vector3 angularVelocity = rigidbody.angularVelocity;
+
+            if (angularVelocity.IsZero())
+                return rigidbody.velocity;
+
+            Vector3 centerOfMass = rigidbody.worldCenterOfMass;
+            Quaternion q = Quaternion.Euler(angularVelocity * (Mathf.Rad2Deg * Time.deltaTime));
+            Vector3 rotatedPoint = centerOfMass + q * (worldPoint - centerOfMass);
+            Vector3 tangentialVelocity = (rotatedPoint - worldPoint) / Time.deltaTime;
+
+            return rigidbody.velocity + tangentialVelocity;
+        }
+
         public static bool Contains(this LayerMask mask, int layer) =>
             ((mask & (1 << layer)) != 0);
+
+        public static bool IsZero(this Vector3 vector3) =>
+            vector3.sqrMagnitude < DoubleMinTolerance;
+
+        public static bool IsEquals(this float value1, float value2) =>
+            Math.Abs(value1 - value2) < FloatMinTolerance;
     }
 }

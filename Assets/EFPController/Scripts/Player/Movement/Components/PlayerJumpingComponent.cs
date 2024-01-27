@@ -74,49 +74,49 @@ namespace EFPController
                 }
                 else
                 {
-                    if (allowJumping)
+                    if (!allowJumping)
+                        return;
+                    
+                    // determine if player is jumping and set jumping variable
+                    if (_inputManager.GetActionKeyDown(InputManager.Action.Jump)
+                        && _jumpButton // check that jump button is not being held
+                        && !_playerMovement.SwimmingComponent.IsBelowWater
+                        && _playerMovement.SwimmingComponent.CanWaterJump
+                        && canStandUpOrJump
+                        && LandStartTime + antiBunnyHopFactor < t // check for bunnyhop delay before jumping
+                        && (_playerMovement.SlopeAngle < _playerMovement.slopeLimit || _playerMovement.SwimmingComponent.InWater)
+                       )
                     {
-                        // determine if player is jumping and set jumping variable
-                        if (_inputManager.GetActionKeyDown(InputManager.Action.Jump)
-                            && _jumpButton // check that jump button is not being held
-                            && !_playerMovement.SwimmingComponent.IsBelowWater
-                            && _playerMovement.SwimmingComponent.CanWaterJump
-                            && canStandUpOrJump
-                            && LandStartTime + antiBunnyHopFactor < t // check for bunnyhop delay before jumping
-                            && (_playerMovement.SlopeAngle < _playerMovement.slopeLimit || _playerMovement.SwimmingComponent.InWater)
-                           )
+                        // do not jump if ground normal is greater than slopeLimit and not in water
+                        if (_playerMovement.CrouchingComponent.IsCrouching)
                         {
-                            // do not jump if ground normal is greater than slopeLimit and not in water
-                            if (_playerMovement.CrouchingComponent.IsCrouching)
-                            {
-                                _playerMovement.CrouchingComponent.IsCrouching = false;
-                                _playerMovement.CrouchingComponent.LastCrouchTime = t;
-                            }
-
-                            _jumpTimer = t;
-
-                            _player.CameraAnimator.SetTrigger(CameraAnimNames.Jump);
-
-                            if (_jumpfxstate)
-                            {
-                                // Play Audio jump sfx
-                                _jumpfxstate = false;
-                            }
-
-                            _playerMovement.YVelocity = jumpSpeed;
-
-                            // apply the jump velocity to the player rigidbody
-                            _rigidbody.AddForce(Vector3.up * Mathf.Sqrt(2f * jumpSpeed * -Physics.gravity.y),
-                                ForceMode.VelocityChange);
-                            IsJumping = true;
+                            _playerMovement.CrouchingComponent.IsCrouching = false;
+                            _playerMovement.CrouchingComponent.LastCrouchTime = t;
                         }
 
-                        // reset jumpBtn to prevent continuous jumping while holding jump button.
-                        if (!_inputManager.GetActionKey(InputManager.Action.Jump) &&
-                            LandStartTime + antiBunnyHopFactor < t)
+                        _jumpTimer = t;
+
+                        _player.CameraAnimator.SetTrigger(CameraAnimNames.Jump);
+
+                        if (_jumpfxstate)
                         {
-                            _jumpButton = true;
+                            // Play Audio jump sfx
+                            _jumpfxstate = false;
                         }
+
+                        _playerMovement.YVelocity = jumpSpeed;
+
+                        // apply the jump velocity to the player rigidbody
+                        _rigidbody.AddForce(Vector3.up * Mathf.Sqrt(2f * jumpSpeed * -Physics.gravity.y),
+                            ForceMode.VelocityChange);
+                        IsJumping = true;
+                    }
+
+                    // reset jumpBtn to prevent continuous jumping while holding jump button.
+                    if (!_inputManager.GetActionKey(InputManager.Action.Jump) &&
+                        LandStartTime + antiBunnyHopFactor < t)
+                    {
+                        _jumpButton = true;
                     }
                 }
             }

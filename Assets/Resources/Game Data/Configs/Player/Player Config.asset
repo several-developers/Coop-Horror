@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Player Config
   m_EditorClassIdentifier: 
   _metaName: Player Config
+  _movementConfig2: {fileID: 11400000, guid: fbf384ff3fb41144092d4170323081b6, type: 2}
   _groundMask:
     serializedVersion: 2
     m_Bits: 1
@@ -21,8 +22,8 @@ MonoBehaviour:
   _movementThreshold: 0.01
   _dampSpeedUp: 0.2
   _dampSpeedDown: 0.1
-  _jumpVelocity: 20
-  _fallMultiplier: 1
+  _jumpVelocity: 25
+  _fallMultiplier: 1.7
   _holdJumpMultiplier: 5
   _frictionAgainstFloor: 0.189
   _frictionAgainstWall: 0.082
@@ -59,7 +60,7 @@ MonoBehaviour:
   _canSlideMultiplierCurve: 0.061
   _cantSlideMultiplierCurve: 0.039
   _climbingStairsMultiplierCurve: 0.637
-  _gravityMultiplier: 5
+  _gravityMultiplier: 3
   _gravityMultiplierOnSlideChange: 3
   _gravityMultiplierIfUnclimbableSlope: 30
   _lockOnSlope: 1

@@ -514,17 +514,6 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             physicMaterial.frictionCombine = materialCombine;
         }
 
-        private float RoundValue(float value)
-        {
-            const float tolerance = 0.000001f;
-            float unit = Mathf.Round(value);
-
-            if (value - unit < tolerance && value - unit > -tolerance)
-                return unit;
-            
-            return value;
-        }
-
         #endregion
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

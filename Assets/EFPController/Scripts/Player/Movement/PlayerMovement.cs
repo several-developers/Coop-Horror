@@ -417,14 +417,14 @@ namespace EFPController
             // Player Input
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            if (!isSwimming)
-            {
-                _inputXLerpSpeed = _inputYLerpSpeed = _inputLerpSpeed;
-            }
-            else
+            if (isSwimming)
             {
                 // player accelerates and decelerates slower in water.
                 _inputXLerpSpeed = _inputYLerpSpeed = 3f;
+            }
+            else
+            {
+                _inputXLerpSpeed = _inputYLerpSpeed = _inputLerpSpeed;
             }
 
             if (_sprintComponent.IsSprinting)
@@ -665,7 +665,7 @@ namespace EFPController
             // limit speed if strafing diagonally
             _limitStrafeSpeed = Mathf.Abs(InputX) > 0.5f && Mathf.Abs(InputY) > 0.5f ? diagonalStrafeAmt : 1f;
 
-            // We are grounded, so recalculate movedirection directly from axes	
+            // We are grounded, so recalculate move direction directly from axes	
             MoveDirection = new Vector3(_inputXSmoothed * _limitStrafeSpeed, 0f, _inputYSmoothed * _limitStrafeSpeed);
 
             // realign moveDirection vector to world space

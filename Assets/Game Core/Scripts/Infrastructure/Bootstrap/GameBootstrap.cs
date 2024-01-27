@@ -19,7 +19,7 @@ namespace GameCore.Infrastructure.Bootstrap
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const int TargetFrameRate = 60;
+        private const int TargetFrameRate = 144;
 
         private IGameStateMachine _gameStateMachine;
 
