@@ -7,6 +7,10 @@ namespace GameCore.Gameplay.Entities.Player.Movement
     public class MovementConfig2 : EditorMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
+
+        [Title(Constants.Settings)]
+        [SerializeField]
+        private bool _debugMode;
         
         [Title(Constants.References)]
         [SerializeField, Required]
@@ -25,7 +29,8 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         private PhysicMaterial _flyPhysMaterial;
 
         // PROPERTIES: ----------------------------------------------------------------------------
-        
+
+        public bool DebugMode => _debugMode;
         public MovementComponentConfig MovementComponentConfig => _movementComponentConfig;
         public JumpComponentConfig JumpComponentConfig => _jumpComponentConfig;
         public PhysicMaterial GroundedPhysMaterial => _groundedPhysMaterial;

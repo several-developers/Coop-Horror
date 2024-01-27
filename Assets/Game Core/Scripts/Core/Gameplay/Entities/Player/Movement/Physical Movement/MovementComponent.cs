@@ -10,17 +10,17 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         public MovementComponent(PlayerEntity playerEntity, PhysicalMovementBehaviour2 movementBehaviour)
         {
             PlayerReferences playerReferences = playerEntity.References;
-            MovementConfig2 movementConfig = playerReferences.PlayerConfig.MovementConfig2;
 
+            _movementConfig = playerReferences.PlayerConfig.MovementConfig2;
             _movementBehaviour = movementBehaviour;
-            _movementComponentConfig = movementConfig.MovementComponentConfig;
+            _movementComponentConfig = _movementConfig.MovementComponentConfig;
             _transform = playerEntity.transform;
             _rigidbody = playerReferences.Rigidbody;
             _collider = playerReferences.Collider;
 
-            _groundedPhysMaterial = movementConfig.GroundedPhysMaterial;
-            _stayPhysMaterial = movementConfig.StayPhysMaterial;
-            _flyPhysMaterial = movementConfig.FlyPhysMaterial;
+            _groundedPhysMaterial = _movementConfig.GroundedPhysMaterial;
+            _stayPhysMaterial = _movementConfig.StayPhysMaterial;
+            _flyPhysMaterial = _movementConfig.FlyPhysMaterial;
             _groundMask = _movementComponentConfig.GroundMask;
         }
 
@@ -28,7 +28,6 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         public float YVelocity
         {
-            get => _yVelocity;
             set => _yVelocity = value;
         }
         
@@ -38,6 +37,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly PhysicalMovementBehaviour2 _movementBehaviour;
+        private readonly MovementConfig2 _movementConfig;
         private readonly MovementComponentConfig _movementComponentConfig;
         private readonly Transform _transform;
         private readonly Rigidbody _rigidbody;
@@ -330,7 +330,9 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
             // Finally, add movement velocity to player rigidbody velocity.
             if (!_velocityChange.IsZero())
+            {
                 _rigidbody.AddForce(_velocityChange, ForceMode.VelocityChange);
+            }
 
             bool hitPlatform = _isGrounded
                                && !_jumpComponent.IsJumping
@@ -369,33 +371,36 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             bool sphereCast = Physics.SphereCast(origin, radius, castDirection, out RaycastHit hit, maxDistance,
                 _groundMask.value, QueryTriggerInteraction.Ignore);
 
-            if (sphereCast)
+            if (!sphereCast)
+                return;
+            
+            _isGrounded = true;
+            _groundHitInfo = hit;
+            _groundNormal = hit.normal;
+            _groundPoint = hit.point;
+
+            if (_lastOnGroundPositionTime < Time.time)
             {
-                _isGrounded = true;
-                _groundHitInfo = hit;
-                _groundNormal = hit.normal;
-                _groundPoint = hit.point;
-
-                if (_lastOnGroundPositionTime < Time.time)
-                {
-                    _lastOnGroundPosition = _groundPoint;
-                    _lastOnGroundPositionTime = Time.time + 1f;
-                }
-
-                CheckSlope(direction);
-
-                bool applyForce = _playerBottomPos.y - hit.point.y > 0.01f
-                                  && _rigidbody.velocity.y <= 0.01f;
-                if (!applyForce)
-                    return;
-
-                Vector3 newForce = 30f * Physics.gravity.y * Time.fixedDeltaTime * _transform.up;
-
-                if (newForce.IsZero())
-                    return;
-
-                _rigidbody.AddForce(newForce, ForceMode.VelocityChange);
+                _lastOnGroundPosition = _groundPoint;
+                _lastOnGroundPositionTime = Time.time + 1f;
             }
+
+            CheckSlope(direction);
+
+            bool applyForce = Mathf.Abs(_playerBottomPos.y - hit.point.y) > 0.01f
+                              && _rigidbody.velocity.y <= 0.01f;
+                
+            Debug.Log("Apply force: " + applyForce);
+                
+            if (!applyForce)
+                return;
+
+            Vector3 newForce = 30f * Physics.gravity.y * Time.fixedDeltaTime * _transform.up;
+
+            if (newForce.IsZero())
+                return;
+
+            _rigidbody.AddForce(newForce, ForceMode.VelocityChange);
         }
 
         private void CheckSlope(Vector3 direction)
@@ -406,8 +411,8 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             if (direction.magnitude > 0f)
                 _slopeAngle = 90f - _slopeAngle;
 
-            //if (_debug)
-            //Debug.DrawLine(PlayerBottomPos, PlayerBottomPos + _futureDirection, Color.blue, 5f);
+            if (_movementConfig.DebugMode)
+                Debug.DrawLine(_playerBottomPos, _playerBottomPos + _futureDirection, Color.blue, 5f);
         }
 
         private Vector3 GetMoveDirection(Vector3 direction)
