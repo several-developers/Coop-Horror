@@ -15,6 +15,8 @@ namespace GameCore.Gameplay.InputHandlerTEMP
 
         // Gameplay
         public event Action<Vector2> OnMoveEvent = delegate { };
+        public event Action OnSprintEvent = delegate { };
+        public event Action OnSprintCanceledEvent = delegate { };
         public event Action OnJumpEvent = delegate { };
         public event Action<Vector2> OnLookEvent = delegate { };
         public event Action OnAttackEvent = delegate { };
@@ -77,6 +79,20 @@ namespace GameCore.Gameplay.InputHandlerTEMP
         {
             var moveVector = context.ReadValue<Vector2>();
             OnMoveEvent.Invoke(moveVector);
+        }
+        
+        public void OnSprint(InputAction.CallbackContext context)
+        {
+            switch (context.phase)
+            {
+                case InputActionPhase.Performed:
+                    OnSprintEvent?.Invoke();
+                    break;
+                
+                case InputActionPhase.Canceled:
+                    OnSprintCanceledEvent?.Invoke();
+                    break;
+            }
         }
 
         public void OnJump(InputAction.CallbackContext context)

@@ -9,15 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43c0e96b206648cca3638cca8c44bd07, type: 3}
-  m_Name: Movement Config 2
+  m_Script: {fileID: 11500000, guid: af2fe3bb5b6346b9946965920c57731b, type: 3}
+  m_Name: Movement Component Config
   m_EditorClassIdentifier: 
-  _metaName: Movement Config 2
+  _metaName: Movement Component Config
   _groundMask:
     serializedVersion: 2
     m_Bits: 1
   _inputLerpSpeed: 90
-  _slopeLimit: 55
+  _slopeLimit: 40
   _walkSpeed: 5
   _backwardSpeedPercentage: 0.9
   _strafeSpeedPercentage: 0.8
@@ -60,11 +60,3 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _movementComponentConfig: {fileID: 11400000, guid: e94b6e8c619562546b7e7312513cd03a,
-    type: 2}
-  _jumpComponentConfig: {fileID: 11400000, guid: e5eb0c8a248196f4f90c4e9f91bc420f,
-    type: 2}
-  _groundedPhysMaterial: {fileID: 13400000, guid: f5a8bbec1686b9b44b216e231f529413,
-    type: 2}
-  _stayPhysMaterial: {fileID: 13400000, guid: 5c5c10cd23cfcd244af9ef060e8e372d, type: 2}
-  _flyPhysMaterial: {fileID: 13400000, guid: f5a8bbec1686b9b44b216e231f529413, type: 2}

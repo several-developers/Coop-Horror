@@ -9,9 +9,10 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         public JumpComponent(PlayerEntity playerEntity, PhysicalMovementBehaviour2 movementBehaviour)
         {
             PlayerReferences playerReferences = playerEntity.References;
+            MovementConfig2 movementConfig = playerReferences.PlayerConfig.MovementConfig2;
             
-            _playerEntity = playerEntity;
-            _movementConfig = playerReferences.PlayerConfig.MovementConfig2;
+            _movementComponentConfig = movementConfig.MovementComponentConfig;
+            _jumpComponentConfig = movementConfig.JumpComponentConfig;
             _movementBehaviour = movementBehaviour;
             _rigidbody = playerReferences.Rigidbody;
         }
@@ -37,10 +38,12 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         
         // FIELDS: --------------------------------------------------------------------------------
         
-        private readonly PlayerEntity _playerEntity;
-        private readonly MovementConfig2 _movementConfig;
+        private readonly MovementComponentConfig _movementComponentConfig;
+        private readonly JumpComponentConfig _jumpComponentConfig;
         private readonly PhysicalMovementBehaviour2 _movementBehaviour;
         private readonly Rigidbody _rigidbody;
+
+        private MovementComponent _movementComponent;
 
         private float _landStartTime = -999f; // Time that player landed from jump.
         private float _jumpTimer; // Track the time player began jump.
@@ -50,12 +53,15 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void Init() =>
+            _movementComponent = _movementBehaviour.MovementComponent;
+
         public void Tick()
         {
-            float antiBunnyHopFactor = _movementConfig.AntiBunnyHopFactor;
-            float jumpSpeed = _movementConfig.JumpSpeed;
+            float antiBunnyHopFactor = _jumpComponentConfig.AntiBunnyHopFactor;
+            float jumpSpeed = _jumpComponentConfig.JumpSpeed;
             float t = Time.time;
-            bool isGrounded = _movementBehaviour.IsGrounded;
+            bool isGrounded = _movementComponent.IsGrounded;
 
             if (!isGrounded)
                 return;
@@ -76,11 +82,11 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             }
             else
             {
-                float slopeLimit = _movementConfig.SlopeLimit;
+                float slopeLimit = _movementComponentConfig.SlopeLimit;
                     
                 bool jump = _performJump
                             && _landStartTime + antiBunnyHopFactor < t // Check for bunny hop delay before jumping.
-                            && _movementBehaviour.SlopeAngle < slopeLimit;
+                            && _movementComponent.SlopeAngle < slopeLimit;
 
                 if (jump)
                 {
@@ -94,7 +100,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
                         _playJumpSFX = false;
                     }
                         
-                    _movementBehaviour.YVelocity = jumpSpeed;
+                    _movementComponent.YVelocity = jumpSpeed;
 
                     Vector3 force = Vector3.up * Mathf.Sqrt(2f * jumpSpeed * -Physics.gravity.y);
                         
