@@ -33,6 +33,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private float _animationBlend;
         private float _distance;
         private float _syncCurrentTime;
+        private bool _isArrived;
         private bool _canMove;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -48,7 +49,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _distance += targetSpeed * Time.fixedDeltaTime;
 
             if (_distance > _path.PathLength)
+            {
+                if (!_isArrived)
+                {
+                    _isArrived = true;
+                    OnDestinationReachedEvent?.Invoke();
+                }
+                
                 _distance = _path.PathLength;
+            }
             
             MoveRigidbody(_distance);
 
@@ -81,7 +90,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _transform.position = position;
             _transform.rotation = rotation;
         }
-        
+
+        public void ToggleArrived(bool isArrived) =>
+            _isArrived = isArrived;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void MoveRigidbody(float distance)

@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.InputHandlerTEMP;
+using GameCore.Utilities;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player.Movement
@@ -11,13 +12,14 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         {
             PlayerReferences playerReferences = playerEntity.References;
 
-            _playerEntity = playerEntity;
             _inputReader = playerReferences.InputReader;
             _movementConfig = playerReferences.PlayerConfig.MovementConfig3;
             _transform = playerEntity.transform;
             _rigidbody = playerReferences.Rigidbody;
             _collider = playerReferences.Collider;
             _groundMask = _movementConfig.GroundMask;
+
+            _jumpComponent = new JumpComponent(playerEntity, movementBehaviour: this);
 
             _globalDownDirection = Vector3.down.normalized;
 
@@ -26,11 +28,15 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             _inputReader.OnJumpEvent += OnJump;
         }
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public bool IsGrounded => _isGrounded;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly PlayerEntity _playerEntity;
         private readonly InputReader _inputReader;
         private readonly MovementConfig3 _movementConfig;
+        private readonly JumpComponent _jumpComponent;
         private readonly Transform _transform;
         private readonly Rigidbody _rigidbody;
         private readonly CapsuleCollider _collider;
@@ -42,13 +48,14 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         private Vector3 _globalMoveDirection;
         private Vector3 _downDirection;
         private Vector3 _globalDownDirection;
-        private Vector3 _slopeNormal;
-        private RaycastHit _slopeInfo;
+        
+        private RaycastHit _groundHitInfo;
+        private Vector3 _groundPoint;
+        private Vector3 _groundNormal;
 
         private float _moveSpeed;
         private float _slopeAngle;
 
-        private bool _performJump;
         private bool _performSprint;
 
         private bool _isGrounded;
@@ -64,16 +71,17 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             ControlDrag();
             ControlSpeed();
 
-            Jump();
+            _jumpComponent.Jump();
 
             GetMoveDirection();
 
-            ResetJump();
+            _jumpComponent.ResetJump();
         }
 
         public void FixedTick()
         {
             Movement();
+            AdditionalMovement();
             ApplyGravity();
         }
 
@@ -101,13 +109,15 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             float frictionAgainstFloor = _movementConfig.FrictionAgainstFloor;
             float maxDistance = _collider.height * 0.5f + 0.5f;
 
-            bool isSloping = Physics.Raycast(origin: _transform.position, direction: Vector3.down, out _slopeInfo,
+            bool isSloping = Physics.Raycast(origin: _transform.position, direction: Vector3.down, out _groundHitInfo,
                 maxDistance);
 
             if (isSloping)
             {
-                _slopeNormal = _slopeInfo.normal;
-                bool equalsOne = Mathf.Approximately(a: _slopeInfo.normal.y, b: 1f);
+                _groundNormal = _groundHitInfo.normal;
+                _groundPoint = _groundHitInfo.point;
+                
+                bool equalsOne = Mathf.Approximately(a: _groundHitInfo.normal.y, b: 1f);
 
                 if (equalsOne)
                 {
@@ -122,7 +132,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
                     float maxSlopeAngle = _movementConfig.MaxSlopeAngle;
                     float speedMultiplier = speedMultiplierOnAngle.Evaluate(time: _slopeAngle / 90f);
 
-                    Vector3 slopeMoveDirection = Vector3.ProjectOnPlane(vector: _globalMoveDirection, _slopeNormal);
+                    Vector3 slopeMoveDirection = Vector3.ProjectOnPlane(vector: _globalMoveDirection, _groundNormal);
 
                     if (_slopeAngle <= maxSlopeAngle)
                     {
@@ -137,16 +147,16 @@ namespace GameCore.Gameplay.Entities.Player.Movement
                         SetFriction(frictionWall: 0f, isMinimum: true);
                     }
 
-                    _slopeAngle = Vector3.Angle(Vector3.up, _slopeNormal);
+                    _slopeAngle = Vector3.Angle(Vector3.up, _groundNormal);
                     _isSloping = true;
                 }
 
-                _downDirection = Vector3.ProjectOnPlane(Vector3.down, _slopeNormal);
+                _downDirection = Vector3.ProjectOnPlane(Vector3.down, _groundNormal);
             }
             else
             {
                 _downDirection = Vector3.down.normalized;
-                _slopeNormal = Vector3.zero;
+                _groundNormal = Vector3.zero;
                 _isSloping = false;
 
                 SetFriction(frictionAgainstFloor, isMinimum: true);
@@ -192,22 +202,27 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             _rigidbody.AddForce(force, ForceMode.Acceleration);
         }
 
-        private void Jump()
+        private void AdditionalMovement()
         {
-            if (!_performJump || !_isGrounded)
+            if (!_isGrounded)
                 return;
 
-            float jumpForce = _movementConfig.JumpForce;
-            Vector3 force = _transform.up * Mathf.Sqrt(jumpForce * -2f * Physics.gravity.y);
-            Vector3 velocity = _rigidbody.velocity;
+            Rigidbody rigidbody = _groundHitInfo.rigidbody;
+            bool hitRigidbody = rigidbody != null && rigidbody.isKinematic;
 
-            _rigidbody.velocity = new Vector3(velocity.x, 0f, velocity.z);
-            _rigidbody.AddForce(force, ForceMode.VelocityChange);
+            if (!hitRigidbody)
+                return;
+            
+            float moveSpeedMultiplier = _movementConfig.MoveSpeedMultiplier;
+            float fdt = Time.fixedDeltaTime;
+            
+            Vector3 velocity = rigidbody.GetVelocityAtPoint(_groundPoint);
+            //_rigidbody.velocity += velocity;
+            
+            velocity *= moveSpeedMultiplier * fdt;
+            _rigidbody.AddForce(velocity, ForceMode.Acceleration);
         }
-
-        private void ResetJump() =>
-            _performJump = false;
-
+        
         private void GetMoveDirection()
         {
             var moveVector = _inputReader.GameInput.Gameplay.Move.ReadValue<Vector2>();
@@ -224,7 +239,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
                 gravity = _globalDownDirection * (gravityMultiplier * -Physics.gravity.y);
 
             // Slide if angle too big
-            bool flag1 = !Mathf.Approximately(a: _slopeNormal.y, b: 0f);
+            bool flag1 = !Mathf.Approximately(a: _groundNormal.y, b: 0f);
             bool flag2 = _slopeAngle > maxSlopeAngle;
             bool canSlide = flag1 && flag2;
 
@@ -267,6 +282,6 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             _performSprint = false;
 
         private void OnJump() =>
-            _performJump = true;
+            _jumpComponent.ActivateJump();
     }
 }

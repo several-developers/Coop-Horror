@@ -425,7 +425,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxVerticalAngle: 60
-  _sensitivity: 0.9
+  _sensitivity: 0.8
   _cameraReferences:
     _mainCamera: {fileID: 9036817173485120049}
     _itemPivot: {fileID: 9036817174032464219}

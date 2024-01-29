@@ -13,8 +13,8 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
             _inputReader = playerReferences.InputReader;
 
-            _movementComponent = new MovementComponent(playerEntity, movementBehaviour: this);
-            _jumpComponent = new JumpComponent(playerEntity, movementBehaviour: this);
+            _movementComponent = new MovementComponentDelete(playerEntity, movementBehaviour: this);
+            _jumpComponent = new JumpComponentDelete(playerEntity, movementBehaviour: this);
             
             _movementComponent.Init();
             _jumpComponent.Init();
@@ -27,14 +27,14 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public MovementComponent MovementComponent => _movementComponent;
-        public JumpComponent JumpComponent => _jumpComponent;
+        public MovementComponentDelete MovementComponentDelete => _movementComponent;
+        public JumpComponentDelete JumpComponentDelete => _jumpComponent;
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly InputReader _inputReader;
-        private readonly MovementComponent _movementComponent;
-        private readonly JumpComponent _jumpComponent;
+        private readonly MovementComponentDelete _movementComponent;
+        private readonly JumpComponentDelete _jumpComponent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

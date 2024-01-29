@@ -10,7 +10,10 @@ namespace GameCore.Gameplay.Locations
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private CinemachinePath _path;
+        private CinemachinePath _enterPath;
+        
+        [SerializeField, Required]
+        private CinemachinePath _exitPath;
         
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -22,8 +25,10 @@ namespace GameCore.Gameplay.Locations
             _instance = this;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public CinemachinePath GetPath() => _path;
+        
+        public CinemachinePath GetEnterPath() => _enterPath;
+        
+        public CinemachinePath GetExitPath() => _exitPath;
         
         public static LocationManager Get() => _instance;
     }

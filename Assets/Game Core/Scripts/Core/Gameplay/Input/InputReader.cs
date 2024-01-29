@@ -10,7 +10,7 @@ namespace GameCore.Gameplay.InputHandlerTEMP
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public GameInput GameInput => _gameInput;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
 
         // Gameplay
@@ -25,10 +25,10 @@ namespace GameCore.Gameplay.InputHandlerTEMP
         public event Action OnDropItemEvent = delegate { };
         public event Action<float> OnScrollEvent = delegate { };
         public event Action OnPauseEvent = delegate { };
-        
+
         // Menus
         public event Action OnResumeEvent = delegate { };
-        
+
         private GameInput _gameInput;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -37,12 +37,12 @@ namespace GameCore.Gameplay.InputHandlerTEMP
         {
             if (_gameInput != null)
                 return;
-            
+
             _gameInput = new GameInput();
-                
+
             _gameInput.Gameplay.SetCallbacks(instance: this);
             _gameInput.Menus.SetCallbacks(instance: this);
-            
+
             EnableGameplayInput();
         }
 
@@ -54,7 +54,7 @@ namespace GameCore.Gameplay.InputHandlerTEMP
         {
             // Check if nessesary.
             //_playerInputActions.SwitchCurrentActionMap(Constants.PlayerActionMap);
-            
+
             _gameInput.Gameplay.Enable();
             _gameInput.Menus.Disable();
         }
@@ -74,13 +74,13 @@ namespace GameCore.Gameplay.InputHandlerTEMP
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-        
+
         public void OnMove(InputAction.CallbackContext context)
         {
             var moveVector = context.ReadValue<Vector2>();
             OnMoveEvent.Invoke(moveVector);
         }
-        
+
         public void OnSprint(InputAction.CallbackContext context)
         {
             switch (context.phase)
@@ -88,7 +88,7 @@ namespace GameCore.Gameplay.InputHandlerTEMP
                 case InputActionPhase.Performed:
                     OnSprintEvent?.Invoke();
                     break;
-                
+
                 case InputActionPhase.Canceled:
                     OnSprintCanceledEvent?.Invoke();
                     break;
@@ -114,7 +114,7 @@ namespace GameCore.Gameplay.InputHandlerTEMP
                 case InputActionPhase.Performed:
                     OnAttackEvent.Invoke();
                     break;
-                
+
                 case InputActionPhase.Canceled:
                     OnAttackCanceledEvent.Invoke();
                     break;
@@ -135,6 +135,9 @@ namespace GameCore.Gameplay.InputHandlerTEMP
 
         public void OnScroll(InputAction.CallbackContext context)
         {
+            if (!context.performed)
+                return;
+            
             var scrollValue = context.ReadValue<float>();
             OnScrollEvent.Invoke(scrollValue);
         }
@@ -143,56 +146,48 @@ namespace GameCore.Gameplay.InputHandlerTEMP
         {
             if (!context.performed)
                 return;
-            
+
             OnPauseEvent.Invoke();
             EnableUIInput();
         }
 
         public void OnNavigate(InputAction.CallbackContext context)
         {
-            
         }
 
         public void OnSubmit(InputAction.CallbackContext context)
         {
-            
         }
 
         public void OnCancel(InputAction.CallbackContext context)
         {
-            
         }
 
         public void OnPoint(InputAction.CallbackContext context)
         {
-            
         }
 
         public void OnClick(InputAction.CallbackContext context)
         {
-            
         }
 
         public void OnScrollWheel(InputAction.CallbackContext context)
         {
-            
         }
 
         public void OnMiddleClick(InputAction.CallbackContext context)
         {
-            
         }
 
         public void OnRightClick(InputAction.CallbackContext context)
         {
-            
         }
 
         public void OnResume(InputAction.CallbackContext context)
         {
             if (!context.performed)
                 return;
-            
+
             OnResumeEvent.Invoke();
             EnableGameplayInput();
         }

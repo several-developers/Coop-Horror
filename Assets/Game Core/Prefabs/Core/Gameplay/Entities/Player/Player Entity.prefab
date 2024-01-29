@@ -2932,32 +2932,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6516424174033649999
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76f1756c006ac9149b82b11ca6357da3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  interactDistance: 2
-  interactCastRadius: 0.2
-  audioSources: {fileID: 1916549900642507524}
-  controller: {fileID: 0}
-  cameraBobAnims: {fileID: 0}
-  footsteps: {fileID: 0}
-  deadlyHeight: -1000
-  effectsAudioSource: {fileID: 2194461843507448856}
-  returnToGroundAltitude: -500
-  colliders:
-  - {fileID: 1967799250354909116}
 --- !u!4 &8684867425259486934 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,

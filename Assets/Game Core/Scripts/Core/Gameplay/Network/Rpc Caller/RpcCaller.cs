@@ -17,6 +17,7 @@ namespace GameCore.Gameplay.Network
         public event Action<Vector3> OnTeleportPlayerWithOffsetEvent;
         public event Action OnRoadLocationLoadedEvent;
         public event Action OnLocationLoadedEvent;
+        public event Action OnLeavingLocationEvent;
         public event Action OnLocationLeftEvent;
 
         private static RpcCaller _instance;
@@ -43,6 +44,11 @@ namespace GameCore.Gameplay.Network
             LoadLocationServerRpc(sceneNameIndex);
         }
 
+        public void StartLeavingLocation()
+        {
+            
+        }
+        
         public void LeaveLocation() => LeaveLocationServerRpc();
 
         public void SendRoadLocationLoaded() => SendRoadLocationLoadedServerRpc();
@@ -105,6 +111,9 @@ namespace GameCore.Gameplay.Network
             LoadLocationClientRpc(sceneNameIndex);
 
         [ServerRpc(RequireOwnership = false)]
+        private void StartLeavingLocationServerRpc() => StartLeavingLocationClientRpc();
+        
+        [ServerRpc(RequireOwnership = false)]
         private void LeaveLocationServerRpc() => LeaveLocationClientRpc();
 
         [ServerRpc(RequireOwnership = false)]
@@ -138,6 +147,10 @@ namespace GameCore.Gameplay.Network
         [ClientRpc]
         private void LoadLocationClientRpc(int sceneNameIndex) => LoadLocationLogic(sceneNameIndex);
 
+        [ClientRpc]
+        private void StartLeavingLocationClientRpc() =>
+            OnLeavingLocationEvent?.Invoke();
+        
         [ClientRpc]
         private void LeaveLocationClientRpc() => LeaveLocationLogic();
 

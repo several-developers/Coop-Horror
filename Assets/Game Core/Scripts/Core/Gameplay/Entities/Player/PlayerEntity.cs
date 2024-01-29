@@ -53,6 +53,7 @@ namespace GameCore.Gameplay.Entities.Player
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public PlayerReferences References => _references;
+        public bool IsInsideMobileHQ => _isInsideMobileHQ;
         
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -78,6 +79,7 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _lookAtObject;
 
         private bool _isInitialized;
+        private bool _isInsideMobileHQ;
 
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
 
@@ -162,6 +164,9 @@ namespace GameCore.Gameplay.Entities.Player
             //_animator.SetTrigger(id: AnimatorHashes.HitReaction);
         }
 
+        public void ToggleInsideMobileHQ(bool isInside) =>
+            _isInsideMobileHQ = isInside;
+
         public Transform GetTransform() => transform;
 
         public Transform GetCameraItemPivot() => _cameraItemPivot;
@@ -227,7 +232,7 @@ namespace GameCore.Gameplay.Entities.Player
             {
                 IPlayerInteractionObserver playerInteractionObserver = NetworkSpawner.Get().PlayerInteractionObserver;
                 
-                _cameraController.Init(target: transform, _references.HeadPoint);
+                _cameraController.Init(playerEntity: this);
                 
                 _lookAtObject = _cameraController.CameraReferences.LookAtObject;
                 

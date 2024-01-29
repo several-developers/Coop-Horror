@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
@@ -53,16 +54,16 @@ namespace GameCore.Gameplay.PlayerCamera
         private static CameraController _instance;
         
         private InputReader _inputReader;
-        private Transform _mobileHqTransform;
+        private PlayerEntity _playerEntity;
         private Transform _transform;
         private Transform _target;
-        private Transform _cameraPoint;
+        private Transform _headPoint;
+        private Transform _mobileHqTransform;
         
         private Vector3 _lastFrameMobileHqRotation;
         private Vector2 _lookVector;
         private float _mouseVerticalValue;
         private bool _isInitialized;
-        private bool _insideMobileHq;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
@@ -88,7 +89,7 @@ namespace GameCore.Gameplay.PlayerCamera
 
             float yRotationTemp = _target.rotation.eulerAngles.y;
 
-            if (_insideMobileHq)
+            if (_playerEntity.IsInsideMobileHQ)
             {
                 Vector3 difference = mobileHeadquartersRotation - _lastFrameMobileHqRotation;
                 yRotationTemp += difference.y;
@@ -98,7 +99,7 @@ namespace GameCore.Gameplay.PlayerCamera
             
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
-            _transform.position = _cameraPoint.position;
+            _transform.position = _headPoint.position;
             _transform.localRotation = finalRotation;
 
             _target.rotation = Quaternion.Euler(0, yRotation, 0);
@@ -108,10 +109,11 @@ namespace GameCore.Gameplay.PlayerCamera
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Init(Transform target, Transform cameraPoint)
+        public void Init(PlayerEntity playerEntity)
         {
-            _target = target;
-            _cameraPoint = cameraPoint;
+            _playerEntity = playerEntity;
+            _target = playerEntity.transform;
+            _headPoint = playerEntity.References.HeadPoint;
             _isInitialized = true;
 
             MobileHeadquartersEntity mobileHeadquartersEntity = MobileHeadquartersEntity.Get();

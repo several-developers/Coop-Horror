@@ -3,11 +3,11 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player.Movement
 {
-    public class MovementComponent
+    public class MovementComponentDelete
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MovementComponent(PlayerEntity playerEntity, PhysicalMovementBehaviour2 movementBehaviour)
+        public MovementComponentDelete(PlayerEntity playerEntity, PhysicalMovementBehaviour2 movementBehaviour)
         {
             PlayerReferences playerReferences = playerEntity.References;
 
@@ -47,7 +47,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         private readonly PhysicMaterial _flyPhysMaterial;
         private readonly LayerMask _groundMask;
 
-        private JumpComponent _jumpComponent;
+        private JumpComponentDelete _jumpComponent;
 
         private Vector3 _lastOnGroundPosition;
 
@@ -105,7 +105,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         public void Init()
         {
-            _jumpComponent = _movementBehaviour.JumpComponent;
+            _jumpComponent = _movementBehaviour.JumpComponentDelete;
         }
 
         public void FixedTick()

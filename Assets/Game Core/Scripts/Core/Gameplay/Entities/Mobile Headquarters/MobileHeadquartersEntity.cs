@@ -1,6 +1,5 @@
 ﻿using System;
 using Cinemachine;
-using EFPController;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums;
 using GameCore.Gameplay.Entities.Player;
@@ -9,7 +8,6 @@ using GameCore.Gameplay.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
-using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -17,6 +15,17 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
     public class MobileHeadquartersEntity : NetworkBehaviour, IMobileHeadquartersEntity
     {
+        private enum State
+        {
+            _ = 0,
+            
+            MovingOnRoad = 1,
+            IdleOnRoad = 2,
+            IdleOnLocation = 3,
+            ArrivingAtLocation = 4,
+            LeavingLocation = 5,
+        }
+        
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -55,6 +64,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private RigidbodyPathMovement _pathMovement;
         private RpcCaller _rpcCaller;
+        private State _currentState;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -118,11 +128,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void ArriveAtRoadLocation(bool sendTeleportEvent = true)
+        public void ArrivedAtRoadLocation(bool sendTeleportEvent = true)
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
             CinemachinePath path = roadLocationManager.GetPath();
-            
+
             ChangePath(path, sendTeleportEvent);
             
             _loadLocationLever.InteractWithoutEvents(isLeverPulled: false);
@@ -158,6 +168,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             _rpcCaller.OnRoadLocationLoadedEvent += OnRoadLocationLoaded;
             _rpcCaller.OnLocationLoadedEvent += OnLocationLoaded;
+            _rpcCaller.OnLeavingLocationEvent += OnLeavingLocation;
             _rpcCaller.OnLocationLeftEvent += OnLocationLeft;
         }
         
@@ -184,6 +195,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _rpcCaller.OnRoadLocationLoadedEvent -= OnRoadLocationLoaded;
             _rpcCaller.OnLocationLoadedEvent -= OnLocationLoaded;
+            _rpcCaller.OnLeavingLocationEvent -= OnLeavingLocation;
             _rpcCaller.OnLocationLeftEvent -= OnLocationLeft;
         }
 
@@ -218,15 +230,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             Quaternion newRotation = transform.rotation;
             
             Transform playerTransform = playerEntity.transform;
-            playerTransform.position = _playerPoint.position;
-            
-            var player = playerEntity.GetComponent<EFPController.Player>();
-            SmoothLook smoothLook = player.SmoothLook;
-
             Vector3 difference = newRotation.eulerAngles - startRotation.eulerAngles;
+            Vector3 playerRotation = playerTransform.rotation.eulerAngles;
+            playerRotation.y += difference.y;
             
-            smoothLook.RotationX += difference.y;
-
+            playerTransform.position = _playerPoint.position;
+            playerTransform.rotation = Quaternion.Euler(playerRotation);
+            
             OnTeleportedEvent?.Invoke();
         }
 
@@ -242,6 +252,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void EnableDoorLever() =>
             _toggleMobileDoorLever.ToggleInteract(canInteract: true);
+
+        private void EnterState(State state) =>
+            _currentState = state;
 
         // RPC: -----------------------------------------------------------------------------------
         
@@ -264,8 +277,23 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [Button]
         private void OnDestinationReached()
         {
-            _leaveLocationLever.InteractWithoutEvents(isLeverPulled: false);
-            _leaveLocationLever.ToggleInteract(canInteract: true);
+            switch (_currentState)
+            {
+                case State.ArrivingAtLocation:
+                    ToggleDoorState(isOpen: true);
+            
+                    _leaveLocationLever.InteractWithoutEvents(isLeverPulled: false);
+                    _leaveLocationLever.ToggleInteract(canInteract: true);
+                    
+                    EnterState(State.IdleOnLocation);
+                    break;
+                
+                case State.LeavingLocation:
+                    _rpcCaller.LeaveLocation();
+                    
+                    EnterState(State.MovingOnRoad);
+                    break;
+            }
         }
 
         private void OnDoorOpened() => EnableDoorLever();
@@ -287,7 +315,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _leaveLocationLever.InteractLogic();
 
         private void OnLeaveLocation() =>
-            _rpcCaller.LeaveLocation();
+            _rpcCaller.StartLeavingLocation();
 
         private void OnRoadLocationLoaded()
         {
@@ -297,17 +325,30 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void OnLocationLoaded()
         {
             LocationManager locationManager = LocationManager.Get();
-            CinemachinePath path = locationManager.GetPath();
-
+            CinemachinePath path = locationManager.GetEnterPath();
+            
+            _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
-            OnDestinationReached(); // TEMP
             ToggleMovement(canMove: true);
+        }
+
+        private void OnLeavingLocation()
+        {
+            LocationManager locationManager = LocationManager.Get();
+            CinemachinePath path = locationManager.GetExitPath();
+            
+            _pathMovement.ToggleArrived(isArrived: false);
+            ChangePath(path);
+            ToggleMovement(canMove: true);
+            ToggleDoorState(isOpen: false);
+            
+            EnterState(State.LeavingLocation);
         }
 
         private void OnLocationLeft()
         {
             ToggleMovement(canMove: false);
-            ArriveAtRoadLocation();
+            ArrivedAtRoadLocation();
         }
     }
 }

@@ -49,7 +49,7 @@ MonoBehaviour:
     pathColor: {r: 0, g: 1, b: 0, a: 1}
     inactivePathColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     width: 0.2
-  m_Looped: 1
+  m_Looped: 0
   m_Waypoints:
   - position: {x: 0, y: 0, z: 0}
     tangent: {x: 0, y: 0, z: 1}

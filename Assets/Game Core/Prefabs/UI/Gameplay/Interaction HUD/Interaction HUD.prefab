@@ -65,8 +65,6 @@ MonoBehaviour:
     _interactionDisabledTextSettings:
     - _interactionType: 1
       _text: Can't pick up item now
-    - _interactionType: 4
-      _text: Can't open/close right now
   _textTMP: {fileID: 1650463360097365807}
   _fadeAnimation:
     _fadeInDuration: 0.05

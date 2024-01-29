@@ -442,7 +442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _canInteractFromStart: 1
-  _isEnabledFromStart: 0
+  _isLeverPulledFromStart: 0
   _animator: {fileID: 3866227387355302479}
   _animationObserver: {fileID: 8550360421689074004}
 --- !u!4 &3839156221072241954 stripped
