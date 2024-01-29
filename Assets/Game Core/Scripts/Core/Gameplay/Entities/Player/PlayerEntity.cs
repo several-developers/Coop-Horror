@@ -220,7 +220,7 @@ namespace GameCore.Gameplay.Entities.Player
             void InitMovement()
             {
                 Transform cameraTransform = _cameraController.transform;
-                _movementBehaviour = new PhysicalMovementBehaviour2(playerEntity: this);
+                _movementBehaviour = new PhysicalMovementBehaviour3(playerEntity: this);
             }
             
             void BasicInit()

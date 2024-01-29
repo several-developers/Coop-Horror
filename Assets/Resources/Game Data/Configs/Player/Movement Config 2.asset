@@ -13,53 +13,7 @@ MonoBehaviour:
   m_Name: Movement Config 2
   m_EditorClassIdentifier: 
   _metaName: Movement Config 2
-  _groundMask:
-    serializedVersion: 2
-    m_Bits: 1
-  _inputLerpSpeed: 90
-  _slopeLimit: 55
-  _walkSpeed: 5
-  _backwardSpeedPercentage: 0.9
-  _strafeSpeedPercentage: 0.8
-  _diagonalStrafeAmt: 0.9
-  _maxStepHeight: 0.6
-  _stepHeightRadius: 0.6
-  _gravityMultiplier: 2
-  _gravityMax: 30
-  _airSpeedMultiplier: 1
-  _slopeSpeed:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: -0.002223433
-      tangentMode: 65
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.6987639
-      value: 0.99844635
-      inSlope: -0.002223433
-      outSlope: -0.026184037
-      tangentMode: 5
-      weightedMode: 0
-      inWeight: 0.08454482
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  _debugMode: 0
   _movementComponentConfig: {fileID: 11400000, guid: e94b6e8c619562546b7e7312513cd03a,
     type: 2}
   _jumpComponentConfig: {fileID: 11400000, guid: e5eb0c8a248196f4f90c4e9f91bc420f,

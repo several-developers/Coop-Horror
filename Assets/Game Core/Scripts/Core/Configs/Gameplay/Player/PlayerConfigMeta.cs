@@ -12,8 +12,12 @@ namespace GameCore.Configs.Gameplay.Player
 
         [SerializeField]
         private MovementConfig2 _movementConfig2;
+        
+        [SerializeField]
+        private MovementConfig3 _movementConfig3;
 
         public MovementConfig2 MovementConfig2 => _movementConfig2;
+        public MovementConfig3 MovementConfig3 => _movementConfig3;
 
         [Title("Movement specifics")]
         [Tooltip("Layers where the player can stand on")]
@@ -59,11 +63,11 @@ namespace GameCore.Configs.Gameplay.Player
         
         [SerializeField, Range(0f, 1f)]
         [Tooltip("Player friction against floor")]
-        private float _frictionAgainstFloor = 0.3f;
+        private float _frictionAgainstFloor = 0.189f;
         
         [SerializeField, Range(0.01f, 0.99f)]
         [Tooltip("Player friction against wall")]
-        private float _frictionAgainstWall = 0.839f;
+        private float _frictionAgainstWall = 0.082f;
         
         [Space(10)]
 

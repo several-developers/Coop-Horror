@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Player Config
   _movementConfig2: {fileID: 11400000, guid: fbf384ff3fb41144092d4170323081b6, type: 2}
+  _movementConfig3: {fileID: 11400000, guid: a44a16049707311468d7a96025581cd9, type: 2}
   _groundMask:
     serializedVersion: 2
     m_Bits: 1

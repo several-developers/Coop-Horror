@@ -296,10 +296,6 @@ namespace GameCore.Gameplay.Entities.Player.Movement
                 _groundNormal = Vector3.zero;
 
                 Vector3 vector = new(_moveInputVector.x, 0f, _moveInputVector.y); // _transform.forward
-                Vector3 cameraForward = _cameraTransform.forward;
-                Vector3 forward = _transform.forward;
-
-                vector = Vector3.zero;
                 vector = Quaternion.Euler(0f, _targetAngle, 0f) * Vector3.forward;
                 
                 _forward = Vector3.ProjectOnPlane(vector, slopeHit.normal).normalized;
