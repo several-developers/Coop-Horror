@@ -24,6 +24,9 @@ namespace GameCore.Gameplay.PlayerCamera
 
         [SerializeField, Min(0.1f)]
         private float _sensitivity = 1f;
+
+        [SerializeField, Min(0f)]
+        private float _cameraSpeed = 10f;
         
         [Title(Constants.References)]
         [SerializeField]
@@ -85,8 +88,8 @@ namespace GameCore.Gameplay.PlayerCamera
             
             _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
-            Vector3 mobileHeadquartersRotation = _mobileHqTransform.rotation.eulerAngles;
 
+            Vector3 mobileHeadquartersRotation = _mobileHqTransform.rotation.eulerAngles;
             float yRotationTemp = _target.rotation.eulerAngles.y;
 
             if (_playerEntity.IsInsideMobileHQ)
@@ -99,7 +102,7 @@ namespace GameCore.Gameplay.PlayerCamera
             
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
-            _transform.position = _headPoint.position;
+            _transform.position = Vector3.Lerp(_transform.position, _headPoint.position, _cameraSpeed * Time.deltaTime);
             _transform.localRotation = finalRotation;
 
             _target.rotation = Quaternion.Euler(0, yRotation, 0);

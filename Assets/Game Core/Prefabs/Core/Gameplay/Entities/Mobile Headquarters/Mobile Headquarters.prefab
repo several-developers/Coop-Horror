@@ -3288,6 +3288,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Toggle Mobile Door Lever
       objectReference: {fileID: 0}
+    - target: {fileID: 1900281593773600290, guid: b59b3d0ef7edd8e4c80e65a53f645177,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2650425794012276954, guid: b59b3d0ef7edd8e4c80e65a53f645177,
         type: 3}
       propertyPath: m_RootOrder

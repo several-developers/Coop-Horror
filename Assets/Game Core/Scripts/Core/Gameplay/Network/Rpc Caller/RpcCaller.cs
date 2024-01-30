@@ -44,11 +44,8 @@ namespace GameCore.Gameplay.Network
             LoadLocationServerRpc(sceneNameIndex);
         }
 
-        public void StartLeavingLocation()
-        {
-            
-        }
-        
+        public void StartLeavingLocation() => StartLeavingLocationServerRpc();
+
         public void LeaveLocation() => LeaveLocationServerRpc();
 
         public void SendRoadLocationLoaded() => SendRoadLocationLoadedServerRpc();

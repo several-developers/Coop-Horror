@@ -64,7 +64,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private RigidbodyPathMovement _pathMovement;
         private RpcCaller _rpcCaller;
-        private State _currentState;
+        private State _currentState = State.MovingOnRoad;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -232,6 +232,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             Transform playerTransform = playerEntity.transform;
             Vector3 difference = newRotation.eulerAngles - startRotation.eulerAngles;
             Vector3 playerRotation = playerTransform.rotation.eulerAngles;
+            playerRotation.x += difference.x;
             playerRotation.y += difference.y;
             
             playerTransform.position = _playerPoint.position;
@@ -311,17 +312,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void OnLoadLocation() =>
             _rpcCaller.LoadLocation(SceneName.Desert);
 
-        private void OnInteractWithLeaveLocationLever() =>
-            _leaveLocationLever.InteractLogic();
-
-        private void OnLeaveLocation() =>
-            _rpcCaller.StartLeavingLocation();
-
         private void OnRoadLocationLoaded()
         {
             
         }
-        
+
         private void OnLocationLoaded()
         {
             LocationManager locationManager = LocationManager.Get();
@@ -330,7 +325,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
             ToggleMovement(canMove: true);
+            
+            EnterState(State.ArrivingAtLocation);
         }
+
+        private void OnInteractWithLeaveLocationLever() =>
+            _leaveLocationLever.InteractLogic();
+
+        private void OnLeaveLocation() =>
+            _rpcCaller.StartLeavingLocation();
 
         private void OnLeavingLocation()
         {

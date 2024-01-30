@@ -56,7 +56,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _gravityMultiplier: 3
-  _gravityMultiplierOnSlideChange: 3
   _gravityMultiplierIfUnclimbableSlope: 30
   _groundMask:
     serializedVersion: 2
