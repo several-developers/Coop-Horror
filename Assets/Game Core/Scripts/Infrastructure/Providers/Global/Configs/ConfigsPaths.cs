@@ -12,6 +12,7 @@
         public const string ItemsListConfig = GameplayConfigs + "Items List Config";
         public const string LocationsListConfig = GameplayConfigs + "Locations List Config";
         public const string TimeConfig = GameplayConfigs + "Time Config";
+        public const string DungeonGeneratorConfig = GameplayConfigs + "Dungeon Generator Config";
         
         public const string PlayerConfig = Configs + "Player/Player Config";
         public const string GameBalanceConfig = Configs + "Game Balance Config";

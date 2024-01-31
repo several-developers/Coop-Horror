@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Game;
+﻿using GameCore.Configs.Global.Game;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Utilities;
 

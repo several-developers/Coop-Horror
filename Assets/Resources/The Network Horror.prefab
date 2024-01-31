@@ -67,3 +67,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPrefab: {fileID: 5746002443945451132, guid: a77369042e11ddd49be3f82d556be8a1,
     type: 3}
+  _ignoreRoadLocation: 1

@@ -211,7 +211,7 @@ namespace GameCore.Gameplay.Entities.Player
             InitMovement();
             BasicInit();
 
-            //_references.PlayerModel.SetActive(false);
+            _references.PlayerModel.SetActive(false);
 
             InputReader inputReader = _references.InputReader; // TEMP
             

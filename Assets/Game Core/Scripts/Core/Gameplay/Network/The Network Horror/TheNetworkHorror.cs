@@ -65,6 +65,7 @@ namespace GameCore.Gameplay.Network
         private bool _offlineMode;
         private bool _isGameTimerOn;
         private bool _isRoadLocationLoaded; // TEMP
+        public bool _ignoreRoadLocation; // TEMP
 
         // TEMP
 
@@ -205,7 +206,7 @@ namespace GameCore.Gameplay.Network
             if (!isGameplaySceneLoaded)
                 return;
 
-            if (!_isRoadLocationLoaded)
+            if (!_isRoadLocationLoaded && !_ignoreRoadLocation)
                 return;
 
             bool isReady = ReadyPlayersDictionary.ContainsKey(ClientID) && ReadyPlayersDictionary[ClientID];

@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Configs.Game;
+using GameCore.Configs.Global.Game;
 using GameCore.Enums;
 using GameCore.Gameplay;
 using GameCore.Infrastructure.Providers.Global;

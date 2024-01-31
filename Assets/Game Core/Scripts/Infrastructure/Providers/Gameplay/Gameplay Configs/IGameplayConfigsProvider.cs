@@ -1,4 +1,5 @@
 ﻿using GameCore.Configs.Gameplay;
+using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Configs.Gameplay.Time;
@@ -13,5 +14,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         ItemsListConfigMeta GetItemsListConfig();
         LocationsListConfigMeta GetLocationsListConfig();
         TimeConfigMeta GetTimeConfig();
+        DungeonGeneratorConfigMeta GetDungeonGeneratorConfig();
     }
 }
