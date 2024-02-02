@@ -33,6 +33,7 @@ namespace CustomEditors
             AddIconsToItems(tree);
             AddDraggableItems(tree);
 
+            tree.SortMenuItemsByName();
             tree.EnumerateTree().SortMenuItemsByName();
             tree.EnumerateTree().AddThumbnailIcons();
 

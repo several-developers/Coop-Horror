@@ -50,5 +50,13 @@ namespace GameCore.Gameplay.Dungeon
             }
         }
 #endif
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void Setup(RoomSettingsMeta roomSettings) =>
+            _roomSettings = roomSettings;
+
+        public Vector3 GetRandomDoorPosition() =>
+            transform.position;
     }
 }

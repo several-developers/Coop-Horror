@@ -1,27 +1,24 @@
-﻿using CustomEditors;
+﻿using System;
 using GameCore.Enums;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Dungeon
 {
-    public class RoomSettingsMeta : EditorMeta
+    [Serializable]
+    public class RoomSettingsReference
     {
         // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title(Constants.Settings)]
-        [SerializeField]
-        private Vector3 _size = Vector3.one;
-        
-        [SerializeField]
-        private Vector3 _offset;
 
         [SerializeField]
         private DungeonRoomType _roomType;
 
+        [SerializeField, Required]
+        private RoomSettingsMeta _roomSettings;
+
         // PROPERTIES: ----------------------------------------------------------------------------
-        
-        public Vector3 Size => _size;
-        public Vector3 Offset => _offset;
+
+        public DungeonRoomType RoomType => _roomType;
+        public RoomSettingsMeta RoomSettings => _roomSettings;
     }
 }
