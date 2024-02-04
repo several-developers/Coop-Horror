@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Dungeon Generator Config
   _dungeonSpawnOffsetY: 0
-  _roomsAmount: {x: 4, y: 4}
-  _corridorSpawnChance: 100
+  _roomsAmount: {x: 2, y: 2}
+  _hallwaySpawnChance: 35

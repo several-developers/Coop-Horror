@@ -22,7 +22,7 @@ namespace GameCore.Gameplay.Dungeon
         {
             int settingsAmount = _settings.Count;
             doorwaySettings = null;
-            
+
             if (settingsAmount == 0)
                 return false;
 

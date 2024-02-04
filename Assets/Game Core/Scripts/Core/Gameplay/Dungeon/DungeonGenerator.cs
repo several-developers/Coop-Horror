@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Enums;
@@ -7,6 +8,7 @@ using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Dungeon
 {
@@ -19,7 +21,7 @@ namespace GameCore.Gameplay.Dungeon
             _dungeonGeneratorConfig = gameplayConfigsProvider.GetDungeonGeneratorConfig();
 
         // MEMBERS: -------------------------------------------------------------------------------
-        
+
         [Title(Constants.References)]
         [SerializeField, Required]
         private Transform _dungeonRoot;
@@ -33,7 +35,7 @@ namespace GameCore.Gameplay.Dungeon
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public int LastRoomIndex => _lastRoomIndex;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private DungeonGeneratorConfigMeta _dungeonGeneratorConfig;
@@ -42,6 +44,11 @@ namespace GameCore.Gameplay.Dungeon
 
         private List<RoomZone> _roomZonesInstances = new();
         private int _lastRoomIndex;
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Awake() =>
+            _roomZonesGeneratorLogic = new RoomZonesGeneratorLogic(dungeonGenerator: this, _dungeonGeneratorConfig);
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -67,6 +74,8 @@ namespace GameCore.Gameplay.Dungeon
 
             return false;
         }
+
+        public RoomZone GetLastRoomZone() => _roomZonesInstances[^1];
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -95,8 +104,7 @@ namespace GameCore.Gameplay.Dungeon
             Vector2Int roomsAmount = _dungeonGeneratorConfig.RoomsAmount;
             int targetRoomsAmount = Random.Range(roomsAmount.x, roomsAmount.y + 1);
             int currentRoomsAmount = targetRoomsAmount;
-            
-            int corridorSpawnChance = _dungeonGeneratorConfig.CorridorSpawnChance;
+
             int iterations = 0;
 
             Debug.Log($"Rooms amount: {targetRoomsAmount}");
@@ -106,25 +114,11 @@ namespace GameCore.Gameplay.Dungeon
                 if (CheckInfinityLoop())
                     break;
 
-                bool spawnCorridor = GlobalUtilities.IsRandomSuccessful(corridorSpawnChance);
-                DungeonRoomType roomType;
-
-                if (spawnCorridor)
-                {
-                    roomType = GetRandomCorridorRoomType();
-                }
-                else
-                {
-                    //currentCorridorsAmount = 0;
-                    roomType = GetRandomRoomType();
-                }
-
-                _roomZonesGeneratorLogic.HandleRoomSpawn(roomType);
-
-                if (spawnCorridor)
-                    continue;
+                _roomZonesGeneratorLogic.HandleRoomSpawn();
 
                 currentRoomsAmount--;
+
+                yield return new WaitForSeconds(1f);
             }
 
             yield return null;
@@ -159,30 +153,6 @@ namespace GameCore.Gameplay.Dungeon
                 return;
 
             CreateRoomZone(roomSettings, position, Quaternion.identity);
-        }
-
-        private static DungeonRoomType GetRandomRoomType()
-        {
-            List<DungeonRoomType> roomTypes = new()
-            {
-                DungeonRoomType.TwoWaysRoom1
-            };
-
-            int randomIndex = Random.Range(0, roomTypes.Count);
-            return roomTypes[randomIndex];
-        }
-
-        private DungeonRoomType GetRandomCorridorRoomType()
-        {
-            List<DungeonRoomType> roomTypes = new()
-            {
-                DungeonRoomType.Corridor1,
-                DungeonRoomType.Corridor2,
-                DungeonRoomType.Corridor3,
-            };
-
-            int randomIndex = Random.Range(0, roomTypes.Count);
-            return roomTypes[randomIndex];
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
