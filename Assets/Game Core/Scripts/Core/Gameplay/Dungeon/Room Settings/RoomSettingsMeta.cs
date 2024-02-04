@@ -19,9 +19,22 @@ namespace GameCore.Gameplay.Dungeon
         [SerializeField]
         private DungeonRoomType _roomType;
 
+        [SerializeField, Space(height: 5)]
+        private DoorwaysSettings _doorwaysSettings;
+
         // PROPERTIES: ----------------------------------------------------------------------------
         
         public Vector3 Size => _size;
         public Vector3 Offset => _offset;
+        public DungeonRoomType RoomType => _roomType;
+        public DoorwaysSettings DoorwaysSettings => _doorwaysSettings;
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public bool TryGetDoorwaySettings(DoorwayDirection direction, out DoorwaySettings doorwaySettings) =>
+            _doorwaysSettings.TryGetDoorwaySettings(direction, out doorwaySettings);
+        
+        public bool TryGetRandomDoorwaySettings(out DoorwaySettings doorwaySettings) =>
+            _doorwaysSettings.TryGetRandomDoorwaySettings(out doorwaySettings);
     }
 }

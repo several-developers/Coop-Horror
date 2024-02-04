@@ -30,12 +30,43 @@ namespace GameCore.Gameplay.Dungeon
         [SerializeField, Space(height: 5)]
         private RoomSettingsReferences _roomSettingsReferences;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public int LastRoomIndex => _lastRoomIndex;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         private DungeonGeneratorConfigMeta _dungeonGeneratorConfig;
+        private RoomZonesGeneratorLogic _roomZonesGeneratorLogic;
         private Coroutine _generatorCO;
 
         private List<RoomZone> _roomZonesInstances = new();
+        private int _lastRoomIndex;
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void CreateRoomZone(RoomSettingsMeta roomSettings, Vector3 position, Quaternion rotation)
+        {
+            _lastRoomIndex++;
+
+            RoomZone roomZoneInstance = Instantiate(_roomZonePrefab, position, rotation, _dungeonRoot);
+            roomZoneInstance.Setup(roomSettings, _lastRoomIndex);
+
+            _roomZonesInstances.Add(roomZoneInstance);
+        }
+
+        public bool TryGetRoomSettings(DungeonRoomType roomType, out RoomSettingsMeta roomSettings)
+        {
+            bool isRoomSettingsFound = _roomSettingsReferences.TryGetRoomSettings(roomType, out roomSettings);
+
+            if (isRoomSettingsFound)
+                return true;
+
+            string errorLog = Log.HandleLog($"Room settings for <gb>{roomType}</gb> <rb>not found</rb>!");
+            //Debug.LogError(errorLog);
+
+            return false;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -52,46 +83,67 @@ namespace GameCore.Gameplay.Dungeon
         {
             foreach (RoomZone roomZone in _roomZonesInstances)
                 Destroy(roomZone.gameObject);
-            
+
             _roomZonesInstances.Clear();
         }
-        
+
         private IEnumerator GeneratorLogic()
         {
-            CreateEnterRoom();
+            CreateEnterRoomZone();
             yield return null;
 
             Vector2Int roomsAmount = _dungeonGeneratorConfig.RoomsAmount;
             int targetRoomsAmount = Random.Range(roomsAmount.x, roomsAmount.y + 1);
             int currentRoomsAmount = targetRoomsAmount;
-            int corridorSpawnChance = _dungeonGeneratorConfig.CorridorSpawnChance;
-
-            RoomZone lastRoomZone = _roomZonesInstances[0]; // Enter room
             
+            int corridorSpawnChance = _dungeonGeneratorConfig.CorridorSpawnChance;
+            int iterations = 0;
+
+            Debug.Log($"Rooms amount: {targetRoomsAmount}");
+
             while (currentRoomsAmount > 0)
             {
+                if (CheckInfinityLoop())
+                    break;
+
                 bool spawnCorridor = GlobalUtilities.IsRandomSuccessful(corridorSpawnChance);
                 DungeonRoomType roomType;
 
                 if (spawnCorridor)
+                {
                     roomType = GetRandomCorridorRoomType();
+                }
                 else
+                {
+                    //currentCorridorsAmount = 0;
                     roomType = GetRandomRoomType();
+                }
 
-                Vector3 spawnPosition = lastRoomZone.GetRandomDoorPosition();
-                
-                CreateRoomZone(roomType, spawnPosition);
+                _roomZonesGeneratorLogic.HandleRoomSpawn(roomType);
 
                 if (spawnCorridor)
                     continue;
-                
+
                 currentRoomsAmount--;
             }
-            
+
             yield return null;
+
+            // LOCAL METHODS: -----------------------------
+
+            bool CheckInfinityLoop()
+            {
+                iterations++;
+
+                if (iterations < 100)
+                    return false;
+
+                Debug.LogError("Infinity loop!");
+                return true;
+            }
         }
 
-        private void CreateEnterRoom()
+        private void CreateEnterRoomZone()
         {
             Vector3 spawnPosition = Vector3.zero;
             spawnPosition.y -= _dungeonGeneratorConfig.DungeonSpawnOffsetY;
@@ -106,21 +158,7 @@ namespace GameCore.Gameplay.Dungeon
             if (!isRoomSettingsFound)
                 return;
 
-            RoomZone roomZoneInstance = Instantiate(_roomZonePrefab, position, Quaternion.identity, _dungeonRoot);
-            roomZoneInstance.Setup(roomSettings);
-        }
-        
-        private bool TryGetRoomSettings(DungeonRoomType roomType, out RoomSettingsMeta roomSettings)
-        {
-            bool isRoomSettingsFound = _roomSettingsReferences.TryGetRoomSettings(roomType, out roomSettings);
-
-            if (isRoomSettingsFound)
-                return true;
-            
-            string errorLog = Log.HandleLog($"Room settings for <gb>{roomType}</gb> <rb>not found</rb>!");
-            Debug.LogError(errorLog);
-
-            return false;
+            CreateRoomZone(roomSettings, position, Quaternion.identity);
         }
 
         private static DungeonRoomType GetRandomRoomType()
@@ -133,13 +171,14 @@ namespace GameCore.Gameplay.Dungeon
             int randomIndex = Random.Range(0, roomTypes.Count);
             return roomTypes[randomIndex];
         }
-        
-        private static DungeonRoomType GetRandomCorridorRoomType()
+
+        private DungeonRoomType GetRandomCorridorRoomType()
         {
             List<DungeonRoomType> roomTypes = new()
             {
                 DungeonRoomType.Corridor1,
-                DungeonRoomType.Corridor2
+                DungeonRoomType.Corridor2,
+                DungeonRoomType.Corridor3,
             };
 
             int randomIndex = Random.Range(0, roomTypes.Count);

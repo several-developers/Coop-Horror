@@ -10,8 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a238dea8a8140c88eddf8c5f835a1de, type: 3}
-  m_Name: Dead End
+  m_Name: Two Ways Coridor Room 3
   m_EditorClassIdentifier: 
-  _size: {x: 8, y: 6, z: 6}
-  _offset: {x: 1, y: 0, z: 0}
+  _metaName: Two Ways Coridor Room 3
+  _size: {x: 6, y: 6, z: 9}
+  _offset: {x: 1.5, y: 0, z: 0}
   _roomType: 0
+  _doorwaysSettings:
+    _settings:
+    - _localPosition: {x: 1.5, y: 2.5, z: 4.5}
+      _direction: 0
+      _connectionType: 3
+    - _localPosition: {x: 1.5, y: 2.5, z: -4.5}
+      _direction: 1
+      _connectionType: 3

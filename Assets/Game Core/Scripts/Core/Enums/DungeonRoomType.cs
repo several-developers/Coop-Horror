@@ -5,10 +5,10 @@
         _ = 0,
         Enter = 1,
         Exit = 2,
-        DeadEnd = 3,
         
         Corridor1 = 10,
         Corridor2 = 11,
+        Corridor3 = 12,
         
         TwoWaysRoom1 = 20,
         

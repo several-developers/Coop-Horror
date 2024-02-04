@@ -44,4 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7122770422f642f9b3a7271c72ba3d9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _doorwayColor: {r: 1, g: 0.6617211, b: 0.06132078, a: 1}
+  _northColor: {r: 0, g: 0.13010883, b: 1, a: 1}
+  _southColor: {r: 1, g: 0, b: 0.7017374, a: 1}
+  _eastColor: {r: 1, g: 0.033018887, b: 0.033018887, a: 1}
+  _westColor: {r: 0.27929512, g: 1, b: 0.07075471, a: 1}
   _roomSettings: {fileID: 0}

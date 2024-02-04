@@ -14,7 +14,7 @@ namespace GameCore.Configs.Gameplay.DungeonGenerator
         
         [SerializeField, MinMaxSlider(minValue: 0, maxValue: 10, showFields: true)]
         private Vector2Int _roomsAmount;
-
+        
         [SerializeField, Range(0, 100), SuffixLabel("%", overlay: true)]
         private int _corridorSpawnChance = 35;
 

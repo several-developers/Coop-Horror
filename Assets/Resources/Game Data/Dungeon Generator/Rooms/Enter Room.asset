@@ -12,6 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a238dea8a8140c88eddf8c5f835a1de, type: 3}
   m_Name: Enter Room
   m_EditorClassIdentifier: 
+  _metaName: Enter Room
   _size: {x: 12, y: 7, z: 18}
   _offset: {x: -4, y: 1.9, z: 1}
   _roomType: 1
+  _doorwaysSettings:
+    _settings:
+    - _localPosition: {x: -10, y: 2.5, z: 4}
+      _direction: 2
+      _connectionType: 2
+    - _localPosition: {x: -4, y: 2.5, z: 10}
+      _direction: 0
+      _connectionType: 2
+    - _localPosition: {x: 2, y: 2.5, z: 4}
+      _direction: 3
+      _connectionType: 2

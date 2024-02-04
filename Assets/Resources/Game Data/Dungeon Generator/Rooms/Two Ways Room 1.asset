@@ -13,6 +13,14 @@ MonoBehaviour:
   m_Name: Two Ways Room 1
   m_EditorClassIdentifier: 
   _metaName: Two Ways Room 1
-  _size: {x: 11, y: 6, z: 10}
+  _size: {x: 9, y: 6, z: 12}
   _offset: {x: 1.5, y: 0, z: 0}
-  _roomType: 0
+  _roomType: 20
+  _doorwaysSettings:
+    _settings:
+    - _localPosition: {x: -3, y: 2.5, z: 0}
+      _direction: 2
+      _connectionType: 2
+    - _localPosition: {x: 6, y: 2.5, z: 0}
+      _direction: 3
+      _connectionType: 2

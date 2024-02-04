@@ -116,9 +116,21 @@ namespace GameCore.Gameplay.Entities.Player
             UpdateClient();
         }
 
-        private void FixedUpdate() => FixedUpdateServer();
+        private void FixedUpdate()
+        {
+            if (!_isInitialized)
+                return;
+            
+            FixedUpdateServer();
+        }
 
-        private void LateUpdate() => LateUpdateServer();
+        private void LateUpdate()
+        {
+            if (!_isInitialized)
+                return;
+            
+            LateUpdateServer();
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -146,6 +158,14 @@ namespace GameCore.Gameplay.Entities.Player
             if (_isInitialized)
             {
                 Debug.Log($"Player #{OwnerClientId} already initialized.");
+                return;
+            }
+            
+            InventoryHUD inventoryHUD = InventoryHUD.Get(); // TEMP
+
+            if (inventoryHUD == null)
+            {
+                _isInitialized = false;
                 return;
             }
 
@@ -244,7 +264,9 @@ namespace GameCore.Gameplay.Entities.Player
 
                 _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
 
-                InventoryHUD.Get().Init(playerEntity: this); // TEMP
+                InventoryHUD inventoryHUD = InventoryHUD.Get(); // TEMP
+                if (inventoryHUD != null)
+                    inventoryHUD.Init(playerEntity: this); // TEMP
 
                 _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
 
@@ -305,7 +327,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void LateUpdateServer()
         {
-            if (!IsOwner || !_isInitialized)
+            if (!IsOwner)
                 return;
 
             _lookAtPosition.Value = _lookAtObject.position;
