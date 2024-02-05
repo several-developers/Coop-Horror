@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e228b45736a8cf4ea000616e628a4dd, type: 3}
+  m_Name: Prototype Dungeon
+  m_EditorClassIdentifier: 
+  globalPropGroupID_obsolete: 
+  globalPropRanges_obsolete: []
+  Length:
+    Min: 10
+    Max: 15
+  BranchMode: 0
+  BranchCount:
+    Min: 1
+    Max: 5
+  GlobalProps: []
+  KeyManager: {fileID: 0}
+  DoorwayConnectionChance: 0.25
+  RestrictConnectionToSameSection: 0
+  TileInjectionRules: []
+  TileTagConnectionMode: 0
+  TileConnectionTags: []
+  BranchTagPruneMode: 1
+  BranchPruneTags: []
+  Nodes:
+  - Graph: {fileID: 11400000}
+    TileSets:
+    - {fileID: 11400000, guid: e7cf229bd2572ec4b9be2a8f838dee3b, type: 2}
+    NodeType: 1
+    Position: 0
+    Label: Start
+    Keys: []
+    Locks: []
+    LockPlacement: 0
+  - Graph: {fileID: 11400000}
+    TileSets:
+    - {fileID: 11400000, guid: dfa72dcf4e987724aa641006063f5a7d, type: 2}
+    NodeType: 2
+    Position: 1
+    Label: Goal
+    Keys: []
+    Locks: []
+    LockPlacement: 0
+  Lines:
+  - Graph: {fileID: 11400000}
+    DungeonArchetypes:
+    - {fileID: 11400000, guid: a50b7e4b973e8694e96f7c098c991730, type: 2}
+    Position: 0
+    Length: 1
+    Keys: []
+    Locks: []
+  currentFileVersion: 1
