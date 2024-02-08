@@ -134,20 +134,20 @@ namespace DunGen
 
 		protected int retryCount;
 		protected DungeonProxy proxyDungeon;
-		protected readonly Dictionary<TilePlacementResult, int> tilePlacementResultCounters = new Dictionary<TilePlacementResult, int>();
-		protected readonly List<GameObject> useableTiles = new List<GameObject>();
+		protected readonly Dictionary<TilePlacementResult, int> tilePlacementResultCounters = new();
+		protected readonly List<GameObject> useableTiles = new();
 		protected int targetLength;
 		protected List<InjectedTile> tilesPendingInjection;
-		protected List<DungeonGeneratorPostProcessStep> postProcessSteps = new List<DungeonGeneratorPostProcessStep>();
+		protected List<DungeonGeneratorPostProcessStep> postProcessSteps = new();
 
 		[SerializeField]
 		private int fileVersion;
 		private int nextNodeIndex;
 		private DungeonArchetype currentArchetype;
 		private GraphLine previousLineSegment;
-		private List<TileProxy> preProcessData = new List<TileProxy>();
-		private Stopwatch yieldTimer = new Stopwatch();
-		private Dictionary<TileProxy, InjectedTile> injectedTiles = new Dictionary<TileProxy, InjectedTile>();
+		private List<TileProxy> preProcessData = new();
+		private Stopwatch yieldTimer = new();
+		private Dictionary<TileProxy, InjectedTile> injectedTiles = new();
 
 
 		public DungeonGenerator()
@@ -213,7 +213,7 @@ namespace DunGen
 			}
 #endif
 
-			ChosenSeed = (ShouldRandomizeSeed) ? new RandomStream().Next() : Seed;
+			ChosenSeed = ShouldRandomizeSeed ? GetRandomSeed() : Seed;
 			RandomStream = new RandomStream(ChosenSeed);
 
 			if (Root == null)
@@ -238,8 +238,11 @@ namespace DunGen
 
 		public void RandomizeSeed()
 		{
-			Seed = new RandomStream().Next();
+			Seed = GetRandomSeed();
 		}
+
+		private int GetRandomSeed() =>
+			new RandomStream().Next();
 
 		protected virtual IEnumerator InnerGenerate(bool isRetry)
 		{
@@ -428,8 +431,7 @@ namespace DunGen
 			previousLineSegment = null;
 			tilePlacementResultCounters.Clear();
 
-			if (Cleared != null)
-				Cleared();
+			Cleared?.Invoke();
 		}
 
 		private void ChangeStatus(GenerationStatus status)

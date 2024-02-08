@@ -1,4 +1,4 @@
-﻿using GameCore.Enums;
+﻿using GameCore.Enums.Global;
 using UnityEngine;
 using UnityEngine.UI;
 

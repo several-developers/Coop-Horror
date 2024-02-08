@@ -1,7 +1,6 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Time;
-using GameCore.Enums;
+using GameCore.Enums.Gameplay;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using UnityEngine;
 using Zenject;

@@ -1,33 +1,53 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using DunGen.Adapters;
 
 namespace DunGen
 {
     [AddComponentMenu("DunGen/Runtime Dungeon")]
-	public class RuntimeDungeon : MonoBehaviour
-	{
-        public DungeonGenerator Generator = new DungeonGenerator();
+    public class RuntimeDungeon : MonoBehaviour
+    {
+        // MEMBERS: -------------------------------------------------------------------------------
+        
+        public DungeonGenerator Generator = new();
         public bool GenerateOnStart = true;
-		public GameObject Root;
+        public GameObject Root;
 
-
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+        
         protected virtual void Start()
         {
-			if (GenerateOnStart)
-				Generate();
-		}
+            if (GenerateOnStart)
+                Generate();
+        }
 
-		public void Generate()
-		{
-			if(Root != null)
-				Generator.Root = Root;
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
+        public void Generate()
+        {
+            if (Root != null)
+                Generator.Root = Root;
 
-			if (!Generator.IsGenerating)
-				Generator.Generate();
-		}
-	}
+            if (!Generator.IsGenerating)
+                Generator.Generate();
+        }
+
+        public void GenerateWithSeed(int seed)
+        {
+            if (Root != null)
+                Generator.Root = Root;
+
+            if (Generator.IsGenerating)
+                return;
+
+            Generator.ShouldRandomizeSeed = false;
+            Generator.Seed = seed;
+            
+            Generator.Generate();
+        }
+
+        public void Clear()
+        {
+            if (!Generator.IsGenerating)
+                Generator.Clear(stopCoroutines: true);
+        }
+    }
 }

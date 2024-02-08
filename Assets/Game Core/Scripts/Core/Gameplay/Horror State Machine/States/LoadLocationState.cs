@@ -71,13 +71,13 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 RpcCaller rpcCaller = RpcCaller.Get();
                 rpcCaller.SendLocationLoaded();
                 
-                EnterGameLoopState();
+                EnterGenerateDungeonsState();
                 break;
             }
         }
 
-        private void EnterGameLoopState() =>
-            _horrorStateMachine.ChangeState<GameLoopState>();
+        private void EnterGenerateDungeonsState() =>
+            _horrorStateMachine.ChangeState<GenerateDungeonsState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

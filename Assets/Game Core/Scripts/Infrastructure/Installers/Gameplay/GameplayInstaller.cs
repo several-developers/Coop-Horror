@@ -1,6 +1,7 @@
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Locations;
 using GameCore.Gameplay.Locations.GameTime;
+using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.Observers.Gameplay.UI;
 using GameCore.Observers.Global.Graphy;
@@ -27,6 +28,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             BindUIObserver();
             BindPlayerInteractionObserver();
+            BindDungeonsObserver();
             BindGraphyStateObserver();
             BindMobileHeadquartersEntity();
             BindSun();
@@ -47,6 +49,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<PlayerInteractionObserver>()
+                .AsSingle();
+        }
+        
+        private void BindDungeonsObserver()
+        {
+            Container
+                .BindInterfacesTo<DungeonsObserver>()
                 .AsSingle();
         }
 

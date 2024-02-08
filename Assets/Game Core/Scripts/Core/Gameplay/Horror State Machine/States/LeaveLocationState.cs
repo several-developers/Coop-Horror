@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Locations;
 using GameCore.Gameplay.Network;
+using Unity.VisualScripting;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
@@ -41,6 +43,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 return;
             
             UnloadLastLocation();
+            ClearDungeons();
             EnterGameLoopState();
         }
         
@@ -51,6 +54,12 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private void UnloadLastLocation() =>
             _locationsLoader.UnloadLastLocationNetwork();
+
+        private void ClearDungeons()
+        {
+            DungeonsManager dungeonsManager = DungeonsManager.Get();
+            dungeonsManager.ClearDungeons();
+        }
         
         private void EnterGameLoopState() =>
             _horrorStateMachine.ChangeState<GameLoopState>();

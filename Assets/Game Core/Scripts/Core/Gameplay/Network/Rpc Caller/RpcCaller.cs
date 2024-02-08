@@ -1,5 +1,6 @@
 ﻿using System;
 using GameCore.Enums;
+using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network.Other;
 using Unity.Netcode;
@@ -12,13 +13,14 @@ namespace GameCore.Gameplay.Network
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent;
-        public event Action<int> OnDestroyItemPreviewEvent;
-        public event Action<Vector3> OnTeleportPlayerWithOffsetEvent;
-        public event Action OnRoadLocationLoadedEvent;
-        public event Action OnLocationLoadedEvent;
-        public event Action OnLeavingLocationEvent;
-        public event Action OnLocationLeftEvent;
+        public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent = delegate {  };
+        public event Action<int> OnDestroyItemPreviewEvent = delegate {  };
+        public event Action<Vector3> OnTeleportPlayerWithOffsetEvent = delegate {  };
+        public event Action OnRoadLocationLoadedEvent = delegate {  };
+        public event Action OnLocationLoadedEvent = delegate {  };
+        public event Action OnLeavingLocationEvent = delegate {  };
+        public event Action OnLocationLeftEvent = delegate {  };
+        public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate {  };
 
         private static RpcCaller _instance;
 
@@ -54,6 +56,9 @@ namespace GameCore.Gameplay.Network
 
         public void SendLeftLocation() => SendLeftLocationServerRpc();
 
+        public void SendGenerateDungeons(DungeonsSeedData data) =>
+            SendGenerateDungeonsServerRpc(data.SeedOne, data.SeedTwo, data.SeedThree);
+
         public static RpcCaller Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -67,10 +72,6 @@ namespace GameCore.Gameplay.Network
             {
                 var sceneName = (SceneName)sceneNameIndex;
                 horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
-            }
-            else
-            {
-                
             }
         }
 
@@ -122,23 +123,26 @@ namespace GameCore.Gameplay.Network
         [ServerRpc(RequireOwnership = false)]
         private void SendLeftLocationServerRpc() => SendLeftLocationClientRpc();
 
+        [ServerRpc(RequireOwnership = false)]
+        private void SendGenerateDungeonsServerRpc(int seedOne, int seedTwo, int seedThree) =>
+            SendGenerateDungeonsClientRpc(seedOne, seedTwo, seedThree);
+
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong clientID, int slotIndex, int itemID)
         {
             CreateItemPreviewStaticData data = new(clientID, slotIndex, itemID);
-
-            OnCreateItemPreviewEvent?.Invoke(data);
+            OnCreateItemPreviewEvent.Invoke(data);
         }
 
         [ClientRpc]
         private void DestroyItemPreviewClientRpc(int slotIndex) =>
-            OnDestroyItemPreviewEvent?.Invoke(slotIndex);
+            OnDestroyItemPreviewEvent.Invoke(slotIndex);
 
         [ClientRpc]
         private void TeleportPlayersWithOffsetClientRpc(float x, float y, float z)
         {
             Vector3 offset = new(x, y, z);
-            OnTeleportPlayerWithOffsetEvent?.Invoke(offset);
+            OnTeleportPlayerWithOffsetEvent.Invoke(offset);
         }
 
         [ClientRpc]
@@ -146,21 +150,28 @@ namespace GameCore.Gameplay.Network
 
         [ClientRpc]
         private void StartLeavingLocationClientRpc() =>
-            OnLeavingLocationEvent?.Invoke();
+            OnLeavingLocationEvent.Invoke();
         
         [ClientRpc]
         private void LeaveLocationClientRpc() => LeaveLocationLogic();
 
         [ClientRpc]
         private void SendRoadLocationLoadedClientRpc() =>
-            OnRoadLocationLoadedEvent?.Invoke();
+            OnRoadLocationLoadedEvent.Invoke();
 
         [ClientRpc]
         private void SendLocationLoadedClientRpc() =>
-            OnLocationLoadedEvent?.Invoke();
+            OnLocationLoadedEvent.Invoke();
 
         [ClientRpc]
         private void SendLeftLocationClientRpc() =>
-            OnLocationLeftEvent?.Invoke();
+            OnLocationLeftEvent.Invoke();
+
+        [ClientRpc]
+        private void SendGenerateDungeonsClientRpc(int seedOne, int seedTwo, int seedThree)
+        {
+            DungeonsSeedData data = new(seedOne, seedTwo, seedThree);
+            OnGenerateDungeonsEvent.Invoke(data);
+        }
     }
 }
