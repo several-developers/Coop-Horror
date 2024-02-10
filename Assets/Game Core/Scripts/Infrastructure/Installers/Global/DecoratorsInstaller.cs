@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.Locations.GameTime;
+﻿using GameCore.Gameplay.Levels.GameTime;
 using GameCore.Infrastructure.Services.Global.Decorators.CollectionsService;
 using Zenject;
 

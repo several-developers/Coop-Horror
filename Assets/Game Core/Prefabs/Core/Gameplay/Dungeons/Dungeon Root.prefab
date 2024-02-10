@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9031828415429099059}
   - component: {fileID: 9031828415429099060}
+  - component: {fileID: 1711504090653068425}
   m_Layer: 0
   m_Name: Dungeon Root
   m_TagString: Untagged
@@ -45,3 +46,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dungeonIndex: 0
+  _dungeonReferences: {fileID: 1711504090653068425}
+--- !u!114 &1711504090653068425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9031828415429099058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66ed85ba46554788b7679e635832976f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _dungeon: {fileID: 0}

@@ -81,8 +81,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _path = path;
             _distance = 0;
 
-            _rigidbody.velocity = Vector3.zero;
-            _rigidbody.angularVelocity = Vector3.zero;
+            //_rigidbody.velocity = Vector3.zero;
+            //_rigidbody.angularVelocity = Vector3.zero;
             
             Vector3 position = EvaluatePositionAtUnit(distance: 0f);
             Quaternion rotation = EvaluateOrientationAtUnit(distance: 0f);
@@ -101,8 +101,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             Vector3 position = EvaluatePositionAtUnit(distance);
             Quaternion rotation = EvaluateOrientationAtUnit(distance);
 
-            _rigidbody.MovePosition(position);
-            _rigidbody.MoveRotation(rotation);
+            _transform.position = position;
+            _transform.rotation = rotation;
+            
+            //_rigidbody.MovePosition(position);
+            //_rigidbody.MoveRotation(rotation);
         }
 
         public Vector3 EvaluatePositionAtUnit(float distance) =>

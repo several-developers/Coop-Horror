@@ -1,6 +1,7 @@
 using GameCore.Gameplay.Entities.MobileHeadquarters;
-using GameCore.Gameplay.Locations;
-using GameCore.Gameplay.Locations.GameTime;
+using GameCore.Gameplay.Levels;
+using GameCore.Gameplay.Levels.Locations;
+using GameCore.Gameplay.Levels.GameTime;
 using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.Observers.Gameplay.UI;
@@ -34,6 +35,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindSun();
             BindTimeCycle();
             BindLocationsLoader();
+            BindLevelManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -93,6 +95,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<LocationsLoader>()
+                .AsSingle();
+        }
+
+        private void BindLevelManager()
+        {
+            Container
+                .BindInterfacesTo<LevelManager>()
                 .AsSingle();
         }
     }

@@ -16,7 +16,6 @@ namespace GameCore.Gameplay.Network
         public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent = delegate {  };
         public event Action<int> OnDestroyItemPreviewEvent = delegate {  };
         public event Action<Vector3> OnTeleportPlayerWithOffsetEvent = delegate {  };
-        public event Action OnRoadLocationLoadedEvent = delegate {  };
         public event Action OnLocationLoadedEvent = delegate {  };
         public event Action OnLeavingLocationEvent = delegate {  };
         public event Action OnLocationLeftEvent = delegate {  };
@@ -49,15 +48,12 @@ namespace GameCore.Gameplay.Network
         public void StartLeavingLocation() => StartLeavingLocationServerRpc();
 
         public void LeaveLocation() => LeaveLocationServerRpc();
-
-        public void SendRoadLocationLoaded() => SendRoadLocationLoadedServerRpc();
-
+        
         public void SendLocationLoaded() => SendLocationLoadedServerRpc();
 
         public void SendLeftLocation() => SendLeftLocationServerRpc();
 
-        public void SendGenerateDungeons(DungeonsSeedData data) =>
-            SendGenerateDungeonsServerRpc(data.SeedOne, data.SeedTwo, data.SeedThree);
+        public void SendGenerateDungeons(DungeonsSeedData data) => SendGenerateDungeonsServerRpc(data);
 
         public static RpcCaller Get() => _instance;
 
@@ -115,17 +111,14 @@ namespace GameCore.Gameplay.Network
         private void LeaveLocationServerRpc() => LeaveLocationClientRpc();
 
         [ServerRpc(RequireOwnership = false)]
-        private void SendRoadLocationLoadedServerRpc() => SendRoadLocationLoadedClientRpc();
-
-        [ServerRpc(RequireOwnership = false)]
         private void SendLocationLoadedServerRpc() => SendLocationLoadedClientRpc();
 
         [ServerRpc(RequireOwnership = false)]
         private void SendLeftLocationServerRpc() => SendLeftLocationClientRpc();
 
         [ServerRpc(RequireOwnership = false)]
-        private void SendGenerateDungeonsServerRpc(int seedOne, int seedTwo, int seedThree) =>
-            SendGenerateDungeonsClientRpc(seedOne, seedTwo, seedThree);
+        private void SendGenerateDungeonsServerRpc(DungeonsSeedData data) =>
+            SendGenerateDungeonsClientRpc(data);
 
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong clientID, int slotIndex, int itemID)
@@ -154,11 +147,7 @@ namespace GameCore.Gameplay.Network
         
         [ClientRpc]
         private void LeaveLocationClientRpc() => LeaveLocationLogic();
-
-        [ClientRpc]
-        private void SendRoadLocationLoadedClientRpc() =>
-            OnRoadLocationLoadedEvent.Invoke();
-
+        
         [ClientRpc]
         private void SendLocationLoadedClientRpc() =>
             OnLocationLoadedEvent.Invoke();
@@ -168,10 +157,7 @@ namespace GameCore.Gameplay.Network
             OnLocationLeftEvent.Invoke();
 
         [ClientRpc]
-        private void SendGenerateDungeonsClientRpc(int seedOne, int seedTwo, int seedThree)
-        {
-            DungeonsSeedData data = new(seedOne, seedTwo, seedThree);
+        private void SendGenerateDungeonsClientRpc(DungeonsSeedData data) =>
             OnGenerateDungeonsEvent.Invoke(data);
-        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Gameplay.Locations.GameTime;
+using GameCore.Gameplay.Levels.GameTime;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
 using TMPro;

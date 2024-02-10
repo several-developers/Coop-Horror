@@ -95,7 +95,7 @@ namespace GameCore.Gameplay.PlayerCamera
             if (_playerEntity.IsInsideMobileHQ)
             {
                 Vector3 difference = mobileHeadquartersRotation - _lastFrameMobileHqRotation;
-                yRotationTemp += difference.y;
+                //yRotationTemp += difference.y;
             }
             
             float yRotation = yRotationTemp + _lookVector.x * _sensitivity;

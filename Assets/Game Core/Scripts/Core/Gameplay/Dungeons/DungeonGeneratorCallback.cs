@@ -13,14 +13,26 @@ namespace GameCore.Gameplay.Dungeons
         [Title(Constants.Settings)]
         [SerializeField]
         private DungeonIndex _dungeonIndex;
+
+        [Title(Constants.References)]
+        [SerializeField, Required]
+        private DungeonReferences _dungeonReferences;
         
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<DungeonIndex> OnGenerationCompletedEvent;
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        public event Action<DungeonIndex, DungeonReferences> OnGenerationCompletedEvent;
         
-        public void OnDungeonComplete(Dungeon dungeon) =>
-            OnGenerationCompletedEvent?.Invoke(_dungeonIndex);
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void DungeonGenerationCompleteLogic(Dungeon dungeon)
+        {
+            _dungeonReferences.SetDungeon(dungeon);
+            
+            OnGenerationCompletedEvent?.Invoke(_dungeonIndex, _dungeonReferences);
+        }
+        
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        public void OnDungeonComplete(Dungeon dungeon) => DungeonGenerationCompleteLogic(dungeon);
     }
 }

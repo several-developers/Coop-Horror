@@ -2,7 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums;
-using GameCore.Gameplay.Locations;
+using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using UnityEngine;
 

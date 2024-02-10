@@ -4,7 +4,7 @@ using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
-using GameCore.Gameplay.Locations;
+using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
@@ -103,6 +103,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             base.OnNetworkDespawn();
         }
 
+        private void Update() =>
+            _pathMovement.Movement();
+
         public override void OnDestroy()
         {
             _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
@@ -122,9 +125,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             base.OnDestroy();
         }
-
-        private void FixedUpdate() =>
-            _pathMovement.Movement();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -166,7 +166,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _rpcCaller = RpcCaller.Get();
 
-            _rpcCaller.OnRoadLocationLoadedEvent += OnRoadLocationLoaded;
             _rpcCaller.OnLocationLoadedEvent += OnLocationLoaded;
             _rpcCaller.OnLeavingLocationEvent += OnLeavingLocation;
             _rpcCaller.OnLocationLeftEvent += OnLocationLeft;
@@ -193,7 +192,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void DespawnServerAndClient()
         {
-            _rpcCaller.OnRoadLocationLoadedEvent -= OnRoadLocationLoaded;
             _rpcCaller.OnLocationLoadedEvent -= OnLocationLoaded;
             _rpcCaller.OnLeavingLocationEvent -= OnLeavingLocation;
             _rpcCaller.OnLocationLeftEvent -= OnLocationLeft;
@@ -311,11 +309,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void OnLoadLocation() =>
             _rpcCaller.LoadLocation(SceneName.Desert);
-
-        private void OnRoadLocationLoaded()
-        {
-            
-        }
 
         private void OnLocationLoaded()
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 using GameCore.Gameplay.Entities.Player.Other;
-using GameCore.Gameplay.Locations.GameTime;
+using GameCore.Gameplay.Levels.GameTime;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Network

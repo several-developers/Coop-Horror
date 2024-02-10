@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.Locations;
+﻿using GameCore.Gameplay.Levels.Locations;
 using CustomEditors;
 using Sirenix.OdinInspector;
 using UnityEngine;

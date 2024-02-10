@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Locations.GameTime;
+using GameCore.Gameplay.Levels.GameTime;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;

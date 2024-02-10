@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.Interaction;
@@ -78,6 +79,7 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _cameraItemPivot;
         private Transform _lookAtObject;
 
+        private ParentBehaviour _parentBehaviour = ParentBehaviour.None;
         private bool _isInitialized;
         private bool _isInsideMobileHQ;
 
@@ -184,8 +186,21 @@ namespace GameCore.Gameplay.Entities.Player
             //_animator.SetTrigger(id: AnimatorHashes.HitReaction);
         }
 
-        public void ToggleInsideMobileHQ(bool isInside) =>
+        public void ToggleInsideMobileHQ(bool isInside)
+        {
             _isInsideMobileHQ = isInside;
+
+            if (!_isInitialized)
+            {
+                _parentBehaviour = _isInsideMobileHQ ? ParentBehaviour.SetParent : ParentBehaviour.RemoveParent;
+                return;
+            }
+
+            if (_isInsideMobileHQ)
+                SetMobileHQAsParent();
+            else
+                RemoveParent();
+        }
 
         public Transform GetTransform() => transform;
 
@@ -279,6 +294,17 @@ namespace GameCore.Gameplay.Entities.Player
             if (IsOwner)
                 return;
 
+            switch (_parentBehaviour)
+            {
+                case ParentBehaviour.SetParent:
+                    SetMobileHQAsParent();
+                    break;
+                
+                case ParentBehaviour.RemoveParent:
+                    RemoveParent();
+                    break;
+            }
+
             _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
 
             Debug.Log($"Player #{OwnerClientId} setup Client.");
@@ -356,6 +382,12 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void DropItem() =>
             _inventory.DropItem();
+
+        private void SetMobileHQAsParent() =>
+            _networkObject.TrySetParent(_mobileHeadquartersEntity.NetworkObject);
+
+        private void RemoveParent() =>
+            _networkObject.TryRemoveParent();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.Locations.GameTime;
+﻿using GameCore.Gameplay.Levels.GameTime;
 
 namespace GameCore.Gameplay.Network
 {

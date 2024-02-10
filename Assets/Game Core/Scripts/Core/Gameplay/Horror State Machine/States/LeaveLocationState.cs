@@ -2,7 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Dungeons;
-using GameCore.Gameplay.Locations;
+using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using Unity.VisualScripting;
 
@@ -55,7 +55,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         private void UnloadLastLocation() =>
             _locationsLoader.UnloadLastLocationNetwork();
 
-        private void ClearDungeons()
+        private static void ClearDungeons()
         {
             DungeonsManager dungeonsManager = DungeonsManager.Get();
             dungeonsManager.ClearDungeons();
