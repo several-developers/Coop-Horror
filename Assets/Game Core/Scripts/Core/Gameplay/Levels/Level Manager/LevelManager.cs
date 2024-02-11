@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
+using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Observers.Gameplay.Dungeons;
 using UnityEngine;
 
@@ -24,10 +25,15 @@ namespace GameCore.Gameplay.Levels
         private readonly IDungeonsObserver _dungeonsObserver;
         private readonly Dictionary<DungeonIndex, DungeonReferences> _dungeonReferences;
 
+        private SurfaceElevator _surfaceElevator;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Dispose() =>
             _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
+        
+        public void AddSurfaceElevator(SurfaceElevator surfaceElevator) =>
+            _surfaceElevator = surfaceElevator;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

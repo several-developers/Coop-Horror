@@ -1,11 +1,8 @@
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Levels;
-using GameCore.Gameplay.Levels.Locations;
+using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Levels.GameTime;
-using GameCore.Observers.Gameplay.Dungeons;
-using GameCore.Observers.Gameplay.PlayerInteraction;
-using GameCore.Observers.Gameplay.UI;
-using GameCore.Observers.Global.Graphy;
+using GameCore.Gameplay.Levels.Locations;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -27,46 +24,15 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         public override void InstallBindings()
         {
-            BindUIObserver();
-            BindPlayerInteractionObserver();
-            BindDungeonsObserver();
-            BindGraphyStateObserver();
             BindMobileHeadquartersEntity();
             BindSun();
             BindTimeCycle();
             BindLocationsLoader();
             BindLevelManager();
+            BindElevatorManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void BindUIObserver()
-        {
-            Container
-                .BindInterfacesTo<UIObserver>()
-                .AsSingle();
-        }
-        
-        private void BindPlayerInteractionObserver()
-        {
-            Container
-                .BindInterfacesTo<PlayerInteractionObserver>()
-                .AsSingle();
-        }
-        
-        private void BindDungeonsObserver()
-        {
-            Container
-                .BindInterfacesTo<DungeonsObserver>()
-                .AsSingle();
-        }
-
-        private void BindGraphyStateObserver()
-        {
-            Container
-                .BindInterfacesTo<GraphyStateObserver>()
-                .AsSingle();
-        }
 
         private void BindMobileHeadquartersEntity()
         {
@@ -102,6 +68,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<LevelManager>()
+                .AsSingle();
+        }
+
+        private void BindElevatorManager()
+        {
+            Container
+                .BindInterfacesTo<ElevatorManager>()
                 .AsSingle();
         }
     }

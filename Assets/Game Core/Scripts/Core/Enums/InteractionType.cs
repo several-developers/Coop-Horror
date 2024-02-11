@@ -8,6 +8,7 @@
         Close = 3,
         ToggleMobileDoor = 4,
         LoadLocationMobileLever = 5,
-        LeaveLocationMobileLever = 6
+        LeaveLocationMobileLever = 6,
+        ElevatorFloorButton = 7
     }
 }

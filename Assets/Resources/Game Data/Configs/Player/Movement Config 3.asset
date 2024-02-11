@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Movement Config 3
   m_EditorClassIdentifier: 
   _metaName: Movement Config 3
-  _walkSpeed: 6
-  _sprintSpeed: 9
+  _walkSpeed: 7
+  _sprintSpeed: 15
   _acceleration: 10
   _moveSpeedMultiplier: 300
   _moveSpeedAirMultiplier: 0.3
   _groundDrag: 6
   _airDrag: 2
-  _jumpForce: 15
+  _jumpForce: 13
   _maxSlopeAngle: 40
   _speedMultiplierOnAngle:
     serializedVersion: 2
@@ -55,7 +55,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _gravityMultiplier: 3
+  _gravityMultiplier: 3.7
   _gravityMultiplierIfUnclimbableSlope: 30
   _groundMask:
     serializedVersion: 2

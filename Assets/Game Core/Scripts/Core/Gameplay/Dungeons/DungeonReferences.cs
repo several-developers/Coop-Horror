@@ -1,4 +1,5 @@
 ﻿using DunGen;
+using GameCore.Gameplay.Levels.Elevator;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -9,12 +10,17 @@ namespace GameCore.Gameplay.Dungeons
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
-        [SerializeField, ReadOnly]
+        [SerializeField, Required]
         private Dungeon _dungeon;
 
-        // PUBLIC METHODS: ------------------------------------------------------------------------
+        [SerializeField, ReadOnly]
+        private DungeonElevator _dungeonElevator;
 
-        public void SetDungeon(Dungeon dungeon) =>
-            _dungeon = dungeon;
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
+        public void AddDungeonElevator(DungeonElevator dungeonElevator) =>
+            _dungeonElevator = dungeonElevator;
+
+        public DungeonElevator GetDungeonElevator() => _dungeonElevator;
     }
 }

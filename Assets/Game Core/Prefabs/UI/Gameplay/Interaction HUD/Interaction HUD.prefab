@@ -62,6 +62,8 @@ MonoBehaviour:
       _text: Press 'E' to start the game
     - _interactionType: 6
       _text: Press 'E' to leave the location
+    - _interactionType: 7
+      _text: Press 'E' to choose floor
     _interactionDisabledTextSettings:
     - _interactionType: 1
       _text: Can't pick up item now

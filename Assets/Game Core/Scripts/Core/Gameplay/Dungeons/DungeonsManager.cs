@@ -21,9 +21,6 @@ namespace GameCore.Gameplay.Dungeons
         [Title(Constants.References)]
         [SerializeField, Required]
         private RuntimeDungeon[] _dungeons;
-
-        [SerializeField, Required]
-        private DungeonGeneratorCallback[] _dungeonCallbacks;
         
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -38,8 +35,7 @@ namespace GameCore.Gameplay.Dungeons
         {
             _instance = this;
 
-            foreach (DungeonGeneratorCallback dungeonCallback in _dungeonCallbacks)
-                dungeonCallback.OnGenerationCompletedEvent += OnGenerationCompleted;
+            _dungeonsObserver.OnDungeonGenerationCompletedEvent += OnDungeonGenerationCompleted;
         }
 
         private void Start()
@@ -52,6 +48,8 @@ namespace GameCore.Gameplay.Dungeons
         {
             RpcCaller rpcCaller = RpcCaller.Get();
             rpcCaller.OnGenerateDungeonsEvent -= OnGenerateDungeons;
+            
+            _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -98,11 +96,9 @@ namespace GameCore.Gameplay.Dungeons
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnGenerationCompleted(DungeonIndex dungeonIndex, DungeonReferences dungeonReferences)
+        private void OnDungeonGenerationCompleted(DungeonIndex dungeonIndex, DungeonReferences dungeonReferences)
         {
             _generatedDungeonsAmount++;
-            
-            _dungeonsObserver.SendDungeonGenerationCompleted(dungeonIndex, dungeonReferences);
             
             if (_generatedDungeonsAmount >= 3)
                 _dungeonsObserver.SendDungeonsGenerationCompleted();

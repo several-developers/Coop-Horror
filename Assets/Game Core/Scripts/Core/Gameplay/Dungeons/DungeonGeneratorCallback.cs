@@ -1,13 +1,20 @@
-﻿using System;
-using DunGen;
+﻿using DunGen;
 using GameCore.Enums.Gameplay;
+using GameCore.Observers.Gameplay.Dungeons;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Dungeons
 {
     public class DungeonGeneratorCallback : MonoBehaviour, IDungeonCompleteReceiver
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IDungeonsObserver dungeonsObserver) =>
+            _dungeonsObserver = dungeonsObserver;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -17,22 +24,14 @@ namespace GameCore.Gameplay.Dungeons
         [Title(Constants.References)]
         [SerializeField, Required]
         private DungeonReferences _dungeonReferences;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
-
-        public event Action<DungeonIndex, DungeonReferences> OnGenerationCompletedEvent;
         
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void DungeonGenerationCompleteLogic(Dungeon dungeon)
-        {
-            _dungeonReferences.SetDungeon(dungeon);
-            
-            OnGenerationCompletedEvent?.Invoke(_dungeonIndex, _dungeonReferences);
-        }
+        private IDungeonsObserver _dungeonsObserver;
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        public void OnDungeonComplete(Dungeon dungeon) => DungeonGenerationCompleteLogic(dungeon);
+        public void OnDungeonComplete(Dungeon dungeon) =>
+            _dungeonsObserver.SendDungeonGenerationCompleted(_dungeonIndex, _dungeonReferences);
     }
 }
