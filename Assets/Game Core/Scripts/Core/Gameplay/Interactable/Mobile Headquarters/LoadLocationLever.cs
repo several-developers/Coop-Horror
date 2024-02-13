@@ -1,4 +1,4 @@
-﻿using GameCore.Enums;
+﻿using GameCore.Enums.Gameplay;
 
 namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 {

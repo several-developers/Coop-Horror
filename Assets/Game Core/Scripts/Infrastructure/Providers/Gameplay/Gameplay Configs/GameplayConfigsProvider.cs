@@ -1,5 +1,6 @@
 ﻿using GameCore.Configs.Gameplay;
 using GameCore.Configs.Gameplay.DungeonGenerator;
+using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Configs.Gameplay.Time;
@@ -21,6 +22,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _locationsListConfig = Load<LocationsListConfigMeta>(path: ConfigsPaths.LocationsListConfig);
             _timeConfig = Load<TimeConfigMeta>(path: ConfigsPaths.TimeConfig);
             _dungeonGeneratorConfig = Load<DungeonGeneratorConfigMeta>(path: ConfigsPaths.DungeonGeneratorConfig);
+            _elevatorConfig = Load<ElevatorConfigMeta>(path: ConfigsPaths.ElevatorConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -31,6 +33,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly LocationsListConfigMeta _locationsListConfig;
         private readonly TimeConfigMeta _timeConfig;
         private readonly DungeonGeneratorConfigMeta _dungeonGeneratorConfig;
+        private readonly ElevatorConfigMeta _elevatorConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -40,5 +43,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public LocationsListConfigMeta GetLocationsListConfig() => _locationsListConfig;
         public TimeConfigMeta GetTimeConfig() => _timeConfig;
         public DungeonGeneratorConfigMeta GetDungeonGeneratorConfig() => _dungeonGeneratorConfig;
+        public ElevatorConfigMeta GetElevatorConfig() => _elevatorConfig;
     }
 }

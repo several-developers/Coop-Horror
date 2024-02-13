@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Levels.GameTime;
 using Sirenix.OdinInspector;
@@ -7,7 +6,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using Zenject;
 
 namespace GameCore.Gameplay.Network
 {
@@ -39,13 +37,11 @@ namespace GameCore.Gameplay.Network
         public event UnityAction<ulong> OnClientQuitEvent; // Server event when any client disconnect
 
         public delegate bool ApprovalEvent(ulong clientID, int data);
-
         public ApprovalEvent OnCheckApprovalEvent; // Additional approval validations for when a client connects
 
         public delegate Vector3 Vector3Event(int playerID);
-
         public Vector3Event OnFindPlayerSpawnPositionEvent; // Find player spawn position for client
-
+        
         private static readonly Dictionary<ulong, bool> ReadyPlayersDictionary = new();
         private static readonly Dictionary<ulong, bool> InitializedPlayersDictionary = new();
         private static readonly Dictionary<ulong, PlayerEntity> PlayersEntities = new();
@@ -83,6 +79,16 @@ namespace GameCore.Gameplay.Network
 
         private void Start() =>
             _timeCycleDecorator.OnHourPassedEvent += OnHourPassed;
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+        }
 
         private void Update()
         {

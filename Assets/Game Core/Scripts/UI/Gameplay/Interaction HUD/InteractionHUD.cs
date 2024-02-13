@@ -1,4 +1,4 @@
-﻿using GameCore.Enums;
+﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Interactable;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.UI.Global.Animations;

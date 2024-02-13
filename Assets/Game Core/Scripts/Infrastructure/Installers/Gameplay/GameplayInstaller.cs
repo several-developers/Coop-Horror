@@ -1,6 +1,5 @@
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Levels;
-using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Levels.GameTime;
 using GameCore.Gameplay.Levels.Locations;
 using Sirenix.OdinInspector;
@@ -29,7 +28,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindTimeCycle();
             BindLocationsLoader();
             BindLevelManager();
-            BindElevatorManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -68,13 +66,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<LevelManager>()
-                .AsSingle();
-        }
-
-        private void BindElevatorManager()
-        {
-            Container
-                .BindInterfacesTo<ElevatorManager>()
                 .AsSingle();
         }
     }

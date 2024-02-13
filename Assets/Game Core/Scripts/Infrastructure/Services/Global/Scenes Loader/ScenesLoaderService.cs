@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using GameCore.Enums.Global;
 using GameCore.Utilities;
-using GameCore.Enums;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;

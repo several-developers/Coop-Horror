@@ -1,5 +1,5 @@
-﻿using GameCore.Enums;
-using CustomEditors;
+﻿using CustomEditors;
+using GameCore.Enums.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

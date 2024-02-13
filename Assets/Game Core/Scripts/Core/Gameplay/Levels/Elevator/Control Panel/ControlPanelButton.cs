@@ -1,7 +1,6 @@
 ﻿using System;
-using GameCore.Enums;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Interactable;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,6 +11,10 @@ namespace GameCore.Gameplay.Levels.Elevator
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [Title(Constants.Settings)]
+        [SerializeField]
+        private ElevatorFloor _elevatorFloor;
+        
         [Title(Constants.References)]
         [SerializeField, Required]
         private AnimationObserver _animationObserver;
@@ -22,9 +25,9 @@ namespace GameCore.Gameplay.Levels.Elevator
         // FIELDS: --------------------------------------------------------------------------------
         
         public event Action OnInteractionStateChangedEvent;
+        public event Action<ElevatorFloor> OnStartElevatorClickedEvent;
 
-        protected RpcCaller RPCCaller;
-        
+        private ElevatorManager _elevatorManager;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -32,15 +35,27 @@ namespace GameCore.Gameplay.Levels.Elevator
         private void Awake() =>
             _animationObserver.OnEnabledEvent += OnEnabledEvent;
 
-        private void Start() =>
-            RPCCaller = RpcCaller.Get();
+        private void Start()
+        {
+            _elevatorManager = ElevatorManager.Get();
+            _elevatorManager.OnElevatorStoppedEvent += OnElevatorStopped;
+        }
 
-        private void OnDestroy() =>
+        private void OnDestroy()
+        {
             _animationObserver.OnEnabledEvent -= OnEnabledEvent;
+            
+            _elevatorManager.OnElevatorStoppedEvent -= OnElevatorStopped;
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public abstract void Interact();
+        public void Interact()
+        {
+            ToggleInteract(canInteract: false);
+            PlayAnimation();
+            StartElevator();
+        }
 
         public void ToggleInteract(bool canInteract)
         {
@@ -48,23 +63,34 @@ namespace GameCore.Gameplay.Levels.Elevator
             SendInteractionStateChangedEvent();
         }
 
+        private void StartElevator() =>
+            OnStartElevatorClickedEvent?.Invoke(_elevatorFloor);
+
         public InteractionType GetInteractionType() =>
             InteractionType.ElevatorFloorButton;
 
         public bool CanInteract() => _canInteract;
 
-        // PROTECTED METHODS: ---------------------------------------------------------------------
-
-        protected void PlayAnimation() =>
-            _animator.SetTrigger(id: AnimatorHashes.Trigger);
-
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void PlayAnimation() =>
+            _animator.SetTrigger(id: AnimatorHashes.Trigger);
 
         private void SendInteractionStateChangedEvent() =>
             OnInteractionStateChangedEvent?.Invoke();
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnEnabledEvent() => ToggleInteract(canInteract: true);
+        private void OnEnabledEvent()
+        {
+            bool isElevatorMoving = _elevatorManager.IsElevatorMoving();
+
+            if (isElevatorMoving)
+                return;
+            
+            ToggleInteract(canInteract: true);
+        }
+
+        private void OnElevatorStopped(ElevatorFloor elevatorFloor) => ToggleInteract(canInteract: true);
     }
 }

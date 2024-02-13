@@ -1,6 +1,5 @@
 ﻿using System;
-using GameCore.Enums;
-using GameCore.Gameplay.Entities.Player;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;

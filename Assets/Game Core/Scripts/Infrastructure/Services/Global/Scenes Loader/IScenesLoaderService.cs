@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Enums;
+using GameCore.Enums.Global;
 using UnityEngine.SceneManagement;
 
 namespace GameCore.Infrastructure.Services.Global

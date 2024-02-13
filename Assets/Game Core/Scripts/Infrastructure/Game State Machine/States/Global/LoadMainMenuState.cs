@@ -1,5 +1,4 @@
-﻿using GameCore.Enums;
-using GameCore.Gameplay;
+﻿using GameCore.Enums.Global;
 using GameCore.Infrastructure.Services.Global;
 
 namespace GameCore.Infrastructure.StateMachine

@@ -93,6 +93,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50902e8b28ef4e8189a42e7790b28062, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _elevatorFloor: 0
+  _animator: {fileID: 6633701748697437394}
 --- !u!1001 &7469218804922031144
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -100,6 +102,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 457100376313110348}
     m_Modifications:
+    - target: {fileID: 1399091104172466394, guid: c69e76bbb69cfb14e9424291e36ec159,
+        type: 3}
+      propertyPath: _elevator
+      value: 
+      objectReference: {fileID: 7395761925459335207}
     - target: {fileID: 3750073814762262345, guid: c69e76bbb69cfb14e9424291e36ec159,
         type: 3}
       propertyPath: m_Name
@@ -162,3 +169,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c69e76bbb69cfb14e9424291e36ec159, type: 3}
+--- !u!95 &6633701748697437394 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 4298785324457527546, guid: c69e76bbb69cfb14e9424291e36ec159,
+    type: 3}
+  m_PrefabInstance: {fileID: 7469218804922031144}
+  m_PrefabAsset: {fileID: 0}

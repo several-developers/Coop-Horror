@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Enums;
+using GameCore.Enums.Global;
 using GameCore.Infrastructure.Services.Global;
 
 namespace GameCore.Gameplay.Levels.Locations

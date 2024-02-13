@@ -1,7 +1,7 @@
 ﻿using System;
 using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
-using GameCore.Enums;
+using GameCore.Enums.Global;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;

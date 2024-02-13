@@ -1,7 +1,6 @@
 ﻿using System;
 using GameCore.Configs.Global.Game;
-using GameCore.Enums;
-using GameCore.Gameplay;
+using GameCore.Enums.Global;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Infrastructure.Services.Global;
 using UnityEngine.SceneManagement;

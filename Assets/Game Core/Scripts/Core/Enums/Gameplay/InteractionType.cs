@@ -1,4 +1,4 @@
-﻿namespace GameCore.Enums
+﻿namespace GameCore.Enums.Gameplay
 {
     public enum InteractionType
     {
@@ -9,6 +9,7 @@
         ToggleMobileDoor = 4,
         LoadLocationMobileLever = 5,
         LeaveLocationMobileLever = 6,
-        ElevatorFloorButton = 7
+        ElevatorFloorButton = 7,
+        ElevatorCallButton = 8
     }
 }

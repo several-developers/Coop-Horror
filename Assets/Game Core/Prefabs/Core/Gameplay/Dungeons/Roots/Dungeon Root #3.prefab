@@ -72,5 +72,10 @@ PrefabInstance:
       propertyPath: _dungeonIndex
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 9031828415429099060, guid: aae92e8ae6068d743b5f69c392521378,
+        type: 3}
+      propertyPath: _elevatorFloor
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aae92e8ae6068d743b5f69c392521378, type: 3}

@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 1126930004867064460}
   - component: {fileID: 7771722589068162915}
   m_Layer: 0
-  m_Name: Surface Floor (TMP)
+  m_Name: Move Direction (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5091853531179806860
 RectTransform:
   m_ObjectHideFlags: 0
@@ -31,11 +31,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6301035081694652479}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.055}
+  m_AnchoredPosition: {x: -0.22, y: 0}
   m_SizeDelta: {x: 5, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &1126930004867064460
@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 8249413297715597303}
   - component: {fileID: 5454269465728608587}
   m_Layer: 0
-  m_Name: Floor (TMP)
+  m_Name: Floor Number (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -286,7 +286,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6301035081694652479}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -342,7 +342,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2611766919270357733}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
   m_Name: 
@@ -355,7 +355,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1
+  m_text: ~
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -436,6 +436,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6301035081694652479}
+  - component: {fileID: 3433751814185003274}
   m_Layer: 0
   m_Name: Floor Display
   m_TagString: Untagged
@@ -457,11 +458,25 @@ Transform:
   m_Children:
   - {fileID: 1190541789557394316}
   - {fileID: 95830657975385343}
-  - {fileID: 5091853531179806860}
   - {fileID: 6735463723830782513}
+  - {fileID: 5091853531179806860}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3433751814185003274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3916367336923504560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3876ca5521b4e3d9118c310bd8b1301, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _floorNumberTMP: {fileID: 5454269465728608587}
+  _moveDirectionTransform: {fileID: 5091853531179806860}
 --- !u!1 &4204022696173699515
 GameObject:
   m_ObjectHideFlags: 0

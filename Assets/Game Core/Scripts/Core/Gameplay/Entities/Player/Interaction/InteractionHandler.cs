@@ -1,4 +1,4 @@
-﻿using GameCore.Enums;
+﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Items;

@@ -1,5 +1,6 @@
 ﻿using System;
-using GameCore.Enums;
+using GameCore.Enums.Gameplay;
+using GameCore.Enums.Global;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network.Other;
@@ -20,6 +21,8 @@ namespace GameCore.Gameplay.Network
         public event Action OnLeavingLocationEvent = delegate {  };
         public event Action OnLocationLeftEvent = delegate {  };
         public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate {  };
+        public event Action<ElevatorFloor> OnStartElevatorEvent = delegate {  };
+        public event Action<ElevatorFloor> OnOpenElevatorEvent = delegate {  };
 
         private static RpcCaller _instance;
 
@@ -27,7 +30,7 @@ namespace GameCore.Gameplay.Network
 
         private void Awake() =>
             _instance = this;
-
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void CreateItemPreview(int slotIndex, int itemID) =>
@@ -35,10 +38,7 @@ namespace GameCore.Gameplay.Network
 
         public void DestroyItemPreview(int slotIndex) =>
             DestroyItemPreviewServerRpc(slotIndex);
-
-        public void TeleportPlayersWithOffset(Vector3 offset) =>
-            TeleportPlayersWithOffsetServerRpc(offset.x, offset.y, offset.z);
-
+        
         public void LoadLocation(SceneName sceneName)
         {
             int sceneNameIndex = (int)sceneName;
@@ -54,6 +54,10 @@ namespace GameCore.Gameplay.Network
         public void SendLeftLocation() => SendLeftLocationServerRpc();
 
         public void SendGenerateDungeons(DungeonsSeedData data) => SendGenerateDungeonsServerRpc(data);
+
+        public void SendStartElevator(ElevatorFloor elevatorFloor) => SendStartElevatorServerRpc(elevatorFloor);
+        
+        public void SendOpenElevator(ElevatorFloor elevatorFloor) => SendOpenElevatorServerRpc(elevatorFloor);
 
         public static RpcCaller Get() => _instance;
 
@@ -73,7 +77,7 @@ namespace GameCore.Gameplay.Network
 
         private void LeaveLocationLogic()
         {
-            if (!IsServer)
+            if (!IsOwner)
                 return;
             
             NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
@@ -97,10 +101,6 @@ namespace GameCore.Gameplay.Network
             DestroyItemPreviewClientRpc(slotIndex);
 
         [ServerRpc(RequireOwnership = false)]
-        private void TeleportPlayersWithOffsetServerRpc(float x, float y, float z) =>
-            TeleportPlayersWithOffsetClientRpc(x, y, z);
-
-        [ServerRpc(RequireOwnership = false)]
         private void LoadLocationServerRpc(int sceneNameIndex) =>
             LoadLocationClientRpc(sceneNameIndex);
 
@@ -120,6 +120,14 @@ namespace GameCore.Gameplay.Network
         private void SendGenerateDungeonsServerRpc(DungeonsSeedData data) =>
             SendGenerateDungeonsClientRpc(data);
 
+        [ServerRpc(RequireOwnership = false)]
+        private void SendStartElevatorServerRpc(ElevatorFloor elevatorFloor) =>
+            SendStartElevatorClientRpc(elevatorFloor);
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SendOpenElevatorServerRpc(ElevatorFloor elevatorFloor) =>
+            SendOpenElevatorClientRpc(elevatorFloor);
+
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong clientID, int slotIndex, int itemID)
         {
@@ -130,13 +138,6 @@ namespace GameCore.Gameplay.Network
         [ClientRpc]
         private void DestroyItemPreviewClientRpc(int slotIndex) =>
             OnDestroyItemPreviewEvent.Invoke(slotIndex);
-
-        [ClientRpc]
-        private void TeleportPlayersWithOffsetClientRpc(float x, float y, float z)
-        {
-            Vector3 offset = new(x, y, z);
-            OnTeleportPlayerWithOffsetEvent.Invoke(offset);
-        }
 
         [ClientRpc]
         private void LoadLocationClientRpc(int sceneNameIndex) => LoadLocationLogic(sceneNameIndex);
@@ -159,5 +160,13 @@ namespace GameCore.Gameplay.Network
         [ClientRpc]
         private void SendGenerateDungeonsClientRpc(DungeonsSeedData data) =>
             OnGenerateDungeonsEvent.Invoke(data);
+        
+        [ClientRpc]
+        private void SendStartElevatorClientRpc(ElevatorFloor elevatorFloor) =>
+            OnStartElevatorEvent.Invoke(elevatorFloor);
+        
+        [ClientRpc]
+        private void SendOpenElevatorClientRpc(ElevatorFloor elevatorFloor) =>
+            OnOpenElevatorEvent.Invoke(elevatorFloor);
     }
 }

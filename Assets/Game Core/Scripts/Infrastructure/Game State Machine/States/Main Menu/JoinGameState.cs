@@ -1,4 +1,4 @@
-﻿using GameCore.Enums;
+﻿using GameCore.Enums.Global;
 using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.Network;
 using GameCore.UI.MainMenu.ConnectingMenu;

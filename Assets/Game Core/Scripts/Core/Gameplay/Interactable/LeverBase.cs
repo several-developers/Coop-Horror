@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Enums;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using UnityEngine;
