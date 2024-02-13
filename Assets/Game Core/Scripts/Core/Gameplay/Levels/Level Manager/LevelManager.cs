@@ -15,7 +15,8 @@ namespace GameCore.Gameplay.Levels
         public LevelManager(IDungeonsObserver dungeonsObserver)
         {
             _dungeonsObserver = dungeonsObserver;
-            _dungeonReferences = new Dictionary<DungeonIndex, DungeonReferences>(capacity: 3);
+            _dungeonReferences = new Dictionary<ElevatorFloor, DungeonReferences>(capacity: 3);
+            _elevatorsReferences = new Dictionary<ElevatorFloor, ElevatorBase>(capacity: 4);
 
             _dungeonsObserver.OnDungeonGenerationCompletedEvent += OnDungeonGenerationCompleted;
         }
@@ -23,9 +24,8 @@ namespace GameCore.Gameplay.Levels
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly IDungeonsObserver _dungeonsObserver;
-        private readonly Dictionary<DungeonIndex, DungeonReferences> _dungeonReferences;
-
-        private SurfaceElevator _surfaceElevator;
+        private readonly Dictionary<ElevatorFloor, DungeonReferences> _dungeonReferences;
+        private readonly Dictionary<ElevatorFloor, ElevatorBase> _elevatorsReferences;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -33,22 +33,34 @@ namespace GameCore.Gameplay.Levels
             _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
         
         public void AddSurfaceElevator(SurfaceElevator surfaceElevator) =>
-            _surfaceElevator = surfaceElevator;
+            _elevatorsReferences.TryAdd(ElevatorFloor.Surface, surfaceElevator);
+
+        public bool TryGetElevator(ElevatorFloor elevatorFloor, out ElevatorBase elevator)
+        {
+            if (_elevatorsReferences.TryGetValue(elevatorFloor, out elevator))
+                return true;
+
+            string errorLog = Log.HandleLog($"Elevator <gb>'{elevatorFloor}'</gb> <rb>not found</rb>!");
+            Debug.LogError(errorLog);
+            
+            return false;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnDungeonGenerationCompleted(DungeonIndex dungeonIndex, DungeonReferences dungeonReferences)
+        private void OnDungeonGenerationCompleted(ElevatorFloor elevatorFloor, DungeonReferences dungeonReferences)
         {
-            if (_dungeonReferences.ContainsKey(dungeonIndex))
+            if (_dungeonReferences.ContainsKey(elevatorFloor))
             {
-                string errorLog = Log.HandleLog($"Dictionary <rb>already contains</rb> <gb>{dungeonIndex}</gb> key!");
+                string errorLog = Log.HandleLog($"Dictionary <rb>already contains</rb> <gb>{elevatorFloor}</gb> key!");
                 Debug.LogError(errorLog);
                 return;
             }
             
-            _dungeonReferences.Add(dungeonIndex, dungeonReferences);
+            _dungeonReferences.Add(elevatorFloor, dungeonReferences);
+            _elevatorsReferences.Add(elevatorFloor, dungeonReferences.GetElevator());
         }
     }
 }

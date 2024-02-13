@@ -58,7 +58,7 @@ namespace GameCore.Gameplay.Entities.Player
         
         // FIELDS: --------------------------------------------------------------------------------
 
-        public static PlayerEntity Instance;
+        public static PlayerEntity Instance; // TEMP, move
         
         public event Action<Vector2> OnMovementVectorChangedEvent;
 
@@ -202,6 +202,12 @@ namespace GameCore.Gameplay.Entities.Player
                 RemoveParent();
         }
 
+        public void TeleportPlayer(Vector3 position, Quaternion rotation)
+        {
+            _cameraController.ToggleSnap();
+            _networkTransform.Teleport(position, rotation, transform.localScale);
+        }
+
         public Transform GetTransform() => transform;
 
         public Transform GetCameraItemPivot() => _cameraItemPivot;
@@ -284,8 +290,6 @@ namespace GameCore.Gameplay.Entities.Player
                     inventoryHUD.Init(playerEntity: this); // TEMP
 
                 _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
-
-                _mobileHeadquartersEntity.OnTeleportedEvent += OnMobileHQTeleported;
             }
         }
 
@@ -367,8 +371,6 @@ namespace GameCore.Gameplay.Entities.Player
             _inventoryManager.Dispose();
             _interactionHandler.Dispose();
             
-            _mobileHeadquartersEntity.OnTeleportedEvent -= OnMobileHQTeleported;
-
             InputReader inputReader = _references.InputReader; // TEMP
             
             inputReader.OnMoveEvent -= OnMove;
@@ -438,12 +440,6 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _inventory.SetSelectedSlotIndex(newValue);
             _inventoryManager.ToggleItemsState();
-        }
-
-        [Button]
-        private void OnMobileHQTeleported()
-        {
-            _networkTransform.Teleport(transform.position, transform.rotation, transform.localScale);
         }
     }
 }

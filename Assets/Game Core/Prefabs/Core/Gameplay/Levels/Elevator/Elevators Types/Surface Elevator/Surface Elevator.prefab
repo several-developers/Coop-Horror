@@ -24,11 +24,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3750073814762262346, guid: 6df2a89f02911334ebe435e37501e010,
         type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.95
-      objectReference: {fileID: 0}
-    - target: {fileID: 3750073814762262346, guid: 6df2a89f02911334ebe435e37501e010,
-        type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
@@ -147,6 +142,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Surface Elevator
       objectReference: {fileID: 0}
+    - target: {fileID: 8489197676710068869, guid: bd93bbe5a7ce3ba43bbaa6f418078f7b,
+        type: 3}
+      propertyPath: _elevator
+      value: 
+      objectReference: {fileID: 3308865725088519337}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd93bbe5a7ce3ba43bbaa6f418078f7b, type: 3}
 --- !u!1 &1997201917055687385 stripped

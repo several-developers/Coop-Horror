@@ -14,13 +14,13 @@ namespace GameCore.Gameplay.Dungeons
         private Dungeon _dungeon;
 
         [SerializeField, ReadOnly]
-        private DungeonElevator _dungeonElevator;
+        private ElevatorBase _elevator;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void AddDungeonElevator(DungeonElevator dungeonElevator) =>
-            _dungeonElevator = dungeonElevator;
+        public void SetElevator(ElevatorBase elevator) =>
+            _elevator = elevator;
 
-        public DungeonElevator GetDungeonElevator() => _dungeonElevator;
+        public ElevatorBase GetElevator() => _elevator;
     }
 }

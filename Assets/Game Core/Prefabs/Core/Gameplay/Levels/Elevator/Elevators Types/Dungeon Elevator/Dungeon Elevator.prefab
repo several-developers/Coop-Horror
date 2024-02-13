@@ -67,6 +67,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dungeon Elevator
       objectReference: {fileID: 0}
+    - target: {fileID: 8489197676710068869, guid: bd93bbe5a7ce3ba43bbaa6f418078f7b,
+        type: 3}
+      propertyPath: _elevator
+      value: 
+      objectReference: {fileID: 7395761925459335207}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd93bbe5a7ce3ba43bbaa6f418078f7b, type: 3}
 --- !u!4 &457100376313110348 stripped

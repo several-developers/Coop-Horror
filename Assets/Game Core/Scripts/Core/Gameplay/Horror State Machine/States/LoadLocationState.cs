@@ -39,6 +39,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         private void LoadLocation(SceneName sceneName) =>
             _locationsLoader.LoadLocationNetwork(sceneName, OnLocationLoaded);
 
+        #warning CHANGE TO OBSERVER
         private async void FindLocationManager()
         {
             int iterations = 0;

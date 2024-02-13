@@ -55,9 +55,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private LeaveLocationLever _leaveLocationLever;
 
         // FIELDS: --------------------------------------------------------------------------------
-
-        public event Action OnTeleportedEvent; 
-
+        
         private static MobileHeadquartersEntity _instance;
 
         private readonly NetworkVariable<float> _pathPosition = new();
@@ -224,6 +222,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             
             if (!sendTeleportEvent)
                 return;
+
+            return;
             
             Quaternion newRotation = transform.rotation;
             
@@ -235,8 +235,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             
             playerTransform.position = _playerPoint.position;
             playerTransform.rotation = Quaternion.Euler(playerRotation);
-            
-            OnTeleportedEvent?.Invoke();
         }
 
         [Button]

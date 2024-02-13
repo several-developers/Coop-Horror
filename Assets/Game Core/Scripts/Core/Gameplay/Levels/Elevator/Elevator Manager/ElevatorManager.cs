@@ -49,7 +49,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         public ElevatorFloor GetCurrentFloor() =>
             _currentFloor.Value;
-        
+
         public bool IsElevatorMoving() =>
             _isElevatorMoving.Value;
 

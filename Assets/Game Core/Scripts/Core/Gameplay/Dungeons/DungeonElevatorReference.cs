@@ -29,7 +29,7 @@ namespace GameCore.Gameplay.Dungeons
                 return;
             }
             
-            dungeonReferences.AddDungeonElevator(_dungeonElevator);
+            dungeonReferences.SetElevator(_dungeonElevator);
         }
     }
 }

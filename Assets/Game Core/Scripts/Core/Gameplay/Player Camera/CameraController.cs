@@ -27,7 +27,7 @@ namespace GameCore.Gameplay.PlayerCamera
 
         [SerializeField, Min(0f)]
         private float _cameraSpeed = 10f;
-        
+
         [Title(Constants.References)]
         [SerializeField]
         private CameraReferences _cameraReferences;
@@ -35,7 +35,7 @@ namespace GameCore.Gameplay.PlayerCamera
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public CameraReferences CameraReferences => _cameraReferences;
-        
+
         private float MouseVerticalValue
         {
             get => _mouseVerticalValue;
@@ -51,30 +51,31 @@ namespace GameCore.Gameplay.PlayerCamera
                 _mouseVerticalValue = verticalAngle;
             }
         }
-        
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private static CameraController _instance;
-        
+
         private InputReader _inputReader;
         private PlayerEntity _playerEntity;
         private Transform _transform;
         private Transform _target;
         private Transform _headPoint;
         private Transform _mobileHqTransform;
-        
+
         private Vector3 _lastFrameMobileHqRotation;
         private Vector2 _lookVector;
         private float _mouseVerticalValue;
+        private bool _snap;
         private bool _isInitialized;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
-        
+
         private void Awake()
         {
             _instance = this;
             _transform = transform;
-            
+
             _inputReader.OnLookEvent += OnLook;
         }
 
@@ -85,7 +86,7 @@ namespace GameCore.Gameplay.PlayerCamera
         {
             if (!_isInitialized)
                 return;
-            
+
             _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
 
@@ -97,12 +98,22 @@ namespace GameCore.Gameplay.PlayerCamera
                 Vector3 difference = mobileHeadquartersRotation - _lastFrameMobileHqRotation;
                 //yRotationTemp += difference.y;
             }
-            
+
             float yRotation = yRotationTemp + _lookVector.x * _sensitivity;
-            
+
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
-            _transform.position = Vector3.Lerp(_transform.position, _headPoint.position, _cameraSpeed * Time.deltaTime);
+            if (_snap)
+            {
+                _snap = false;
+                _transform.position = _headPoint.position;
+            }
+            else
+            {
+                _transform.position =
+                    Vector3.Lerp(_transform.position, _headPoint.position, _cameraSpeed * Time.deltaTime);
+            }
+
             _transform.localRotation = finalRotation;
 
             _target.rotation = Quaternion.Euler(0, yRotation, 0);
@@ -122,7 +133,10 @@ namespace GameCore.Gameplay.PlayerCamera
             MobileHeadquartersEntity mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
             _mobileHqTransform = mobileHeadquartersEntity.transform;
         }
-        
+
+        public void ToggleSnap() =>
+            _snap = true;
+
         public static CameraController Get() => _instance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

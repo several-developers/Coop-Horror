@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Elevator Config
   m_EditorClassIdentifier: 
   _metaName: Elevator Config
-  _floorMovementDuration: 4
+  _floorMovementDuration: 3
   _reactivationDelay: 2

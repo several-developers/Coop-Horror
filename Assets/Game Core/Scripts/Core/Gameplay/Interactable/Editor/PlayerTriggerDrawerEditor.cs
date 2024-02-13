@@ -1,15 +1,12 @@
-﻿using UnityEditor;
+﻿using Sirenix.OdinInspector.Editor;
+using UnityEditor;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Interactable.Editor
 {
     [CustomEditor(typeof(PlayerTriggerDrawer))]
-    public class PlayerTriggerDrawerEditor : UnityEditor.Editor
+    public class PlayerTriggerDrawerEditor : OdinEditor
     {
-        // FIELDS: --------------------------------------------------------------------------------
-        
-        private static readonly Color Color = new(1f, 0.667f, 0f, 0.2f);
-        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         [DrawGizmo(GizmoType.NonSelected | GizmoType.Selected | GizmoType.InSelectionHierarchy |
@@ -20,9 +17,9 @@ namespace GameCore.Gameplay.Interactable.Editor
 
             if (!drawSphere)
                 return;
-            
+
             Color handlesColor = Handles.color;
-            Handles.color = Color;
+            Handles.color = ColorsConstants.PlayerTriggerColor;
             float radius = obj.GetColliderRadius();
 
             Handles.DrawWireDisc(center: obj.transform.position, normal: Vector3.up, radius, thickness: 3);
