@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.Other;
@@ -69,50 +68,41 @@ namespace GameCore.Gameplay.Levels.Elevator
             if (!IsLocalPlayerInTheElevator())
                 return;
             
-            TeleportLocalPlayer();
+            TeleportLocalPlayer2();
         }
 
-        private async void TeleportLocalPlayer()
+        private void TeleportLocalPlayer2()
         {
             ElevatorFloor currentFloor = _elevatorManager.GetCurrentFloor();
-            bool isElevatorFound = _levelManager.TryGetElevator(currentFloor, out ElevatorBase elevatorBase);
+            bool isElevatorFound = _levelManager.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
 
             if (!isElevatorFound)
                 return;
-
+            
             var playerEntity = PlayerEntity.Instance;
             Transform playerTransform = playerEntity.transform;
             Transform thisElevatorTransform = _elevator.transform;
-            Transform targetElevatorTransform = elevatorBase.transform;
+            Transform targetElevatorTransform = targetElevator.transform;
 
-            Quaternion playerRotation = playerTransform.rotation;
+            Vector3 playerPosition = playerTransform.position;
+            Vector3 thisElevatorPosition = thisElevatorTransform.position;
+            Vector3 targetElevatorPosition = targetElevatorTransform.position;
+            
             Quaternion thisElevatorRotation = thisElevatorTransform.rotation;
             Quaternion targetElevatorRotation = targetElevatorTransform.rotation;
 
-            Vector3 playerLocalPosition = thisElevatorTransform.InverseTransformPoint(playerTransform.position);
-            Vector3 rotationDifference = targetElevatorRotation.eulerAngles - thisElevatorRotation.eulerAngles;
+            Vector3 difference = playerPosition - thisElevatorPosition;
+            Vector3 rotatedDifference = thisElevatorRotation * difference;
+            Vector3 newPosition = targetElevatorPosition + targetElevatorRotation * rotatedDifference;
 
-            Debug.Log("Start Player Position: " + playerTransform.position);
-            Debug.Log("Start Elevator Position: " + thisElevatorTransform.position);
-            
-            //playerLocalPosition.y += playerEntity.References.Collider.height;
-            Debug.Log("Local Player Position: " + playerLocalPosition);
-            
-            Vector3 position = targetElevatorTransform.position + playerLocalPosition;
+            Quaternion playerRotation = playerTransform.rotation;
+            Vector3 rotationDifference = targetElevatorRotation.eulerAngles - thisElevatorRotation.eulerAngles;
             Vector3 eulerAngles = playerRotation.eulerAngles;
-            
             eulerAngles.x += rotationDifference.x;
             eulerAngles.y += rotationDifference.y;
-            
             Quaternion rotation = Quaternion.Euler(eulerAngles);
             
-            Debug.Log("New Player Position: " + position);
-            Debug.Log("New Elevator Position: " + targetElevatorTransform.position);
-            playerEntity.TeleportPlayer(position, rotation);
-            
-            await UniTask.DelayFrame(10);
-            
-            Debug.Log("Player Position after delay: " + playerTransform.position);
+            playerEntity.TeleportPlayer(newPosition, rotation);
         }
 
         private bool IsLocalPlayerInTheElevator()
