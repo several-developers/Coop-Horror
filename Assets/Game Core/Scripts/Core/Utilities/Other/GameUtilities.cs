@@ -12,6 +12,28 @@ namespace GameCore.Utilities
             Cursor.lockState = cursorLockMode;
         }
 
+        public static void Teleport(Transform target, Transform parent1, Transform parent2, out Vector3 position,
+            out Quaternion rotation)
+        {
+            Vector3 targetPosition = target.position;
+            Vector3 parent1Position = parent1.position;
+            Vector3 parent2Position = parent2.position;
+            
+            Quaternion parent1Rotation = parent1.rotation;
+            Quaternion parent2Rotation = parent2.rotation;
+
+            Vector3 difference = targetPosition - parent1Position;
+            Vector3 rotatedDifference = parent1Rotation * difference;
+            position = parent2Position + parent2Rotation * rotatedDifference;
+
+            Quaternion targetRotation = target.rotation;
+            Vector3 rotationDifference = parent2Rotation.eulerAngles - parent1Rotation.eulerAngles;
+            Vector3 eulerAngles = targetRotation.eulerAngles;
+            eulerAngles.x += rotationDifference.x;
+            eulerAngles.y += rotationDifference.y;
+            rotation = Quaternion.Euler(eulerAngles);
+        }
+        
         public static bool DoSceneExist(string scene) =>
             Application.CanStreamedLevelBeLoaded(scene);
 

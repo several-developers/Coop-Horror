@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Dungeons;
+using GameCore.Gameplay.Levels;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using Unity.VisualScripting;
@@ -12,10 +13,12 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LeaveLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader)
+        public LeaveLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader,
+            ILevelManager levelManager)
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
+            _levelManager = levelManager;
             _cancellationTokenSource = new CancellationTokenSource();
             
             horrorStateMachine.AddState(this);
@@ -25,6 +28,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
+        private readonly ILevelManager _levelManager;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -44,6 +48,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             
             UnloadLastLocation();
             ClearDungeons();
+            _levelManager.Clear();
             EnterGameLoopState();
         }
         

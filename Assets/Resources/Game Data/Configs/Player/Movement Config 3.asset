@@ -20,7 +20,7 @@ MonoBehaviour:
   _moveSpeedAirMultiplier: 0.3
   _groundDrag: 6
   _airDrag: 2
-  _jumpForce: 13
+  _jumpForce: 14
   _maxSlopeAngle: 40
   _speedMultiplierOnAngle:
     serializedVersion: 2

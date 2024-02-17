@@ -54,12 +54,14 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [SerializeField, Required]
         private LeaveLocationLever _leaveLocationLever;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public RpcCaller RpcCaller => _rpcCaller;
+        
         // FIELDS: --------------------------------------------------------------------------------
         
         private static MobileHeadquartersEntity _instance;
-
-        private readonly NetworkVariable<float> _pathPosition = new();
-
+        
         private RigidbodyPathMovement _pathMovement;
         private RpcCaller _rpcCaller;
         private State _currentState = State.MovingOnRoad;
@@ -101,8 +103,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             base.OnNetworkDespawn();
         }
 
-        private void Update() =>
+        private void Update()
+        {
+            if (!IsOwner)
+                return;
+            
             _pathMovement.Movement();
+        }
 
         public override void OnDestroy()
         {

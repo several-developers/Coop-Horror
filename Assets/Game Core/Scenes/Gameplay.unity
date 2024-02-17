@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 40dbdba7faed3ca48a48b2c66828dfdf,
+    type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 4d00757aae04027408738f9c589e4796,
     type: 2}
 --- !u!196 &4
@@ -22174,8 +22175,7 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 3614436883
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1956820334519849814, guid: b573e9cfef954b44eb72d3d379112c48, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b573e9cfef954b44eb72d3d379112c48, type: 3}
 --- !u!114 &6195987239777192163 stripped
 MonoBehaviour:
@@ -22183,12 +22183,48 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 6195987239777192162}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 6195987239777192164}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43a4806faf6c4d239abe26fcfecb57fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &6195987239777192164 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6195987239533786563, guid: b573e9cfef954b44eb72d3d379112c48,
+    type: 3}
+  m_PrefabInstance: {fileID: 6195987239777192162}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6195987239777192165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195987239777192164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0445756174f0834ba947f4d8a5cc640, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!4 &6227867230756353471
 Transform:
   m_ObjectHideFlags: 0
@@ -22883,6 +22919,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 9036817173812853579, guid: 0e668771974678d46a9a205aea7ded01,
+        type: 3}
+      propertyPath: _cameraSpeed
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 9036817173812853580, guid: 0e668771974678d46a9a205aea7ded01,
         type: 3}
       propertyPath: m_RootOrder

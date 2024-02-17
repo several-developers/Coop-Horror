@@ -2,6 +2,7 @@
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.Other;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -80,29 +81,12 @@ namespace GameCore.Gameplay.Levels.Elevator
                 return;
             
             var playerEntity = PlayerEntity.Instance;
-            Transform playerTransform = playerEntity.transform;
-            Transform thisElevatorTransform = _elevator.transform;
-            Transform targetElevatorTransform = targetElevator.transform;
-
-            Vector3 playerPosition = playerTransform.position;
-            Vector3 thisElevatorPosition = thisElevatorTransform.position;
-            Vector3 targetElevatorPosition = targetElevatorTransform.position;
+            Transform target = playerEntity.transform;
+            Transform parent1 = _elevator.transform;
+            Transform parent2 = targetElevator.transform;
             
-            Quaternion thisElevatorRotation = thisElevatorTransform.rotation;
-            Quaternion targetElevatorRotation = targetElevatorTransform.rotation;
-
-            Vector3 difference = playerPosition - thisElevatorPosition;
-            Vector3 rotatedDifference = thisElevatorRotation * difference;
-            Vector3 newPosition = targetElevatorPosition + targetElevatorRotation * rotatedDifference;
-
-            Quaternion playerRotation = playerTransform.rotation;
-            Vector3 rotationDifference = targetElevatorRotation.eulerAngles - thisElevatorRotation.eulerAngles;
-            Vector3 eulerAngles = playerRotation.eulerAngles;
-            eulerAngles.x += rotationDifference.x;
-            eulerAngles.y += rotationDifference.y;
-            Quaternion rotation = Quaternion.Euler(eulerAngles);
-            
-            playerEntity.TeleportPlayer(newPosition, rotation);
+            GameUtilities.Teleport(target, parent1, parent2, out Vector3 position, out Quaternion rotation);
+            playerEntity.TeleportPlayer(position, rotation);
         }
 
         private bool IsLocalPlayerInTheElevator()

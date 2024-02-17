@@ -34,7 +34,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private float _distance;
         private float _syncCurrentTime;
         private bool _isArrived;
-        private bool _canMove;
+        private bool _canMove = true;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -55,10 +55,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     _isArrived = true;
                     OnDestinationReachedEvent?.Invoke();
                 }
-                
+
                 _distance = _path.PathLength;
             }
-            
+
             MoveRigidbody(_distance);
 
             float inputMagnitude = _mobileHeadquartersConfig.MotionSpeed; // 1f
@@ -72,7 +72,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public void ToggleMovement(bool canMove) =>
             _canMove = canMove;
-        
+
         public void ToggleMoveAnimation(bool canMove) =>
             _animator.SetBool(id: AnimatorHashes.CanMove, value: canMove);
 
@@ -83,7 +83,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             //_rigidbody.velocity = Vector3.zero;
             //_rigidbody.angularVelocity = Vector3.zero;
-            
+
             Vector3 position = EvaluatePositionAtUnit(distance: 0f);
             Quaternion rotation = EvaluateOrientationAtUnit(distance: 0f);
 
@@ -103,7 +103,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             _transform.position = position;
             _transform.rotation = rotation;
-            
+
             //_rigidbody.MovePosition(position);
             //_rigidbody.MoveRotation(rotation);
         }

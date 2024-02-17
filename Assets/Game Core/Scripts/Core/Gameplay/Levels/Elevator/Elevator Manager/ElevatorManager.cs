@@ -13,14 +13,16 @@ namespace GameCore.Gameplay.Levels.Elevator
     public class ElevatorManager : NetworkBehaviour
     {
         // FIELDS: --------------------------------------------------------------------------------
-
+        
         public event Action<ElevatorStaticData> OnElevatorStartedEvent = delegate { };
         public event Action<ElevatorStaticData> OnFloorChangedEvent = delegate { };
         public event Action<ElevatorFloor> OnElevatorStoppedEvent = delegate { };
 
-        private readonly NetworkVariable<ElevatorFloor> _currentFloor = new();
-        private readonly NetworkVariable<ElevatorFloor> _targetFloor = new();
-        private readonly NetworkVariable<bool> _isElevatorMoving = new();
+        private const NetworkVariableWritePermission Owner = NetworkVariableWritePermission.Owner;
+
+        private readonly NetworkVariable<ElevatorFloor> _currentFloor = new(writePerm: Owner);
+        private readonly NetworkVariable<ElevatorFloor> _targetFloor = new(writePerm: Owner);
+        private readonly NetworkVariable<bool> _isElevatorMoving = new(writePerm: Owner);
 
         private static ElevatorManager _instance;
 

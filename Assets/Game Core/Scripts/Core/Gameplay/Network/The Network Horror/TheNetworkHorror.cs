@@ -168,6 +168,9 @@ namespace GameCore.Gameplay.Network
         // TEMP
         public void SetRoadLocationLoaded() =>
             _isRoadLocationLoaded = true;
+        
+        public bool TryGetPlayerEntity(ulong clientID, out PlayerEntity playerEntity) =>
+            PlayersEntities.TryGetValue(clientID, out playerEntity);
 
         public bool IsActive() =>
             _networkManager.IsServer || _networkManager.IsHost || _networkManager.IsClient;

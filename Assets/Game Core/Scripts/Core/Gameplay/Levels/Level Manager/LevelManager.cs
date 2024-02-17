@@ -35,6 +35,16 @@ namespace GameCore.Gameplay.Levels
         public void AddSurfaceElevator(SurfaceElevator surfaceElevator) =>
             _elevatorsReferences.TryAdd(ElevatorFloor.Surface, surfaceElevator);
 
+        // TEMP
+        public void Clear()
+        {
+            _dungeonReferences.Clear();
+            
+            _elevatorsReferences.Remove(ElevatorFloor.One);
+            _elevatorsReferences.Remove(ElevatorFloor.Two);
+            _elevatorsReferences.Remove(ElevatorFloor.Three);
+        }
+
         public bool TryGetElevator(ElevatorFloor elevatorFloor, out ElevatorBase elevator)
         {
             if (_elevatorsReferences.TryGetValue(elevatorFloor, out elevator))
