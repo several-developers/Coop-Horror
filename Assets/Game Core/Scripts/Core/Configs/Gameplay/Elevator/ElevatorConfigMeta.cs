@@ -15,6 +15,14 @@ namespace GameCore.Configs.Gameplay.Elevator
         [SerializeField, Min(0)]
         private float _reactivationDelay = 2f;
 
+        [SerializeField, Min(0)]
+        [InfoBox("NOT IMPLEMENTED", InfoMessageType.Warning)]
+        private float _doorsOpenDuration = 1f;
+        
+        [SerializeField, Min(0)]
+        [InfoBox("NOT IMPLEMENTED", InfoMessageType.Warning)]
+        private float _doorsCloseDuration = 1f;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float FloorMovementDuration => _floorMovementDuration;

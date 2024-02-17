@@ -1,5 +1,4 @@
 ﻿using GameCore.Observers.Gameplay.Dungeons;
-using GameCore.Observers.Gameplay.Elevator;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.Observers.Gameplay.UI;
 using Zenject;
@@ -15,7 +14,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindUIObserver();
             BindPlayerInteractionObserver();
             BindDungeonsObserver();
-            BindElevatorObserver();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -38,13 +36,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<DungeonsObserver>()
-                .AsSingle();
-        }
-
-        private void BindElevatorObserver()
-        {
-            Container
-                .BindInterfacesTo<ElevatorObserver>()
                 .AsSingle();
         }
     }

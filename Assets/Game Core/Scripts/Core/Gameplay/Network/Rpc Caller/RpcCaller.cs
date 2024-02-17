@@ -54,14 +54,14 @@ namespace GameCore.Gameplay.Network
 
         public void SendLeftLocation() => SendLeftLocationServerRpc();
 
-        public void SendGenerateDungeons(DungeonsSeedData data) => SendGenerateDungeonsServerRpc(data);
+        public void GenerateDungeons(DungeonsSeedData data) => GenerateDungeonsServerRpc(data);
 
-        public void SendStartElevator(ElevatorFloor elevatorFloor) => SendStartElevatorServerRpc(elevatorFloor);
+        public void StartElevator(ElevatorFloor elevatorFloor) => StartElevatorServerRpc(elevatorFloor);
         
-        public void SendOpenElevator(ElevatorFloor elevatorFloor) => SendOpenElevatorServerRpc(elevatorFloor);
+        public void OpenElevator(ElevatorFloor elevatorFloor) => OpenElevatorServerRpc(elevatorFloor);
 
-        public void SendTogglePlayerInsideMobileHQEvent(ulong clientID, bool isInside) =>
-            SendTogglePlayerInsideMobileHQServerRpc(clientID, isInside);
+        public void TogglePlayerInsideMobileHQEvent(ulong clientID, bool isInside) =>
+            TogglePlayerInsideMobileHQServerRpc(clientID, isInside);
 
         public static RpcCaller Get() => _instance;
 
@@ -121,20 +121,20 @@ namespace GameCore.Gameplay.Network
         private void SendLeftLocationServerRpc() => SendLeftLocationClientRpc();
 
         [ServerRpc(RequireOwnership = false)]
-        private void SendGenerateDungeonsServerRpc(DungeonsSeedData data) =>
-            SendGenerateDungeonsClientRpc(data);
+        private void GenerateDungeonsServerRpc(DungeonsSeedData data) =>
+            GenerateDungeonsClientRpc(data);
 
         [ServerRpc(RequireOwnership = false)]
-        private void SendStartElevatorServerRpc(ElevatorFloor elevatorFloor) =>
-            SendStartElevatorClientRpc(elevatorFloor);
+        private void StartElevatorServerRpc(ElevatorFloor elevatorFloor) =>
+            StartElevatorClientRpc(elevatorFloor);
 
         [ServerRpc(RequireOwnership = false)]
-        private void SendOpenElevatorServerRpc(ElevatorFloor elevatorFloor) =>
-            SendOpenElevatorClientRpc(elevatorFloor);
+        private void OpenElevatorServerRpc(ElevatorFloor elevatorFloor) =>
+            OpenElevatorClientRpc(elevatorFloor);
 
         [ServerRpc(RequireOwnership = false)]
-        private void SendTogglePlayerInsideMobileHQServerRpc(ulong clientID, bool isInside) =>
-            SendTogglePlayerInsideMobileHQClientRpc(clientID, isInside);
+        private void TogglePlayerInsideMobileHQServerRpc(ulong clientID, bool isInside) =>
+            TogglePlayerInsideMobileHQClientRpc(clientID, isInside);
 
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong clientID, int slotIndex, int itemID)
@@ -166,19 +166,19 @@ namespace GameCore.Gameplay.Network
             OnLocationLeftEvent.Invoke();
 
         [ClientRpc]
-        private void SendGenerateDungeonsClientRpc(DungeonsSeedData data) =>
+        private void GenerateDungeonsClientRpc(DungeonsSeedData data) =>
             OnGenerateDungeonsEvent.Invoke(data);
         
         [ClientRpc]
-        private void SendStartElevatorClientRpc(ElevatorFloor elevatorFloor) =>
+        private void StartElevatorClientRpc(ElevatorFloor elevatorFloor) =>
             OnStartElevatorEvent.Invoke(elevatorFloor);
-        
+
         [ClientRpc]
-        private void SendOpenElevatorClientRpc(ElevatorFloor elevatorFloor) =>
+        private void OpenElevatorClientRpc(ElevatorFloor elevatorFloor) =>
             OnOpenElevatorEvent.Invoke(elevatorFloor);
 
         [ClientRpc]
-        private void SendTogglePlayerInsideMobileHQClientRpc(ulong clientID, bool isInside) =>
+        private void TogglePlayerInsideMobileHQClientRpc(ulong clientID, bool isInside) =>
             OnTogglePlayerInsideMobileHQEvent.Invoke(clientID, isInside);
     }
 }

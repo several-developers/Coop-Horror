@@ -48,7 +48,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             DungeonsSeedData data = new(seedOne, seedTwo, seedThree);
             
             RpcCaller rpcCaller = RpcCaller.Get();
-            rpcCaller.SendGenerateDungeons(data);
+            rpcCaller.GenerateDungeons(data);
         }
         
         private static int GenerateRandomSeed(RandomStream randomStream) =>

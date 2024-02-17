@@ -27,7 +27,7 @@ namespace GameCore.Gameplay.Triggers
             playerEntity.ToggleInsideMobileHQ(isInside: true);
             
             RpcCaller rpcCaller = _mobileHeadquartersEntity.RpcCaller;
-            rpcCaller.SendTogglePlayerInsideMobileHQEvent(playerEntity.OwnerClientId, isInside: true);
+            rpcCaller.TogglePlayerInsideMobileHQEvent(playerEntity.OwnerClientId, isInside: true);
         }
 
         private void OnTriggerExit(Collider other)
@@ -41,7 +41,7 @@ namespace GameCore.Gameplay.Triggers
             playerEntity.ToggleInsideMobileHQ(isInside: false);
             
             RpcCaller rpcCaller = _mobileHeadquartersEntity.RpcCaller;
-            rpcCaller.SendTogglePlayerInsideMobileHQEvent(playerEntity.OwnerClientId, isInside: false);
+            rpcCaller.TogglePlayerInsideMobileHQEvent(playerEntity.OwnerClientId, isInside: false);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void StartElevator(ElevatorFloor elevatorFloor) =>
-            _rpcCaller.SendStartElevator(elevatorFloor);
+            _rpcCaller.StartElevator(elevatorFloor);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

@@ -69,7 +69,8 @@ namespace GameCore.Gameplay.Levels.Elevator
         public InteractionType GetInteractionType() =>
             InteractionType.ElevatorFloorButton;
 
-        public bool CanInteract() => _canInteract;
+        public bool CanInteract() =>
+            _canInteract && !IsElevatorMoving();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -78,14 +79,15 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void SendInteractionStateChangedEvent() =>
             OnInteractionStateChangedEvent?.Invoke();
+
+        private bool IsElevatorMoving() =>
+            _elevatorManager.IsElevatorMoving();
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnEnabledEvent()
         {
-            bool isElevatorMoving = _elevatorManager.IsElevatorMoving();
-
-            if (isElevatorMoving)
+            if (IsElevatorMoving())
                 return;
             
             ToggleInteract(canInteract: true);

@@ -57,6 +57,9 @@ namespace GameCore.Gameplay.Levels.Elevator
         
         public void Interact()
         {
+            if (IsElevatorMoving())
+                return;
+            
             ToggleInteract(canInteract: false);
             PlayAnimation();
             HandleClick();
@@ -71,7 +74,8 @@ namespace GameCore.Gameplay.Levels.Elevator
         public InteractionType GetInteractionType() =>
             InteractionType.ElevatorCallButton;
 
-        public bool CanInteract() => _canInteract;
+        public bool CanInteract() =>
+            _canInteract && !IsElevatorMoving();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -82,7 +86,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         {
             ElevatorFloor elevatorFloor = _elevator.GetElevatorFloor();
             ElevatorFloor currentFloor = _elevatorManager.GetCurrentFloor();
-            bool isElevatorMoving = _elevatorManager.IsElevatorMoving();
+            bool isElevatorMoving = IsElevatorMoving();
             bool openElevator = !isElevatorMoving && currentFloor == elevatorFloor;
 
             if (openElevator)
@@ -92,10 +96,13 @@ namespace GameCore.Gameplay.Levels.Elevator
         }
 
         private void OpenElevator(ElevatorFloor elevatorFloor) =>
-            _rpcCaller.SendOpenElevator(elevatorFloor);
+            _rpcCaller.OpenElevator(elevatorFloor);
 
         private void StartElevator(ElevatorFloor elevatorFloor) =>
             _controlPanel.StartElevator(elevatorFloor);
+
+        private bool IsElevatorMoving() =>
+            _elevatorManager.IsElevatorMoving();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

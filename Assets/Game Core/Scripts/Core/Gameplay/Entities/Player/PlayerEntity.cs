@@ -10,6 +10,7 @@ using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.UI.Gameplay.Inventory;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -275,6 +276,9 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!IsOwner)
                 return;
+            
+            if (Input.GetKeyDown(KeyCode.T))
+                GameUtilities.SwapCursorLockState();
 
             _movementBehaviour.Tick();
             _interactionChecker.Check();
