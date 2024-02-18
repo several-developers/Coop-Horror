@@ -20,7 +20,7 @@ namespace GameCore.Gameplay.Dungeons
 
         [Title(Constants.Settings)]
         [SerializeField]
-        private ElevatorFloor _elevatorFloor;
+        private Floor _floor;
 
         [Title(Constants.References)]
         [SerializeField, Required]
@@ -35,9 +35,9 @@ namespace GameCore.Gameplay.Dungeons
         public void OnDungeonComplete(Dungeon dungeon)
         {
             ElevatorBase dungeonElevator = _dungeonReferences.GetElevator();
-            dungeonElevator.ChangeElevatorFloor(_elevatorFloor);
+            dungeonElevator.ChangeElevatorFloor(_floor);
             
-            _dungeonsObserver.SendDungeonGenerationCompleted(_elevatorFloor, _dungeonReferences);
+            _dungeonsObserver.SendDungeonGenerationCompleted(_floor, _dungeonReferences);
         }
     }
 }

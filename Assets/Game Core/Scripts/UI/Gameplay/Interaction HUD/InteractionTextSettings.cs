@@ -51,7 +51,7 @@ namespace GameCore.UI.Gameplay.Interaction
             }
 
             if (canInteract)
-                return "No Text Found.";
+                return "Text Not Found.";
             
             return _defaultDisabledInteractionText;
         }

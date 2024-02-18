@@ -8,13 +8,13 @@ namespace GameCore.Observers.Gameplay.Dungeons
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<ElevatorFloor, DungeonReferences> OnDungeonGenerationCompletedEvent;
+        public event Action<Floor, DungeonReferences> OnDungeonGenerationCompletedEvent;
         public event Action OnDungeonsGenerationCompletedEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void SendDungeonGenerationCompleted(ElevatorFloor elevatorFloor, DungeonReferences dungeonReferences) =>
-            OnDungeonGenerationCompletedEvent?.Invoke(elevatorFloor, dungeonReferences);
+        public void SendDungeonGenerationCompleted(Floor floor, DungeonReferences dungeonReferences) =>
+            OnDungeonGenerationCompletedEvent?.Invoke(floor, dungeonReferences);
 
         public void SendDungeonsGenerationCompleted() =>
             OnDungeonsGenerationCompletedEvent?.Invoke();

@@ -6,7 +6,7 @@ namespace GameCore.Gameplay.Levels.Elevator
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ElevatorStaticData(ElevatorFloor currentFloor, ElevatorFloor targetFloor, bool isMovingUp)
+        public ElevatorStaticData(Floor currentFloor, Floor targetFloor, bool isMovingUp)
         {
             CurrentFloor = currentFloor;
             TargetFloor = targetFloor;
@@ -16,8 +16,8 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public ElevatorFloor CurrentFloor { get; }
-        public ElevatorFloor TargetFloor { get; }
+        public Floor CurrentFloor { get; }
+        public Floor TargetFloor { get; }
         public bool IsMovingUp { get; }
         public bool IsTargetFloor { get; }
     }

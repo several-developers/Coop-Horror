@@ -69,7 +69,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38ca9609794445dba7208b11c288d950, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _elevatorFloor: 1
+  _floor: 1
   _animationObserver: {fileID: 745753158200923948}
   _animator: {fileID: 2707029153518141988}
 --- !u!95 &2707029153518141988 stripped

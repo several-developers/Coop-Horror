@@ -28,8 +28,8 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void StartElevator(ElevatorFloor elevatorFloor) =>
-            _rpcCaller.StartElevator(elevatorFloor);
+        public void StartElevator(Floor floor) =>
+            _rpcCaller.StartElevator(floor);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -41,6 +41,6 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnStartElevatorClicked(ElevatorFloor elevatorFloor) => StartElevator(elevatorFloor);
+        private void OnStartElevatorClicked(Floor floor) => StartElevator(floor);
     }
 }

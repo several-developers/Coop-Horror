@@ -13,7 +13,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         [Title(Constants.Settings)]
         [SerializeField]
-        private ElevatorFloor _elevatorFloor;
+        private Floor _floor;
         
         [Title(Constants.References)]
         [SerializeField, Required]
@@ -25,7 +25,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         // FIELDS: --------------------------------------------------------------------------------
         
         public event Action OnInteractionStateChangedEvent;
-        public event Action<ElevatorFloor> OnStartElevatorClickedEvent;
+        public event Action<Floor> OnStartElevatorClickedEvent;
 
         private ElevatorManager _elevatorManager;
         private bool _canInteract = true;
@@ -64,7 +64,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         }
 
         private void StartElevator() =>
-            OnStartElevatorClickedEvent?.Invoke(_elevatorFloor);
+            OnStartElevatorClickedEvent?.Invoke(_floor);
 
         public InteractionType GetInteractionType() =>
             InteractionType.ElevatorFloorButton;
@@ -93,6 +93,6 @@ namespace GameCore.Gameplay.Levels.Elevator
             ToggleInteract(canInteract: true);
         }
 
-        private void OnElevatorStopped(ElevatorFloor elevatorFloor) => ToggleInteract(canInteract: true);
+        private void OnElevatorStopped(Floor floor) => ToggleInteract(canInteract: true);
     }
 }

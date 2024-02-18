@@ -16,10 +16,10 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         public event Action<ElevatorStaticData> OnElevatorStartedEvent = delegate { };
         public event Action<ElevatorStaticData> OnFloorChangedEvent = delegate { };
-        public event Action<ElevatorFloor> OnElevatorStoppedEvent = delegate { };
+        public event Action<Floor> OnElevatorStoppedEvent = delegate { };
 
-        private readonly NetworkVariable<ElevatorFloor> _currentFloor = new();
-        private readonly NetworkVariable<ElevatorFloor> _targetFloor = new();
+        private readonly NetworkVariable<Floor> _currentFloor = new();
+        private readonly NetworkVariable<Floor> _targetFloor = new();
         private readonly NetworkVariable<bool> _isElevatorMoving = new();
 
         private static ElevatorManager _instance;
@@ -47,7 +47,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public ElevatorFloor GetCurrentFloor() =>
+        public Floor GetCurrentFloor() =>
             _currentFloor.Value;
 
         public bool IsElevatorMoving() =>
@@ -120,23 +120,23 @@ namespace GameCore.Gameplay.Levels.Elevator
             _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
         }
 
-        private void TryStartElevator(ElevatorFloor elevatorFloor)
+        private void TryStartElevator(Floor floor)
         {
             if (_isElevatorMoving.Value)
                 return;
 
-            if (elevatorFloor == _currentFloor.Value)
+            if (floor == _currentFloor.Value)
                 return;
 
-            StartElevatorOnServer(elevatorFloor);
+            StartElevatorOnServer(floor);
         }
 
-        private void StartElevatorOnServer(ElevatorFloor elevatorFloor)
+        private void StartElevatorOnServer(Floor floor)
         {
             if (!IsOwner)
                 return;
 
-            _targetFloor.Value = elevatorFloor;
+            _targetFloor.Value = floor;
             _isElevatorMoving.Value = true;
 
             _movementCO = StartCoroutine(routine: ElevatorMovementCO());
@@ -153,7 +153,7 @@ namespace GameCore.Gameplay.Levels.Elevator
             SendElevatorStoppedServerRpc();
         }
 
-        private void SendElevatorStartedEvent(ElevatorFloor targetFloor)
+        private void SendElevatorStartedEvent(Floor targetFloor)
         {
             bool isMovingUp = IsMovingUp(targetFloor);
             ElevatorStaticData data = new(_currentFloor.Value, targetFloor, isMovingUp);
@@ -166,7 +166,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private IEnumerator ElevatorMovementCO()
         {
-            ElevatorFloor targetFloor = _targetFloor.Value;
+            Floor targetFloor = _targetFloor.Value;
             
             SendElevatorStartedEvent(targetFloor);
             SendElevatorStartedServerRpc(targetFloor);
@@ -183,7 +183,7 @@ namespace GameCore.Gameplay.Levels.Elevator
                 int newFloorInt = (int)_currentFloor.Value;
                 newFloorInt += isMovingUp ? -1 : 1;
 
-                var newFloor = (ElevatorFloor)newFloorInt;
+                var newFloor = (Floor)newFloorInt;
                 _currentFloor.Value = newFloor;
             }
 
@@ -194,7 +194,7 @@ namespace GameCore.Gameplay.Levels.Elevator
             StopElevator();
         }
 
-        private bool IsMovingUp(ElevatorFloor targetFloor)
+        private bool IsMovingUp(Floor targetFloor)
         {
             int currentFloorInt = (int)_currentFloor.Value;
             int targetFloorInt = (int)targetFloor;
@@ -205,14 +205,14 @@ namespace GameCore.Gameplay.Levels.Elevator
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
-        private void SendElevatorStartedServerRpc(ElevatorFloor targetFloor) =>
+        private void SendElevatorStartedServerRpc(Floor targetFloor) =>
             SendElevatorStartedClientRpc(targetFloor);
 
         [ServerRpc(RequireOwnership = false)]
         private void SendElevatorStoppedServerRpc() => SendElevatorStoppedClientRpc();
 
         [ClientRpc]
-        private void SendElevatorStartedClientRpc(ElevatorFloor targetFloor)
+        private void SendElevatorStartedClientRpc(Floor targetFloor)
         {
             if (IsOwner)
                 return;
@@ -231,9 +231,9 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnStartElevator(ElevatorFloor elevatorFloor) => TryStartElevator(elevatorFloor);
+        private void OnStartElevator(Floor floor) => TryStartElevator(floor);
 
-        private void OnCurrentFloorChanged(ElevatorFloor previousValue, ElevatorFloor newValue)
+        private void OnCurrentFloorChanged(Floor previousValue, Floor newValue)
         {
             bool isMovingUp = IsMovingUp(_targetFloor.Value);
             ElevatorStaticData data = new(currentFloor: newValue, _targetFloor.Value, isMovingUp);

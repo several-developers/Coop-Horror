@@ -11,7 +11,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         [Title(Constants.Settings)]
         [SerializeField]
-        private ElevatorFloor _elevatorFloor;
+        private Floor _floor;
         
         [Title(Constants.References)]
         [SerializeField, Required]
@@ -46,10 +46,10 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void ChangeElevatorFloor(ElevatorFloor elevatorFloor) =>
-            _elevatorFloor = elevatorFloor;
+        public void ChangeElevatorFloor(Floor floor) =>
+            _floor = floor;
 
-        public ElevatorFloor GetElevatorFloor() => _elevatorFloor;
+        public Floor GetElevatorFloor() => _floor;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void OnElevatorStarted(ElevatorStaticData data)
         {
-            bool isSameFloor = data.CurrentFloor == _elevatorFloor;
+            bool isSameFloor = data.CurrentFloor == _floor;
 
             if (!isSameFloor)
                 return;
@@ -87,8 +87,8 @@ namespace GameCore.Gameplay.Levels.Elevator
             if (!isTargetFloor)
                 return;
             
-            ElevatorFloor currentFloor = data.CurrentFloor;
-            bool isSameFloor = currentFloor == _elevatorFloor;
+            Floor currentFloor = data.CurrentFloor;
+            bool isSameFloor = currentFloor == _floor;
 
             if (!isSameFloor)
                 return;
@@ -96,9 +96,9 @@ namespace GameCore.Gameplay.Levels.Elevator
             OpenElevator();
         }
 
-        private void OnOpenElevator(ElevatorFloor elevatorFloor)
+        private void OnOpenElevator(Floor floor)
         {
-            bool isSameFloor = elevatorFloor == _elevatorFloor;
+            bool isSameFloor = floor == _floor;
 
             if (!isSameFloor)
                 return;

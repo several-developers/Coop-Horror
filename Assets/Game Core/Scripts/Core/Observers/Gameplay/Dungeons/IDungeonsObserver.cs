@@ -6,9 +6,9 @@ namespace GameCore.Observers.Gameplay.Dungeons
 {
     public interface IDungeonsObserver
     {
-        event Action<ElevatorFloor, DungeonReferences> OnDungeonGenerationCompletedEvent;
+        event Action<Floor, DungeonReferences> OnDungeonGenerationCompletedEvent;
         event Action OnDungeonsGenerationCompletedEvent;
-        void SendDungeonGenerationCompleted(ElevatorFloor elevatorFloor, DungeonReferences dungeonReferences);
+        void SendDungeonGenerationCompleted(Floor floor, DungeonReferences dungeonReferences);
         void SendDungeonsGenerationCompleted();
     }
 }

@@ -74,7 +74,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void TeleportLocalPlayer2()
         {
-            ElevatorFloor currentFloor = _elevatorManager.GetCurrentFloor();
+            Floor currentFloor = _elevatorManager.GetCurrentFloor();
             bool isElevatorFound = _levelManager.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
 
             if (!isElevatorFound)

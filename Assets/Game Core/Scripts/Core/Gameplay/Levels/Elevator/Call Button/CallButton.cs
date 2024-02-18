@@ -84,22 +84,22 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void HandleClick()
         {
-            ElevatorFloor elevatorFloor = _elevator.GetElevatorFloor();
-            ElevatorFloor currentFloor = _elevatorManager.GetCurrentFloor();
+            Floor floor = _elevator.GetElevatorFloor();
+            Floor currentFloor = _elevatorManager.GetCurrentFloor();
             bool isElevatorMoving = IsElevatorMoving();
-            bool openElevator = !isElevatorMoving && currentFloor == elevatorFloor;
+            bool openElevator = !isElevatorMoving && currentFloor == floor;
 
             if (openElevator)
-                OpenElevator(elevatorFloor);
+                OpenElevator(floor);
             else
-                StartElevator(elevatorFloor);
+                StartElevator(floor);
         }
 
-        private void OpenElevator(ElevatorFloor elevatorFloor) =>
-            _rpcCaller.OpenElevator(elevatorFloor);
+        private void OpenElevator(Floor floor) =>
+            _rpcCaller.OpenElevator(floor);
 
-        private void StartElevator(ElevatorFloor elevatorFloor) =>
-            _controlPanel.StartElevator(elevatorFloor);
+        private void StartElevator(Floor floor) =>
+            _controlPanel.StartElevator(floor);
 
         private bool IsElevatorMoving() =>
             _elevatorManager.IsElevatorMoving();
@@ -116,6 +116,6 @@ namespace GameCore.Gameplay.Levels.Elevator
             ToggleInteract(canInteract: true);
         }
         
-        private void OnElevatorStopped(ElevatorFloor elevatorFloor) => ToggleInteract(canInteract: true);
+        private void OnElevatorStopped(Floor floor) => ToggleInteract(canInteract: true);
     }
 }

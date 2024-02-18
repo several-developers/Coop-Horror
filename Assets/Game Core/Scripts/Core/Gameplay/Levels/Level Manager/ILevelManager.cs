@@ -7,6 +7,6 @@ namespace GameCore.Gameplay.Levels
     {
         void AddSurfaceElevator(SurfaceElevator surfaceElevator);
         void Clear();
-        bool TryGetElevator(ElevatorFloor elevatorFloor, out ElevatorBase elevator);
+        bool TryGetElevator(Floor floor, out ElevatorBase elevator);
     }
 }

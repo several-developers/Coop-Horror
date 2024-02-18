@@ -13,7 +13,7 @@ namespace GameCore.Gameplay.Interactable.Editor
                    GizmoType.NotInSelectionHierarchy)]
         public static void RenderCustomGizmo(PlayerTriggerDrawer obj, GizmoType gizmo)
         {
-            bool drawSphere = obj.DrawSphere();
+            bool drawSphere = obj.DrawSphere;
 
             if (!drawSphere)
                 return;

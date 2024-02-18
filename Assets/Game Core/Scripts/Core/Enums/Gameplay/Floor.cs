@@ -1,6 +1,6 @@
 ﻿namespace GameCore.Enums.Gameplay
 {
-    public enum ElevatorFloor
+    public enum Floor
     {
         Surface = 0,
         One = 1,

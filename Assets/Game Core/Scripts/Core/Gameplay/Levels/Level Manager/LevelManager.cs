@@ -15,8 +15,8 @@ namespace GameCore.Gameplay.Levels
         public LevelManager(IDungeonsObserver dungeonsObserver)
         {
             _dungeonsObserver = dungeonsObserver;
-            _dungeonReferences = new Dictionary<ElevatorFloor, DungeonReferences>(capacity: 3);
-            _elevatorsReferences = new Dictionary<ElevatorFloor, ElevatorBase>(capacity: 4);
+            _dungeonReferences = new Dictionary<Floor, DungeonReferences>(capacity: 3);
+            _elevatorsReferences = new Dictionary<Floor, ElevatorBase>(capacity: 4);
 
             _dungeonsObserver.OnDungeonGenerationCompletedEvent += OnDungeonGenerationCompleted;
         }
@@ -24,8 +24,8 @@ namespace GameCore.Gameplay.Levels
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly IDungeonsObserver _dungeonsObserver;
-        private readonly Dictionary<ElevatorFloor, DungeonReferences> _dungeonReferences;
-        private readonly Dictionary<ElevatorFloor, ElevatorBase> _elevatorsReferences;
+        private readonly Dictionary<Floor, DungeonReferences> _dungeonReferences;
+        private readonly Dictionary<Floor, ElevatorBase> _elevatorsReferences;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -33,24 +33,24 @@ namespace GameCore.Gameplay.Levels
             _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
         
         public void AddSurfaceElevator(SurfaceElevator surfaceElevator) =>
-            _elevatorsReferences.TryAdd(ElevatorFloor.Surface, surfaceElevator);
+            _elevatorsReferences.TryAdd(Floor.Surface, surfaceElevator);
 
         // TEMP
         public void Clear()
         {
             _dungeonReferences.Clear();
             
-            _elevatorsReferences.Remove(ElevatorFloor.One);
-            _elevatorsReferences.Remove(ElevatorFloor.Two);
-            _elevatorsReferences.Remove(ElevatorFloor.Three);
+            _elevatorsReferences.Remove(Floor.One);
+            _elevatorsReferences.Remove(Floor.Two);
+            _elevatorsReferences.Remove(Floor.Three);
         }
 
-        public bool TryGetElevator(ElevatorFloor elevatorFloor, out ElevatorBase elevator)
+        public bool TryGetElevator(Floor floor, out ElevatorBase elevator)
         {
-            if (_elevatorsReferences.TryGetValue(elevatorFloor, out elevator))
+            if (_elevatorsReferences.TryGetValue(floor, out elevator))
                 return true;
 
-            string errorLog = Log.HandleLog($"Elevator <gb>'{elevatorFloor}'</gb> <rb>not found</rb>!");
+            string errorLog = Log.HandleLog($"Elevator <gb>'{floor}'</gb> <rb>not found</rb>!");
             Debug.LogError(errorLog);
             
             return false;
@@ -60,17 +60,17 @@ namespace GameCore.Gameplay.Levels
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnDungeonGenerationCompleted(ElevatorFloor elevatorFloor, DungeonReferences dungeonReferences)
+        private void OnDungeonGenerationCompleted(Floor floor, DungeonReferences dungeonReferences)
         {
-            if (_dungeonReferences.ContainsKey(elevatorFloor))
+            if (_dungeonReferences.ContainsKey(floor))
             {
-                string errorLog = Log.HandleLog($"Dictionary <rb>already contains</rb> <gb>{elevatorFloor}</gb> key!");
+                string errorLog = Log.HandleLog($"Dictionary <rb>already contains</rb> <gb>{floor}</gb> key!");
                 Debug.LogError(errorLog);
                 return;
             }
             
-            _dungeonReferences.Add(elevatorFloor, dungeonReferences);
-            _elevatorsReferences.Add(elevatorFloor, dungeonReferences.GetElevator());
+            _dungeonReferences.Add(floor, dungeonReferences);
+            _elevatorsReferences.Add(floor, dungeonReferences.GetElevator());
         }
     }
 }

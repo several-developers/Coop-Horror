@@ -15,11 +15,13 @@ namespace GameCore.Gameplay.Interactable
         [SerializeField, Required]
         private SphereCollider _sphereCollider;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public bool DrawSphere => _drawSphere;
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public float GetColliderRadius() =>
             _sphereCollider.radius;
-
-        public bool DrawSphere() => _drawSphere;
     }
 }

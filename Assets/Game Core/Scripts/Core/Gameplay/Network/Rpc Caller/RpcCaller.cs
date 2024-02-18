@@ -21,8 +21,8 @@ namespace GameCore.Gameplay.Network
         public event Action OnLeavingLocationEvent = delegate {  };
         public event Action OnLocationLeftEvent = delegate {  };
         public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate {  };
-        public event Action<ElevatorFloor> OnStartElevatorEvent = delegate {  };
-        public event Action<ElevatorFloor> OnOpenElevatorEvent = delegate {  };
+        public event Action<Floor> OnStartElevatorEvent = delegate {  };
+        public event Action<Floor> OnOpenElevatorEvent = delegate {  };
         public event Action<ulong, bool> OnTogglePlayerInsideMobileHQEvent = delegate {  }; 
 
         private static RpcCaller _instance;
@@ -56,9 +56,9 @@ namespace GameCore.Gameplay.Network
 
         public void GenerateDungeons(DungeonsSeedData data) => GenerateDungeonsServerRpc(data);
 
-        public void StartElevator(ElevatorFloor elevatorFloor) => StartElevatorServerRpc(elevatorFloor);
+        public void StartElevator(Floor floor) => StartElevatorServerRpc(floor);
         
-        public void OpenElevator(ElevatorFloor elevatorFloor) => OpenElevatorServerRpc(elevatorFloor);
+        public void OpenElevator(Floor floor) => OpenElevatorServerRpc(floor);
 
         public void TogglePlayerInsideMobileHQEvent(ulong clientID, bool isInside) =>
             TogglePlayerInsideMobileHQServerRpc(clientID, isInside);
@@ -125,12 +125,12 @@ namespace GameCore.Gameplay.Network
             GenerateDungeonsClientRpc(data);
 
         [ServerRpc(RequireOwnership = false)]
-        private void StartElevatorServerRpc(ElevatorFloor elevatorFloor) =>
-            StartElevatorClientRpc(elevatorFloor);
+        private void StartElevatorServerRpc(Floor floor) =>
+            StartElevatorClientRpc(floor);
 
         [ServerRpc(RequireOwnership = false)]
-        private void OpenElevatorServerRpc(ElevatorFloor elevatorFloor) =>
-            OpenElevatorClientRpc(elevatorFloor);
+        private void OpenElevatorServerRpc(Floor floor) =>
+            OpenElevatorClientRpc(floor);
 
         [ServerRpc(RequireOwnership = false)]
         private void TogglePlayerInsideMobileHQServerRpc(ulong clientID, bool isInside) =>
@@ -170,12 +170,12 @@ namespace GameCore.Gameplay.Network
             OnGenerateDungeonsEvent.Invoke(data);
         
         [ClientRpc]
-        private void StartElevatorClientRpc(ElevatorFloor elevatorFloor) =>
-            OnStartElevatorEvent.Invoke(elevatorFloor);
+        private void StartElevatorClientRpc(Floor floor) =>
+            OnStartElevatorEvent.Invoke(floor);
 
         [ClientRpc]
-        private void OpenElevatorClientRpc(ElevatorFloor elevatorFloor) =>
-            OnOpenElevatorEvent.Invoke(elevatorFloor);
+        private void OpenElevatorClientRpc(Floor floor) =>
+            OnOpenElevatorEvent.Invoke(floor);
 
         [ClientRpc]
         private void TogglePlayerInsideMobileHQClientRpc(ulong clientID, bool isInside) =>

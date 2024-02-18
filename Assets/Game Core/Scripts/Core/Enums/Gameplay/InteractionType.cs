@@ -10,6 +10,7 @@
         LoadLocationMobileLever = 5,
         LeaveLocationMobileLever = 6,
         ElevatorFloorButton = 7,
-        ElevatorCallButton = 8
+        ElevatorCallButton = 8,
+        FireExitDoor = 9
     }
 }

@@ -24,7 +24,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void Start()
         {
-            UpdateFloorNumber(ElevatorFloor.Surface);
+            UpdateFloorNumber(Floor.Surface);
             
             _elevatorManager = ElevatorManager.Get();
             
@@ -42,7 +42,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void UpdateDisplayInfo(ElevatorStaticData data)
         {
-            ElevatorFloor currentFloor = data.CurrentFloor;
+            Floor currentFloor = data.CurrentFloor;
             bool isTargetFloor = data.IsTargetFloor;
             
             _moveDirectionTransform.gameObject.SetActive(!isTargetFloor);
@@ -51,13 +51,13 @@ namespace GameCore.Gameplay.Levels.Elevator
             UpdateMoveDirection(data.IsMovingUp);
         }
 
-        private void UpdateFloorNumber(ElevatorFloor floor)
+        private void UpdateFloorNumber(Floor floor)
         {
             string text = floor switch
             {
-                ElevatorFloor.One => "1",
-                ElevatorFloor.Two => "2",
-                ElevatorFloor.Three => "3",
+                Floor.One => "1",
+                Floor.Two => "2",
+                Floor.Three => "3",
                 _ => "~"
             };
 
