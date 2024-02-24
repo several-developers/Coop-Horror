@@ -1,5 +1,4 @@
 ﻿using System;
-using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.Interaction;
@@ -55,7 +54,6 @@ namespace GameCore.Gameplay.Entities.Player
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public PlayerReferences References => _references;
-        public ClientNetworkTransform NetworkTransform => _networkTransform;
         public bool IsInsideMobileHQ => _isInsideMobileHQ;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -276,7 +274,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!IsOwner)
                 return;
-            
+
             if (Input.GetKeyDown(KeyCode.T))
                 GameUtilities.SwapCursorLockState();
 
@@ -434,12 +432,12 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (isInside == _isInsideMobileHQ)
                 return;
-            
+
             bool isMatches = clientID == OwnerClientId;
 
             if (!isMatches)
                 return;
-            
+
             _isInsideMobileHQ = isInside;
             _networkTransform.InLocalSpace = isInside;
         }

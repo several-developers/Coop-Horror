@@ -36,7 +36,7 @@ namespace GameCore
         {
             Type type = state.GetType();
 
-            if (_states.ContainsKey(type))
+            if (IsStateExists(type))
                 return;
 
             _states.Add(type, state);
@@ -46,7 +46,7 @@ namespace GameCore
         {
             Type type = state.GetType();
 
-            if (_states.ContainsKey(type))
+            if (IsStateExists(type))
                 RemoveState(type);
 
             _states.Add(type, state);
@@ -132,8 +132,8 @@ namespace GameCore
         {
             bool isStateExists = _states.ContainsKey(type);
 
-            if (!isStateExists)
-                LogStateDontExistsError(type);
+            //if (!isStateExists)
+                //LogStateDontExistsError(type);
             
             return isStateExists;
         }

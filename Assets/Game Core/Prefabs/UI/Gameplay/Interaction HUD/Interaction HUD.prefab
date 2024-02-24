@@ -66,6 +66,8 @@ MonoBehaviour:
       _text: Press 'E' to choose floor
     - _interactionType: 8
       _text: Press 'E' to call elevator
+    - _interactionType: 9
+      _text: Press 'E' to open
     _interactionDisabledTextSettings:
     - _interactionType: 1
       _text: Can't pick up item now

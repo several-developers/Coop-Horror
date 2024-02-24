@@ -957,6 +957,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 507051336428859141}
+  - {fileID: 1815116686499984693}
   m_Father: {fileID: 6706075126910601190}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2125,6 +2126,81 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!1001 &2037473777340639374
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 7327629532673652306}
+    m_Modifications:
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -7.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 43.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.0000029206271
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -180
+      objectReference: {fileID: 0}
+    - target: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1034580788641096336, guid: 8ac45535bb340cb43902675bff5e34d2,
+        type: 3}
+      propertyPath: m_Name
+      value: Surface Fire Exit
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8ac45535bb340cb43902675bff5e34d2, type: 3}
+--- !u!4 &1815116686499984693 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 393529064683003323, guid: 8ac45535bb340cb43902675bff5e34d2,
+    type: 3}
+  m_PrefabInstance: {fileID: 2037473777340639374}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2598222261843006625
 PrefabInstance:
   m_ObjectHideFlags: 0

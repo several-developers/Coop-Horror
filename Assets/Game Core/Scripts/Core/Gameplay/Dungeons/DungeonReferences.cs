@@ -15,7 +15,7 @@ namespace GameCore.Gameplay.Dungeons
 
         [SerializeField, ReadOnly]
         private ElevatorBase _elevator;
-
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void SetElevator(ElevatorBase elevator) =>

@@ -17,6 +17,11 @@ PrefabInstance:
       propertyPath: _isInsideDungeon
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2831427350812233717, guid: 056f0179d4b051a48a3abb5b68bbd6be,
+        type: 3}
+      propertyPath: _isSurfaceFireExit
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5017644627689798184, guid: 056f0179d4b051a48a3abb5b68bbd6be,
         type: 3}
       propertyPath: m_RootOrder
@@ -75,7 +80,7 @@ PrefabInstance:
     - target: {fileID: 5660963243943085315, guid: 056f0179d4b051a48a3abb5b68bbd6be,
         type: 3}
       propertyPath: m_Name
-      value: Dungeon Fire Exit
+      value: Surface Fire Exit
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 056f0179d4b051a48a3abb5b68bbd6be, type: 3}
@@ -95,7 +100,7 @@ PrefabInstance:
     - target: {fileID: 3393532191798489721, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4295251982968524163, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
@@ -105,12 +110,12 @@ PrefabInstance:
     - target: {fileID: 4994263700880665178, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5364665334236939216, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5618845482529939123, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
@@ -170,22 +175,22 @@ PrefabInstance:
     - target: {fileID: 6787809030278938005, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6871392599559710841, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7716585284717507986, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8336810538875332661, guid: d734e70adb9efaa4792749695054494e,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d734e70adb9efaa4792749695054494e, type: 3}

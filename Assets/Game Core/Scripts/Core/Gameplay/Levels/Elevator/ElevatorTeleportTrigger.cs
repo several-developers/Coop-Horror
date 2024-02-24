@@ -69,10 +69,10 @@ namespace GameCore.Gameplay.Levels.Elevator
             if (!IsLocalPlayerInTheElevator())
                 return;
             
-            TeleportLocalPlayer2();
+            TeleportLocalPlayer();
         }
 
-        private void TeleportLocalPlayer2()
+        private void TeleportLocalPlayer()
         {
             Floor currentFloor = _elevatorManager.GetCurrentFloor();
             bool isElevatorFound = _levelManager.TryGetElevator(currentFloor, out ElevatorBase targetElevator);

@@ -14,16 +14,17 @@ namespace GameCore.Gameplay.Network
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent = delegate {  };
-        public event Action<int> OnDestroyItemPreviewEvent = delegate {  };
-        public event Action<Vector3> OnTeleportPlayerWithOffsetEvent = delegate {  };
-        public event Action OnLocationLoadedEvent = delegate {  };
-        public event Action OnLeavingLocationEvent = delegate {  };
-        public event Action OnLocationLeftEvent = delegate {  };
-        public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate {  };
-        public event Action<Floor> OnStartElevatorEvent = delegate {  };
-        public event Action<Floor> OnOpenElevatorEvent = delegate {  };
-        public event Action<ulong, bool> OnTogglePlayerInsideMobileHQEvent = delegate {  }; 
+        public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent = delegate { };
+        public event Action<int> OnDestroyItemPreviewEvent = delegate { };
+        public event Action<Vector3> OnTeleportPlayerWithOffsetEvent = delegate { };
+        public event Action OnLocationLoadedEvent = delegate { };
+        public event Action OnLeavingLocationEvent = delegate { };
+        public event Action OnLocationLeftEvent = delegate { };
+        public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate { };
+        public event Action<Floor> OnStartElevatorEvent = delegate { };
+        public event Action<Floor> OnOpenElevatorEvent = delegate { };
+        public event Action<ulong, bool> OnTogglePlayerInsideMobileHQEvent = delegate { };
+        public event Action<ulong, Floor, bool> OnTeleportToFireExitEvent = delegate { };
 
         private static RpcCaller _instance;
 
@@ -31,7 +32,7 @@ namespace GameCore.Gameplay.Network
 
         private void Awake() =>
             _instance = this;
-        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void CreateItemPreview(int slotIndex, int itemID) =>
@@ -39,7 +40,7 @@ namespace GameCore.Gameplay.Network
 
         public void DestroyItemPreview(int slotIndex) =>
             DestroyItemPreviewServerRpc(slotIndex);
-        
+
         public void LoadLocation(SceneName sceneName)
         {
             int sceneNameIndex = (int)sceneName;
@@ -49,7 +50,7 @@ namespace GameCore.Gameplay.Network
         public void StartLeavingLocation() => StartLeavingLocationServerRpc();
 
         public void LeaveLocation() => LeaveLocationServerRpc();
-        
+
         public void SendLocationLoaded() => SendLocationLoadedServerRpc();
 
         public void SendLeftLocation() => SendLeftLocationServerRpc();
@@ -57,11 +58,14 @@ namespace GameCore.Gameplay.Network
         public void GenerateDungeons(DungeonsSeedData data) => GenerateDungeonsServerRpc(data);
 
         public void StartElevator(Floor floor) => StartElevatorServerRpc(floor);
-        
+
         public void OpenElevator(Floor floor) => OpenElevatorServerRpc(floor);
 
         public void TogglePlayerInsideMobileHQEvent(ulong clientID, bool isInside) =>
             TogglePlayerInsideMobileHQServerRpc(clientID, isInside);
+
+        public void TeleportToFireExit(Floor floor, bool isInStairsLocation) =>
+            TeleportToFireExitServerRpc(floor, isInStairsLocation);
 
         public static RpcCaller Get() => _instance;
 
@@ -83,7 +87,7 @@ namespace GameCore.Gameplay.Network
         {
             if (!IsOwner)
                 return;
-            
+
             NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
             IHorrorStateMachine horrorStateMachine = networkServiceLocator.GetHorrorStateMachine();
 
@@ -110,7 +114,7 @@ namespace GameCore.Gameplay.Network
 
         [ServerRpc(RequireOwnership = false)]
         private void StartLeavingLocationServerRpc() => StartLeavingLocationClientRpc();
-        
+
         [ServerRpc(RequireOwnership = false)]
         private void LeaveLocationServerRpc() => LeaveLocationClientRpc();
 
@@ -136,6 +140,14 @@ namespace GameCore.Gameplay.Network
         private void TogglePlayerInsideMobileHQServerRpc(ulong clientID, bool isInside) =>
             TogglePlayerInsideMobileHQClientRpc(clientID, isInside);
 
+        [ServerRpc(RequireOwnership = false)]
+        private void TeleportToFireExitServerRpc(Floor floor, bool isInStairsLocation,
+            ServerRpcParams serverRpcParams = default)
+        {
+            ulong clientID = serverRpcParams.Receive.SenderClientId;
+            TeleportToFireExitClientRpc(clientID, floor, isInStairsLocation);
+        }
+
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong clientID, int slotIndex, int itemID)
         {
@@ -153,10 +165,10 @@ namespace GameCore.Gameplay.Network
         [ClientRpc]
         private void StartLeavingLocationClientRpc() =>
             OnLeavingLocationEvent.Invoke();
-        
+
         [ClientRpc]
         private void LeaveLocationClientRpc() => LeaveLocationLogic();
-        
+
         [ClientRpc]
         private void SendLocationLoadedClientRpc() =>
             OnLocationLoadedEvent.Invoke();
@@ -168,7 +180,7 @@ namespace GameCore.Gameplay.Network
         [ClientRpc]
         private void GenerateDungeonsClientRpc(DungeonsSeedData data) =>
             OnGenerateDungeonsEvent.Invoke(data);
-        
+
         [ClientRpc]
         private void StartElevatorClientRpc(Floor floor) =>
             OnStartElevatorEvent.Invoke(floor);
@@ -180,5 +192,9 @@ namespace GameCore.Gameplay.Network
         [ClientRpc]
         private void TogglePlayerInsideMobileHQClientRpc(ulong clientID, bool isInside) =>
             OnTogglePlayerInsideMobileHQEvent.Invoke(clientID, isInside);
+
+        [ClientRpc]
+        private void TeleportToFireExitClientRpc(ulong clientID, Floor floor, bool isInStairsLocation) =>
+            OnTeleportToFireExitEvent.Invoke(clientID, floor, isInStairsLocation);
     }
 }

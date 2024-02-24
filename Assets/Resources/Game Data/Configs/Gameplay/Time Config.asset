@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Time Config
   m_EditorClassIdentifier: 
   _metaName: Time Config
-  _cycleDurationInMinutes: 2
+  _cycleDurationInMinutes: 0.5
   _cycleLengthModifier: 1
   _second: 0
   _minute: 0
-  _hour: 0
+  _hour: 6
   _simulate: 0
   _stopAtNight: 0
   _sunIntensityCurve:

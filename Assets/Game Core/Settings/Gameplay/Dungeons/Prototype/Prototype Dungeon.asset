@@ -15,17 +15,29 @@ MonoBehaviour:
   globalPropGroupID_obsolete: 
   globalPropRanges_obsolete: []
   Length:
-    Min: 10
-    Max: 15
+    Min: 12
+    Max: 16
   BranchMode: 0
   BranchCount:
     Min: 1
     Max: 5
   GlobalProps: []
   KeyManager: {fileID: 0}
-  DoorwayConnectionChance: 0.25
+  DoorwayConnectionChance: 0.3
   RestrictConnectionToSameSection: 0
-  TileInjectionRules: []
+  TileInjectionRules:
+  - TileSet: {fileID: 11400000, guid: 2fba7be447ae1d847a07bf72be0725b7, type: 2}
+    NormalizedPathDepth:
+      Min: 0
+      Max: 0.4
+    NormalizedBranchDepth:
+      Min: 0
+      Max: 0.4
+    CanAppearOnMainPath: 1
+    CanAppearOnBranchPath: 1
+    IsRequired: 1
+    IsLocked: 0
+    LockID: 0
   TileTagConnectionMode: 0
   TileConnectionTags: []
   BranchTagPruneMode: 1

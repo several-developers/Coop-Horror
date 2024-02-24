@@ -17,6 +17,8 @@ namespace GameCore.Gameplay.Levels
             _dungeonsObserver = dungeonsObserver;
             _dungeonReferences = new Dictionary<Floor, DungeonReferences>(capacity: 3);
             _elevatorsReferences = new Dictionary<Floor, ElevatorBase>(capacity: 4);
+            _stairsFireExits = new Dictionary<Floor, FireExit>(capacity: 4);
+            _otherFireExits = new Dictionary<Floor, FireExit>(capacity: 4);
 
             _dungeonsObserver.OnDungeonGenerationCompletedEvent += OnDungeonGenerationCompleted;
         }
@@ -26,6 +28,8 @@ namespace GameCore.Gameplay.Levels
         private readonly IDungeonsObserver _dungeonsObserver;
         private readonly Dictionary<Floor, DungeonReferences> _dungeonReferences;
         private readonly Dictionary<Floor, ElevatorBase> _elevatorsReferences;
+        private readonly Dictionary<Floor, FireExit> _stairsFireExits;
+        private readonly Dictionary<Floor, FireExit> _otherFireExits;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -34,6 +38,12 @@ namespace GameCore.Gameplay.Levels
         
         public void AddSurfaceElevator(SurfaceElevator surfaceElevator) =>
             _elevatorsReferences.TryAdd(Floor.Surface, surfaceElevator);
+
+        public void AddStairsFireExit(Floor floor, FireExit fireExit) =>
+            _stairsFireExits.Add(floor, fireExit);
+
+        public void AddOtherFireExit(Floor floor, FireExit fireExit) =>
+            _otherFireExits.Add(floor, fireExit);
 
         // TEMP
         public void Clear()
@@ -51,6 +61,28 @@ namespace GameCore.Gameplay.Levels
                 return true;
 
             string errorLog = Log.HandleLog($"Elevator <gb>'{floor}'</gb> <rb>not found</rb>!");
+            Debug.LogError(errorLog);
+            
+            return false;
+        }
+
+        public bool TryGetStairsFireExit(Floor floor, out FireExit fireExit)
+        {
+            if (_stairsFireExits.TryGetValue(floor, out fireExit))
+                return true;
+
+            string errorLog = Log.HandleLog($"Stairs Fire Exit <gb>'{floor}'</gb> <rb>not found</rb>!");
+            Debug.LogError(errorLog);
+            
+            return false;
+        }
+
+        public bool TryGetOtherFireExit(Floor floor, out FireExit fireExit)
+        {
+            if (_otherFireExits.TryGetValue(floor, out fireExit))
+                return true;
+
+            string errorLog = Log.HandleLog($"Other Fire Exit <gb>'{floor}'</gb> <rb>not found</rb>!");
             Debug.LogError(errorLog);
             
             return false;
