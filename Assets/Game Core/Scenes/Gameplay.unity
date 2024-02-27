@@ -30134,6 +30134,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Horror Game
       objectReference: {fileID: 0}
+    - target: {fileID: 6297492169560020483, guid: 58e8b65455e6bf7438bfb232b6606e30,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 58e8b65455e6bf7438bfb232b6606e30, type: 3}
 --- !u!1 &6421605973353521618

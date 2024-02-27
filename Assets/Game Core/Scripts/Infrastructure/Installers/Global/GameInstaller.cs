@@ -1,7 +1,9 @@
 ﻿using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Infrastructure.StateMachine;
 using GameCore.Observers.Global.StateMachine;
 using GameCore.Utilities;
+using UnityEngine;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Global
@@ -13,9 +15,12 @@ namespace GameCore.Infrastructure.Installers.Global
         public override void InstallBindings()
         {
             BindCoroutineRunner();
+            BindUpdateRunner();
             BindGameStateMachine();
             BindMenuFactory();
             BindGameStateMachineObserver();
+            
+            Test();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -25,6 +30,18 @@ namespace GameCore.Infrastructure.Installers.Global
             Container
                 .Bind<ICoroutineRunner>()
                 .FromInstance(this)
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindUpdateRunner()
+        {
+            GameObject updateRunnerObject = new();
+            var updateRunner = updateRunnerObject.AddComponent<UpdateRunner>();
+
+            Container
+                .Bind<IUpdateRunner>()
+                .FromInstance(updateRunner)
                 .AsSingle()
                 .NonLazy();
         }
@@ -51,6 +68,21 @@ namespace GameCore.Infrastructure.Installers.Global
                 .BindInterfacesTo<GameStateMachineObserver>()
                 .AsSingle()
                 .NonLazy();
+        }
+
+        private void Test()
+        {
+            Container
+                .Bind<LocalLobby>()
+                .AsSingle();
+            
+            Container
+                .Bind<LocalLobbyUser>()
+                .AsSingle();
+            
+            Container
+                .Bind<LobbyServiceFacade>()
+                .AsSingle();
         }
     }
 }

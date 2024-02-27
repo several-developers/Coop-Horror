@@ -136,7 +136,7 @@ namespace GameCore.Gameplay.Network
             _networkManager = networkManager;
             _timeCycleDecorator = timeCycleDecorator;
 
-            _networkManager.ConnectionApprovalCallback += OnApprovalCheck;
+            //_networkManager.ConnectionApprovalCallback += OnApprovalCheck;
             _networkManager.OnClientConnectedCallback += OnClientConnected;
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
         }
