@@ -45,8 +45,8 @@ namespace GameCore.Infrastructure.StateMachine
         private void ToggleMultiplayer(bool isEnabled) =>
             GameStaticState.ToggleMultiplayer(isEnabled);
 
-        private void EnterOnlineMenuState() =>
-            _gameStateMachine.ChangeState<OnlineMenuState>();
+        private void EnterSignInState() =>
+            _gameStateMachine.ChangeState<SignInState>();
 
         private void EnterOfflineMenuState() =>
             _gameStateMachine.ChangeState<OfflineMenuState>();
@@ -56,7 +56,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void OnOnlineClicked()
         {
             ToggleMultiplayer(isEnabled: true);
-            EnterOnlineMenuState();
+            EnterSignInState();
         }
 
         private void OnOfflineClicked()

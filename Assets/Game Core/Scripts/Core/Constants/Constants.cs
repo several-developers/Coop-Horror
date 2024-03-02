@@ -21,6 +21,9 @@
         public const string UISoundBus = "UI";
 
         public const string PlayerTag = "Player";
+        
+        public const string DefaultIP = "127.0.0.1";
+        public const int DefaultPort = 9998;
 
         public const int SaveCellsAmount = 3;
         public const int MaxPlayers = 4;

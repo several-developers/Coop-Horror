@@ -3,12 +3,12 @@ using Unity.Netcode.Transports.UTP;
 
 namespace GameCore.Gameplay.Network.ConnectionManagement
 {
-    internal class ConnectionMethodIP : ConnectionMethodBase
+    public class ConnectionMethodIP : ConnectionMethodBase
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ConnectionMethodIP(string ip, ushort port, ConnectionManager connectionManager, string playerName) :
-            base(connectionManager, playerName)
+        public ConnectionMethodIP(string ip, ushort port, ConnectionManager connectionManager,
+            ProfileManager profileManager, string playerName) : base(connectionManager, profileManager, playerName)
         {
             _ipAddress = ip;
             _port = port;

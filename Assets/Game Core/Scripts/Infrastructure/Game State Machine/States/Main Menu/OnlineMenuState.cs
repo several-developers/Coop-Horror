@@ -10,7 +10,6 @@ namespace GameCore.Infrastructure.StateMachine
         public OnlineMenuState(IGameStateMachine gameStateMachine)
         {
             _gameStateMachine = gameStateMachine;
-
             _gameStateMachine.AddState(this);
         }
 
@@ -27,15 +26,18 @@ namespace GameCore.Infrastructure.StateMachine
             CreateOnlineMenu();
 
             _onlineMenuView.OnBackButtonClickedEvent += OnBackButtonClicked;
-            _onlineMenuView.OnHostClickedEvent += OnHostClicked;
-            _onlineMenuView.OnJoinClickedEvent += OnJoinClicked;
+            _onlineMenuView.OnOpenRelayLobbyMenuClickedEvent += OnOpenRelayLobbyMenuClicked;
+            _onlineMenuView.OnOpenIPLobbyMenuClickedEvent += OnOpenIPLobbyMenuClicked;
         }
 
         public void Exit()
         {
+            if (_onlineMenuView == null)
+                return;
+            
             _onlineMenuView.OnBackButtonClickedEvent -= OnBackButtonClicked;
-            _onlineMenuView.OnHostClickedEvent -= OnHostClicked;
-            _onlineMenuView.OnJoinClickedEvent -= OnJoinClicked;
+            _onlineMenuView.OnOpenRelayLobbyMenuClickedEvent -= OnOpenRelayLobbyMenuClicked;
+            _onlineMenuView.OnOpenIPLobbyMenuClickedEvent -= OnOpenIPLobbyMenuClicked;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -51,13 +53,19 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void EnterJoinGameState() =>
             _gameStateMachine.ChangeState<JoinGameState>();
-
+        
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnBackButtonClicked() => EnterPrepareMainMenuState();
 
-        private void OnHostClicked() => EnterCreateLobbyState();
+        private void OnOpenRelayLobbyMenuClicked()
+        {
+            //EnterCreateLobbyState();
+        }
 
-        private void OnJoinClicked() => EnterJoinGameState();
+        private void OnOpenIPLobbyMenuClicked()
+        {
+            //EnterJoinGameState();
+        }
     }
 }

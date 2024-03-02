@@ -21,7 +21,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         // Used in ApprovalCheck. This is intended as a bit of light protection against DOS attacks
         // that rely on sending silly big buffers of garbage.
-        private const int k_MaxConnectPayload = 1024;
+        private const int MaxConnectPayload = 1024;
 
         private readonly LobbyServiceFacade _lobbyServiceFacade;
         
@@ -107,7 +107,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             byte[] connectionData = request.Payload;
             ulong clientId = request.ClientNetworkId;
             
-            if (connectionData.Length > k_MaxConnectPayload)
+            if (connectionData.Length > MaxConnectPayload)
             {
                 // If connectionData too high, deny immediately to avoid wasting time on the server. This is intended as
                 // a bit of light protection against DOS attacks that rely on sending silly big buffers of garbage.
@@ -119,7 +119,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             
             // https://docs.unity3d.com/2020.2/Documentation/Manual/JSONSerialization.html
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
-            var gameReturnStatus = GetConnectStatus(connectionPayload);
+            ConnectStatus gameReturnStatus = GetConnectStatus(connectionPayload);
 
             if (gameReturnStatus == ConnectStatus.Success)
             {
@@ -128,7 +128,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
                 // connection approval will create a player object for you
                 response.Approved = true;
-                response.CreatePlayerObject = true;
+                //response.CreatePlayerObject = true;
                 response.Position = Vector3.zero;
                 response.Rotation = Quaternion.identity;
                 return;

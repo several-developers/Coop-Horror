@@ -340,8 +340,8 @@ MonoBehaviour:
   _fadeTime: 0.25
   _targetCG: {fileID: 4546651808884384122}
   _backButton: {fileID: 5058703299667513167}
-  _hostButton: {fileID: 4031597701433019575}
-  _joinButton: {fileID: 4031597701015349275}
+  _openRelayLobbyMenuButton: {fileID: 4031597701433019575}
+  _openIPLobbyMenuButton: {fileID: 4031597701015349275}
 --- !u!223 &4546651808884384116
 Canvas:
   m_ObjectHideFlags: 0
@@ -634,7 +634,7 @@ PrefabInstance:
     - target: {fileID: 642870175908998501, guid: 6afcd6fdd6e7aa544bdc2cae3de0b22e,
         type: 3}
       propertyPath: m_Name
-      value: Host (Button)
+      value: Open Relay Lobby Menu (Button)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6afcd6fdd6e7aa544bdc2cae3de0b22e, type: 3}
@@ -756,7 +756,7 @@ PrefabInstance:
     - target: {fileID: 642870175908998501, guid: 9818938090489ed48aa4d5742c2ed98c,
         type: 3}
       propertyPath: m_Name
-      value: Join (Button)
+      value: Open IP Lobby Menu (Button)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9818938090489ed48aa4d5742c2ed98c, type: 3}

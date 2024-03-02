@@ -31,7 +31,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         {
         }
 
-        public virtual void StartClientIP(string playerName, string ipaddress, int port)
+        public virtual void StartClientIP(string playerName, string ipAddress, int port)
         {
         }
 

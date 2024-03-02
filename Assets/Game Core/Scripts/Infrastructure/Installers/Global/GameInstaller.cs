@@ -1,4 +1,7 @@
 ﻿using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Network.ConnectionManagement;
+using GameCore.Gameplay.Network.UnityServices.Auth;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Infrastructure.StateMachine;
 using GameCore.Observers.Global.StateMachine;
@@ -19,7 +22,7 @@ namespace GameCore.Infrastructure.Installers.Global
             BindGameStateMachine();
             BindMenuFactory();
             BindGameStateMachineObserver();
-            
+
             Test();
         }
 
@@ -75,13 +78,29 @@ namespace GameCore.Infrastructure.Installers.Global
             Container
                 .Bind<LocalLobby>()
                 .AsSingle();
-            
+
             Container
                 .Bind<LocalLobbyUser>()
                 .AsSingle();
-            
+
             Container
-                .Bind<LobbyServiceFacade>()
+                .BindInterfacesAndSelfTo<LobbyServiceFacade>()
+                .AsSingle();
+
+            Container
+                .Bind<AuthenticationServiceFacade>()
+                .AsSingle();
+
+            Container
+                .Bind<ProfileManager>()
+                .AsSingle();
+
+            var connectionManager =
+                Container.InstantiateComponentOnNewGameObject<ConnectionManager>("Connection Manager");
+
+            Container
+                .Bind<ConnectionManager>()
+                .FromInstance(connectionManager)
                 .AsSingle();
         }
     }

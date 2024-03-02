@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Network.UnityServices.Other;
 using GameCore.Utilities;
 using Unity.Services.Authentication;
@@ -53,7 +54,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         private RateLimitCooldown _rateLimitHost;
 
         private float _heartbeatTime;
-        private bool m_IsTracking;
+        private bool _isTracking;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -76,10 +77,10 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
 
         public void BeginTracking()
         {
-            if (m_IsTracking)
+            if (_isTracking)
                 return;
 
-            m_IsTracking = true;
+            _isTracking = true;
 
             // 2s update cadence is arbitrary and is here to demonstrate the fact that this update can be rather
             // infrequent the actual rate limits are tracked via the RateLimitCooldown objects defined above.
@@ -111,9 +112,9 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
             }
         }
 
-        public Task EndTracking()
+        public UniTask EndTracking()
         {
-            var task = Task.CompletedTask;
+            var task = UniTask.CompletedTask;
 
             if (CurrentUnityLobby != null)
             {
@@ -133,11 +134,11 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
                 _localLobby?.Reset(_localUser);
             }
 
-            if (!m_IsTracking)
+            if (!_isTracking)
                 return task;
 
             _updateRunner.Unsubscribe(UpdateLobby);
-            m_IsTracking = false;
+            _isTracking = false;
             _heartbeatTime = 0;
             _joinedLobbyContentHeartbeat.EndTracking();
 
@@ -147,7 +148,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         /// <summary>
         /// Attempt to create a new lobby and then join it.
         /// </summary>
-        public async Task<(bool Success, Lobby Lobby)> TryCreateLobbyAsync(string lobbyName, int maxPlayers,
+        public async UniTask<(bool Success, Lobby Lobby)> TryCreateLobbyAsync(string lobbyName, int maxPlayers,
             bool isPrivate)
         {
             if (!_rateLimitHost.CanCall)
@@ -177,7 +178,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         /// <summary>
         /// Attempt to join an existing lobby. Will try to join via code, if code is null - will try to join via ID.
         /// </summary>
-        public async Task<(bool Success, Lobby Lobby)> TryJoinLobbyAsync(string lobbyId, string lobbyCode)
+        public async UniTask<(bool Success, Lobby Lobby)> TryJoinLobbyAsync(string lobbyId, string lobbyCode)
         {
             if (!_rateLimitJoin.CanCall ||
                 (lobbyId == null && lobbyCode == null))
@@ -217,7 +218,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         /// <summary>
         /// Attempt to join the first lobby among the available lobbies that match the filtered onlineMode.
         /// </summary>
-        public async Task<(bool Success, Lobby Lobby)> TryQuickJoinLobbyAsync()
+        public async UniTask<(bool Success, Lobby Lobby)> TryQuickJoinLobbyAsync()
         {
             if (!_rateLimitQuickJoin.CanCall)
             {
@@ -246,7 +247,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         /// <summary>
         /// Used for getting the list of all active lobbies, without needing full info for each.
         /// </summary>
-        public async Task RetrieveAndPublishLobbyListAsync()
+        public async UniTask RetrieveAndPublishLobbyListAsync()
         {
             if (!_rateLimitQuery.CanCall)
             {
@@ -288,7 +289,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         /// <summary>
         /// Attempt to leave a lobby
         /// </summary>
-        public async Task LeaveLobbyAsync(string lobbyId)
+        public async UniTask LeaveLobbyAsync(string lobbyId)
         {
             string uasId = AuthenticationService.Instance.PlayerId;
             try
@@ -324,7 +325,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
             }
         }
 
-        public async Task DeleteLobbyAsync(string lobbyId)
+        public async UniTask DeleteLobbyAsync(string lobbyId)
         {
             if (_localUser.IsHost)
             {
@@ -346,7 +347,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         /// <summary>
         /// Attempt to push a set of key-value pairs associated with the local player which will overwrite any existing data for these keys.
         /// </summary>
-        public async Task UpdatePlayerDataAsync(Dictionary<string, PlayerDataObject> data)
+        public async UniTask UpdatePlayerDataAsync(Dictionary<string, PlayerDataObject> data)
         {
             if (!_rateLimitQuery.CanCall)
             {
@@ -383,7 +384,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         /// <summary>
         /// Lobby can be provided info about Relay (or any other remote allocation) so it can add automatic disconnect handling.
         /// </summary>
-        public async Task UpdatePlayerRelayInfoAsync(string allocationId, string connectionInfo)
+        public async UniTask UpdatePlayerRelayInfoAsync(string allocationId, string connectionInfo)
         {
             if (!_rateLimitQuery.CanCall)
             {
@@ -413,7 +414,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         /// <summary>
         /// Attempt to update a set of key-value pairs associated with a given lobby.
         /// </summary>
-        public async Task UpdateLobbyDataAsync(Dictionary<string, DataObject> data)
+        public async UniTask UpdateLobbyDataAsync(Dictionary<string, DataObject> data)
         {
             if (!_rateLimitQuery.CanCall)
                 return;

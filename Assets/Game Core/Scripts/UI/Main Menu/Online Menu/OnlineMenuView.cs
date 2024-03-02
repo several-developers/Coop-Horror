@@ -15,24 +15,24 @@ namespace GameCore.UI.MainMenu.OnlineMenu
         private Button _backButton;
         
         [SerializeField, Required]
-        private Button _hostButton;
+        private Button _openRelayLobbyMenuButton;
         
         [SerializeField, Required]
-        private Button _joinButton;
+        private Button _openIPLobbyMenuButton;
         
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnBackButtonClickedEvent;
-        public event Action OnHostClickedEvent;
-        public event Action OnJoinClickedEvent;
+        public event Action OnOpenRelayLobbyMenuClickedEvent;
+        public event Action OnOpenIPLobbyMenuClickedEvent;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
             _backButton.onClick.AddListener(OnBackButtonClicked);
-            _hostButton.onClick.AddListener(OnHostClicked);
-            _joinButton.onClick.AddListener(OnJoinClicked);
+            _openRelayLobbyMenuButton.onClick.AddListener(OnOpenRelayLobbyMenuClicked);
+            _openIPLobbyMenuButton.onClick.AddListener(OnOpenIPLobbyMenuClicked);
             
             DestroyOnHide();
         }
@@ -47,16 +47,16 @@ namespace GameCore.UI.MainMenu.OnlineMenu
             OnBackButtonClickedEvent?.Invoke();
         }
         
-        private void OnHostClicked()
+        private void OnOpenRelayLobbyMenuClicked()
         {
             Hide();
-            OnHostClickedEvent?.Invoke();
+            OnOpenRelayLobbyMenuClickedEvent?.Invoke();
         }
 
-        private void OnJoinClicked()
+        private void OnOpenIPLobbyMenuClicked()
         {
             Hide();
-            OnJoinClickedEvent?.Invoke();
+            OnOpenIPLobbyMenuClickedEvent?.Invoke();
         }
     }
 }
