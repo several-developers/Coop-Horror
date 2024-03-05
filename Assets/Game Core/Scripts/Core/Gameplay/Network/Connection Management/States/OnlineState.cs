@@ -1,10 +1,14 @@
+using GameCore.Enums.Global;
+using GameCore.Gameplay.PubSub;
+
 namespace GameCore.Gameplay.Network.ConnectionManagement
 {
     internal abstract class OnlineState : ConnectionState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        protected OnlineState(ConnectionManager connectionManager) : base(connectionManager)
+        protected OnlineState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher)
+            : base(connectionManager, connectStatusPublisher)
         {
         }
 
@@ -17,7 +21,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         public override void OnUserRequestedShutdown()
         {
             // This behaviour will be the same for every online state
-            //m_ConnectStatusPublisher.Publish(ConnectStatus.UserRequestedDisconnect);
+            ConnectStatusPublisher.Publish(message: ConnectStatus.UserRequestedDisconnect);
             ConnectionManager.ChangeState(ConnectionManager.OfflineState);
         }
 

@@ -1,8 +1,10 @@
-﻿using GameCore.Gameplay.Factories;
+﻿using GameCore.Enums.Global;
+using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.UnityServices.Auth;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
+using GameCore.Gameplay.PubSub;
 using GameCore.Infrastructure.StateMachine;
 using GameCore.Observers.Global.StateMachine;
 using GameCore.Utilities;
@@ -24,6 +26,7 @@ namespace GameCore.Infrastructure.Installers.Global
             BindGameStateMachineObserver();
 
             Test();
+            BindMessageChannels();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -95,12 +98,28 @@ namespace GameCore.Infrastructure.Installers.Global
                 .Bind<ProfileManager>()
                 .AsSingle();
 
-            var connectionManager =
-                Container.InstantiateComponentOnNewGameObject<ConnectionManager>("Connection Manager");
-
+            // var connectionManager =
+            //     Container.InstantiateComponentOnNewGameObject<ConnectionManager>("Connection Manager");
+            //
+            // Container
+            //     .Bind<ConnectionManager>()
+            //     .AsSingle();
+            
             Container
                 .Bind<ConnectionManager>()
-                .FromInstance(connectionManager)
+                .FromNewComponentOnNewGameObject()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindMessageChannels()
+        {
+            Container
+                .BindInterfacesTo<MessageChannel<ConnectStatus>>()
+                .AsSingle();
+            
+            Container
+                .BindInterfacesTo<MessageChannel<ReconnectMessage>>()
                 .AsSingle();
         }
     }

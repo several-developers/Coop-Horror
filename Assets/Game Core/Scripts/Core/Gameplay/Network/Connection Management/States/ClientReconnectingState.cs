@@ -2,6 +2,7 @@ using System.Collections;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
+using GameCore.Gameplay.PubSub;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Network.ConnectionManagement
@@ -17,37 +18,49 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ClientReconnectingState(ConnectionManager connectionManager, LobbyServiceFacade lobbyServiceFacade,
-            LocalLobby localLobby) : base(connectionManager, lobbyServiceFacade, localLobby)
+        public ClientReconnectingState(ConnectionManager connectionManager,
+            IPublisher<ConnectStatus> connectStatusPublisher, LobbyServiceFacade lobbyServiceFacade,
+            LocalLobby localLobby, IPublisher<ReconnectMessage> reconnectMessagePublisher)
+            : base(connectionManager, connectStatusPublisher, lobbyServiceFacade, localLobby)
         {
+            _reconnectMessagePublisher = reconnectMessagePublisher;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        Coroutine m_ReconnectCoroutine;
-        string m_LobbyCode = "";
-        int m_NbAttempts;
+        private const float TimeBetweenAttempts = 5;
 
-        const float k_TimeBetweenAttempts = 5;
+        private readonly IPublisher<ReconnectMessage> _reconnectMessagePublisher;
+
+        private Coroutine _reconnectCoroutine;
+        private string _lobbyCode = "";
+        private int _attempts;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void Enter()
         {
-            m_NbAttempts = 0;
-            //m_LobbyCode = m_LobbyServiceFacade.CurrentUnityLobby != null ? m_LobbyServiceFacade.CurrentUnityLobby.LobbyCode : "";
-            m_ReconnectCoroutine = ConnectionManager.StartCoroutine(ReconnectCoroutine());
+            _attempts = 0;
+
+            _lobbyCode = LobbyServiceFacade.CurrentUnityLobby != null
+                ? LobbyServiceFacade.CurrentUnityLobby.LobbyCode
+                : "";
+
+            _reconnectCoroutine = ConnectionManager.StartCoroutine(ReconnectCoroutine());
         }
 
         public override void Exit()
         {
-            if (m_ReconnectCoroutine != null)
+            if (_reconnectCoroutine != null)
             {
-                ConnectionManager.StopCoroutine(m_ReconnectCoroutine);
-                m_ReconnectCoroutine = null;
+                ConnectionManager.StopCoroutine(_reconnectCoroutine);
+                _reconnectCoroutine = null;
             }
 
-            //m_ReconnectMessagePublisher.Publish(new ReconnectMessage(m_ConnectionManager.NbReconnectAttempts, m_ConnectionManager.NbReconnectAttempts));
+            ReconnectMessage message = new(currentAttempt: ConnectionManager.ReconnectAttempts,
+                maxAttempt: ConnectionManager.ReconnectAttempts);
+
+            _reconnectMessagePublisher.Publish(message);
         }
 
         public override void OnClientConnected(ulong _) =>
@@ -56,18 +69,18 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         public override void OnClientDisconnect(ulong _)
         {
             string disconnectReason = ConnectionManager.NetworkManager.DisconnectReason;
-            
-            if (m_NbAttempts < ConnectionManager.ReconnectAttempts)
+
+            if (_attempts < ConnectionManager.ReconnectAttempts)
             {
                 if (string.IsNullOrEmpty(disconnectReason))
                 {
-                    m_ReconnectCoroutine = ConnectionManager.StartCoroutine(ReconnectCoroutine());
+                    _reconnectCoroutine = ConnectionManager.StartCoroutine(ReconnectCoroutine());
                 }
                 else
                 {
                     var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
-                    //m_ConnectStatusPublisher.Publish(connectStatus);
-                    
+                    ConnectStatusPublisher.Publish(connectStatus);
+
                     switch (connectStatus)
                     {
                         case ConnectStatus.UserRequestedDisconnect:
@@ -76,9 +89,9 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                         case ConnectStatus.IncompatibleBuildType:
                             ConnectionManager.ChangeState(ConnectionManager.OfflineState);
                             break;
-                        
+
                         default:
-                            m_ReconnectCoroutine = ConnectionManager.StartCoroutine(ReconnectCoroutine());
+                            _reconnectCoroutine = ConnectionManager.StartCoroutine(ReconnectCoroutine());
                             break;
                     }
                 }
@@ -87,12 +100,12 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             {
                 if (string.IsNullOrEmpty(disconnectReason))
                 {
-                    //m_ConnectStatusPublisher.Publish(ConnectStatus.GenericDisconnect);
+                    ConnectStatusPublisher.Publish(message: ConnectStatus.GenericDisconnect);
                 }
                 else
                 {
                     var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
-                    //m_ConnectStatusPublisher.Publish(connectStatus);
+                    ConnectStatusPublisher.Publish(connectStatus);
                 }
 
                 ConnectionManager.ChangeState(ConnectionManager.OfflineState);
@@ -100,15 +113,15 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
         private IEnumerator ReconnectCoroutine()
         {
             // If not on first attempt, wait some time before trying again, so that if the issue causing the disconnect
             // is temporary, it has time to fix itself before we try again. Here we are using a simple fixed cooldown
             // but we could want to use exponential backoff instead, to wait a longer time between each failed attempt.
             // See https://en.wikipedia.org/wiki/Exponential_backoff
-            if (m_NbAttempts > 0)
-                yield return new WaitForSeconds(k_TimeBetweenAttempts);
+            if (_attempts > 0)
+                yield return new WaitForSeconds(TimeBetweenAttempts);
 
             Debug.Log("Lost connection to host, trying to reconnect...");
 
@@ -116,13 +129,17 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             // Wait until NetworkManager completes shutting down.
             yield return new WaitWhile(() => ConnectionManager.NetworkManager.ShutdownInProgress);
+
+            Debug.Log($"Reconnecting attempt {_attempts + 1}/{ConnectionManager.ReconnectAttempts}...");
             
-            Debug.Log($"Reconnecting attempt {m_NbAttempts + 1}/{ConnectionManager.ReconnectAttempts}...");
-            //m_ReconnectMessagePublisher.Publish(new ReconnectMessage(m_NbAttempts, m_ConnectionManager.NbReconnectAttempts));
+            ReconnectMessage message = new(currentAttempt: _attempts,
+                maxAttempt: ConnectionManager.ReconnectAttempts);
             
-            m_NbAttempts++;
-            
-            if (!string.IsNullOrEmpty(m_LobbyCode)) // Attempting to reconnect to lobby.
+            _reconnectMessagePublisher.Publish(message);
+
+            _attempts++;
+
+            if (!string.IsNullOrEmpty(_lobbyCode)) // Attempting to reconnect to lobby.
             {
                 // When using Lobby with Relay, if a user is disconnected from the Relay server, the server will notify
                 // the Lobby service and mark the user as disconnected, but will not remove them from the lobby. They
@@ -130,7 +147,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                 // the dashboard), after which they will be removed from the lobby completely.
                 // See https://docs.unity.com/lobby/reconnect-to-lobby.html
                 var reconnectingToLobby = LobbyServiceFacade.ReconnectToLobbyAsync(LocalLobby?.LobbyID);
-                
+
                 yield return new WaitUntil(() => reconnectingToLobby.IsCompleted);
 
                 // If succeeded, attempt to connect to Relay
@@ -139,7 +156,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                     // If this fails, the OnClientDisconnect callback will be invoked by Netcode
                     UniTask connectingToRelay = ConnectClientAsync();
                     UniTask.Awaiter awaiter = connectingToRelay.GetAwaiter();
-                    
+
                     yield return new WaitUntil(() => awaiter.IsCompleted);
                 }
                 else

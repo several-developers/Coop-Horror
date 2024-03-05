@@ -1,7 +1,9 @@
 using System;
+using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.Session_Manager;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
+using GameCore.Gameplay.PubSub;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -15,7 +17,8 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public StartingHostState(ConnectionManager connectionManager, LocalLobby localLobby) : base(connectionManager)
+        public StartingHostState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher,
+            LocalLobby localLobby) : base(connectionManager, connectStatusPublisher)
         {
             _localLobby = localLobby;
         }
@@ -42,7 +45,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         public override void OnServerStarted()
         {
-            //m_ConnectStatusPublisher.Publish(ConnectStatus.Success);
+            ConnectStatusPublisher.Publish(message: ConnectStatus.Success);
             ConnectionManager.ChangeState(ConnectionManager.HostingState);
         }
 
@@ -101,7 +104,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         private void StartHostFailed()
         {
-            //m_ConnectStatusPublisher.Publish(ConnectStatus.StartHostFailed);
+            ConnectStatusPublisher.Publish(message: ConnectStatus.StartHostFailed);
             ConnectionManager.ChangeState(ConnectionManager.OfflineState);
         }
     }

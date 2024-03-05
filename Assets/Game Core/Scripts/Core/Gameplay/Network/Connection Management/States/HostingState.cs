@@ -2,6 +2,7 @@ using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.Session_Manager;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
+using GameCore.Gameplay.PubSub;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -11,8 +12,8 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public HostingState(ConnectionManager connectionManager, LobbyServiceFacade lobbyServiceFacade)
-            : base(connectionManager)
+        public HostingState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher,
+            LobbyServiceFacade lobbyServiceFacade) : base(connectionManager, connectStatusPublisher)
         {
             _lobbyServiceFacade = lobbyServiceFacade;
         }
@@ -147,14 +148,10 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private ConnectStatus GetConnectStatus(ConnectionPayload connectionPayload)
         {
             if (ConnectionManager.NetworkManager.ConnectedClientsIds.Count >= ConnectionManager.MaxConnectedPlayers)
-            {
                 return ConnectStatus.ServerFull;
-            }
 
             if (connectionPayload.isDebug != Debug.isDebugBuild)
-            {
                 return ConnectStatus.IncompatibleBuildType;
-            }
 
             return SessionManager<SessionPlayerData>.Instance.IsDuplicateConnection(connectionPayload.playerId) ?
                 ConnectStatus.LoggedInAgain : ConnectStatus.Success;

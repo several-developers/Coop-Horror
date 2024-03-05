@@ -1,3 +1,5 @@
+using GameCore.Enums.Global;
+using GameCore.Gameplay.PubSub;
 using Unity.Netcode;
 
 namespace GameCore.Gameplay.Network.ConnectionManagement
@@ -6,12 +8,17 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        protected ConnectionState(ConnectionManager connectionManager) =>
+        protected ConnectionState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher)
+        {
             ConnectionManager = connectionManager;
+            ConnectStatusPublisher = connectStatusPublisher;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         protected readonly ConnectionManager ConnectionManager;
+
+        protected readonly IPublisher<ConnectStatus> ConnectStatusPublisher;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -35,11 +42,17 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         {
         }
 
-        public virtual void StartClientLobby(string playerName) { }
-        
-        public virtual void StartHostIP(string playerName, string ipaddress, int port) { }
-        
-        public virtual void StartHostLobby(string playerName) { }
+        public virtual void StartClientLobby(string playerName)
+        {
+        }
+
+        public virtual void StartHostIP(string playerName, string ipaddress, int port)
+        {
+        }
+
+        public virtual void StartHostLobby(string playerName)
+        {
+        }
 
         public virtual void OnUserRequestedShutdown()
         {

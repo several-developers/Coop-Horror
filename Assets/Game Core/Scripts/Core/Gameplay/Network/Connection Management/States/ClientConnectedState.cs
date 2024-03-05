@@ -1,4 +1,6 @@
 using GameCore.Enums.Global;
+using GameCore.Gameplay.Network.UnityServices.Lobbies;
+using GameCore.Gameplay.PubSub;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Network.ConnectionManagement
@@ -7,16 +9,23 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public ClientConnectedState(ConnectionManager connectionManager) : base(connectionManager)
+        public ClientConnectedState(ConnectionManager connectionManager,
+            IPublisher<ConnectStatus> connectStatusPublisher, LobbyServiceFacade lobbyServiceFacade)
+            : base(connectionManager, connectStatusPublisher)
         {
+            _lobbyServiceFacade = lobbyServiceFacade;
         }
+
+        // FIELDS: --------------------------------------------------------------------------------
+
+        private readonly LobbyServiceFacade _lobbyServiceFacade;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void Enter()
         {
-            //if (m_LobbyServiceFacade.CurrentUnityLobby != null)
-                //m_LobbyServiceFacade.BeginTracking();
+            if (_lobbyServiceFacade.CurrentUnityLobby != null)
+                _lobbyServiceFacade.BeginTracking();
         }
 
         public override void Exit() { }
@@ -27,20 +36,20 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             
             if (string.IsNullOrEmpty(disconnectReason))
             {
-                //m_ConnectStatusPublisher.Publish(ConnectStatus.Reconnecting);
+                ConnectStatusPublisher.Publish(message: ConnectStatus.Reconnecting);
                 ConnectionManager.ChangeState(ConnectionManager.ClientReconnectingState);
             }
             else
             {
                 var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
-                //m_ConnectStatusPublisher.Publish(connectStatus);
+                ConnectStatusPublisher.Publish(message: connectStatus);
                 ConnectionManager.ChangeState(ConnectionManager.OfflineState);
             }
         }
 
         public override void OnUserRequestedShutdown()
         {
-            //m_ConnectStatusPublisher.Publish(ConnectStatus.UserRequestedDisconnect);
+            ConnectStatusPublisher.Publish(message: ConnectStatus.UserRequestedDisconnect);
             ConnectionManager.ChangeState(ConnectionManager.OfflineState);
         }
     }

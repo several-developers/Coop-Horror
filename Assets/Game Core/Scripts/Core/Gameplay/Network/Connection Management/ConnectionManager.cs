@@ -1,5 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
+using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
+using GameCore.Gameplay.PubSub;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -12,34 +14,39 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(LobbyServiceFacade lobbyServiceFacade, ProfileManager profileManager,
-            LocalLobby localLobby, LocalLobbyUser lobbyUser)
+        private void Construct(IPublisher<ConnectStatus> connectStatusPublisher,
+            IPublisher<ReconnectMessage> reconnectMessagePublisher, LobbyServiceFacade lobbyServiceFacade,
+            ProfileManager profileManager, LocalLobby localLobby, LocalLobbyUser lobbyUser)
         {
+            _connectStatusPublisher = connectStatusPublisher;
+            _reconnectMessagePublisher = reconnectMessagePublisher;
             _lobbyServiceFacade = lobbyServiceFacade;
             _profileManager = profileManager;
             _localLobby = localLobby;
             _lobbyUser = lobbyUser;
         }
-        
+
         // PROPERTIES: ----------------------------------------------------------------------------
-        
+
         public NetworkManager NetworkManager { get; private set; }
-        public int ReconnectAttempts => MaxReconnectAttempts; 
+        public int ReconnectAttempts => MaxReconnectAttempts;
         public int MaxConnectedPlayers { get; } = 4;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         internal OfflineState OfflineState;
         internal ClientConnectingState ClientConnectingState;
         internal ClientConnectedState ClientConnectedState;
         internal ClientReconnectingState ClientReconnectingState;
         internal StartingHostState StartingHostState;
         internal HostingState HostingState;
-        
+
         private const int MaxReconnectAttempts = 2; // TEMP
-        
-        private static ConnectionManager _instance; 
-        
+
+        private static ConnectionManager _instance;
+
+        private IPublisher<ConnectStatus> _connectStatusPublisher;
+        private IPublisher<ReconnectMessage> _reconnectMessagePublisher;
         private LobbyServiceFacade _lobbyServiceFacade;
         private ProfileManager _profileManager;
         private LocalLobby _localLobby;
@@ -51,7 +58,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private void Awake()
         {
             _instance = this;
-            
+
             DontDestroyOnLoad(gameObject);
         }
 
@@ -71,7 +78,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         internal void ChangeState(ConnectionState nextState)
         {
             Debug.Log($"{name}: Changed connection state from {_currentState.GetType().Name} to " +
@@ -89,7 +96,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private async void GetNetworkManager()
         {
             int iterations = 0;
-            
+
             while (NetworkManager.Singleton == null)
             {
                 iterations++;
@@ -99,12 +106,12 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                     Debug.LogError("Infinity loop! Network Manager not found!");
                     break;
                 }
-                
+
                 await UniTask.DelayFrame(1);
             }
-            
+
             NetworkManager = NetworkManager.Singleton;
-            
+
             NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
             NetworkManager.OnServerStarted += OnServerStarted;
@@ -114,22 +121,24 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         private void SetupStates()
         {
-            OfflineState = new OfflineState(connectionManager: this, _profileManager, _lobbyServiceFacade, _localLobby);
-            
-            ClientConnectingState = new ClientConnectingState(connectionManager: this, _lobbyServiceFacade,
-                _localLobby);
+            OfflineState = new OfflineState(connectionManager: this, _connectStatusPublisher, _profileManager,
+                _lobbyServiceFacade, _localLobby);
 
-            ClientConnectedState = new ClientConnectedState(connectionManager: this);
-            
-            ClientReconnectingState = new ClientReconnectingState(connectionManager: this, _lobbyServiceFacade,
-                _localLobby);
-            
-            StartingHostState = new StartingHostState(connectionManager: this, _localLobby);
-            HostingState = new HostingState(connectionManager: this, _lobbyServiceFacade);
+            ClientConnectingState = new ClientConnectingState(connectionManager: this, _connectStatusPublisher,
+                _lobbyServiceFacade, _localLobby);
+
+            ClientConnectedState = new ClientConnectedState(connectionManager: this, _connectStatusPublisher,
+                _lobbyServiceFacade);
+
+            ClientReconnectingState = new ClientReconnectingState(connectionManager: this, _connectStatusPublisher,
+                _lobbyServiceFacade, _localLobby, _reconnectMessagePublisher);
+
+            StartingHostState = new StartingHostState(connectionManager: this, _connectStatusPublisher, _localLobby);
+            HostingState = new HostingState(connectionManager: this, _connectStatusPublisher, _lobbyServiceFacade);
 
             _currentState = OfflineState;
         }
-        
+
         [Button(30, ButtonStyle.FoldoutButton)]
         public void StartClientLobby(string playerName) =>
             _currentState.StartClientLobby(playerName);

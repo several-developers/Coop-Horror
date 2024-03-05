@@ -1,4 +1,6 @@
+using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
+using GameCore.Gameplay.PubSub;
 
 namespace GameCore.Gameplay.Network.ConnectionManagement
 {
@@ -6,8 +8,9 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public OfflineState(ConnectionManager connectionManager, ProfileManager profileManager,
-            LobbyServiceFacade lobbyServiceFacade, LocalLobby localLobby) : base(connectionManager)
+        public OfflineState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher,
+            ProfileManager profileManager, LobbyServiceFacade lobbyServiceFacade, LocalLobby localLobby)
+            : base(connectionManager, connectStatusPublisher)
         {
             _profileManager = profileManager;
             _lobbyServiceFacade = lobbyServiceFacade;

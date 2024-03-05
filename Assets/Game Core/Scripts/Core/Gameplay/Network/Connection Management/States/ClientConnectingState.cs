@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
+using GameCore.Gameplay.PubSub;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Network.ConnectionManagement
@@ -10,8 +11,9 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public ClientConnectingState(ConnectionManager connectionManager, LobbyServiceFacade lobbyServiceFacade,
-            LocalLobby localLobby) : base(connectionManager)
+        public ClientConnectingState(ConnectionManager connectionManager,
+            IPublisher<ConnectStatus> connectStatusPublisher, LobbyServiceFacade lobbyServiceFacade,
+            LocalLobby localLobby) : base(connectionManager, connectStatusPublisher)
         {
             LobbyServiceFacade = lobbyServiceFacade;
             LocalLobby = localLobby;
@@ -37,13 +39,13 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         
         public override void OnClientConnected(ulong _)
         {
-            //m_ConnectStatusPublisher.Publish(ConnectStatus.Success);
+            ConnectStatusPublisher.Publish(message: ConnectStatus.Success);
             ConnectionManager.ChangeState(ConnectionManager.ClientConnectedState);
         }
 
         public override void OnClientDisconnect(ulong _)
         {
-            // client ID is for sure ours here
+            // Client ID is for sure ours here.
             StartingClientFailedAsync();
         }
 
@@ -62,9 +64,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
                 // NGO's StartClient launches everything
                 if (!ConnectionManager.NetworkManager.StartClient())
-                {
                     throw new Exception("NetworkManager StartClient failed");
-                }
 
                 //SceneLoaderWrapper.Instance.AddOnSceneEventCallback();
             }
@@ -85,12 +85,12 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             
             if (string.IsNullOrEmpty(disconnectReason))
             {
-                //m_ConnectStatusPublisher.Publish(ConnectStatus.StartClientFailed);
+                ConnectStatusPublisher.Publish(message: ConnectStatus.StartClientFailed);
             }
             else
             {
                 var connectStatus = JsonUtility.FromJson<ConnectStatus>(disconnectReason);
-                //m_ConnectStatusPublisher.Publish(connectStatus);
+                ConnectStatusPublisher.Publish(connectStatus);
             }
             
             ConnectionManager.ChangeState(ConnectionManager.OfflineState);
