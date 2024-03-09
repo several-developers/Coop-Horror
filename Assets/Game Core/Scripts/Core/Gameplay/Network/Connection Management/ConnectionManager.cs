@@ -2,6 +2,7 @@
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
+using GameCore.Infrastructure.StateMachine;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -15,15 +16,19 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         [Inject]
         private void Construct(IPublisher<ConnectStatus> connectStatusPublisher,
-            IPublisher<ReconnectMessage> reconnectMessagePublisher, LobbyServiceFacade lobbyServiceFacade,
-            ProfileManager profileManager, LocalLobby localLobby, LocalLobbyUser lobbyUser)
+            IPublisher<ReconnectMessage> reconnectMessagePublisher,
+            IPublisher<ConnectionEventMessage> connectionEventPublisher, LobbyServiceFacade lobbyServiceFacade,
+            ProfileManager profileManager, LocalLobby localLobby, LocalLobbyUser lobbyUser,
+            IGameStateMachine gameStateMachine)
         {
             _connectStatusPublisher = connectStatusPublisher;
             _reconnectMessagePublisher = reconnectMessagePublisher;
+            _connectionEventPublisher = connectionEventPublisher;
             _lobbyServiceFacade = lobbyServiceFacade;
             _profileManager = profileManager;
             _localLobby = localLobby;
             _lobbyUser = lobbyUser;
+            _gameStateMachine = gameStateMachine;
         }
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -47,11 +52,13 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         private IPublisher<ConnectStatus> _connectStatusPublisher;
         private IPublisher<ReconnectMessage> _reconnectMessagePublisher;
+        private IPublisher<ConnectionEventMessage> _connectionEventPublisher;
         private LobbyServiceFacade _lobbyServiceFacade;
         private ProfileManager _profileManager;
         private LocalLobby _localLobby;
         private LocalLobbyUser _lobbyUser;
         private ConnectionState _currentState;
+        private IGameStateMachine _gameStateMachine;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -134,7 +141,9 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                 _lobbyServiceFacade, _localLobby, _reconnectMessagePublisher);
 
             StartingHostState = new StartingHostState(connectionManager: this, _connectStatusPublisher, _localLobby);
-            HostingState = new HostingState(connectionManager: this, _connectStatusPublisher, _lobbyServiceFacade);
+            
+            HostingState = new HostingState(connectionManager: this, _connectStatusPublisher, _connectionEventPublisher,
+                _gameStateMachine, _lobbyServiceFacade);
 
             _currentState = OfflineState;
         }

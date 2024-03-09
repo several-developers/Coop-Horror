@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using GameCore.UI.Global.MenuView;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -25,7 +26,11 @@ namespace GameCore.UI.MainMenu.LobbiesMenu
         
         [SerializeField, Required]
         private CanvasGroup _hostContainerCG;
-        
+
+        // FIELDS: --------------------------------------------------------------------------------
+
+        public event Action OnCloseClickedEvent; 
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
         protected virtual void Awake()
@@ -73,6 +78,10 @@ namespace GameCore.UI.MainMenu.LobbiesMenu
             _hostContainerCG.blocksRaycasts = true;
         }
         
-        private void OnCloseClicked() => Hide();
+        private void OnCloseClicked()
+        {
+            OnCloseClickedEvent?.Invoke();
+            Hide();
+        }
     }
 }

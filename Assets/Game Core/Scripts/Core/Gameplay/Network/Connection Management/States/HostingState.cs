@@ -1,8 +1,10 @@
+using System.Text;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.Session_Manager;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
+using GameCore.Infrastructure.StateMachine;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -13,8 +15,11 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
         public HostingState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher,
+            IPublisher<ConnectionEventMessage> connectionEventPublisher, IGameStateMachine gameStateMachine,
             LobbyServiceFacade lobbyServiceFacade) : base(connectionManager, connectStatusPublisher)
         {
+            _connectionEventPublisher = connectionEventPublisher;
+            _gameStateMachine = gameStateMachine;
             _lobbyServiceFacade = lobbyServiceFacade;
         }
 
@@ -24,24 +29,32 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         // that rely on sending silly big buffers of garbage.
         private const int MaxConnectPayload = 1024;
 
+        private readonly IPublisher<ConnectionEventMessage> _connectionEventPublisher;
+        private readonly IGameStateMachine _gameStateMachine;
         private readonly LobbyServiceFacade _lobbyServiceFacade;
-        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void Enter()
         {
+            _gameStateMachine.ChangeState<LoadGameplayState>();
+            
             if (_lobbyServiceFacade.CurrentUnityLobby != null)
                 _lobbyServiceFacade.BeginTracking();
         }
 
-        public override void Exit()
-        {
+        public override void Exit() =>
             SessionManager<SessionPlayerData>.Instance.OnServerEnded();
-        }
-        
+
         public override void OnClientConnected(ulong clientId)
         {
-            // m_ConnectionEventPublisher.Publish(new ConnectionEventMessage() { ConnectStatus = ConnectStatus.Success, PlayerName = SessionManager<SessionPlayerData>.Instance.GetPlayerData(clientId)?.PlayerName });
+            var message = new ConnectionEventMessage
+            {
+                ConnectStatus = ConnectStatus.Success,
+                PlayerName = SessionManager<SessionPlayerData>.Instance.GetPlayerData(clientId)?.PlayerName
+            };
+            
+            _connectionEventPublisher.Publish(message);
         }
 
         public override void OnClientDisconnect(ulong clientId)
@@ -52,15 +65,22 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             }
             else
             {
-                var playerId = SessionManager<SessionPlayerData>.Instance.GetPlayerId(clientId);
+                string playerId = SessionManager<SessionPlayerData>.Instance.GetPlayerId(clientId);
 
                 if (playerId == null)
                     return;
+                
                 var sessionData = SessionManager<SessionPlayerData>.Instance.GetPlayerData(playerId);
                 
                 if (sessionData.HasValue)
                 {
-                    //m_ConnectionEventPublisher.Publish(new ConnectionEventMessage() { ConnectStatus = ConnectStatus.GenericDisconnect, PlayerName = sessionData.Value.PlayerName });
+                    var message = new ConnectionEventMessage
+                    {
+                        ConnectStatus = ConnectStatus.GenericDisconnect,
+                        PlayerName = sessionData.Value.PlayerName
+                    };
+                    
+                    _connectionEventPublisher.Publish(message);
                 }
                 
                 SessionManager<SessionPlayerData>.Instance.DisconnectClient(clientId);
@@ -116,7 +136,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                 return;
             }
 
-            string payload = System.Text.Encoding.UTF8.GetString(connectionData);
+            string payload = Encoding.UTF8.GetString(connectionData);
             
             // https://docs.unity3d.com/2020.2/Documentation/Manual/JSONSerialization.html
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);

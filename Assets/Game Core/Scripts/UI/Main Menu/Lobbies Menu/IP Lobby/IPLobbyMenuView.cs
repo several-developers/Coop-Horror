@@ -7,13 +7,13 @@ namespace GameCore.UI.MainMenu.LobbiesMenu.IPLobby
     public class IPLobbyMenuView : LobbyMenuBase
     {
         // MEMBERS: -------------------------------------------------------------------------------
-
+        
         [SerializeField, Required]
         private IPJoiningUI _ipJoiningUI;
         
         [SerializeField, Required]
         private IPHostingUI _ipHostingUI;
-
+        
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         protected override void Awake()

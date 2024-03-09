@@ -121,6 +121,10 @@ namespace GameCore.Infrastructure.Installers.Global
             Container
                 .BindInterfacesTo<MessageChannel<ReconnectMessage>>()
                 .AsSingle();
+            
+            Container
+                .BindInterfacesTo<MessageChannel<ConnectionEventMessage>>()
+                .AsSingle();
         }
     }
 }

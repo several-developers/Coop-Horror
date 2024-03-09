@@ -141,6 +141,11 @@ namespace GameCore.Gameplay.Network
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
         }
 
+        public void StartSmth()
+        {
+            AfterConnected();
+        }
+
         public void StartHost()
         {
             _networkManager.StartHost();

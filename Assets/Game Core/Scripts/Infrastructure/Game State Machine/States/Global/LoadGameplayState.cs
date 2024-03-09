@@ -43,6 +43,12 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnGameplaySceneLoaded() => EnterGameplayState();
+        private void OnGameplaySceneLoaded()
+        {
+            TheNetworkHorror networkHorror = TheNetworkHorror.Get();
+            networkHorror.StartSmth();
+            
+            EnterGameplayState();
+        }
     }
 }

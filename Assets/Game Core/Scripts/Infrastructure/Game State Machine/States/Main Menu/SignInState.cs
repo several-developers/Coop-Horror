@@ -60,12 +60,9 @@ namespace GameCore.Infrastructure.StateMachine
                 OnSignInFailed();
             }
         }
-        
-        private void EnterOnlineMenuState() =>
-            _gameStateMachine.ChangeState<OnlineMenuState>();
-        
-        private void EnterCreateIPLobbyState() =>
-            _gameStateMachine.ChangeState<CreateIPLobbyState>();
+
+        private void EnterMainMenuState() =>
+            _gameStateMachine.ChangeState<MainMenuState>();
 
         private void EnterPrepareMainMenuState() =>
             _gameStateMachine.ChangeState<PrepareMainMenuState>();
@@ -82,7 +79,7 @@ namespace GameCore.Infrastructure.StateMachine
             // so the LocalLobby must know about it already when that happens.
             _localLobby.AddUser(_localUser);
             
-            EnterCreateIPLobbyState();
+            EnterMainMenuState();
         }
         
         private void OnSignInFailed()

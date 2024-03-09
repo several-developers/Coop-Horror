@@ -3,7 +3,7 @@ using GameCore.UI.MainMenu.LobbiesMenu.IPLobby;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class CreateIPLobbyState : IEnterState, IExitState
+    public class CreateIPLobbyState : IEnterState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -22,19 +22,22 @@ namespace GameCore.Infrastructure.StateMachine
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
-        {
-            CreateIPLobbyMenu();
-        }
-
-        public void Exit()
-        {
-        }
+        public void Enter() => CreateIPLobbyMenu();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-
-        private void CreateIPLobbyMenu() =>
+        
+        private void CreateIPLobbyMenu()
+        {
             _ipLobbyMenu = MenuFactory.Create<IPLobbyMenuView>();
+
+            _ipLobbyMenu.OnCloseClickedEvent += OnCloseClicked;
+        }
+
+        private void EnterMainMenuState() =>
+            _gameStateMachine.ChangeState<MainMenuState>();
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnCloseClicked() => EnterMainMenuState();
     }
 }

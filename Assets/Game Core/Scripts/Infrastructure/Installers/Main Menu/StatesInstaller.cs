@@ -10,6 +10,7 @@ namespace GameCore.Infrastructure.Installers.MainMenu
         public override void InstallBindings()
         {
             BindPrepareMainMenuState();
+            BindMainMenuState();
             BindSignInState();
             BindCreateIPLobbyState();
             BindOnlineMenuState();
@@ -24,6 +25,14 @@ namespace GameCore.Infrastructure.Installers.MainMenu
         {
             Container
                 .Bind<PrepareMainMenuState>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindMainMenuState()
+        {
+            Container
+                .Bind<MainMenuState>()
                 .AsSingle()
                 .NonLazy();
         }
