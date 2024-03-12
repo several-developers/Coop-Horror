@@ -22,10 +22,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
-        {
-            CreateSelectLobbyMenu();
-        }
+        public void Enter() => CreateSelectLobbyMenu();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -40,13 +37,13 @@ namespace GameCore.Infrastructure.StateMachine
         private void EnterCreateIPLobbyState() =>
             _gameStateMachine.ChangeState<CreateIPLobbyState>();
 
+        private void EnterCreateRelayLobbyState() =>
+            _gameStateMachine.ChangeState<CreateRelayLobbyState>();
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnStartWithLobbyClicked()
-        {
-            
-        }
-        
+        private void OnStartWithLobbyClicked() => EnterCreateRelayLobbyState();
+
         private void OnStartWithDirectIPClicked() => EnterCreateIPLobbyState();
     }
 }

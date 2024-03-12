@@ -19,7 +19,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly IUpdateRunner _updateRunner;
         private readonly LocalLobby _localLobby;
         private readonly LocalLobbyUser _localUser;
@@ -33,9 +33,9 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         public void BeginTracking()
         {
             _updateRunner.Subscribe(OnUpdate, updatePeriod: 1.5f);
-            
+
             _localLobby.OnChangedEvent += OnLocalLobbyChanged;
-            
+
             // Ensure the initial presence of a new player is pushed to the lobby; otherwise, when a non-host joins,
             // the LocalLobby never receives their data until they push something new.
             _shouldPushData = true;
@@ -45,7 +45,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         {
             _shouldPushData = false;
             _updateRunner.Unsubscribe(OnUpdate);
-            
+
             _localLobby.OnChangedEvent -= OnLocalLobbyChanged;
         }
 
@@ -69,24 +69,25 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
             if (_awaitingQueryCount > 0)
                 return;
 
+
             if (_localUser.IsHost)
                 _lobbyServiceFacade.DoLobbyHeartbeat(dt);
 
             if (!_shouldPushData)
                 return;
-            
+
             _shouldPushData = false;
 
             if (_localUser.IsHost)
             {
                 // todo this should disappear once we use await correctly.
                 // todo This causes issues at the moment if OnSuccess isn't called properly
-                
+
                 _awaitingQueryCount++;
                 await _lobbyServiceFacade.UpdateLobbyDataAsync(_localLobby.GetDataForUnityServices());
                 _awaitingQueryCount--;
             }
-            
+
             _awaitingQueryCount++;
             await _lobbyServiceFacade.UpdatePlayerDataAsync(_localUser.GetDataForUnityServices());
             _awaitingQueryCount--;

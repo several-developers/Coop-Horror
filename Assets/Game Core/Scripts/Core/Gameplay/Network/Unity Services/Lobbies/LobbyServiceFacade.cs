@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Network.UnityServices.Other;
+using GameCore.Gameplay.PubSub;
 using GameCore.Utilities;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
@@ -19,14 +20,16 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LobbyServiceFacade(IUpdateRunner updateRunner, LocalLobby localLobby, LocalLobbyUser localUser)
+        public LobbyServiceFacade(IPublisher<LobbyListFetchedMessage> lobbyListFetchedPub, IUpdateRunner updateRunner,
+            LocalLobby localLobby, LocalLobbyUser localUser)
         {
             _updateRunner = updateRunner;
             _localLobby = localLobby;
             _localUser = localUser;
+            _lobbyListFetchedPub = lobbyListFetchedPub;
 
             _lobbyApiInterface = new LobbyAPIInterface(); // TEMP
-            
+
             // TEMP
             _joinedLobbyContentHeartbeat = new JoinedLobbyContentHeartbeat(updateRunner, localLobby, localUser,
                 lobbyServiceFacade: this);
@@ -42,6 +45,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         // We'll aim for longer in case periods don't align.
         private const float HeartbeatPeriod = 8;
 
+        private readonly IPublisher<LobbyListFetchedMessage> _lobbyListFetchedPub;
         private readonly IUpdateRunner _updateRunner;
         private readonly LocalLobby _localLobby;
         private readonly LocalLobbyUser _localUser;
@@ -114,7 +118,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
 
         public UniTask EndTracking()
         {
-            var task = UniTask.CompletedTask;
+            UniTask task = UniTask.CompletedTask;
 
             if (CurrentUnityLobby != null)
             {
@@ -257,8 +261,11 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
 
             try
             {
-                var response = await _lobbyApiInterface.QueryAllLobbies();
-                //m_LobbyListFetchedPub.Publish(new LobbyListFetchedMessage(LocalLobby.CreateLocalLobbies(response)));
+                QueryResponse response = await _lobbyApiInterface.QueryAllLobbies();
+                List<LocalLobby> lobbies = LocalLobby.CreateLocalLobbies(response);
+                LobbyListFetchedMessage message = new(lobbies);
+                
+                _lobbyListFetchedPub.Publish(message);
             }
             catch (LobbyServiceException e)
             {

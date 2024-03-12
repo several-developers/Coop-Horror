@@ -42,7 +42,7 @@ namespace GameCore.Infrastructure.Installers.Global
 
         private void BindUpdateRunner()
         {
-            GameObject updateRunnerObject = new();
+            GameObject updateRunnerObject = new(name: "Update Runner");
             var updateRunner = updateRunnerObject.AddComponent<UpdateRunner>();
 
             Container
@@ -114,6 +114,7 @@ namespace GameCore.Infrastructure.Installers.Global
 
         private void BindMessageChannels()
         {
+            // These message channels are essential and persist for the lifetime of the lobby and relay services.
             Container
                 .BindInterfacesTo<MessageChannel<ConnectStatus>>()
                 .AsSingle();
@@ -124,6 +125,11 @@ namespace GameCore.Infrastructure.Installers.Global
             
             Container
                 .BindInterfacesTo<MessageChannel<ConnectionEventMessage>>()
+                .AsSingle();
+            
+            // Buffered message channels hold the latest received message in buffer and pass to any new subscribers.
+            Container
+                .BindInterfacesTo<BufferedMessageChannel<LobbyListFetchedMessage>>()
                 .AsSingle();
         }
     }

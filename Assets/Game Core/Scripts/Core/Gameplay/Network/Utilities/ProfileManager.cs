@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Network
 {
@@ -29,7 +30,7 @@ namespace GameCore.Gameplay.Network
         
         private static string GetProfile()
         {
-            return "Vladeski";
+            return "Vladeski_" + Random.Range(0, 9999);
 #if UNITY_EDITOR
 
             // When running in the Editor make a unique ID from the Application.dataPath.

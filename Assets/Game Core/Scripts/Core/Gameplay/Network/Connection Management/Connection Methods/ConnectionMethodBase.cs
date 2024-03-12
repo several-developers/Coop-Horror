@@ -51,7 +51,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         {
             // if (Services.Core.UnityServices.State != ServicesInitializationState.Initialized) 
             //     return GetGuid() + _profileManager.Profile;
-
+            
             return AuthenticationService.Instance.IsSignedIn
                 ? AuthenticationService.Instance.PlayerId
                 : GetGuid() + _profileManager.Profile;

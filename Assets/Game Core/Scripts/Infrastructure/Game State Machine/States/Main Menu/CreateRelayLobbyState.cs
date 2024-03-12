@@ -1,3 +1,6 @@
+using GameCore.Gameplay.Factories;
+using GameCore.UI.MainMenu.LobbiesMenu.RelayLobby;
+
 namespace GameCore.Infrastructure.StateMachine
 {
     public class CreateRelayLobbyState : IEnterState
@@ -15,16 +18,26 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
 
+        private RelayLobbyMenuView _relayLobbyMenu;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
-        {
-            
-        }
-        
-        // PRIVATE METHODS: -----------------------------------------------------------------------
+        public void Enter() => CreateIPLobbyMenu();
 
-        //private void CreateCreateLobbyMenu() =>
-            //_createLobbyMenuView = MenuFactory.Create<CreateLobbyMenuView>();
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+        
+        private void CreateIPLobbyMenu()
+        {
+            _relayLobbyMenu = MenuFactory.Create<RelayLobbyMenuView>();
+
+            _relayLobbyMenu.OnCloseClickedEvent += OnCloseClicked;
+        }
+
+        private void EnterMainMenuState() =>
+            _gameStateMachine.ChangeState<MainMenuState>();
+        
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnCloseClicked() => EnterMainMenuState();
     }
 }

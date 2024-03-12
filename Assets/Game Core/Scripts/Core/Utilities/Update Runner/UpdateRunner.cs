@@ -19,6 +19,8 @@ namespace GameCore.Utilities
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
+        private void Awake() => DontDestroyOnLoad(gameObject);
+
         /// <summary>
         /// Each frame, advance all subscribers. Any that have hit their period should then act,
         /// though if they take too long they could be removed.

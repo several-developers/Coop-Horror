@@ -42,7 +42,7 @@ namespace GameCore.UI.MainMenu.LobbiesMenu
             _closeButton.onClick.AddListener(OnCloseClicked);
         }
 
-        private void Start() => Show();
+        protected virtual void Start() => Show();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         

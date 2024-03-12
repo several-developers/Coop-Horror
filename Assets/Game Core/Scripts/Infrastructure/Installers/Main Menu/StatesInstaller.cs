@@ -13,6 +13,7 @@ namespace GameCore.Infrastructure.Installers.MainMenu
             BindMainMenuState();
             BindSignInState();
             BindCreateIPLobbyState();
+            BindCreateRelayLobbyState();
             BindOnlineMenuState();
             BindOfflineMenuState();
             BindCreateLobbyState();
@@ -49,6 +50,14 @@ namespace GameCore.Infrastructure.Installers.MainMenu
         {
             Container
                 .Bind<CreateIPLobbyState>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindCreateRelayLobbyState()
+        {
+            Container
+                .Bind<CreateRelayLobbyState>()
                 .AsSingle()
                 .NonLazy();
         }
