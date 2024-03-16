@@ -73,7 +73,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             // connection approval will create a player object for you
             response.Approved = true;
-            //response.CreatePlayerObject = true;
+            response.CreatePlayerObject = true;
         }
 
         public StartingHostState Configure(ConnectionMethodBase baseConnectionMethod)

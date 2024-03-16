@@ -1,11 +1,11 @@
-﻿using System;
-using Cinemachine;
+﻿using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -13,19 +13,19 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
-    public class MobileHeadquartersEntity : NetworkBehaviour, IMobileHeadquartersEntity
+    public class MobileHeadquartersEntity : NetworkBehaviour, IMobileHeadquartersEntity, INetcodeBehaviour
     {
         private enum State
         {
             _ = 0,
-            
+
             MovingOnRoad = 1,
             IdleOnRoad = 2,
             IdleOnLocation = 3,
             ArrivingAtLocation = 4,
             LeavingLocation = 5,
         }
-        
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -38,7 +38,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [SerializeField, Required]
         private AnimationObserver _animationObserver;
-        
+
         [SerializeField, Required]
         private NetworkObject _networkObject;
 
@@ -57,11 +57,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public RpcCaller RpcCaller => _rpcCaller;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private static MobileHeadquartersEntity _instance;
-        
+
         private RigidbodyPathMovement _pathMovement;
         private RpcCaller _rpcCaller;
         private State _currentState = State.MovingOnRoad;
@@ -71,7 +71,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void Awake()
         {
             _instance = this;
-            
+
             _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _animator,
                 _mobileHeadquartersConfig);
 
@@ -90,25 +90,28 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _leaveLocationLever.OnInteractEvent += OnInteractWithLeaveLocationLever;
             _leaveLocationLever.OnEnabledEvent += OnLeaveLocation;
         }
-        
+
         public override void OnNetworkSpawn()
         {
-            Init();
+            InitServerAndClient();
+            InitServer();
+            InitClient();
             base.OnNetworkSpawn();
         }
 
         public override void OnNetworkDespawn()
         {
-            Despawn();
+            DespawnServerAndClient();
+            DespawnServer();
+            DespawnClient();
             base.OnNetworkDespawn();
         }
 
         private void Update()
         {
-            if (!IsOwner)
-                return;
-            
-            _pathMovement.Movement();
+            UpdateServerAndClient();
+            UpdateServer();
+            UpdateClient();
         }
 
         public override void OnDestroy()
@@ -133,15 +136,64 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void ArrivedAtRoadLocation(bool sendTeleportEvent = true)
+        public void InitServerAndClient()
         {
-            RoadLocationManager roadLocationManager = RoadLocationManager.Get();
-            CinemachinePath path = roadLocationManager.GetPath();
-
-            ChangePath(path, sendTeleportEvent);
+            ArrivedAtRoadLocation(sendTeleportEvent: false);
             
-            _loadLocationLever.InteractWithoutEvents(isLeverPulled: false);
-            _loadLocationLever.ToggleInteract(canInteract: true);
+            _rpcCaller = RpcCaller.Get();
+
+            _rpcCaller.OnLocationLoadedEvent += OnLocationLoaded;
+            _rpcCaller.OnLeavingLocationEvent += OnLeavingLocation;
+            _rpcCaller.OnLocationLeftEvent += OnLocationLeft;
+        }
+
+        public void InitServer()
+        {
+            if (!IsOwner)
+                return;
+        }
+
+        public void InitClient()
+        {
+            if (IsOwner)
+                return;
+        }
+        
+        public void UpdateServerAndClient()
+        {
+        }
+
+        public void UpdateServer()
+        {
+            if (!IsOwner)
+                return;
+            
+            _pathMovement.Movement();
+        }
+
+        public void UpdateClient()
+        {
+            if (IsOwner)
+                return;
+        }
+        
+        public void DespawnServerAndClient()
+        {
+            _rpcCaller.OnLocationLoadedEvent -= OnLocationLoaded;
+            _rpcCaller.OnLeavingLocationEvent -= OnLeavingLocation;
+            _rpcCaller.OnLocationLeftEvent -= OnLocationLeft;
+        }
+
+        public void DespawnServer()
+        {
+            if (!IsOwner)
+                return;
+        }
+
+        public void DespawnClient()
+        {
+            if (IsOwner)
+                return;
         }
 
         public Transform GetTransform() => transform;
@@ -155,101 +207,34 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             Vector3 direction = transform.forward;
             return direction;
         }
-        
+
         public static MobileHeadquartersEntity Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void Init()
+        private void ArrivedAtRoadLocation(bool sendTeleportEvent = true)
         {
-            InitClientAndServer();
-            InitServer();
-            InitClient();
-        }
+            RoadLocationManager roadLocationManager = RoadLocationManager.Get();
+            CinemachinePath path = roadLocationManager.GetPath();
 
-        private void InitClientAndServer()
-        {
-            _rpcCaller = RpcCaller.Get();
+            ChangePath(path, sendTeleportEvent);
 
-            _rpcCaller.OnLocationLoadedEvent += OnLocationLoaded;
-            _rpcCaller.OnLeavingLocationEvent += OnLeavingLocation;
-            _rpcCaller.OnLocationLeftEvent += OnLocationLeft;
+            _loadLocationLever.InteractWithoutEvents(isLeverPulled: false);
+            _loadLocationLever.ToggleInteract(canInteract: true);
         }
         
-        private void InitServer()
-        {
-            if (!IsOwner)
-                return;
-        }
-
-        private void InitClient()
-        {
-            if (IsOwner)
-                return;
-        }
-
-        private void Despawn()
-        {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
-
-        private void DespawnServerAndClient()
-        {
-            _rpcCaller.OnLocationLoadedEvent -= OnLocationLoaded;
-            _rpcCaller.OnLeavingLocationEvent -= OnLeavingLocation;
-            _rpcCaller.OnLocationLeftEvent -= OnLocationLeft;
-        }
-
-        private void DespawnServer()
-        {
-            if (!IsOwner)
-                return;
-        }
-
-        private void DespawnClient()
-        {
-            if (IsOwner)
-                return;
-        }
-
         private void ChangePath(CinemachinePath path, bool sendTeleportEvent = true)
         {
-            PlayerEntity playerEntity = PlayerEntity.Instance;
+            var playerEntity = PlayerEntity.Instance;
 
             if (sendTeleportEvent)
-            {
                 _playerPoint.position = playerEntity.transform.position;
-            }
 
-            Quaternion startRotation = transform.rotation;
-            
             _pathMovement.ChangePath(path);
-            
-            if (!sendTeleportEvent)
-                return;
-
-            return;
-            
-            Quaternion newRotation = transform.rotation;
-            
-            Transform playerTransform = playerEntity.transform;
-            Vector3 difference = newRotation.eulerAngles - startRotation.eulerAngles;
-            Vector3 playerRotation = playerTransform.rotation.eulerAngles;
-            playerRotation.x += difference.x;
-            playerRotation.y += difference.y;
-            
-            playerTransform.position = _playerPoint.position;
-            playerTransform.rotation = Quaternion.Euler(playerRotation);
         }
 
-        [Button]
-        private void ToggleMovement(bool canMove)
-        {
+        private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
-            //_pathMovement.ToggleMoveAnimation(canMove);
-        }
 
         private void ToggleDoorState(bool isOpen) =>
             _animator.SetBool(id: AnimatorHashes.IsOpen, isOpen);
@@ -261,7 +246,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _currentState = state;
 
         // RPC: -----------------------------------------------------------------------------------
-        
+
         [ServerRpc(RequireOwnership = false)]
         private void InteractWithMobileDoorLeverServerRpc() => InteractWithMobileDoorLeverClientRpc();
 
@@ -285,16 +270,16 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             {
                 case State.ArrivingAtLocation:
                     ToggleDoorState(isOpen: true);
-            
+
                     _leaveLocationLever.InteractWithoutEvents(isLeverPulled: false);
                     _leaveLocationLever.ToggleInteract(canInteract: true);
-                    
+
                     EnterState(State.IdleOnLocation);
                     break;
-                
+
                 case State.LeavingLocation:
                     _rpcCaller.LeaveLocation();
-                    
+
                     EnterState(State.MovingOnRoad);
                     break;
             }
@@ -319,11 +304,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             LocationManager locationManager = LocationManager.Get();
             CinemachinePath path = locationManager.GetEnterPath();
-            
+
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
             ToggleMovement(canMove: true);
-            
+
             EnterState(State.ArrivingAtLocation);
         }
 
@@ -337,12 +322,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             LocationManager locationManager = LocationManager.Get();
             CinemachinePath path = locationManager.GetExitPath();
-            
+
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
             ToggleMovement(canMove: true);
             ToggleDoorState(isOpen: false);
-            
+
             EnterState(State.LeavingLocation);
         }
 

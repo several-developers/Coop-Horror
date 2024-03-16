@@ -54,7 +54,7 @@ namespace GameCore.Gameplay.Network.Session_Manager
             if (_hasSessionStarted)
             {
                 // Mark client as disconnected, but keep their data so they can reconnect.
-                if (_clientIDToPlayerId.TryGetValue(clientId, out var playerId))
+                if (_clientIDToPlayerId.TryGetValue(clientId, out string playerId))
                 {
                     if (GetPlayerData(playerId)?.ClientID == clientId)
                     {
@@ -67,7 +67,7 @@ namespace GameCore.Gameplay.Network.Session_Manager
             else
             {
                 // Session has not started, no need to keep their data
-                if (_clientIDToPlayerId.TryGetValue(clientId, out var playerId))
+                if (_clientIDToPlayerId.TryGetValue(clientId, out string playerId))
                 {
                     _clientIDToPlayerId.Remove(clientId);
                     if (GetPlayerData(playerId)?.ClientID == clientId)
@@ -138,9 +138,7 @@ namespace GameCore.Gameplay.Network.Session_Manager
         public string GetPlayerId(ulong clientId)
         {
             if (_clientIDToPlayerId.TryGetValue(clientId, out string playerId))
-            {
                 return playerId;
-            }
 
             Debug.Log($"No client player ID found mapped to the given client ID: {clientId}");
             return null;
@@ -153,12 +151,11 @@ namespace GameCore.Gameplay.Network.Session_Manager
         /// <returns>Player data struct matching the given ID</returns>
         public T? GetPlayerData(ulong clientId)
         {
-            //First see if we have a playerId matching the clientID given.
-            var playerId = GetPlayerId(clientId);
+            // First see if we have a playerId matching the clientID given.
+            string playerId = GetPlayerId(clientId);
+            
             if (playerId != null)
-            {
                 return GetPlayerData(playerId);
-            }
 
             Debug.Log($"No client player ID found mapped to the given client ID: {clientId}");
             return null;
@@ -172,9 +169,7 @@ namespace GameCore.Gameplay.Network.Session_Manager
         public T? GetPlayerData(string playerId)
         {
             if (_clientData.TryGetValue(playerId, out T data))
-            {
                 return data;
-            }
 
             Debug.Log($"No PlayerData of matching player ID found: {playerId}");
             return null;
@@ -188,13 +183,9 @@ namespace GameCore.Gameplay.Network.Session_Manager
         public void SetPlayerData(ulong clientId, T sessionPlayerData)
         {
             if (_clientIDToPlayerId.TryGetValue(clientId, out string playerId))
-            {
                 _clientData[playerId] = sessionPlayerData;
-            }
             else
-            {
                 Debug.LogError($"No client player ID found mapped to the given client ID: {clientId}");
-            }
         }
 
         /// <summary>

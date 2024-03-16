@@ -7,7 +7,8 @@
         public const string ScenesLoaderPrefab = "Scenes Loader";
         public const string MenuPrefabsList = Other + "Menu Prefabs List";
         public const string NetworkManager = "Network Manager";
-        public const string NetworkHorror = "The Network Horror";
+        public const string TheNetworkHorror = "The Network Horror";
+        public const string NetworkHorror = "Network Horror";
 
         private const string GameData = "Game Data/";
         private const string Settings = GameData + "Settings/";

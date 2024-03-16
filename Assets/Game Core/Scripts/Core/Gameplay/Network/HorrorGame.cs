@@ -24,7 +24,7 @@ namespace GameCore.Gameplay.Network
         private void Awake()
         {
             _instance = this;
-            StartGame();
+            //StartGame();
         }
 
         private void Start()

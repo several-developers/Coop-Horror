@@ -1,16 +1,19 @@
 ﻿using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Network.ConnectionManagement;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class QuitGameplayState : IEnterState
+    public class QuitGameplaySceneState : IEnterState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public QuitGameplayState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine)
+        public QuitGameplaySceneState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
+            ConnectionManager connectionManager)
         {
             _gameStateMachine = gameStateMachine;
             _horrorStateMachine = horrorStateMachine;
+            _connectionManager = connectionManager;
 
             _gameStateMachine.AddState(this);
         }
@@ -19,6 +22,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IHorrorStateMachine _horrorStateMachine;
+        private readonly ConnectionManager _connectionManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -31,10 +35,12 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static void Disconnect()
+        private void Disconnect()
         {
-            TheNetworkHorror network = TheNetworkHorror.Get();
-            network.Disconnect();
+            //TheNetworkHorror network = TheNetworkHorror.Get();
+            //network.Disconnect();
+            
+            _connectionManager.RequestShutdown();
         }
 
         private void QuitHorrorStateMachine() =>

@@ -134,6 +134,9 @@ namespace GameCore.Gameplay.PlayerCamera
             _mobileHqTransform = mobileHeadquartersEntity.transform;
         }
 
+        public void Disable() =>
+            _isInitialized = false;
+
         public void ToggleSnap() =>
             _snap = true;
 

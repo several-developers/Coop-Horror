@@ -25,6 +25,9 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Enter()
         {
+            EnterSignInState();
+            return;
+
             CreatePlayModeSelectionMenu();
 
             _playModeSelectionMenu.OnOnlineClickedEvent += OnOnlineClicked;
@@ -33,17 +36,17 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Exit()
         {
-            _playModeSelectionMenu.OnOnlineClickedEvent -= OnOnlineClicked;
-            _playModeSelectionMenu.OnOfflineClickedEvent -= OnOfflineClicked;
+            if (_playModeSelectionMenu != null)
+            {
+                _playModeSelectionMenu.OnOnlineClickedEvent -= OnOnlineClicked;
+                _playModeSelectionMenu.OnOfflineClickedEvent -= OnOfflineClicked;
+            }
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CreatePlayModeSelectionMenu() =>
             _playModeSelectionMenu = MenuFactory.Create<PlayModeSelectionMenuView>();
-
-        private void ToggleMultiplayer(bool isEnabled) =>
-            GameStaticState.ToggleMultiplayer(isEnabled);
 
         private void EnterSignInState() =>
             _gameStateMachine.ChangeState<SignInState>();
@@ -53,16 +56,8 @@ namespace GameCore.Infrastructure.StateMachine
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnOnlineClicked()
-        {
-            ToggleMultiplayer(isEnabled: true);
-            EnterSignInState();
-        }
+        private void OnOnlineClicked() => EnterSignInState();
 
-        private void OnOfflineClicked()
-        {
-            ToggleMultiplayer(isEnabled: false);
-            EnterOfflineMenuState();
-        }
+        private void OnOfflineClicked() => EnterOfflineMenuState();
     }
 }

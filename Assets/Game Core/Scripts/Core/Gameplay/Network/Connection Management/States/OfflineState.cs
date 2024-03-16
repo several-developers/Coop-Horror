@@ -1,6 +1,8 @@
 using GameCore.Enums.Global;
+using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
+using UnityEngine.SceneManagement;
 
 namespace GameCore.Gameplay.Network.ConnectionManagement
 {
@@ -28,6 +30,11 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         public override void Enter()
         {
             ConnectionManager.NetworkManager.Shutdown();
+            
+            if (SceneManager.GetActiveScene().name != "MainMenu")
+            {
+                SceneLoaderWrapper.Instance.LoadScene("MainMenu", useNetworkSceneManager: false);
+            }
         }
 
         public override void Exit()

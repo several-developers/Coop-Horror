@@ -60,7 +60,7 @@ namespace GameCore.UI.Gameplay.DeveloperMenu.CheatButtons
             if (!isStateExists)
                 return;
 
-            bool isInteractable = state is GameplayState;
+            bool isInteractable = state is GameplaySceneState;
             _button.interactable = isInteractable;
         }
 

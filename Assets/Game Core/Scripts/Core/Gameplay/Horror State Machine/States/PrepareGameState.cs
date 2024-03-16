@@ -1,23 +1,17 @@
-﻿using System;
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
-using GameCore.Gameplay.Network;
-using Unity.Netcode;
+﻿using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Factories.Player;
 using UnityEngine;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
-    public class PrepareGameState : IEnterStateAsync, IDisposable
+    public class PrepareGameState : IEnterState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PrepareGameState(IHorrorStateMachine horrorStateMachine,
-            IMobileHeadquartersEntity mobileHeadquartersEntity)
+        public PrepareGameState(IHorrorStateMachine horrorStateMachine, IPlayerFactory playerFactory)
         {
             _horrorStateMachine = horrorStateMachine;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
-            _cancellationTokenSource = new CancellationTokenSource();
+            _playerFactory = playerFactory;
 
             horrorStateMachine.AddState(this);
         }
@@ -25,53 +19,24 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IHorrorStateMachine _horrorStateMachine;
-        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
-        private readonly CancellationTokenSource _cancellationTokenSource;
+        private readonly IPlayerFactory _playerFactory;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public async UniTaskVoid Enter()
+        public void Enter()
         {
-            int iterations = 0;
-
-            while (iterations < 1000)
-            {
-                iterations++;
-                
-                bool isCanceled = await UniTask
-                    .DelayFrame(1)
-                    .SuppressCancellationThrow();
-
-                if (isCanceled)
-                    return;
-
-                NetworkObject networkObject = _mobileHeadquartersEntity.GetNetworkObject();
-                bool isSpawned = networkObject.IsSpawned;
-
-                if (!isSpawned)
-                    continue;
-                
-                //RpcCaller rpcCaller = RpcCaller.Get();
-                //rpcCaller.SendRoadLocationLoaded();
-                
-                _mobileHeadquartersEntity.ArrivedAtRoadLocation(sendTeleportEvent: false);
-                
-                TheNetworkHorror networkHorror = TheNetworkHorror.Get(); // TEMP
-                networkHorror.SetRoadLocationLoaded(); // TEMP
-
-                break;
-            }
-            
-            Debug.Log($"Prepared with {iterations} iterations.");
-
+            CreatePlayer();
             EnterGameLoopState();
         }
 
-        public void Dispose() =>
-            _cancellationTokenSource?.Dispose();
-
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void CreatePlayer()
+        {
+            Vector3 spawnPosition = new(0, 2, 1000);
+            //PlayerEntity playerInstance = _playerFactory.Create(spawnPosition);
+        }
+        
         private void EnterGameLoopState() =>
             _horrorStateMachine.ChangeState<GameLoopState>();
     }

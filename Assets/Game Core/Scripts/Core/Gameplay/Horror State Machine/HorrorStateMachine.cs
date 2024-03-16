@@ -24,18 +24,14 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         public void ChangeState<TState>() where TState : IState
         {
-            //LogStateChange<TState>();
-            
+            LogStateChange<TState>();
             _stateMachine.ChangeState<TState>();
-            //_gameStateMachineObserver.SendStateChanged();
         }
 
         public void ChangeState<TState, TEnterParams>(TEnterParams enterParams) where TState : IState
         {
-            //LogStateChange<TState>();
-          
+            LogStateChange<TState>();
             _stateMachine.ChangeState<TState, TEnterParams>(enterParams);
-            //_gameStateMachineObserver.SendStateChanged();
         }
 
         public bool TryGetCurrentState(out IState state) =>

@@ -7,6 +7,7 @@ using GameCore.Gameplay.Entities.Player.Other;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Network.Utilities;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.UI.Gameplay.Inventory;
 using GameCore.Utilities;
@@ -18,7 +19,7 @@ using UnityEngine.InputSystem;
 namespace GameCore.Gameplay.Entities.Player
 {
     [RequireComponent(typeof(PlayerInput))]
-    public class PlayerEntity : NetworkBehaviour, IPlayerEntity
+    public class PlayerEntity : NetworkBehaviour, IPlayerEntity, INetcodeBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -91,6 +92,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!_isInitialized)
                 return;
 
+            UpdateServerAndClient();
             UpdateServer();
             UpdateClient();
         }
@@ -120,11 +122,22 @@ namespace GameCore.Gameplay.Entities.Player
 
         public override void OnNetworkDespawn()
         {
-            Despawn();
+            DespawnServerAndClient();
+            DespawnServer();
+            DespawnClient();
             base.OnNetworkDespawn();
         }
 
         public void Init()
+        {
+            InitServerAndClient();
+            InitServer();
+            InitClient();
+
+            _isInitialized = true;
+        }
+
+        public void InitServerAndClient()
         {
             //float reloadTime = 1.5f;
             //float reloadAnimationTime = _animator.GetAnimationTime(AnimatorHashes.ReloadingAnimation);
@@ -148,49 +161,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             _networkHorror = TheNetworkHorror.Get();
             _networkHorror.OnDisconnectEvent += OnDisconnect;
-
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-
-            _isInitialized = true;
-        }
-
-        public void TakeDamage(IEntity source, float damage)
-        {
-            //_animator.SetTrigger(id: AnimatorHashes.HitReaction);
-        }
-
-        public void TeleportPlayer(Vector3 position, Quaternion rotation)
-        {
-            _cameraController.ToggleSnap();
-            _networkTransform.Teleport(position, rotation, transform.localScale);
-        }
-
-        public void ToggleInsideMobileHQ(bool isInside)
-        {
-            if (isInside)
-                SetMobileHQAsParent();
-            else
-                RemoveParent();
-        }
-
-        public Transform GetTransform() => transform;
-
-        public Transform GetCameraItemPivot() => _cameraItemPivot;
-
-        public Transform GetPlayerItemPivot() => _playerItemPivot;
-
-        public NetworkObject GetNetworkObject() => _networkObject;
-
-        public PlayerInventory GetInventory() => _inventory;
-
-        public bool IsDead() => _isDead;
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void InitServerAndClient()
-        {
+            
             _rpcCaller = RpcCaller.Get();
             _cameraController = Gameplay.PlayerCamera.CameraController.Get();
             _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
@@ -209,7 +180,7 @@ namespace GameCore.Gameplay.Entities.Player
             _rpcCaller.OnTogglePlayerInsideMobileHQEvent += OnTogglePlayerInsideMobileHQ;
         }
 
-        private void InitServer()
+        public void InitServer()
         {
             if (!IsOwner)
                 return;
@@ -260,17 +231,27 @@ namespace GameCore.Gameplay.Entities.Player
             }
         }
 
-        private void InitClient()
+        public void InitClient()
         {
             if (IsOwner)
                 return;
 
+            // For invisible player bug fixing.
+            Vector3 startPosition = transform.position;
+            startPosition.x += 0.05f;
+            transform.position = startPosition;
+            
             _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
 
             Debug.Log($"Player #{OwnerClientId} setup Client.");
         }
-
-        private void UpdateServer()
+        
+        public void UpdateServerAndClient()
+        {
+            
+        }
+        
+        public void UpdateServer()
         {
             if (!IsOwner)
                 return;
@@ -298,38 +279,15 @@ namespace GameCore.Gameplay.Entities.Player
             _animator.SetFloat(AnimatorHashes.MoveSpeedBlend, blend);*/
         }
 
-        private void UpdateClient()
+        public void UpdateClient()
         {
             if (IsOwner)
                 return;
 
             _headLookObject.position = _lookAtPosition.Value;
         }
-
-        private void FixedUpdateServer()
-        {
-            if (!IsOwner)
-                return;
-
-            _movementBehaviour.FixedTick();
-        }
-
-        private void LateUpdateServer()
-        {
-            if (!IsOwner)
-                return;
-
-            _lookAtPosition.Value = _lookAtObject.position;
-        }
-
-        private void Despawn()
-        {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
-
-        private void DespawnServerAndClient()
+        
+        public void DespawnServerAndClient()
         {
             _networkHorror.OnDisconnectEvent -= OnDisconnect;
 
@@ -339,7 +297,7 @@ namespace GameCore.Gameplay.Entities.Player
             _rpcCaller.OnTogglePlayerInsideMobileHQEvent -= OnTogglePlayerInsideMobileHQ;
         }
 
-        private void DespawnServer()
+        public void DespawnServer()
         {
             if (!IsOwner)
                 return;
@@ -357,12 +315,63 @@ namespace GameCore.Gameplay.Entities.Player
             inputReader.OnDropItemEvent -= OnDropItem;
         }
 
-        private void DespawnClient()
+        public void DespawnClient()
         {
             if (IsOwner)
                 return;
 
+            _cameraController.Disable();
+            
             _currentSelectedSlotIndex.OnValueChanged -= OnClientSelectedSlotChanged;
+        }
+        
+        public void TakeDamage(IEntity source, float damage)
+        {
+            //_animator.SetTrigger(id: AnimatorHashes.HitReaction);
+        }
+
+        public void TeleportPlayer(Vector3 position, Quaternion rotation)
+        {
+            _cameraController.ToggleSnap();
+            _networkTransform.Teleport(position, rotation, transform.localScale);
+        }
+
+        public void ToggleInsideMobileHQ(bool isInside)
+        {
+            if (isInside)
+                SetMobileHQAsParent();
+            else
+                RemoveParent();
+        }
+
+        public Transform GetTransform() => transform;
+
+        public Transform GetCameraItemPivot() => _cameraItemPivot;
+
+        public Transform GetPlayerItemPivot() => _playerItemPivot;
+
+        public NetworkObject GetNetworkObject() => _networkObject;
+
+        public PlayerInventory GetInventory() => _inventory;
+
+        public bool IsDead() => _isDead;
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void FixedUpdateServer()
+        {
+            if (!IsOwner)
+                return;
+
+            _movementBehaviour.FixedTick();
+        }
+
+        private void LateUpdateServer()
+        {
+            if (!IsOwner)
+                return;
+
+            _lookAtPosition.Value = _lookAtObject.position;
         }
 
         private void Interact() =>

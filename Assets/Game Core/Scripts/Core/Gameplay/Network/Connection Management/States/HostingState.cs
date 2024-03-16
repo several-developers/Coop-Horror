@@ -37,7 +37,13 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         public override void Enter()
         {
-            _gameStateMachine.ChangeState<LoadGameplayState>();
+            //_gameStateMachine.ChangeState<LoadGameplayState>();
+            
+            SceneLoaderWrapper.Instance.AddOnSceneEventCallback();
+
+            //The "BossRoom" server always advances to CharSelect immediately on start. Different games
+            //may do this differently.
+            SceneLoaderWrapper.Instance.LoadScene("Gameplay", useNetworkSceneManager: true);
             
             if (_lobbyServiceFacade.CurrentUnityLobby != null)
                 _lobbyServiceFacade.BeginTracking();
@@ -149,7 +155,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
                 // connection approval will create a player object for you
                 response.Approved = true;
-                //response.CreatePlayerObject = true;
+                response.CreatePlayerObject = true;
                 response.Position = Vector3.zero;
                 response.Rotation = Quaternion.identity;
                 return;

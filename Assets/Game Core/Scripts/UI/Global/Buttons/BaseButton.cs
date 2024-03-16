@@ -5,10 +5,17 @@ namespace GameCore.UI.Global.Buttons
 {
     public abstract class BaseButton : MonoBehaviour
     {
+        // FIELDS: --------------------------------------------------------------------------------
+
+        protected Button Button;
+        
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
-        protected virtual void Awake() =>
-            GetComponent<Button>().onClick.AddListener(OnButtonClicked);
+        protected virtual void Awake()
+        {
+            Button = GetComponent<Button>();
+            Button.onClick.AddListener(OnButtonClicked);
+        }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 

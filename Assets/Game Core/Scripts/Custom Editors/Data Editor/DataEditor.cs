@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameCore;
 using GameCore.Gameplay.Events;
 using GameCore.Infrastructure.Data;
 using GameCore.Utilities;
@@ -17,7 +18,7 @@ namespace CustomEditors
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const string EditorMenuItem = "🕹 Horror/💾 Data Editor";
+        private const string EditorMenuItem = EditorConstants.GameMenuName + "/💾 Data Editor";
 
         private static DataManager _dataManager;
         private static Dictionary<Type, DataBase> _allData;

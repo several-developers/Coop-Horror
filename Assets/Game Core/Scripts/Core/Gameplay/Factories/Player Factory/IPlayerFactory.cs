@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using GameCore.Gameplay.Entities.Player;
+using UnityEngine;
 
 namespace GameCore.Gameplay.Factories.Player
 {
     public interface IPlayerFactory
     {
-        void Create(Vector3 at);
+        PlayerEntity Create(Vector3 at);
     }
 }

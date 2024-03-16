@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using GameCore;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace CustomEditors
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const string ScenesMenuItem = "🕹 Horror/💾 Scenes/";
+        private const string ScenesMenuItem = EditorConstants.GameMenuName + "/💾 Scenes/";
         private const string ScenesPath = "Assets/Game Core/Scenes/";
 
         private const string BootstrapSceneMenuItem = ScenesMenuItem + "🚀 Bootstrap";
@@ -19,6 +20,7 @@ namespace CustomEditors
         private const string MainMenuSceneMenuItem = ScenesMenuItem + "🌐 Main Menu";
 
         private const string GameplaySceneMenuItem = ScenesMenuItem + "⚔ Gameplay";
+        private const string QuickStartMenuItem = EditorConstants.GameMenuName + "/⚡ Quick Start";
         //private const string MultiplayerTestSceneMenuItem = ScenesMenuItem + "⚔ Multiplayer Test";
         //private const string PrototypesSceneMenuItem = ScenesMenuItem + "⏳ Prototypes";
 
@@ -62,6 +64,16 @@ namespace CustomEditors
         // private static void LoadPrototypesScene() =>
         //     OpenScene(PrototypesScenePath);
 
+        [MenuItem(QuickStartMenuItem)]
+        private static void QuickStart()
+        {
+            if (Application.isPlaying || !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                return;
+            
+            EditorSceneManager.OpenScene(BootstrapScenePath, OpenSceneMode.Single);
+            EditorApplication.EnterPlaymode();
+        }
+        
         private static void OpenScene(string path)
         {
             if (!Application.isPlaying && EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())

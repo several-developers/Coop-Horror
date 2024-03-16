@@ -8,11 +8,11 @@ using GameCore.Utilities;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class GameplayState : IEnterState, IExitState
+    public class GameplaySceneState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameplayState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
+        public GameplaySceneState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
             IConfigsProvider configsProvider, IUIObserver uiObserver)
         {
             _gameStateMachine = gameStateMachine;
@@ -87,7 +87,7 @@ namespace GameCore.Infrastructure.StateMachine
             _horrorStateMachine.ChangeState<PrepareGameState>();
 
         private void EnterQuitGameplayState() =>
-            _gameStateMachine.ChangeState<QuitGameplayState>();
+            _gameStateMachine.ChangeState<QuitGameplaySceneState>();
 
         private void EnterGameOverState() =>
             _gameStateMachine.ChangeState<GameOverState>();

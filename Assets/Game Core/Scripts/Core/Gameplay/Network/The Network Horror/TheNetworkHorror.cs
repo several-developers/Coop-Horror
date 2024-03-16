@@ -56,7 +56,6 @@ namespace GameCore.Gameplay.Network
         private ServerLogic _serverLogic;
         private ClientLogic _clientLogic;
 
-        private ClientState _localState = ClientState.Offline;
         private float _slowUpdateTimer;
         private bool _offlineMode;
         private bool _isGameTimerOn;
@@ -79,16 +78,6 @@ namespace GameCore.Gameplay.Network
 
         private void Start() =>
             _timeCycleDecorator.OnHourPassedEvent += OnHourPassed;
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-        }
 
         private void Update()
         {
@@ -444,12 +433,5 @@ namespace GameCore.Gameplay.Network
             if (IsServer)
                 _serverLogic.UpdateGameTimer();
         }
-    }
-
-    public enum ClientState
-    {
-        Offline = 0, // Not connected
-        Connecting = 5, // Waiting to change scene or receive world data
-        Ready = 10, // Everything is loaded and spawned
     }
 }

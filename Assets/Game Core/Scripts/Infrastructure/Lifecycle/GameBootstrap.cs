@@ -2,13 +2,12 @@
 using UnityEngine;
 using Zenject;
 
-namespace GameCore.Infrastructure.Bootstrap
+namespace GameCore.Infrastructure.Lifecycle
 {
     // ----------------------------------------------------------------------
     //      - Находится в Resources/Project Context.prefab
     //      - Игра корректно работает при запуске из любой сцены.
     // ----------------------------------------------------------------------
-
     public class GameBootstrap : MonoBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------

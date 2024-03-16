@@ -64,9 +64,9 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void CreateNetworkHorror()
         {
-            TheNetworkHorror networkHorror = _assetsProvider.GetNetworkHorror();
-            TheNetworkHorror networkHorrorInstance = Object.Instantiate(networkHorror);
-            networkHorrorInstance.Init(_networkManager, _timeCycleDecorator);
+            NetworkHorror networkHorrorPrefab = _assetsProvider.GetNetworkHorror();
+            NetworkHorror networkHorrorInstance = Object.Instantiate(networkHorrorPrefab);
+            networkHorrorInstance.Setup(_networkManager);
         }
 
         private void EnterLoadDataState() =>

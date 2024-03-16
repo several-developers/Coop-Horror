@@ -5,6 +5,7 @@ using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.UnityServices.Auth;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
+using GameCore.Infrastructure.Lifecycle;
 using GameCore.Infrastructure.StateMachine;
 using GameCore.Observers.Global.StateMachine;
 using GameCore.Utilities;
@@ -106,6 +107,12 @@ namespace GameCore.Infrastructure.Installers.Global
             //     .AsSingle();
             
             Container
+                .Bind<ApplicationController>()
+                .FromNewComponentOnNewGameObject()
+                .AsSingle()
+                .NonLazy();
+            
+            Container
                 .Bind<ConnectionManager>()
                 .FromNewComponentOnNewGameObject()
                 .AsSingle()
@@ -125,6 +132,10 @@ namespace GameCore.Infrastructure.Installers.Global
             
             Container
                 .BindInterfacesTo<MessageChannel<ConnectionEventMessage>>()
+                .AsSingle();
+            
+            Container
+                .BindInterfacesTo<MessageChannel<QuitApplicationMessage>>()
                 .AsSingle();
             
             // Buffered message channels hold the latest received message in buffer and pass to any new subscribers.

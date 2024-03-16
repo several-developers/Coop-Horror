@@ -53,8 +53,8 @@ namespace GameCore.Infrastructure.StateMachine
         private void EnterOnlineMenuState() =>
             _gameStateMachine.ChangeState<OnlineMenuState>();
 
-        private void EnterGameplayState() =>
-            _gameStateMachine.ChangeState<GameplayState>();
+        private void EnterGameplaySceneState() =>
+            _gameStateMachine.ChangeState<GameplaySceneState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ namespace GameCore.Infrastructure.StateMachine
                 return;
             }
 
-            EnterGameplayState();
+            EnterGameplaySceneState();
         }
     }
 }

@@ -19,6 +19,7 @@ namespace GameCore.Infrastructure.Providers.Global
         GameObject GetScenesLoaderPrefab(); // TEMP
         MenuPrefabsListMeta GetMenuPrefabsList(); // TEMP
         NetworkManager GetNetworkManager();
-        TheNetworkHorror GetNetworkHorror();
+        TheNetworkHorror GetTheNetworkHorror();
+        NetworkHorror GetNetworkHorror();
     }
 }

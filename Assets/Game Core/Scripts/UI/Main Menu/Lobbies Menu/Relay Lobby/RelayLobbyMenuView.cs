@@ -217,7 +217,7 @@ namespace GameCore.UI.MainMenu.LobbiesMenu.RelayLobby
             _lobbyServiceFacade.SetRemoteLobby(remoteLobby);
 
             Debug.Log($"Joined lobby with code: {_localLobby.LobbyCode}, " +
-                      $"Internal Relay Join Code{_localLobby.RelayJoinCode}");
+                      $"Internal Relay Join Code {_localLobby.RelayJoinCode}");
             
             _connectionManager.StartClientLobby(_localUser.DisplayName);
         }

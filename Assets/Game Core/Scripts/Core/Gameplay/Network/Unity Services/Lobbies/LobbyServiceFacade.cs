@@ -394,9 +394,7 @@ namespace GameCore.Gameplay.Network.UnityServices.Lobbies
         public async UniTask UpdatePlayerRelayInfoAsync(string allocationId, string connectionInfo)
         {
             if (!_rateLimitQuery.CanCall)
-            {
                 return;
-            }
 
             try
             {

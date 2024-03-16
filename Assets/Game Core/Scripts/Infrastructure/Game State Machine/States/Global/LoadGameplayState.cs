@@ -1,5 +1,4 @@
 ﻿using GameCore.Enums.Global;
-using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Services.Global;
 
 namespace GameCore.Infrastructure.StateMachine
@@ -27,28 +26,14 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void LoadGameplayScene()
-        {
-            TheNetworkHorror network = TheNetworkHorror.Get();
-            bool isMultiplayerEnabled = network.IsActive();
-            
-            if (isMultiplayerEnabled)
-                _scenesLoaderService.LoadSceneNetwork(SceneName.Gameplay, OnGameplaySceneLoaded);
-            else
-                _scenesLoaderService.LoadScene(SceneName.Gameplay, OnGameplaySceneLoaded);
-        }
-        
-        private void EnterGameplayState() =>
-            _gameStateMachine.ChangeState<GameplayState>();
+        private void LoadGameplayScene() =>
+            _scenesLoaderService.LoadSceneNetwork(SceneName.Gameplay, OnGameplaySceneLoaded);
+
+        private void EnterGameplaySceneState() =>
+            _gameStateMachine.ChangeState<GameplaySceneState>();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnGameplaySceneLoaded()
-        {
-            TheNetworkHorror networkHorror = TheNetworkHorror.Get();
-            networkHorror.StartSmth();
-            
-            EnterGameplayState();
-        }
+        private void OnGameplaySceneLoaded() => EnterGameplaySceneState();
     }
 }

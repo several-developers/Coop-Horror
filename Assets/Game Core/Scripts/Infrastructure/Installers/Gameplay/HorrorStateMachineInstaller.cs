@@ -31,8 +31,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private void BindPrepareGameState()
         {
             Container
-                .Bind(typeof(PrepareGameState), typeof(IDisposable))
-                .To<PrepareGameState>()
+                .Bind<PrepareGameState>()
                 .AsSingle()
                 .NonLazy();
         }

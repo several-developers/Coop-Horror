@@ -81,7 +81,7 @@ namespace GameCore.Infrastructure.StateMachine
             }
 
             if (IsSceneMatches(SceneName.Gameplay))
-                EnterGameplayState();
+                EnterGameplaySceneState();
         }
         
         private void LoadScene(SceneName sceneName, Action callback = null) =>
@@ -93,8 +93,8 @@ namespace GameCore.Infrastructure.StateMachine
         private void EnterPrepareMainMenuState() =>
             _gameStateMachine.ChangeState<PrepareMainMenuState>();
         
-        private void EnterGameplayState() =>
-            _gameStateMachine.ChangeState<GameplayState>();
+        private void EnterGameplaySceneState() =>
+            _gameStateMachine.ChangeState<GameplaySceneState>();
 
         private static bool IsSceneMatches(SceneName sceneName)
         {
