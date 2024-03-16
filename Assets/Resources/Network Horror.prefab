@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1940391704733545944}
   - component: {fileID: -8011127673663287335}
   - component: {fileID: 8707238204668581641}
-  - component: {fileID: 3515494399405513072}
   m_Layer: 0
   m_Name: Network Horror
   m_TagString: Untagged
@@ -46,12 +45,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
+  GlobalObjectIdHash: 2231593576
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!114 &8707238204668581641
@@ -66,16 +66,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b94e822c43d746ad9033d5e6779ff7f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3515494399405513072
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7987760044055154378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 717a02054ef2699498e6bd4234fd7995, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _containerSource: 1

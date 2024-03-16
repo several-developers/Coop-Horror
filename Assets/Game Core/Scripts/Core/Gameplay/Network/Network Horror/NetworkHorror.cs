@@ -23,8 +23,11 @@ namespace GameCore.Gameplay.Network
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() => DontDestroyOnLoad(gameObject);
-        
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+
         public override void OnDestroy()
         {
             DespawnServerAndClient();
