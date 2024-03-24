@@ -28,14 +28,6 @@ namespace GameCore.Gameplay.Network
             DontDestroyOnLoad(gameObject);
         }
 
-        public override void OnDestroy()
-        {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-            base.OnDestroy();
-        }
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Setup(NetworkManager networkManager) =>
@@ -79,14 +71,22 @@ namespace GameCore.Gameplay.Network
             InitClient();
         }
 
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            DespawnServerAndClient();
+            DespawnServer();
+            DespawnClient();
+        }
+
         private void OnClientConnected(ulong clientId)
         {
-            Debug.Log($"Client ${clientId} connected.");
+            Debug.Log($"Client #{clientId} connected.");
         }
 
         private void OnClientDisconnect(ulong clientId)
         {
-            Debug.Log($"Client ${clientId} disconnect.");
+            Debug.Log($"Client #{clientId} disconnect.");
         }
 
         private void OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)

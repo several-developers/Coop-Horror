@@ -67,7 +67,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             if (!isItemAdded)
                 return;
 
-            NetworkObject playerNetworkObject = _playerEntity.GetNetworkObject();
+            NetworkObject playerNetworkObject = _playerEntity.NetworkObject;
             
             interactableItem.PickUpClient(playerNetworkObject.OwnerClientId);
             interactableItem.PickUpServer(playerNetworkObject);

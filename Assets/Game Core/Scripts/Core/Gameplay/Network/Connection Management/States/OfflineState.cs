@@ -1,5 +1,4 @@
 using GameCore.Enums.Global;
-using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
 using UnityEngine.SceneManagement;
@@ -29,12 +28,9 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         public override void Enter()
         {
+            _lobbyServiceFacade.EndTracking();
             ConnectionManager.NetworkManager.Shutdown();
-            
-            if (SceneManager.GetActiveScene().name != "MainMenu")
-            {
-                SceneLoaderWrapper.Instance.LoadScene("MainMenu", useNetworkSceneManager: false);
-            }
+            TryLoadMainMenu();
         }
 
         public override void Exit()
@@ -73,6 +69,19 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                 _lobbyServiceFacade, _localLobby);
             
             ConnectionManager.ChangeState(ConnectionManager.StartingHostState.Configure(connectionMethod));
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void TryLoadMainMenu()
+        {
+            string activeSceneName = SceneManager.GetActiveScene().name;
+            bool isCurrentSceneMainMenu = string.Equals(activeSceneName, SceneName.MainMenu.ToString());
+
+            if (isCurrentSceneMainMenu)
+                return;
+            
+            ConnectionManager.EnterLoadMainMenuState();
         }
     }
 }

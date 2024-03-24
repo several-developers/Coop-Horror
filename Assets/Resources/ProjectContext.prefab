@@ -44,6 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac2d35e5b09747549858a10ceec05335, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _netcodeHooksPrefab: {fileID: 7983908270445636699, guid: 5570cba3d8dd9fe468867974f8bf0ae0,
+    type: 3}
 --- !u!1 &1956429670948329491
 GameObject:
   m_ObjectHideFlags: 0
@@ -381,3 +383,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96e1b933b68040ed8129fbd9ad559873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _scenesLoaderService: {fileID: 2095179559288716994, guid: e53b4c9d0785ac1478090c7e4e4d6a08,
+    type: 3}

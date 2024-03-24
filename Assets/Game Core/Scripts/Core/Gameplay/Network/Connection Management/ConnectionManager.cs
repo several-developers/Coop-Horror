@@ -2,6 +2,7 @@
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
+using GameCore.Infrastructure.Services.Global;
 using GameCore.Infrastructure.StateMachine;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -19,7 +20,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             IPublisher<ReconnectMessage> reconnectMessagePublisher,
             IPublisher<ConnectionEventMessage> connectionEventPublisher, LobbyServiceFacade lobbyServiceFacade,
             ProfileManager profileManager, LocalLobby localLobby, LocalLobbyUser lobbyUser,
-            IGameStateMachine gameStateMachine)
+            IScenesLoaderService2 scenesLoaderService, IGameStateMachine gameStateMachine)
         {
             _connectStatusPublisher = connectStatusPublisher;
             _reconnectMessagePublisher = reconnectMessagePublisher;
@@ -28,6 +29,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             _profileManager = profileManager;
             _localLobby = localLobby;
             _lobbyUser = lobbyUser;
+            _scenesLoaderService = scenesLoaderService;
             _gameStateMachine = gameStateMachine;
         }
 
@@ -58,6 +60,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private LocalLobby _localLobby;
         private LocalLobbyUser _lobbyUser;
         private ConnectionState _currentState;
+        private IScenesLoaderService2 _scenesLoaderService;
         private IGameStateMachine _gameStateMachine;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -85,6 +88,15 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void AddOnSceneEventCallback() =>
+            _scenesLoaderService.AddOnSceneEventCallback();
+
+        public void LoadScene(SceneName sceneName, bool isNetwork) =>
+            _scenesLoaderService.LoadScene(sceneName, isNetwork);
+
+        public void EnterLoadMainMenuState() =>
+            _gameStateMachine.ChangeState<LoadMainMenuState>();
 
         internal void ChangeState(ConnectionState nextState)
         {

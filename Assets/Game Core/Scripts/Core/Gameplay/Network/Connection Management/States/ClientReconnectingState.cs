@@ -123,9 +123,16 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             if (_attempts > 0)
                 yield return new WaitForSeconds(TimeBetweenAttempts);
 
-            Debug.Log("Lost connection to host, trying to reconnect...");
+            //Debug.Log("Lost connection to host, trying to reconnect...");
 
             ConnectionManager.NetworkManager.Shutdown();
+
+            // TEMP
+            {
+                Debug.Log("Lost connection to host.");
+                OnClientDisconnect(0);
+                yield break;
+            }
 
             // Wait until NetworkManager completes shutting down.
             yield return new WaitWhile(() => ConnectionManager.NetworkManager.ShutdownInProgress);
@@ -139,7 +146,8 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             _attempts++;
 
-            if (!string.IsNullOrEmpty(_lobbyCode)) // Attempting to reconnect to lobby.
+            // Attempting to reconnect to lobby.
+            if (!string.IsNullOrEmpty(_lobbyCode))
             {
                 // When using Lobby with Relay, if a user is disconnected from the Relay server, the server will notify
                 // the Lobby service and mark the user as disconnected, but will not remove them from the lobby. They

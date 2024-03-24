@@ -253,7 +253,7 @@ namespace GameCore.Gameplay.Network
                 if (OnFindPlayerSpawnPositionEvent != null)
                     spawnPosition = OnFindPlayerSpawnPositionEvent.Invoke(playerID: 0);
 
-                SpawnPlayerServerRpc(spawnPosition, clientID);
+                //SpawnPlayerServerRpc(spawnPosition, clientID);
             }
         }
 
@@ -312,60 +312,6 @@ namespace GameCore.Gameplay.Network
             ReadyPlayersDictionary[clientID] = true;
         }
 
-        [ServerRpc]
-        private void SpawnPlayerServerRpc(Vector3 spawnPosition, ulong clientID)
-        {
-            PlayerEntity playerInstance = Instantiate(_playerPrefab, spawnPosition, Quaternion.identity);
-
-            NetworkObject playerNetworkObject = playerInstance.GetNetworkObject();
-            playerNetworkObject.SpawnAsPlayerObject(clientID, destroyWithScene: true);
-
-            PlayersEntities.Add(clientID, playerInstance);
-
-            SetupPlayerClientRpc(playerNetworkObject);
-        }
-
-        [ClientRpc]
-        private void SetupPlayerClientRpc(NetworkObjectReference playerNetworkObjectReference)
-        {
-            bool isNetworkObjectFound = playerNetworkObjectReference.TryGet(out NetworkObject networkObject);
-
-            if (!isNetworkObjectFound)
-                return;
-
-            bool isPlayerEntityFound = networkObject.TryGetComponent(out PlayerEntity playerEntity);
-
-            if (!isPlayerEntityFound)
-                return;
-
-            playerEntity.Init();
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void SendInitializePlayerServerRpc(ulong clientID)
-        {
-            PlayerEntity playerEntity = PlayersEntities[clientID];
-            NetworkObject playerNetworkObject = playerEntity.GetNetworkObject();
-
-            SendInitializePlayerClientRpc(playerNetworkObject);
-        }
-
-        [ClientRpc]
-        private void SendInitializePlayerClientRpc(NetworkObjectReference playerNetworkObjectReference)
-        {
-            bool isNetworkObjectFound = playerNetworkObjectReference.TryGet(out NetworkObject networkObject);
-
-            if (!isNetworkObjectFound)
-                return;
-
-            bool isPlayerEntityFound = networkObject.TryGetComponent(out PlayerEntity playerEntity);
-
-            if (!isPlayerEntityFound)
-                return;
-
-            playerEntity.Init();
-        }
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
@@ -400,7 +346,7 @@ namespace GameCore.Gameplay.Network
                     if (!isSpawned)
                         continue;
 
-                    SendInitializePlayerServerRpc(id);
+                    //SendInitializePlayerServerRpc(id);
                 }
             }
 

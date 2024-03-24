@@ -38,13 +38,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [SerializeField, Required]
         private AnimationObserver _animationObserver;
-
-        [SerializeField, Required]
-        private NetworkObject _networkObject;
-
-        [SerializeField, Required]
-        private Transform _playerPoint;
-
+        
         [SerializeField, Required]
         private ToggleMobileDoorLever _toggleMobileDoorLever;
 
@@ -93,18 +87,18 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public override void OnNetworkSpawn()
         {
+            base.OnNetworkSpawn();
             InitServerAndClient();
             InitServer();
             InitClient();
-            base.OnNetworkSpawn();
         }
 
         public override void OnNetworkDespawn()
         {
+            base.OnNetworkDespawn();
             DespawnServerAndClient();
             DespawnServer();
             DespawnClient();
-            base.OnNetworkDespawn();
         }
 
         private void Update()
@@ -138,7 +132,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public void InitServerAndClient()
         {
-            ArrivedAtRoadLocation(sendTeleportEvent: false);
+            ArrivedAtRoadLocation();
             
             _rpcCaller = RpcCaller.Get();
 
@@ -197,11 +191,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         }
 
         public Transform GetTransform() => transform;
-
-        public Transform GetPlayerPoint() => _playerPoint;
-
-        public NetworkObject GetNetworkObject() => _networkObject;
-
+        
         public Vector3 GetVelocity()
         {
             Vector3 direction = transform.forward;
@@ -212,24 +202,19 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void ArrivedAtRoadLocation(bool sendTeleportEvent = true)
+        private void ArrivedAtRoadLocation()
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
             CinemachinePath path = roadLocationManager.GetPath();
 
-            ChangePath(path, sendTeleportEvent);
+            ChangePath(path);
 
             _loadLocationLever.InteractWithoutEvents(isLeverPulled: false);
             _loadLocationLever.ToggleInteract(canInteract: true);
         }
         
-        private void ChangePath(CinemachinePath path, bool sendTeleportEvent = true)
+        private void ChangePath(CinemachinePath path)
         {
-            var playerEntity = PlayerEntity.Instance;
-
-            if (sendTeleportEvent)
-                _playerPoint.position = playerEntity.transform.position;
-
             _pathMovement.ChangePath(path);
         }
 

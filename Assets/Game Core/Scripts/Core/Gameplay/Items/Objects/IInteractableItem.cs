@@ -4,7 +4,7 @@ using Unity.Netcode;
 
 namespace GameCore.Gameplay.Items
 {
-    public interface IInteractableItem : IInteractable, INetworkObject
+    public interface IInteractableItem : IInteractable
     {
         void ChangeOwnership();
         void PickUpServer(NetworkObject playerNetworkObject);

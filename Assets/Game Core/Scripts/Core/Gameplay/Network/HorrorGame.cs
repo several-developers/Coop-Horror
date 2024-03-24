@@ -99,12 +99,8 @@ namespace GameCore.Gameplay.Network
         // Optional, if not defined, will spawn at the PlayerSpawn with the same player_id (or at Vector3.zero if none)
         private Vector3 FindPlayerPos(int playerID)
         {
-            PlayerSpawnPoint playerSpawnPoint = PlayerSpawnPoint.GetRandomSpawnPoint();
-
-            if (playerSpawnPoint != null)
-                return playerSpawnPoint.GetRandomPosition();
-
-            return transform.GetRandomPosition();
+            bool isSpawnPointFound = PlayerSpawnPoint.GetRandomSpawnPoint(out PlayerSpawnPoint spawnPoint);
+            return isSpawnPointFound ? spawnPoint.GetRandomPosition() : transform.GetRandomPosition();
         }
     }
 }

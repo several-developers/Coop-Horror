@@ -13,7 +13,7 @@ namespace GameCore.Gameplay.Network.Other
     {
         // PROPERTIES: ----------------------------------------------------------------------------
         
-        public static SceneLoaderWrapper Instance { get; protected set; }
+        private static SceneLoaderWrapper Instance { get; set; }
 
         private bool IsNetworkSceneManagementEnabled => NetworkManager != null && NetworkManager.SceneManager != null && NetworkManager.NetworkConfig.EnableSceneManagement;
 

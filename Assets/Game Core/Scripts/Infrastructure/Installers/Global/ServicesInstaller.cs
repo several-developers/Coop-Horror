@@ -1,11 +1,19 @@
 ﻿using GameCore.Infrastructure.Services.Global;
 using GameCore.Infrastructure.Services.Global.Rewards;
+using Sirenix.OdinInspector;
+using UnityEngine;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Global
 {
     public partial class ServicesInstaller : MonoInstaller
     {
+        // MEMBERS: -------------------------------------------------------------------------------
+
+        [Title(Constants.References)]
+        [SerializeField, Required]
+        private ScenesLoaderService2 _scenesLoaderService;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         private DataInstaller _dataInstaller;
@@ -17,6 +25,7 @@ namespace GameCore.Infrastructure.Installers.Global
             BindDataServices();
             BindSaveLoadService();
             BindScenesLoaderService();
+            BindScenesLoaderService2();
             BindRewardsService();
         }
 
@@ -40,6 +49,16 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .BindInterfacesTo<ScenesLoaderService>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindScenesLoaderService2()
+        {
+            Container
+                .Bind<IScenesLoaderService2>()
+                .To<ScenesLoaderService2>()
+                .FromComponentInNewPrefab(_scenesLoaderService)
                 .AsSingle()
                 .NonLazy();
         }

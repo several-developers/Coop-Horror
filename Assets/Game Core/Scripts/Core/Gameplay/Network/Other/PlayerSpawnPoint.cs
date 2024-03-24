@@ -49,15 +49,19 @@ namespace GameCore.Gameplay.Network.Other
             return spawnPosition;
         }
 
-        public static PlayerSpawnPoint GetRandomSpawnPoint()
+        public static bool GetRandomSpawnPoint(out PlayerSpawnPoint spawnPoint)
         {
             int spawnPointsAmount = SpawnPointsList.Count;
 
             if (spawnPointsAmount == 0)
-                return null;
+            {
+                spawnPoint = null;
+                return false;
+            }
 
             int randomIndex = Random.Range(0, spawnPointsAmount);
-            return SpawnPointsList[randomIndex];
+            spawnPoint = SpawnPointsList[randomIndex];
+            return true;
         }
     }
 }

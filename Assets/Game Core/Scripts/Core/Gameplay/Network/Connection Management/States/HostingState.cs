@@ -39,11 +39,11 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         {
             //_gameStateMachine.ChangeState<LoadGameplayState>();
             
-            SceneLoaderWrapper.Instance.AddOnSceneEventCallback();
+            ConnectionManager.AddOnSceneEventCallback();
 
             //The "BossRoom" server always advances to CharSelect immediately on start. Different games
             //may do this differently.
-            SceneLoaderWrapper.Instance.LoadScene("Gameplay", useNetworkSceneManager: true);
+            ConnectionManager.LoadScene(SceneName.Gameplay, isNetwork: true);
             
             if (_lobbyServiceFacade.CurrentUnityLobby != null)
                 _lobbyServiceFacade.BeginTracking();

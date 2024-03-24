@@ -64,7 +64,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             // Create relay allocation
             Allocation hostAllocation = await RelayService.Instance
                 .CreateAllocationAsync(ConnectionManager.MaxConnectedPlayers, region: null);
-            
+
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(hostAllocation.AllocationId);
 
             Debug.Log($"server: connection data: {hostAllocation.ConnectionData[0]} {hostAllocation.ConnectionData[1]}, " +

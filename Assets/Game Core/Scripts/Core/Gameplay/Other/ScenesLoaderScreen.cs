@@ -2,22 +2,20 @@
 using GameCore.Infrastructure.Services.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace GameCore.Gameplay.Other
 {
-    public class ScenesLoader : MonoBehaviour
+    public class ScenesLoaderScreen : MonoBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IScenesLoaderService scenesLoaderService)
+        private void Construct(IScenesLoaderService2 scenesLoaderService2)
         {
-            _scenesLoaderService = scenesLoaderService;
+            _scenesLoaderService2 = scenesLoaderService2;
 
-            _scenesLoaderService.OnSceneStartLoading += OnSceneStartLoading;
-            _scenesLoaderService.OnSceneFinishedLoading += OnSceneFinishedLoading;
+            _scenesLoaderService2.OnLoadingScreenStateChangedEvent += OnLoadingScreenStateChanged;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -35,17 +33,14 @@ namespace GameCore.Gameplay.Other
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private IScenesLoaderService _scenesLoaderService;
+        private IScenesLoaderService2 _scenesLoaderService2;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() => DontDestroyOnLoad(gameObject);
 
-        private void OnDestroy()
-        {
-            _scenesLoaderService.OnSceneStartLoading -= OnSceneStartLoading;
-            _scenesLoaderService.OnSceneFinishedLoading -= OnSceneFinishedLoading;
-        }
+        private void OnDestroy() =>
+            _scenesLoaderService2.OnLoadingScreenStateChangedEvent -= OnLoadingScreenStateChanged;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -67,20 +62,6 @@ namespace GameCore.Gameplay.Other
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnSceneStartLoading(LoadSceneMode loadSceneMode)
-        {
-            if (loadSceneMode == LoadSceneMode.Additive)
-                return;
-            
-            FadeAnimation(fadeIn: true);
-        }
-
-        private void OnSceneFinishedLoading(LoadSceneMode loadSceneMode)
-        {
-            if (loadSceneMode == LoadSceneMode.Additive)
-                return;
-            
-            FadeAnimation(fadeIn: false);
-        }
+        private void OnLoadingScreenStateChanged(bool showLoadingScreen) => FadeAnimation(showLoadingScreen);
     }
 }

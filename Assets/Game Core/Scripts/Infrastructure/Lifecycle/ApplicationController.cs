@@ -44,14 +44,6 @@ namespace GameCore.Infrastructure.Lifecycle
             Application.targetFrameRate = 120;
         }
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Tilde))
-            {
-                GameUtilities.SwapCursorLockState();
-            }
-        }
-
         private void OnDestroy()
         {
             _subscriptions?.Dispose();

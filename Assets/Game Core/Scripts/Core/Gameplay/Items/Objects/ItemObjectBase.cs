@@ -132,9 +132,7 @@ namespace GameCore.Gameplay.Items
         // ПРОТЕСТИТЬ С ЛАГАМИ
         public void HideClient() =>
             _child.SetActive(false);
-
-        public NetworkObject GetNetworkObject() => NetworkObject;
-
+        
         public InteractionType GetInteractionType() =>
             InteractionType.PickUpItem;
 

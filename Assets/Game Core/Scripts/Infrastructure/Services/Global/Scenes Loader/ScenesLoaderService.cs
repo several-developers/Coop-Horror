@@ -34,7 +34,7 @@ namespace GameCore.Infrastructure.Services.Global
 
             _coroutineRunner.StartCoroutine(SceneLoader(sceneName, LoadSceneMode.Single, callback));
         }
-        
+
         public void LoadSceneAdditive(SceneName sceneName, Action callback = null)
         {
             if (_isSceneLoading)
@@ -57,7 +57,6 @@ namespace GameCore.Infrastructure.Services.Global
             Scene scene = SceneManager.GetSceneByName(sceneName.ToString());
             NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
             networkSceneManager.UnloadScene(scene);
-            
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -71,7 +70,7 @@ namespace GameCore.Infrastructure.Services.Global
 
             NetworkSceneManager networkSceneManager = NetworkManager.Singleton.SceneManager;
             networkSceneManager.LoadScene(sceneName.ToString(), loadSceneMode);
-            
+
             networkSceneManager.OnLoadEventCompleted += OnSceneLoaded;
 
             // LOCAL METHODS: -----------------------------
@@ -84,7 +83,7 @@ namespace GameCore.Infrastructure.Services.Global
                 callback?.Invoke();
             }
         }
-        
+
         private IEnumerator SceneLoader(SceneName sceneName, LoadSceneMode loadSceneMode, Action callback = null)
         {
             // The Application loads the Scene in the background as the current Scene runs.

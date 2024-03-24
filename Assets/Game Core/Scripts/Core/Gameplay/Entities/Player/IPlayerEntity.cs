@@ -1,6 +1,6 @@
 ﻿namespace GameCore.Gameplay.Entities.Player
 {
-    public interface IPlayerEntity : IEntity, INetworkObject, IDamageable
+    public interface IPlayerEntity : IEntity, IDamageable
     {
     }
 }

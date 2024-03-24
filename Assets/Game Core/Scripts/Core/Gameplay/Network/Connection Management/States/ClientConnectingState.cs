@@ -1,7 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Global;
-using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
 using UnityEngine;
@@ -67,7 +66,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                 if (!ConnectionManager.NetworkManager.StartClient())
                     throw new Exception("NetworkManager StartClient failed");
 
-                SceneLoaderWrapper.Instance.AddOnSceneEventCallback();
+                ConnectionManager.AddOnSceneEventCallback();
             }
             catch (Exception e)
             {

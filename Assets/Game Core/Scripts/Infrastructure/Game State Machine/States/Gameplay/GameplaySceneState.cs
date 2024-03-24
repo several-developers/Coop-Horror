@@ -38,6 +38,7 @@ namespace GameCore.Infrastructure.StateMachine
         public void Enter()
         {
             LockCursor();
+            EnableGameplayInput();
             CreatePauseMenu();
             CreateQuitConfirmMenuView();
             InitHorrorStateMachine();
@@ -67,6 +68,9 @@ namespace GameCore.Infrastructure.StateMachine
         
         private static void UnlockCursor() =>
             GameUtilities.ChangeCursorLockState(isLocked: false);
+
+        private void EnableGameplayInput() =>
+            _inputReader.EnableGameplayInput();
 
         private void CreatePauseMenu() =>
             _pauseMenuView = MenuFactory.Create<PauseMenuView>();

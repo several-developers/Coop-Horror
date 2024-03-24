@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.Interaction;
@@ -39,10 +40,7 @@ namespace GameCore.Gameplay.Entities.Player
         [Title(Constants.References)]
         [SerializeField]
         private PlayerReferences _references;
-
-        [SerializeField, Required]
-        private NetworkObject _networkObject;
-
+        
         [SerializeField, Required]
         private ClientNetworkTransform _networkTransform;
 
@@ -68,7 +66,6 @@ namespace GameCore.Gameplay.Entities.Player
         private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
 
-        private TheNetworkHorror _networkHorror;
         private RpcCaller _rpcCaller;
         private Gameplay.PlayerCamera.CameraController _cameraController;
 
@@ -118,6 +115,11 @@ namespace GameCore.Gameplay.Entities.Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            InitServerAndClient();
+            InitServer();
+            InitClient();
+
+            _isInitialized = true;
         }
 
         public override void OnNetworkDespawn()
@@ -126,15 +128,6 @@ namespace GameCore.Gameplay.Entities.Player
             DespawnServer();
             DespawnClient();
             base.OnNetworkDespawn();
-        }
-
-        public void Init()
-        {
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-
-            _isInitialized = true;
         }
 
         public void InitServerAndClient()
@@ -158,9 +151,6 @@ namespace GameCore.Gameplay.Entities.Player
                 _isInitialized = false;
                 return;
             }
-
-            _networkHorror = TheNetworkHorror.Get();
-            _networkHorror.OnDisconnectEvent += OnDisconnect;
             
             _rpcCaller = RpcCaller.Get();
             _cameraController = Gameplay.PlayerCamera.CameraController.Get();
@@ -184,7 +174,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!IsOwner)
                 return;
-
+            
             Debug.Log($"Player #{OwnerClientId} setup Owner.");
 
             Instance = this;
@@ -289,8 +279,6 @@ namespace GameCore.Gameplay.Entities.Player
         
         public void DespawnServerAndClient()
         {
-            _networkHorror.OnDisconnectEvent -= OnDisconnect;
-
             _rpcCaller.OnCreateItemPreviewEvent -= OnCreateItemPreview;
             _rpcCaller.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
             _rpcCaller.OnTeleportPlayerWithOffsetEvent -= OnTeleportPlayerWithOffset;
@@ -302,6 +290,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!IsOwner)
                 return;
 
+            _cameraController.Disable();
             _inventoryManager.Dispose();
             _interactionHandler.Dispose();
 
@@ -320,7 +309,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (IsOwner)
                 return;
 
-            _cameraController.Disable();
+            _inventory.DropAllItems();
             
             _currentSelectedSlotIndex.OnValueChanged -= OnClientSelectedSlotChanged;
         }
@@ -349,9 +338,7 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform GetCameraItemPivot() => _cameraItemPivot;
 
         public Transform GetPlayerItemPivot() => _playerItemPivot;
-
-        public NetworkObject GetNetworkObject() => _networkObject;
-
+        
         public PlayerInventory GetInventory() => _inventory;
 
         public bool IsDead() => _isDead;
@@ -380,16 +367,18 @@ namespace GameCore.Gameplay.Entities.Player
         private void DropItem() =>
             _inventory.DropItem();
 
-        private void SetMobileHQAsParent() =>
-            _networkObject.TrySetParent(_mobileHeadquartersEntity.NetworkObject);
+        private void SetMobileHQAsParent()
+        {
+            if (_mobileHeadquartersEntity == null) 
+                _mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
+
+            NetworkObject.TrySetParent(_mobileHeadquartersEntity.NetworkObject);
+        }
 
         private void RemoveParent() =>
-            _networkObject.TryRemoveParent();
+            NetworkObject.TryRemoveParent();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnDisconnect() =>
-            _inventory.DropAllItems();
 
         private void OnMove(Vector2 movementVector) =>
             OnMovementVectorChangedEvent?.Invoke(movementVector);

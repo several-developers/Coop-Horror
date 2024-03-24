@@ -1,4 +1,5 @@
 using GameCore.Utilities;
+using UnityEngine;
 
 namespace GameCore.Gameplay.Network.UnityServices.Lobbies
 {

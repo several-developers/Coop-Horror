@@ -3,11 +3,11 @@ using GameCore.Infrastructure.Services.Global;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class LoadMainMenuState : IEnterState
+    public class LoadMainMenuState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LoadMainMenuState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
+        public LoadMainMenuState(IGameStateMachine gameStateMachine, IScenesLoaderService2 scenesLoaderService)
         {
             _gameStateMachine = gameStateMachine;
             _scenesLoaderService = scenesLoaderService;
@@ -18,12 +18,19 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IScenesLoaderService _scenesLoaderService;
+        private readonly IScenesLoaderService2 _scenesLoaderService;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter() =>
-            _scenesLoaderService.LoadScene(SceneName.MainMenu, OnMainMenuSceneLoaded);
+        public void Enter()
+        {
+            _scenesLoaderService.LoadScene(SceneName.MainMenu, isNetwork: false);
+
+            _scenesLoaderService.OnSceneFinishedLoadingEvent += OnSceneFinishedLoading;
+        }
+        
+        public void Exit() =>
+            _scenesLoaderService.OnSceneFinishedLoadingEvent -= OnSceneFinishedLoading;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -32,6 +39,6 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnMainMenuSceneLoaded() => EnterPrepareMainMenuState();
+        private void OnSceneFinishedLoading() => EnterPrepareMainMenuState();
     }
 }

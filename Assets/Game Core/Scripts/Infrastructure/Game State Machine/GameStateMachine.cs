@@ -29,7 +29,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void ChangeState<T>() where T : IState
         {
-            //LogStateChange<T>();
+            LogStateChange<T>();
             
             _stateMachine.ChangeState<T>();
             _gameStateMachineObserver.SendStateChanged();

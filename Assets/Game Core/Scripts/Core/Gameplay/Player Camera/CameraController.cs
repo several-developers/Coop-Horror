@@ -1,5 +1,4 @@
-﻿using GameCore.Gameplay.Entities.MobileHeadquarters;
-using GameCore.Gameplay.Entities.Player;
+﻿using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
@@ -57,13 +56,10 @@ namespace GameCore.Gameplay.PlayerCamera
         private static CameraController _instance;
 
         private InputReader _inputReader;
-        private PlayerEntity _playerEntity;
         private Transform _transform;
         private Transform _target;
         private Transform _headPoint;
-        private Transform _mobileHqTransform;
 
-        private Vector3 _lastFrameMobileHqRotation;
         private Vector2 _lookVector;
         private float _mouseVerticalValue;
         private bool _snap;
@@ -89,18 +85,8 @@ namespace GameCore.Gameplay.PlayerCamera
 
             _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
-
-            Vector3 mobileHeadquartersRotation = _mobileHqTransform.rotation.eulerAngles;
-            float yRotationTemp = _target.rotation.eulerAngles.y;
-
-            if (_playerEntity.IsInsideMobileHQ)
-            {
-                Vector3 difference = mobileHeadquartersRotation - _lastFrameMobileHqRotation;
-                //yRotationTemp += difference.y;
-            }
-
-            float yRotation = yRotationTemp + _lookVector.x * _sensitivity;
-
+            
+            float yRotation = _target.rotation.eulerAngles.y + _lookVector.x * _sensitivity;
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
             if (_snap)
@@ -115,27 +101,23 @@ namespace GameCore.Gameplay.PlayerCamera
             }
 
             _transform.localRotation = finalRotation;
-
             _target.rotation = Quaternion.Euler(0, yRotation, 0);
-
-            _lastFrameMobileHqRotation = mobileHeadquartersRotation;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Init(PlayerEntity playerEntity)
         {
-            _playerEntity = playerEntity;
             _target = playerEntity.transform;
             _headPoint = playerEntity.References.HeadPoint;
             _isInitialized = true;
-
-            MobileHeadquartersEntity mobileHeadquartersEntity = MobileHeadquartersEntity.Get();
-            _mobileHqTransform = mobileHeadquartersEntity.transform;
         }
 
-        public void Disable() =>
+        public void Disable()
+        {
             _isInitialized = false;
+            Destroy(gameObject);
+        }
 
         public void ToggleSnap() =>
             _snap = true;
