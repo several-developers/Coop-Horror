@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using GameCore.Gameplay.NetworkDepricated2;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -17,7 +16,7 @@ namespace GameCore.Utilities
 
             try
             {
-                FastBufferWriter writer = new(size, Allocator.Temp, maxSize: TheNetworkHorrorDepricated2.MsgSize);
+                FastBufferWriter writer = new(size, Allocator.Temp, maxSize: 1024 * 1024);
                 writer.WriteNetworkSerializable(obj);
                 return writer.ToArray();
             }

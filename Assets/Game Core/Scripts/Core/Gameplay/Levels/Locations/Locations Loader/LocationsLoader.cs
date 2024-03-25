@@ -1,6 +1,6 @@
-﻿using System;
-using GameCore.Enums.Global;
+﻿using GameCore.Enums.Global;
 using GameCore.Infrastructure.Services.Global;
+using UnityEngine.SceneManagement;
 
 namespace GameCore.Gameplay.Levels.Locations
 {
@@ -8,10 +8,8 @@ namespace GameCore.Gameplay.Levels.Locations
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LocationsLoader(IScenesLoaderService scenesLoaderService)
-        {
+        public LocationsLoader(IScenesLoaderService scenesLoaderService) =>
             _scenesLoaderService = scenesLoaderService;
-        }
 
         // FIELDS: --------------------------------------------------------------------------------
         
@@ -22,7 +20,7 @@ namespace GameCore.Gameplay.Levels.Locations
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void LoadLocationNetwork(SceneName sceneName, Action callback = null)
+        public void LoadLocationNetwork(SceneName sceneName)
         {
             if (_isLocationLoaded)
                 return;
@@ -30,16 +28,16 @@ namespace GameCore.Gameplay.Levels.Locations
             _isLocationLoaded = true;
             _lastLoadedLocation = sceneName;
             
-            _scenesLoaderService.LoadSceneNetworkAdditive(sceneName, callback);
+            _scenesLoaderService.LoadScene(sceneName, isNetwork: true, LoadSceneMode.Additive);
         }
 
-        public void UnloadLastLocationNetwork()
+        public void UnloadLastLocation()
         {
             if (!_isLocationLoaded)
                 return;
 
             _isLocationLoaded = false;
-            _scenesLoaderService.UnloadSceneNetwork(_lastLoadedLocation);
+            _scenesLoaderService.UnloadScene(_lastLoadedLocation, isNetwork: true);
         }
     }
 }

@@ -1,3 +1,5 @@
+using GameCore.Gameplay.Network.ConnectionManagement;
+using GameCore.Gameplay.Network.Session_Manager;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,8 +22,57 @@ namespace GameCore.Gameplay.Network
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
+
             name = "Persistent Player #" + OwnerClientId;
+
+            if (!IsServer)
+                return;
+
+            SessionPlayerData? sessionPlayerData =
+                SessionManager<SessionPlayerData>.Instance.GetPlayerData(OwnerClientId);
+
+            if (!sessionPlayerData.HasValue)
+                return;
+
+            SessionPlayerData playerData = sessionPlayerData.Value;
+            //m_NetworkNameState.Name.Value = playerData.PlayerName;
+
+            if (playerData.HasCharacterSpawned)
+            {
+                //m_NetworkAvatarGuidState.AvatarGuid.Value = playerData.AvatarNetworkGuid;
+            }
+            else
+            {
+                //m_NetworkAvatarGuidState.SetRandomAvatar();
+                //playerData.AvatarNetworkGuid = m_NetworkAvatarGuidState.AvatarGuid.Value;
+                SessionManager<SessionPlayerData>.Instance.SetPlayerData(OwnerClientId, playerData);
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            RemovePersistentPlayer();
+            base.OnNetworkDespawn();
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void RemovePersistentPlayer()
+        {
+            if (!IsServer)
+                return;
+            
+            SessionPlayerData? sessionPlayerData =
+                SessionManager<SessionPlayerData>.Instance.GetPlayerData(OwnerClientId);
+
+            if (!sessionPlayerData.HasValue)
+                return;
+            
+            SessionPlayerData playerData = sessionPlayerData.Value;
+            //playerData.PlayerName = m_NetworkNameState.Name.Value;
+            //playerData.AvatarNetworkGuid = m_NetworkAvatarGuidState.AvatarGuid.Value;
+            
+            SessionManager<SessionPlayerData>.Instance.SetPlayerData(OwnerClientId, playerData);
         }
     }
 }

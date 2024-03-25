@@ -123,17 +123,10 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             if (_attempts > 0)
                 yield return new WaitForSeconds(TimeBetweenAttempts);
 
-            //Debug.Log("Lost connection to host, trying to reconnect...");
+            Debug.Log("Lost connection to host, trying to reconnect...");
 
             ConnectionManager.NetworkManager.Shutdown();
-
-            // TEMP
-            {
-                Debug.Log("Lost connection to host.");
-                OnClientDisconnect(0);
-                yield break;
-            }
-
+            
             // Wait until NetworkManager completes shutting down.
             yield return new WaitWhile(() => ConnectionManager.NetworkManager.ShutdownInProgress);
 

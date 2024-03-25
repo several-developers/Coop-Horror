@@ -58,7 +58,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void UnloadLastLocation() =>
-            _locationsLoader.UnloadLastLocationNetwork();
+            _locationsLoader.UnloadLastLocation();
 
         private static void ClearDungeons()
         {

@@ -6,16 +6,16 @@ using Zenject;
 
 namespace GameCore.Gameplay.Other
 {
-    public class ScenesLoaderScreen : MonoBehaviour
+    public class LoadingScreenView : MonoBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IScenesLoaderService2 scenesLoaderService2)
+        private void Construct(IScenesLoaderService scenesLoaderService)
         {
-            _scenesLoaderService2 = scenesLoaderService2;
+            _scenesLoaderService = scenesLoaderService;
 
-            _scenesLoaderService2.OnLoadingScreenStateChangedEvent += OnLoadingScreenStateChanged;
+            _scenesLoaderService.OnLoadingScreenStateChangedEvent += OnLoadingScreenStateChanged;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -33,14 +33,14 @@ namespace GameCore.Gameplay.Other
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private IScenesLoaderService2 _scenesLoaderService2;
+        private IScenesLoaderService _scenesLoaderService;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() => DontDestroyOnLoad(gameObject);
 
         private void OnDestroy() =>
-            _scenesLoaderService2.OnLoadingScreenStateChangedEvent -= OnLoadingScreenStateChanged;
+            _scenesLoaderService.OnLoadingScreenStateChangedEvent -= OnLoadingScreenStateChanged;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

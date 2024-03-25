@@ -8,7 +8,7 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CreateRelayLobbyState(IGameStateMachine gameStateMachine, IScenesLoaderService2 scenesLoaderService)
+        public CreateRelayLobbyState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
         {
             _gameStateMachine = gameStateMachine;
             _scenesLoaderService = scenesLoaderService;
@@ -19,7 +19,7 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IScenesLoaderService2 _scenesLoaderService;
+        private readonly IScenesLoaderService _scenesLoaderService;
 
         private RelayLobbyMenuView _relayLobbyMenu;
 
@@ -29,11 +29,11 @@ namespace GameCore.Infrastructure.StateMachine
         {
             CreateRelayLobbyMenu();
 
-            _scenesLoaderService.OnSceneFinishedLoadingEvent += OnSceneFinishedLoading;
+            _scenesLoaderService.OnSceneLoadedEvent += OnSceneLoaded;
         }
 
         public void Exit() =>
-            _scenesLoaderService.OnSceneFinishedLoadingEvent -= OnSceneFinishedLoading;
+            _scenesLoaderService.OnSceneLoadedEvent -= OnSceneLoaded;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
@@ -54,6 +54,6 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void OnCloseClicked() => EnterMainMenuState();
 
-        private void OnSceneFinishedLoading() => EnterGameplaySceneState();
+        private void OnSceneLoaded() => EnterGameplaySceneState();
     }
 }

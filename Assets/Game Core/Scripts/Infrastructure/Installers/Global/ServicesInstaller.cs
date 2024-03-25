@@ -12,7 +12,7 @@ namespace GameCore.Infrastructure.Installers.Global
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private ScenesLoaderService2 _scenesLoaderService;
+        private ScenesLoaderService _scenesLoaderService;
         
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -25,7 +25,6 @@ namespace GameCore.Infrastructure.Installers.Global
             BindDataServices();
             BindSaveLoadService();
             BindScenesLoaderService();
-            BindScenesLoaderService2();
             BindRewardsService();
         }
 
@@ -48,16 +47,8 @@ namespace GameCore.Infrastructure.Installers.Global
         private void BindScenesLoaderService()
         {
             Container
-                .BindInterfacesTo<ScenesLoaderService>()
-                .AsSingle()
-                .NonLazy();
-        }
-
-        private void BindScenesLoaderService2()
-        {
-            Container
-                .Bind<IScenesLoaderService2>()
-                .To<ScenesLoaderService2>()
+                .Bind<IScenesLoaderService>()
+                .To<ScenesLoaderService>()
                 .FromComponentInNewPrefab(_scenesLoaderService)
                 .AsSingle()
                 .NonLazy();

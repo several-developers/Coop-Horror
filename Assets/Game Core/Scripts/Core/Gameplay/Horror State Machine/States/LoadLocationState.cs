@@ -4,20 +4,23 @@ using Cysharp.Threading.Tasks;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
+using GameCore.Infrastructure.Services.Global;
 using UnityEngine;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
-    public class LoadLocationState : IEnterState<SceneName>, IDisposable
+    public class LoadLocationState : IEnterState<SceneName>, IExitState, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LoadLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader)
+        public LoadLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader,
+            IScenesLoaderService scenesLoaderService)
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
+            _scenesLoaderService = scenesLoaderService;
             _cancellationTokenSource = new CancellationTokenSource();
-            
+
             horrorStateMachine.AddState(this);
         }
 
@@ -25,6 +28,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
+        private readonly IScenesLoaderService _scenesLoaderService;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -32,14 +36,22 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         public void Dispose() =>
             _cancellationTokenSource?.Dispose();
 
-        public void Enter(SceneName sceneName) => LoadLocation(sceneName);
+        public void Enter(SceneName sceneName)
+        {
+            _scenesLoaderService.OnSceneLoadedEvent += OnSceneLoaded;
+
+            LoadLocation(sceneName);
+        }
+
+        public void Exit() =>
+            _scenesLoaderService.OnSceneLoadedEvent -= OnSceneLoaded;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void LoadLocation(SceneName sceneName) =>
-            _locationsLoader.LoadLocationNetwork(sceneName, OnLocationLoaded);
+            _locationsLoader.LoadLocationNetwork(sceneName);
 
-        #warning CHANGE TO OBSERVER
+#warning CHANGE TO OBSERVER
         private async void FindLocationManager()
         {
             int iterations = 0;
@@ -71,7 +83,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
                 RpcCaller rpcCaller = RpcCaller.Get();
                 rpcCaller.SendLocationLoaded();
-                
+
                 EnterGenerateDungeonsState();
                 break;
             }
@@ -82,6 +94,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnLocationLoaded() => FindLocationManager();
+        private void OnSceneLoaded() => FindLocationManager();
     }
 }

@@ -3,7 +3,7 @@ using GameCore.Infrastructure.Services.Global;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class LoadGameplayState : IEnterState
+    public class LoadGameplayState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -22,18 +22,26 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter() => LoadGameplayScene();
+        public void Enter()
+        {
+            _scenesLoaderService.OnSceneLoadedEvent += OnSceneLoaded;
+
+            LoadGameplayScene();
+        }
+
+        public void Exit() =>
+            _scenesLoaderService.OnSceneLoadedEvent -= OnSceneLoaded;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void LoadGameplayScene() =>
-            _scenesLoaderService.LoadSceneNetwork(SceneName.Gameplay, OnGameplaySceneLoaded);
+            _scenesLoaderService.LoadScene(SceneName.Gameplay, isNetwork: true);
 
         private void EnterGameplaySceneState() =>
             _gameStateMachine.ChangeState<GameplaySceneState>();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnGameplaySceneLoaded() => EnterGameplaySceneState();
+        private void OnSceneLoaded() => EnterGameplaySceneState();
     }
 }

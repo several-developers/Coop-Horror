@@ -20,7 +20,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             IPublisher<ReconnectMessage> reconnectMessagePublisher,
             IPublisher<ConnectionEventMessage> connectionEventPublisher, LobbyServiceFacade lobbyServiceFacade,
             ProfileManager profileManager, LocalLobby localLobby, LocalLobbyUser lobbyUser,
-            IScenesLoaderService2 scenesLoaderService, IGameStateMachine gameStateMachine)
+            IScenesLoaderService scenesLoaderService, IGameStateMachine gameStateMachine)
         {
             _connectStatusPublisher = connectStatusPublisher;
             _reconnectMessagePublisher = reconnectMessagePublisher;
@@ -60,7 +60,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private LocalLobby _localLobby;
         private LocalLobbyUser _lobbyUser;
         private ConnectionState _currentState;
-        private IScenesLoaderService2 _scenesLoaderService;
+        private IScenesLoaderService _scenesLoaderService;
         private IGameStateMachine _gameStateMachine;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------

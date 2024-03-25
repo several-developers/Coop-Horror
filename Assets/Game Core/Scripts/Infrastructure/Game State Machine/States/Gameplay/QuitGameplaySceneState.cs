@@ -1,6 +1,6 @@
 ﻿using GameCore.Gameplay.HorrorStateMachineSpace;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.ConnectionManagement;
+using GameCore.Gameplay.Network.Session_Manager;
 
 namespace GameCore.Infrastructure.StateMachine
 {
@@ -30,23 +30,18 @@ namespace GameCore.Infrastructure.StateMachine
         {
             Disconnect();
             QuitHorrorStateMachine();
-            EnterLoadMainMenuState();
+            SendSessionEnded();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void Disconnect()
-        {
-            //TheNetworkHorror network = TheNetworkHorror.Get();
-            //network.Disconnect();
-            
+        private void Disconnect() =>
             _connectionManager.RequestShutdown();
-        }
 
         private void QuitHorrorStateMachine() =>
             _horrorStateMachine.ChangeState<QuitState>();
-
-        private void EnterLoadMainMenuState() =>
-            _gameStateMachine.ChangeState<LoadMainMenuState>();
+        
+        private static void SendSessionEnded() =>
+            SessionManager<SessionPlayerData>.Instance.OnSessionEnded();
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GameCore.Enums.Global;
 using UnityEngine.SceneManagement;
 
@@ -6,13 +6,11 @@ namespace GameCore.Infrastructure.Services.Global
 {
     public interface IScenesLoaderService
     {
-        event Action<LoadSceneMode> OnSceneStartLoading;
-        event Action<LoadSceneMode> OnSceneFinishedLoading;
-        void LoadScene(SceneName sceneName, Action callback = null);
-        void LoadSceneAdditive(SceneName sceneName, Action callback = null);
-        void LoadSceneNetwork(SceneName sceneName, Action callback = null);
-        void LoadSceneNetworkAdditive(SceneName sceneName, Action callback = null);
-        void UnloadScene(SceneName sceneName, Action callback = null);
-        void UnloadSceneNetwork(SceneName sceneName, Action callback = null);
+        event Action OnSceneLoadEvent;
+        event Action OnSceneLoadedEvent;
+        event Action<bool> OnLoadingScreenStateChangedEvent; 
+        void AddOnSceneEventCallback();
+        void LoadScene(SceneName sceneName, bool isNetwork, LoadSceneMode loadSceneMode = LoadSceneMode.Single);
+        void UnloadScene(SceneName sceneName, bool isNetwork);
     }
 }

@@ -7,7 +7,7 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LoadMainMenuState(IGameStateMachine gameStateMachine, IScenesLoaderService2 scenesLoaderService)
+        public LoadMainMenuState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
         {
             _gameStateMachine = gameStateMachine;
             _scenesLoaderService = scenesLoaderService;
@@ -18,7 +18,7 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IScenesLoaderService2 _scenesLoaderService;
+        private readonly IScenesLoaderService _scenesLoaderService;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -26,11 +26,11 @@ namespace GameCore.Infrastructure.StateMachine
         {
             _scenesLoaderService.LoadScene(SceneName.MainMenu, isNetwork: false);
 
-            _scenesLoaderService.OnSceneFinishedLoadingEvent += OnSceneFinishedLoading;
+            _scenesLoaderService.OnSceneLoadedEvent += OnSceneLoaded;
         }
         
         public void Exit() =>
-            _scenesLoaderService.OnSceneFinishedLoadingEvent -= OnSceneFinishedLoading;
+            _scenesLoaderService.OnSceneLoadedEvent -= OnSceneLoaded;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -39,6 +39,6 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnSceneFinishedLoading() => EnterPrepareMainMenuState();
+        private void OnSceneLoaded() => EnterPrepareMainMenuState();
     }
 }
