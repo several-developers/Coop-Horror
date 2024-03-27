@@ -15,7 +15,7 @@ namespace GameCore.Utilities
         private const double DoubleMinTolerance = 9.99999943962493E-11;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public static Tweener VisibilityState(this CanvasGroup canvasGroup, bool show, float fadeTime = 0,
             bool ignoreScaleTime = false)
         {

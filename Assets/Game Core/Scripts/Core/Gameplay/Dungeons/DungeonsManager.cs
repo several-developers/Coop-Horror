@@ -96,12 +96,12 @@ namespace GameCore.Gameplay.Dungeons
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnDungeonGenerationCompleted(Floor floor, DungeonReferences dungeonReferences)
+        private void OnDungeonGenerationCompleted(Floor floor)
         {
             _generatedDungeonsAmount++;
             
             if (_generatedDungeonsAmount >= 3)
-                _dungeonsObserver.SendDungeonsGenerationCompleted();
+                _dungeonsObserver.DungeonsGenerationCompleted();
         }
 
         private void OnGenerateDungeons(DungeonsSeedData data) => GenerateDungeonsWithSeed(data);

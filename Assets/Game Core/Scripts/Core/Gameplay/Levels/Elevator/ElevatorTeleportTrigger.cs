@@ -25,7 +25,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         private readonly List<PlayerEntity> _playersList = new();
         
         private ILevelManager _levelManager;
-        private ElevatorManager _elevatorManager;
+        private ElevatorsManager _elevatorsManager;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -33,12 +33,12 @@ namespace GameCore.Gameplay.Levels.Elevator
         {
             GetLevelManager();
             
-            _elevatorManager = ElevatorManager.Get();
-            _elevatorManager.OnFloorChangedEvent += OnFloorChanged;
+            _elevatorsManager = ElevatorsManager.Get();
+            _elevatorsManager.OnFloorChangedEvent += OnFloorChanged;
         }
 
         private void OnDestroy() =>
-            _elevatorManager.OnFloorChangedEvent -= OnFloorChanged;
+            _elevatorsManager.OnFloorChangedEvent -= OnFloorChanged;
 
         private void OnTriggerEnter(Collider other)
         {
@@ -74,13 +74,13 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void TeleportLocalPlayer()
         {
-            Floor currentFloor = _elevatorManager.GetCurrentFloor();
+            Floor currentFloor = _elevatorsManager.GetCurrentFloor();
             bool isElevatorFound = _levelManager.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
 
             if (!isElevatorFound)
                 return;
             
-            var playerEntity = PlayerEntity.Instance;
+            var playerEntity = PlayerEntity.GetLocalPlayer();
             Transform target = playerEntity.transform;
             Transform parent1 = _elevator.transform;
             Transform parent2 = targetElevator.transform;
@@ -91,7 +91,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private bool IsLocalPlayerInTheElevator()
         {
-            var localPlayer = PlayerEntity.Instance;
+            var localPlayer = PlayerEntity.GetLocalPlayer();
             bool isLocalPlayerInTheElevator = false;
             
             foreach (PlayerEntity playerEntity in _playersList)

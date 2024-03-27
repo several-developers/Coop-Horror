@@ -100,6 +100,9 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void OnOpenPauseMenu()
         {
+            if (_pauseMenuView.IsShown)
+                return;
+            
             UnlockCursor();
             ShowPauseMenu();
             _inputReader.EnableUIInput();

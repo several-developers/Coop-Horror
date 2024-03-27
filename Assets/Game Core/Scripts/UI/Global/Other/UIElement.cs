@@ -32,6 +32,10 @@ namespace GameCore.UI.Global
         [SerializeField, Required]
         private CanvasGroup _targetCG;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+        
+        public bool IsShown { get; private set; }
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnHideEvent;
@@ -77,6 +81,8 @@ namespace GameCore.UI.Global
 
         protected void VisibilityState(bool show)
         {
+            IsShown = show;
+            
             if (show && _changeCanvasState)
                 _canvas.enabled = true;
             

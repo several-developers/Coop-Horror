@@ -1,16 +1,12 @@
-﻿using GameCore.Enums;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
-
-namespace GameCore.Gameplay.HorrorStateMachineSpace
+﻿namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
     public class GameLoopState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameLoopState(IHorrorStateMachine horrorStateMachine, IMobileHeadquartersEntity mobileHeadquartersEntity)
+        public GameLoopState(IHorrorStateMachine horrorStateMachine)
         {
             _horrorStateMachine = horrorStateMachine;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
 
             horrorStateMachine.AddState(this);
         }
@@ -18,7 +14,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IHorrorStateMachine _horrorStateMachine;
-        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

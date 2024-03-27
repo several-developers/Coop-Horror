@@ -1,7 +1,6 @@
 ﻿using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums.Global;
-using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
@@ -53,9 +52,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public RpcCaller RpcCaller => _rpcCaller;
 
         // FIELDS: --------------------------------------------------------------------------------
-
-        private static MobileHeadquartersEntity _instance;
-
+        
         private RigidbodyPathMovement _pathMovement;
         private RpcCaller _rpcCaller;
         private State _currentState = State.MovingOnRoad;
@@ -64,8 +61,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void Awake()
         {
-            _instance = this;
-
             _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _animator,
                 _mobileHeadquartersConfig);
 
@@ -191,15 +186,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         }
 
         public Transform GetTransform() => transform;
+
+        public NetworkObject GetNetworkObject() => NetworkObject;
         
         public Vector3 GetVelocity()
         {
             Vector3 direction = transform.forward;
             return direction;
         }
-
-        public static MobileHeadquartersEntity Get() => _instance;
-
+        
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void ArrivedAtRoadLocation()

@@ -5,6 +5,7 @@ using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Configs.Gameplay.Time;
 using GameCore.Configs.Gameplay.Player;
+using GameCore.Configs.Gameplay.PrefabsList;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
 {
@@ -17,5 +18,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         TimeConfigMeta GetTimeConfig();
         DungeonGeneratorConfigMeta GetDungeonGeneratorConfig();
         ElevatorConfigMeta GetElevatorConfig();
+        PrefabsListConfigMeta GetPrefabsListConfig();
     }
 }

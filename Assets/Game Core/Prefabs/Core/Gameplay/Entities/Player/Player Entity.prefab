@@ -2762,7 +2762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
+  GlobalObjectIdHash: 2175522384
+  InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -2865,6 +2866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0445756174f0834ba947f4d8a5cc640, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -2916,7 +2918,6 @@ MonoBehaviour:
     _headPoint: {fileID: 260123221838165337}
     _playerItemPivot: {fileID: 8186703484883488036}
     _headLookObject: {fileID: 9205309517001490629}
-  _networkObject: {fileID: -4117527861951101490}
   _networkTransform: {fileID: 5356547518013829562}
   _playerItemPivot: {fileID: 8186703484883488036}
   _headLookObject: {fileID: 9205309517001490629}
@@ -2932,6 +2933,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1372091596477892721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4628898490251457778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 717a02054ef2699498e6bd4234fd7995, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _containerSource: 0
 --- !u!4 &8684867425259486934 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,

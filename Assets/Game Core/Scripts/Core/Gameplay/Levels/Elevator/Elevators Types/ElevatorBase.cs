@@ -2,11 +2,18 @@
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
     public abstract class ElevatorBase : MonoBehaviour
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IElevatorsManager elevatorsManager) =>
+            _elevatorsManager = elevatorsManager;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -19,34 +26,36 @@ namespace GameCore.Gameplay.Levels.Elevator
         
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ElevatorManager _elevatorManager;
+        private IElevatorsManager _elevatorsManager;
         private RpcCaller _rpcCaller;
         private bool _isOpen;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
+        private void Awake()
+        {
+            _elevatorsManager.OnElevatorStartedEvent += OnElevatorsStarted;
+            _elevatorsManager.OnFloorChangedEvent += OnFloorChanged;
+        }
+
         protected virtual void Start()
         {
-            _elevatorManager = ElevatorManager.Get();
             _rpcCaller = RpcCaller.Get();
-
-            _elevatorManager.OnElevatorStartedEvent += OnElevatorStarted;
-            _elevatorManager.OnFloorChangedEvent += OnFloorChanged;
-
+            
             _rpcCaller.OnOpenElevatorEvent += OnOpenElevator;
         }
 
         private void OnDestroy()
         {
-            _elevatorManager.OnElevatorStartedEvent -= OnElevatorStarted;
-            _elevatorManager.OnFloorChangedEvent -= OnFloorChanged;
+            _elevatorsManager.OnElevatorStartedEvent -= OnElevatorsStarted;
+            _elevatorsManager.OnFloorChangedEvent -= OnFloorChanged;
 
             _rpcCaller.OnOpenElevatorEvent -= OnOpenElevator;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void ChangeElevatorFloor(Floor floor) =>
+        public void SetElevatorFloor(Floor floor) =>
             _floor = floor;
 
         public Floor GetElevatorFloor() => _floor;
@@ -70,7 +79,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnElevatorStarted(ElevatorStaticData data)
+        private void OnElevatorsStarted(ElevatorStaticData data)
         {
             bool isSameFloor = data.CurrentFloor == _floor;
 

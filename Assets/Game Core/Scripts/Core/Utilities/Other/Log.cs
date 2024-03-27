@@ -3,8 +3,10 @@ using UnityEngine;
 
 namespace GameCore
 {
-    public class Log
+    public static class Log
     {
+        // FIELDS: --------------------------------------------------------------------------------
+        
         private const string StatColor = "<color=#FF6B37>";
         private const string ValuesColor = "<color=#60FF79>";
         private const string AttributeColor = "<color=#3BAAFF>";
@@ -28,10 +30,20 @@ namespace GameCore
 
         private const string ColorEndPrefix = "</color>";
 
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
         public static string HandleLog(string log)
         {
             HandleMessage(log, out string logResult);
             return AddWhite(logResult);
+        }
+        
+        public static void PrintError(string log, Object context = null)
+        {
+            HandleMessage(log, out string logResult);
+            string finalLog = AddWhite(logResult);
+            
+            Debug.LogError(finalLog, context);
         }
 
         public static string HandleLog(string tag, string log)
@@ -41,24 +53,8 @@ namespace GameCore
             return AddWhite(logResult);
         }
 
-        public static void Print(string log)
-        {
-            HandleMessage(log, out string text);
-            PrintMessage(text);
-        }
-
-        public static void Error(string log)
-        {
-            HandleMessage(log, out string text);
-            PrintMessage(text, true);
-        }
-
-        public static void Error(string log, Object context)
-        {
-            HandleMessage(log, out string text);
-            PrintMessage(text, context, true);
-        }
-
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+        
         private static void HandleMessage(string log, out string result)
         {
             StringBuilder text = new(log);
@@ -96,22 +92,6 @@ namespace GameCore
         private static string AddWhite(string log)
         {
             return $"<color=white>{log}</color>";
-        }
-
-        private static void PrintMessage(string text, bool isError = false)
-        {
-            if (isError)
-                Debug.LogError($"<color=white>{text}</color>");
-            else
-                Debug.Log($"<color=white>{text}</color>");
-        }
-
-        private static void PrintMessage(string text, Object context, bool isError = false)
-        {
-            if (isError)
-                Debug.LogError($"<color=white>{text}</color>", context);
-            else
-                Debug.Log($"<color=white>{text}</color>", context);
         }
     }
 }

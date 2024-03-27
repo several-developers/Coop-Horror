@@ -1,6 +1,5 @@
 ﻿using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
-using GameCore.Observers.Gameplay.PlayerInteraction;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -12,21 +11,14 @@ namespace GameCore.Gameplay.Network
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsMetaProvider itemsMetaProvider,
-            IPlayerInteractionObserver playerInteractionObserver)
-        {
+        private void Construct(IItemsMetaProvider itemsMetaProvider) =>
             _itemsMetaProvider = itemsMetaProvider;
-            _playerInteractionObserver = playerInteractionObserver;
-        }
-        
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private static NetworkSpawner _instance;
 
         private IItemsMetaProvider _itemsMetaProvider;
-        private IPlayerInteractionObserver _playerInteractionObserver;
-
-        public IPlayerInteractionObserver PlayerInteractionObserver => _playerInteractionObserver; // TEMP
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 

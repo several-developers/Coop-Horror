@@ -2,6 +2,7 @@
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Observers.Gameplay.UI;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -16,8 +17,11 @@ namespace GameCore.UI.Gameplay.Inventory
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsMetaProvider itemsMetaProvider) =>
+        private void Construct(IItemsMetaProvider itemsMetaProvider, IUIObserver uiObserver)
+        {
             _itemsMetaProvider = itemsMetaProvider;
+            _uiObserver = uiObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -32,10 +36,9 @@ namespace GameCore.UI.Gameplay.Inventory
         private LayoutGroup _layoutGroup;
 
         // FIELDS: --------------------------------------------------------------------------------
-
-        private static InventoryHUD _instance; // TEMP
-
+        
         private IItemsMetaProvider _itemsMetaProvider;
+        private IUIObserver _uiObserver;
 
         private InventoryFactory _inventoryFactory;
         private LayoutFixHelper _layoutFixHelper;
@@ -47,9 +50,10 @@ namespace GameCore.UI.Gameplay.Inventory
 
         private void Awake()
         {
-            _instance = this;
             _inventoryFactory = new InventoryFactory(_itemSlotViewPrefab, _slotsContainer);
             _layoutFixHelper = new LayoutFixHelper(coroutineRunner: this, _layoutGroup);
+
+            _uiObserver.OnInitPlayerEvent += OnInitPlayer;
         }
 
         private void Start()
@@ -61,9 +65,11 @@ namespace GameCore.UI.Gameplay.Inventory
 
         private void OnDestroy()
         {
+            _uiObserver.OnInitPlayerEvent -= OnInitPlayer;
+
             if (!_isInitialized)
                 return;
-
+            
             PlayerInventory inventory = _playerEntity.GetInventory();
 
             inventory.OnSelectedSlotChangedEvent -= OnSelectedSlotChanged;
@@ -71,9 +77,9 @@ namespace GameCore.UI.Gameplay.Inventory
             inventory.OnItemDroppedEvent -= OnItemDropped;
         }
 
-        // PUBLIC METHODS: ------------------------------------------------------------------------
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        public void Init(PlayerEntity playerEntity)
+        private void Init(PlayerEntity playerEntity)
         {
             _playerEntity = playerEntity;
             _isInitialized = true;
@@ -84,11 +90,7 @@ namespace GameCore.UI.Gameplay.Inventory
             inventory.OnItemEquippedEvent += OnItemEquipped;
             inventory.OnItemDroppedEvent += OnItemDropped;
         }
-
-        public static InventoryHUD Get() => _instance;
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
+        
         private void CreateItemsSlots()
         {
             _inventoryFactory.Create();
@@ -153,6 +155,8 @@ namespace GameCore.UI.Gameplay.Inventory
             _inventoryFactory.GetItemSlot(slotIndex, out itemSlotView);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnInitPlayer(PlayerEntity playerEntity) => Init(playerEntity);
 
         private void OnSelectedSlotChanged(int selectedSlotIndex) => SelectSlot(selectedSlotIndex);
 

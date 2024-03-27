@@ -1,6 +1,6 @@
 ﻿namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
-    public interface IMobileHeadquartersEntity : IEntity
+    public interface IMobileHeadquartersEntity : IEntity, INetworkObject
     {
     }
 }

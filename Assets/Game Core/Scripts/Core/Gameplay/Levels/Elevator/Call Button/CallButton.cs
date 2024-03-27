@@ -29,7 +29,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         public event Action OnInteractionStateChangedEvent;
 
-        private ElevatorManager _elevatorManager;
+        private ElevatorsManager _elevatorsManager;
         private RpcCaller _rpcCaller;
         private bool _canInteract = true;
 
@@ -40,17 +40,17 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void Start()
         {
-            _elevatorManager = ElevatorManager.Get();
+            _elevatorsManager = ElevatorsManager.Get();
             _rpcCaller = RpcCaller.Get();
             
-            _elevatorManager.OnElevatorStoppedEvent += OnElevatorStopped;
+            _elevatorsManager.OnElevatorStoppedEvent += OnElevatorsStopped;
         }
 
         private void OnDestroy()
         {
             _animationObserver.OnEnabledEvent -= OnEnabledEvent;
             
-            _elevatorManager.OnElevatorStoppedEvent -= OnElevatorStopped;
+            _elevatorsManager.OnElevatorStoppedEvent -= OnElevatorsStopped;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -85,7 +85,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         private void HandleClick()
         {
             Floor floor = _elevator.GetElevatorFloor();
-            Floor currentFloor = _elevatorManager.GetCurrentFloor();
+            Floor currentFloor = _elevatorsManager.GetCurrentFloor();
             bool isElevatorMoving = IsElevatorMoving();
             bool openElevator = !isElevatorMoving && currentFloor == floor;
 
@@ -102,13 +102,13 @@ namespace GameCore.Gameplay.Levels.Elevator
             _controlPanel.StartElevator(floor);
 
         private bool IsElevatorMoving() =>
-            _elevatorManager.IsElevatorMoving();
+            _elevatorsManager.IsElevatorMoving();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnEnabledEvent()
         {
-            bool isElevatorMoving = _elevatorManager.IsElevatorMoving();
+            bool isElevatorMoving = _elevatorsManager.IsElevatorMoving();
 
             if (isElevatorMoving)
                 return;
@@ -116,6 +116,6 @@ namespace GameCore.Gameplay.Levels.Elevator
             ToggleInteract(canInteract: true);
         }
         
-        private void OnElevatorStopped(Floor floor) => ToggleInteract(canInteract: true);
+        private void OnElevatorsStopped(Floor floor) => ToggleInteract(canInteract: true);
     }
 }

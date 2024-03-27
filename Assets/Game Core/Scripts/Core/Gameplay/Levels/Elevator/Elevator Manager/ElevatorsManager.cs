@@ -10,7 +10,16 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
-    public class ElevatorManager : NetworkBehaviour
+    public interface IElevatorsManager
+    {
+        event Action<ElevatorStaticData> OnElevatorStartedEvent;
+        event Action<ElevatorStaticData> OnFloorChangedEvent;
+        event Action<Floor> OnElevatorStoppedEvent;
+        Floor GetCurrentFloor();
+        bool IsElevatorMoving();
+    }
+    
+    public class ElevatorsManager : NetworkBehaviour, IElevatorsManager
     {
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -22,7 +31,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         private readonly NetworkVariable<Floor> _targetFloor = new();
         private readonly NetworkVariable<bool> _isElevatorMoving = new();
 
-        private static ElevatorManager _instance;
+        private static ElevatorsManager _instance;
 
         private ElevatorConfigMeta _elevatorConfig;
         private RpcCaller _rpcCaller;
@@ -35,8 +44,8 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         public override void OnNetworkSpawn()
         {
-            Init();
             base.OnNetworkSpawn();
+            Init();
         }
 
         public override void OnNetworkDespawn()
@@ -53,7 +62,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         public bool IsElevatorMoving() =>
             _isElevatorMoving.Value;
 
-        public static ElevatorManager Get() => _instance;
+        public static ElevatorsManager Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

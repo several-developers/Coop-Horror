@@ -1,11 +1,19 @@
-﻿using EFPController;
+﻿using GameCore.Gameplay.InputHandlerTEMP;
+using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
-namespace GameCore.Gameplay.Entities.Player
+namespace GameCore.Gameplay.Entities.Player.CameraManagement
 {
     public class PlayerCamera : MonoBehaviour
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IConfigsProvider configsProvider) =>
+            _inputReader = configsProvider.GetInputReader();
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -15,56 +23,29 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField, Min(0.1f)]
         private float _sensitivity = 1f;
 
+        [SerializeField, Min(0f)]
+        private float _cameraSpeed = 10f;
+
         [Title(Constants.References)]
-        [SerializeField, Required]
-        private Camera _camera;
+        [SerializeField]
+        private CameraReferences _cameraReferences;
 
-        [SerializeField, Required]
-        private GameObject _weaponRoot;
-
-        [SerializeField, Required]
-        private AudioListener _audioListener;
-
-        [SerializeField, Required]
-        private SmoothLook _smoothLook;
-        
-        [SerializeField, Required]
-        private CameraRootAnimations _cameraRootAnimations;
-        
-        [SerializeField, Required]
-        private CameraControl _cameraControl;
-        
-        [SerializeField, Required]
-        private Animator _cameraAnimator;
-
-        [SerializeField, Required]
-        private Transform _itemPivot;
-        
-        [SerializeField, Required]
-        private Transform _lookAtObject;
-        
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public Camera Camera => _camera;
-        public GameObject WeaponRoot => _weaponRoot;
-        public GameObject CameraRoot => gameObject;
-        public AudioListener AudioListener => _audioListener;
-        public SmoothLook SmoothLook => _smoothLook;
-        public CameraRootAnimations CameraRootAnimations => _cameraRootAnimations;
-        public CameraControl CameraControl => _cameraControl;
-        public Animator CameraAnimator => _cameraAnimator;
-        public Transform ItemPivot => _itemPivot;
-        public Transform LookAtObject => _lookAtObject;
+        public CameraReferences CameraReferences => _cameraReferences;
 
         private float MouseVerticalValue
         {
             get => _mouseVerticalValue;
             set
             {
-                if (value == 0) return;
+                if (value == 0)
+                    return;
 
                 float verticalAngle = _mouseVerticalValue + value * _sensitivity;
-                verticalAngle = Mathf.Clamp(verticalAngle, -_maxVerticalAngle, _maxVerticalAngle);
+                float min = -_maxVerticalAngle;
+                float max = _maxVerticalAngle;
+                verticalAngle = Mathf.Clamp(value: verticalAngle, min, max);
                 _mouseVerticalValue = verticalAngle;
             }
         }
@@ -73,67 +54,73 @@ namespace GameCore.Gameplay.Entities.Player
 
         private static PlayerCamera _instance;
 
+        private InputReader _inputReader;
         private Transform _transform;
         private Transform _target;
-        private Transform _cameraPoint;
-        private Transform _mobileHeadquartersTransform;
-        private GameInput _playerInputActions;
+        private Transform _headPoint;
 
-        private Vector3 _lastFrameMobileHeadquartersRotation;
         private Vector2 _lookVector;
         private float _mouseVerticalValue;
-        private bool _isPlayerFound;
+        private bool _snap;
+        private bool _isInitialized;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
-            _instance = this;
-
-        private void Start()
+        private void Awake()
         {
-            //_mobileHeadquartersTransform = MobileHeadquartersEntity.Get().transform;
-            //_lastFrameMobileHeadquartersRotation = _mobileHeadquartersTransform.rotation.eulerAngles;
+            _instance = this;
+            _transform = transform;
+            _transform.SetParent(null);
+
+            _inputReader.OnLookEvent += OnLook;
         }
+
+        private void OnDestroy() =>
+            _inputReader.OnLookEvent -= OnLook;
 
         private void LateUpdate()
         {
-            return;
-            if (!_isPlayerFound)
+            if (!_isInitialized)
                 return;
 
-            _lookVector = _playerInputActions.Gameplay.Look.ReadValue<Vector2>();
+            _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
-
-            Vector3 mobileHeadquartersRotation = _mobileHeadquartersTransform.rotation.eulerAngles;
-            Vector3 difference = mobileHeadquartersRotation - _lastFrameMobileHeadquartersRotation;
-
-            float yRotation = _target.rotation.eulerAngles.y + difference.y + _lookVector.x * _sensitivity;
+            
+            float yRotation = _target.rotation.eulerAngles.y + _lookVector.x * _sensitivity;
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
-            _transform.position = _cameraPoint.position;
+            if (_snap)
+            {
+                _snap = false;
+                _transform.position = _headPoint.position;
+            }
+            else
+            {
+                _transform.position =
+                    Vector3.Lerp(_transform.position, _headPoint.position, _cameraSpeed * Time.deltaTime);
+            }
+
             _transform.localRotation = finalRotation;
-
             _target.rotation = Quaternion.Euler(0, yRotation, 0);
-
-            _lastFrameMobileHeadquartersRotation = mobileHeadquartersRotation;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void SetTarget(Transform target, Transform cameraPoint)
+        public void Init(PlayerEntity playerEntity)
         {
-            _transform = transform;
-            _cameraPoint = cameraPoint;
-            _target = target;
-            _isPlayerFound = true;
-
+            _target = playerEntity.transform;
+            _headPoint = playerEntity.References.HeadPoint;
+            _isInitialized = true;
         }
 
-        public void RemoveTarget()
+        public void Disable()
         {
-            _target = null;
-            _isPlayerFound = false;
+            _isInitialized = false;
+            Destroy(gameObject);
         }
+
+        public void EnableSnap() =>
+            _snap = true;
 
         public static PlayerCamera Get() => _instance;
 

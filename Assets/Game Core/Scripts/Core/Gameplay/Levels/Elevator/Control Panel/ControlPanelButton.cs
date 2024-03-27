@@ -27,7 +27,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         public event Action OnInteractionStateChangedEvent;
         public event Action<Floor> OnStartElevatorClickedEvent;
 
-        private ElevatorManager _elevatorManager;
+        private ElevatorsManager _elevatorsManager;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -37,15 +37,15 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void Start()
         {
-            _elevatorManager = ElevatorManager.Get();
-            _elevatorManager.OnElevatorStoppedEvent += OnElevatorStopped;
+            _elevatorsManager = ElevatorsManager.Get();
+            _elevatorsManager.OnElevatorStoppedEvent += OnElevatorsStopped;
         }
 
         private void OnDestroy()
         {
             _animationObserver.OnEnabledEvent -= OnEnabledEvent;
             
-            _elevatorManager.OnElevatorStoppedEvent -= OnElevatorStopped;
+            _elevatorsManager.OnElevatorStoppedEvent -= OnElevatorsStopped;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -81,7 +81,7 @@ namespace GameCore.Gameplay.Levels.Elevator
             OnInteractionStateChangedEvent?.Invoke();
 
         private bool IsElevatorMoving() =>
-            _elevatorManager.IsElevatorMoving();
+            _elevatorsManager.IsElevatorMoving();
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -93,6 +93,6 @@ namespace GameCore.Gameplay.Levels.Elevator
             ToggleInteract(canInteract: true);
         }
 
-        private void OnElevatorStopped(Floor floor) => ToggleInteract(canInteract: true);
+        private void OnElevatorsStopped(Floor floor) => ToggleInteract(canInteract: true);
     }
 }

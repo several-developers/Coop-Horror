@@ -66,7 +66,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<LevelManager>()
-                .AsSingle();
+                .AsSingle()
+                .NonLazy();
         }
     }
 }

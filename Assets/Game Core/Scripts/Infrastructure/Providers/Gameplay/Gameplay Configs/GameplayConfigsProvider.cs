@@ -5,6 +5,7 @@ using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Configs.Gameplay.Time;
 using GameCore.Configs.Gameplay.Player;
+using GameCore.Configs.Gameplay.PrefabsList;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
 
@@ -23,6 +24,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _timeConfig = Load<TimeConfigMeta>(path: ConfigsPaths.TimeConfig);
             _dungeonGeneratorConfig = Load<DungeonGeneratorConfigMeta>(path: ConfigsPaths.DungeonGeneratorConfig);
             _elevatorConfig = Load<ElevatorConfigMeta>(path: ConfigsPaths.ElevatorConfig);
+            _prefabsListConfig = Load<PrefabsListConfigMeta>(path: ConfigsPaths.PrefabsListConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -34,6 +36,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly TimeConfigMeta _timeConfig;
         private readonly DungeonGeneratorConfigMeta _dungeonGeneratorConfig;
         private readonly ElevatorConfigMeta _elevatorConfig;
+        private readonly PrefabsListConfigMeta _prefabsListConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -44,5 +47,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public TimeConfigMeta GetTimeConfig() => _timeConfig;
         public DungeonGeneratorConfigMeta GetDungeonGeneratorConfig() => _dungeonGeneratorConfig;
         public ElevatorConfigMeta GetElevatorConfig() => _elevatorConfig;
+        public PrefabsListConfigMeta GetPrefabsListConfig() => _prefabsListConfig;
     }
 }

@@ -1,7 +1,6 @@
-﻿using System;
+﻿using GameCore.Gameplay.Entities.Player.CameraManagement;
 using UnityEngine;
 using UnityEngine.Events;
-
 
 namespace PhysicsBasedCharacterController
 {
@@ -215,7 +214,7 @@ namespace PhysicsBasedCharacterController
         private void Start()
         {
             if (characterCamera == null)
-                characterCamera = GameCore.Gameplay.PlayerCamera.CameraController.Get().gameObject;
+                characterCamera = PlayerCamera.Get().gameObject;
         }
 
 

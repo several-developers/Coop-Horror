@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network;
@@ -32,8 +33,15 @@ namespace GameCore.Gameplay.GameManagement
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SpawnPlayer(ulong clientId, bool lateJoin)
+        private async void SpawnPlayer(ulong clientId, bool lateJoin)
         {
+            bool isCanceled = await UniTask
+                .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+            
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
             
             Vector3 spawnPosition = GetSpawnPosition();

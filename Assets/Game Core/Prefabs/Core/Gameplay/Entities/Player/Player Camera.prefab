@@ -388,7 +388,7 @@ GameObject:
   - component: {fileID: 9036817173812853580}
   - component: {fileID: 9036817173812853579}
   m_Layer: 0
-  m_Name: Camera Controller
+  m_Name: Player Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -426,7 +426,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxVerticalAngle: 60
   _sensitivity: 0.8
-  _cameraSpeed: 50
+  _cameraSpeed: 500
   _cameraReferences:
     _mainCamera: {fileID: 9036817173485120049}
     _itemPivot: {fileID: 9036817174032464219}

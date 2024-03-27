@@ -18,7 +18,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ElevatorManager _elevatorManager;
+        private ElevatorsManager _elevatorsManager;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -26,16 +26,16 @@ namespace GameCore.Gameplay.Levels.Elevator
         {
             UpdateFloorNumber(Floor.Surface);
             
-            _elevatorManager = ElevatorManager.Get();
+            _elevatorsManager = ElevatorsManager.Get();
             
-            _elevatorManager.OnElevatorStartedEvent += OnElevatorStarted;
-            _elevatorManager.OnFloorChangedEvent += OnFloorChanged;
+            _elevatorsManager.OnElevatorStartedEvent += OnElevatorsStarted;
+            _elevatorsManager.OnFloorChangedEvent += OnFloorChanged;
         }
 
         private void OnDestroy()
         {
-            _elevatorManager.OnElevatorStartedEvent -= OnElevatorStarted;
-            _elevatorManager.OnFloorChangedEvent -= OnFloorChanged;
+            _elevatorsManager.OnElevatorStartedEvent -= OnElevatorsStarted;
+            _elevatorsManager.OnFloorChangedEvent -= OnFloorChanged;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -72,7 +72,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnElevatorStarted(ElevatorStaticData data) => UpdateDisplayInfo(data);
+        private void OnElevatorsStarted(ElevatorStaticData data) => UpdateDisplayInfo(data);
 
         private void OnFloorChanged(ElevatorStaticData data) => UpdateDisplayInfo(data);
     }

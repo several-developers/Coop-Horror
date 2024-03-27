@@ -1,7 +1,6 @@
 ﻿using DunGen;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Levels;
-using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Observers.Gameplay.Dungeons;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -26,10 +25,6 @@ namespace GameCore.Gameplay.Dungeons
         [SerializeField]
         private Floor _floor;
         
-        [Title(Constants.References)]
-        [SerializeField, Required]
-        private DungeonReferences _dungeonReferences;
-        
         // FIELDS: --------------------------------------------------------------------------------
         
         private ILevelManager _levelManager;
@@ -53,12 +48,7 @@ namespace GameCore.Gameplay.Dungeons
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        public void OnDungeonComplete(Dungeon dungeon)
-        {
-            ElevatorBase dungeonElevator = _dungeonReferences.GetElevator();
-            dungeonElevator.ChangeElevatorFloor(_floor);
-            
-            _dungeonsObserver.SendDungeonGenerationCompleted(_floor, _dungeonReferences);
-        }
+        public void OnDungeonComplete(Dungeon dungeon) =>
+            _dungeonsObserver.DungeonGenerationCompleted(_floor);
     }
 }

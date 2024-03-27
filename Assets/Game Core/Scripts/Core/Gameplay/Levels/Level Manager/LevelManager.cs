@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Observers.Gameplay.Dungeons;
-using UnityEngine;
 
 namespace GameCore.Gameplay.Levels
 {
@@ -15,18 +13,16 @@ namespace GameCore.Gameplay.Levels
         public LevelManager(IDungeonsObserver dungeonsObserver)
         {
             _dungeonsObserver = dungeonsObserver;
-            _dungeonReferences = new Dictionary<Floor, DungeonReferences>(capacity: 3);
             _elevatorsReferences = new Dictionary<Floor, ElevatorBase>(capacity: 4);
             _stairsFireExits = new Dictionary<Floor, FireExit>(capacity: 4);
             _otherFireExits = new Dictionary<Floor, FireExit>(capacity: 4);
 
-            _dungeonsObserver.OnDungeonGenerationCompletedEvent += OnDungeonGenerationCompleted;
+            _dungeonsObserver.OnRegisterElevatorEvent += OnRegisterElevator;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly IDungeonsObserver _dungeonsObserver;
-        private readonly Dictionary<Floor, DungeonReferences> _dungeonReferences;
         private readonly Dictionary<Floor, ElevatorBase> _elevatorsReferences;
         private readonly Dictionary<Floor, FireExit> _stairsFireExits;
         private readonly Dictionary<Floor, FireExit> _otherFireExits;
@@ -34,8 +30,8 @@ namespace GameCore.Gameplay.Levels
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Dispose() =>
-            _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
-        
+            _dungeonsObserver.OnRegisterElevatorEvent -= OnRegisterElevator;
+
         public void AddSurfaceElevator(SurfaceElevator surfaceElevator) =>
             _elevatorsReferences.TryAdd(Floor.Surface, surfaceElevator);
 
@@ -48,8 +44,6 @@ namespace GameCore.Gameplay.Levels
         // TEMP
         public void Clear()
         {
-            _dungeonReferences.Clear();
-            
             _elevatorsReferences.Remove(Floor.One);
             _elevatorsReferences.Remove(Floor.Two);
             _elevatorsReferences.Remove(Floor.Three);
@@ -60,9 +54,7 @@ namespace GameCore.Gameplay.Levels
             if (_elevatorsReferences.TryGetValue(floor, out elevator))
                 return true;
 
-            string errorLog = Log.HandleLog($"Elevator <gb>'{floor}'</gb> <rb>not found</rb>!");
-            Debug.LogError(errorLog);
-            
+            Log.PrintError(log: $"Elevator <gb>'{floor}'</gb> <rb>not found</rb>!");
             return false;
         }
 
@@ -71,9 +63,7 @@ namespace GameCore.Gameplay.Levels
             if (_stairsFireExits.TryGetValue(floor, out fireExit))
                 return true;
 
-            string errorLog = Log.HandleLog($"Stairs Fire Exit <gb>'{floor}'</gb> <rb>not found</rb>!");
-            Debug.LogError(errorLog);
-            
+            Log.PrintError(log: $"Stairs Fire Exit <gb>'{floor}'</gb> <rb>not found</rb>!");
             return false;
         }
 
@@ -82,27 +72,21 @@ namespace GameCore.Gameplay.Levels
             if (_otherFireExits.TryGetValue(floor, out fireExit))
                 return true;
 
-            string errorLog = Log.HandleLog($"Other Fire Exit <gb>'{floor}'</gb> <rb>not found</rb>!");
-            Debug.LogError(errorLog);
-            
+            Log.PrintError(log: $"Other Fire Exit <gb>'{floor}'</gb> <rb>not found</rb>!");
             return false;
         }
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnDungeonGenerationCompleted(Floor floor, DungeonReferences dungeonReferences)
+        private void OnRegisterElevator(ElevatorBase elevatorBase)
         {
-            if (_dungeonReferences.ContainsKey(floor))
-            {
-                string errorLog = Log.HandleLog($"Dictionary <rb>already contains</rb> <gb>{floor}</gb> key!");
-                Debug.LogError(errorLog);
+            Floor floor = elevatorBase.GetElevatorFloor();
+            bool isSuccessfulAdded = _elevatorsReferences.TryAdd(floor, elevatorBase);
+
+            if (isSuccessfulAdded)
                 return;
-            }
-            
-            _dungeonReferences.Add(floor, dungeonReferences);
-            _elevatorsReferences.Add(floor, dungeonReferences.GetElevator());
+
+            Log.PrintError(log: $"Elevator with floor <gb>{floor}</gb> is already added!");
         }
     }
 }

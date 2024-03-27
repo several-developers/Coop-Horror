@@ -2,7 +2,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Gameplay.PlayerCamera
+namespace GameCore.Gameplay.Entities.Player.CameraManagement
 {
     [Serializable]
     public class CameraReferences

@@ -14,6 +14,7 @@
         public const string TimeConfig = GameplayConfigs + "Time Config";
         public const string DungeonGeneratorConfig = GameplayConfigs + "Dungeon Generator Config";
         public const string ElevatorConfig = GameplayConfigs + "Elevator Config";
+        public const string PrefabsListConfig = GameplayConfigs + "Prefabs List Config";
         
         public const string PlayerConfig = Configs + "Player/Player Config";
         public const string GameBalanceConfig = Configs + "Game Balance Config";
