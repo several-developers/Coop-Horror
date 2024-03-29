@@ -14,7 +14,7 @@ namespace GameCore.Infrastructure.Services.Global
         public event Action OnSceneLoadEvent;
         public event Action OnSceneLoadedEvent;
         public event Action<bool> OnLoadingScreenStateChangedEvent;
-
+        
         private bool IsNetworkSceneManagementEnabled => NetworkManager != null
                                                         && NetworkManager.SceneManager != null
                                                         && NetworkManager.NetworkConfig.EnableSceneManagement;

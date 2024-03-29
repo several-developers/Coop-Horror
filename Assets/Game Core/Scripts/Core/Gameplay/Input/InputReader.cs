@@ -189,7 +189,7 @@ namespace GameCore.Gameplay.InputHandlerTEMP
                 return;
 
             OnResumeEvent.Invoke();
-            EnableGameplayInput();
+            //EnableGameplayInput();
         }
     }
 }

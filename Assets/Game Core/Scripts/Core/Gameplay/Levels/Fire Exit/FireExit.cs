@@ -3,14 +3,22 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Network.Other;
+using GameCore.Observers.Gameplay.LevelManager;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Levels
 {
     public class FireExit : MonoBehaviour, IInteractable
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(ILevelProviderObserver levelProviderObserver) =>
+            _levelProviderObserver = levelProviderObserver;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -36,6 +44,7 @@ namespace GameCore.Gameplay.Levels
 
         public event Action OnInteractionStateChangedEvent;
         
+        private ILevelProviderObserver _levelProviderObserver;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -78,8 +87,7 @@ namespace GameCore.Gameplay.Levels
 
             if (!isFound)
             {
-                string errorLog = Log.HandleLog($"<gb>Dungeon Root</gb> component <rb>not found</rb>!");
-                Debug.LogError(errorLog);
+                Log.PrintError(log: $"<gb>{nameof(DungeonRoot).GetNiceName()}</gb> component <rb>not found</rb>!");
                 return;
             }
 
@@ -92,9 +100,7 @@ namespace GameCore.Gameplay.Levels
             if (!_isSurfaceFireExit)
                 return;
 
-            NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
-            ILevelManager levelManager = networkServiceLocator.GetLevelManager();
-            levelManager.AddOtherFireExit(Floor.Surface, fireExit: this);
+            _levelProviderObserver.RegisterOtherFireExit(Floor.Surface, fireExit: this);
         }
     }
 }

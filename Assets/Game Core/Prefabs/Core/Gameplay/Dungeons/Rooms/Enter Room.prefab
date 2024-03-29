@@ -5950,6 +5950,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dungeonElevator: {fileID: 2019513365285740915}
+--- !u!114 &2432326880641217080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7531489911938548663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 717a02054ef2699498e6bd4234fd7995, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _containerSource: 0
 --- !u!4 &7841558961501845521 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1626678699038666815, guid: f647a68cf4c46ce49ac52e499e01a85d,

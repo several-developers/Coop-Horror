@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab57c5df5564a3bba48eb6971286b87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _elevatorFloor: 0
+  _floor: 0
   _animator: {fileID: 4294089274358508998}
 --- !u!4 &7601978004778869502 stripped
 Transform:

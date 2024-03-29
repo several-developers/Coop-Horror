@@ -24,7 +24,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private readonly List<PlayerEntity> _playersList = new();
         
-        private ILevelManager _levelManager;
+        private ILevelProvider _levelProvider;
         private ElevatorsManager _elevatorsManager;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -61,7 +61,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         private void GetLevelManager()
         {
             NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
-            _levelManager = networkServiceLocator.GetLevelManager();
+            _levelProvider = networkServiceLocator.GetLevelManager();
         }
         
         private void TryTeleportLocalPlayer()
@@ -75,7 +75,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         private void TeleportLocalPlayer()
         {
             Floor currentFloor = _elevatorsManager.GetCurrentFloor();
-            bool isElevatorFound = _levelManager.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
+            bool isElevatorFound = _levelProvider.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
 
             if (!isElevatorFound)
                 return;

@@ -27,7 +27,7 @@ namespace GameCore.Gameplay.Levels.Locations
 
             _isLocationLoaded = true;
             _lastLoadedLocation = sceneName;
-            
+
             _scenesLoaderService.LoadScene(sceneName, isNetwork: true, LoadSceneMode.Additive);
         }
 

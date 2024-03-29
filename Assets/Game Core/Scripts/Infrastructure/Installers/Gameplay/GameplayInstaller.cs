@@ -27,7 +27,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindSun();
             BindTimeCycle();
             BindLocationsLoader();
-            BindLevelManager();
+            BindLevelProvider();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -62,10 +62,10 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle();
         }
 
-        private void BindLevelManager()
+        private void BindLevelProvider()
         {
             Container
-                .BindInterfacesTo<LevelManager>()
+                .BindInterfacesTo<LevelProvider>()
                 .AsSingle()
                 .NonLazy();
         }

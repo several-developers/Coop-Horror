@@ -14,11 +14,11 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public LeaveLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader,
-            ILevelManager levelManager)
+            ILevelProvider levelProvider)
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
-            _levelManager = levelManager;
+            _levelProvider = levelProvider;
             _cancellationTokenSource = new CancellationTokenSource();
             
             horrorStateMachine.AddState(this);
@@ -28,7 +28,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
-        private readonly ILevelManager _levelManager;
+        private readonly ILevelProvider _levelProvider;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -48,7 +48,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             
             UnloadLastLocation();
             ClearDungeons();
-            _levelManager.Clear();
+            _levelProvider.Clear();
             EnterGameLoopState();
         }
         

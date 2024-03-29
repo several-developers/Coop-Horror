@@ -1,7 +1,9 @@
-﻿using DunGen;
+﻿using Cysharp.Threading.Tasks;
+using DunGen;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Levels;
 using GameCore.Observers.Gameplay.Dungeons;
+using GameCore.Observers.Gameplay.LevelManager;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -13,10 +15,10 @@ namespace GameCore.Gameplay.Dungeons
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ILevelManager levelManager, IDungeonsObserver dungeonsObserver)
+        private void Construct(IDungeonsObserver dungeonsObserver, ILevelProviderObserver levelProviderObserver)
         {
-            _levelManager = levelManager;
             _dungeonsObserver = dungeonsObserver;
+            _levelProviderObserver = levelProviderObserver;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -24,11 +26,11 @@ namespace GameCore.Gameplay.Dungeons
         [Title(Constants.Settings)]
         [SerializeField]
         private Floor _floor;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
-        
-        private ILevelManager _levelManager;
+
         private IDungeonsObserver _dungeonsObserver;
+        private ILevelProviderObserver _levelProviderObserver;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -39,16 +41,29 @@ namespace GameCore.Gameplay.Dungeons
         public void AddFireExitToLevelManager(FireExit fireExit)
         {
             bool isInStairsLocation = fireExit.IsInStairsLocation;
-            
+
             if (isInStairsLocation)
-                _levelManager.AddStairsFireExit(_floor, fireExit);
+                _levelProviderObserver.RegisterStairsFireExit(_floor, fireExit);
             else
-                _levelManager.AddOtherFireExit(_floor, fireExit);
+                _levelProviderObserver.RegisterOtherFireExit(_floor, fireExit);
         }
-        
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private async void SendDungeonGenerationCompleted()
+        {
+            bool isCanceled = await UniTask
+                .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+
+            _dungeonsObserver.DungeonGenerationCompleted(_floor);
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        public void OnDungeonComplete(Dungeon dungeon) =>
-            _dungeonsObserver.DungeonGenerationCompleted(_floor);
+        public void OnDungeonComplete(Dungeon dungeon) => SendDungeonGenerationCompleted();
     }
 }

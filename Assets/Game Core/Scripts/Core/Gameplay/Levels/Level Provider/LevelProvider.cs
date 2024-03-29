@@ -2,51 +2,49 @@
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Levels.Elevator;
-using GameCore.Observers.Gameplay.Dungeons;
+using GameCore.Observers.Gameplay.LevelManager;
 
 namespace GameCore.Gameplay.Levels
 {
-    public class LevelManager : ILevelManager, IDisposable
+    public class LevelProvider : ILevelProvider, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LevelManager(IDungeonsObserver dungeonsObserver)
+        public LevelProvider(ILevelProviderObserver levelProviderObserver)
         {
-            _dungeonsObserver = dungeonsObserver;
+            _levelProviderObserver = levelProviderObserver;
             _elevatorsReferences = new Dictionary<Floor, ElevatorBase>(capacity: 4);
             _stairsFireExits = new Dictionary<Floor, FireExit>(capacity: 4);
             _otherFireExits = new Dictionary<Floor, FireExit>(capacity: 4);
 
-            _dungeonsObserver.OnRegisterElevatorEvent += OnRegisterElevator;
+            _levelProviderObserver.OnRegisterElevatorEvent += OnRegisterElevator;
+            _levelProviderObserver.OnRegisterSurfaceElevatorEvent += OnRegisterSurfaceElevator;
+            _levelProviderObserver.OnRegisterStairsFireExitEvent += OnRegisterStairsFireExit;
+            _levelProviderObserver.OnRegisterOtherFireExitEvent += OnRegisterOtherFireExit;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        private readonly IDungeonsObserver _dungeonsObserver;
+        private readonly ILevelProviderObserver _levelProviderObserver;
         private readonly Dictionary<Floor, ElevatorBase> _elevatorsReferences;
         private readonly Dictionary<Floor, FireExit> _stairsFireExits;
         private readonly Dictionary<Floor, FireExit> _otherFireExits;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Dispose() =>
-            _dungeonsObserver.OnRegisterElevatorEvent -= OnRegisterElevator;
+        public void Dispose()
+        {
+            _levelProviderObserver.OnRegisterElevatorEvent -= OnRegisterElevator;
+            _levelProviderObserver.OnRegisterSurfaceElevatorEvent -= OnRegisterSurfaceElevator;
+            _levelProviderObserver.OnRegisterStairsFireExitEvent -= OnRegisterStairsFireExit;
+            _levelProviderObserver.OnRegisterOtherFireExitEvent -= OnRegisterOtherFireExit;
+        }
 
-        public void AddSurfaceElevator(SurfaceElevator surfaceElevator) =>
-            _elevatorsReferences.TryAdd(Floor.Surface, surfaceElevator);
-
-        public void AddStairsFireExit(Floor floor, FireExit fireExit) =>
-            _stairsFireExits.Add(floor, fireExit);
-
-        public void AddOtherFireExit(Floor floor, FireExit fireExit) =>
-            _otherFireExits.Add(floor, fireExit);
-
-        // TEMP
         public void Clear()
         {
-            _elevatorsReferences.Remove(Floor.One);
-            _elevatorsReferences.Remove(Floor.Two);
-            _elevatorsReferences.Remove(Floor.Three);
+            _elevatorsReferences.Clear();
+            _stairsFireExits.Clear();
+            _otherFireExits.Clear();
         }
 
         public bool TryGetElevator(Floor floor, out ElevatorBase elevator)
@@ -87,6 +85,36 @@ namespace GameCore.Gameplay.Levels
                 return;
 
             Log.PrintError(log: $"Elevator with floor <gb>{floor}</gb> is already added!");
+        }
+
+        private void OnRegisterSurfaceElevator(SurfaceElevator surfaceElevator)
+        {
+            bool isSuccessfulAdded = _elevatorsReferences.TryAdd(Floor.Surface, surfaceElevator);
+            
+            if (isSuccessfulAdded)
+                return;
+
+            Log.PrintError(log: "Surface Elevator is already added!");
+        }
+
+        private void OnRegisterStairsFireExit(Floor floor, FireExit fireExit)
+        {
+            bool isSuccessfulAdded = _stairsFireExits.TryAdd(floor, fireExit);
+            
+            if (isSuccessfulAdded)
+                return;
+
+            Log.PrintError(log: "Stairs Fire Exit is already added!");
+        }
+        
+        private void OnRegisterOtherFireExit(Floor floor, FireExit fireExit)
+        {
+            bool isSuccessfulAdded = _otherFireExits.TryAdd(floor, fireExit);
+            
+            if (isSuccessfulAdded)
+                return;
+
+            Log.PrintError(log: "Other Fire Exit is already added!");
         }
     }
 }

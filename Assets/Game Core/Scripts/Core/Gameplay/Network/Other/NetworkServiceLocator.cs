@@ -1,6 +1,5 @@
 ﻿using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Levels;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using UnityEngine;
 using Zenject;
 
@@ -11,12 +10,10 @@ namespace GameCore.Gameplay.Network.Other
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IHorrorStateMachine horrorStateMachine, IGameplayConfigsProvider gameplayConfigsProvider,
-            ILevelManager levelManager)
+        private void Construct(IHorrorStateMachine horrorStateMachine, ILevelProvider levelProvider)
         {
             _horrorStateMachine = horrorStateMachine;
-            _gameplayConfigsProvider = gameplayConfigsProvider;
-            _levelManager = levelManager;
+            _levelProvider = levelProvider;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -24,8 +21,7 @@ namespace GameCore.Gameplay.Network.Other
         private static NetworkServiceLocator _instance;
 
         private IHorrorStateMachine _horrorStateMachine;
-        private IGameplayConfigsProvider _gameplayConfigsProvider;
-        private ILevelManager _levelManager;
+        private ILevelProvider _levelProvider;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -36,9 +32,7 @@ namespace GameCore.Gameplay.Network.Other
 
         public IHorrorStateMachine GetHorrorStateMachine() => _horrorStateMachine;
 
-        public IGameplayConfigsProvider GetGameplayConfigsProvider() => _gameplayConfigsProvider;
-
-        public ILevelManager GetLevelManager() => _levelManager;
+        public ILevelProvider GetLevelManager() => _levelProvider;
 
         public static NetworkServiceLocator Get() => _instance;
     }

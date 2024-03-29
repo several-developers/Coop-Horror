@@ -1,5 +1,5 @@
 ﻿using GameCore.Gameplay.Levels.Elevator;
-using GameCore.Observers.Gameplay.Dungeons;
+using GameCore.Observers.Gameplay.LevelManager;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,8 +12,8 @@ namespace GameCore.Gameplay.Dungeons
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IDungeonsObserver dungeonsObserver) =>
-            _dungeonsObserver = dungeonsObserver;
+        private void Construct(ILevelProviderObserver levelProviderObserver) =>
+            _levelProviderObserver = levelProviderObserver;
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.Dungeons
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        private IDungeonsObserver _dungeonsObserver;
+        private ILevelProviderObserver _levelProviderObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ namespace GameCore.Gameplay.Dungeons
             }
             
             _dungeonElevator.SetElevatorFloor(dungeonRoot.Floor);
-            _dungeonsObserver.RegisterElevator(_dungeonElevator);
+            _levelProviderObserver.RegisterElevator(_dungeonElevator);
         }
     }
 }

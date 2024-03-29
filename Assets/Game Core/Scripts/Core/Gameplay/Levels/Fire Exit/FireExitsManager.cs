@@ -1,6 +1,7 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network;
+using GameCore.Observers.Gameplay.LevelManager;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -12,8 +13,11 @@ namespace GameCore.Gameplay.Levels
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ILevelManager levelManager) =>
-            _levelManager = levelManager;
+        private void Construct(ILevelProvider levelProvider, ILevelProviderObserver levelProviderObserver)
+        {
+            _levelProvider = levelProvider;
+            _levelProviderObserver = levelProviderObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -23,19 +27,18 @@ namespace GameCore.Gameplay.Levels
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ILevelManager _levelManager;
-        private TheNetworkHorror _networkHorror;
+        private ILevelProvider _levelProvider;
+        private ILevelProviderObserver _levelProviderObserver;
         private RpcCaller _rpcCaller;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Start()
         {
-            _networkHorror = TheNetworkHorror.Get();
             _rpcCaller = RpcCaller.Get();
 
             foreach (FireExit stairsFireExit in _stairsFireExits)
-                _levelManager.AddStairsFireExit(stairsFireExit.Floor, stairsFireExit);
+                _levelProviderObserver.RegisterStairsFireExit(stairsFireExit.Floor, stairsFireExit);
 
             _rpcCaller.OnTeleportToFireExitEvent += OnTeleportToFireExit;
         }
@@ -47,22 +50,13 @@ namespace GameCore.Gameplay.Levels
 
         private void TeleportToFireExit(ulong clientID, Floor floor, bool isInStairsLocation)
         {
-            bool isClientIDMatches = clientID == _networkHorror.OwnerClientId;
-
-            if (!isClientIDMatches)
-                return;
-
-            bool isPlayerFound = _networkHorror.TryGetPlayerEntity(clientID, out PlayerEntity playerEntity);
-
-            if (!isPlayerFound)
-                return;
-
+            PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
             FireExit fireExit;
 
             // Reversed
             bool isFireExitFound = isInStairsLocation
-                ? _levelManager.TryGetOtherFireExit(floor, out fireExit)
-                : _levelManager.TryGetStairsFireExit(floor, out fireExit);
+                ? _levelProvider.TryGetOtherFireExit(floor, out fireExit)
+                : _levelProvider.TryGetStairsFireExit(floor, out fireExit);
 
             if (!isFireExitFound)
                 return;

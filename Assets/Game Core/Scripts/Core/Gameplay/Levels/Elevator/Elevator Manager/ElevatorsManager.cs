@@ -3,24 +3,21 @@ using System.Collections;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Network.Other;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Unity.Netcode;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
-    public interface IElevatorsManager
-    {
-        event Action<ElevatorStaticData> OnElevatorStartedEvent;
-        event Action<ElevatorStaticData> OnFloorChangedEvent;
-        event Action<Floor> OnElevatorStoppedEvent;
-        Floor GetCurrentFloor();
-        bool IsElevatorMoving();
-    }
-    
     public class ElevatorsManager : NetworkBehaviour, IElevatorsManager
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IGameplayConfigsProvider gameplayConfigsProvider) =>
+            _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
+
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<ElevatorStaticData> OnElevatorStartedEvent = delegate { };
@@ -75,8 +72,6 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void InitServerAndClient()
         {
-            GetElevatorConfig();
-
             _rpcCaller = RpcCaller.Get();
 
             _rpcCaller.OnStartElevatorEvent += OnStartElevator;
@@ -120,13 +115,6 @@ namespace GameCore.Gameplay.Levels.Elevator
         {
             if (IsOwner)
                 return;
-        }
-
-        private void GetElevatorConfig()
-        {
-            NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
-            IGameplayConfigsProvider gameplayConfigsProvider = networkServiceLocator.GetGameplayConfigsProvider();
-            _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
         }
 
         private void TryStartElevator(Floor floor)
