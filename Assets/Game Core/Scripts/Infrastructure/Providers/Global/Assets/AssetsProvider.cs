@@ -19,7 +19,6 @@ namespace GameCore.Infrastructure.Providers.Global
             _scenesLoaderPrefab = Load<GameObject>(path: AssetsPaths.ScenesLoaderPrefab);
             _menuPrefabsList = Load<MenuPrefabsListMeta>(path: AssetsPaths.MenuPrefabsList);
             _networkManager = Load<NetworkManager>(path: AssetsPaths.NetworkManager);
-            _theNetworkHorror = Load<TheNetworkHorror>(path: AssetsPaths.TheNetworkHorror);
             _networkHorror = Load<NetworkHorror>(path: AssetsPaths.NetworkHorror);
         }
 
@@ -28,7 +27,6 @@ namespace GameCore.Infrastructure.Providers.Global
         private readonly GameObject _scenesLoaderPrefab;
         private readonly MenuPrefabsListMeta _menuPrefabsList;
         private readonly NetworkManager _networkManager;
-        private readonly TheNetworkHorror _theNetworkHorror;
         private readonly NetworkHorror _networkHorror;
         
         private readonly Dictionary<string, AsyncOperationHandle> _completedCache = new();
@@ -85,8 +83,6 @@ namespace GameCore.Infrastructure.Providers.Global
         public MenuPrefabsListMeta GetMenuPrefabsList() => _menuPrefabsList;
 
         public NetworkManager GetNetworkManager() => _networkManager;
-        
-        public TheNetworkHorror GetTheNetworkHorror() => _theNetworkHorror;
         
         public NetworkHorror GetNetworkHorror() => _networkHorror;
 

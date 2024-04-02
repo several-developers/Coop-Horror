@@ -21,8 +21,6 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
 
-        private TheNetworkHorror _network;
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
@@ -32,20 +30,20 @@ namespace GameCore.Infrastructure.StateMachine
             //
             // JoinGame();
 
-            _network = TheNetworkHorror.Get();
 
             StartClient();
 
-            _network.OnAfterChangeSceneEvent += OnAfterChangeScene;
         }
 
-        public void Exit() =>
-            _network.OnAfterChangeSceneEvent -= OnAfterChangeScene;
+        public void Exit()
+        {
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void StartClient() =>
-            _network.StartClient();
+        private void StartClient()
+        {
+        }
 
         private static ConnectingMenuView CreateConnectingMenu() =>
             MenuFactory.Create<ConnectingMenuView>();

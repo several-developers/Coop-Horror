@@ -47,12 +47,6 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateSaveSelectionMenuView() =>
             _saveSelectionMenuView = MenuFactory.Create<SaveSelectionMenuView>();
 
-        private static void StartHost()
-        {
-            TheNetworkHorror networkHorror = TheNetworkHorror.Get();
-            networkHorror.StartHost();
-        }
-
         private void HideSaveSelectionMenu() =>
             _saveSelectionMenuView.Hide();
 
@@ -73,7 +67,6 @@ namespace GameCore.Infrastructure.StateMachine
         private void OnStartGameClicked()
         {
             HideSaveSelectionMenu();
-            StartHost();
             EnterLoadGameplayState();
         }
     }

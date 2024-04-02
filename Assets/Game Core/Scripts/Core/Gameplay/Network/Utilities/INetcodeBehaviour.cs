@@ -1,6 +1,6 @@
 namespace GameCore.Gameplay.Network.Utilities
 {
-    public interface INetcodeBehaviour : INetcodeInitBehaviour, INetcodeUpdateBehaviour, INetcodeDespawnBehaviour
+    public interface INetcodeBehaviour : INetcodeInitBehaviour, INetcodeTickBehaviour, INetcodeDespawnBehaviour
     {
     }
 
@@ -18,10 +18,10 @@ namespace GameCore.Gameplay.Network.Utilities
         void DespawnClient();
     }
     
-    public interface INetcodeUpdateBehaviour
+    public interface INetcodeTickBehaviour
     {
-        void UpdateServerAndClient();
-        void UpdateServer();
-        void UpdateClient();
+        void TickServerAndClient();
+        void TickServer();
+        void TickClient();
     }
 }

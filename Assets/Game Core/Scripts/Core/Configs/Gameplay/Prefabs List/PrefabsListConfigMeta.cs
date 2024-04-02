@@ -1,4 +1,5 @@
 ﻿using CustomEditors;
+using GameCore.Core.Gameplay.GameTimerManagement;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
@@ -20,11 +21,15 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         [SerializeField, Required]
         private RpcCaller _rpcCaller;
 
+        [SerializeField, Required]
+        private GameTimerManager _gameTimerManager;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public ElevatorsManager ElevatorsManager => _elevatorsManager;
         public PlayerSpawner PlayerSpawner => _playerSpawner;
         public RpcCaller RpcCaller => _rpcCaller;
+        public GameTimerManager GameTimerManager => _gameTimerManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

@@ -105,9 +105,9 @@ namespace GameCore.Gameplay.Entities.Player
             if (!_isInitialized)
                 return;
 
-            UpdateServerAndClient();
-            UpdateServer();
-            UpdateClient();
+            TickServerAndClient();
+            TickServer();
+            TickClient();
         }
 
         private void FixedUpdate()
@@ -264,12 +264,12 @@ namespace GameCore.Gameplay.Entities.Player
             }
         }
 
-        public void UpdateServerAndClient()
+        public void TickServerAndClient()
         {
             // TO DO
         }
 
-        public void UpdateServer()
+        public void TickServer()
         {
             if (!IsOwner)
                 return;
@@ -281,7 +281,7 @@ namespace GameCore.Gameplay.Entities.Player
             _interactionChecker.Check();
         }
 
-        public void UpdateClient()
+        public void TickClient()
         {
             if (IsOwner)
                 return;

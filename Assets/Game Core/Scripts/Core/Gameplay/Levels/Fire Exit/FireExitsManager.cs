@@ -37,6 +37,11 @@ namespace GameCore.Gameplay.Levels
         private void TeleportToFireExit(ulong clientID, Floor floor, bool isInStairsLocation)
         {
             PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
+            bool isPlayerMatches = playerEntity.OwnerClientId == clientID;
+
+            if (!isPlayerMatches)
+                return;
+            
             FireExit fireExit;
 
             // Reversed

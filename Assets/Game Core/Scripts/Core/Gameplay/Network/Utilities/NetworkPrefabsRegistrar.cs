@@ -25,13 +25,19 @@ namespace GameCore.Gameplay.Network.Utilities
         
         // FIELDS: --------------------------------------------------------------------------------
 
+        private static bool _isInitialized;
+        
         private DiContainer _diContainer;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void RegisterPrefabs()
         {
+            if (_isInitialized)
+                return;
+            
             NetworkManager networkManager = NetworkManager.Singleton;
+            _isInitialized = true;
 
             foreach (GameObject prefab in _prefabs)
             {

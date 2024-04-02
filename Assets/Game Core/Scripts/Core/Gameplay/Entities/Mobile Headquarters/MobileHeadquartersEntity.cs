@@ -33,7 +33,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [Title(Constants.References)]
         [SerializeField]
         private MobileHeadquartersReferences _references;
-        
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public MobileHeadquartersReferences References => _references;
@@ -52,7 +52,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _mobileHeadquartersConfig);
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
-            
+
             _mobileHeadquartersController.Init();
 
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
@@ -76,9 +76,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void Update()
         {
-            UpdateServerAndClient();
-            UpdateServer();
-            UpdateClient();
+            TickServerAndClient();
+            TickServer();
+            TickClient();
         }
 
         public override void OnDestroy()
@@ -86,7 +86,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersController.Dispose();
 
             _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
-            
+
             base.OnDestroy();
         }
 
@@ -117,11 +117,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 return;
         }
 
-        public void UpdateServerAndClient()
+        public void TickServerAndClient()
         {
         }
 
-        public void UpdateServer()
+        public void TickServer()
         {
             if (!IsOwner)
                 return;
@@ -129,7 +129,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _pathMovement.Movement();
         }
 
-        public void UpdateClient()
+        public void TickClient()
         {
             if (IsOwner)
                 return;
@@ -185,7 +185,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
-        
+
         private void EnterState(State state) =>
             _currentState = state;
 
@@ -220,7 +220,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             {
                 case State.ArrivingAtLocation:
                     _mobileHeadquartersController.ToggleDoorState(isOpen: true);
-                    
+
                     LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
                     leaveLocationLever.InteractWithoutEvents(isLeverPulled: false);
                     leaveLocationLever.ToggleInteract(canInteract: true);
@@ -236,8 +236,16 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             }
         }
 
-        private void OnLocationLoaded()
+        private async void OnLocationLoaded()
         {
+#warning ЛОКАЦИЯ НЕ УСПЕВАЕТ ЗАГРУЗИТСЯ НА КЛИЕНТЕ
+            bool isCanceled = await UniTask
+                .DelayFrame(delayFrameCount: 2, cancellationToken: this.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+
             LocationManager locationManager = LocationManager.Get();
             CinemachinePath path = locationManager.GetEnterPath();
 
@@ -247,7 +255,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             EnterState(State.ArrivingAtLocation);
         }
-        
+
         private void OnLeavingLocation()
         {
             LocationManager locationManager = LocationManager.Get();
