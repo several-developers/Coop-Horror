@@ -15,3 +15,7 @@ MonoBehaviour:
   _metaName: Prefabs List Config
   _elevatorsManager: {fileID: 7910312692771768809, guid: 96c893cd92814744d9080566f4947cae,
     type: 3}
+  _playerSpawner: {fileID: 3767574992753507385, guid: e09cafe6053c7f94698faecb9d7a4ca6,
+    type: 3}
+  _rpcCaller: {fileID: 821963907471402004, guid: 4882ad51cdb7a9940a0d147cfaecb943,
+    type: 3}

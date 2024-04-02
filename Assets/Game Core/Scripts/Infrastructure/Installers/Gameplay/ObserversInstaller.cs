@@ -1,4 +1,5 @@
 ﻿using GameCore.Observers.Gameplay.Dungeons;
+using GameCore.Observers.Gameplay.Level;
 using GameCore.Observers.Gameplay.LevelManager;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.Observers.Gameplay.UI;
@@ -15,6 +16,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindUIObserver();
             BindPlayerInteractionObserver();
             BindDungeonsObserver();
+            BindLevelObserver();
             BindLevelProviderObserver();
         }
 
@@ -38,6 +40,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<DungeonsObserver>()
+                .AsSingle();
+        }
+
+        private void BindLevelObserver()
+        {
+            Container
+                .BindInterfacesTo<LevelObserver>()
                 .AsSingle();
         }
 

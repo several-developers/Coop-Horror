@@ -9,13 +9,21 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         public override void InstallBindings()
         {
+            BindPrepareGameplaySceneState();
             BindGameplaySceneState();
             BindQuitGameplaySceneState();
-            BindGameOverState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void BindPrepareGameplaySceneState()
+        {
+            Container
+                .Bind<PrepareGameplaySceneState>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
         private void BindGameplaySceneState()
         {
             Container
@@ -28,14 +36,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .Bind<QuitGameplaySceneState>()
-                .AsSingle()
-                .NonLazy();
-        }
-        
-        private void BindGameOverState()
-        {
-            Container
-                .Bind<GameOverState>()
                 .AsSingle()
                 .NonLazy();
         }

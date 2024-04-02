@@ -1,3 +1,4 @@
+using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Levels;
 using GameCore.Gameplay.Levels.GameTime;
@@ -28,6 +29,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindTimeCycle();
             BindLocationsLoader();
             BindLevelProvider();
+            BindDungeonsManager();
+            BindFireExitsManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -66,6 +69,22 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<LevelProvider>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindDungeonsManager()
+        {
+            Container
+                .BindInterfacesTo<DungeonsManager>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindFireExitsManager()
+        {
+            Container
+                .BindInterfacesTo<FireExitsManager>()
                 .AsSingle()
                 .NonLazy();
         }

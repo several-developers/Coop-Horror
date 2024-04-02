@@ -47,8 +47,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private void BindLoadLocationState()
         {
             Container
-                .Bind(typeof(LoadLocationState), typeof(IDisposable))
-                .To<LoadLocationState>()
+                .Bind<LoadLocationState>()
                 .AsSingle()
                 .NonLazy();
         }

@@ -181,7 +181,6 @@ namespace GameCore.Gameplay.Entities.Player
 
                 _rpcCaller.OnCreateItemPreviewEvent += OnCreateItemPreview;
                 _rpcCaller.OnDestroyItemPreviewEvent += OnDestroyItemPreview;
-                _rpcCaller.OnTeleportPlayerWithOffsetEvent += OnTeleportPlayerWithOffset;
                 _rpcCaller.OnTogglePlayerInsideMobileHQEvent += OnTogglePlayerInsideMobileHQ;
             }
 
@@ -294,7 +293,6 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _rpcCaller.OnCreateItemPreviewEvent -= OnCreateItemPreview;
             _rpcCaller.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
-            _rpcCaller.OnTeleportPlayerWithOffsetEvent -= OnTeleportPlayerWithOffset;
             _rpcCaller.OnTogglePlayerInsideMobileHQEvent -= OnTogglePlayerInsideMobileHQ;
         }
 
@@ -425,14 +423,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnDestroyItemPreview(int slotIndex) =>
             _inventoryManager.DestroyItemPreview(slotIndex);
-
-        private void OnTeleportPlayerWithOffset(Vector3 offset)
-        {
-            Transform thisTransform = transform;
-            Vector3 currentPosition = thisTransform.position;
-            Vector3 newPosition = currentPosition + offset;
-            thisTransform.position = newPosition;
-        }
 
         private void OnOwnerSelectedSlotChanged(int slotIndex) =>
             _currentSelectedSlotIndex.Value = slotIndex;

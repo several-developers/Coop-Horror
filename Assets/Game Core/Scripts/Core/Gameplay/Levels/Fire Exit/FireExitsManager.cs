@@ -1,49 +1,35 @@
-﻿using GameCore.Enums.Gameplay;
+﻿using System;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network;
-using GameCore.Observers.Gameplay.LevelManager;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Levels
 {
-    public class FireExitsManager : MonoBehaviour
+    public class FireExitsManager : IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        [Inject]
-        private void Construct(ILevelProvider levelProvider, ILevelProviderObserver levelProviderObserver)
-        {
+        public FireExitsManager(ILevelProvider levelProvider) =>
             _levelProvider = levelProvider;
-            _levelProviderObserver = levelProviderObserver;
-        }
-
-        // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title(Constants.References)]
-        [SerializeField, Required]
-        private FireExit[] _stairsFireExits;
-
+        
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ILevelProvider _levelProvider;
-        private ILevelProviderObserver _levelProviderObserver;
+        private readonly ILevelProvider _levelProvider;
+        
         private RpcCaller _rpcCaller;
+        
+        // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
-
-        private void Start()
+        public void Initialize()
         {
             _rpcCaller = RpcCaller.Get();
-
-            foreach (FireExit stairsFireExit in _stairsFireExits)
-                _levelProviderObserver.RegisterStairsFireExit(stairsFireExit.Floor, stairsFireExit);
-
+            
             _rpcCaller.OnTeleportToFireExitEvent += OnTeleportToFireExit;
         }
-
-        private void OnDestroy() =>
+        
+        public void Dispose() =>
             _rpcCaller.OnTeleportToFireExitEvent -= OnTeleportToFireExit;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

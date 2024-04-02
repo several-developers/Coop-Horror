@@ -35,15 +35,10 @@ namespace GameCore.Gameplay.Levels
         [SerializeField, Required]
         private Transform _teleportPoint;
 
-        // PROPERTIES: ----------------------------------------------------------------------------
-
-        public Floor Floor => _floor;
-        public bool IsInStairsLocation => _isInStairsLocation;
-
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnInteractionStateChangedEvent;
-        
+
         private ILevelProviderObserver _levelProviderObserver;
         private bool _canInteract = true;
 
@@ -52,11 +47,12 @@ namespace GameCore.Gameplay.Levels
         private void Start()
         {
             FindDungeonRoot();
-            RegisterSurfaceFireExit();
+            RegisterStairsFireExit();
+            RegisterLocationSurfaceFireExit();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void Interact()
         {
             RpcCaller rpcCaller = RpcCaller.Get();
@@ -70,7 +66,7 @@ namespace GameCore.Gameplay.Levels
         }
 
         public Transform GetTeleportPoint() => _teleportPoint;
-        
+
         public InteractionType GetInteractionType() =>
             InteractionType.FireExitDoor;
 
@@ -82,7 +78,7 @@ namespace GameCore.Gameplay.Levels
         {
             if (_isInStairsLocation || _isSurfaceFireExit)
                 return;
-            
+
             bool isFound = transform.parent.parent.TryGetComponent(out DungeonRoot dungeonRoot);
 
             if (!isFound)
@@ -92,15 +88,23 @@ namespace GameCore.Gameplay.Levels
             }
 
             _floor = dungeonRoot.Floor;
-            dungeonRoot.AddFireExitToLevelManager(fireExit: this);
+            _levelProviderObserver.RegisterOtherFireExit(_floor, fireExit: this);
         }
 
-        private void RegisterSurfaceFireExit()
+        private void RegisterStairsFireExit()
         {
-            if (!_isSurfaceFireExit)
+            if (!_isInStairsLocation)
                 return;
 
-            _levelProviderObserver.RegisterOtherFireExit(Floor.Surface, fireExit: this);
+            _levelProviderObserver.RegisterStairsFireExit(_floor, fireExit: this);
+        }
+
+        private void RegisterLocationSurfaceFireExit()
+        {
+            if (_isInStairsLocation || _floor != Floor.Surface)
+                return;
+            
+            _levelProviderObserver.RegisterOtherFireExit(_floor, fireExit: this);
         }
     }
 }

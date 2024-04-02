@@ -1,6 +1,7 @@
 ﻿using GameCore.Gameplay.Entities.Player.CameraManagement;
 using UnityEngine;
 using UnityEngine.Events;
+// ReSharper disable InconsistentNaming
 
 namespace PhysicsBasedCharacterController
 {

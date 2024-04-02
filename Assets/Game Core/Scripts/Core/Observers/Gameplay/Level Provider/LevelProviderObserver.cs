@@ -1,5 +1,6 @@
 using System;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Levels;
 using GameCore.Gameplay.Levels.Elevator;
 
@@ -13,6 +14,8 @@ namespace GameCore.Observers.Gameplay.LevelManager
         public event Action<SurfaceElevator> OnRegisterSurfaceElevatorEvent;
         public event Action<Floor, FireExit> OnRegisterStairsFireExitEvent;
         public event Action<Floor, FireExit> OnRegisterOtherFireExitEvent;
+        public event Action<DungeonWrapper> OnRegisterDungeonEvent;
+        public event Action<Floor, DungeonRoot> OnRegisterDungeonRootEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -27,5 +30,11 @@ namespace GameCore.Observers.Gameplay.LevelManager
 
         public void RegisterOtherFireExit(Floor floor, FireExit fireExit) =>
             OnRegisterOtherFireExitEvent?.Invoke(floor, fireExit);
+
+        public void RegisterDungeon(DungeonWrapper dungeonWrapper) =>
+            OnRegisterDungeonEvent?.Invoke(dungeonWrapper);
+
+        public void RegisterDungeonRoot(Floor floor, DungeonRoot dungeonRoot) =>
+            OnRegisterDungeonRootEvent?.Invoke(floor, dungeonRoot);
     }
 }

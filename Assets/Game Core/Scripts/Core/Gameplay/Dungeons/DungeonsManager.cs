@@ -1,96 +1,142 @@
-﻿using DunGen;
+﻿using System;
+using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Levels;
 using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.Dungeons;
 using Sirenix.OdinInspector;
-using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Dungeons
 {
-    public class DungeonsManager : MonoBehaviour
+    public class DungeonsManager : IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        [Inject]
-        private void Construct(IDungeonsObserver dungeonsObserver) =>
+        public DungeonsManager(ILevelProvider levelProvider, IDungeonsObserver dungeonsObserver)
+        {
+            _levelProvider = levelProvider;
             _dungeonsObserver = dungeonsObserver;
+            _dungeonsList = new List<DungeonWrapper>(capacity: 3);
+        }
 
-        // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title(Constants.References)]
-        [SerializeField, Required]
-        private RuntimeDungeon[] _dungeons;
-        
         // FIELDS: --------------------------------------------------------------------------------
+
+        private readonly ILevelProvider _levelProvider;
+        private readonly IDungeonsObserver _dungeonsObserver;
+        private readonly List<DungeonWrapper> _dungeonsList;
 
         private static DungeonsManager _instance;
 
-        private IDungeonsObserver _dungeonsObserver;
         private int _generatedDungeonsAmount;
 
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
+        // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        private void Awake()
+        public void Initialize()
         {
             _instance = this;
-
+            
+            GetDungeons();
+            SetDungeonsRoots();
+            
+            RpcCaller rpcCaller = RpcCaller.Get();
+            rpcCaller.OnGenerateDungeonsEvent += OnGenerateDungeons;
+            
             _dungeonsObserver.OnDungeonGenerationCompletedEvent += OnDungeonGenerationCompleted;
         }
 
-        private void Start()
-        {
-            RpcCaller rpcCaller = RpcCaller.Get();
-            rpcCaller.OnGenerateDungeonsEvent += OnGenerateDungeons;
-        }
-
-        private void OnDestroy()
+        public void Dispose()
         {
             RpcCaller rpcCaller = RpcCaller.Get();
             rpcCaller.OnGenerateDungeonsEvent -= OnGenerateDungeons;
-            
+
             _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
         }
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void ClearDungeons()
         {
             _generatedDungeonsAmount = 0;
-            
-            foreach (RuntimeDungeon dungeon in _dungeons)
-                dungeon.Clear();
+
+            foreach (DungeonWrapper dungeonWrapper in _dungeonsList)
+                dungeonWrapper.Clear();
         }
-        
+
         public static DungeonsManager Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void GetDungeons()
+        {
+            Floor[] floors = { Floor.One, Floor.Two, Floor.Three };
+
+            foreach (Floor floor in floors)
+            {
+                bool isDungeonFound = _levelProvider.TryGetDungeon(floor, out DungeonWrapper dungeonWrapper);
+
+                if (!isDungeonFound)
+                {
+                    Log.PrintError(log: $"Dungeon with floor <gb>{floor}</gb> <rb>not found</rb>!");
+                    continue;
+                }
+
+                _dungeonsList.Add(dungeonWrapper);
+            }
+        }
+
+        private void SetDungeonsRoots()
+        {
+            foreach (DungeonWrapper dungeonWrapper in _dungeonsList)
+            {
+                Floor floor = dungeonWrapper.GetFloor();
+                bool isDungeonRootFound = _levelProvider.TryGetDungeonRoot(floor, out DungeonRoot dungeonRoot);
+
+                if (!isDungeonRootFound)
+                {
+                    Log.PrintError(log: $"Dungeon Root <gb>{floor}</gb> <rb>not found</rb>!");
+                    return;
+                }
+
+                dungeonWrapper.SetRoot(dungeonRoot.gameObject);
+            }
+        }
+        
         private void GenerateDungeons()
         {
             _generatedDungeonsAmount = 0;
-            
-            foreach (RuntimeDungeon dungeon in _dungeons)
-                dungeon.Generate();
+
+            foreach (DungeonWrapper dungeonWrapper in _dungeonsList)
+                dungeonWrapper.Generate();
         }
-        
+
         private void GenerateDungeonsWithSeed(DungeonsSeedData data)
         {
             _generatedDungeonsAmount = 0;
-            
-            int iterations = _dungeons.Length;
 
-            for (int i = 0; i < iterations; i++)
+            foreach (DungeonWrapper dungeonWrapper in _dungeonsList)
             {
-                int seed = i switch
-                {
-                    0 => data.SeedOne,
-                    1 => data.SeedTwo,
-                    2 => data.SeedThree,
-                    _ => 0
-                };
+                Floor floor = dungeonWrapper.GetFloor();
+                int seed;
 
-                _dungeons[i].GenerateWithSeed(seed);
+                switch (floor)
+                {
+                    case Floor.One:
+                        seed = data.SeedOne;
+                        break;
+
+                    case Floor.Two:
+                        seed = data.SeedTwo;
+                        break;
+
+                    case Floor.Three:
+                        seed = data.SeedThree;
+                        break;
+
+                    default:
+                        Log.PrintError(log: "Wrong floor setup!");
+                        continue;
+                }
+
+                dungeonWrapper.GenerateWithSeed(seed);
             }
         }
 
@@ -99,7 +145,7 @@ namespace GameCore.Gameplay.Dungeons
         private void OnDungeonGenerationCompleted(Floor floor)
         {
             _generatedDungeonsAmount++;
-            
+
             if (_generatedDungeonsAmount >= 3)
                 _dungeonsObserver.DungeonsGenerationCompleted();
         }
@@ -108,10 +154,11 @@ namespace GameCore.Gameplay.Dungeons
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
+#warning ПЕРЕНЕСТИ
         [Title(Constants.DebugButtons)]
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugGenerateDungeons() => GenerateDungeons();
-        
+
         [Button(buttonSize: 30, ButtonStyle.FoldoutButton), DisableInEditorMode]
         private void DebugGenerateDungeonsWithSeed(int seedOne, int seedTwo, int seedThree)
         {

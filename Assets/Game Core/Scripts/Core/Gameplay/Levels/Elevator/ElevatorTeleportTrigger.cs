@@ -1,21 +1,30 @@
 ﻿using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Network.Other;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
     public class ElevatorTeleportTrigger : MonoBehaviour
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator, ILevelProvider levelProvider)
+        {
+            _elevatorsManagerDecorator = elevatorsManagerDecorator;
+            _levelProvider = levelProvider;
+        }
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
         [SerializeField]
         private bool _drawTrigger;
-        
+
         [Title(Constants.References)]
         [SerializeField, Required]
         private ElevatorBase _elevator;
@@ -23,22 +32,17 @@ namespace GameCore.Gameplay.Levels.Elevator
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly List<PlayerEntity> _playersList = new();
-        
+
+        private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private ILevelProvider _levelProvider;
-        private ElevatorsManager _elevatorsManager;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
-        {
-            GetLevelManager();
-            
-            _elevatorsManager = ElevatorsManager.Get();
-            _elevatorsManager.OnFloorChangedEvent += OnFloorChanged;
-        }
+        private void Awake() =>
+            _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
 
         private void OnDestroy() =>
-            _elevatorsManager.OnFloorChangedEvent -= OnFloorChanged;
+            _elevatorsManagerDecorator.OnFloorChangedEvent -= OnFloorChanged;
 
         private void OnTriggerEnter(Collider other)
         {
@@ -58,33 +62,27 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void GetLevelManager()
-        {
-            NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
-            _levelProvider = networkServiceLocator.GetLevelManager();
-        }
-        
         private void TryTeleportLocalPlayer()
         {
             if (!IsLocalPlayerInTheElevator())
                 return;
-            
+
             TeleportLocalPlayer();
         }
 
         private void TeleportLocalPlayer()
         {
-            Floor currentFloor = _elevatorsManager.GetCurrentFloor();
+            Floor currentFloor = _elevatorsManagerDecorator.GetCurrentFloor();
             bool isElevatorFound = _levelProvider.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
 
             if (!isElevatorFound)
                 return;
-            
-            var playerEntity = PlayerEntity.GetLocalPlayer();
+
+            PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
             Transform target = playerEntity.transform;
             Transform parent1 = _elevator.transform;
             Transform parent2 = targetElevator.transform;
-            
+
             GameUtilities.Teleport(target, parent1, parent2, out Vector3 position, out Quaternion rotation);
             playerEntity.TeleportPlayer(position, rotation);
         }
@@ -93,7 +91,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         {
             var localPlayer = PlayerEntity.GetLocalPlayer();
             bool isLocalPlayerInTheElevator = false;
-            
+
             foreach (PlayerEntity playerEntity in _playersList)
             {
                 bool isMatches = playerEntity == localPlayer;
@@ -106,7 +104,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
             return isLocalPlayerInTheElevator;
         }
-        
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnFloorChanged(ElevatorStaticData data)
@@ -115,7 +113,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
             if (!isTargetFloor)
                 return;
-            
+
             TryTeleportLocalPlayer();
         }
     }

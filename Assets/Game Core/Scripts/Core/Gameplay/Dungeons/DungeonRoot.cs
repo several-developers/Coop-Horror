@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using DunGen;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Levels;
 using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Observers.Gameplay.LevelManager;
 using Sirenix.OdinInspector;
@@ -27,28 +26,23 @@ namespace GameCore.Gameplay.Dungeons
         [SerializeField]
         private Floor _floor;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public Floor Floor => _floor;
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private IDungeonsObserver _dungeonsObserver;
         private ILevelProviderObserver _levelProviderObserver;
 
-        // PROPERTIES: ----------------------------------------------------------------------------
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        public Floor Floor => _floor;
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void AddFireExitToLevelManager(FireExit fireExit)
-        {
-            bool isInStairsLocation = fireExit.IsInStairsLocation;
-
-            if (isInStairsLocation)
-                _levelProviderObserver.RegisterStairsFireExit(_floor, fireExit);
-            else
-                _levelProviderObserver.RegisterOtherFireExit(_floor, fireExit);
-        }
+        private void Awake() => RegisterDungeonRoot();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void RegisterDungeonRoot() =>
+            _levelProviderObserver.RegisterDungeonRoot(_floor, dungeonRoot: this);
 
         private async void SendDungeonGenerationCompleted()
         {

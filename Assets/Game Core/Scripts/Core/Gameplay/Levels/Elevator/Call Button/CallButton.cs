@@ -5,11 +5,18 @@ using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
     public class CallButton : MonoBehaviour, IInteractable
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
+            _elevatorsManagerDecorator = elevatorsManagerDecorator;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
@@ -29,28 +36,27 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         public event Action OnInteractionStateChangedEvent;
 
-        private ElevatorsManager _elevatorsManager;
+        private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private RpcCaller _rpcCaller;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
-            _animationObserver.OnEnabledEvent += OnEnabledEvent;
-
-        private void Start()
+        private void Awake()
         {
-            _elevatorsManager = ElevatorsManager.Get();
-            _rpcCaller = RpcCaller.Get();
+            _elevatorsManagerDecorator.OnElevatorStoppedEvent += OnElevatorsStopped;
             
-            _elevatorsManager.OnElevatorStoppedEvent += OnElevatorsStopped;
+            _animationObserver.OnEnabledEvent += OnEnabledEvent;
         }
+
+        private void Start() =>
+            _rpcCaller = RpcCaller.Get();
 
         private void OnDestroy()
         {
-            _animationObserver.OnEnabledEvent -= OnEnabledEvent;
+            _elevatorsManagerDecorator.OnElevatorStoppedEvent -= OnElevatorsStopped;
             
-            _elevatorsManager.OnElevatorStoppedEvent -= OnElevatorsStopped;
+            _animationObserver.OnEnabledEvent -= OnEnabledEvent;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -85,7 +91,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         private void HandleClick()
         {
             Floor floor = _elevator.GetElevatorFloor();
-            Floor currentFloor = _elevatorsManager.GetCurrentFloor();
+            Floor currentFloor = _elevatorsManagerDecorator.GetCurrentFloor();
             bool isElevatorMoving = IsElevatorMoving();
             bool openElevator = !isElevatorMoving && currentFloor == floor;
 
@@ -102,13 +108,13 @@ namespace GameCore.Gameplay.Levels.Elevator
             _controlPanel.StartElevator(floor);
 
         private bool IsElevatorMoving() =>
-            _elevatorsManager.IsElevatorMoving();
+            _elevatorsManagerDecorator.IsElevatorMoving();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnEnabledEvent()
         {
-            bool isElevatorMoving = _elevatorsManager.IsElevatorMoving();
+            bool isElevatorMoving = IsElevatorMoving();
 
             if (isElevatorMoving)
                 return;

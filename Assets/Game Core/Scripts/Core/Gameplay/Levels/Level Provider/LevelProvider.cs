@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Observers.Gameplay.LevelManager;
 
@@ -16,11 +17,15 @@ namespace GameCore.Gameplay.Levels
             _elevatorsReferences = new Dictionary<Floor, ElevatorBase>(capacity: 4);
             _stairsFireExits = new Dictionary<Floor, FireExit>(capacity: 4);
             _otherFireExits = new Dictionary<Floor, FireExit>(capacity: 4);
+            _dungeons = new Dictionary<Floor, DungeonWrapper>(capacity: 3);
+            _dungeonRoots = new Dictionary<Floor, DungeonRoot>(capacity: 3);
 
             _levelProviderObserver.OnRegisterElevatorEvent += OnRegisterElevator;
             _levelProviderObserver.OnRegisterSurfaceElevatorEvent += OnRegisterSurfaceElevator;
             _levelProviderObserver.OnRegisterStairsFireExitEvent += OnRegisterStairsFireExit;
             _levelProviderObserver.OnRegisterOtherFireExitEvent += OnRegisterOtherFireExit;
+            _levelProviderObserver.OnRegisterDungeonEvent += OnRegisterDungeon;
+            _levelProviderObserver.OnRegisterDungeonRootEvent += OnRegisterDungeonRoot;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -29,6 +34,8 @@ namespace GameCore.Gameplay.Levels
         private readonly Dictionary<Floor, ElevatorBase> _elevatorsReferences;
         private readonly Dictionary<Floor, FireExit> _stairsFireExits;
         private readonly Dictionary<Floor, FireExit> _otherFireExits;
+        private readonly Dictionary<Floor, DungeonWrapper> _dungeons;
+        private readonly Dictionary<Floor, DungeonRoot> _dungeonRoots;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -38,6 +45,8 @@ namespace GameCore.Gameplay.Levels
             _levelProviderObserver.OnRegisterSurfaceElevatorEvent -= OnRegisterSurfaceElevator;
             _levelProviderObserver.OnRegisterStairsFireExitEvent -= OnRegisterStairsFireExit;
             _levelProviderObserver.OnRegisterOtherFireExitEvent -= OnRegisterOtherFireExit;
+            _levelProviderObserver.OnRegisterDungeonEvent -= OnRegisterDungeon;
+            _levelProviderObserver.OnRegisterDungeonRootEvent -= OnRegisterDungeonRoot;
         }
 
         public void Clear()
@@ -74,6 +83,24 @@ namespace GameCore.Gameplay.Levels
             return false;
         }
 
+        public bool TryGetDungeon(Floor floor, out DungeonWrapper dungeonWrapper)
+        {
+            if (_dungeons.TryGetValue(floor, out dungeonWrapper))
+                return true;
+
+            Log.PrintError(log: $"Dungeon <gb>'{floor}'</gb> <rb>not found</rb>!");
+            return false;
+        }
+
+        public bool TryGetDungeonRoot(Floor floor, out DungeonRoot dungeonRoot)
+        {
+            if (_dungeonRoots.TryGetValue(floor, out dungeonRoot))
+                return true;
+
+            Log.PrintError(log: $"Dungeon Root <gb>'{floor}'</gb> <rb>not found</rb>!");
+            return false;
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnRegisterElevator(ElevatorBase elevatorBase)
@@ -104,7 +131,7 @@ namespace GameCore.Gameplay.Levels
             if (isSuccessfulAdded)
                 return;
 
-            Log.PrintError(log: "Stairs Fire Exit is already added!");
+            Log.PrintError(log: $"Stairs Fire Exit <gb>{floor}</gb> is already added!");
         }
         
         private void OnRegisterOtherFireExit(Floor floor, FireExit fireExit)
@@ -114,7 +141,28 @@ namespace GameCore.Gameplay.Levels
             if (isSuccessfulAdded)
                 return;
 
-            Log.PrintError(log: "Other Fire Exit is already added!");
+            Log.PrintError(log: $"Other Fire Exit <gb>{floor}</gb> is already added!");
+        }
+        
+        private void OnRegisterDungeon(DungeonWrapper dungeonWrapper)
+        {
+            Floor floor = dungeonWrapper.GetFloor();
+            bool isSuccessfulAdded = _dungeons.TryAdd(floor, dungeonWrapper);
+            
+            if (isSuccessfulAdded)
+                return;
+
+            Log.PrintError(log: $"Dungeon <gb>{floor}</gb> is already added!");
+        }
+        
+        private void OnRegisterDungeonRoot(Floor floor, DungeonRoot dungeonRoot)
+        {
+            bool isSuccessfulAdded = _dungeonRoots.TryAdd(floor, dungeonRoot);
+            
+            if (isSuccessfulAdded)
+                return;
+
+            Log.PrintError(log: $"Dungeon Root <gb>{floor}</gb> is already added!");
         }
     }
 }

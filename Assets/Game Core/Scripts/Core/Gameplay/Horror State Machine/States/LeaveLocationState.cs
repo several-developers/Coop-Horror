@@ -33,6 +33,9 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void Dispose() =>
+            _cancellationTokenSource?.Dispose();
+
         public async UniTaskVoid Enter()
         {
             RpcCaller rpcCaller = RpcCaller.Get();
@@ -51,9 +54,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             _levelProvider.Clear();
             EnterGameLoopState();
         }
-        
-        public void Dispose() =>
-            _cancellationTokenSource?.Dispose();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

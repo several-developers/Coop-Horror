@@ -4,11 +4,18 @@ using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
     public abstract class ControlPanelButton : MonoBehaviour, IInteractable
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
+            _elevatorsManagerDecorator = elevatorsManagerDecorator;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -27,25 +34,23 @@ namespace GameCore.Gameplay.Levels.Elevator
         public event Action OnInteractionStateChangedEvent;
         public event Action<Floor> OnStartElevatorClickedEvent;
 
-        private ElevatorsManager _elevatorsManager;
+        private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
-            _animationObserver.OnEnabledEvent += OnEnabledEvent;
-
-        private void Start()
+        private void Awake()
         {
-            _elevatorsManager = ElevatorsManager.Get();
-            _elevatorsManager.OnElevatorStoppedEvent += OnElevatorsStopped;
+            _elevatorsManagerDecorator.OnElevatorStoppedEvent += OnElevatorsStopped;
+            
+            _animationObserver.OnEnabledEvent += OnEnabledEvent;
         }
 
         private void OnDestroy()
         {
-            _animationObserver.OnEnabledEvent -= OnEnabledEvent;
+            _elevatorsManagerDecorator.OnElevatorStoppedEvent -= OnElevatorsStopped;
             
-            _elevatorsManager.OnElevatorStoppedEvent -= OnElevatorsStopped;
+            _animationObserver.OnEnabledEvent -= OnEnabledEvent;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -81,7 +86,7 @@ namespace GameCore.Gameplay.Levels.Elevator
             OnInteractionStateChangedEvent?.Invoke();
 
         private bool IsElevatorMoving() =>
-            _elevatorsManager.IsElevatorMoving();
+            _elevatorsManagerDecorator.IsElevatorMoving();
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

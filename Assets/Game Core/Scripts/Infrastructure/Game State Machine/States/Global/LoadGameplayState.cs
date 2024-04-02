@@ -37,11 +37,11 @@ namespace GameCore.Infrastructure.StateMachine
         private void LoadGameplayScene() =>
             _scenesLoaderService.LoadScene(SceneName.Gameplay, isNetwork: true);
 
-        private void EnterGameplaySceneState() =>
-            _gameStateMachine.ChangeState<GameplaySceneState>();
+        private void EnterPrepareGameplaySceneState() =>
+            _gameStateMachine.ChangeState<PrepareGameplaySceneState>();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnSceneLoaded() => EnterGameplaySceneState();
+        private void OnSceneLoaded() => EnterPrepareGameplaySceneState();
     }
 }

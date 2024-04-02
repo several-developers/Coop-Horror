@@ -38,15 +38,28 @@ namespace GameCore.Gameplay.GameManagement
             bool isCanceled = await UniTask
                 .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
                 .SuppressCancellationThrow();
-
+            
             if (isCanceled)
                 return;
             
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
-            
+
             Vector3 spawnPosition = GetSpawnPosition();
-            PlayerEntity newPlayer = Instantiate(_playerConfig.PlayerPrefab, spawnPosition, Quaternion.identity);
+            PlayerEntity playerEntityPrefab = _playerConfig.PlayerPrefab;
+            NetworkObject playerNetworkObjectPrefab = playerEntityPrefab.GetComponent<NetworkObject>();
             
+            //PlayerEntity playerInstance = Instantiate(_playerConfig.PlayerPrefab, spawnPosition, Quaternion.identity);
+            NetworkObject playerNetworkObjectInstance = _networkManager.SpawnManager
+                .InstantiateAndSpawn(playerNetworkObjectPrefab, clientId, position: spawnPosition);
+
+            bool isPlayerEntityFound = playerNetworkObjectInstance.TryGetComponent(out PlayerEntity playerInstance);
+
+            if (!isPlayerEntityFound)
+            {
+                Log.PrintError(log: $"<gb>Player Entity</gb> <rb>not found</rb>!");
+                return;
+            }
+
             bool persistentPlayerExists = playerNetworkObject.TryGetComponent(out PersistentPlayer persistentPlayer);
 
             Assert.IsTrue(persistentPlayerExists,
@@ -62,21 +75,21 @@ namespace GameCore.Gameplay.GameManagement
                 {
                     Vector3 position = sessionPlayerData.Value.PlayerPosition;
                     Quaternion rotation = sessionPlayerData.Value.PlayerRotation;
-                    newPlayer.transform.SetPositionAndRotation(position, rotation);
+                    playerInstance.transform.SetPositionAndRotation(position, rotation);
                 }
             }
 
             // Spawn players characters with 'destroyWithScene = true'.
-            newPlayer.NetworkObject.SpawnWithOwnership(clientId, destroyWithScene: true);
+            //playerInstance.NetworkObject.SpawnWithOwnership(clientId, destroyWithScene: true);
         }
 
         private IEnumerator WaitToCheckForGameOver()
         {
             // Wait until next frame so that the client's player character has despawned.
-            
+
             yield return null;
             //CheckForGameOver();
-            
+
             Debug.Log("Game Over");
         }
 
@@ -85,7 +98,7 @@ namespace GameCore.Gameplay.GameManagement
             bool isSpawnPointFound = PlayerSpawnPoint.GetRandomSpawnPoint(out PlayerSpawnPoint spawnPoint);
             return isSpawnPointFound ? spawnPoint.GetRandomPosition() : transform.GetRandomPosition();
         }
-        
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
@@ -118,7 +131,7 @@ namespace GameCore.Gameplay.GameManagement
         private void OnClientDisconnect(ulong clientId)
         {
             Debug.Log($"Client #{clientId} disconnect.");
-            
+
             if (clientId != NetworkManager.Singleton.LocalClientId)
             {
                 // If a client disconnects, check for game over in case all other players are already down.

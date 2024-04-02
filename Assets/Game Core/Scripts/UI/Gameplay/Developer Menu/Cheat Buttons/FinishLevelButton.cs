@@ -60,12 +60,13 @@ namespace GameCore.UI.Gameplay.DeveloperMenu.CheatButtons
             if (!isStateExists)
                 return;
 
-            bool isInteractable = state is GameplaySceneState;
-            _button.interactable = isInteractable;
+            //bool isInteractable = state is GameplaySceneState;
+            //_button.interactable = isInteractable;
         }
 
-        private void EnterGameOverState() =>
-            _gameStateMachine.ChangeState<GameOverState>();
+        private void EnterGameOverState()
+        {
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

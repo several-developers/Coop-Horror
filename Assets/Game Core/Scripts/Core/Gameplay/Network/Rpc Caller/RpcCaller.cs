@@ -3,20 +3,24 @@ using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.HorrorStateMachineSpace;
-using GameCore.Gameplay.Network.Other;
 using Unity.Netcode;
-using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Network
 {
     // Owner Client ID всегда будет 0!
     public class RpcCaller : NetworkBehaviour
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IHorrorStateMachine horrorStateMachine) =>
+            _horrorStateMachine = horrorStateMachine;
+
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent = delegate { };
         public event Action<int> OnDestroyItemPreviewEvent = delegate { };
-        public event Action<Vector3> OnTeleportPlayerWithOffsetEvent = delegate { };
         public event Action OnLocationLoadedEvent = delegate { };
         public event Action OnLeavingLocationEvent = delegate { };
         public event Action OnLocationLeftEvent = delegate { };
@@ -27,11 +31,12 @@ namespace GameCore.Gameplay.Network
         public event Action<ulong, Floor, bool> OnTeleportToFireExitEvent = delegate { };
 
         private static RpcCaller _instance;
+        
+        private IHorrorStateMachine _horrorStateMachine;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
-            _instance = this;
+        private void Awake() => _instance = this;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -73,25 +78,19 @@ namespace GameCore.Gameplay.Network
 
         private void LoadLocationLogic(int sceneNameIndex)
         {
-            NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
-            IHorrorStateMachine horrorStateMachine = networkServiceLocator.GetHorrorStateMachine();
-
-            if (IsOwner)
-            {
-                var sceneName = (SceneName)sceneNameIndex;
-                horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
-            }
+            if (!IsOwner)
+                return;
+            
+            var sceneName = (SceneName)sceneNameIndex;
+            _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
         }
 
         private void LeaveLocationLogic()
         {
             if (!IsOwner)
                 return;
-
-            NetworkServiceLocator networkServiceLocator = NetworkServiceLocator.Get();
-            IHorrorStateMachine horrorStateMachine = networkServiceLocator.GetHorrorStateMachine();
-
-            horrorStateMachine.ChangeState<LeaveLocationState>();
+            
+            _horrorStateMachine.ChangeState<LeaveLocationState>();
         }
 
         // RPC: -----------------------------------------------------------------------------------

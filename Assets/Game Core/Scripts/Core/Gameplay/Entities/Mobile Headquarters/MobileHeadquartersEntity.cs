@@ -1,4 +1,5 @@
 ﻿using Cinemachine;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
@@ -125,9 +126,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void InitServerAndClient()
+        public async void InitServerAndClient()
         {
             ArrivedAtRoadLocation();
+
+            await UniTask.DelayFrame(1); // TEMP
             
             _rpcCaller = RpcCaller.Get();
 

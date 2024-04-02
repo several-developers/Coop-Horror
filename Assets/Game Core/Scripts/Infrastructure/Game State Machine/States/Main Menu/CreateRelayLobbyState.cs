@@ -44,8 +44,8 @@ namespace GameCore.Infrastructure.StateMachine
             _relayLobbyMenu.OnCloseClickedEvent += OnCloseClicked;
         }
 
-        private void EnterGameplaySceneState() =>
-            _gameStateMachine.ChangeState<GameplaySceneState>();
+        private void EnterPrepareGameplaySceneState() =>
+            _gameStateMachine.ChangeState<PrepareGameplaySceneState>();
 
         private void EnterMainMenuState() =>
             _gameStateMachine.ChangeState<MainMenuState>();
@@ -54,6 +54,6 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void OnCloseClicked() => EnterMainMenuState();
 
-        private void OnSceneLoaded() => EnterGameplaySceneState();
+        private void OnSceneLoaded() => EnterPrepareGameplaySceneState();
     }
 }

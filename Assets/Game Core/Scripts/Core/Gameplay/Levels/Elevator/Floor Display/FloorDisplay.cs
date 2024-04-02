@@ -2,11 +2,18 @@
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
     public class FloorDisplay : MonoBehaviour
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
+            _elevatorsManagerDecorator = elevatorsManagerDecorator;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
@@ -18,24 +25,22 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ElevatorsManager _elevatorsManager;
-        
+        private IElevatorsManagerDecorator _elevatorsManagerDecorator;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
+        private void Awake()
         {
-            UpdateFloorNumber(Floor.Surface);
-            
-            _elevatorsManager = ElevatorsManager.Get();
-            
-            _elevatorsManager.OnElevatorStartedEvent += OnElevatorsStarted;
-            _elevatorsManager.OnFloorChangedEvent += OnFloorChanged;
+            _elevatorsManagerDecorator.OnElevatorStartedEvent += OnElevatorsStarted;
+            _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
         }
+
+        private void Start() => UpdateFloorNumber(Floor.Surface);
 
         private void OnDestroy()
         {
-            _elevatorsManager.OnElevatorStartedEvent -= OnElevatorsStarted;
-            _elevatorsManager.OnFloorChangedEvent -= OnFloorChanged;
+            _elevatorsManagerDecorator.OnElevatorStartedEvent -= OnElevatorsStarted;
+            _elevatorsManagerDecorator.OnFloorChangedEvent -= OnFloorChanged;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

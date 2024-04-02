@@ -11,8 +11,8 @@ namespace GameCore.Gameplay.Levels.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManager elevatorsManager) =>
-            _elevatorsManager = elevatorsManager;
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
+            _elevatorsManagerDecorator = elevatorsManagerDecorator;
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         
         // FIELDS: --------------------------------------------------------------------------------
 
-        private IElevatorsManager _elevatorsManager;
+        private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private RpcCaller _rpcCaller;
         private bool _isOpen;
 
@@ -34,8 +34,8 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void Awake()
         {
-            _elevatorsManager.OnElevatorStartedEvent += OnElevatorsStarted;
-            _elevatorsManager.OnFloorChangedEvent += OnFloorChanged;
+            _elevatorsManagerDecorator.OnElevatorStartedEvent += OnElevatorsStarted;
+            _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
         }
 
         protected virtual void Start()
@@ -47,8 +47,8 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private void OnDestroy()
         {
-            _elevatorsManager.OnElevatorStartedEvent -= OnElevatorsStarted;
-            _elevatorsManager.OnFloorChangedEvent -= OnFloorChanged;
+            _elevatorsManagerDecorator.OnElevatorStartedEvent -= OnElevatorsStarted;
+            _elevatorsManagerDecorator.OnFloorChangedEvent -= OnFloorChanged;
 
             _rpcCaller.OnOpenElevatorEvent -= OnOpenElevator;
         }
