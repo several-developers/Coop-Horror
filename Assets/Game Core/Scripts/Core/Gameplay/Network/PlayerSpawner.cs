@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.Session_Manager;
@@ -15,7 +14,7 @@ using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using Zenject;
 
-namespace GameCore.Gameplay.GameManagement
+namespace GameCore.Gameplay.Network
 {
     public class PlayerSpawner : NetworkBehaviour
     {

@@ -224,13 +224,13 @@ namespace GameCore.Gameplay.Network
 
         private void CheckIfCanSpawnPlayers()
         {
-            NetworkSpawner networkSpawner = NetworkSpawner.Get();
-
-            if (networkSpawner == null)
-                return;
-
-            if (!networkSpawner.IsSpawnerReady())
-                networkSpawner.Spawn();
+            // NetworkSpawner networkSpawner = NetworkSpawner.Get();
+            //
+            // if (networkSpawner == null)
+            //     return;
+            //
+            // if (!networkSpawner.IsSpawnerReady())
+            //     networkSpawner.Spawn();
 
             IReadOnlyList<ulong> connectedClientsIDs = _networkManager.ConnectedClientsIds;
 

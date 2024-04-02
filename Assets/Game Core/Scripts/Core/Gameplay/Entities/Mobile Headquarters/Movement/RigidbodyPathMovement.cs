@@ -9,12 +9,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public RigidbodyPathMovement(MobileHeadquartersEntity mobileHeadquartersEntity, Animator animator,
+        public RigidbodyPathMovement(MobileHeadquartersEntity mobileHeadquartersEntity,
             MobileHeadquartersConfigMeta mobileHeadquartersConfig)
         {
             _transform = mobileHeadquartersEntity.transform;
             _rigidbody = mobileHeadquartersEntity.GetComponent<Rigidbody>();
-            _animator = animator;
+            _animator = mobileHeadquartersEntity.References.Animator;
             _mobileHeadquartersConfig = mobileHeadquartersConfig;
 
             //_dollyCart.enabled = true;

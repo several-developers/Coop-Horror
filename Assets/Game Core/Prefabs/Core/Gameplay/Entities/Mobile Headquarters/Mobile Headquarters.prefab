@@ -774,7 +774,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 102978470
+  GlobalObjectIdHash: 1957246166
   InScenePlacedSourceGlobalObjectIdHash: 1957246166
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
@@ -830,6 +830,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _mobileHeadquartersConfig: {fileID: 11400000, guid: 42fa32de715f30247b6994951dad2972,
     type: 2}
+  _references:
+    _animator: {fileID: 1830334093793617745}
+    _animationObserver: {fileID: 7144477240461052206}
+    _toggleMobileDoorLever: {fileID: 8067631092820087447}
+    _loadLocationLever: {fileID: 7287405237099232689}
+    _leaveLocationLever: {fileID: 5395301855820843947}
   _animator: {fileID: 1830334093793617745}
   _animationObserver: {fileID: 7144477240461052206}
   _toggleMobileDoorLever: {fileID: 8067631092820087447}
