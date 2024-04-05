@@ -14,12 +14,14 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _references = mobileHeadquartersEntity.References;
+            _rpcHandlerDecorator = mobileHeadquartersEntity.RpcHandlerDecorator;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly MobileHeadquartersEntity _mobileHeadquartersEntity;
         private readonly MobileHeadquartersReferences _references;
+        private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -62,7 +64,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             leaveLocationLever.OnInteractEvent -= OnInteractWithLeaveLocationLever;
             leaveLocationLever.OnEnabledEvent -= OnLeaveLocation;
         }
-        
+
         public void ToggleDoorState(bool isOpen)
         {
             Animator animator = _references.Animator;
@@ -70,7 +72,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
         private void EnableDoorLever()
         {
             ToggleMobileDoorLever toggleMobileDoorLever = _references.ToggleMobileDoorLever;
@@ -93,11 +95,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void OnInteractWithLoadLocationLever() =>
             _mobileHeadquartersEntity.InteractWithLoadLocationLeverServerRpc();
 
-        private void OnLoadLocation()
-        {
-            RpcCaller rpcCaller = _mobileHeadquartersEntity.RpcCaller;
-            rpcCaller.LoadLocation(SceneName.Desert);
-        }
+        private void OnLoadLocation() =>
+            _rpcHandlerDecorator.LoadLocation(SceneName.Desert);
 
         private void OnInteractWithLeaveLocationLever()
         {
@@ -105,10 +104,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             leaveLocationLever.InteractLogic();
         }
 
-        private void OnLeaveLocation()
-        {
-            RpcCaller rpcCaller = _mobileHeadquartersEntity.RpcCaller;
-            rpcCaller.StartLeavingLocation();
-        }
+        private void OnLeaveLocation() =>
+            _rpcHandlerDecorator.StartLeavingLocation();
     }
 }

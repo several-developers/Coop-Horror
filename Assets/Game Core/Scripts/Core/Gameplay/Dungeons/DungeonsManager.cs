@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Levels;
-using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.Dungeons;
+using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
 using Zenject;
 
@@ -13,10 +13,12 @@ namespace GameCore.Gameplay.Dungeons
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public DungeonsManager(ILevelProvider levelProvider, IDungeonsObserver dungeonsObserver)
+        public DungeonsManager(ILevelProvider levelProvider, IDungeonsObserver dungeonsObserver,
+            IRpcObserver rpcObserver)
         {
             _levelProvider = levelProvider;
             _dungeonsObserver = dungeonsObserver;
+            _rpcObserver = rpcObserver;
             _dungeonsList = new List<DungeonWrapper>(capacity: 3);
         }
 
@@ -24,6 +26,7 @@ namespace GameCore.Gameplay.Dungeons
 
         private readonly ILevelProvider _levelProvider;
         private readonly IDungeonsObserver _dungeonsObserver;
+        private readonly IRpcObserver _rpcObserver;
         private readonly List<DungeonWrapper> _dungeonsList;
 
         private static DungeonsManager _instance;
@@ -35,20 +38,18 @@ namespace GameCore.Gameplay.Dungeons
         public void Initialize()
         {
             _instance = this;
-            
+
             GetDungeons();
             SetDungeonsRoots();
-            
-            RpcCaller rpcCaller = RpcCaller.Get();
-            rpcCaller.OnGenerateDungeonsEvent += OnGenerateDungeons;
-            
+
+            _rpcObserver.OnGenerateDungeonsEvent += OnGenerateDungeons;
+
             _dungeonsObserver.OnDungeonGenerationCompletedEvent += OnDungeonGenerationCompleted;
         }
 
         public void Dispose()
         {
-            RpcCaller rpcCaller = RpcCaller.Get();
-            rpcCaller.OnGenerateDungeonsEvent -= OnGenerateDungeons;
+            _rpcObserver.OnGenerateDungeonsEvent -= OnGenerateDungeons;
 
             _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
         }
@@ -99,7 +100,7 @@ namespace GameCore.Gameplay.Dungeons
                 dungeonWrapper.SetRoot(dungeonRoot.gameObject);
             }
         }
-        
+
         private void GenerateDungeons()
         {
             _generatedDungeonsAmount = 0;

@@ -14,11 +14,12 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public LeaveLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader,
-            ILevelProvider levelProvider)
+            ILevelProvider levelProvider, IRpcHandlerDecorator rpcHandlerDecorator)
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
             _levelProvider = levelProvider;
+            _rpcHandlerDecorator = rpcHandlerDecorator;
             _cancellationTokenSource = new CancellationTokenSource();
             
             horrorStateMachine.AddState(this);
@@ -29,6 +30,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
         private readonly ILevelProvider _levelProvider;
+        private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -38,8 +40,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         public async UniTaskVoid Enter()
         {
-            RpcCaller rpcCaller = RpcCaller.Get();
-            rpcCaller.SendLeftLocation();
+            _rpcHandlerDecorator.LeftLocation();
 
             // TEMP
             bool isCanceled = await UniTask

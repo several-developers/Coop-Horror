@@ -17,11 +17,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        protected override void Start()
-        {
-            base.Start();
-            RegisterSurfaceElevator();
-        }
+        private void Start() => RegisterSurfaceElevator();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

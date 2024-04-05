@@ -13,9 +13,16 @@ namespace GameCore.Gameplay.Triggers
         [Title(Constants.References)]
         [SerializeField, Required]
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
-        
+
+        // FIELDS: --------------------------------------------------------------------------------
+
+        private IRpcHandlerDecorator _rpcHandlerDecorator;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
-        
+
+        private void Awake() =>
+            _rpcHandlerDecorator = _mobileHeadquartersEntity.RpcHandlerDecorator;
+
         private void OnTriggerEnter(Collider other)
         {
             if (!_mobileHeadquartersEntity.IsOwner)
@@ -25,9 +32,7 @@ namespace GameCore.Gameplay.Triggers
                 return;
             
             playerEntity.ToggleInsideMobileHQ(isInside: true);
-            
-            RpcCaller rpcCaller = _mobileHeadquartersEntity.RpcCaller;
-            rpcCaller.TogglePlayerInsideMobileHQEvent(playerEntity.OwnerClientId, isInside: true);
+            _rpcHandlerDecorator.TogglePlayerInsideMobileHQ(playerEntity.OwnerClientId, isInside: true);
         }
 
         private void OnTriggerExit(Collider other)
@@ -39,9 +44,7 @@ namespace GameCore.Gameplay.Triggers
                 return;
             
             playerEntity.ToggleInsideMobileHQ(isInside: false);
-            
-            RpcCaller rpcCaller = _mobileHeadquartersEntity.RpcCaller;
-            rpcCaller.TogglePlayerInsideMobileHQEvent(playerEntity.OwnerClientId, isInside: false);
+            _rpcHandlerDecorator.TogglePlayerInsideMobileHQ(playerEntity.OwnerClientId, isInside: false);
         }
     }
 }

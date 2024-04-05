@@ -33,6 +33,7 @@ namespace GameCore.Core.Gameplay.GameTimerManagement
         
         public void InitServerAndClient()
         {
+            // TO DO
         }
 
         public void InitServer()
@@ -51,25 +52,28 @@ namespace GameCore.Core.Gameplay.GameTimerManagement
             _gameTimer.OnValueChanged += OnGameTimerUpdated;
         }
 
-        public void TickServerAndClient()
-        {
+        public void TickServerAndClient() =>
             _timeCycleDecorator.Tick();
-        }
 
         public void TickServer()
         {
             if (!IsOwner)
                 return;
+            
+            // TO DO
         }
 
         public void TickClient()
         {
             if (IsOwner)
                 return;
+            
+            // TO DO
         }
         
         public void DespawnServerAndClient()
         {
+            // TO DO
         }
 
         public void DespawnServer()

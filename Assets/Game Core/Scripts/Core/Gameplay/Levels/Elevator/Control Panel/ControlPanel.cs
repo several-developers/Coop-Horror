@@ -1,14 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
     public class ControlPanel : MonoBehaviour
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator) =>
+            _rpcHandlerDecorator = rpcHandlerDecorator;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
@@ -17,19 +23,16 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private RpcCaller _rpcCaller;
-        
+        private IRpcHandlerDecorator _rpcHandlerDecorator;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() => SetupPanelButtons();
 
-        private void Start() =>
-            _rpcCaller = RpcCaller.Get();
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void StartElevator(Floor floor) =>
-            _rpcCaller.StartElevator(floor);
+            _rpcHandlerDecorator.StartElevator(floor);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

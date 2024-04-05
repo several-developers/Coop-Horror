@@ -17,7 +17,7 @@ MonoBehaviour:
     type: 3}
   _playerSpawner: {fileID: 3767574992753507385, guid: e09cafe6053c7f94698faecb9d7a4ca6,
     type: 3}
-  _rpcCaller: {fileID: 821963907471402004, guid: 4882ad51cdb7a9940a0d147cfaecb943,
+  _rpcHandler: {fileID: 821963907471402004, guid: 4882ad51cdb7a9940a0d147cfaecb943,
     type: 3}
   _gameTimerManager: {fileID: 6677644779065434593, guid: f722e5c15e829314a872d28ce9ee5253,
     type: 3}

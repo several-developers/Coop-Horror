@@ -10,6 +10,7 @@ using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Observers.Gameplay.PlayerInteraction;
+using GameCore.Observers.Gameplay.Rpc;
 using GameCore.Observers.Gameplay.UI;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -27,13 +28,15 @@ namespace GameCore.Gameplay.Entities.Player
 
         [Inject]
         private void Construct(IItemsPreviewFactory itemsPreviewFactory,
-            IMobileHeadquartersEntity mobileHeadquartersEntity, IPlayerInteractionObserver playerInteractionObserver,
-            IUIObserver uiObserver)
+            IMobileHeadquartersEntity mobileHeadquartersEntity, IRpcHandlerDecorator rpcHandlerDecorator,
+            IPlayerInteractionObserver playerInteractionObserver, IRpcObserver rpcObserver, IUIObserver uiObserver)
         {
             _itemsPreviewFactory = itemsPreviewFactory;
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
-            _uiObserver = uiObserver;
+            _rpcHandlerDecorator = rpcHandlerDecorator;
             _playerInteractionObserver = playerInteractionObserver;
+            _rpcObserver = rpcObserver;
+            _uiObserver = uiObserver;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -69,29 +72,32 @@ namespace GameCore.Gameplay.Entities.Player
         public PlayerReferences References => _references;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         public event Action<Vector2> OnMovementVectorChangedEvent;
 
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
-        
+
         private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
 
         private static PlayerEntity _localPlayer;
 
         private IItemsPreviewFactory _itemsPreviewFactory;
+        private IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private IRpcHandlerDecorator _rpcHandlerDecorator;
         private IPlayerInteractionObserver _playerInteractionObserver;
+        private IRpcObserver _rpcObserver;
         private IUIObserver _uiObserver;
+
         private PlayerCamera _playerCamera;
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
         private IMovementBehaviour _movementBehaviour;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
-        private IMobileHeadquartersEntity _mobileHeadquartersEntity;
-        private RpcCaller _rpcCaller;
+
         private Transform _cameraItemPivot;
         private Transform _lookAtObject;
 
@@ -177,17 +183,17 @@ namespace GameCore.Gameplay.Entities.Player
 
             void GetRPCCaller()
             {
-                _rpcCaller = RpcCaller.Get();
-
-                _rpcCaller.OnCreateItemPreviewEvent += OnCreateItemPreview;
-                _rpcCaller.OnDestroyItemPreviewEvent += OnDestroyItemPreview;
-                _rpcCaller.OnTogglePlayerInsideMobileHQEvent += OnTogglePlayerInsideMobileHQ;
+                _rpcObserver.OnCreateItemPreviewEvent += OnCreateItemPreview;
+                _rpcObserver.OnDestroyItemPreviewEvent += OnDestroyItemPreview;
+                _rpcObserver.OnTogglePlayerInsideMobileHQEvent += OnTogglePlayerInsideMobileHQ;
             }
 
             void InitInventory()
             {
                 _inventory = new PlayerInventory();
-                _inventoryManager = new PlayerInventoryManager(playerEntity: this, _rpcCaller, _itemsPreviewFactory);
+                
+                _inventoryManager = new PlayerInventoryManager(playerEntity: this, _rpcHandlerDecorator,
+                    _itemsPreviewFactory);
             }
         }
 
@@ -291,9 +297,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         public void DespawnServerAndClient()
         {
-            _rpcCaller.OnCreateItemPreviewEvent -= OnCreateItemPreview;
-            _rpcCaller.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
-            _rpcCaller.OnTogglePlayerInsideMobileHQEvent -= OnTogglePlayerInsideMobileHQ;
+            _rpcObserver.OnCreateItemPreviewEvent -= OnCreateItemPreview;
+            _rpcObserver.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
+            _rpcObserver.OnTogglePlayerInsideMobileHQEvent -= OnTogglePlayerInsideMobileHQ;
         }
 
         public void DespawnServer()
@@ -418,7 +424,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!isItemOwner)
                 return;
 
-            _inventoryManager.CreateItemPreview(data.SlotIndex, data.ItemID, cameraPivot: false);
+            _inventoryManager.CreateItemPreviewClientSide(data.SlotIndex, data.ItemID, cameraPivot: false);
         }
 
         private void OnDestroyItemPreview(int slotIndex) =>

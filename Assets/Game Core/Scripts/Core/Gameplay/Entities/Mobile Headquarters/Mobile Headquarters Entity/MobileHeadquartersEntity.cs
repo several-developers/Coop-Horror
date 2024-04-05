@@ -5,9 +5,11 @@ using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
+using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
@@ -24,6 +26,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             LeavingLocation = 5,
         }
 
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, IRpcObserver rpcObserver)
+        {
+            RpcHandlerDecorator = rpcHandlerDecorator;
+            _rpcObserver = rpcObserver;
+        }
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -37,13 +48,14 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public MobileHeadquartersReferences References => _references;
-        public RpcCaller RpcCaller => _rpcCaller;
+        public IRpcHandlerDecorator RpcHandlerDecorator { get; private set; }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private IRpcObserver _rpcObserver;
+        
         private MobileHeadquartersController _mobileHeadquartersController;
         private RigidbodyPathMovement _pathMovement;
-        private RpcCaller _rpcCaller;
         private State _currentState = State.MovingOnRoad;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -56,22 +68,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersController.Init();
 
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
-        }
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
         }
 
         private void Update()
@@ -92,17 +88,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public async void InitServerAndClient()
+        public void InitServerAndClient()
         {
             ArrivedAtRoadLocation();
-
-            await UniTask.DelayFrame(1); // TEMP
-
-            _rpcCaller = RpcCaller.Get();
-
-            _rpcCaller.OnLocationLoadedEvent += OnLocationLoaded;
-            _rpcCaller.OnLeavingLocationEvent += OnLeavingLocation;
-            _rpcCaller.OnLocationLeftEvent += OnLocationLeft;
+            
+            _rpcObserver.OnLocationLoadedEvent += OnLocationLoaded;
+            _rpcObserver.OnLeavingLocationEvent += OnLeavingLocation;
+            _rpcObserver.OnLocationLeftEvent += OnLocationLeft;
         }
 
         public void InitServer()
@@ -137,9 +129,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public void DespawnServerAndClient()
         {
-            _rpcCaller.OnLocationLoadedEvent -= OnLocationLoaded;
-            _rpcCaller.OnLeavingLocationEvent -= OnLeavingLocation;
-            _rpcCaller.OnLocationLeftEvent -= OnLocationLeft;
+            _rpcObserver.OnLocationLoadedEvent -= OnLocationLoaded;
+            _rpcObserver.OnLeavingLocationEvent -= OnLeavingLocation;
+            _rpcObserver.OnLocationLeftEvent -= OnLocationLeft;
         }
 
         public void DespawnServer()
@@ -213,6 +205,24 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            
+            InitServerAndClient();
+            InitServer();
+            InitClient();
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            
+            DespawnServerAndClient();
+            DespawnServer();
+            DespawnClient();
+        }
+        
         [Button]
         private void OnDestinationReached()
         {
@@ -229,7 +239,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case State.LeavingLocation:
-                    _rpcCaller.LeaveLocation();
+                    RpcHandlerDecorator.LeaveLocation();
 
                     EnterState(State.MovingOnRoad);
                     break;

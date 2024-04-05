@@ -1,9 +1,8 @@
 ﻿using System.Collections;
-using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Observers.Gameplay.Rpc;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -15,10 +14,11 @@ namespace GameCore.Gameplay.Levels.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator,
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator, IRpcObserver rpcObserver,
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
+            _rpcObserver = rpcObserver;
             _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
         }
 
@@ -29,8 +29,8 @@ namespace GameCore.Gameplay.Levels.Elevator
         private readonly NetworkVariable<bool> _isElevatorMoving = new();
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
+        private IRpcObserver _rpcObserver;
         private ElevatorConfigMeta _elevatorConfig;
-        private RpcCaller _rpcCaller;
         private Coroutine _movementCO;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -45,24 +45,12 @@ namespace GameCore.Gameplay.Levels.Elevator
         {
             _elevatorsManagerDecorator.OnGetCurrentFloorEvent -= GetCurrentFloor;
             _elevatorsManagerDecorator.OnIsElevatorMovingEvent -= IsElevatorMoving;
-            
+
             base.OnDestroy();
         }
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            Init();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            Despawn();
-            base.OnNetworkDespawn();
-        }
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public Floor GetCurrentFloor() =>
             _currentFloor.Value;
 
@@ -71,42 +59,27 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void Init()
-        {
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
-
-        private async void InitServerAndClient()
+        private void InitServerAndClient()
         {
             _currentFloor.OnValueChanged += OnCurrentFloorChanged;
 
-            await UniTask.DelayFrame(1);
-            
-            _rpcCaller = RpcCaller.Get();
-
-            _rpcCaller.OnStartElevatorEvent += OnStartElevator;
-
+            _rpcObserver.OnStartElevatorEvent += OnStartElevator;
         }
 
         private void InitServer()
         {
             if (!IsOwner)
                 return;
+
+            // TO DO
         }
 
         private void InitClient()
         {
             if (IsOwner)
                 return;
-        }
 
-        private void Despawn()
-        {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
+            // TO DO
         }
 
         private void DespawnServerAndClient()
@@ -119,13 +92,15 @@ namespace GameCore.Gameplay.Levels.Elevator
             if (!IsOwner)
                 return;
 
-            _rpcCaller.OnStartElevatorEvent -= OnStartElevator;
+            _rpcObserver.OnStartElevatorEvent -= OnStartElevator;
         }
 
         private void DespawnClient()
         {
             if (IsOwner)
                 return;
+
+            // TO DO
         }
 
         private void TryStartElevator(Floor floor)
@@ -165,7 +140,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         {
             bool isMovingUp = IsMovingUp(targetFloor);
             ElevatorStaticData data = new(_currentFloor.Value, targetFloor, isMovingUp);
-            
+
             _elevatorsManagerDecorator.ElevatorStarted(data);
         }
 
@@ -175,10 +150,10 @@ namespace GameCore.Gameplay.Levels.Elevator
         private IEnumerator ElevatorMovementCO()
         {
             Floor targetFloor = _targetFloor.Value;
-            
+
             SendElevatorStartedEvent(targetFloor);
             SendElevatorStartedServerRpc(targetFloor);
-            
+
             float delay;
             bool isMovingUp = IsMovingUp(targetFloor);
 
@@ -239,13 +214,31 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            InitServerAndClient();
+            InitServer();
+            InitClient();
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            DespawnServerAndClient();
+            DespawnServer();
+            DespawnClient();
+
+            base.OnNetworkDespawn();
+        }
+
         private void OnStartElevator(Floor floor) => TryStartElevator(floor);
 
         private void OnCurrentFloorChanged(Floor previousValue, Floor newValue)
         {
             bool isMovingUp = IsMovingUp(_targetFloor.Value);
             ElevatorStaticData data = new(currentFloor: newValue, _targetFloor.Value, isMovingUp);
-            
+
             _elevatorsManagerDecorator.FloorChanged(data);
         }
     }

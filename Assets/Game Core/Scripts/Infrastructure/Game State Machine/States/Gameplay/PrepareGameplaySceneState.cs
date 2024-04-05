@@ -56,8 +56,8 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void CreateRpcCaller()
         {
-            RpcCaller rpcCallerPrefab = _prefabsListConfig.RpcCaller;
-            CreateNetworkPrefab(rpcCallerPrefab.gameObject);
+            RpcHandler rpcHandlerPrefab = _prefabsListConfig.RpcHandler;
+            CreateNetworkPrefab(rpcHandlerPrefab.gameObject);
         }
 
         private void CreatePlayerSpawner()

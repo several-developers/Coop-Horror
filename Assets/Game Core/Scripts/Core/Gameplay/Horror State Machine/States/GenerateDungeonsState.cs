@@ -9,9 +9,11 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GenerateDungeonsState(IHorrorStateMachine horrorStateMachine, IDungeonsObserver dungeonsObserver)
+        public GenerateDungeonsState(IHorrorStateMachine horrorStateMachine, IRpcHandlerDecorator rpcHandlerDecorator,
+            IDungeonsObserver dungeonsObserver)
         {
             _horrorStateMachine = horrorStateMachine;
+            _rpcHandlerDecorator = rpcHandlerDecorator;
             _dungeonsObserver = dungeonsObserver;
 
             horrorStateMachine.AddState(this);
@@ -20,17 +22,18 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IHorrorStateMachine _horrorStateMachine;
+        private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
         private readonly IDungeonsObserver _dungeonsObserver;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void Enter()
         {
             SendGenerateDungeons();
 
             _dungeonsObserver.OnDungeonsGenerationCompletedEvent += OnDungeonsGenerationCompleted;
         }
-        
+
         public void Exit() =>
             _dungeonsObserver.OnDungeonsGenerationCompletedEvent -= OnDungeonsGenerationCompleted;
 
@@ -39,7 +42,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         private void EnterGameLoopState() =>
             _horrorStateMachine.ChangeState<GameLoopState>();
 
-        private static void SendGenerateDungeons()
+        private void SendGenerateDungeons()
         {
             RandomStream randomStream = new();
             int seedOne = GenerateRandomSeed(randomStream);
@@ -47,10 +50,9 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             int seedThree = GenerateRandomSeed(randomStream);
             DungeonsSeedData data = new(seedOne, seedTwo, seedThree);
             
-            RpcCaller rpcCaller = RpcCaller.Get();
-            rpcCaller.GenerateDungeons(data);
+            _rpcHandlerDecorator.GenerateDungeons(data);
         }
-        
+
         private static int GenerateRandomSeed(RandomStream randomStream) =>
             randomStream.Next();
 

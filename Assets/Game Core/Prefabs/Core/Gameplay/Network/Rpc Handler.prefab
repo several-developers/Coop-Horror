@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 821963907471402027}
   - component: {fileID: 821963907471402004}
   m_Layer: 0
-  m_Name: Rpc Caller
+  m_Name: Rpc Handler
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -16,8 +16,11 @@ namespace GameCore.Gameplay.Levels
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ILevelProviderObserver levelProviderObserver) =>
+        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, ILevelProviderObserver levelProviderObserver)
+        {
+            _rpcHandlerDecorator = rpcHandlerDecorator;
             _levelProviderObserver = levelProviderObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -39,6 +42,7 @@ namespace GameCore.Gameplay.Levels
 
         public event Action OnInteractionStateChangedEvent;
 
+        private IRpcHandlerDecorator _rpcHandlerDecorator;
         private ILevelProviderObserver _levelProviderObserver;
         private bool _canInteract = true;
 
@@ -53,11 +57,8 @@ namespace GameCore.Gameplay.Levels
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Interact()
-        {
-            RpcCaller rpcCaller = RpcCaller.Get();
-            rpcCaller.TeleportToFireExit(_floor, _isInStairsLocation);
-        }
+        public void Interact() =>
+            _rpcHandlerDecorator.TeleportToFireExit(_floor, _isInStairsLocation);
 
         public void ToggleInteract(bool canInteract)
         {

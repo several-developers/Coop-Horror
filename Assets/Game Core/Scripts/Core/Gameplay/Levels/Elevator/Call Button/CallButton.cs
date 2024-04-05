@@ -14,8 +14,12 @@ namespace GameCore.Gameplay.Levels.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator,
+            IRpcHandlerDecorator rpcHandlerDecorator)
+        {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
+            _rpcHandlerDecorator = rpcHandlerDecorator;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -25,7 +29,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         [SerializeField, Required]
         private AnimationObserver _animationObserver;
-        
+
         [SerializeField, Required]
         private ElevatorBase _elevator;
 
@@ -37,7 +41,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         public event Action OnInteractionStateChangedEvent;
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
-        private RpcCaller _rpcCaller;
+        private IRpcHandlerDecorator _rpcHandlerDecorator;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -45,27 +49,24 @@ namespace GameCore.Gameplay.Levels.Elevator
         private void Awake()
         {
             _elevatorsManagerDecorator.OnElevatorStoppedEvent += OnElevatorsStopped;
-            
+
             _animationObserver.OnEnabledEvent += OnEnabledEvent;
         }
-
-        private void Start() =>
-            _rpcCaller = RpcCaller.Get();
-
+        
         private void OnDestroy()
         {
             _elevatorsManagerDecorator.OnElevatorStoppedEvent -= OnElevatorsStopped;
-            
+
             _animationObserver.OnEnabledEvent -= OnEnabledEvent;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void Interact()
         {
             if (IsElevatorMoving())
                 return;
-            
+
             ToggleInteract(canInteract: false);
             PlayAnimation();
             HandleClick();
@@ -102,7 +103,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         }
 
         private void OpenElevator(Floor floor) =>
-            _rpcCaller.OpenElevator(floor);
+            _rpcHandlerDecorator.OpenElevator(floor);
 
         private void StartElevator(Floor floor) =>
             _controlPanel.StartElevator(floor);
@@ -118,10 +119,10 @@ namespace GameCore.Gameplay.Levels.Elevator
 
             if (isElevatorMoving)
                 return;
-            
+
             ToggleInteract(canInteract: true);
         }
-        
+
         private void OnElevatorsStopped(Floor floor) => ToggleInteract(canInteract: true);
     }
 }

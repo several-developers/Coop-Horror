@@ -19,7 +19,7 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         private PlayerSpawner _playerSpawner;
         
         [SerializeField, Required]
-        private RpcCaller _rpcCaller;
+        private RpcHandler _rpcHandler;
 
         [SerializeField, Required]
         private GameTimerManager _gameTimerManager;
@@ -28,7 +28,7 @@ namespace GameCore.Configs.Gameplay.PrefabsList
 
         public ElevatorsManager ElevatorsManager => _elevatorsManager;
         public PlayerSpawner PlayerSpawner => _playerSpawner;
-        public RpcCaller RpcCaller => _rpcCaller;
+        public RpcHandler RpcHandler => _rpcHandler;
         public GameTimerManager GameTimerManager => _gameTimerManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

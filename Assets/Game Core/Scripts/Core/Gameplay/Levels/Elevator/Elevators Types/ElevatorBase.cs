@@ -1,5 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Network;
+using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -11,8 +11,11 @@ namespace GameCore.Gameplay.Levels.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator, IRpcObserver rpcObserver)
+        {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
+            _rpcObserver = rpcObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -27,7 +30,7 @@ namespace GameCore.Gameplay.Levels.Elevator
         // FIELDS: --------------------------------------------------------------------------------
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
-        private RpcCaller _rpcCaller;
+        private IRpcObserver _rpcObserver;
         private bool _isOpen;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -36,13 +39,8 @@ namespace GameCore.Gameplay.Levels.Elevator
         {
             _elevatorsManagerDecorator.OnElevatorStartedEvent += OnElevatorsStarted;
             _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
-        }
-
-        protected virtual void Start()
-        {
-            _rpcCaller = RpcCaller.Get();
             
-            _rpcCaller.OnOpenElevatorEvent += OnOpenElevator;
+            _rpcObserver.OnOpenElevatorEvent += OnOpenElevator;
         }
 
         private void OnDestroy()
@@ -50,7 +48,7 @@ namespace GameCore.Gameplay.Levels.Elevator
             _elevatorsManagerDecorator.OnElevatorStartedEvent -= OnElevatorsStarted;
             _elevatorsManagerDecorator.OnFloorChangedEvent -= OnFloorChanged;
 
-            _rpcCaller.OnOpenElevatorEvent -= OnOpenElevator;
+            _rpcObserver.OnOpenElevatorEvent -= OnOpenElevator;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

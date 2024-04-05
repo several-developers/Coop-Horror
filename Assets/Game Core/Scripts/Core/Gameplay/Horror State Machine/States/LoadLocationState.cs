@@ -10,10 +10,11 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public LoadLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader,
-            ILevelObserver levelObserver)
+            IRpcHandlerDecorator rpcHandlerDecorator, ILevelObserver levelObserver)
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
+            _rpcHandlerDecorator = rpcHandlerDecorator;
             _levelObserver = levelObserver;
 
             horrorStateMachine.AddState(this);
@@ -23,6 +24,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
+        private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
         private readonly ILevelObserver _levelObserver;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -49,9 +51,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private void OnLocationLoaded()
         {
-            RpcCaller rpcCaller = RpcCaller.Get();
-            rpcCaller.SendLocationLoaded(); // For Mobile HQ
-
+            _rpcHandlerDecorator.LocationLoaded(); // For Mobile HQ
             EnterGenerateDungeonsState();
         }
     }

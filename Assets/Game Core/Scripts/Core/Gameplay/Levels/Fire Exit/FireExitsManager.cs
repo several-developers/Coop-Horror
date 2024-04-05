@@ -1,36 +1,32 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Network;
+using GameCore.Observers.Gameplay.Rpc;
 using UnityEngine;
-using Zenject;
 
 namespace GameCore.Gameplay.Levels
 {
-    public class FireExitsManager : IInitializable, IDisposable
+    public class FireExitsManager : IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public FireExitsManager(ILevelProvider levelProvider) =>
+        public FireExitsManager(ILevelProvider levelProvider, IRpcObserver rpcObserver)
+        {
             _levelProvider = levelProvider;
-        
+            _rpcObserver = rpcObserver;
+            
+            _rpcObserver.OnTeleportToFireExitEvent += OnTeleportToFireExit;
+        }
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly ILevelProvider _levelProvider;
-        
-        private RpcCaller _rpcCaller;
+        private readonly IRpcObserver _rpcObserver;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void Initialize()
-        {
-            _rpcCaller = RpcCaller.Get();
-            
-            _rpcCaller.OnTeleportToFireExitEvent += OnTeleportToFireExit;
-        }
         
         public void Dispose() =>
-            _rpcCaller.OnTeleportToFireExitEvent -= OnTeleportToFireExit;
+            _rpcObserver.OnTeleportToFireExitEvent -= OnTeleportToFireExit;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

@@ -13,11 +13,11 @@ namespace GameCore.Gameplay.Entities.Inventory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PlayerInventoryManager(PlayerEntity playerEntity, RpcCaller rpcCaller,
+        public PlayerInventoryManager(PlayerEntity playerEntity, IRpcHandlerDecorator rpcHandlerDecorator,
             IItemsPreviewFactory itemsPreviewFactory)
         {
             _playerEntity = playerEntity;
-            _rpcCaller = rpcCaller;
+            _rpcHandlerDecorator = rpcHandlerDecorator;
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInventory = playerEntity.GetInventory();
             _cameraItemPivot = playerEntity.GetCameraItemPivot();
@@ -32,7 +32,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly PlayerEntity _playerEntity;
-        private readonly RpcCaller _rpcCaller;
+        private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
         private readonly PlayerInventory _playerInventory;
         private readonly Transform _cameraItemPivot;
         private readonly Transform _playerItemPivot;
@@ -68,14 +68,14 @@ namespace GameCore.Gameplay.Entities.Inventory
                 return;
 
             NetworkObject playerNetworkObject = _playerEntity.NetworkObject;
-            
+
             interactableItem.PickUpClient(playerNetworkObject.OwnerClientId);
             interactableItem.PickUpServer(playerNetworkObject);
-            
+
             _interactableItems[slotIndex] = interactableItem;
 
-            CreateItemPreview(slotIndex, itemID, cameraPivot: true);
-            _rpcCaller.CreateItemPreview(slotIndex, itemID);
+            CreateItemPreviewClientSide(slotIndex, itemID, cameraPivot: true);
+            CreateItemPreviewServerSide(slotIndex, itemID);
             ToggleItemsState();
 
             // LOCAL METHODS: -----------------------------
@@ -94,16 +94,16 @@ namespace GameCore.Gameplay.Entities.Inventory
             }
         }
 
-        public void CreateItemPreview(int slotIndex, int itemID, bool cameraPivot)
+        public void CreateItemPreviewClientSide(int slotIndex, int itemID, bool cameraPivot)
         {
             bool isItemPreviewExists = _itemsPreviewObjects[slotIndex] != null;
 
             // Prevent creation of the second preview item for the item owner.
             if (isItemPreviewExists)
                 return;
-            
+
             Transform itemPivot = cameraPivot ? _cameraItemPivot : _playerItemPivot;
-            
+
             bool isItemCreated = _itemsPreviewFactory.Create(itemID, itemPivot, cameraPivot,
                 out ItemPreviewObject itemPreview);
 
@@ -111,20 +111,20 @@ namespace GameCore.Gameplay.Entities.Inventory
                 return;
 
             bool isSelected = _playerInventory.GetSelectedSlotIndex() == slotIndex;
-            
+
             if (!isSelected)
                 itemPreview.Hide();
 
             _itemsPreviewObjects[slotIndex] = itemPreview;
         }
-        
+
         public void DestroyItemPreview(int slotIndex)
         {
             ItemPreviewObject itemPreviewObject = _itemsPreviewObjects[slotIndex];
-            
+
             if (itemPreviewObject != null)
                 itemPreviewObject.Drop();
-            
+
             _itemsPreviewObjects[slotIndex] = null;
         }
 
@@ -167,17 +167,20 @@ namespace GameCore.Gameplay.Entities.Inventory
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
+        private void CreateItemPreviewServerSide(int slotIndex, int itemID) =>
+            _rpcHandlerDecorator.CreateItemPreview(slotIndex, itemID);
+
         private void DropItem(int slotIndex, bool randomPosition)
         {
             IInteractableItem interactableItem = _interactableItems[slotIndex];
-            
+
             interactableItem?.DropServer(randomPosition); // Server RPC
             interactableItem?.DropClient(randomPosition);
 
             _interactableItems[slotIndex] = null;
-            
-            _rpcCaller.DestroyItemPreview(slotIndex);
+
+            _rpcHandlerDecorator.DestroyItemPreview(slotIndex);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
