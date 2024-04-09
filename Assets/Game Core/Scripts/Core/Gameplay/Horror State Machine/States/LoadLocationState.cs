@@ -1,6 +1,5 @@
 ﻿using GameCore.Enums.Global;
 using GameCore.Gameplay.Levels.Locations;
-using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.Level;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
@@ -10,11 +9,10 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public LoadLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader,
-            IRpcHandlerDecorator rpcHandlerDecorator, ILevelObserver levelObserver)
+            ILevelObserver levelObserver)
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
-            _rpcHandlerDecorator = rpcHandlerDecorator;
             _levelObserver = levelObserver;
 
             horrorStateMachine.AddState(this);
@@ -24,7 +22,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
-        private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
         private readonly ILevelObserver _levelObserver;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -49,10 +46,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnLocationLoaded()
-        {
-            _rpcHandlerDecorator.LocationLoaded(); // For Mobile HQ
-            EnterGenerateDungeonsState();
-        }
+        private void OnLocationLoaded() => EnterGenerateDungeonsState();
     }
 }

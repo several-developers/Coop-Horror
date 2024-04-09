@@ -11,8 +11,11 @@ namespace GameCore.Gameplay.Levels.Locations
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ILevelObserver levelObserver) =>
+        private void Construct(ILocationManagerDecorator locationManagerDecorator, ILevelObserver levelObserver)
+        {
+            _locationManagerDecorator = locationManagerDecorator;
             _levelObserver = levelObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -24,29 +27,33 @@ namespace GameCore.Gameplay.Levels.Locations
         private CinemachinePath _exitPath;
         
         // FIELDS: --------------------------------------------------------------------------------
-
-        private static LocationManager _instance;
         
+        private ILocationManagerDecorator _locationManagerDecorator;
         private ILevelObserver _levelObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
-            _instance = this;
+        private void Awake()
+        {
+            _locationManagerDecorator.OnGetEnterPathEvent += GetEnterPath;
+            _locationManagerDecorator.OnGetExitPathEvent += GetExitPath;
+        }
 
         private void Start() => SendLocationLoaded();
+
+        private void OnDestroy()
+        {
+            _locationManagerDecorator.OnGetEnterPathEvent -= GetEnterPath;
+            _locationManagerDecorator.OnGetExitPathEvent -= GetExitPath;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void SendLocationLoaded() =>
             _levelObserver.LocationLoaded();
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public CinemachinePath GetEnterPath() => _enterPath;
+        private CinemachinePath GetEnterPath() => _enterPath;
         
-        public CinemachinePath GetExitPath() => _exitPath;
-        
-        public static LocationManager Get() => _instance;
+        private CinemachinePath GetExitPath() => _exitPath;
     }
 }

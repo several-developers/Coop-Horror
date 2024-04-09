@@ -16,7 +16,7 @@ namespace GameCore.Gameplay.Network
             _networkHorrorDecorator = networkHorrorDecorator;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private INetworkHorrorDecorator _networkHorrorDecorator;
         private NetworkManager _networkManager;
         private bool _initialSpawnDone;
@@ -35,6 +35,8 @@ namespace GameCore.Gameplay.Network
 
         public void InitServerAndClient()
         {
+            _networkHorrorDecorator.OnIsServerEvent += IsServer;
+            
             _networkManager.OnClientConnectedCallback += OnClientConnected;
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
             //_networkManager.SceneManager.OnLoadEventCompleted += OnLoadEventCompleted;
@@ -43,24 +45,41 @@ namespace GameCore.Gameplay.Network
 
         public void InitServer()
         {
+            if (!IsOwner)
+                return;
         }
 
         public void InitClient()
         {
+            if (IsOwner)
+                return;
         }
 
         public void DespawnServerAndClient()
         {
+            _networkHorrorDecorator.OnIsServerEvent -= IsServer;
+
+            _networkManager.OnClientConnectedCallback -= OnClientConnected;
+            _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
         }
 
         public void DespawnServer()
         {
+            if (!IsOwner)
+                return;
+            
         }
 
         public void DespawnClient()
         {
+            if (IsOwner)
+                return;
         }
 
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private bool IsServer() => IsOwner;
+        
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
@@ -89,7 +108,8 @@ namespace GameCore.Gameplay.Network
             Debug.Log($"Client #{clientId} disconnect.");
         }
 
-        private void OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+        private void OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,
+            List<ulong> clientsTimedOut)
         {
             Debug.Log($"Load event completed.");
 

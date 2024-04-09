@@ -7,6 +7,7 @@ using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.Session_Manager;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Observers.Gameplay.Level;
 using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -21,11 +22,15 @@ namespace GameCore.Gameplay.Network
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameplayConfigsProvider gameplayConfigsProvider) =>
+        private void Construct(ILevelObserver levelObserver, IGameplayConfigsProvider gameplayConfigsProvider)
+        {
+            _levelObserver = levelObserver;
             _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private ILevelObserver _levelObserver;
         private PlayerConfigMeta _playerConfig;
         private NetworkManager _networkManager;
         private bool _initialSpawnDone;
@@ -37,16 +42,16 @@ namespace GameCore.Gameplay.Network
             bool isCanceled = await UniTask
                 .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
                 .SuppressCancellationThrow();
-            
+
             if (isCanceled)
                 return;
-            
+
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
 
             Vector3 spawnPosition = GetSpawnPosition();
             PlayerEntity playerEntityPrefab = _playerConfig.PlayerPrefab;
             NetworkObject playerNetworkObjectPrefab = playerEntityPrefab.GetComponent<NetworkObject>();
-            
+
             //PlayerEntity playerInstance = Instantiate(_playerConfig.PlayerPrefab, spawnPosition, Quaternion.identity);
             NetworkObject playerNetworkObjectInstance = _networkManager.SpawnManager
                 .InstantiateAndSpawn(playerNetworkObjectPrefab, clientId, position: spawnPosition);
@@ -138,6 +143,7 @@ namespace GameCore.Gameplay.Network
             }
         }
 
+#warning Перенести в отдельный скрипт
         private void OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,
             List<ulong> clientsTimedOut)
         {

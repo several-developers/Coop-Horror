@@ -14,7 +14,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindPrepareGameState();
             BindGameLoopState();
             BindLoadLocationState();
-            BindLeaveLocationState();
+            BindLeaveLocationServerState();
+            BindLeaveLocationClientState();
             BindGenerateDungeonsState();
             BindQuitState();
         }
@@ -52,11 +53,19 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .NonLazy();
         }
         
-        private void BindLeaveLocationState()
+        private void BindLeaveLocationServerState()
         {
             Container
-                .Bind(typeof(LeaveLocationState), typeof(IDisposable))
-                .To<LeaveLocationState>()
+                .Bind(typeof(LeaveLocationServerState), typeof(IDisposable))
+                .To<LeaveLocationServerState>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindLeaveLocationClientState()
+        {
+            Container
+                .Bind<LeaveLocationClientState>()
                 .AsSingle()
                 .NonLazy();
         }

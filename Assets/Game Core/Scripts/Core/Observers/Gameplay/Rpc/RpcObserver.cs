@@ -11,8 +11,7 @@ namespace GameCore.Observers.Gameplay.Rpc
         
         public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent = delegate { };
         public event Action<int> OnDestroyItemPreviewEvent = delegate { };
-        public event Action OnLocationLoadedEvent = delegate { };
-        public event Action OnLeavingLocationEvent = delegate { };
+        public event Action OnStartLeavingLocationEvent = delegate { };
         public event Action OnLocationLeftEvent = delegate { };
         public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate { };
         public event Action<Floor> OnStartElevatorEvent = delegate { };
@@ -28,11 +27,8 @@ namespace GameCore.Observers.Gameplay.Rpc
         public void DestroyItemPreview(int slotIndex) =>
             OnDestroyItemPreviewEvent.Invoke(slotIndex);
 
-        public void LocationLoaded() =>
-            OnLocationLoadedEvent.Invoke();
-
-        public void LeavingLocation() =>
-            OnLeavingLocationEvent.Invoke();
+        public void StartLeavingLocation() =>
+            OnStartLeavingLocationEvent.Invoke();
 
         public void LocationLeft() =>
             OnLocationLeftEvent.Invoke();

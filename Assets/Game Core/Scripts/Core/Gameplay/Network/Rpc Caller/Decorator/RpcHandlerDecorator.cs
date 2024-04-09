@@ -13,9 +13,7 @@ namespace GameCore.Gameplay.Network
         public event Action<int> OnDestroyItemPreviewEvent = delegate { };
         public event Action<SceneName> OnLoadLocationEvent = delegate { };
         public event Action OnStartLeavingLocationEvent = delegate { };
-        public event Action OnLeaveLocationEvent = delegate { };
-        public event Action OnLocationLoadedEvent = delegate { };
-        public event Action OnLeftLocationEvent = delegate { };
+        public event Action OnLocationLeftEvent = delegate { };
         public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate { };
         public event Action<Floor> OnStartElevatorEvent = delegate { };
         public event Action<Floor> OnOpenElevatorEvent = delegate { };
@@ -36,14 +34,8 @@ namespace GameCore.Gameplay.Network
         public void StartLeavingLocation() =>
             OnStartLeavingLocationEvent.Invoke();
 
-        public void LeaveLocation() =>
-            OnLeaveLocationEvent.Invoke();
-
-        public void LocationLoaded() =>
-            OnLocationLoadedEvent.Invoke();
-
-        public void LeftLocation() =>
-            OnLeftLocationEvent.Invoke();
+        public void LocationLeft() =>
+            OnLocationLeftEvent.Invoke();
 
         public void GenerateDungeons(DungeonsSeedData data) => 
             OnGenerateDungeonsEvent.Invoke(data);

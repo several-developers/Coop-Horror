@@ -31,6 +31,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindLevelProvider();
             BindDungeonsManager();
             BindFireExitsManager();
+            BindLocationManagerDecorator();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -87,6 +88,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .BindInterfacesTo<FireExitsManager>()
                 .AsSingle()
                 .NonLazy();
+        }
+        
+        private void BindLocationManagerDecorator()
+        {
+            Container
+                .BindInterfacesTo<LocationManagerDecorator>()
+                .AsSingle();
         }
     }
 }

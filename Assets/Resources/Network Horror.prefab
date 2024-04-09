@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1940391704733545944}
   - component: {fileID: -8011127673663287335}
   - component: {fileID: 8707238204668581641}
+  - component: {fileID: 2231891646671229468}
   m_Layer: 0
   m_Name: Network Horror
   m_TagString: Untagged
@@ -66,3 +67,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b94e822c43d746ad9033d5e6779ff7f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2231891646671229468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7987760044055154378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 717a02054ef2699498e6bd4234fd7995, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _containerSource: 1

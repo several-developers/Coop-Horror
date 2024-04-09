@@ -1,10 +1,11 @@
-﻿using Cinemachine;
-using Cysharp.Threading.Tasks;
+﻿using System;
+using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
+using GameCore.Observers.Gameplay.Level;
 using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -29,9 +30,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, IRpcObserver rpcObserver)
+        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator,
+            ILocationManagerDecorator locationManagerDecorator, ILevelObserver levelObserver, IRpcObserver rpcObserver)
         {
             RpcHandlerDecorator = rpcHandlerDecorator;
+            _locationManagerDecorator = locationManagerDecorator;
+            _levelObserver = levelObserver;
             _rpcObserver = rpcObserver;
         }
 
@@ -52,8 +56,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnLocationLeftEvent; // Server only.
+
+        private ILocationManagerDecorator _locationManagerDecorator;
+        private ILevelObserver _levelObserver;
         private IRpcObserver _rpcObserver;
-        
+
         private MobileHeadquartersController _mobileHeadquartersController;
         private RigidbodyPathMovement _pathMovement;
         private State _currentState = State.MovingOnRoad;
@@ -64,10 +72,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _mobileHeadquartersConfig);
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
-
-            _mobileHeadquartersController.Init();
-
-            _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
         }
 
         private void Update()
@@ -77,36 +81,36 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             TickClient();
         }
 
-        public override void OnDestroy()
-        {
-            _mobileHeadquartersController.Dispose();
-
-            _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
-
-            base.OnDestroy();
-        }
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void InitServerAndClient()
         {
+            _mobileHeadquartersController.InitServerAndClient();
+
             ArrivedAtRoadLocation();
-            
-            _rpcObserver.OnLocationLoadedEvent += OnLocationLoaded;
-            _rpcObserver.OnLeavingLocationEvent += OnLeavingLocation;
+
+            _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
+
+            _rpcObserver.OnStartLeavingLocationEvent += StartLeavingLocation;
             _rpcObserver.OnLocationLeftEvent += OnLocationLeft;
+            
+            _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
         }
 
         public void InitServer()
         {
             if (!IsOwner)
                 return;
+
+            _mobileHeadquartersController.InitServer();
         }
 
         public void InitClient()
         {
             if (IsOwner)
                 return;
+
+            _mobileHeadquartersController.InitClient();
         }
 
         public void TickServerAndClient()
@@ -129,21 +133,30 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public void DespawnServerAndClient()
         {
-            _rpcObserver.OnLocationLoadedEvent -= OnLocationLoaded;
-            _rpcObserver.OnLeavingLocationEvent -= OnLeavingLocation;
+            _mobileHeadquartersController.DespawnServerAndClient();
+
+            _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
+
+            _rpcObserver.OnStartLeavingLocationEvent -= StartLeavingLocation;
             _rpcObserver.OnLocationLeftEvent -= OnLocationLeft;
+            
+            _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
         }
 
         public void DespawnServer()
         {
             if (!IsOwner)
                 return;
+
+            _mobileHeadquartersController.DespawnServer();
         }
 
         public void DespawnClient()
         {
             if (IsOwner)
                 return;
+
+            _mobileHeadquartersController.DespawnClient();
         }
 
         public Transform GetTransform() => transform;
@@ -170,10 +183,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             loadLocationLever.ToggleInteract(canInteract: true);
         }
 
-        private void ChangePath(CinemachinePath path)
-        {
+        private void ChangePath(CinemachinePath path) =>
             _pathMovement.ChangePath(path);
-        }
 
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
@@ -189,6 +200,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [ServerRpc(RequireOwnership = false)]
         public void InteractWithLoadLocationLeverServerRpc() => InteractWithLoadLocationLeverClientRpc();
 
+        [ServerRpc]
+        private void DestinationReachedServerRpc() => DestinationReachedClientRpc();
+
         [ClientRpc]
         private void InteractWithMobileDoorLeverClientRpc()
         {
@@ -203,12 +217,21 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             loadLocationLever.InteractLogic();
         }
 
+        [ClientRpc]
+        private void DestinationReachedClientRpc()
+        {
+            if (IsOwner)
+                return;
+
+            OnDestinationReached();
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
+
             InitServerAndClient();
             InitServer();
             InitClient();
@@ -217,18 +240,22 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            
+
             DespawnServerAndClient();
             DespawnServer();
             DespawnClient();
         }
-        
+
         [Button]
         private void OnDestinationReached()
         {
             switch (_currentState)
             {
                 case State.ArrivingAtLocation:
+
+                    if (IsOwner)
+                        DestinationReachedServerRpc();
+
                     _mobileHeadquartersController.ToggleDoorState(isOpen: true);
 
                     LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
@@ -239,37 +266,29 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case State.LeavingLocation:
-                    RpcHandlerDecorator.LeaveLocation();
+                    OnLocationLeftEvent?.Invoke();
+                    RpcHandlerDecorator.LocationLeft();
 
                     EnterState(State.MovingOnRoad);
                     break;
             }
         }
 
-        private async void OnLocationLoaded()
+        private void OnLocationLoaded()
         {
-#warning ЛОКАЦИЯ НЕ УСПЕВАЕТ ЗАГРУЗИТСЯ НА КЛИЕНТЕ
-            bool isCanceled = await UniTask
-                .DelayFrame(delayFrameCount: 2, cancellationToken: this.GetCancellationTokenOnDestroy())
-                .SuppressCancellationThrow();
-
-            if (isCanceled)
-                return;
-
-            LocationManager locationManager = LocationManager.Get();
-            CinemachinePath path = locationManager.GetEnterPath();
+            CinemachinePath path = _locationManagerDecorator.GetEnterPath();
 
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
             ToggleMovement(canMove: true);
 
+#warning Синхронизировать через Network Variable?
             EnterState(State.ArrivingAtLocation);
         }
 
-        private void OnLeavingLocation()
+        private void StartLeavingLocation()
         {
-            LocationManager locationManager = LocationManager.Get();
-            CinemachinePath path = locationManager.GetExitPath();
+            CinemachinePath path = _locationManagerDecorator.GetExitPath();
 
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);

@@ -10,10 +10,8 @@ namespace GameCore.Gameplay.Network
         event Action<int, int> OnCreateItemPreviewEvent;
         event Action<int> OnDestroyItemPreviewEvent;
         event Action<SceneName> OnLoadLocationEvent;
-        event Action OnStartLeavingLocationEvent;
-        event Action OnLeaveLocationEvent;
-        event Action OnLocationLoadedEvent;
-        event Action OnLeftLocationEvent;
+        event Action OnStartLeavingLocationEvent; // Mobile HQ starts leaving the location.
+        event Action OnLocationLeftEvent; // Mobile HQ left the location.
         event Action<DungeonsSeedData> OnGenerateDungeonsEvent;
         event Action<Floor> OnStartElevatorEvent;
         event Action<Floor> OnOpenElevatorEvent;
@@ -24,9 +22,7 @@ namespace GameCore.Gameplay.Network
         void DestroyItemPreview(int slotIndex);
         void LoadLocation(SceneName sceneName);
         void StartLeavingLocation();
-        void LeaveLocation();
-        void LocationLoaded();
-        void LeftLocation();
+        void LocationLeft();
         void GenerateDungeons(DungeonsSeedData data);
         void StartElevator(Floor floor);
         void OpenElevator(Floor floor);

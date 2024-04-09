@@ -1,12 +1,13 @@
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Other;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
-    public class MobileHeadquartersController
+    public class MobileHeadquartersController : INetcodeInitBehaviour, INetcodeDespawnBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -24,8 +25,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void Init()
+        
+        public void InitServerAndClient()
         {
             AnimationObserver animationObserver = _references.AnimationObserver;
             animationObserver.OnDoorOpenedEvent += OnDoorOpened;
@@ -42,10 +43,24 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
             leaveLocationLever.OnInteractEvent += OnInteractWithLeaveLocationLever;
-            leaveLocationLever.OnEnabledEvent += OnLeaveLocation;
+            leaveLocationLever.OnEnabledEvent += OnStartLeavingLocation;
+        }
+        
+        public void InitServer()
+        {
+            // LoadLocationLever loadLocationLever = _references.LoadLocationLever;
+            // loadLocationLever.OnEnabledEvent += OnLoadLocation;
+            //
+            // LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
+            // leaveLocationLever.OnEnabledEvent += OnStartLeavingLocation;
         }
 
-        public void Dispose()
+        public void InitClient()
+        {
+            
+        }
+        
+        public void DespawnServerAndClient()
         {
             AnimationObserver animationObserver = _references.AnimationObserver;
             animationObserver.OnDoorOpenedEvent -= OnDoorOpened;
@@ -62,7 +77,21 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
             leaveLocationLever.OnInteractEvent -= OnInteractWithLeaveLocationLever;
-            leaveLocationLever.OnEnabledEvent -= OnLeaveLocation;
+            leaveLocationLever.OnEnabledEvent -= OnStartLeavingLocation;
+        }
+        
+        public void DespawnServer()
+        {
+            // LoadLocationLever loadLocationLever = _references.LoadLocationLever;
+            // loadLocationLever.OnEnabledEvent -= OnLoadLocation;
+            //
+            // LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
+            // leaveLocationLever.OnEnabledEvent -= OnStartLeavingLocation;
+        }
+
+        public void DespawnClient()
+        {
+            
         }
 
         public void ToggleDoorState(bool isOpen)
@@ -95,7 +124,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void OnInteractWithLoadLocationLever() =>
             _mobileHeadquartersEntity.InteractWithLoadLocationLeverServerRpc();
 
-        private void OnLoadLocation() =>
+        private void OnLoadLocation() => 
             _rpcHandlerDecorator.LoadLocation(SceneName.Desert);
 
         private void OnInteractWithLeaveLocationLever()
@@ -104,7 +133,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             leaveLocationLever.InteractLogic();
         }
 
-        private void OnLeaveLocation() =>
+        private void OnStartLeavingLocation() =>
             _rpcHandlerDecorator.StartLeavingLocation();
     }
 }

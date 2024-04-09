@@ -4,6 +4,7 @@ using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Observers.Gameplay.Rpc;
 using Unity.Netcode;
+using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Network
@@ -34,16 +35,9 @@ namespace GameCore.Gameplay.Network
             if (!IsOwner)
                 return;
             
+            Debug.LogWarning("Load location!!!!");
             var sceneName = (SceneName)sceneNameIndex;
             _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
-        }
-
-        private void LeaveLocationLogic()
-        {
-            if (!IsOwner)
-                return;
-            
-            _horrorStateMachine.ChangeState<LeaveLocationState>();
         }
 
         // RPC: -----------------------------------------------------------------------------------
@@ -64,13 +58,7 @@ namespace GameCore.Gameplay.Network
 
         [ServerRpc(RequireOwnership = false)]
         private void StartLeavingLocationServerRpc() => StartLeavingLocationClientRpc();
-
-        [ServerRpc(RequireOwnership = false)]
-        private void LeaveLocationServerRpc() => LeaveLocationClientRpc();
-
-        [ServerRpc(RequireOwnership = false)]
-        private void LocationLoadedServerRpc() => LocationLoadedClientRpc();
-
+        
         [ServerRpc(RequireOwnership = false)]
         private void LeftLocationServerRpc() => LeftLocationClientRpc();
 
@@ -111,14 +99,7 @@ namespace GameCore.Gameplay.Network
 
         [ClientRpc]
         private void StartLeavingLocationClientRpc() =>
-            _rpcObserver.LeavingLocation();
-
-        [ClientRpc]
-        private void LeaveLocationClientRpc() => LeaveLocationLogic();
-
-        [ClientRpc]
-        private void LocationLoadedClientRpc() =>
-            _rpcObserver.LocationLoaded();
+            _rpcObserver.StartLeavingLocation();
 
         [ClientRpc]
         private void LeftLocationClientRpc() =>
@@ -154,9 +135,7 @@ namespace GameCore.Gameplay.Network
             _rpcHandlerDecorator.OnDestroyItemPreviewEvent += OnDestroyItemPreview;
             _rpcHandlerDecorator.OnLoadLocationEvent += OnLoadLocation;
             _rpcHandlerDecorator.OnStartLeavingLocationEvent += OnStartLeavingLocation;
-            _rpcHandlerDecorator.OnLeaveLocationEvent += OnLeaveLocation;
-            _rpcHandlerDecorator.OnLocationLoadedEvent += OnLocationLoaded;
-            _rpcHandlerDecorator.OnLeftLocationEvent += OnLeftLocation;
+            _rpcHandlerDecorator.OnLocationLeftEvent += LocationLeft;
             _rpcHandlerDecorator.OnGenerateDungeonsEvent += OnGenerateDungeons;
             _rpcHandlerDecorator.OnStartElevatorEvent += OnStartElevator;
             _rpcHandlerDecorator.OnOpenElevatorEvent += OnOpenElevator;
@@ -172,9 +151,7 @@ namespace GameCore.Gameplay.Network
             _rpcHandlerDecorator.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
             _rpcHandlerDecorator.OnLoadLocationEvent -= OnLoadLocation;
             _rpcHandlerDecorator.OnStartLeavingLocationEvent -= OnStartLeavingLocation;
-            _rpcHandlerDecorator.OnLeaveLocationEvent -= OnLeaveLocation;
-            _rpcHandlerDecorator.OnLocationLoadedEvent -= OnLocationLoaded;
-            _rpcHandlerDecorator.OnLeftLocationEvent -= OnLeftLocation;
+            _rpcHandlerDecorator.OnLocationLeftEvent -= LocationLeft;
             _rpcHandlerDecorator.OnGenerateDungeonsEvent -= OnGenerateDungeons;
             _rpcHandlerDecorator.OnStartElevatorEvent -= OnStartElevator;
             _rpcHandlerDecorator.OnOpenElevatorEvent -= OnOpenElevator;
@@ -194,12 +171,8 @@ namespace GameCore.Gameplay.Network
         }
 
         private void OnStartLeavingLocation() => StartLeavingLocationServerRpc();
-
-        private void OnLeaveLocation() => LeaveLocationServerRpc();
-
-        private void OnLocationLoaded() => LocationLoadedServerRpc();
-
-        private void OnLeftLocation() => LeftLocationServerRpc();
+        
+        private void LocationLeft() => LeftLocationServerRpc();
 
         private void OnGenerateDungeons(DungeonsSeedData data) => GenerateDungeonsServerRpc(data);
 
