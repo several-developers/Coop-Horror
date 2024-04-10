@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d230428fb994b9895d80e51445d3344, type: 3}
+  m_Name: Quests Config
+  m_EditorClassIdentifier: 
+  _metaName: Quests Config
+  _maxQuestsAmount: 5
+  _maxActiveQuests: 3
+  _questsLookUpList: 0000000000000000010000000100000003000000
+  _questsPresets:
+  - _difficulty: 0
+    _itemsListLength: {x: 3, y: 3}
+    _itemQuantity: {x: 1, y: 2}
+  - _difficulty: 1
+    _itemsListLength: {x: 3, y: 4}
+    _itemQuantity: {x: 1, y: 3}
+  - _difficulty: 3
+    _itemsListLength: {x: 3, y: 6}
+    _itemQuantity: {x: 1, y: 4}

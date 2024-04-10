@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+// ReSharper disable InconsistentNaming
+#pragma warning disable CS0108, CS0114
 
 
 namespace PhysicsBasedCharacterController

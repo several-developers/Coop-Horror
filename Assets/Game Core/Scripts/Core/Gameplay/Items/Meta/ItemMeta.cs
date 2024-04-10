@@ -1,6 +1,11 @@
-﻿using CustomEditors;
+﻿using System.Linq;
+using CustomEditors;
 using Sirenix.OdinInspector;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace GameCore.Gameplay.Items
 {
@@ -91,7 +96,26 @@ namespace GameCore.Gameplay.Items
         {
             _canEditItemID = false;
             
-            UnityEditor.AssetDatabase.SaveAssetIfDirty(obj: this);
+            AssetDatabase.SaveAssetIfDirty(obj: this);
+        }
+
+        [VerticalGroup(RowRight)]
+        [Button(14), DisableInPlayMode, ShowIf(nameof(_canEditItemID))]
+        [GUIColor(1f, 1f, 0.2f)]
+        private void SetHighestItemID()
+        {
+            ItemMeta[] itemsMeta = AssetDatabase
+                .FindAssets("t:" + typeof(ItemMeta))
+                .Select(x => AssetDatabase.LoadAssetAtPath<ItemMeta>(AssetDatabase.GUIDToAssetPath(x)))
+                .ToArray();
+
+            int highestItemID = 0;
+
+            foreach (ItemMeta itemMeta in itemsMeta)
+                highestItemID = Mathf.Max(a: highestItemID, b: itemMeta.ItemID);
+
+            _itemID = highestItemID + 1;
+            SaveItemID();
         }
 #endif
     }

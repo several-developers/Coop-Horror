@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Unity.Netcode.Transports.UTP;
+#pragma warning disable CS1998
 
 namespace GameCore.Gameplay.Network.ConnectionManagement
 {

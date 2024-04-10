@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 // ReSharper disable InconsistentNaming
+#pragma warning disable CS0108, CS0114
 
 namespace PhysicsBasedCharacterController
 {
