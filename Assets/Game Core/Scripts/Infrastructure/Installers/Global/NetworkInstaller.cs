@@ -17,13 +17,13 @@ namespace GameCore.Infrastructure.Installers.Global
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private NetcodeHooks _netcodeHooksPrefab;
+        private NetcodeHooks _netcodeHooks;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void InstallBindings()
         {
-            BindNetworkHorrorDecorator();
+            BindNetworkHorror();
             BindNetcodeHooks();
             
             
@@ -33,21 +33,20 @@ namespace GameCore.Infrastructure.Installers.Global
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void BindNetworkHorrorDecorator()
+        private void BindNetworkHorror()
         {
             Container
-                .BindInterfacesTo<NetworkHorrorDecorator>()
-                .AsSingle();
+                .BindInterfacesTo<NetworkHorror>()
+                .AsSingle()
+                .NonLazy();
         }
 
         private void BindNetcodeHooks()
         {
             Container
                 .Bind<INetcodeHooks>()
-                .To<NetcodeHooks>()
-                .FromComponentInNewPrefab(_netcodeHooksPrefab)
-                .AsSingle()
-                .NonLazy();
+                .FromInstance(_netcodeHooks)
+                .AsSingle();
         }
         
         private void Test()

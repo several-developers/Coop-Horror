@@ -1,5 +1,6 @@
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Quests;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -12,6 +13,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             BindRpcHandlerDecorator();
             BindElevatorsManagerDecorator();
+            BindQuestsManagerDecorator();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -27,6 +29,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<ElevatorsManagerDecorator>()
+                .AsSingle();
+        }
+        
+        private void BindQuestsManagerDecorator()
+        {
+            Container
+                .BindInterfacesTo<QuestsManagerDecorator>()
                 .AsSingle();
         }
     }

@@ -7,6 +7,7 @@ using GameCore.Configs.Gameplay.Time;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
 using GameCore.Configs.Gameplay.Quests;
+using GameCore.Configs.Gameplay.QuestsItems;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
 {
@@ -21,5 +22,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         ElevatorConfigMeta GetElevatorConfig();
         PrefabsListConfigMeta GetPrefabsListConfig();
         QuestsConfigMeta GetQuestsConfig();
+        QuestsItemsConfigMeta GetQuestsItemsConfig();
     }
 }

@@ -13,10 +13,6 @@ namespace GameCore.Gameplay.Network
         public event Action OnNetworkSpawnHookEvent;
         public event Action OnNetworkDespawnHookEvent;
 
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
-
-        private void Awake() => DontDestroyOnLoad(gameObject);
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
         
         public override void OnNetworkSpawn()

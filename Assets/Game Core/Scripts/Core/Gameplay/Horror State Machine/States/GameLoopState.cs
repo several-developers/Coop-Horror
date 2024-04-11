@@ -9,11 +9,11 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameLoopState(IHorrorStateMachine horrorStateMachine, INetworkHorrorDecorator networkHorrorDecorator,
+        public GameLoopState(IHorrorStateMachine horrorStateMachine, INetworkHorror networkHorror,
             IMobileHeadquartersEntity mobileHeadquartersEntity, IRpcObserver rpcObserver)
         {
             _horrorStateMachine = horrorStateMachine;
-            _networkHorrorDecorator = networkHorrorDecorator;
+            _networkHorror = networkHorror;
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _rpcObserver = rpcObserver;
 
@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IHorrorStateMachine _horrorStateMachine;
-        private readonly INetworkHorrorDecorator _networkHorrorDecorator;
+        private readonly INetworkHorror _networkHorror;
         private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
         private readonly IRpcObserver _rpcObserver;
 
@@ -87,7 +87,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private bool IsServer() =>
-            _networkHorrorDecorator.IsServer();
+            _networkHorror.IsOwner;
 
         private void EnterLeaveLocationServerState() =>
             _horrorStateMachine.ChangeState<LeaveLocationServerState>();

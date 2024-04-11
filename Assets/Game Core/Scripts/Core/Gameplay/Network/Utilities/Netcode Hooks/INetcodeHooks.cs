@@ -6,5 +6,7 @@ namespace GameCore.Gameplay.Network
     {
         event Action OnNetworkSpawnHookEvent;
         event Action OnNetworkDespawnHookEvent;
+        ulong OwnerClientId { get; }
+        bool IsOwner { get; }
     }
 }

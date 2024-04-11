@@ -85,6 +85,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "InteractWithTablet",
+                    "type": "Button",
+                    "id": "323dc7d2-7758-4512-86a0-d0f6bd5f8227",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -395,6 +404,17 @@
                     "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4ef14ca0-99ac-4e8d-9749-722e04f83488",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "InteractWithTablet",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -478,6 +498,15 @@
                     "name": "Resume",
                     "type": "Button",
                     "id": "a7ce7ca2-3eb1-41e9-badc-2dac125adc89",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "InteractWithTablet",
+                    "type": "Button",
+                    "id": "f06e5da4-9e3a-40c0-bfd1-1a7956d6b548",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -889,6 +918,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Resume",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cb4f6a34-5469-44c4-8b9b-037a18f12ece",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "InteractWithTablet",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

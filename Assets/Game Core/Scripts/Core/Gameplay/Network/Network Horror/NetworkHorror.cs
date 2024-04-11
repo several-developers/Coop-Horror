@@ -1,41 +1,52 @@
+using System;
 using System.Collections.Generic;
 using GameCore.Gameplay.Network.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Zenject;
 
 namespace GameCore.Gameplay.Network
 {
-    public class NetworkHorror : NetworkBehaviour, INetcodeInitBehaviour, INetcodeDespawnBehaviour
+    public class NetworkHorror : INetworkHorror, IDisposable, INetcodeInitBehaviour, INetcodeDespawnBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        [Inject]
-        private void Construct(INetworkHorrorDecorator networkHorrorDecorator) =>
-            _networkHorrorDecorator = networkHorrorDecorator;
+        public NetworkHorror(INetcodeHooks netcodeHooks)
+        {
+            _netcodeHooks = netcodeHooks;
+            
+            _netcodeHooks.OnNetworkSpawnHookEvent += OnNetworkSpawnHook;
+            _netcodeHooks.OnNetworkDespawnHookEvent += OnNetworkDespawnHook;
+        }
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public static ulong ServerID { get; private set; }
+        public static ulong ClientID { get; private set; }
+        
+        public bool IsOwner => _netcodeHooks.IsOwner;
+
+        private ulong OwnerClientId => _netcodeHooks.OwnerClientId;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
-        private INetworkHorrorDecorator _networkHorrorDecorator;
+        private readonly INetcodeHooks _netcodeHooks;
+        
         private NetworkManager _networkManager;
         private bool _initialSpawnDone;
 
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
-
-        private void Awake()
-        {
-            DontDestroyOnLoad(gameObject);
-        }
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Setup(NetworkManager networkManager) =>
-            _networkManager = networkManager;
-
+        public void Dispose()
+        {
+            _netcodeHooks.OnNetworkSpawnHookEvent -= OnNetworkSpawnHook;
+            _netcodeHooks.OnNetworkDespawnHookEvent -= OnNetworkDespawnHook;
+        }
+        
         public void InitServerAndClient()
         {
-            _networkHorrorDecorator.OnIsServerEvent += IsServer;
+            ServerID = OwnerClientId;
+            _networkManager = NetworkManager.Singleton;
             
             _networkManager.OnClientConnectedCallback += OnClientConnected;
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
@@ -47,18 +58,20 @@ namespace GameCore.Gameplay.Network
         {
             if (!IsOwner)
                 return;
+            
+            ClientID = _netcodeHooks.OwnerClientId;
         }
 
         public void InitClient()
         {
             if (IsOwner)
                 return;
+            
+            ClientID = _networkManager.LocalClientId;
         }
 
         public void DespawnServerAndClient()
         {
-            _networkHorrorDecorator.OnIsServerEvent -= IsServer;
-
             _networkManager.OnClientConnectedCallback -= OnClientConnected;
             _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
         }
@@ -78,21 +91,19 @@ namespace GameCore.Gameplay.Network
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private bool IsServer() => IsOwner;
-        
+        private bool IsNetworkOwner() => IsOwner;
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        public override void OnNetworkSpawn()
+        private void OnNetworkSpawnHook()
         {
-            base.OnNetworkSpawn();
             InitServerAndClient();
             InitServer();
             InitClient();
         }
 
-        public override void OnNetworkDespawn()
+        private void OnNetworkDespawnHook()
         {
-            base.OnNetworkDespawn();
             DespawnServerAndClient();
             DespawnServer();
             DespawnClient();

@@ -16,6 +16,7 @@
         public const string ElevatorConfig = GameplayConfigs + "Elevator Config";
         public const string PrefabsListConfig = GameplayConfigs + "Prefabs List Config";
         public const string QuestsConfig = GameplayConfigs + "Quests Config";
+        public const string QuestsItemsConfig = GameplayConfigs + "Quests Items Config";
         
         public const string PlayerConfig = Configs + "Player/Player Config";
         public const string GameBalanceConfig = Configs + "Game Balance Config";

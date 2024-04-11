@@ -21,3 +21,5 @@ MonoBehaviour:
     type: 3}
   _gameTimerManager: {fileID: 6677644779065434593, guid: f722e5c15e829314a872d28ce9ee5253,
     type: 3}
+  _questsManager: {fileID: 6106899287118582781, guid: 564db287dbba7074b9aa8784cdc5015e,
+    type: 3}

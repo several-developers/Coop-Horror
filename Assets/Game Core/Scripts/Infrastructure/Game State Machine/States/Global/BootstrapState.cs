@@ -1,6 +1,4 @@
-﻿using GameCore.Gameplay.Levels.GameTime;
-using GameCore.Gameplay.Network;
-using GameCore.Infrastructure.Providers.Global;
+﻿using GameCore.Infrastructure.Providers.Global;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -18,12 +16,11 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public BootstrapState(IGameStateMachine gameStateMachine, IAssetsProvider assetsProvider,
-            ITimeCycleDecorator timeCycleDecorator, DiContainer diContainer)
+        public BootstrapState(IGameStateMachine gameStateMachine, IAssetsProvider assetsProvider, 
+            DiContainer diContainer)
         {
             _gameStateMachine = gameStateMachine;
             _assetsProvider = assetsProvider;
-            _timeCycleDecorator = timeCycleDecorator; // TEMP
             _diContainer = diContainer;
 
             _gameStateMachine.AddState(this);
@@ -33,10 +30,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IAssetsProvider _assetsProvider;
-        private readonly ITimeCycleDecorator _timeCycleDecorator; // TEMP
         private readonly DiContainer _diContainer;
-
-        private NetworkManager _networkManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -44,7 +38,6 @@ namespace GameCore.Infrastructure.StateMachine
         {
             CreateScenesLoader();
             CreateNetworkManager();
-            CreateNetworkHorror();
             EnterLoadDataState();
         }
 
@@ -59,14 +52,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateNetworkManager()
         {
             NetworkManager networkManagerPrefab = _assetsProvider.GetNetworkManager();
-            _networkManager = Object.Instantiate(networkManagerPrefab);
-        }
-
-        private void CreateNetworkHorror()
-        {
-            NetworkHorror networkHorrorPrefab = _assetsProvider.GetNetworkHorror();
-            NetworkHorror networkHorrorInstance = Object.Instantiate(networkHorrorPrefab);
-            networkHorrorInstance.Setup(_networkManager);
+            Object.Instantiate(networkManagerPrefab);
         }
 
         private void EnterLoadDataState() =>

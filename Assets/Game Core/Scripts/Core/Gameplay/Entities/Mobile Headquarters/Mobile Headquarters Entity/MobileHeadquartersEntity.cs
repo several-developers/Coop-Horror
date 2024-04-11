@@ -1,10 +1,12 @@
 ﻿using System;
 using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
+using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
+using GameCore.Gameplay.Other;
 using GameCore.Observers.Gameplay.Level;
 using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
@@ -56,7 +58,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnLocationLeftEvent; // Server only.
+        public event Action OnLocationLeftEvent = delegate { }; // Server only.
+        public event Action OnOpenQuestsSelectionMenuEvent = delegate { };
 
         private ILocationManagerDecorator _locationManagerDecorator;
         private ILevelObserver _levelObserver;
@@ -72,6 +75,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _mobileHeadquartersConfig);
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
+            
+            SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
+            openQuestsSelectionMenuButton.OnTriggerEvent += OnOpenQuestsSelectionMenu;
         }
 
         private void Update()
@@ -79,6 +85,14 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             TickServerAndClient();
             TickServer();
             TickClient();
+        }
+
+        public override void OnDestroy()
+        {
+            SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
+            openQuestsSelectionMenuButton.OnTriggerEvent -= OnOpenQuestsSelectionMenu;
+            
+            base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -93,7 +107,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             _rpcObserver.OnStartLeavingLocationEvent += StartLeavingLocation;
             _rpcObserver.OnLocationLeftEvent += OnLocationLeft;
-            
+
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
         }
 
@@ -266,7 +280,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case State.LeavingLocation:
-                    OnLocationLeftEvent?.Invoke();
+                    OnLocationLeftEvent.Invoke();
                     RpcHandlerDecorator.LocationLeft();
 
                     EnterState(State.MovingOnRoad);
@@ -303,5 +317,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             ToggleMovement(canMove: false);
             ArrivedAtRoadLocation();
         }
+
+        private void OnOpenQuestsSelectionMenu() =>
+            OnOpenQuestsSelectionMenuEvent.Invoke();
     }
 }

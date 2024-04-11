@@ -25,6 +25,7 @@ namespace GameCore.Gameplay.InputHandlerTEMP
         public event Action OnDropItemEvent = delegate { };
         public event Action<float> OnScrollEvent = delegate { };
         public event Action OnPauseEvent = delegate { };
+        public event Action OnInteractWithTabletEvent = delegate { };
 
         // Menus
         public event Action OnResumeEvent = delegate { };
@@ -149,6 +150,14 @@ namespace GameCore.Gameplay.InputHandlerTEMP
 
             OnPauseEvent.Invoke();
             EnableUIInput();
+        }
+
+        public void OnInteractWithTablet(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
+                return;
+
+            OnInteractWithTabletEvent.Invoke();
         }
 
         public void OnNavigate(InputAction.CallbackContext context)

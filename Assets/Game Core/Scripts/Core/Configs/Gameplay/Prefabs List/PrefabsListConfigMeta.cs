@@ -2,6 +2,7 @@
 using GameCore.Core.Gameplay.GameTimerManagement;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Quests;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -24,12 +25,16 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         [SerializeField, Required]
         private GameTimerManager _gameTimerManager;
 
+        [SerializeField, Required]
+        private QuestsManager _questsManager;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public ElevatorsManager ElevatorsManager => _elevatorsManager;
         public PlayerSpawner PlayerSpawner => _playerSpawner;
         public RpcHandler RpcHandler => _rpcHandler;
         public GameTimerManager GameTimerManager => _gameTimerManager;
+        public QuestsManager QuestsManager => _questsManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

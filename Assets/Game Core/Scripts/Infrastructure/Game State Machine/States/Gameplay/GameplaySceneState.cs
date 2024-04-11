@@ -1,9 +1,12 @@
+using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Gameplay.PauseMenu;
+using GameCore.UI.Gameplay.Quests;
 using GameCore.Utilities;
+using Zenject;
 
 namespace GameCore.Infrastructure.StateMachine
 {
@@ -12,10 +15,12 @@ namespace GameCore.Infrastructure.StateMachine
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public GameplaySceneState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
-            IConfigsProvider configsProvider)
+            IMobileHeadquartersEntity mobileHeadquartersEntity, DiContainer diContainer, IConfigsProvider configsProvider)
         {
             _gameStateMachine = gameStateMachine;
             _horrorStateMachine = horrorStateMachine;
+            _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _diContainer = diContainer;
             _inputReader = configsProvider.GetInputReader();
 
             _gameStateMachine.AddState(this);
@@ -25,10 +30,14 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IHorrorStateMachine _horrorStateMachine;
+        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private readonly DiContainer _diContainer;
         private readonly InputReader _inputReader;
 
         private PauseMenuView _pauseMenuView;
         private QuitConfirmMenuView _quitConfirmMenuView;
+        private QuestsSelectionMenuView _questsSelectionMenuView;
+        private int _openedMenus; // TEMP
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -39,13 +48,22 @@ namespace GameCore.Infrastructure.StateMachine
 
             CreatePauseMenu(); // TEMP
             CreateQuitConfirmMenuView(); // TEMP
+            CreateQuestsSelectionMenuView(); // TEMP
 
             InitHorrorStateMachine();
 
             _inputReader.OnPauseEvent += OnOpenPauseMenu;
+            _inputReader.OnResumeEvent += OnResume;
+            
+            _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
 
+            _pauseMenuView.OnShowEvent += OnMenuShown;
+            _pauseMenuView.OnHideEvent += OnMenuHidden;
             _pauseMenuView.OnContinueClickedEvent += OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent += OnQuitClicked;
+
+            _questsSelectionMenuView.OnShowEvent += OnMenuShown;
+            _questsSelectionMenuView.OnHideEvent += OnMenuHidden;
 
             _quitConfirmMenuView.OnConfirmClickedEvent += OnConfirmQuitClicked;
         }
@@ -53,14 +71,36 @@ namespace GameCore.Infrastructure.StateMachine
         public void Exit()
         {
             _inputReader.OnPauseEvent -= OnOpenPauseMenu;
+            _inputReader.OnResumeEvent -= OnResume;
+            
+            _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
 
+            _pauseMenuView.OnShowEvent -= OnMenuShown;
+            _pauseMenuView.OnHideEvent -= OnMenuHidden;
             _pauseMenuView.OnContinueClickedEvent -= OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent -= OnQuitClicked;
+
+            _questsSelectionMenuView.OnShowEvent -= OnMenuShown;
+            _questsSelectionMenuView.OnHideEvent -= OnMenuHidden;
 
             _quitConfirmMenuView.OnConfirmClickedEvent -= OnConfirmQuitClicked;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void CheckCursorState()
+        {
+            if (_openedMenus > 0)
+            {
+                UnlockCursor();
+                _inputReader.EnableUIInput();
+            }
+            else
+            {
+                LockCursor();
+                _inputReader.EnableGameplayInput();
+            }
+        }
 
         private static void LockCursor() =>
             GameUtilities.ChangeCursorLockState(isLocked: true);
@@ -77,11 +117,8 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateQuitConfirmMenuView() =>
             _quitConfirmMenuView = MenuFactory.Create<QuitConfirmMenuView>();
 
-        private void ShowPauseMenu() =>
-            _pauseMenuView.Show();
-
-        private void HidePauseMenu() =>
-            _pauseMenuView.Hide();
+        private void CreateQuestsSelectionMenuView() =>
+            _questsSelectionMenuView = MenuFactory.Create<QuestsSelectionMenuView>(_diContainer);
 
         private void ShowQuitConfirmMenu() =>
             _quitConfirmMenuView.Show();
@@ -99,20 +136,43 @@ namespace GameCore.Infrastructure.StateMachine
             if (_pauseMenuView.IsShown)
                 return;
 
-            UnlockCursor();
-            ShowPauseMenu();
-            _inputReader.EnableUIInput();
+            _pauseMenuView.Show();
         }
 
-        private void OnContinueClicked()
+        private void OnResume()
         {
-            LockCursor();
-            HidePauseMenu();
-            _inputReader.EnableGameplayInput();
+            if (_questsSelectionMenuView.IsShown)
+            {
+                _questsSelectionMenuView.Hide();
+                return;
+            }
         }
+
+        private void OnOpenQuestsSelectionMenu()
+        {
+            if (_questsSelectionMenuView.IsShown)
+                _questsSelectionMenuView.Hide();
+            else
+                _questsSelectionMenuView.Show();
+        }
+
+        private void OnContinueClicked() =>
+            _pauseMenuView.Hide();
 
         private void OnQuitClicked() => ShowQuitConfirmMenu();
 
         private void OnConfirmQuitClicked() => EnterQuitGameplayState();
+
+        private void OnMenuShown()
+        {
+            _openedMenus++;
+            CheckCursorState();
+        }
+
+        private void OnMenuHidden()
+        {
+            _openedMenus--;
+            CheckCursorState();
+        }
     }
 }

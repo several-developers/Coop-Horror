@@ -62,5 +62,15 @@ namespace GameCore.Gameplay.Quests
 
         public int GetQuestItemsAmount() =>
             _questItems.Count;
+
+        public int GetItemsTotalAmount()
+        {
+            int totalAmount = 0;
+
+            foreach (int itemQuantity in _questItems.Values)
+                totalAmount += itemQuantity;
+
+            return totalAmount;
+        }
     }
 }

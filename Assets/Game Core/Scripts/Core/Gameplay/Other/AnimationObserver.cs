@@ -7,31 +7,35 @@ namespace GameCore.Gameplay.Other
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnAttackEvent;
-        public event Action OnAttackFinishedEvent;
-        public event Action OnEnabledEvent;
-        public event Action OnDisabledEvent;
-        public event Action OnDoorOpenedEvent;
-        public event Action OnDoorClosedEvent;
+        public event Action OnAttackEvent = delegate { };
+        public event Action OnAttackFinishedEvent = delegate { };
+        public event Action OnEnabledEvent = delegate { };
+        public event Action OnDisabledEvent = delegate { };
+        public event Action OnDoorOpenedEvent = delegate { };
+        public event Action OnDoorClosedEvent = delegate { };
+        public event Action OnInteractEvent = delegate { };
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public void OnTriggerAttackEvent() =>
-            OnAttackEvent?.Invoke();
+            OnAttackEvent.Invoke();
         
         public void OnTriggerAttackFinishedEvent() =>
-            OnAttackFinishedEvent?.Invoke();
+            OnAttackFinishedEvent.Invoke();
         
         public void OnTriggerEnabledEvent() =>
-            OnEnabledEvent?.Invoke();
+            OnEnabledEvent.Invoke();
 
         public void OnTriggerDisabledEvent() =>
-            OnDisabledEvent?.Invoke();
+            OnDisabledEvent.Invoke();
         
         public void OnTriggerDoorOpenedEvent() =>
-            OnDoorOpenedEvent?.Invoke();
+            OnDoorOpenedEvent.Invoke();
 
         public void OnTriggerDoorClosedEvent() =>
-            OnDoorClosedEvent?.Invoke();
+            OnDoorClosedEvent.Invoke();
+
+        public void OnTriggerInteractEvent() =>
+            OnInteractEvent.Invoke();
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
@@ -26,6 +27,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [SerializeField, Required]
         private LeaveLocationLever _leaveLocationLever;
 
+        [SerializeField, Required]
+        private SimpleButton _openQuestsSelectionMenuButton;
+
         // PROPERTIES: ----------------------------------------------------------------------------
         
         public Animator Animator => _animator;
@@ -33,5 +37,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public ToggleMobileDoorLever ToggleMobileDoorLever => _toggleMobileDoorLever;
         public LoadLocationLever LoadLocationLever => _loadLocationLever;
         public LeaveLocationLever LeaveLocationLever => _leaveLocationLever;
+        public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
     }
 }

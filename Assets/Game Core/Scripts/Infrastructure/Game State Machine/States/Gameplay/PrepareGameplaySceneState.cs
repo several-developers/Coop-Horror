@@ -2,6 +2,7 @@
 using GameCore.Core.Gameplay.GameTimerManagement;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Unity.Netcode;
 using UnityEngine;
@@ -51,6 +52,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreateRpcCaller();
             CreatePlayerSpawner();
             CreateElevatorsManager();
+            CreateQuestsManager();
             CreateGameTimer();
         }
 
@@ -70,6 +72,12 @@ namespace GameCore.Infrastructure.StateMachine
         {
             ElevatorsManager elevatorsManagerPrefab = _prefabsListConfig.ElevatorsManager;
             CreateNetworkPrefab(elevatorsManagerPrefab.gameObject);
+        }
+
+        private void CreateQuestsManager()
+        {
+            QuestsManager questsManagerPrefab = _prefabsListConfig.QuestsManager;
+            CreateNetworkPrefab(questsManagerPrefab.gameObject);
         }
 
         private void CreateGameTimer()
