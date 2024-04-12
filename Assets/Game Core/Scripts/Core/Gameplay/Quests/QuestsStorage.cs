@@ -6,39 +6,77 @@ namespace GameCore.Gameplay.Quests
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public QuestsStorage() =>
+        public QuestsStorage()
+        {
+            _awaitingQuestsData = new List<QuestRuntimeData>(capacity: 6);
             _activeQuestsData = new List<QuestRuntimeData>(capacity: 6);
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private readonly List<QuestRuntimeData> _awaitingQuestsData;
         private readonly List<QuestRuntimeData> _activeQuestsData;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void AddQuestData(QuestRuntimeData questRuntimeData) =>
+        public void AddAwaitingQuestData(QuestRuntimeData questRuntimeData) =>
+            _awaitingQuestsData.Add(questRuntimeData);
+        
+        public void AddActiveQuestData(QuestRuntimeData questRuntimeData) =>
             _activeQuestsData.Add(questRuntimeData);
 
-        public void UpdateQuestsData(IEnumerable<QuestRuntimeDataContainer> questsRuntimeDataContainers)
+        public void UpdateAwaitingQuestsData(IEnumerable<QuestRuntimeDataContainer> questsRuntimeDataContainers)
         {
             ClearData();
 
             foreach (QuestRuntimeDataContainer dataContainer in questsRuntimeDataContainers)
             {
                 QuestRuntimeData runtimeData = new(dataContainer);
-                _activeQuestsData.Add(runtimeData);
+                _awaitingQuestsData.Add(runtimeData);
             }
         }
 
+        public void SelectQuest(int questID)
+        {
+            int awaitingQuestsAmount = _awaitingQuestsData.Count;
+            int questIndex = -1;
+            
+            for (int i = awaitingQuestsAmount - 1; i >= 0; i--)
+            {
+                bool isMatches = _awaitingQuestsData[i].QuestID == questID;
+
+                if (!isMatches)
+                    continue;
+
+                questIndex = i;
+                break;
+            }
+
+            bool isAwaitingQuestFound = questIndex != -1;
+
+            if (!isAwaitingQuestFound)
+            {
+                Log.PrintError(log: $"Awaiting quest <gb>({questID})</gb> <rb>not found</rb>!");
+                return;
+            }
+
+            QuestRuntimeData questRuntimeData = _awaitingQuestsData[questIndex];
+            _awaitingQuestsData.RemoveAt(questIndex);
+            AddActiveQuestData(questRuntimeData);
+        }
+        
+        public IReadOnlyList<QuestRuntimeData> GetAwaitingQuestsData() => _awaitingQuestsData;
+        
         public IReadOnlyList<QuestRuntimeData> GetActiveQuestsData() => _activeQuestsData;
 
-        public QuestRuntimeDataContainer[] GetQuestsRuntimeDataContainers()
+        public QuestRuntimeDataContainer[] GetAwaitingQuestsRuntimeDataContainers()
         {
-            int activeQuestsAmount = _activeQuestsData.Count;
+            int activeQuestsAmount = _awaitingQuestsData.Count;
             var questsRuntimeDataContainers = new QuestRuntimeDataContainer[activeQuestsAmount];
 
             for (int i = 0; i < activeQuestsAmount; i++)
             {
-                QuestRuntimeData questRuntimeData = _activeQuestsData[i];
+                QuestRuntimeData questRuntimeData = _awaitingQuestsData[i];
                 QuestRuntimeDataContainer questRuntimeDataContainer = new(questRuntimeData);
                 questsRuntimeDataContainers[i] = questRuntimeDataContainer;
             }

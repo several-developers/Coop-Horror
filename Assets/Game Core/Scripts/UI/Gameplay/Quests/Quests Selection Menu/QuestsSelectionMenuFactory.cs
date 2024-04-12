@@ -9,19 +9,22 @@ namespace GameCore.UI.Gameplay.Quests
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public QuestsSelectionMenuFactory(IQuestsManagerDecorator questsManagerDecorator,
-            Transform questsItemsContainer, QuestItemButtonView questItemButtonPrefab)
+        public QuestsSelectionMenuFactory(QuestsSelectionMenuView questsSelectionMenuView,
+            IQuestsManagerDecorator questsManagerDecorator, Transform container,
+            QuestItemButtonView questItemButtonPrefab)
         {
+            _questsSelectionMenuView = questsSelectionMenuView;
             _questsManagerDecorator = questsManagerDecorator;
-            _questsItemsContainer = questsItemsContainer;
+            _container = container;
             _questItemButtonPrefab = questItemButtonPrefab;
             _questItemsButtons = new List<QuestItemButtonView>(capacity: 5);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private readonly QuestsSelectionMenuView _questsSelectionMenuView;
         private readonly IQuestsManagerDecorator _questsManagerDecorator;
-        private readonly Transform _questsItemsContainer;
+        private readonly Transform _container;
         private readonly QuestItemButtonView _questItemButtonPrefab;
         private readonly List<QuestItemButtonView> _questItemsButtons;
 
@@ -38,18 +41,18 @@ namespace GameCore.UI.Gameplay.Quests
         private void CreationLogic()
         {
             QuestsStorage questsStorage = _questsManagerDecorator.GetQuestsStorage();
-            IReadOnlyList<QuestRuntimeData> activeQuestsData = questsStorage.GetActiveQuestsData();
+            IReadOnlyList<QuestRuntimeData> activeQuestsData = questsStorage.GetAwaitingQuestsData();
 
             foreach (QuestRuntimeData questRuntimeData in activeQuestsData)
             {
-                QuestItemButtonView questItemButton = Object.Instantiate(_questItemButtonPrefab, _questsItemsContainer);
+                QuestItemButtonView questItemButton = Object.Instantiate(_questItemButtonPrefab, _container);
                 int questID = questRuntimeData.QuestID;
-                int reward = questRuntimeData.Reward;
                 int itemQuantity = questRuntimeData.GetItemsTotalAmount();
                 QuestDifficulty questDifficulty = questRuntimeData.Difficulty;
-                
+
                 questItemButton.Setup(questID, itemQuantity, questDifficulty);
-                
+                questItemButton.OnQuestItemClickedEvent += OnQuestItemClicked;
+
                 _questItemsButtons.Add(questItemButton);
             }
         }
@@ -58,8 +61,16 @@ namespace GameCore.UI.Gameplay.Quests
         {
             foreach (QuestItemButtonView questItemButtonView in _questItemsButtons)
                 Object.Destroy(questItemButtonView.gameObject);
-            
+
             _questItemsButtons.Clear();
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnQuestItemClicked(int questID)
+        {
+            _questsManagerDecorator.SelectQuest(questID);
+            _questsSelectionMenuView.Hide();
         }
     }
 }

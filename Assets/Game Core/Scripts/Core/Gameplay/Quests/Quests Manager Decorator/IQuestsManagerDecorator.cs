@@ -4,9 +4,13 @@ namespace GameCore.Gameplay.Quests
 {
     public interface IQuestsManagerDecorator
     {
-        event Action OnQuestsDataReceivedEvent; 
+        event Action OnAwaitingQuestsDataReceivedEvent; 
+        event Action OnActiveQuestsDataReceivedEvent; 
+        event Action<int> OnSelectQuestEvent; 
         event Func<QuestsStorage> OnGetQuestsStorageEvent;
-        void QuestsDataReceived();
+        void AwaitingQuestsDataReceived();
+        void ActiveQuestsDataReceived();
+        void SelectQuest(int questID);
         QuestsStorage GetQuestsStorage();
     }
 }

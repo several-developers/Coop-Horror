@@ -17,8 +17,8 @@ namespace GameCore.UI.Gameplay.Quests
         {
             _questsManagerDecorator = questsManagerDecorator;
 
-            _questsSelectionMenuFactory = new QuestsSelectionMenuFactory(questsManagerDecorator, _questsItemsContainer,
-                _questItemButtonPrefab);
+            _questsSelectionMenuFactory = new QuestsSelectionMenuFactory(questsSelectionMenuView: this,
+                questsManagerDecorator, _questsItemsContainer, _questItemButtonPrefab);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -45,11 +45,11 @@ namespace GameCore.UI.Gameplay.Quests
         {
             _layoutFixHelper = new LayoutFixHelper(coroutineRunner: this, _questsItemsLayoutGroup);
 
-            _questsManagerDecorator.OnQuestsDataReceivedEvent += OnQuestsDataReceived;
+            _questsManagerDecorator.OnAwaitingQuestsDataReceivedEvent += AwaitingQuestsDataReceived;
         }
 
         private void OnDestroy() =>
-            _questsManagerDecorator.OnQuestsDataReceivedEvent -= OnQuestsDataReceived;
+            _questsManagerDecorator.OnAwaitingQuestsDataReceivedEvent -= AwaitingQuestsDataReceived;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -69,6 +69,6 @@ namespace GameCore.UI.Gameplay.Quests
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnQuestsDataReceived() => CreateQuestsItemsButtons();
+        private void AwaitingQuestsDataReceived() => CreateQuestsItemsButtons();
     }
 }

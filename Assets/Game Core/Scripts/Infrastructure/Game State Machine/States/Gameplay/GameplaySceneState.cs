@@ -5,6 +5,7 @@ using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Gameplay.PauseMenu;
 using GameCore.UI.Gameplay.Quests;
+using GameCore.UI.Gameplay.Quests.ActiveQuests;
 using GameCore.Utilities;
 using Zenject;
 
@@ -49,6 +50,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreatePauseMenu(); // TEMP
             CreateQuitConfirmMenuView(); // TEMP
             CreateQuestsSelectionMenuView(); // TEMP
+            CreateActiveQuestsView(); // TEMP
 
             InitHorrorStateMachine();
 
@@ -112,13 +114,16 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.EnableGameplayInput();
 
         private void CreatePauseMenu() =>
-            _pauseMenuView = MenuFactory.Create<PauseMenuView>();
+            _pauseMenuView = MenuFactory.Create<PauseMenuView>(_diContainer);
 
         private void CreateQuitConfirmMenuView() =>
-            _quitConfirmMenuView = MenuFactory.Create<QuitConfirmMenuView>();
+            _quitConfirmMenuView = MenuFactory.Create<QuitConfirmMenuView>(_diContainer);
 
         private void CreateQuestsSelectionMenuView() =>
             _questsSelectionMenuView = MenuFactory.Create<QuestsSelectionMenuView>(_diContainer);
+        
+        private void CreateActiveQuestsView() =>
+            MenuFactory.Create<ActiveQuestsView>(_diContainer);
 
         private void ShowQuitConfirmMenu() =>
             _quitConfirmMenuView.Show();

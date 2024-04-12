@@ -1,9 +1,9 @@
 ﻿using GameCore.Configs.Gameplay.Quests;
+using GameCore.Configs.Gameplay.QuestsItems;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Unity.Netcode;
-using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Quests
@@ -18,9 +18,10 @@ namespace GameCore.Gameplay.Quests
         {
             _questsManagerDecorator = questsManagerDecorator;
             QuestsConfigMeta questsConfig = gameplayConfigsProvider.GetQuestsConfig();
+            QuestsItemsConfigMeta questsItemsConfig = gameplayConfigsProvider.GetQuestsItemsConfig();
 
             _questsStorage = new QuestsStorage();
-            _questsFactory = new QuestsFactory(_questsStorage, questsConfig);
+            _questsFactory = new QuestsFactory(_questsStorage, questsConfig, questsItemsConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -31,11 +32,15 @@ namespace GameCore.Gameplay.Quests
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
+        private void Awake()
+        {
+            _questsManagerDecorator.OnSelectQuestEvent += OnSelectQuest;
             _questsManagerDecorator.OnGetQuestsStorageEvent += GetQuestsStorage;
+        }
 
         public override void OnDestroy()
         {
+            _questsManagerDecorator.OnSelectQuestEvent -= OnSelectQuest;
             _questsManagerDecorator.OnGetQuestsStorageEvent -= GetQuestsStorage;
 
             base.OnDestroy();
@@ -53,7 +58,7 @@ namespace GameCore.Gameplay.Quests
                 return;
 
             _questsFactory.Create();
-            _questsManagerDecorator.QuestsDataReceived();
+            _questsManagerDecorator.AwaitingQuestsDataReceived();
         }
 
         public void InitClient()
@@ -81,11 +86,11 @@ namespace GameCore.Gameplay.Quests
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void SynchronizeQuestsData(ulong requestedClientId)
+        
+        private void SynchronizeAwaitingQuestsData(ulong requestedClientId)
         {
-            QuestRuntimeDataContainer[] questsRuntimeDataContainers = _questsStorage.GetQuestsRuntimeDataContainers();
-            SynchronizeQuestsDataServerRpc(questsRuntimeDataContainers, requestedClientId);
+            QuestRuntimeDataContainer[] questsRuntimeDataContainers = _questsStorage.GetAwaitingQuestsRuntimeDataContainers();
+            SynchronizeAwaitingQuestsDataServerRpc(questsRuntimeDataContainers, requestedClientId);
         }
 
         private QuestsStorage GetQuestsStorage() => _questsStorage;
@@ -93,10 +98,10 @@ namespace GameCore.Gameplay.Quests
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc]
-        private void SynchronizeQuestsDataServerRpc(QuestRuntimeDataContainer[] questsRuntimeDataContainers,
+        private void SynchronizeAwaitingQuestsDataServerRpc(QuestRuntimeDataContainer[] questsRuntimeDataContainers,
             ulong requestedClientId)
         {
-            SynchronizeQuestsDataClientRpc(questsRuntimeDataContainers, requestedClientId);
+            SynchronizeAwaitingQuestsDataClientRpc(questsRuntimeDataContainers, requestedClientId);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -106,8 +111,11 @@ namespace GameCore.Gameplay.Quests
             RequestQuestsDataClientRpc(clientId);
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        private void SelectQuestServerRpc(int questID) => SelectQuestClientRpc(questID);
+
         [ClientRpc]
-        private void SynchronizeQuestsDataClientRpc(QuestRuntimeDataContainer[] questsRuntimeDataContainers,
+        private void SynchronizeAwaitingQuestsDataClientRpc(QuestRuntimeDataContainer[] questsRuntimeDataContainers,
             ulong requestedClientId)
         {
             if (IsOwner)
@@ -116,8 +124,8 @@ namespace GameCore.Gameplay.Quests
             if (NetworkHorror.ClientID != requestedClientId)
                 return;
 
-            _questsStorage.UpdateQuestsData(questsRuntimeDataContainers);
-            _questsManagerDecorator.QuestsDataReceived();
+            _questsStorage.UpdateAwaitingQuestsData(questsRuntimeDataContainers);
+            _questsManagerDecorator.AwaitingQuestsDataReceived();
         }
 
         [ClientRpc]
@@ -126,7 +134,15 @@ namespace GameCore.Gameplay.Quests
             if (!IsOwner)
                 return;
             
-            SynchronizeQuestsData(requestedClientId);
+            SynchronizeAwaitingQuestsData(requestedClientId);
+        }
+
+        [ClientRpc]
+        private void SelectQuestClientRpc(int questID)
+        {
+            _questsStorage.SelectQuest(questID);
+            _questsManagerDecorator.ActiveQuestsDataReceived();
+            _questsManagerDecorator.AwaitingQuestsDataReceived();
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
@@ -148,5 +164,7 @@ namespace GameCore.Gameplay.Quests
             DespawnServer();
             DespawnClient();
         }
+
+        private void OnSelectQuest(int questID) => SelectQuestServerRpc(questID);
     }
 }

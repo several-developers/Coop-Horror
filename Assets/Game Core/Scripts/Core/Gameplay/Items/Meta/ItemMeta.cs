@@ -53,6 +53,7 @@ namespace GameCore.Gameplay.Items
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public Sprite Icon => _icon;
+        public string ItemName => _itemName;
         public int ItemID => _itemID;
         public Vector3 ItemCameraPreviewPosition => _itemCameraPreviewPosition;
         public Vector3 ItemCameraPreviewRotation => _itemCameraPreviewRotation;

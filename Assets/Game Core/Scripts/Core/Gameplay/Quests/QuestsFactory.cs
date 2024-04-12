@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Quests;
+using GameCore.Configs.Gameplay.QuestsItems;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Items;
 using Sirenix.Utilities;
 using UnityEngine;
 
@@ -10,16 +12,19 @@ namespace GameCore.Gameplay.Quests
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public QuestsFactory(QuestsStorage questsStorage, QuestsConfigMeta questsConfig)
+        public QuestsFactory(QuestsStorage questsStorage, QuestsConfigMeta questsConfig,
+            QuestsItemsConfigMeta questsItemsConfig)
         {
             _questsStorage = questsStorage;
             _questsConfig = questsConfig;
+            _questsItemsConfig = questsItemsConfig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly QuestsStorage _questsStorage;
         private readonly QuestsConfigMeta _questsConfig;
+        private readonly QuestsItemsConfigMeta _questsItemsConfig;
 
         private int _activeQuestsAmount;
         private int _lastQuestID;
@@ -58,11 +63,11 @@ namespace GameCore.Gameplay.Quests
                 foreach (QuestDifficulty difficulty in availableDifficulties)
                 {
                     _lastQuestID++;
-                    
+
                     IReadOnlyDictionary<int, int> questItemsID = CreateQuestItems(difficulty);
                     QuestRuntimeData questRuntimeData = new(difficulty, questID: _lastQuestID, reward: 0, questItemsID);
 
-                    _questsStorage.AddQuestData(questRuntimeData);
+                    _questsStorage.AddAwaitingQuestData(questRuntimeData);
                 }
             }
         }
@@ -73,9 +78,35 @@ namespace GameCore.Gameplay.Quests
             QuestPresetConfig questPresetConfig = GetQuestPresetConfig(difficulty);
             int itemsListLength = questPresetConfig.GetRandomItemsListLength();
 
+            ItemsReference itemsReference = _questsItemsConfig.GetItemsReference(difficulty);
+            IReadOnlyList<ItemMeta> allItemsMeta = itemsReference.GetAllItemsMeta();
+            int allItemsAmount = allItemsMeta.Count;
+            
+            const int itemSearchAttempts = 10;
+
             for (int i = 0; i < itemsListLength; i++)
             {
-                int itemID = Random.Range(-9999, 9999);
+                int itemID = 0;
+                bool uniqueItemFound = false;
+
+                // Search for the Item ID for the selected Quest Difficulty
+                for (int j = 0; j < itemSearchAttempts; j++)
+                {
+                    int itemIndex = Random.Range(0, allItemsAmount);
+                    itemID = allItemsMeta[itemIndex].ItemID;
+                    
+                    bool alreadyContainsItem = questItems.ContainsKey(itemID);
+                    
+                    if (alreadyContainsItem)
+                        continue;
+
+                    uniqueItemFound = true;
+                    break;
+                }
+                
+                if (!uniqueItemFound)
+                    continue;
+                
                 int itemQuantity = questPresetConfig.GetRandomItemQuantity();
                 questItems.Add(itemID, itemQuantity);
             }
