@@ -225,11 +225,11 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         public override void OnNetworkDespawn()
         {
+            base.OnNetworkDespawn();
+
             DespawnServerAndClient();
             DespawnServer();
             DespawnClient();
-
-            base.OnNetworkDespawn();
         }
 
         private void OnStartElevator(Floor floor) => TryStartElevator(floor);

@@ -493,7 +493,7 @@ MonoBehaviour:
   _changeInteractableState: 1
   _changeCanvasState: 0
   _canvas: {fileID: 0}
-  _fadeTime: 0.35
+  _fadeTime: 0.2
   _targetCG: {fileID: 1106199781379220469}
   _questsItemsContainer: {fileID: 5883659421479849309}
   _questItemButtonPrefab: {fileID: 5238247576550255921, guid: 5c2b27ebb20e7ee4e862c5d725139619,

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Test Item Cube
   m_EditorClassIdentifier: 
   _metaName: Test Item Cube
-  _icon: {fileID: 21300000, guid: d1546f8db185caf4dafcfa58efa3ba2c, type: 3}
+  _icon: {fileID: 21300000, guid: 62dfd2a271ca75c4e8b516bda82cc902, type: 3}
   _itemName: Test Item Cube
   _itemID: -2
   _itemCameraPreviewPosition: {x: 0.45, y: -0.24, z: 0.6}

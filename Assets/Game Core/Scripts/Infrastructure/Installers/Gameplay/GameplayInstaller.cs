@@ -1,3 +1,4 @@
+using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Levels;
@@ -19,12 +20,16 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         [SerializeField, Required]
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
+
+        [SerializeField, Required]
+        private DeliveryPoint _deliveryPoint;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void InstallBindings()
         {
             BindMobileHeadquartersEntity();
+            BindDeliveryPoint();
             BindSun();
             BindTimeCycle();
             BindLocationsLoader();
@@ -41,6 +46,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .Bind<IMobileHeadquartersEntity>()
                 .FromInstance(_mobileHeadquartersEntity)
+                .AsSingle();
+        }
+        
+        private void BindDeliveryPoint()
+        {
+            Container
+                .Bind<IDeliveryPoint>()
+                .FromInstance(_deliveryPoint)
                 .AsSingle();
         }
 

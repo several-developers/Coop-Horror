@@ -134,24 +134,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-
-            _isInitialized = true;
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-            base.OnNetworkDespawn();
-        }
-
         public void InitServerAndClient()
         {
             BasicInit();
@@ -400,6 +382,26 @@ namespace GameCore.Gameplay.Entities.Player
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            
+            InitServerAndClient();
+            InitServer();
+            InitClient();
+
+            _isInitialized = true;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            
+            DespawnServerAndClient();
+            DespawnServer();
+            DespawnClient();
+        }
+        
         private void OnMove(Vector2 movementVector) =>
             OnMovementVectorChangedEvent?.Invoke(movementVector);
 

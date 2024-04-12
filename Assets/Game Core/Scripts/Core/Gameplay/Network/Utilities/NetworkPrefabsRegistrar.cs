@@ -37,6 +37,10 @@ namespace GameCore.Gameplay.Network.Utilities
                 return;
             
             NetworkManager networkManager = NetworkManager.Singleton;
+
+            if (networkManager == null)
+                return;
+            
             _isInitialized = true;
 
             foreach (GameObject prefab in _prefabs)

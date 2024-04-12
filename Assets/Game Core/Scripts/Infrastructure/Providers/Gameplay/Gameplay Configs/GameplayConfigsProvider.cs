@@ -1,4 +1,5 @@
 ﻿using GameCore.Configs.Gameplay;
+using GameCore.Configs.Gameplay.Delivery;
 using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
@@ -29,6 +30,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _prefabsListConfig = Load<PrefabsListConfigMeta>(path: ConfigsPaths.PrefabsListConfig);
             _questsConfig = Load<QuestsConfigMeta>(path: ConfigsPaths.QuestsConfig);
             _questsItemsConfig = Load<QuestsItemsConfigMeta>(path: ConfigsPaths.QuestsItemsConfig);
+            _deliveryConfig = Load<DeliveryConfigMeta>(path: ConfigsPaths.DeliveryConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -43,6 +45,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly PrefabsListConfigMeta _prefabsListConfig;
         private readonly QuestsConfigMeta _questsConfig;
         private readonly QuestsItemsConfigMeta _questsItemsConfig;
+        private readonly DeliveryConfigMeta _deliveryConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -56,5 +59,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public PrefabsListConfigMeta GetPrefabsListConfig() => _prefabsListConfig;
         public QuestsConfigMeta GetQuestsConfig() => _questsConfig;
         public QuestsItemsConfigMeta GetQuestsItemsConfig() => _questsItemsConfig;
+        public DeliveryConfigMeta GetDeliveryConfig() => _deliveryConfig;
     }
 }
