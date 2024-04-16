@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Delivery Config
   m_EditorClassIdentifier: 
   _metaName: Delivery Config
-  _droneCartFlySpeed: 25
-  _droneFlySpeed: 25
-  _droneFlySpeedChangeRate: 0.25
+  _awaitingTimeTimer: 10
+  _droneCartFlySpeed: 35
+  _droneFlySpeed: 35
+  _droneFlySpeedChangeRate: 0.2

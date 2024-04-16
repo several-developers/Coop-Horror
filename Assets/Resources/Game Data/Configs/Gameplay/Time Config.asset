@@ -17,9 +17,9 @@ MonoBehaviour:
   _cycleLengthModifier: 2
   _second: 0
   _minute: 0
-  _hour: 6
+  _hour: 0
   _simulate: 1
-  _stopAtNight: 0
+  _stopAtNight: 1
   _sunIntensityCurve:
     serializedVersion: 2
     m_Curve:

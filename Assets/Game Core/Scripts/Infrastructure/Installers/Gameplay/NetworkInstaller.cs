@@ -1,3 +1,4 @@
+using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
@@ -14,6 +15,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindRpcHandlerDecorator();
             BindElevatorsManagerDecorator();
             BindQuestsManagerDecorator();
+            BindGameTimeManagerDecorator();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -36,6 +38,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<QuestsManagerDecorator>()
+                .AsSingle();
+        }
+        
+        private void BindGameTimeManagerDecorator()
+        {
+            Container
+                .BindInterfacesTo<GameTimeManagerDecorator>()
                 .AsSingle();
         }
     }

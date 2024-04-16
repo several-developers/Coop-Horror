@@ -10,6 +10,10 @@ namespace GameCore.Configs.Gameplay.Delivery
 
         [TitleGroup(Constants.Settings)]
         [BoxGroup(DroneSettingsTitle)]
+        [SerializeField, Min(0), SuffixLabel("seconds", overlay: true)]
+        private float _takeOffDelay = 20f;
+        
+        [BoxGroup(DroneSettingsTitle)]
         [SerializeField, Min(0)]
         private float _droneCartFlySpeed = 3f;
         
@@ -23,6 +27,7 @@ namespace GameCore.Configs.Gameplay.Delivery
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public float TakeOffDelay => _takeOffDelay;
         public float DroneCartFlySpeed => _droneCartFlySpeed;
         public float DroneFlySpeed => _droneFlySpeed;
         public float DroneFlySpeedChangeRate => _droneFlySpeedChangeRate;

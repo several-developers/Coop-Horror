@@ -29,6 +29,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [SerializeField, Required]
         private SimpleButton _openQuestsSelectionMenuButton;
+        
+        [SerializeField, Required]
+        private SimpleButton _callDeliveryDroneButton;
 
         // PROPERTIES: ----------------------------------------------------------------------------
         
@@ -38,5 +41,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public LoadLocationLever LoadLocationLever => _loadLocationLever;
         public LeaveLocationLever LeaveLocationLever => _leaveLocationLever;
         public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
+        public SimpleButton CallDeliveryDroneButton => _callDeliveryDroneButton;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using GameCore.Configs.Gameplay.PrefabsList;
-using GameCore.Core.Gameplay.GameTimerManagement;
+using GameCore.Gameplay.GameTimeManagement;
+using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
@@ -53,7 +54,8 @@ namespace GameCore.Infrastructure.StateMachine
             CreatePlayerSpawner();
             CreateElevatorsManager();
             CreateQuestsManager();
-            CreateGameTimer();
+            CreateDeliveryManager();
+            CreateGameTimeManager();
         }
 
         private void CreateRpcCaller()
@@ -80,10 +82,16 @@ namespace GameCore.Infrastructure.StateMachine
             CreateNetworkPrefab(questsManagerPrefab.gameObject);
         }
 
-        private void CreateGameTimer()
+        private void CreateDeliveryManager()
         {
-            GameTimerManager gameTimerManagerPrefab = _prefabsListConfig.GameTimerManager;
-            CreateNetworkPrefab(gameTimerManagerPrefab.gameObject);
+            DeliveryManager deliveryManagerPrefab = _prefabsListConfig.DeliveryManager;
+            CreateNetworkPrefab(deliveryManagerPrefab.gameObject);
+        }
+
+        private void CreateGameTimeManager()
+        {
+            GameTimeManager gameTimeManagerPrefab = _prefabsListConfig.GameTimeManager;
+            CreateNetworkPrefab(gameTimeManagerPrefab.gameObject);
         }
 
         private void CreateNetworkPrefab(GameObject gameObject)

@@ -1,5 +1,4 @@
-﻿using System;
-using GameCore.Gameplay.Levels.GameTime;
+﻿using GameCore.Gameplay.GameTimeManagement;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -22,6 +21,8 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         [SerializeField, Required]
         private TextMeshProUGUI _timeTMP;
 
+        // FIELDS: --------------------------------------------------------------------------------
+
         private ITimeCycle _timeCycle;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -42,14 +43,14 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
 
         private void UpdateTime()
         {
-            DateTime dateTime = _timeCycle.GetDateTime();
-            UpdateTime(dateTime.Minute, dateTime.Hour);
+            MyDateTime dateTime = _timeCycle.GetDateTime();
+            UpdateTime(dateTime.Minute, dateTime.Hour, dateTime.Day);
         }
 
-        private void UpdateTime(int minute, int hour)
+        private void UpdateTime(int minute, int hour, int day)
         {
             string time = string.Format($"{hour:D2}:{minute:D2}");
-            _timeTMP.text = time;
+            _timeTMP.text = $"{time}\nDay: {day}";
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

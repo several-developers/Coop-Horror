@@ -1,7 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Levels.GameTime
+namespace GameCore.Gameplay.GameTimeManagement
 {
     public class Sun : MonoBehaviour
     {

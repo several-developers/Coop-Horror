@@ -1,27 +1,30 @@
-﻿using System;
-using GameCore.Gameplay.Levels.GameTime;
-using GameCore.Gameplay.Network.Utilities;
+﻿using GameCore.Gameplay.Network.Utilities;
+using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Zenject;
 
-namespace GameCore.Core.Gameplay.GameTimerManagement
+namespace GameCore.Gameplay.GameTimeManagement
 {
-    public class GameTimerManager : NetworkBehaviour, INetcodeBehaviour
+    public class GameTimeManager : NetworkBehaviour, INetcodeBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ITimeCycleDecorator timeCycleDecorator) =>
-            _timeCycleDecorator = timeCycleDecorator;
+        private void Construct(IGameTimeManagerDecorator gameTimeManagerDecorator, ITimeCycle timeCycle)
+        {
+            _gameTimeManagerDecorator = gameTimeManagerDecorator;
+            _timeCycle = timeCycle;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly NetworkVariable<MyDateTime> _gameTimer = new();
 
-        private ITimeCycleDecorator _timeCycleDecorator;
+        private IGameTimeManagerDecorator _gameTimeManagerDecorator;
+        private ITimeCycle _timeCycle;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
-
+        
         private void Update()
         {
             TickServerAndClient();
@@ -40,8 +43,10 @@ namespace GameCore.Core.Gameplay.GameTimerManagement
         {
             if (!IsOwner)
                 return;
+
+            _gameTimeManagerDecorator.OnIncreaseDayEvent += OnIncreaseDay;
             
-            _timeCycleDecorator.OnHourPassedEvent += OnHourPassed;
+            _timeCycle.OnHourPassedEvent += OnHourPassed;
         }
 
         public void InitClient()
@@ -53,7 +58,7 @@ namespace GameCore.Core.Gameplay.GameTimerManagement
         }
 
         public void TickServerAndClient() =>
-            _timeCycleDecorator.Tick();
+            _timeCycle.Tick();
 
         public void TickServer()
         {
@@ -81,7 +86,9 @@ namespace GameCore.Core.Gameplay.GameTimerManagement
             if (!IsOwner)
                 return;
             
-            _timeCycleDecorator.OnHourPassedEvent -= OnHourPassed;
+            _gameTimeManagerDecorator.OnIncreaseDayEvent -= OnIncreaseDay;
+
+            _timeCycle.OnHourPassedEvent -= OnHourPassed;
         }
 
         public void DespawnClient()
@@ -96,11 +103,16 @@ namespace GameCore.Core.Gameplay.GameTimerManagement
         
         private void UpdateGameTimer()
         {
-            DateTime dateTime = _timeCycleDecorator.GetDateTime();
-            MyDateTime myDateTime = new(dateTime.Second, dateTime.Minute, dateTime.Hour);
-            _gameTimer.Value = myDateTime;
+            MyDateTime dateTime = _timeCycle.GetDateTime();
+            _gameTimer.Value = dateTime;
         }
 
+        private void IncreaseDay()
+        {
+            _timeCycle.IncreaseDay();
+            UpdateGameTimer();
+        }
+        
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
@@ -121,9 +133,17 @@ namespace GameCore.Core.Gameplay.GameTimerManagement
             base.OnNetworkDespawn();
         }
 
+        private void OnIncreaseDay() => IncreaseDay();
+
         private void OnHourPassed() => UpdateGameTimer();
 
         private void OnGameTimerUpdated(MyDateTime previousDate, MyDateTime newDate) =>
-            _timeCycleDecorator.SyncDateTime(newDate);
+            _timeCycle.SyncDateTime(newDate);
+
+        // DEBUG BUTTONS: -------------------------------------------------------------------------
+
+        [Title(Constants.DebugButtons)]
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugIncreaseDay() => IncreaseDay();
     }
 }

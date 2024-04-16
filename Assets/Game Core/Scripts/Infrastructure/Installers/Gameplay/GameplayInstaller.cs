@@ -2,7 +2,7 @@ using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Levels;
-using GameCore.Gameplay.Levels.GameTime;
+using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Levels.Locations;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -69,7 +69,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<TimeCycle>()
-                .AsSingle();
+                .AsSingle()
+                .NonLazy();
         }
 
         private void BindLocationsLoader()

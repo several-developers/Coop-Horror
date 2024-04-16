@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DG.Tweening;
 using GameCore.Configs.Gameplay.Delivery;
 using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -24,12 +25,31 @@ namespace GameCore.Gameplay.Entities.DeliveryDrone
             _droneMovement = new DroneMovement(deliveryConfig, droneCartTransform, droneTransform: transform);
         }
 
+        // MEMBERS: -------------------------------------------------------------------------------
+
+        [Title(Constants.Settings)]
+        [SerializeField, Min(0)]
+        private float _redLightMaxIntensity = 3f;
+        
+        [SerializeField, Min(0)]
+        private float _redLightPulseDuration = 0.5f;
+
+        [SerializeField]
+        private Ease _redLightPulseEase = Ease.InOutQuad;
+        
+        [Title(Constants.References)]
+        [SerializeField, Required]
+        private Light _redLight;
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private IDeliveryPoint _deliveryPoint;
         private DroneMovement _droneMovement;
+        private Tweener _redLightPulseTN;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Awake() => PlayLightPulseAnimation(fadeIn: false);
 
         private void Update()
         {
@@ -98,6 +118,23 @@ namespace GameCore.Gameplay.Entities.DeliveryDrone
         
         public Transform GetTransform() => transform;
 
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void PlayLightPulseAnimation(bool fadeIn)
+        {
+            float endValue = fadeIn ? _redLightMaxIntensity : 0f;
+            float duration = _redLightPulseDuration;
+            Ease ease = _redLightPulseEase;
+            
+            _redLightPulseTN.Kill();
+
+            _redLightPulseTN = _redLight
+                .DOIntensity(endValue, duration)
+                .SetEase(ease)
+                .SetLink(gameObject)
+                .OnComplete(() => PlayLightPulseAnimation(!fadeIn));
+        }
+        
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()

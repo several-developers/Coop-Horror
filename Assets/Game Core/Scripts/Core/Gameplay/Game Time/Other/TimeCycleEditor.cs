@@ -1,9 +1,8 @@
-﻿using System;
-using Sirenix.OdinInspector;
+﻿using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
 
-namespace GameCore.Gameplay.Levels.GameTime
+namespace GameCore.Gameplay.GameTimeManagement
 {
     public class TimeCycleEditor : MonoBehaviour
     {
@@ -58,7 +57,7 @@ namespace GameCore.Gameplay.Levels.GameTime
 
         private void Start()
         {
-            DateTime dateTime = _timeCycle.GetDateTime();
+            MyDateTime dateTime = _timeCycle.GetDateTime();
             _simulate = _timeCycle.GetSimulateState();
 
             UpdateFields(dateTime);
@@ -69,7 +68,7 @@ namespace GameCore.Gameplay.Levels.GameTime
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void UpdateFields(DateTime dateTime)
+        private void UpdateFields(MyDateTime dateTime)
         {
             _cycleSecond = dateTime.Second;
             _cycleMinute = dateTime.Minute;
@@ -83,26 +82,26 @@ namespace GameCore.Gameplay.Levels.GameTime
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnTimeUpdated(DateTime dateTime) => UpdateFields(dateTime);
+        private void OnTimeUpdated(MyDateTime dateTime) => UpdateFields(dateTime);
 
         private void OnSecondChanged()
         {
-            DateTime dateTime = _timeCycle.GetDateTime();
-            _timeCycle.SetDateTime(_second, dateTime.Minute, dateTime.Hour);
+            MyDateTime dateTime = _timeCycle.GetDateTime();
+            _timeCycle.SetDateTime(_second, dateTime.Minute, dateTime.Hour, dateTime.Day);
             UpdateFields(dateTime);
         }
 
         private void OnMinuteChanged()
         {
-            DateTime dateTime = _timeCycle.GetDateTime();
-            _timeCycle.SetDateTime(dateTime.Second, _minute, dateTime.Hour);
+            MyDateTime dateTime = _timeCycle.GetDateTime();
+            _timeCycle.SetDateTime(dateTime.Second, _minute, dateTime.Hour, dateTime.Day);
             UpdateFields(dateTime);
         }
 
         private void OnHourChanged()
         {
-            DateTime dateTime = _timeCycle.GetDateTime();
-            _timeCycle.SetDateTime(dateTime.Second, dateTime.Minute, _hour);
+            MyDateTime dateTime = _timeCycle.GetDateTime();
+            _timeCycle.SetDateTime(dateTime.Second, dateTime.Minute, _hour, dateTime.Day);
             UpdateFields(dateTime);
         }
 

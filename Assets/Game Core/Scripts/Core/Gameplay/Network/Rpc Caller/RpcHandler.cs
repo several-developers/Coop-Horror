@@ -35,7 +35,6 @@ namespace GameCore.Gameplay.Network
             if (!IsOwner)
                 return;
             
-            Debug.LogWarning("Load location!!!!");
             var sceneName = (SceneName)sceneNameIndex;
             _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
         }

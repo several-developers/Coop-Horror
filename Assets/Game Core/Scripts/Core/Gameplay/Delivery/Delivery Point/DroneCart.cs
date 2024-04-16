@@ -8,10 +8,11 @@ namespace GameCore.Gameplay.Delivery
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public DroneCart(DeliveryConfigMeta deliveryConfig, CinemachinePath landingPath, CinemachinePath takeOffPath,
-            CinemachineDollyCart deliveryCart)
+        public DroneCart(DeliveryConfigMeta deliveryConfig, DeliveryPoint deliveryPoint, CinemachinePath landingPath,
+            CinemachinePath takeOffPath, CinemachineDollyCart deliveryCart)
         {
             _deliveryConfig = deliveryConfig;
+            _deliveryPoint = deliveryPoint;
             _landingPath = landingPath;
             _takeOffPath = takeOffPath;
             _deliveryCart = deliveryCart;
@@ -24,11 +25,13 @@ namespace GameCore.Gameplay.Delivery
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly DeliveryConfigMeta _deliveryConfig;
+        private readonly DeliveryPoint _deliveryPoint;
         private readonly CinemachinePath _landingPath;
         private readonly CinemachinePath _takeOffPath;
         private readonly CinemachineDollyCart _deliveryCart;
-        
+
         private bool _isFlying;
+        private bool _isLanding;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -36,12 +39,12 @@ namespace GameCore.Gameplay.Delivery
         {
             if (!_isFlying)
                 return;
-            
+
             float targetSpeed = _deliveryConfig.DroneCartFlySpeed;
             float speedChangeRate = _deliveryConfig.DroneFlySpeedChangeRate;
-            
+
             const float speedOffset = 0.1f;
-            
+
             float finalSpeed;
             float currentSpeed = _deliveryCart.m_Speed;
             bool changeSpeedSmoothly = currentSpeed < targetSpeed - speedOffset ||
@@ -75,6 +78,7 @@ namespace GameCore.Gameplay.Delivery
 
         public void Land()
         {
+            _isLanding = true;
             _deliveryCart.m_Path = _landingPath;
             _deliveryCart.m_Position = 0f;
 
@@ -83,6 +87,7 @@ namespace GameCore.Gameplay.Delivery
 
         public void TakeOff()
         {
+            _isLanding = false;
             _deliveryCart.m_Path = _takeOffPath;
             _deliveryCart.m_Position = 0f;
 
@@ -101,6 +106,11 @@ namespace GameCore.Gameplay.Delivery
         {
             _isFlying = false;
             _deliveryCart.m_Speed = 0f;
+            
+            if (_isLanding)
+                _deliveryPoint.SendDroneLanded();
+            else
+                _deliveryPoint.SendDroneLeft();
         }
     }
 }

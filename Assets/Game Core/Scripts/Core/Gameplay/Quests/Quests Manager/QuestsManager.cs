@@ -17,16 +17,18 @@ namespace GameCore.Gameplay.Quests
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _questsManagerDecorator = questsManagerDecorator;
-            QuestsConfigMeta questsConfig = gameplayConfigsProvider.GetQuestsConfig();
+            _questsConfig = gameplayConfigsProvider.GetQuestsConfig();
+            
             QuestsItemsConfigMeta questsItemsConfig = gameplayConfigsProvider.GetQuestsItemsConfig();
 
             _questsStorage = new QuestsStorage();
-            _questsFactory = new QuestsFactory(_questsStorage, questsConfig, questsItemsConfig);
+            _questsFactory = new QuestsFactory(_questsStorage, _questsConfig, questsItemsConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private IQuestsManagerDecorator _questsManagerDecorator;
+        private QuestsConfigMeta _questsConfig;
         private QuestsFactory _questsFactory;
         private QuestsStorage _questsStorage;
 
@@ -94,6 +96,13 @@ namespace GameCore.Gameplay.Quests
         }
 
         private QuestsStorage GetQuestsStorage() => _questsStorage;
+
+        private bool CanGetNewQuest()
+        {
+            int activeQuestsAmount = _questsStorage.GetActiveQuestsAmount();
+            bool canGetNewQuest = activeQuestsAmount < _questsConfig.MaxActiveQuests;
+            return canGetNewQuest;
+        }
 
         // RPC: -----------------------------------------------------------------------------------
 
@@ -165,6 +174,12 @@ namespace GameCore.Gameplay.Quests
             DespawnClient();
         }
 
-        private void OnSelectQuest(int questID) => SelectQuestServerRpc(questID);
+        private void OnSelectQuest(int questID)
+        {
+            if (!CanGetNewQuest())
+                return;
+            
+            SelectQuestServerRpc(questID);
+        }
     }
 }

@@ -6,7 +6,6 @@ using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
-using GameCore.Gameplay.Other;
 using GameCore.Observers.Gameplay.Level;
 using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
@@ -59,7 +58,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnLocationLeftEvent = delegate { }; // Server only.
-        public event Action OnOpenQuestsSelectionMenuEvent = delegate { };
+        public event Action OnOpenQuestsSelectionMenuEvent = delegate { }; // Server only.
+        public event Action OnCallDeliveryDroneEvent = delegate { }; // Server only.
 
         private ILocationManagerDecorator _locationManagerDecorator;
         private ILevelObserver _levelObserver;
@@ -75,9 +75,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _mobileHeadquartersConfig);
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
-            
+
             SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
             openQuestsSelectionMenuButton.OnTriggerEvent += OnOpenQuestsSelectionMenu;
+
+            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
+            callDeliveryDroneButton.OnTriggerEvent += OnCallDeliveryDrone;
         }
 
         private void Update()
@@ -91,7 +94,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
             openQuestsSelectionMenuButton.OnTriggerEvent -= OnOpenQuestsSelectionMenu;
-            
+
+            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
+            callDeliveryDroneButton.OnTriggerEvent -= OnCallDeliveryDrone;
+
             base.OnDestroy();
         }
 
@@ -153,7 +159,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             _rpcObserver.OnStartLeavingLocationEvent -= StartLeavingLocation;
             _rpcObserver.OnLocationLeftEvent -= OnLocationLeft;
-            
+
             _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
         }
 
@@ -172,6 +178,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             _mobileHeadquartersController.DespawnClient();
         }
+
+        public void OpenDoor() => OpenDoorServerRpc();
 
         public Transform GetTransform() => transform;
 
@@ -217,6 +225,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [ServerRpc]
         private void DestinationReachedServerRpc() => DestinationReachedClientRpc();
 
+        [ServerRpc]
+        private void OpenDoorServerRpc() => OpenDoorClientRpc();
+
         [ClientRpc]
         private void InteractWithMobileDoorLeverClientRpc()
         {
@@ -229,6 +240,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             LoadLocationLever loadLocationLever = _references.LoadLocationLever;
             loadLocationLever.InteractLogic();
+            
+            _mobileHeadquartersController.ToggleDoorState(isOpen: false);
         }
 
         [ClientRpc]
@@ -239,6 +252,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             OnDestinationReached();
         }
+
+        [ClientRpc]
+        private void OpenDoorClientRpc() =>
+            _mobileHeadquartersController.ToggleDoorState(isOpen: true);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -320,5 +337,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void OnOpenQuestsSelectionMenu() =>
             OnOpenQuestsSelectionMenuEvent.Invoke();
+
+        private void OnCallDeliveryDrone() =>
+            OnCallDeliveryDroneEvent.Invoke();
     }
 }

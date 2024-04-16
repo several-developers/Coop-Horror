@@ -100,6 +100,7 @@ MonoBehaviour:
   _landingPath: {fileID: 2632693784111307723}
   _takeOffPath: {fileID: 2632693783023035214}
   _deliveryCart: {fileID: 2632693783788147858}
+  _heliport: {fileID: 2632693783297448455}
 --- !u!1001 &1596630755804863225
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -172,6 +173,12 @@ PrefabInstance:
 --- !u!4 &2632693783297448448 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3648313973019017465, guid: dc11fb35fe2e5a04c8cf013367d818ee,
+    type: 3}
+  m_PrefabInstance: {fileID: 1596630755804863225}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2632693783297448455 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3648313973019017470, guid: dc11fb35fe2e5a04c8cf013367d818ee,
     type: 3}
   m_PrefabInstance: {fileID: 1596630755804863225}
   m_PrefabAsset: {fileID: 0}

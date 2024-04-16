@@ -84,6 +84,9 @@ namespace GameCore.Gameplay.Quests
             return questsRuntimeDataContainers;
         }
 
+        public int GetActiveQuestsAmount() =>
+            _activeQuestsData.Count;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void ClearData() =>

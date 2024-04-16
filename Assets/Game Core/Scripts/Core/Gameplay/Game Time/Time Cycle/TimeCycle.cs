@@ -5,29 +5,21 @@ using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using UnityEngine;
 using Zenject;
 
-namespace GameCore.Gameplay.Levels.GameTime
+namespace GameCore.Gameplay.GameTimeManagement
 {
-    public class TimeCycle : ITimeCycle, IInitializable, IDisposable
+    public class TimeCycle : ITimeCycle, IInitializable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public TimeCycle(ITimeCycleDecorator timeCycleDecorator, IGameplayConfigsProvider gameplayConfigsProvider,
-            Sun sun)
+        public TimeCycle(IGameplayConfigsProvider gameplayConfigsProvider, Sun sun)
         {
-            _timeCycleDecorator = timeCycleDecorator;
             _timeConfig = gameplayConfigsProvider.GetTimeConfig();
             _sun = sun.Light;
             _sunTransform = _sun.transform;
             _simulate = _timeConfig.Simulate;
             _stopAtNight = _timeConfig.StopAtNight;
             
-            SetDateTime(_timeConfig.Second, _timeConfig.Minute, _timeConfig.Hour);
-
-            OnHourPassedEvent += _timeCycleDecorator.SendHourPassedEvent;
-            
-            _timeCycleDecorator.OnTickEvent += Tick;
-            _timeCycleDecorator.OnSyncDateTimeEvent += SyncDateTime;
-            _timeCycleDecorator.OnGetDateTimeEvent += GetDateTime;
+            SetDateTime(_timeConfig.Second, _timeConfig.Minute, _timeConfig.Hour, day: 1);
         }
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -35,27 +27,32 @@ namespace GameCore.Gameplay.Levels.GameTime
         private int Second
         {
             get => _second;
-            set => SetDateTime(second: value, _minute, _hour);
+            set => SetDateTime(second: value, _minute, _hour, _day);
         }
 
         private int Minute
         {
             get => _minute;
-            set => SetDateTime(_second, minute: value, _hour);
+            set => SetDateTime(_second, minute: value, _hour, _day);
         }
 
         private int Hour
         {
             get => _hour;
-            set => SetDateTime(_second, _minute, hour: value);
+            set => SetDateTime(_second, _minute, hour: value, _day);
+        }
+
+        private int Day
+        {
+            get => _day;
+            set => SetDateTime(_second, _minute, _hour, day: value);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<DateTime> OnTimeUpdatedEvent;
-        public event Action OnHourPassedEvent;
+        public event Action<MyDateTime> OnTimeUpdatedEvent = delegate {  };
+        public event Action OnHourPassedEvent = delegate { };
 
-        private readonly ITimeCycleDecorator _timeCycleDecorator;
         private readonly TimeConfigMeta _timeConfig;
         private readonly Transform _sunTransform;
         private readonly Light _sun;
@@ -66,6 +63,7 @@ namespace GameCore.Gameplay.Levels.GameTime
         private int _second;
         private int _minute;
         private int _hour;
+        private int _day;
         private bool _simulate;
         private bool _stopAtNight;
 
@@ -75,15 +73,6 @@ namespace GameCore.Gameplay.Levels.GameTime
         {
             UpdateVisual();
             SendTimeUpdatedEvent();
-        }
-        
-        public void Dispose()
-        {
-            OnHourPassedEvent -= _timeCycleDecorator.SendHourPassedEvent;
-            
-            _timeCycleDecorator.OnTickEvent -= Tick;
-            _timeCycleDecorator.OnSyncDateTimeEvent -= SyncDateTime;
-            _timeCycleDecorator.OnGetDateTimeEvent -= GetDateTime;
         }
         
         public void Tick()
@@ -98,6 +87,7 @@ namespace GameCore.Gameplay.Levels.GameTime
                 _hour = 0;
 
                 UpdateVisual();
+                SendHourPassedEvent();
                 return;
             }
 
@@ -105,11 +95,12 @@ namespace GameCore.Gameplay.Levels.GameTime
             SendTimeUpdatedEvent();
         }
 
-        public void SetDateTime(int second, int minute, int hour)
+        public void SetDateTime(int second, int minute, int hour, int day)
         {
             _second = second;
             _minute = minute;
             _hour = hour;
+            _day = day;
 
             DateTime currentTime = new();
             currentTime = currentTime.AddHours(hour);
@@ -132,7 +123,7 @@ namespace GameCore.Gameplay.Levels.GameTime
         
         public void SyncDateTime(MyDateTime dateTime)
         {
-            SetDateTime(dateTime.Second, dateTime.Minute, dateTime.Hour);
+            SetDateTime(dateTime.Second, dateTime.Minute, dateTime.Hour, dateTime.Day);
             UpdateVisual();
         }
 
@@ -157,7 +148,17 @@ namespace GameCore.Gameplay.Levels.GameTime
         public void ToggleSimulate(bool simulate) =>
             _simulate = simulate;
 
-        public DateTime GetDateTime() => _date;
+        public void IncreaseDay()
+        {
+            _day += 1;
+            UpdateModule();
+        }
+
+        public MyDateTime GetDateTime()
+        {
+            MyDateTime dateTime = new(_date.Second, _date.Minute, _date.Hour, _day);
+            return dateTime;
+        }
 
         public bool GetSimulateState() => _simulate;
 
@@ -180,7 +181,7 @@ namespace GameCore.Gameplay.Levels.GameTime
             if (_internalTimeOverflow >= 1f)
                 _internalTimeOverflow = 0f;
 
-            SetDateTime(_second, _minute, _hour);
+            SetDateTime(_second, _minute, _hour, _day);
             UpdateVisual();
         }
 
@@ -244,10 +245,13 @@ namespace GameCore.Gameplay.Levels.GameTime
             return timeOfDay;
         }
 
-        private void SendTimeUpdatedEvent() =>
-            OnTimeUpdatedEvent?.Invoke(_date);
+        private void SendTimeUpdatedEvent()
+        {
+            MyDateTime dateTime = GetDateTime();
+            OnTimeUpdatedEvent.Invoke(dateTime);
+        }
 
         private void SendHourPassedEvent() =>
-            OnHourPassedEvent?.Invoke();
+            OnHourPassedEvent.Invoke();
     }
 }

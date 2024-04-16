@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Cinemachine;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Delivery;
@@ -16,9 +17,8 @@ namespace GameCore.Gameplay.Delivery
         [Inject]
         private void Construct(IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            DeliveryConfigMeta deliveryConfig = gameplayConfigsProvider.GetDeliveryConfig();
-            
-            _droneCart = new DroneCart(deliveryConfig, _landingPath, _takeOffPath, _deliveryCart);
+            _deliveryConfig = gameplayConfigsProvider.GetDeliveryConfig();
+            _droneCart = new DroneCart(_deliveryConfig, deliveryPoint: this, _landingPath, _takeOffPath, _deliveryCart);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -33,37 +33,65 @@ namespace GameCore.Gameplay.Delivery
         [SerializeField, Required]
         private CinemachineDollyCart _deliveryCart;
 
+        [SerializeField, Required]
+        private GameObject _heliport;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnDroneLandedEvent = delegate { };
+        public event Action OnDroneLeftEvent = delegate { };
         public event Action OnTeleportDroneToDroneCartEvent = delegate { };
+        public event Action OnTakeOffTimerFinishedEvent = delegate { };
 
+        private DeliveryConfigMeta _deliveryConfig;
         private DroneCart _droneCart;
+        private bool _isTimerActive;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Start() => HidePoint();
 
         private void Update() =>
             _droneCart.Tick();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
-        public Transform GetDroneCartTransform() =>
-            _deliveryCart.transform;
-        
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-        
-        [Button(buttonSize: 30), DisableInEditorMode]
-        private void LandDrone()
+
+        public void ShowPoint() =>
+            _heliport.SetActive(true);
+
+        public void HidePoint() =>
+            _heliport.SetActive(false);
+
+        public void LandDrone()
         {
             _droneCart.Land();
             SendTeleportDroneToDroneCart();
         }
 
-        [Button(buttonSize: 30), DisableInEditorMode]
-        private void TakeOffDrone()
+        public void TakeOffDrone()
         {
             _droneCart.TakeOff();
             SendTeleportDroneToDroneCart();
         }
+
+        public void StartTakeOffTimer()
+        {
+            if (_isTimerActive)
+                return;
+            
+            StartCoroutine(routine: TakeOffTimeCO());
+        }
+
+        public void SendDroneLanded() =>
+            OnDroneLandedEvent.Invoke();
+
+        public void SendDroneLeft() =>
+            OnDroneLeftEvent.Invoke();
+
+        public Transform GetDroneCartTransform() =>
+            _deliveryCart.transform;
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private async void SendTeleportDroneToDroneCart()
         {
@@ -76,5 +104,26 @@ namespace GameCore.Gameplay.Delivery
             
             OnTeleportDroneToDroneCartEvent.Invoke();
         }
+
+        private IEnumerator TakeOffTimeCO()
+        {
+            _isTimerActive = true;
+            float delay = _deliveryConfig.TakeOffDelay;
+            
+            yield return new WaitForSeconds(delay);
+
+            _isTimerActive = false;
+            TakeOffDrone();
+            //OnTakeOffTimerFinishedEvent.Invoke();
+        }
+
+        // DEBUG BUTTONS: -------------------------------------------------------------------------
+
+        [Title(Constants.DebugButtons)]
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugLandDrone() => LandDrone();
+        
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugTakeOffDrone() => TakeOffDrone();
     }
 }
