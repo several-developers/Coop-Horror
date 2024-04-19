@@ -6,6 +6,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
     {
         event Action OnLocationLeftEvent;
         event Action OnOpenQuestsSelectionMenuEvent;
+        event Action OnOpenLocationsSelectionMenuEvent;
         event Action OnCallDeliveryDroneEvent;
         void OpenDoor();
     }

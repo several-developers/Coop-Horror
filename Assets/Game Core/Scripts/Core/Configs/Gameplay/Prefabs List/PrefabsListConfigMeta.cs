@@ -1,6 +1,7 @@
 ﻿using CustomEditors;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Delivery;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
@@ -31,6 +32,9 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         
         [SerializeField, Required]
         private DeliveryManager _deliveryManager;
+        
+        [SerializeField, Required]
+        private GameManager _gameManager;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -40,6 +44,7 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         public GameTimeManager GameTimeManager => _gameTimeManager;
         public QuestsManager QuestsManager => _questsManager;
         public DeliveryManager DeliveryManager => _deliveryManager;
+        public GameManager GameManager => _gameManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

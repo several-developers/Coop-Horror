@@ -9,24 +9,21 @@ namespace GameCore.UI.Gameplay.Quests
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public QuestsSelectionMenuFactory(QuestsSelectionMenuView questsSelectionMenuView,
-            IQuestsManagerDecorator questsManagerDecorator, Transform container,
+        public QuestsSelectionMenuFactory(IQuestsManagerDecorator questsManagerDecorator, Transform container,
             QuestItemButtonView questItemButtonPrefab)
         {
-            _questsSelectionMenuView = questsSelectionMenuView;
             _questsManagerDecorator = questsManagerDecorator;
             _container = container;
             _questItemButtonPrefab = questItemButtonPrefab;
-            _questItemsButtons = new List<QuestItemButtonView>(capacity: 5);
+            _questsItemsButtons = new List<QuestItemButtonView>(capacity: 5);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly QuestsSelectionMenuView _questsSelectionMenuView;
         private readonly IQuestsManagerDecorator _questsManagerDecorator;
         private readonly Transform _container;
         private readonly QuestItemButtonView _questItemButtonPrefab;
-        private readonly List<QuestItemButtonView> _questItemsButtons;
+        private readonly List<QuestItemButtonView> _questsItemsButtons;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -53,24 +50,21 @@ namespace GameCore.UI.Gameplay.Quests
                 questItemButton.Setup(questID, itemQuantity, questDifficulty);
                 questItemButton.OnQuestItemClickedEvent += OnQuestItemClicked;
 
-                _questItemsButtons.Add(questItemButton);
+                _questsItemsButtons.Add(questItemButton);
             }
         }
 
         private void ClearQuestsItemsButtons()
         {
-            foreach (QuestItemButtonView questItemButtonView in _questItemsButtons)
+            foreach (QuestItemButtonView questItemButtonView in _questsItemsButtons)
                 Object.Destroy(questItemButtonView.gameObject);
 
-            _questItemsButtons.Clear();
+            _questsItemsButtons.Clear();
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnQuestItemClicked(int questID)
-        {
+        private void OnQuestItemClicked(int questID) =>
             _questsManagerDecorator.SelectQuest(questID);
-            _questsSelectionMenuView.Hide();
-        }
     }
 }

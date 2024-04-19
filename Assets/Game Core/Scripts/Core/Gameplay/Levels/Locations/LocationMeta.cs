@@ -16,6 +16,11 @@ namespace GameCore.Gameplay.Levels.Locations
         [SerializeField]
         private SceneName _sceneName;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public string LocationName => _locationName;
+        public SceneName SceneName => _sceneName;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override string GetMetaCategory() =>

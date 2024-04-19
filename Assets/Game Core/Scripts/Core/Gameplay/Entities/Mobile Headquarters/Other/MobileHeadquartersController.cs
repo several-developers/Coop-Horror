@@ -1,4 +1,5 @@
 using GameCore.Enums.Global;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
@@ -16,6 +17,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _references = mobileHeadquartersEntity.References;
             _rpcHandlerDecorator = mobileHeadquartersEntity.RpcHandlerDecorator;
+            _gameManagerDecorator = mobileHeadquartersEntity.GameManagerDecorator;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -23,6 +25,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private readonly MobileHeadquartersEntity _mobileHeadquartersEntity;
         private readonly MobileHeadquartersReferences _references;
         private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
+        private readonly IGameManagerDecorator _gameManagerDecorator;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -124,8 +127,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void OnInteractWithLoadLocationLever() =>
             _mobileHeadquartersEntity.InteractWithLoadLocationLeverServerRpc();
 
-        private void OnLoadLocation() => 
-            _rpcHandlerDecorator.LoadLocation(SceneName.Desert);
+        private void OnLoadLocation()
+        {
+            SceneName locationName = _gameManagerDecorator.GetSelectedLocation();
+            _rpcHandlerDecorator.LoadLocation(locationName);
+        }
 
         private void OnInteractWithLeaveLocationLever()
         {

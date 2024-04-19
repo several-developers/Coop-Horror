@@ -1,3 +1,4 @@
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Levels.Elevator;
 using GameCore.Gameplay.Network;
@@ -12,6 +13,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         public override void InstallBindings()
         {
+            BindGameManagerDecorator();
             BindRpcHandlerDecorator();
             BindElevatorsManagerDecorator();
             BindQuestsManagerDecorator();
@@ -19,6 +21,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+        
+        private void BindGameManagerDecorator()
+        {
+            Container
+                .BindInterfacesTo<GameManagerDecorator>()
+                .AsSingle();
+        }
         
         private void BindRpcHandlerDecorator()
         {

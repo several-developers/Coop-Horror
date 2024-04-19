@@ -25,3 +25,5 @@ MonoBehaviour:
     type: 3}
   _deliveryManager: {fileID: 7327734190220689724, guid: 2ef80871f7ffb9b4e936ce7c2c726262,
     type: 3}
+  _gameManager: {fileID: 1363163212788008656, guid: 180fe9c24c2d7bd4c876ba8dec8f3f51,
+    type: 3}

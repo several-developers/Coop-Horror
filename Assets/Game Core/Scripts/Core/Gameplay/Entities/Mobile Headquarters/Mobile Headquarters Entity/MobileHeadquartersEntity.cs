@@ -1,6 +1,7 @@
 ﻿using System;
 using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
@@ -31,10 +32,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator,
+        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, IGameManagerDecorator gameManagerDecorator,
             ILocationManagerDecorator locationManagerDecorator, ILevelObserver levelObserver, IRpcObserver rpcObserver)
         {
             RpcHandlerDecorator = rpcHandlerDecorator;
+            GameManagerDecorator = gameManagerDecorator;
             _locationManagerDecorator = locationManagerDecorator;
             _levelObserver = levelObserver;
             _rpcObserver = rpcObserver;
@@ -54,11 +56,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public MobileHeadquartersReferences References => _references;
         public IRpcHandlerDecorator RpcHandlerDecorator { get; private set; }
+        public IGameManagerDecorator GameManagerDecorator { get; private set; }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnLocationLeftEvent = delegate { }; // Server only.
         public event Action OnOpenQuestsSelectionMenuEvent = delegate { }; // Server only.
+        public event Action OnOpenLocationsSelectionMenuEvent = delegate { };
         public event Action OnCallDeliveryDroneEvent = delegate { }; // Server only.
 
         private ILocationManagerDecorator _locationManagerDecorator;
@@ -79,6 +83,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
             openQuestsSelectionMenuButton.OnTriggerEvent += OnOpenQuestsSelectionMenu;
 
+            SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
+            openLocationsSelectionMenuButton.OnTriggerEvent += OnOpenLocationsSelectionMenu;
+
             SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
             callDeliveryDroneButton.OnTriggerEvent += OnCallDeliveryDrone;
         }
@@ -94,6 +101,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
             openQuestsSelectionMenuButton.OnTriggerEvent -= OnOpenQuestsSelectionMenu;
+
+            SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
+            openLocationsSelectionMenuButton.OnTriggerEvent -= OnOpenLocationsSelectionMenu;
 
             SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
             callDeliveryDroneButton.OnTriggerEvent -= OnCallDeliveryDrone;
@@ -240,7 +250,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             LoadLocationLever loadLocationLever = _references.LoadLocationLever;
             loadLocationLever.InteractLogic();
-            
+
             _mobileHeadquartersController.ToggleDoorState(isOpen: false);
         }
 
@@ -337,6 +347,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void OnOpenQuestsSelectionMenu() =>
             OnOpenQuestsSelectionMenuEvent.Invoke();
+
+        private void OnOpenLocationsSelectionMenu() =>
+            OnOpenLocationsSelectionMenuEvent.Invoke();
 
         private void OnCallDeliveryDrone() =>
             OnCallDeliveryDroneEvent.Invoke();

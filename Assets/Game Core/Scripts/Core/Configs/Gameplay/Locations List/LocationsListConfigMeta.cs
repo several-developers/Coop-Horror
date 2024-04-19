@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.Levels.Locations;
+﻿using System.Collections.Generic;
+using GameCore.Gameplay.Levels.Locations;
 using CustomEditors;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,6 +15,8 @@ namespace GameCore.Configs.Gameplay.LocationsList
         private LocationMeta[] _locationsMeta;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public IEnumerable<LocationMeta> GetAllLocationsMeta() => _locationsMeta;
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;

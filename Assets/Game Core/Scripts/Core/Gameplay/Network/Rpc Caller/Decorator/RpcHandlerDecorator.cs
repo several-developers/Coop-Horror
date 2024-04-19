@@ -28,8 +28,8 @@ namespace GameCore.Gameplay.Network
         public void DestroyItemPreview(int slotIndex) =>
             OnDestroyItemPreviewEvent.Invoke(slotIndex);
 
-        public void LoadLocation(SceneName sceneName) =>
-            OnLoadLocationEvent.Invoke(sceneName);
+        public void LoadLocation(SceneName locationName) =>
+            OnLoadLocationEvent.Invoke(locationName);
 
         public void StartLeavingLocation() =>
             OnStartLeavingLocationEvent.Invoke();

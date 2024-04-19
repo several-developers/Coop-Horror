@@ -3,6 +3,7 @@ using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
+using GameCore.UI.Gameplay.LocationsSelectionMenu;
 using GameCore.UI.Gameplay.PauseMenu;
 using GameCore.UI.Gameplay.Quests;
 using GameCore.UI.Gameplay.Quests.ActiveQuests;
@@ -38,6 +39,7 @@ namespace GameCore.Infrastructure.StateMachine
         private PauseMenuView _pauseMenuView;
         private QuitConfirmMenuView _quitConfirmMenuView;
         private QuestsSelectionMenuView _questsSelectionMenuView;
+        private LocationsSelectionMenuView _locationsSelectionMenuView;
         private int _openedMenus; // TEMP
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -50,6 +52,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreatePauseMenu(); // TEMP
             CreateQuitConfirmMenuView(); // TEMP
             CreateQuestsSelectionMenuView(); // TEMP
+            CreateLocationsSelectionMenuView(); // TEMP
             CreateActiveQuestsView(); // TEMP
 
             InitHorrorStateMachine();
@@ -58,6 +61,7 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.OnResumeEvent += OnResume;
             
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
+            _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent += OnOpenLocationsSelectionMenu;
 
             _pauseMenuView.OnShowEvent += OnMenuShown;
             _pauseMenuView.OnHideEvent += OnMenuHidden;
@@ -67,6 +71,9 @@ namespace GameCore.Infrastructure.StateMachine
             _questsSelectionMenuView.OnShowEvent += OnMenuShown;
             _questsSelectionMenuView.OnHideEvent += OnMenuHidden;
 
+            _locationsSelectionMenuView.OnShowEvent += OnMenuShown;
+            _locationsSelectionMenuView.OnHideEvent += OnMenuHidden;
+
             _quitConfirmMenuView.OnConfirmClickedEvent += OnConfirmQuitClicked;
         }
 
@@ -75,7 +82,8 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.OnPauseEvent -= OnOpenPauseMenu;
             _inputReader.OnResumeEvent -= OnResume;
             
-            _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
+            _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
+            _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent -= OnOpenLocationsSelectionMenu;
 
             _pauseMenuView.OnShowEvent -= OnMenuShown;
             _pauseMenuView.OnHideEvent -= OnMenuHidden;
@@ -84,6 +92,9 @@ namespace GameCore.Infrastructure.StateMachine
 
             _questsSelectionMenuView.OnShowEvent -= OnMenuShown;
             _questsSelectionMenuView.OnHideEvent -= OnMenuHidden;
+            
+            _locationsSelectionMenuView.OnShowEvent -= OnMenuShown;
+            _locationsSelectionMenuView.OnHideEvent -= OnMenuHidden;
 
             _quitConfirmMenuView.OnConfirmClickedEvent -= OnConfirmQuitClicked;
         }
@@ -122,6 +133,9 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateQuestsSelectionMenuView() =>
             _questsSelectionMenuView = MenuFactory.Create<QuestsSelectionMenuView>(_diContainer);
         
+        private void CreateLocationsSelectionMenuView() =>
+            _locationsSelectionMenuView = MenuFactory.Create<LocationsSelectionMenuView>(_diContainer);
+        
         private void CreateActiveQuestsView() =>
             MenuFactory.Create<ActiveQuestsView>(_diContainer);
 
@@ -151,6 +165,12 @@ namespace GameCore.Infrastructure.StateMachine
                 _questsSelectionMenuView.Hide();
                 return;
             }
+            
+            if (_locationsSelectionMenuView.IsShown)
+            {
+                _locationsSelectionMenuView.Hide();
+                return;
+            }
         }
 
         private void OnOpenQuestsSelectionMenu()
@@ -159,6 +179,14 @@ namespace GameCore.Infrastructure.StateMachine
                 _questsSelectionMenuView.Hide();
             else
                 _questsSelectionMenuView.Show();
+        }
+
+        private void OnOpenLocationsSelectionMenu()
+        {
+            if (_locationsSelectionMenuView.IsShown)
+                _locationsSelectionMenuView.Hide();
+            else
+                _locationsSelectionMenuView.Show();
         }
 
         private void OnContinueClicked() =>

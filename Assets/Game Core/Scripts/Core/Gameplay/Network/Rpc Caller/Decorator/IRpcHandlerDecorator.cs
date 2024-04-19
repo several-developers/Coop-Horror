@@ -20,7 +20,7 @@ namespace GameCore.Gameplay.Network
 
         void CreateItemPreview(int slotIndex, int itemID);
         void DestroyItemPreview(int slotIndex);
-        void LoadLocation(SceneName sceneName);
+        void LoadLocation(SceneName locationName);
         void StartLeavingLocation();
         void LocationLeft();
         void GenerateDungeons(DungeonsSeedData data);

@@ -17,8 +17,8 @@ namespace GameCore.UI.Gameplay.Quests
         {
             _questsManagerDecorator = questsManagerDecorator;
 
-            _questsSelectionMenuFactory = new QuestsSelectionMenuFactory(questsSelectionMenuView: this,
-                questsManagerDecorator, _questsItemsContainer, _questItemButtonPrefab);
+            _questsSelectionMenuFactory = new QuestsSelectionMenuFactory(questsManagerDecorator, _questsItemsContainer,
+                _questItemButtonPrefab);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
