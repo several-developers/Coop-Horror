@@ -104,7 +104,7 @@
             return amount;
         }
 
-        public bool TryGetSelectedItem(out TItem item)
+        public bool TryGetSelectedItemData(out TItem item)
         {
             item = _items[_selectedSlotIndex];
             bool isItemExists = IsItemExists(_selectedSlotIndex);

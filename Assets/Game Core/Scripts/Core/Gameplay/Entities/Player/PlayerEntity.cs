@@ -173,7 +173,7 @@ namespace GameCore.Gameplay.Entities.Player
             void InitInventory()
             {
                 _inventory = new PlayerInventory();
-                
+
                 _inventoryManager = new PlayerInventoryManager(playerEntity: this, _rpcHandlerDecorator,
                     _itemsPreviewFactory);
             }
@@ -224,7 +224,8 @@ namespace GameCore.Gameplay.Entities.Player
                     _playerCamera.CameraReferences.MainCamera, _interactionMaxDistance,
                     interactionLM: _interactionLM, _interactionObstaclesLM);
 
-                _interactionHandler = new InteractionHandler(_inventoryManager, _playerInteractionObserver);
+                _interactionHandler =
+                    new InteractionHandler(playerEntity: this, _inventoryManager, _playerInteractionObserver);
             }
         }
 
@@ -332,6 +333,9 @@ namespace GameCore.Gameplay.Entities.Player
                 RemoveParent();
         }
 
+        public void DropItem() =>
+            _inventory.DropItem();
+
         public Transform GetTransform() => transform;
 
         public Transform GetCameraItemPivot() => _cameraItemPivot;
@@ -339,7 +343,7 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform GetPlayerItemPivot() => _playerItemPivot;
 
         public PlayerInventory GetInventory() => _inventory;
-
+        
         public bool IsDead() => _isDead;
 
         public static PlayerEntity GetLocalPlayer() => _localPlayer;
@@ -368,9 +372,6 @@ namespace GameCore.Gameplay.Entities.Player
         private void Interact() =>
             _interactionHandler.Interact();
 
-        private void DropItem() =>
-            _inventory.DropItem();
-
         private void SetMobileHQAsParent()
         {
             NetworkObject networkObject = _mobileHeadquartersEntity.GetNetworkObject();
@@ -385,7 +386,7 @@ namespace GameCore.Gameplay.Entities.Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
+
             InitServerAndClient();
             InitServer();
             InitClient();
@@ -396,12 +397,12 @@ namespace GameCore.Gameplay.Entities.Player
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            
+
             DespawnServerAndClient();
             DespawnServer();
             DespawnClient();
         }
-        
+
         private void OnMove(Vector2 movementVector) =>
             OnMovementVectorChangedEvent?.Invoke(movementVector);
 

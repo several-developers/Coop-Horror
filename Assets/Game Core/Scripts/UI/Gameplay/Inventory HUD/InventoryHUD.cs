@@ -125,14 +125,14 @@ namespace GameCore.UI.Gameplay.Inventory
             itemSlotView.Deselect();
         }
 
-        private void SetIcon(int slotIndex, ItemData itemData)
+        private void SetIcon(int slotIndex, InventoryItemData inventoryItemData)
         {
             bool isItemSlotExists = GetItemSlot(slotIndex, out ItemSlotView itemSlotView);
 
             if (!isItemSlotExists)
                 return;
 
-            int itemID = itemData.ItemID;
+            int itemID = inventoryItemData.ItemID;
             bool isItemMetaFound = _itemsMetaProvider.TryGetItemMeta(itemID, out ItemMeta itemMeta);
 
             if (!isItemMetaFound)
@@ -160,7 +160,7 @@ namespace GameCore.UI.Gameplay.Inventory
 
         private void OnSelectedSlotChanged(int selectedSlotIndex) => SelectSlot(selectedSlotIndex);
 
-        private void OnItemEquipped(int slotIndex, ItemData itemData) => SetIcon(slotIndex, itemData);
+        private void OnItemEquipped(int slotIndex, InventoryItemData inventoryItemData) => SetIcon(slotIndex, inventoryItemData);
 
         private void OnItemDropped(int slotIndex, bool randomPosition) => ClearSlot(slotIndex);
     }

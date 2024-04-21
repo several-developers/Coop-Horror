@@ -7,6 +7,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.GameTimeManagement
 {
+#warning REMOVE sun from here
     public class TimeCycle : ITimeCycle, IInitializable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -18,7 +19,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             _sunTransform = _sun.transform;
             _simulate = _timeConfig.Simulate;
             _stopAtNight = _timeConfig.StopAtNight;
-            
+
             SetDateTime(_timeConfig.Second, _timeConfig.Minute, _timeConfig.Hour, day: 1);
         }
 
@@ -50,7 +51,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<MyDateTime> OnTimeUpdatedEvent = delegate {  };
+        public event Action<MyDateTime> OnTimeUpdatedEvent = delegate { };
         public event Action OnHourPassedEvent = delegate { };
 
         private readonly TimeConfigMeta _timeConfig;
@@ -74,7 +75,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             UpdateVisual();
             SendTimeUpdatedEvent();
         }
-        
+
         public void Tick()
         {
             if (!_simulate)
@@ -120,7 +121,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             _minute = _date.Minute;
             _hour = _date.Hour;
         }
-        
+
         public void SyncDateTime(MyDateTime dateTime)
         {
             SetDateTime(dateTime.Second, dateTime.Minute, dateTime.Hour, dateTime.Day);
@@ -218,7 +219,8 @@ namespace GameCore.Gameplay.GameTimeManagement
             RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
             RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
 
-            _sun.color = _timeConfig.SunColor.Evaluate(timeOfDay);
+            if (_sun != null)
+                _sun.color = _timeConfig.SunColor.Evaluate(timeOfDay);
         }
 
         private void UpdateSunRotation(float timeOfDay)

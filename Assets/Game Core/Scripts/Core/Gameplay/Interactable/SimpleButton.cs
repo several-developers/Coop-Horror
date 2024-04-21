@@ -1,5 +1,6 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace GameCore.Gameplay.Interactable
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void Interact()
+        public void Interact(PlayerEntity playerEntity = null)
         {
             _canInteract = false;
             _animator.SetTrigger(id: AnimatorHashes.Trigger);

@@ -8,7 +8,7 @@ namespace GameCore.Gameplay.Delivery
         event Action OnDroneLandedEvent;
         event Action OnDroneLeftEvent;
         event Action OnTeleportDroneToDroneCartEvent;
-        event Action OnTakeOffTimerFinishedEvent;
+        event Action OnDroneTakeOffTimerFinishedEvent;
         void ShowPoint();
         void HidePoint();
         void LandDrone();

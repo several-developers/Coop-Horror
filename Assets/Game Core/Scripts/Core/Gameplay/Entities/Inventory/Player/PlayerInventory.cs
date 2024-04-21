@@ -8,7 +8,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public PlayerInventory() =>
-            _inventory = new Inventory<ItemData>(Constants.PlayerInventorySize);
+            _inventory = new Inventory<InventoryItemData>(Constants.PlayerInventorySize);
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -17,10 +17,10 @@ namespace GameCore.Gameplay.Entities.Inventory
         // FIELDS: --------------------------------------------------------------------------------
         
         public event Action<int> OnSelectedSlotChangedEvent;
-        public event Action<int, ItemData> OnItemEquippedEvent;
+        public event Action<int, InventoryItemData> OnItemEquippedEvent;
         public event Action<int, bool> OnItemDroppedEvent;
 
-        private readonly Inventory<ItemData> _inventory;
+        private readonly Inventory<InventoryItemData> _inventory;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -53,29 +53,29 @@ namespace GameCore.Gameplay.Entities.Inventory
             SendSelectedSlotChangedEvent(newSlotIndex);
         }
 
-        public bool AddItem(ItemData itemData, out int slotIndex)
+        public bool AddItem(InventoryItemData inventoryItemData, out int slotIndex)
         {
             bool isItemInSelectedSlotExists = _inventory.IsItemInSelectedSlotExists();
 
             //LogPickUpItem(itemData.ItemID);
             
             if (isItemInSelectedSlotExists)
-                slotIndex = _inventory.AddItem(itemData);
+                slotIndex = _inventory.AddItem(inventoryItemData);
             else
-                slotIndex = _inventory.AddItemInSelectedSlot(itemData);
+                slotIndex = _inventory.AddItemInSelectedSlot(inventoryItemData);
 
             // Item wasn't equipped.
             if (slotIndex < 0)
                 return false;
             
-            OnItemEquippedEvent?.Invoke(slotIndex, itemData);
+            OnItemEquippedEvent?.Invoke(slotIndex, inventoryItemData);
 
             return true;
         }
 
         public void DropItem()
         {
-            bool isItemExists = _inventory.TryGetSelectedItem(out ItemData itemData);
+            bool isItemExists = _inventory.TryGetSelectedItemData(out InventoryItemData itemData);
 
             if (!isItemExists)
                 return;
@@ -84,7 +84,7 @@ namespace GameCore.Gameplay.Entities.Inventory
 
             int slotIndex = _inventory.DropSelectedItem();
             const bool randomPosition = false;
-            
+
             OnItemDroppedEvent?.Invoke(slotIndex, randomPosition);
         }
         
@@ -105,11 +105,17 @@ namespace GameCore.Gameplay.Entities.Inventory
             
         }
 
+        public bool TryGetSelectedItemData(out InventoryItemData inventoryItemData) =>
+            _inventory.TryGetSelectedItemData(out inventoryItemData);
+
         public int GetSelectedSlotIndex() =>
             _inventory.GetSelectedSlotIndex();
         
         public bool IsInventoryFull() =>
             _inventory.IsInventoryFull();
+
+        public bool IsItemInSelectedSlotExists() =>
+            _inventory.IsItemInSelectedSlotExists();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

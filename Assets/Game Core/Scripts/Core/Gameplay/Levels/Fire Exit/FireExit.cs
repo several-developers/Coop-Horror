@@ -1,6 +1,7 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.LevelManager;
@@ -57,7 +58,7 @@ namespace GameCore.Gameplay.Levels
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Interact() =>
+        public void Interact(PlayerEntity playerEntity = null) =>
             _rpcHandlerDecorator.TeleportToFireExit(_floor, _isInStairsLocation);
 
         public void ToggleInteract(bool canInteract)

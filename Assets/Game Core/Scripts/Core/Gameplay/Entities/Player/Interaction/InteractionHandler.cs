@@ -10,9 +10,10 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public InteractionHandler(PlayerInventoryManager playerInventoryManager,
+        public InteractionHandler(PlayerEntity playerEntity, PlayerInventoryManager playerInventoryManager,
             IPlayerInteractionObserver playerInteractionObserver)
         {
+            _playerEntity = playerEntity;
             _playerInventoryManager = playerInventoryManager;
             _playerInteractionObserver = playerInteractionObserver;
             _interactableItems = new IInteractableItem[Constants.PlayerInventorySize];
@@ -23,6 +24,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private readonly PlayerEntity _playerEntity;
         private readonly PlayerInventoryManager _playerInventoryManager;
         private readonly IPlayerInteractionObserver _playerInteractionObserver;
         private readonly IInteractableItem[] _interactableItems;
@@ -53,9 +55,9 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
                 case InteractionType.PickUpItem:
                     HandlePickUpItem();
                     break;
-
+    
                 default:
-                    _lastInteractable.Interact();
+                    _lastInteractable.Interact(_playerEntity);
                     break;
             }
         }

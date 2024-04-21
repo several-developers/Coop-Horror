@@ -110,7 +110,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             float maxDistance = _collider.height * 0.5f + 0.5f;
 
             bool isSloping = Physics.Raycast(origin: _transform.position, direction: Vector3.down, out _groundHitInfo,
-                maxDistance);
+                maxDistance, _groundMask);
 
             if (isSloping)
             {

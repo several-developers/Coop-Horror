@@ -41,7 +41,7 @@ namespace GameCore.Gameplay.Delivery
         public event Action OnDroneLandedEvent = delegate { };
         public event Action OnDroneLeftEvent = delegate { };
         public event Action OnTeleportDroneToDroneCartEvent = delegate { };
-        public event Action OnTakeOffTimerFinishedEvent = delegate { };
+        public event Action OnDroneTakeOffTimerFinishedEvent = delegate { };
 
         private DeliveryConfigMeta _deliveryConfig;
         private DroneCart _droneCart;
@@ -79,7 +79,7 @@ namespace GameCore.Gameplay.Delivery
             if (_isTimerActive)
                 return;
             
-            StartCoroutine(routine: TakeOffTimeCO());
+            StartCoroutine(routine: DroneTakeOffTimeCO());
         }
 
         public void SendDroneLanded() =>
@@ -105,7 +105,7 @@ namespace GameCore.Gameplay.Delivery
             OnTeleportDroneToDroneCartEvent.Invoke();
         }
 
-        private IEnumerator TakeOffTimeCO()
+        private IEnumerator DroneTakeOffTimeCO()
         {
             _isTimerActive = true;
             float delay = _deliveryConfig.TakeOffDelay;
@@ -114,7 +114,7 @@ namespace GameCore.Gameplay.Delivery
 
             _isTimerActive = false;
             TakeOffDrone();
-            //OnTakeOffTimerFinishedEvent.Invoke();
+            OnDroneTakeOffTimerFinishedEvent.Invoke();
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

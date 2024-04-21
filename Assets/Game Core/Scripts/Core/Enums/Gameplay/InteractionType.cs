@@ -12,6 +12,7 @@
         ElevatorFloorButton = 7,
         ElevatorCallButton = 8,
         FireExitDoor = 9,
-        SimpleButton = 10
+        SimpleButton = 10,
+        Heliport = 11,
     }
 }

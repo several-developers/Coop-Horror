@@ -1,10 +1,10 @@
 ﻿using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Network;
 using GameCore.Utilities;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Inventory
@@ -59,18 +59,16 @@ namespace GameCore.Gameplay.Entities.Inventory
 
             var interactableItem = (IInteractableItem)interactable;
 
-            int itemID = interactableItem.GetItemID();
-            ItemData itemData = new(itemID);
-            bool isItemAdded = inventory.AddItem(itemData, out int slotIndex);
+            int itemID = interactableItem.ItemID;
+            int uniqueItemID = interactableItem.UniqueItemID;
+            InventoryItemData inventoryItemData = new(itemID, uniqueItemID);
+            bool isItemAdded = inventory.AddItem(inventoryItemData, out int slotIndex);
 
             // Not added.
             if (!isItemAdded)
                 return;
-
-            NetworkObject playerNetworkObject = _playerEntity.NetworkObject;
-
-            interactableItem.PickUpClient(playerNetworkObject.OwnerClientId);
-            interactableItem.PickUpServer(playerNetworkObject);
+            
+            interactableItem.PickUp();
 
             _interactableItems[slotIndex] = interactableItem;
 
@@ -174,9 +172,23 @@ namespace GameCore.Gameplay.Entities.Inventory
         private void DropItem(int slotIndex, bool randomPosition)
         {
             IInteractableItem interactableItem = _interactableItems[slotIndex];
+            Vector3 position;
+            Quaternion rotation;
 
-            interactableItem?.DropServer(randomPosition); // Server RPC
-            interactableItem?.DropClient(randomPosition);
+            if (randomPosition)
+            {
+                position = _playerEntity.transform.position;
+                rotation = Quaternion.identity;
+            }
+            else
+            {
+                ItemPreviewObject itemPreviewObject = _itemsPreviewObjects[slotIndex];
+                Transform itemPreviewTransform = itemPreviewObject.transform;
+                position = itemPreviewTransform.position;
+                rotation = itemPreviewTransform.rotation;
+            }
+
+            interactableItem?.Drop(position, rotation, randomPosition);
 
             _interactableItems[slotIndex] = null;
 

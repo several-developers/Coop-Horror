@@ -38,6 +38,7 @@ namespace GameCore.Gameplay.Delivery
             
             _deliveryPoint.OnDroneLandedEvent += OnDroneLanded;
             _deliveryPoint.OnDroneLeftEvent += OnDroneLeft;
+            _deliveryPoint.OnDroneTakeOffTimerFinishedEvent += OnDroneTakeOffTimerFinished;
 
             _mobileHeadquartersEntity.OnCallDeliveryDroneEvent += OnCallDeliveryDrone;
         }
@@ -60,6 +61,7 @@ namespace GameCore.Gameplay.Delivery
             
             _deliveryPoint.OnDroneLandedEvent -= OnDroneLanded;
             _deliveryPoint.OnDroneLeftEvent -= OnDroneLeft;
+            _deliveryPoint.OnDroneTakeOffTimerFinishedEvent -= OnDroneTakeOffTimerFinished;
 
             _mobileHeadquartersEntity.OnCallDeliveryDroneEvent -= OnCallDeliveryDrone;
         }
@@ -75,6 +77,12 @@ namespace GameCore.Gameplay.Delivery
         [ServerRpc(RequireOwnership = false)]
         private void CallDeliveryDroneServerRpc() => CallDeliveryDroneClientRpc();
 
+        [ServerRpc]
+        private void ShowDeliveryPointServerRpc() => ShowDeliveryPointClientRpc();
+
+        [ServerRpc]
+        private void HideDeliveryPointServerRpc() => HideDeliveryPointClientRpc();
+
         [ClientRpc]
         private void CallDeliveryDroneClientRpc()
         {
@@ -87,7 +95,16 @@ namespace GameCore.Gameplay.Delivery
             _canCallDeliveryDrone = false;
             _deliveryPoint.LandDrone();
             _mobileHeadquartersEntity.OpenDoor();
+            ShowDeliveryPointServerRpc();
         }
+
+        [ClientRpc]
+        private void ShowDeliveryPointClientRpc() =>
+            _deliveryPoint.ShowPoint();
+
+        [ClientRpc]
+        private void HideDeliveryPointClientRpc() =>
+            _deliveryPoint.HidePoint();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -114,7 +131,9 @@ namespace GameCore.Gameplay.Delivery
 
         private void OnDroneLeft() =>
             _canCallDeliveryDrone = true;
-        
+
+        private void OnDroneTakeOffTimerFinished() => HideDeliveryPointServerRpc();
+
         private void OnCallDeliveryDrone() => CallDeliveryDroneServerRpc();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
@@ -55,7 +56,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Interact()
+        public void Interact(PlayerEntity playerEntity = null)
         {
             ToggleInteract(canInteract: false);
             PlayAnimation();
