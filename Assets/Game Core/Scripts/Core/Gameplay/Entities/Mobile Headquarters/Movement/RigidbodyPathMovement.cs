@@ -13,7 +13,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             MobileHeadquartersConfigMeta mobileHeadquartersConfig)
         {
             _transform = mobileHeadquartersEntity.transform;
-            _rigidbody = mobileHeadquartersEntity.GetComponent<Rigidbody>();
             _animator = mobileHeadquartersEntity.References.Animator;
             _mobileHeadquartersConfig = mobileHeadquartersConfig;
 
@@ -25,7 +24,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public event Action OnDestinationReachedEvent;
 
         private readonly Transform _transform;
-        private readonly Rigidbody _rigidbody;
         private readonly Animator _animator;
         private readonly MobileHeadquartersConfigMeta _mobileHeadquartersConfig;
 
@@ -108,10 +106,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             //_rigidbody.MoveRotation(rotation);
         }
 
-        public Vector3 EvaluatePositionAtUnit(float distance) =>
+        private Vector3 EvaluatePositionAtUnit(float distance) =>
             _path.EvaluatePositionAtUnit(distance, CinemachinePathBase.PositionUnits.Distance);
 
-        public Quaternion EvaluateOrientationAtUnit(float distance) =>
+        private Quaternion EvaluateOrientationAtUnit(float distance) =>
             _path.EvaluateOrientationAtUnit(distance, CinemachinePathBase.PositionUnits.Distance);
     }
 }

@@ -1,4 +1,6 @@
-﻿using GameCore.Gameplay.Factories.Items;
+﻿using System;
+using GameCore.Gameplay.Factories.Items;
+using GameCore.Gameplay.Network;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -11,8 +13,11 @@ namespace GameCore.Gameplay.Items.Spawners
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsFactory itemsFactory) =>
+        private void Construct(INetcodeHooks netcodeHooks, IItemsFactory itemsFactory)
+        {
+            _netcodeHooks = netcodeHooks;
             _itemsFactory = itemsFactory;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -26,17 +31,16 @@ namespace GameCore.Gameplay.Items.Spawners
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private INetcodeHooks _netcodeHooks;
         private IItemsFactory _itemsFactory;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
-        {
-            if (!_spawnAtStart)
-                return;
-            
-            SpawnItem();
-        }
+        private void Awake() =>
+            _netcodeHooks.OnNetworkSpawnHookEvent += OnNetworkSpawnHook;
+        
+        private void OnDestroy() =>
+            _netcodeHooks.OnNetworkSpawnHookEvent -= OnNetworkSpawnHook;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -66,6 +70,19 @@ namespace GameCore.Gameplay.Items.Spawners
 
             Log.PrintError(log: $"Item Meta <rb>not found</rb>!");
             return false;
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnNetworkSpawnHook()
+        {
+            if (!_spawnAtStart)
+                return;
+
+            if (!_netcodeHooks.IsOwner)
+                return;
+            
+            SpawnItem();
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

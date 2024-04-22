@@ -4,7 +4,6 @@ using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Observers.Gameplay.Rpc;
 using Unity.Netcode;
-using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Network
@@ -130,57 +129,41 @@ namespace GameCore.Gameplay.Network
         {
             base.OnNetworkSpawn();
 
-            _rpcHandlerDecorator.OnCreateItemPreviewEvent += OnCreateItemPreview;
-            _rpcHandlerDecorator.OnDestroyItemPreviewEvent += OnDestroyItemPreview;
-            _rpcHandlerDecorator.OnLoadLocationEvent += OnLoadLocation;
-            _rpcHandlerDecorator.OnStartLeavingLocationEvent += OnStartLeavingLocation;
-            _rpcHandlerDecorator.OnLocationLeftEvent += LocationLeft;
-            _rpcHandlerDecorator.OnGenerateDungeonsEvent += OnGenerateDungeons;
-            _rpcHandlerDecorator.OnStartElevatorEvent += OnStartElevator;
-            _rpcHandlerDecorator.OnOpenElevatorEvent += OnOpenElevator;
-            _rpcHandlerDecorator.OnTogglePlayerInsideMobileHQEvent += OnTogglePlayerInsideMobileHQ;
-            _rpcHandlerDecorator.OnTeleportToFireExitEvent += OnTeleportToFireExit;
+            _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent += OnCreateItemPreview;
+            _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent += DestroyItemPreviewServerRpc;
+            _rpcHandlerDecorator.OnLoadLocationInnerEvent += OnLoadLocation;
+            _rpcHandlerDecorator.OnStartLeavingLocationInnerEvent += StartLeavingLocationServerRpc;
+            _rpcHandlerDecorator.OnLocationLeftInnerEvent += LeftLocationServerRpc;
+            _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent += GenerateDungeonsServerRpc;
+            _rpcHandlerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
+            _rpcHandlerDecorator.OnOpenElevatorInnerEvent += OpenElevatorServerRpc;
+            _rpcHandlerDecorator.OnTogglePlayerInsideMobileHQInnerEvent += TogglePlayerInsideMobileHQServerRpc;
+            _rpcHandlerDecorator.OnTeleportToFireExitInnerEvent += OnTeleportToFireExit;
         }
 
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
             
-            _rpcHandlerDecorator.OnCreateItemPreviewEvent -= OnCreateItemPreview;
-            _rpcHandlerDecorator.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
-            _rpcHandlerDecorator.OnLoadLocationEvent -= OnLoadLocation;
-            _rpcHandlerDecorator.OnStartLeavingLocationEvent -= OnStartLeavingLocation;
-            _rpcHandlerDecorator.OnLocationLeftEvent -= LocationLeft;
-            _rpcHandlerDecorator.OnGenerateDungeonsEvent -= OnGenerateDungeons;
-            _rpcHandlerDecorator.OnStartElevatorEvent -= OnStartElevator;
-            _rpcHandlerDecorator.OnOpenElevatorEvent -= OnOpenElevator;
-            _rpcHandlerDecorator.OnTogglePlayerInsideMobileHQEvent -= OnTogglePlayerInsideMobileHQ;
-            _rpcHandlerDecorator.OnTeleportToFireExitEvent -= OnTeleportToFireExit;
+            _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent -= OnCreateItemPreview;
+            _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent -= DestroyItemPreviewServerRpc;
+            _rpcHandlerDecorator.OnLoadLocationInnerEvent -= OnLoadLocation;
+            _rpcHandlerDecorator.OnStartLeavingLocationInnerEvent -= StartLeavingLocationServerRpc;
+            _rpcHandlerDecorator.OnLocationLeftInnerEvent -= LeftLocationServerRpc;
+            _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent -= GenerateDungeonsServerRpc;
+            _rpcHandlerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
+            _rpcHandlerDecorator.OnOpenElevatorInnerEvent -= OpenElevatorServerRpc;
+            _rpcHandlerDecorator.OnTogglePlayerInsideMobileHQInnerEvent -= TogglePlayerInsideMobileHQServerRpc;
+            _rpcHandlerDecorator.OnTeleportToFireExitInnerEvent -= OnTeleportToFireExit;
         }
         
         private void OnCreateItemPreview(int slotIndex, int itemID) => CreateItemPreviewServerRpc(slotIndex, itemID);
-        
-        private void OnDestroyItemPreview(int slotIndex) =>
-            DestroyItemPreviewServerRpc(slotIndex);
 
         private void OnLoadLocation(SceneName sceneName)
         {
             int sceneNameIndex = (int)sceneName;
             LoadLocationServerRpc(sceneNameIndex);
         }
-
-        private void OnStartLeavingLocation() => StartLeavingLocationServerRpc();
-        
-        private void LocationLeft() => LeftLocationServerRpc();
-
-        private void OnGenerateDungeons(DungeonsSeedData data) => GenerateDungeonsServerRpc(data);
-
-        private void OnStartElevator(Floor floor) => StartElevatorServerRpc(floor);
-
-        private void OnOpenElevator(Floor floor) => OpenElevatorServerRpc(floor);
-
-        private void OnTogglePlayerInsideMobileHQ(ulong clientID, bool isInside) =>
-            TogglePlayerInsideMobileHQServerRpc(clientID, isInside);
 
         private void OnTeleportToFireExit(Floor floor, bool isInStairsLocation) =>
             TeleportToFireExitServerRpc(floor, isInStairsLocation);

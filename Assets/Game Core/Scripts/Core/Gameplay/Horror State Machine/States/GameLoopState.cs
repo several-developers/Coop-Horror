@@ -1,6 +1,6 @@
-﻿using GameCore.Gameplay.Entities.MobileHeadquarters;
-using GameCore.Gameplay.Network;
+﻿using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
+using GameCore.Observers.Gameplay.Level;
 using GameCore.Observers.Gameplay.Rpc;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
@@ -10,12 +10,12 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public GameLoopState(IHorrorStateMachine horrorStateMachine, INetworkHorror networkHorror,
-            IMobileHeadquartersEntity mobileHeadquartersEntity, IRpcObserver rpcObserver)
+            ILevelObserver levelObserver, IRpcObserver rpcObserver)
         {
             _horrorStateMachine = horrorStateMachine;
             _networkHorror = networkHorror;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _rpcObserver = rpcObserver;
+            _levelObserver = levelObserver;
 
             horrorStateMachine.AddState(this);
         }
@@ -24,7 +24,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly INetworkHorror _networkHorror;
-        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private readonly ILevelObserver _levelObserver;
         private readonly IRpcObserver _rpcObserver;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -53,7 +53,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             if (!IsServer())
                 return;
 
-            _mobileHeadquartersEntity.OnLocationLeftEvent += OnLocationLeftServer;
+            _levelObserver.OnLocationLeftEvent += OnLocationLeftServerLogic;
         }
 
         public void InitClient()
@@ -61,7 +61,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             if (IsServer())
                 return;
 
-            _rpcObserver.OnLocationLeftEvent += OnLocationLeftClient;
+            _rpcObserver.OnLocationLeftEvent += OnLocationLeftClientLogic;
         }
 
         public void DespawnServerAndClient()
@@ -73,7 +73,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             if (!IsServer())
                 return;
 
-            _mobileHeadquartersEntity.OnLocationLeftEvent -= OnLocationLeftServer;
+            _levelObserver.OnLocationLeftEvent -= OnLocationLeftServerLogic;
         }
 
         public void DespawnClient()
@@ -81,7 +81,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             if (IsServer())
                 return;
 
-            _rpcObserver.OnLocationLeftEvent -= OnLocationLeftClient;
+            _rpcObserver.OnLocationLeftEvent -= OnLocationLeftClientLogic;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -97,8 +97,8 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnLocationLeftServer() => EnterLeaveLocationServerState();
+        private void OnLocationLeftServerLogic() => EnterLeaveLocationServerState();
         
-        private void OnLocationLeftClient() => EnterLeaveLocationClientState();
+        private void OnLocationLeftClientLogic() => EnterLeaveLocationClientState();
     }
 }

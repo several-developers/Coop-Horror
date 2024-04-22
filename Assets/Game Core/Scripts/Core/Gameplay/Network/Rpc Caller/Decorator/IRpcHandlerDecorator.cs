@@ -7,16 +7,16 @@ namespace GameCore.Gameplay.Network
 {
     public interface IRpcHandlerDecorator
     {
-        event Action<int, int> OnCreateItemPreviewEvent;
-        event Action<int> OnDestroyItemPreviewEvent;
-        event Action<SceneName> OnLoadLocationEvent;
-        event Action OnStartLeavingLocationEvent; // Mobile HQ starts leaving the location.
-        event Action OnLocationLeftEvent; // Mobile HQ left the location.
-        event Action<DungeonsSeedData> OnGenerateDungeonsEvent;
-        event Action<Floor> OnStartElevatorEvent;
-        event Action<Floor> OnOpenElevatorEvent;
-        event Action<ulong, bool> OnTogglePlayerInsideMobileHQEvent;
-        event Action<Floor, bool> OnTeleportToFireExitEvent;
+        event Action<int, int> OnCreateItemPreviewInnerEvent;
+        event Action<int> OnDestroyItemPreviewInnerEvent;
+        event Action<SceneName> OnLoadLocationInnerEvent;
+        event Action OnStartLeavingLocationInnerEvent; // Mobile HQ starts leaving the location.
+        event Action OnLocationLeftInnerEvent; // Mobile HQ left the location.
+        event Action<DungeonsSeedData> OnGenerateDungeonsInnerEvent;
+        event Action<Floor> OnStartElevatorInnerEvent;
+        event Action<Floor> OnOpenElevatorInnerEvent;
+        event Action<ulong, bool> OnTogglePlayerInsideMobileHQInnerEvent;
+        event Action<Floor, bool> OnTeleportToFireExitInnerEvent;
 
         void CreateItemPreview(int slotIndex, int itemID);
         void DestroyItemPreview(int slotIndex);

@@ -9,47 +9,47 @@ namespace GameCore.Gameplay.Network
     {
         // FIELDS: --------------------------------------------------------------------------------
         
-        public event Action<int, int> OnCreateItemPreviewEvent = delegate { };
-        public event Action<int> OnDestroyItemPreviewEvent = delegate { };
-        public event Action<SceneName> OnLoadLocationEvent = delegate { };
-        public event Action OnStartLeavingLocationEvent = delegate { };
-        public event Action OnLocationLeftEvent = delegate { };
-        public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate { };
-        public event Action<Floor> OnStartElevatorEvent = delegate { };
-        public event Action<Floor> OnOpenElevatorEvent = delegate { };
-        public event Action<ulong, bool> OnTogglePlayerInsideMobileHQEvent = delegate { };
-        public event Action<Floor, bool> OnTeleportToFireExitEvent = delegate { };
+        public event Action<int, int> OnCreateItemPreviewInnerEvent = delegate { };
+        public event Action<int> OnDestroyItemPreviewInnerEvent = delegate { };
+        public event Action<SceneName> OnLoadLocationInnerEvent = delegate { };
+        public event Action OnStartLeavingLocationInnerEvent = delegate { };
+        public event Action OnLocationLeftInnerEvent = delegate { };
+        public event Action<DungeonsSeedData> OnGenerateDungeonsInnerEvent = delegate { };
+        public event Action<Floor> OnStartElevatorInnerEvent = delegate { };
+        public event Action<Floor> OnOpenElevatorInnerEvent = delegate { };
+        public event Action<ulong, bool> OnTogglePlayerInsideMobileHQInnerEvent = delegate { };
+        public event Action<Floor, bool> OnTeleportToFireExitInnerEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void CreateItemPreview(int slotIndex, int itemID) =>
-            OnCreateItemPreviewEvent.Invoke(slotIndex, itemID);
+            OnCreateItemPreviewInnerEvent.Invoke(slotIndex, itemID);
 
         public void DestroyItemPreview(int slotIndex) =>
-            OnDestroyItemPreviewEvent.Invoke(slotIndex);
+            OnDestroyItemPreviewInnerEvent.Invoke(slotIndex);
 
         public void LoadLocation(SceneName locationName) =>
-            OnLoadLocationEvent.Invoke(locationName);
+            OnLoadLocationInnerEvent.Invoke(locationName);
 
         public void StartLeavingLocation() =>
-            OnStartLeavingLocationEvent.Invoke();
+            OnStartLeavingLocationInnerEvent.Invoke();
 
         public void LocationLeft() =>
-            OnLocationLeftEvent.Invoke();
+            OnLocationLeftInnerEvent.Invoke();
 
         public void GenerateDungeons(DungeonsSeedData data) => 
-            OnGenerateDungeonsEvent.Invoke(data);
+            OnGenerateDungeonsInnerEvent.Invoke(data);
 
         public void StartElevator(Floor floor) =>
-            OnStartElevatorEvent.Invoke(floor);
+            OnStartElevatorInnerEvent.Invoke(floor);
 
         public void OpenElevator(Floor floor) => 
-            OnOpenElevatorEvent.Invoke(floor);
+            OnOpenElevatorInnerEvent.Invoke(floor);
 
         public void TogglePlayerInsideMobileHQ(ulong clientID, bool isInside) =>
-            OnTogglePlayerInsideMobileHQEvent.Invoke(clientID, isInside);
+            OnTogglePlayerInsideMobileHQInnerEvent.Invoke(clientID, isInside);
 
         public void TeleportToFireExit(Floor floor, bool isInStairsLocation) =>
-            OnTeleportToFireExitEvent.Invoke(floor, isInStairsLocation);
+            OnTeleportToFireExitInnerEvent.Invoke(floor, isInStairsLocation);
     }
 }

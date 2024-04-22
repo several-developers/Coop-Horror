@@ -18,7 +18,6 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             _interactionMaxDistance = interactionMaxDistance;
             _interactionLm = interactionLM;
             _interactionObstaclesLM = interactionObstaclesLM;
-            _screenCenterPoint = new Vector3(x: 0.5f, y: 0.5f);
             _hits = new RaycastHit[24];
         }
 
@@ -30,9 +29,9 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private readonly float _interactionMaxDistance;
         private readonly LayerMask _interactionLm;
         private readonly LayerMask _interactionObstaclesLM;
-        private readonly Vector3 _screenCenterPoint;
         private readonly RaycastHit[] _hits;
 
+        private int _lastInteractableItemIndex;
         private bool _isInteractionFound;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -70,9 +69,10 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
         private void SendCanInteract(int interactableItemIndex)
         {
-            if (_isInteractionFound)
+            if (_isInteractionFound && interactableItemIndex == _lastInteractableItemIndex)
                 return;
 
+            _lastInteractableItemIndex = interactableItemIndex;
             _isInteractionFound = true;
             var interactable = _hits[interactableItemIndex].transform.GetComponent<IInteractable>();
 
@@ -136,7 +136,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             RaycastHit closestObjectHitInfo = _hits[closestObjectIndex];
             int objectLayer = closestObjectHitInfo.transform.gameObject.layer;
             bool isObstacle = !_interactionLm.Contains(objectLayer);
-
+            
             return isObstacle;
         }
 

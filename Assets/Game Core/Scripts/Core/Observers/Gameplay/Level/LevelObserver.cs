@@ -7,10 +7,14 @@ namespace GameCore.Observers.Gameplay.Level
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnLocationLoadedEvent = delegate { };
+        public event Action OnLocationLeftEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void LocationLoaded() =>
             OnLocationLoadedEvent.Invoke();
+
+        public void LocationLeft() =>
+            OnLocationLeftEvent.Invoke();
     }
 }

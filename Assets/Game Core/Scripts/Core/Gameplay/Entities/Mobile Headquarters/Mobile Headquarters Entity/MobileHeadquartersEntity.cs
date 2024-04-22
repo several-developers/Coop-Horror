@@ -60,7 +60,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnLocationLeftEvent = delegate { }; // Server only.
         public event Action OnOpenQuestsSelectionMenuEvent = delegate { }; // Server only.
         public event Action OnOpenLocationsSelectionMenuEvent = delegate { };
         public event Action OnCallDeliveryDroneEvent = delegate { }; // Server only.
@@ -227,10 +226,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
-        public void InteractWithMobileDoorLeverServerRpc() => InteractWithMobileDoorLeverClientRpc();
-
-        [ServerRpc(RequireOwnership = false)]
-        public void InteractWithLoadLocationLeverServerRpc() => InteractWithLoadLocationLeverClientRpc();
+        public void LoadLocationServerRpc() => LoadLocationClientRpc();
 
         [ServerRpc]
         private void DestinationReachedServerRpc() => DestinationReachedClientRpc();
@@ -239,14 +235,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void OpenDoorServerRpc() => OpenDoorClientRpc();
 
         [ClientRpc]
-        private void InteractWithMobileDoorLeverClientRpc()
-        {
-            ToggleMobileDoorLever toggleMobileDoorLever = _references.ToggleMobileDoorLever;
-            toggleMobileDoorLever.InteractLogic();
-        }
-
-        [ClientRpc]
-        private void InteractWithLoadLocationLeverClientRpc()
+        private void LoadLocationClientRpc()
         {
             LoadLocationLever loadLocationLever = _references.LoadLocationLever;
             loadLocationLever.InteractLogic();
@@ -307,7 +296,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case State.LeavingLocation:
-                    OnLocationLeftEvent.Invoke();
+                    _levelObserver.LocationLeft();
                     RpcHandlerDecorator.LocationLeft();
 
                     EnterState(State.MovingOnRoad);

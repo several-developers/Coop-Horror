@@ -6,7 +6,7 @@
         PickUpItem = 1,
         Open = 2,
         Close = 3,
-        ToggleMobileDoor = 4,
+        ToggleMobileDoor = 4, // DEPRECATED
         LoadLocationMobileLever = 5,
         LeaveLocationMobileLever = 6,
         ElevatorFloorButton = 7,

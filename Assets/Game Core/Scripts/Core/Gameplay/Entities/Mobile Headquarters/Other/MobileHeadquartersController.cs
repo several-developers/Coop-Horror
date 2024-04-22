@@ -35,11 +35,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             animationObserver.OnDoorOpenedEvent += OnDoorOpened;
             animationObserver.OnDoorClosedEvent += OnDoorClosed;
 
-            ToggleMobileDoorLever toggleMobileDoorLever = _references.ToggleMobileDoorLever;
-            toggleMobileDoorLever.OnInteractEvent += OnInteractWithMobileDoorLever;
-            toggleMobileDoorLever.OnEnabledEvent += OnDoorLeverEnabled;
-            toggleMobileDoorLever.OnDisabledEvent += OnDoorLeverDisabled;
-
             LoadLocationLever loadLocationLever = _references.LoadLocationLever;
             loadLocationLever.OnInteractEvent += OnInteractWithLoadLocationLever;
             loadLocationLever.OnEnabledEvent += OnLoadLocation;
@@ -51,16 +46,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         public void InitServer()
         {
-            // LoadLocationLever loadLocationLever = _references.LoadLocationLever;
-            // loadLocationLever.OnEnabledEvent += OnLoadLocation;
-            //
-            // LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
-            // leaveLocationLever.OnEnabledEvent += OnStartLeavingLocation;
         }
 
         public void InitClient()
         {
-            
         }
         
         public void DespawnServerAndClient()
@@ -68,11 +57,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             AnimationObserver animationObserver = _references.AnimationObserver;
             animationObserver.OnDoorOpenedEvent -= OnDoorOpened;
             animationObserver.OnDoorClosedEvent -= OnDoorClosed;
-
-            ToggleMobileDoorLever toggleMobileDoorLever = _references.ToggleMobileDoorLever;
-            toggleMobileDoorLever.OnInteractEvent -= OnInteractWithMobileDoorLever;
-            toggleMobileDoorLever.OnEnabledEvent -= OnDoorLeverEnabled;
-            toggleMobileDoorLever.OnDisabledEvent -= OnDoorLeverDisabled;
 
             LoadLocationLever loadLocationLever = _references.LoadLocationLever;
             loadLocationLever.OnInteractEvent -= OnInteractWithLoadLocationLever;
@@ -85,11 +69,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         public void DespawnServer()
         {
-            // LoadLocationLever loadLocationLever = _references.LoadLocationLever;
-            // loadLocationLever.OnEnabledEvent -= OnLoadLocation;
-            //
-            // LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
-            // leaveLocationLever.OnEnabledEvent -= OnStartLeavingLocation;
         }
 
         public void DespawnClient()
@@ -103,29 +82,18 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             animator.SetBool(id: AnimatorHashes.IsOpen, isOpen);
         }
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void EnableDoorLever()
-        {
-            ToggleMobileDoorLever toggleMobileDoorLever = _references.ToggleMobileDoorLever;
-            toggleMobileDoorLever.ToggleInteract(canInteract: true);
-        }
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnDoorOpened() => EnableDoorLever();
+        private void OnDoorOpened()
+        {
+        }
 
-        private void OnDoorClosed() => EnableDoorLever();
-
-        private void OnInteractWithMobileDoorLever() =>
-            _mobileHeadquartersEntity.InteractWithMobileDoorLeverServerRpc();
-
-        private void OnDoorLeverEnabled() => ToggleDoorState(isOpen: true);
-
-        private void OnDoorLeverDisabled() => ToggleDoorState(isOpen: false);
+        private void OnDoorClosed()
+        {
+        }
 
         private void OnInteractWithLoadLocationLever() =>
-            _mobileHeadquartersEntity.InteractWithLoadLocationLeverServerRpc();
+            _mobileHeadquartersEntity.LoadLocationServerRpc();
 
         private void OnLoadLocation()
         {

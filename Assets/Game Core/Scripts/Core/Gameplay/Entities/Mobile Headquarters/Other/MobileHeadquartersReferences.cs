@@ -19,9 +19,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private AnimationObserver _animationObserver;
         
         [SerializeField, Required]
-        private ToggleMobileDoorLever _toggleMobileDoorLever;
-
-        [SerializeField, Required]
         private LoadLocationLever _loadLocationLever;
 
         [SerializeField, Required]
@@ -40,7 +37,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         public Animator Animator => _animator;
         public AnimationObserver AnimationObserver => _animationObserver;
-        public ToggleMobileDoorLever ToggleMobileDoorLever => _toggleMobileDoorLever;
         public LoadLocationLever LoadLocationLever => _loadLocationLever;
         public LeaveLocationLever LeaveLocationLever => _leaveLocationLever;
         public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
