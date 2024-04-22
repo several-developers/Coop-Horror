@@ -101,18 +101,22 @@ namespace GameCore.Gameplay.Items
             PickUpServerRpc(NetworkObject);
         }
 
-        public void Drop(Vector3 position, Quaternion rotation, bool randomPosition = false)
+        public void Drop(Vector3 position, Quaternion rotation, bool randomPosition = false, bool destroy = false)
         {
             if (!_isPickedUp.Value)
                 return;
 
-            if (randomPosition)
-                position = position.GetRandomPosition(radius: 0.5f);
+            if (!destroy)
+            {
+                if (randomPosition)
+                    position = position.GetRandomPosition(radius: 0.5f);
 
-            _networkTransform.Teleport(position, rotation, newScale: Vector3.one);
+                _networkTransform.Teleport(position, rotation, newScale: Vector3.one);
 
-            DropClientLogic();
-            DropServerRpc();
+                DropClientLogic();
+            }
+
+            DropServerRpc(destroy);
         }
         
         public void ShowServer() => ShowServerRpc();
@@ -204,8 +208,15 @@ namespace GameCore.Gameplay.Items
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void DropServerRpc()
+        private void DropServerRpc(bool destroy)
         {
+            if (destroy)
+            {
+                _itemsProvider.RemoveItem(_uniqueItemID);
+                Destroy(gameObject);
+                return;
+            }
+            
             _isPickedUp.Value = false;
             
             DropClientRpc();

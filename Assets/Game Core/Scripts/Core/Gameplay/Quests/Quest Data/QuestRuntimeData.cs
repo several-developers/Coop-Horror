@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
+using UnityEngine;
 
 namespace GameCore.Gameplay.Quests
 {
@@ -8,14 +9,14 @@ namespace GameCore.Gameplay.Quests
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public QuestRuntimeData(QuestDifficulty difficulty, int questID, int reward,
-            IReadOnlyDictionary<int, int> questItems)
+            IReadOnlyDictionary<int, QuestItemData> questItems)
         {
             Difficulty = difficulty;
             QuestID = questID;
             Reward = reward;
-            _questItems = new Dictionary<int, int>(capacity: questItems.Count);
+            _questItems = new Dictionary<int, QuestItemData>(capacity: questItems.Count);
 
-            foreach (KeyValuePair<int, int> pair in questItems)
+            foreach (KeyValuePair<int, QuestItemData> pair in questItems)
                 _questItems.Add(pair.Key, pair.Value);
         }
 
@@ -26,9 +27,9 @@ namespace GameCore.Gameplay.Quests
             Reward = questRuntimeDataContainer.Reward;
 
             int[] questItemsID = questRuntimeDataContainer.QuestItemsID;
-            int[] questItemsQuantity = questRuntimeDataContainer.QuestItemsQuantity;
+            QuestItemData[] questItemsData = questRuntimeDataContainer.QuestItemsData;
             int itemsAmount = questItemsID.Length;
-            bool isAmountEquals = questItemsID.Length == questItemsQuantity.Length;
+            bool isAmountEquals = questItemsID.Length == questItemsData.Length;
 
             if (!isAmountEquals)
             {
@@ -36,13 +37,13 @@ namespace GameCore.Gameplay.Quests
                 return;
             }
 
-            _questItems = new Dictionary<int, int>(capacity: itemsAmount);
+            _questItems = new Dictionary<int, QuestItemData>(capacity: itemsAmount);
 
             for (int i = 0; i < itemsAmount; i++)
             {
                 int itemID = questItemsID[i];
-                int itemQuantity = questItemsQuantity[i];
-                _questItems.Add(itemID, itemQuantity);
+                QuestItemData questItemData = questItemsData[i];
+                _questItems.Add(itemID, questItemData);
             }
         }
 
@@ -54,12 +55,43 @@ namespace GameCore.Gameplay.Quests
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly Dictionary<int, int> _questItems; // <item_id, item_quantity>
+        private readonly Dictionary<int, QuestItemData> _questItems; // <item_id, item_quantity>
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public IReadOnlyDictionary<int, int> GetQuestItems() => _questItems;
+        public void SubmitQuestItem(int itemID)
+        {
+            bool containsItem = _questItems.ContainsKey(itemID);
 
+            if (!containsItem)
+            {
+                Log.PrintError(log: $"Item with ID <gb>({itemID})</gb> <rb>not found</rb>!");
+                return;
+            }
+
+            QuestItemData questItemData = _questItems[itemID];
+            questItemData.IncreaseItemQuantity();
+
+            _questItems[itemID] = questItemData;
+        }
+        
+        public IReadOnlyDictionary<int, QuestItemData> GetQuestItems() => _questItems;
+
+        public float GetQuestProgress()
+        {
+            float questProgress = 0f;
+            float progressSum = 0f;
+            int questItemsAmount = _questItems.Count;
+
+            foreach (QuestItemData questItemData in _questItems.Values)
+                progressSum += questItemData.GetProgress();
+
+            if (questItemsAmount > 0)
+                questProgress = progressSum / questItemsAmount;
+
+            return questProgress;
+        }
+        
         public int GetQuestItemsAmount() =>
             _questItems.Count;
 
@@ -67,10 +99,31 @@ namespace GameCore.Gameplay.Quests
         {
             int totalAmount = 0;
 
-            foreach (int itemQuantity in _questItems.Values)
-                totalAmount += itemQuantity;
+            foreach (QuestItemData questItemData in _questItems.Values)
+                totalAmount += questItemData.TargetItemQuantity;
 
             return totalAmount;
+        }
+
+        public bool ContainsItem(int itemID) =>
+            _questItems.ContainsKey(itemID);
+
+        public bool IsCompleted()
+        {
+            bool isCompleted = true;
+
+            foreach (QuestItemData questItemData in _questItems.Values)
+            {
+                bool isQuestItemCompleted = questItemData.IsCompleted();
+
+                if (isQuestItemCompleted)
+                    continue;
+
+                isCompleted = false;
+                break;
+            }
+
+            return isCompleted;
         }
     }
 }

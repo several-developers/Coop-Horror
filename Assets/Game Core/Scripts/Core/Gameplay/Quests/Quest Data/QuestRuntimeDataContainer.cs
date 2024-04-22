@@ -14,18 +14,18 @@ namespace GameCore.Gameplay.Quests
             _questID = questRuntimeData.QuestID;
             _reward = questRuntimeData.Reward;
 
-            IReadOnlyDictionary<int, int> questItems = questRuntimeData.GetQuestItems();
+            IReadOnlyDictionary<int, QuestItemData> questItems = questRuntimeData.GetQuestItems();
             int questItemsAmount = questRuntimeData.GetQuestItemsAmount();
 
             _questItemsID = new int[questItemsAmount];
-            _questItemsQuantity = new int[questItemsAmount];
+            _questItemsData = new QuestItemData[questItemsAmount];
 
             int i = 0;
 
-            foreach (KeyValuePair<int, int> pair in questItems)
+            foreach (KeyValuePair<int, QuestItemData> pair in questItems)
             {
                 _questItemsID[i] = pair.Key;
-                _questItemsQuantity[i] = pair.Value;
+                _questItemsData[i] = pair.Value;
                 i++;
             }
         }
@@ -33,7 +33,7 @@ namespace GameCore.Gameplay.Quests
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public int[] QuestItemsID => _questItemsID;
-        public int[] QuestItemsQuantity => _questItemsQuantity;
+        public QuestItemData[] QuestItemsData => _questItemsData;
         public QuestDifficulty Difficulty => _difficulty;
         public int QuestID => _questID;
         public int Reward => _reward;
@@ -41,7 +41,7 @@ namespace GameCore.Gameplay.Quests
         // FIELDS: --------------------------------------------------------------------------------
         
         private int[] _questItemsID;
-        private int[] _questItemsQuantity;
+        private QuestItemData[] _questItemsData;
         private QuestDifficulty _difficulty;
         private int _questID;
         private int _reward;
@@ -51,7 +51,7 @@ namespace GameCore.Gameplay.Quests
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref _questItemsID);
-            serializer.SerializeValue(ref _questItemsQuantity);
+            serializer.SerializeValue(ref _questItemsData);
             serializer.SerializeValue(ref _difficulty);
             serializer.SerializeValue(ref _questID);
             serializer.SerializeValue(ref _reward);

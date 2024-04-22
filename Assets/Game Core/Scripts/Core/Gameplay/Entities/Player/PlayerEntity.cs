@@ -333,8 +333,8 @@ namespace GameCore.Gameplay.Entities.Player
                 RemoveParent();
         }
 
-        public void DropItem() =>
-            _inventory.DropItem();
+        public void DropItem(bool destroy = false) =>
+            _inventory.DropItem(destroy);
 
         public Transform GetTransform() => transform;
 

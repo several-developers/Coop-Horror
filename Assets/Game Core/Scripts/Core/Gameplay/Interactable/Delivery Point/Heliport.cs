@@ -3,6 +3,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Items;
+using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
 using UnityEngine;
 using Zenject;
@@ -14,14 +15,18 @@ namespace GameCore.Gameplay.Interactable
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsProvider itemsProvider) =>
+        private void Construct(IItemsProvider itemsProvider, IQuestsManagerDecorator questsManagerDecorator)
+        {
             _itemsProvider = itemsProvider;
+            _questsManagerDecorator = questsManagerDecorator;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         public event Action OnInteractionStateChangedEvent;
         
         private IItemsProvider _itemsProvider;
+        private IQuestsManagerDecorator _questsManagerDecorator;
         private bool _canInteract = true;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -62,7 +67,8 @@ namespace GameCore.Gameplay.Interactable
             if (!isItemFound)
                 return;
             
-            playerEntity.DropItem();
+            playerEntity.DropItem(destroy: true);
+            _questsManagerDecorator.SubmitQuestItem(item.ItemID);
         }
         
         private void SendInteractionStateChangedEvent() =>

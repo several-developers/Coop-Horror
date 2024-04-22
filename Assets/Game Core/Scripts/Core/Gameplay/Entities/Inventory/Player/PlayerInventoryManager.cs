@@ -169,8 +169,12 @@ namespace GameCore.Gameplay.Entities.Inventory
         private void CreateItemPreviewServerSide(int slotIndex, int itemID) =>
             _rpcHandlerDecorator.CreateItemPreview(slotIndex, itemID);
 
-        private void DropItem(int slotIndex, bool randomPosition)
+        private void DropItem(ItemDropStaticData data)
         {
+            int slotIndex = data.SlotIndex;
+            bool randomPosition = data.RandomPosition;
+            bool destroy = data.Destroy;
+            
             IInteractableItem interactableItem = _interactableItems[slotIndex];
             Vector3 position;
             Quaternion rotation;
@@ -188,7 +192,7 @@ namespace GameCore.Gameplay.Entities.Inventory
                 rotation = itemPreviewTransform.rotation;
             }
 
-            interactableItem?.Drop(position, rotation, randomPosition);
+            interactableItem?.Drop(position, rotation, randomPosition, destroy);
 
             _interactableItems[slotIndex] = null;
 
@@ -199,6 +203,6 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         private void OnSelectedSlotChanged(int selectedSlotIndex) => ToggleItemsState();
 
-        private void OnItemDropped(int slotIndex, bool randomPosition) => DropItem(slotIndex, randomPosition);
+        private void OnItemDropped(ItemDropStaticData data) => DropItem(data);
     }
 }

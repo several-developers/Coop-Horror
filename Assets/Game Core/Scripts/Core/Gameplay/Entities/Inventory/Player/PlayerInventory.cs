@@ -18,7 +18,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         
         public event Action<int> OnSelectedSlotChangedEvent;
         public event Action<int, InventoryItemData> OnItemEquippedEvent;
-        public event Action<int, bool> OnItemDroppedEvent;
+        public event Action<ItemDropStaticData> OnItemDroppedEvent;
 
         private readonly Inventory<InventoryItemData> _inventory;
 
@@ -55,7 +55,7 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         public bool AddItem(InventoryItemData inventoryItemData, out int slotIndex)
         {
-            bool isItemInSelectedSlotExists = _inventory.IsItemInSelectedSlotExists();
+            bool isItemInSelectedSlotExists = _inventory.HasItemInSelectedSlot();
 
             //LogPickUpItem(itemData.ItemID);
             
@@ -73,11 +73,11 @@ namespace GameCore.Gameplay.Entities.Inventory
             return true;
         }
 
-        public void DropItem()
+        public void DropItem(bool destroy = false)
         {
-            bool isItemExists = _inventory.TryGetSelectedItemData(out InventoryItemData itemData);
+            bool hasItemInSelectedSlot = _inventory.HasItemInSelectedSlot();
 
-            if (!isItemExists)
+            if (!hasItemInSelectedSlot)
                 return;
 
             //LogItemDrop(itemData.ItemID);
@@ -85,7 +85,8 @@ namespace GameCore.Gameplay.Entities.Inventory
             int slotIndex = _inventory.DropSelectedItem();
             const bool randomPosition = false;
 
-            OnItemDroppedEvent?.Invoke(slotIndex, randomPosition);
+            ItemDropStaticData data = new(slotIndex, randomPosition, destroy);
+            OnItemDroppedEvent?.Invoke(data);
         }
         
         public void DropAllItems()
@@ -96,7 +97,9 @@ namespace GameCore.Gameplay.Entities.Inventory
             for (int i = 0; i < iterations; i++)
             {
                 _inventory.DropItem(i);
-                OnItemDroppedEvent?.Invoke(i, randomPosition);
+
+                ItemDropStaticData data = new(i, randomPosition, destroy: true);
+                OnItemDroppedEvent?.Invoke(data);
             }
         }
 
@@ -115,7 +118,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             _inventory.IsInventoryFull();
 
         public bool IsItemInSelectedSlotExists() =>
-            _inventory.IsItemInSelectedSlotExists();
+            _inventory.HasItemInSelectedSlot();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

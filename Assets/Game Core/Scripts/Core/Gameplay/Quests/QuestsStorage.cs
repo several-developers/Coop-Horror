@@ -21,9 +21,6 @@ namespace GameCore.Gameplay.Quests
 
         public void AddAwaitingQuestData(QuestRuntimeData questRuntimeData) =>
             _awaitingQuestsData.Add(questRuntimeData);
-        
-        public void AddActiveQuestData(QuestRuntimeData questRuntimeData) =>
-            _activeQuestsData.Add(questRuntimeData);
 
         public void UpdateAwaitingQuestsData(IEnumerable<QuestRuntimeDataContainer> questsRuntimeDataContainers)
         {
@@ -64,6 +61,25 @@ namespace GameCore.Gameplay.Quests
             _awaitingQuestsData.RemoveAt(questIndex);
             AddActiveQuestData(questRuntimeData);
         }
+
+        public void SubmitQuestItem(int itemID)
+        {
+            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
+            {
+                bool isCompleted = questRuntimeData.IsCompleted();
+
+                if (isCompleted)
+                    continue;
+                
+                bool containsItem = questRuntimeData.ContainsItem(itemID);
+
+                if (!containsItem)
+                    continue;
+
+                questRuntimeData.SubmitQuestItem(itemID);
+                break;
+            }
+        }
         
         public IReadOnlyList<QuestRuntimeData> GetAwaitingQuestsData() => _awaitingQuestsData;
         
@@ -89,6 +105,9 @@ namespace GameCore.Gameplay.Quests
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void AddActiveQuestData(QuestRuntimeData questRuntimeData) =>
+            _activeQuestsData.Add(questRuntimeData);
+        
         private void ClearData() =>
             _activeQuestsData.Clear();
     }

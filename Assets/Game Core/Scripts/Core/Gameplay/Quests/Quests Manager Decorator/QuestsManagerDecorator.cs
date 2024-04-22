@@ -8,8 +8,11 @@ namespace GameCore.Gameplay.Quests
         
         public event Action OnAwaitingQuestsDataReceivedEvent = delegate { };
         public event Action OnActiveQuestsDataReceivedEvent = delegate { };
-        public event Action<int> OnSelectQuestEvent = delegate {  };
-        public event Func<QuestsStorage> OnGetQuestsStorageEvent;
+        public event Action OnUpdateQuestsProgressEvent = delegate { };
+        
+        public event Action<int> OnSelectQuestInnerEvent = delegate { };
+        public event Action<int> OnSubmitQuestItemInnerEvent = delegate { };
+        public event Func<QuestsStorage> OnGetQuestsStorageInnerEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -19,10 +22,16 @@ namespace GameCore.Gameplay.Quests
         public void ActiveQuestsDataReceived() => 
             OnActiveQuestsDataReceivedEvent.Invoke();
 
+        public void UpdateQuestsProgress() =>
+            OnUpdateQuestsProgressEvent.Invoke();
+
         public void SelectQuest(int questID) =>
-            OnSelectQuestEvent.Invoke(questID);
+            OnSelectQuestInnerEvent.Invoke(questID);
+
+        public void SubmitQuestItem(int itemID) =>
+            OnSubmitQuestItemInnerEvent.Invoke(itemID);
 
         public QuestsStorage GetQuestsStorage() =>
-            OnGetQuestsStorageEvent?.Invoke();
+            OnGetQuestsStorageInnerEvent?.Invoke();
     }
 }

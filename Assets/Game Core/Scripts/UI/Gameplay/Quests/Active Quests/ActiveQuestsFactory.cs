@@ -35,6 +35,15 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
             CreationLogic();
         }
 
+        public void UpdateQuestsProgress()
+        {
+            foreach (ActiveQuestView activeQuestView in _activeQuestsList)
+            {
+                activeQuestView.UpdateQuestProgress();
+                activeQuestView.UpdateQuestItemsInfo();
+            }
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CreationLogic()

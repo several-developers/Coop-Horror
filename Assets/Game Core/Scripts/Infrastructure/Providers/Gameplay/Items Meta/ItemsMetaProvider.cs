@@ -26,7 +26,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.ItemsMeta
         public bool TryGetItemMeta(int itemID, out ItemMeta itemMeta) =>
             _itemsDictionary.TryGetValue(itemID, out itemMeta);
 
-        public bool IsItemExists(int itemID) =>
+        public bool IsItemMetaExists(int itemID) =>
             _itemsDictionary.ContainsKey(itemID);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -40,7 +40,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.ItemsMeta
             {
                 int itemID = itemMeta.ItemID;
 
-                if (IsItemExists(itemID))
+                if (IsItemExistsWithErrorCheck(itemID))
                     continue;
                 
                 _itemsDictionary.Add(itemID, itemMeta);
@@ -48,7 +48,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.ItemsMeta
             
             // LOCAL METHODS: -----------------------------
 
-            bool IsItemExists(int itemID)
+            bool IsItemExistsWithErrorCheck(int itemID)
             {
                 if (!_itemsDictionary.ContainsKey(itemID))
                     return false;

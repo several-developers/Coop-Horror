@@ -27,6 +27,16 @@ namespace GameCore.Infrastructure.Providers.Gameplay.Items
             Log.PrintError(log: $"Item with Unique ID <gb>({uniqueItemID})</gb> <rb>already exists</rb>!");
         }
 
+        public void RemoveItem(int uniqueItemID)
+        {
+            bool containsItem = _allItems.ContainsKey(uniqueItemID);
+            
+            if (!containsItem)
+                return;
+
+            _allItems.Remove(uniqueItemID);
+        }
+
         public bool TryGetItem(int uniqueItemID, out ItemObjectBase item) =>
             _allItems.TryGetValue(uniqueItemID, out item);
     }

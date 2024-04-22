@@ -117,7 +117,7 @@
             return itemsAmount >= Size;
         }
 
-        public bool IsItemInSelectedSlotExists() =>
+        public bool HasItemInSelectedSlot() =>
             _items[_selectedSlotIndex] != null;
 
         public bool IsItemExists(int slotIndex)

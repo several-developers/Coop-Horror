@@ -64,7 +64,7 @@ namespace GameCore.Gameplay.Quests
                 {
                     _lastQuestID++;
 
-                    IReadOnlyDictionary<int, int> questItemsID = CreateQuestItems(difficulty);
+                    IReadOnlyDictionary<int, QuestItemData> questItemsID = CreateQuestItems(difficulty);
                     QuestRuntimeData questRuntimeData = new(difficulty, questID: _lastQuestID, reward: 0, questItemsID);
 
                     _questsStorage.AddAwaitingQuestData(questRuntimeData);
@@ -72,9 +72,9 @@ namespace GameCore.Gameplay.Quests
             }
         }
 
-        private IReadOnlyDictionary<int, int> CreateQuestItems(QuestDifficulty difficulty)
+        private IReadOnlyDictionary<int, QuestItemData> CreateQuestItems(QuestDifficulty difficulty)
         {
-            Dictionary<int, int> questItems = new();
+            Dictionary<int, QuestItemData> questItems = new();
             QuestPresetConfig questPresetConfig = GetQuestPresetConfig(difficulty);
             int itemsListLength = questPresetConfig.GetRandomItemsListLength();
 
@@ -108,7 +108,8 @@ namespace GameCore.Gameplay.Quests
                     continue;
                 
                 int itemQuantity = questPresetConfig.GetRandomItemQuantity();
-                questItems.Add(itemID, itemQuantity);
+                QuestItemData questItemData = new(itemQuantity);
+                questItems.Add(itemID, questItemData);
             }
 
             return questItems;

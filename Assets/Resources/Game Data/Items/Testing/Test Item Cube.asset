@@ -22,5 +22,7 @@ MonoBehaviour:
   _itemPlayerPreviewPosition: {x: -0.069, y: -0.148, z: -0.039}
   _itemPlayerPreviewRotation: {x: 0, y: 0, z: 0}
   _itemPlayerPreviewScale: {x: 1.6, y: 1.6, z: 1.6}
+  _itemPrefab: {fileID: 6402857742088489240, guid: bb915ccb5b7e65c47a23dc6686b66190,
+    type: 3}
   _itemPreviewPrefab: {fileID: 8255347702447654125, guid: e8f4dd848ed42d34a95114e6f60f950e,
     type: 3}

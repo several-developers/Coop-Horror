@@ -39,9 +39,9 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private IQuestsManagerDecorator _questsManagerDecorator;
         private ActiveQuestsFactory _activeQuestsFactory;
         private LayoutFixHelper _layoutFixHelper;
-        private IQuestsManagerDecorator _questsManagerDecorator;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -51,10 +51,14 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
                 new LayoutFixHelper(coroutineRunner: this, _activeQuestsLayoutGroup, _activeQuestsSizeFitter);
 
             _questsManagerDecorator.OnActiveQuestsDataReceivedEvent += OnActiveQuestsDataReceived;
+            _questsManagerDecorator.OnUpdateQuestsProgressEvent += OnUpdateQuestsProgress;
         }
 
-        private void OnDestroy() =>
+        private void OnDestroy()
+        {
             _questsManagerDecorator.OnActiveQuestsDataReceivedEvent -= OnActiveQuestsDataReceived;
+            _questsManagerDecorator.OnUpdateQuestsProgressEvent -= OnUpdateQuestsProgress;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -71,5 +75,8 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
             CreateActiveQuests();
             Show();
         }
+
+        private void OnUpdateQuestsProgress() =>
+            _activeQuestsFactory.UpdateQuestsProgress();
     }
 }

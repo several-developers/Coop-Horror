@@ -45,6 +45,9 @@ namespace GameCore.Gameplay.Items
 
         [Title(Constants.References)]
         [SerializeField, Required]
+        private ItemObjectBase _itemPrefab;
+        
+        [SerializeField, Required]
         private ItemPreviewObject _itemPreviewPrefab;
         
         //[VerticalGroup(RowRight), SerializeField, Range(0.25f, 2f)]
@@ -61,6 +64,7 @@ namespace GameCore.Gameplay.Items
         public Vector3 ItemPlayerPreviewPosition => _itemPlayerPreviewPosition;
         public Vector3 ItemPlayerPreviewRotation => _itemPlayerPreviewRotation;
         public Vector3 ItemPlayerPreviewScale => _itemPlayerPreviewScale;
+        public ItemObjectBase ItemPrefab => _itemPrefab;
         public ItemPreviewObject ItemPreviewPrefab => _itemPreviewPrefab;
 
         // FIELDS: --------------------------------------------------------------------------------
