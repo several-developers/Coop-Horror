@@ -1,5 +1,7 @@
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
@@ -17,11 +19,13 @@ namespace GameCore.Infrastructure.StateMachine
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public GameplaySceneState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
-            IMobileHeadquartersEntity mobileHeadquartersEntity, DiContainer diContainer, IConfigsProvider configsProvider)
+            IMobileHeadquartersEntity mobileHeadquartersEntity, IConfigsProvider configsProvider,
+            IGameManagerDecorator gameManagerDecorator, DiContainer diContainer)
         {
             _gameStateMachine = gameStateMachine;
             _horrorStateMachine = horrorStateMachine;
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _gameManagerDecorator = gameManagerDecorator;
             _diContainer = diContainer;
             _inputReader = configsProvider.GetInputReader();
 
@@ -33,6 +37,7 @@ namespace GameCore.Infrastructure.StateMachine
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly DiContainer _diContainer;
         private readonly InputReader _inputReader;
 
@@ -59,7 +64,7 @@ namespace GameCore.Infrastructure.StateMachine
 
             _inputReader.OnPauseEvent += OnOpenPauseMenu;
             _inputReader.OnResumeEvent += OnResume;
-            
+
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent += OnOpenLocationsSelectionMenu;
 
@@ -75,13 +80,15 @@ namespace GameCore.Infrastructure.StateMachine
             _locationsSelectionMenuView.OnHideEvent += OnMenuHidden;
 
             _quitConfirmMenuView.OnConfirmClickedEvent += OnConfirmQuitClicked;
+
+            _gameManagerDecorator.OnLocationStateChangedEvent += OnLocationStateChanged;
         }
 
         public void Exit()
         {
             _inputReader.OnPauseEvent -= OnOpenPauseMenu;
             _inputReader.OnResumeEvent -= OnResume;
-            
+
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent -= OnOpenLocationsSelectionMenu;
 
@@ -92,11 +99,13 @@ namespace GameCore.Infrastructure.StateMachine
 
             _questsSelectionMenuView.OnShowEvent -= OnMenuShown;
             _questsSelectionMenuView.OnHideEvent -= OnMenuHidden;
-            
+
             _locationsSelectionMenuView.OnShowEvent -= OnMenuShown;
             _locationsSelectionMenuView.OnHideEvent -= OnMenuHidden;
 
             _quitConfirmMenuView.OnConfirmClickedEvent -= OnConfirmQuitClicked;
+            
+            _gameManagerDecorator.OnLocationStateChangedEvent -= OnLocationStateChanged;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -132,10 +141,10 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void CreateQuestsSelectionMenuView() =>
             _questsSelectionMenuView = MenuFactory.Create<QuestsSelectionMenuView>(_diContainer);
-        
+
         private void CreateLocationsSelectionMenuView() =>
             _locationsSelectionMenuView = MenuFactory.Create<LocationsSelectionMenuView>(_diContainer);
-        
+
         private void CreateActiveQuestsView() =>
             MenuFactory.Create<ActiveQuestsView>(_diContainer);
 
@@ -147,6 +156,12 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void EnterQuitGameplayState() =>
             _gameStateMachine.ChangeState<QuitGameplaySceneState>();
+
+        private bool IsInRoadLocationState()
+        {
+            LocationState locationState = _gameManagerDecorator.GetLocationState();
+            return locationState == LocationState.Road;
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -165,7 +180,7 @@ namespace GameCore.Infrastructure.StateMachine
                 _questsSelectionMenuView.Hide();
                 return;
             }
-            
+
             if (_locationsSelectionMenuView.IsShown)
             {
                 _locationsSelectionMenuView.Hide();
@@ -175,6 +190,9 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void OnOpenQuestsSelectionMenu()
         {
+            if (!IsInRoadLocationState())
+                return;
+            
             if (_questsSelectionMenuView.IsShown)
                 _questsSelectionMenuView.Hide();
             else
@@ -183,6 +201,9 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void OnOpenLocationsSelectionMenu()
         {
+            if (!IsInRoadLocationState())
+                return;
+            
             if (_locationsSelectionMenuView.IsShown)
                 _locationsSelectionMenuView.Hide();
             else
@@ -206,6 +227,15 @@ namespace GameCore.Infrastructure.StateMachine
         {
             _openedMenus--;
             CheckCursorState();
+        }
+
+        private void OnLocationStateChanged(LocationState locationState)
+        {
+            if (_questsSelectionMenuView.IsShown)
+                _questsSelectionMenuView.Hide();
+            
+            if (_locationsSelectionMenuView.IsShown)
+                _locationsSelectionMenuView.Hide();
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using GameCore.Enums.Global;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Observers.Gameplay.Level;
 using Unity.Netcode;
-using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.GameManagement
@@ -26,6 +26,8 @@ namespace GameCore.Gameplay.GameManagement
         private readonly NetworkVariable<SceneName> _selectedLocation =
             new(value: DefaultLocation, writePerm: OwnerPermission);
 
+        private readonly NetworkVariable<LocationState> _locationState = new();
+
         private IGameManagerDecorator _gameManagerDecorator;
         private ILevelObserver _levelObserver;
 
@@ -37,6 +39,7 @@ namespace GameCore.Gameplay.GameManagement
             
             _gameManagerDecorator.OnSelectLocationInnerEvent += SelectLocation;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent += GetSelectedLocation;
+            _gameManagerDecorator.OnGetLocationStateInnerEvent += GetLocationState;
         }
 
         public override void OnDestroy()
@@ -45,16 +48,15 @@ namespace GameCore.Gameplay.GameManagement
             
             _gameManagerDecorator.OnSelectLocationInnerEvent -= SelectLocation;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent -= GetSelectedLocation;
+            _gameManagerDecorator.OnGetLocationStateInnerEvent -= GetLocationState;
             
             base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void InitServerAndClient()
-        {
-            
-        }
+        public void InitServerAndClient() =>
+            _locationState.OnValueChanged += OnInLocationStateChanged;
 
         public void InitServer()
         {
@@ -71,10 +73,8 @@ namespace GameCore.Gameplay.GameManagement
                 return;
         }
 
-        public void DespawnServerAndClient()
-        {
-            
-        }
+        public void DespawnServerAndClient() =>
+            _locationState.OnValueChanged -= OnInLocationStateChanged;
 
         public void DespawnServer()
         {
@@ -98,6 +98,9 @@ namespace GameCore.Gameplay.GameManagement
 
         private SceneName GetSelectedLocation() =>
             _selectedLocation.Value;
+
+        private LocationState GetLocationState() =>
+            _locationState.Value;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -124,12 +127,15 @@ namespace GameCore.Gameplay.GameManagement
 
         private void OnLocationLoaded()
         {
-            Debug.LogWarning("Location loaded");
+            _locationState.Value = LocationState.Game;
         }
         
         private void OnLocationLeft()
         {
-            Debug.LogWarning("Left location");
+            _locationState.Value = LocationState.Road;
         }
+
+        private void OnInLocationStateChanged(LocationState previousValue, LocationState newValue) =>
+            _gameManagerDecorator.LocationStateChanged(locationState: newValue);
     }
 }

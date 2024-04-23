@@ -27,17 +27,6 @@ namespace GameCore.Gameplay.Network
         private IRpcHandlerDecorator _rpcHandlerDecorator;
         private IRpcObserver _rpcObserver;
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void LoadLocationLogic(int sceneNameIndex)
-        {
-            if (!IsOwner)
-                return;
-            
-            var sceneName = (SceneName)sceneNameIndex;
-            _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
-        }
-
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
@@ -52,7 +41,11 @@ namespace GameCore.Gameplay.Network
         private void DestroyItemPreviewServerRpc(int slotIndex) => DestroyItemPreviewClientRpc(slotIndex);
 
         [ServerRpc(RequireOwnership = false)]
-        private void LoadLocationServerRpc(int sceneNameIndex) => LoadLocationClientRpc(sceneNameIndex);
+        private void LoadLocationServerRpc(int sceneNameIndex)
+        {
+            var sceneName = (SceneName)sceneNameIndex;
+            _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
+        }
 
         [ServerRpc(RequireOwnership = false)]
         private void StartLeavingLocationServerRpc() => StartLeavingLocationClientRpc();
@@ -91,10 +84,7 @@ namespace GameCore.Gameplay.Network
         [ClientRpc]
         private void DestroyItemPreviewClientRpc(int slotIndex) =>
             _rpcObserver.DestroyItemPreview(slotIndex);
-
-        [ClientRpc]
-        private void LoadLocationClientRpc(int sceneNameIndex) => LoadLocationLogic(sceneNameIndex);
-
+        
         [ClientRpc]
         private void StartLeavingLocationClientRpc() =>
             _rpcObserver.StartLeavingLocation();

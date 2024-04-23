@@ -1,9 +1,9 @@
+using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
-using GameCore.Gameplay.Other;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
@@ -27,21 +27,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
         private readonly IGameManagerDecorator _gameManagerDecorator;
 
+        private bool _ignoreMainLeverEvents = true;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void InitServerAndClient()
         {
-            AnimationObserver animationObserver = _references.AnimationObserver;
-            animationObserver.OnDoorOpenedEvent += OnDoorOpened;
-            animationObserver.OnDoorClosedEvent += OnDoorClosed;
-
-            LoadLocationLever loadLocationLever = _references.LoadLocationLever;
+            MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent += OnInteractWithLoadLocationLever;
-            loadLocationLever.OnEnabledEvent += OnLoadLocation;
-
-            LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
-            leaveLocationLever.OnInteractEvent += OnInteractWithLeaveLocationLever;
-            leaveLocationLever.OnEnabledEvent += OnStartLeavingLocation;
+            loadLocationLever.OnEnabledEvent += OnMainLeverPulled;
         }
         
         public void InitServer()
@@ -54,17 +48,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         public void DespawnServerAndClient()
         {
-            AnimationObserver animationObserver = _references.AnimationObserver;
-            animationObserver.OnDoorOpenedEvent -= OnDoorOpened;
-            animationObserver.OnDoorClosedEvent -= OnDoorClosed;
-
-            LoadLocationLever loadLocationLever = _references.LoadLocationLever;
+            MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent -= OnInteractWithLoadLocationLever;
-            loadLocationLever.OnEnabledEvent -= OnLoadLocation;
-
-            LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
-            leaveLocationLever.OnInteractEvent -= OnInteractWithLeaveLocationLever;
-            leaveLocationLever.OnEnabledEvent -= OnStartLeavingLocation;
+            loadLocationLever.OnEnabledEvent -= OnMainLeverPulled;
         }
         
         public void DespawnServer()
@@ -82,32 +68,31 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             animator.SetBool(id: AnimatorHashes.IsOpen, isOpen);
         }
 
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnDoorOpened()
-        {
-        }
-
-        private void OnDoorClosed()
-        {
-        }
-
-        private void OnInteractWithLoadLocationLever() =>
-            _mobileHeadquartersEntity.LoadLocationServerRpc();
-
-        private void OnLoadLocation()
+        private void LoadLocation()
         {
             SceneName locationName = _gameManagerDecorator.GetSelectedLocation();
             _rpcHandlerDecorator.LoadLocation(locationName);
         }
 
-        private void OnInteractWithLeaveLocationLever()
-        {
-            LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
-            leaveLocationLever.InteractLogic();
-        }
-
-        private void OnStartLeavingLocation() =>
+        private void StartLeavingLocation() =>
             _rpcHandlerDecorator.StartLeavingLocation();
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnInteractWithLoadLocationLever() =>
+            _mobileHeadquartersEntity.LoadLocationServerRpc();
+
+        private void OnMainLeverPulled()
+        {
+            LocationState locationState = _gameManagerDecorator.GetLocationState();
+            bool isInRoadLocation = locationState == LocationState.Road;
+
+            if (isInRoadLocation)
+                LoadLocation();
+            else
+                StartLeavingLocation();
+        }
     }
 }

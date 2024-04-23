@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.Interactable
         public event Action OnInteractionStateChangedEvent;
         public event Action OnTriggerEvent = delegate { };
         
-        private bool _canInteract = true;
+        protected bool IsInteractionEnabled = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -37,20 +37,20 @@ namespace GameCore.Gameplay.Interactable
         
         public void Interact(PlayerEntity playerEntity = null)
         {
-            _canInteract = false;
+            IsInteractionEnabled = false;
             _animator.SetTrigger(id: AnimatorHashes.Trigger);
         }
 
         public void ToggleInteract(bool canInteract)
         {
-            _canInteract = canInteract;
+            IsInteractionEnabled = canInteract;
             SendInteractionStateChangedEvent();
         }
 
         public InteractionType GetInteractionType() =>
             InteractionType.SimpleButton;
 
-        public bool CanInteract() => _canInteract;
+        public virtual bool CanInteract() => IsInteractionEnabled;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
@@ -61,7 +61,7 @@ namespace GameCore.Gameplay.Interactable
 
         private void OnButtonTriggered()
         {
-            _canInteract = true;
+            IsInteractionEnabled = true;
             OnTriggerEvent.Invoke();
         }
     }

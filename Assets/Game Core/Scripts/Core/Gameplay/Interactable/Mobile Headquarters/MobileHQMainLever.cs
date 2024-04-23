@@ -2,11 +2,11 @@
 
 namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 {
-    public class LeaveLocationLever : LeverBase
+    public class MobileHQMainLever : LeverBase
     {
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override InteractionType GetInteractionType() =>
-            InteractionType.LeaveLocationMobileLever;
+            InteractionType.MobileHQMainLever;
     }
 }

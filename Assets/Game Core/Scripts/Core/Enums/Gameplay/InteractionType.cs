@@ -7,8 +7,8 @@
         Open = 2,
         Close = 3,
         ToggleMobileDoor = 4, // DEPRECATED
-        LoadLocationMobileLever = 5,
-        LeaveLocationMobileLever = 6,
+        MobileHQMainLever = 5,
+        LeaveLocationMobileLever = 6, // DEPRECATED
         ElevatorFloorButton = 7,
         ElevatorCallButton = 8,
         FireExitDoor = 9,

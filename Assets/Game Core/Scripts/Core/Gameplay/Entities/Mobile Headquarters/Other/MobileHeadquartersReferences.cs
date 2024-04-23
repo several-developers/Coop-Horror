@@ -19,10 +19,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private AnimationObserver _animationObserver;
         
         [SerializeField, Required]
-        private LoadLocationLever _loadLocationLever;
-
-        [SerializeField, Required]
-        private LeaveLocationLever _leaveLocationLever;
+        private MobileHQMainLever _mainLever;
 
         [SerializeField, Required]
         private SimpleButton _openQuestsSelectionMenuButton;
@@ -37,8 +34,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         public Animator Animator => _animator;
         public AnimationObserver AnimationObserver => _animationObserver;
-        public LoadLocationLever LoadLocationLever => _loadLocationLever;
-        public LeaveLocationLever LeaveLocationLever => _leaveLocationLever;
+        public MobileHQMainLever MainLever => _mainLever;
         public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
         public SimpleButton OpenLocationsSelectionMenuButton => _openLocationsSelectionMenuButton;
         public SimpleButton CallDeliveryDroneButton => _callDeliveryDroneButton;

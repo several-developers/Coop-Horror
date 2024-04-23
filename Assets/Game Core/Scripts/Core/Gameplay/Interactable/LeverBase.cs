@@ -1,7 +1,8 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Other;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -21,9 +22,6 @@ namespace GameCore.Gameplay.Interactable
         [Title(Constants.References)]
         [SerializeField, Required]
         private Animator _animator;
-
-        [SerializeField, Required]
-        private AnimationObserver _animationObserver;
         
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -32,6 +30,11 @@ namespace GameCore.Gameplay.Interactable
         public event Action OnEnabledEvent;
         public event Action OnDisabledEvent;
 
+        private const string LeverOnAnimation = "Lever On";
+        private const string LeverOffAnimation = "Lever Off";
+
+        private float _leverEnablingDuration;
+        private float _leverDisablingDuration;
         private bool _ignoreAnimationEvents;
         private bool _canInteract = true;
         private bool _isLeverPulled;
@@ -46,18 +49,10 @@ namespace GameCore.Gameplay.Interactable
             if (_isLeverPulledFromStart)
                 _ignoreAnimationEvents = true;
 
+            SetupAnimationsDuration();
             ChangeAnimationState();
-
-            _animationObserver.OnEnabledEvent += OnLeverEnabled;
-            _animationObserver.OnDisabledEvent += OnLeverDisabled;
         }
 
-        private void OnDestroy()
-        {
-            _animationObserver.OnEnabledEvent -= OnLeverEnabled;
-            _animationObserver.OnDisabledEvent -= OnLeverDisabled;
-        }
-        
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void Interact(PlayerEntity playerEntity = null)
@@ -74,6 +69,7 @@ namespace GameCore.Gameplay.Interactable
 
             SendInteractionStateChangedEvent();
             ChangeAnimationState();
+            ChangeState(_isLeverPulled);
         }
         
         public void InteractWithoutEvents(bool isLeverPulled)
@@ -99,6 +95,44 @@ namespace GameCore.Gameplay.Interactable
         private void ChangeAnimationState() =>
             _animator.SetBool(id: AnimatorHashes.IsOn, _isLeverPulled);
 
+        private void SetupAnimationsDuration()
+        {
+            AnimationClip[] animationClips = _animator.runtimeAnimatorController.animationClips;
+
+            foreach (AnimationClip animationClip in animationClips)
+            {
+                bool isOnAnimation = string.Equals(a: animationClip.name, b: LeverOnAnimation);
+                bool isOffAnimation = string.Equals(a: animationClip.name, b: LeverOffAnimation);
+
+                if (isOnAnimation)
+                    _leverEnablingDuration = animationClip.length;
+
+                if (isOffAnimation)
+                    _leverDisablingDuration = animationClip.length;
+            }
+        }
+
+        private async void ChangeState(bool isPulled)
+        {
+            float delaySeconds = isPulled ? _leverEnablingDuration : _leverDisablingDuration;
+            int delay = delaySeconds.ConvertToMilliseconds();
+
+            bool isCanceled = await UniTask
+                .Delay(delay, cancellationToken: this.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+            
+            if (IsIgnoringAnimationEvents())
+                return;
+            
+            if (isPulled)
+                SendEnabledEvent();
+            else
+                SendDisabledEvent();
+        }
+
         private void SendInteractionStateChangedEvent() =>
             OnInteractionStateChangedEvent?.Invoke();
 
@@ -115,24 +149,6 @@ namespace GameCore.Gameplay.Interactable
             
             _ignoreAnimationEvents = false;
             return true;
-        }
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        protected virtual void OnLeverEnabled()
-        {
-            if (IsIgnoringAnimationEvents())
-                return;
-            
-            SendEnabledEvent();
-        }
-
-        protected virtual void OnLeverDisabled()
-        {
-            if (IsIgnoringAnimationEvents())
-                return;
-            
-            SendDisabledEvent();
         }
     }
 }

@@ -209,9 +209,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             ChangePath(path);
 
-            LoadLocationLever loadLocationLever = _references.LoadLocationLever;
-            loadLocationLever.InteractWithoutEvents(isLeverPulled: false);
-            loadLocationLever.ToggleInteract(canInteract: true);
+            MobileHQMainLever mainLever = _references.MainLever;
+            mainLever.InteractWithoutEvents(isLeverPulled: false);
+            mainLever.ToggleInteract(canInteract: true);
         }
 
         private void ChangePath(CinemachinePath path) =>
@@ -220,8 +220,21 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
 
-        private void EnterState(State state) =>
+        private void EnterState(State state)
+        {
             _currentState = state;
+
+            switch (state)
+            {
+                case State.IdleOnLocation:
+                    _mobileHeadquartersController.ToggleDoorState(isOpen: true);
+
+                    MobileHQMainLever mainLever = _references.MainLever;
+                    mainLever.InteractWithoutEvents(isLeverPulled: false);
+                    mainLever.ToggleInteract(canInteract: true);
+                    break;
+            }
+        }
 
         // RPC: -----------------------------------------------------------------------------------
 
@@ -237,7 +250,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [ClientRpc]
         private void LoadLocationClientRpc()
         {
-            LoadLocationLever loadLocationLever = _references.LoadLocationLever;
+            MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.InteractLogic();
 
             _mobileHeadquartersController.ToggleDoorState(isOpen: false);
@@ -282,15 +295,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             switch (_currentState)
             {
                 case State.ArrivingAtLocation:
-
                     if (IsOwner)
                         DestinationReachedServerRpc();
-
-                    _mobileHeadquartersController.ToggleDoorState(isOpen: true);
-
-                    LeaveLocationLever leaveLocationLever = _references.LeaveLocationLever;
-                    leaveLocationLever.InteractWithoutEvents(isLeverPulled: false);
-                    leaveLocationLever.ToggleInteract(canInteract: true);
 
                     EnterState(State.IdleOnLocation);
                     break;
