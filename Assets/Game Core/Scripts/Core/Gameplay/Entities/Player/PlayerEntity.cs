@@ -61,12 +61,6 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField, Required]
         private ClientNetworkTransform _networkTransform;
 
-        [SerializeField, Required]
-        private Transform _playerItemPivot;
-
-        [SerializeField, Required]
-        private Transform _headLookObject;
-
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public PlayerReferences References => _references;
@@ -195,7 +189,9 @@ namespace GameCore.Gameplay.Entities.Player
             {
                 _playerCamera.Init(playerEntity: this);
                 _uiObserver.InitPlayer(playerEntity: this);
-                _references.PlayerModel.SetActive(false);
+
+                foreach (GameObject modelPart in _references.PlayerModelParts)
+                    modelPart.SetActive(false);
 
                 _localPlayer = this;
                 _lookAtObject = _playerCamera.CameraReferences.LookAtObject;
@@ -265,7 +261,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             if (Input.GetKeyDown(KeyCode.T))
                 GameUtilities.SwapCursorLockState();
-
+            
             _movementBehaviour.Tick();
             _interactionChecker.Check();
         }
@@ -275,7 +271,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (IsOwner)
                 return;
 
-            _headLookObject.position = _lookAtPosition.Value;
+            _references.HeadLookObject.position = _lookAtPosition.Value;
         }
 
         public void DespawnServerAndClient()
@@ -340,7 +336,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         public Transform GetCameraItemPivot() => _cameraItemPivot;
 
-        public Transform GetPlayerItemPivot() => _playerItemPivot;
+        public Transform GetPlayerItemPivot() =>
+            _references.PlayerItemPivot;
 
         public PlayerInventory GetInventory() => _inventory;
         

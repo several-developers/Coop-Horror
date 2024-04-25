@@ -17,6 +17,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             _transform = playerEntity.transform;
             _rigidbody = playerReferences.Rigidbody;
             _collider = playerReferences.Collider;
+            _animator = playerReferences.Animator;
             _groundMask = _movementConfig.GroundMask;
 
             _jumpComponent = new JumpComponent(playerEntity, movementBehaviour: this);
@@ -40,6 +41,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         private readonly Transform _transform;
         private readonly Rigidbody _rigidbody;
         private readonly CapsuleCollider _collider;
+        private readonly Animator _animator;
         private readonly LayerMask _groundMask;
 
         private Vector2 _moveInput;
@@ -200,6 +202,12 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
             Vector3 force = _moveDirection.normalized * (_moveSpeed * moveSpeedMultiplier * additionalMultiplier * fdt);
             _rigidbody.AddForce(force, ForceMode.Acceleration);
+
+            float forceMagnitude = _moveDirection.normalized.magnitude;
+            bool canMove = forceMagnitude > 0.05f;
+            
+            _animator.SetFloat(id: AnimatorHashes.MoveSpeedBlend, forceMagnitude);
+            _animator.SetBool(id: AnimatorHashes.CanMove, canMove);
         }
 
         private void AdditionalMovement()

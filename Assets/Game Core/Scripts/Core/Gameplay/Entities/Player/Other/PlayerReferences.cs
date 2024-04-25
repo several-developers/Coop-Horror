@@ -33,21 +33,21 @@ namespace GameCore.Gameplay.Entities.Player
 
         [SerializeField, Required]
         private CapsuleCollider _collider;
-        
-        [SerializeField, Required]
-        private GameObject _playerModel;
 
         [SerializeField, Required]
         private ClientNetworkTransform _networkTransform;
 
         [SerializeField, Required]
         private Transform _headPoint;
-        
+
         [SerializeField, Required]
         private Transform _playerItemPivot;
 
         [SerializeField, Required]
         private Transform _headLookObject;
+
+        [SerializeField, Required, Space(height: 5)]
+        private GameObject[] _playerModelParts;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -58,10 +58,10 @@ namespace GameCore.Gameplay.Entities.Player
         public NetworkObject NetworkObject => _networkObject;
         public Rigidbody Rigidbody => _rigidbody;
         public CapsuleCollider Collider => _collider;
-        public GameObject PlayerModel => _playerModel;
         public ClientNetworkTransform NetworkTransform => _networkTransform;
         public Transform HeadPoint => _headPoint;
         public Transform PlayerItemPivot => _playerItemPivot;
         public Transform HeadLookObject => _headLookObject;
+        public GameObject[] PlayerModelParts => _playerModelParts;
     }
 }
