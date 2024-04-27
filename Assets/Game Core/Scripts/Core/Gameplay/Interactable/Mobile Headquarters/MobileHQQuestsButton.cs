@@ -4,7 +4,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 {
-    public class MobileHQMainLever : LeverBase
+    public class MobileHQQuestsButton : SimpleButton
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -18,9 +18,6 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public override InteractionType GetInteractionType() =>
-            InteractionType.MobileHQMainLever;
-
         public override bool CanInteract()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
@@ -28,9 +25,8 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
             switch (gameState)
             {
-                case GameState.WaitingForPlayers:
                 case GameState.ReadyToLeaveTheRoad:
-                case GameState.ReadyToLeaveTheLocation:
+                case GameState.QuestsChecking:
                     isGameStateValid = true;
                     break;
             }

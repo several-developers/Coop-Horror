@@ -1,4 +1,6 @@
-﻿using GameCore.Gameplay.Network.Utilities;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.Network.Utilities;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Zenject;
@@ -10,21 +12,24 @@ namespace GameCore.Gameplay.GameTimeManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameTimeManagerDecorator gameTimeManagerDecorator, ITimeCycle timeCycle)
+        private void Construct(IGameTimeManagerDecorator gameTimeManagerDecorator,
+            IGameManagerDecorator gameManagerDecorator, ITimeCycle timeCycle)
         {
+            _gameManagerDecorator = gameManagerDecorator;
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
             _timeCycle = timeCycle;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly NetworkVariable<MyDateTime> _gameTimer = new();
 
         private IGameTimeManagerDecorator _gameTimeManagerDecorator;
+        private IGameManagerDecorator _gameManagerDecorator;
         private ITimeCycle _timeCycle;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
-        
+
         private void Update()
         {
             TickServerAndClient();
@@ -33,7 +38,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void InitServerAndClient()
         {
             // TO DO
@@ -45,7 +50,9 @@ namespace GameCore.Gameplay.GameTimeManagement
                 return;
 
             _gameTimeManagerDecorator.OnIncreaseDayEvent += OnIncreaseDay;
-            
+
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+
             _timeCycle.OnHourPassedEvent += OnHourPassed;
         }
 
@@ -53,7 +60,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         {
             if (IsOwner)
                 return;
-            
+
             _gameTimer.OnValueChanged += OnGameTimerUpdated;
         }
 
@@ -64,7 +71,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         {
             if (!IsOwner)
                 return;
-            
+
             // TO DO
         }
 
@@ -72,10 +79,10 @@ namespace GameCore.Gameplay.GameTimeManagement
         {
             if (IsOwner)
                 return;
-            
+
             // TO DO
         }
-        
+
         public void DespawnServerAndClient()
         {
             // TO DO
@@ -85,7 +92,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         {
             if (!IsOwner)
                 return;
-            
+
             _gameTimeManagerDecorator.OnIncreaseDayEvent -= OnIncreaseDay;
 
             _timeCycle.OnHourPassedEvent -= OnHourPassed;
@@ -95,12 +102,12 @@ namespace GameCore.Gameplay.GameTimeManagement
         {
             if (IsOwner)
                 return;
-            
+
             _gameTimer.OnValueChanged -= OnGameTimerUpdated;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
         private void UpdateGameTimer()
         {
             MyDateTime dateTime = _timeCycle.GetDateTime();
@@ -112,13 +119,28 @@ namespace GameCore.Gameplay.GameTimeManagement
             _timeCycle.IncreaseDay();
             UpdateGameTimer();
         }
-        
+
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.HeadingToTheLocation:
+                    _timeCycle.SetSunrise();
+                    break;
+                
+                case GameState.ArrivedAtTheRoad:
+                    _timeCycle.SetMidnight();
+                    _gameManagerDecorator.ChangeGameState(GameState.QuestsChecking);
+                    break;
+            }
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
+
             InitServerAndClient();
             InitServer();
             InitClient();
@@ -129,11 +151,13 @@ namespace GameCore.Gameplay.GameTimeManagement
             DespawnServerAndClient();
             DespawnServer();
             DespawnClient();
-            
+
             base.OnNetworkDespawn();
         }
 
         private void OnIncreaseDay() => IncreaseDay();
+
+        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
 
         private void OnHourPassed() => UpdateGameTimer();
 

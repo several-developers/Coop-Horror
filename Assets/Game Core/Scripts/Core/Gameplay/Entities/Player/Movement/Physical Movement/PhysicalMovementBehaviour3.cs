@@ -203,7 +203,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             Vector3 force = _moveDirection.normalized * (_moveSpeed * moveSpeedMultiplier * additionalMultiplier * fdt);
             _rigidbody.AddForce(force, ForceMode.Acceleration);
 
-            float forceMagnitude = _moveDirection.normalized.magnitude;
+            float forceMagnitude = Mathf.Min(_moveDirection.normalized.magnitude, 0.51f);
             bool canMove = forceMagnitude > 0.05f;
             
             _animator.SetFloat(id: AnimatorHashes.MoveSpeedBlend, forceMagnitude);

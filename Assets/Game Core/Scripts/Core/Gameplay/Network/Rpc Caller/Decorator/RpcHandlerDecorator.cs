@@ -1,6 +1,5 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
-using GameCore.Enums.Global;
 using GameCore.Gameplay.Dungeons;
 
 namespace GameCore.Gameplay.Network
@@ -11,8 +10,6 @@ namespace GameCore.Gameplay.Network
         
         public event Action<int, int> OnCreateItemPreviewInnerEvent = delegate { };
         public event Action<int> OnDestroyItemPreviewInnerEvent = delegate { };
-        public event Action<SceneName> OnLoadLocationInnerEvent = delegate { };
-        public event Action OnStartLeavingLocationInnerEvent = delegate { };
         public event Action OnLocationLeftInnerEvent = delegate { };
         public event Action<DungeonsSeedData> OnGenerateDungeonsInnerEvent = delegate { };
         public event Action<Floor> OnStartElevatorInnerEvent = delegate { };
@@ -27,12 +24,6 @@ namespace GameCore.Gameplay.Network
 
         public void DestroyItemPreview(int slotIndex) =>
             OnDestroyItemPreviewInnerEvent.Invoke(slotIndex);
-
-        public void LoadLocation(SceneName locationName) =>
-            OnLoadLocationInnerEvent.Invoke(locationName);
-
-        public void StartLeavingLocation() =>
-            OnStartLeavingLocationInnerEvent.Invoke();
 
         public void LocationLeft() =>
             OnLocationLeftInnerEvent.Invoke();

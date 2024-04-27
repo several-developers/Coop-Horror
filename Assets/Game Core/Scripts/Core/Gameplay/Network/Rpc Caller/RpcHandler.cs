@@ -1,7 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
-using GameCore.Enums.Global;
 using GameCore.Gameplay.Dungeons;
-using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Observers.Gameplay.Rpc;
 using Unity.Netcode;
 using Zenject;
@@ -13,17 +11,14 @@ namespace GameCore.Gameplay.Network
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IHorrorStateMachine horrorStateMachine, IRpcHandlerDecorator rpcHandlerDecorator,
-            IRpcObserver rpcObserver)
+        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, IRpcObserver rpcObserver)
         {
-            _horrorStateMachine = horrorStateMachine;
             _rpcHandlerDecorator = rpcHandlerDecorator;
             _rpcObserver = rpcObserver;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        private IHorrorStateMachine _horrorStateMachine;
         private IRpcHandlerDecorator _rpcHandlerDecorator;
         private IRpcObserver _rpcObserver;
 
@@ -40,16 +35,6 @@ namespace GameCore.Gameplay.Network
         [ServerRpc(RequireOwnership = false)]
         private void DestroyItemPreviewServerRpc(int slotIndex) => DestroyItemPreviewClientRpc(slotIndex);
 
-        [ServerRpc(RequireOwnership = false)]
-        private void LoadLocationServerRpc(int sceneNameIndex)
-        {
-            var sceneName = (SceneName)sceneNameIndex;
-            _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(sceneName);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void StartLeavingLocationServerRpc() => StartLeavingLocationClientRpc();
-        
         [ServerRpc(RequireOwnership = false)]
         private void LeftLocationServerRpc() => LeftLocationClientRpc();
 
@@ -86,10 +71,6 @@ namespace GameCore.Gameplay.Network
             _rpcObserver.DestroyItemPreview(slotIndex);
         
         [ClientRpc]
-        private void StartLeavingLocationClientRpc() =>
-            _rpcObserver.StartLeavingLocation();
-
-        [ClientRpc]
         private void LeftLocationClientRpc() =>
             _rpcObserver.LocationLeft();
 
@@ -121,8 +102,6 @@ namespace GameCore.Gameplay.Network
 
             _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent += OnCreateItemPreview;
             _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent += DestroyItemPreviewServerRpc;
-            _rpcHandlerDecorator.OnLoadLocationInnerEvent += OnLoadLocation;
-            _rpcHandlerDecorator.OnStartLeavingLocationInnerEvent += StartLeavingLocationServerRpc;
             _rpcHandlerDecorator.OnLocationLeftInnerEvent += LeftLocationServerRpc;
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent += GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
@@ -137,8 +116,6 @@ namespace GameCore.Gameplay.Network
             
             _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent -= OnCreateItemPreview;
             _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent -= DestroyItemPreviewServerRpc;
-            _rpcHandlerDecorator.OnLoadLocationInnerEvent -= OnLoadLocation;
-            _rpcHandlerDecorator.OnStartLeavingLocationInnerEvent -= StartLeavingLocationServerRpc;
             _rpcHandlerDecorator.OnLocationLeftInnerEvent -= LeftLocationServerRpc;
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent -= GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
@@ -148,12 +125,6 @@ namespace GameCore.Gameplay.Network
         }
         
         private void OnCreateItemPreview(int slotIndex, int itemID) => CreateItemPreviewServerRpc(slotIndex, itemID);
-
-        private void OnLoadLocation(SceneName sceneName)
-        {
-            int sceneNameIndex = (int)sceneName;
-            LoadLocationServerRpc(sceneNameIndex);
-        }
 
         private void OnTeleportToFireExit(Floor floor, bool isInStairsLocation) =>
             TeleportToFireExitServerRpc(floor, isInStairsLocation);

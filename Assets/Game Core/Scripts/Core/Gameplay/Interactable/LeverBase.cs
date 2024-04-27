@@ -30,20 +30,21 @@ namespace GameCore.Gameplay.Interactable
         public event Action OnEnabledEvent;
         public event Action OnDisabledEvent;
 
+        protected bool IsInteractionEnabled = true;
+        
         private const string LeverOnAnimation = "Lever On";
         private const string LeverOffAnimation = "Lever Off";
 
         private float _leverEnablingDuration;
         private float _leverDisablingDuration;
         private bool _ignoreAnimationEvents;
-        private bool _canInteract = true;
         private bool _isLeverPulled;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
-            _canInteract = _canInteractFromStart;
+            IsInteractionEnabled = _canInteractFromStart;
             _isLeverPulled = _isLeverPulledFromStart;
             
             if (_isLeverPulledFromStart)
@@ -57,14 +58,14 @@ namespace GameCore.Gameplay.Interactable
         
         public void Interact(PlayerEntity playerEntity = null)
         {
-            _canInteract = false;
+            IsInteractionEnabled = false;
             OnInteractEvent?.Invoke();
         }
 
         public void InteractLogic()
         {
             _ignoreAnimationEvents = false;
-            _canInteract = false;
+            IsInteractionEnabled = false;
             _isLeverPulled = !_isLeverPulled;
 
             SendInteractionStateChangedEvent();
@@ -82,13 +83,13 @@ namespace GameCore.Gameplay.Interactable
 
         public void ToggleInteract(bool canInteract)
         {
-            _canInteract = canInteract;
+            IsInteractionEnabled = canInteract;
             SendInteractionStateChangedEvent();
         }
 
         public abstract InteractionType GetInteractionType();
 
-        public bool CanInteract() => _canInteract;
+        public virtual bool CanInteract() => IsInteractionEnabled;
         
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

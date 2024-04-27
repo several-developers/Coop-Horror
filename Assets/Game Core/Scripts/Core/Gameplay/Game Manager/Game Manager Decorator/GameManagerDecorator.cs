@@ -9,27 +9,47 @@ namespace GameCore.Gameplay.GameManagement
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<SceneName> OnSelectedLocationChangedEvent = delegate { };
-        public event Action<LocationState> OnLocationStateChangedEvent = delegate { };
+        public event Action<GameState> OnGameStateChangedEvent = delegate { };
+        public event Action<int> OnPlayersGoldChangedEvent = delegate { };
 
+        public event Action<GameState> OnChangeGameStateInnerEvent = delegate { };
         public event Action<SceneName> OnSelectLocationInnerEvent = delegate { };
+        public event Action OnLoadSelectedLocationInnerEvent = delegate { };
+        public event Action<int> OnAddPlayersGoldInnerEvent = delegate { };
+        public event Action<int> OnSpendPlayersGoldInnerEvent = delegate { };
         public event Func<SceneName> OnGetSelectedLocationInnerEvent;
-        public event Func<LocationState> OnGetLocationStateInnerEvent;
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
+        public event Func<GameState> OnGetGameStateInnerEvent;
         
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
         public void SelectedLocationChanged(SceneName locationName) =>
             OnSelectedLocationChangedEvent.Invoke(locationName);
-        
-        public void LocationStateChanged(LocationState locationState) =>
-            OnLocationStateChangedEvent.Invoke(locationState);
+
+        public void GameStateChanged(GameState gameState) =>
+            OnGameStateChangedEvent.Invoke(gameState);
+
+        public void PlayersGoldChanged(int playersGold) =>
+            OnPlayersGoldChangedEvent.Invoke(playersGold);
+
+        public void ChangeGameState(GameState gameState) =>
+            OnChangeGameStateInnerEvent.Invoke(gameState);
 
         public void SelectLocation(SceneName locationName) =>
             OnSelectLocationInnerEvent.Invoke(locationName);
 
+        public void LoadSelectedLocation() =>
+            OnLoadSelectedLocationInnerEvent.Invoke();
+
+        public void AddPlayersGold(int amount) =>
+            OnAddPlayersGoldInnerEvent.Invoke(amount);
+
+        public void SpendPlayersGold(int amount) =>
+            OnSpendPlayersGoldInnerEvent.Invoke(amount);
+
         public SceneName GetSelectedLocation() =>
             OnGetSelectedLocationInnerEvent?.Invoke() ?? SceneName.Desert;
 
-        public LocationState GetLocationState() =>
-            OnGetLocationStateInnerEvent?.Invoke() ?? LocationState.Road;
+        public GameState GetGameState() =>
+            OnGetGameStateInnerEvent?.Invoke() ?? GameState.WaitingForPlayers;
     }
 }

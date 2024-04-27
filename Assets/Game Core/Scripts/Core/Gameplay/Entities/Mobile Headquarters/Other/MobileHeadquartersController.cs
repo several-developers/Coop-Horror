@@ -1,9 +1,8 @@
 using GameCore.Enums.Gameplay;
-using GameCore.Enums.Global;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
+using GameCore.Gameplay.Other;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
@@ -16,7 +15,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _references = mobileHeadquartersEntity.References;
-            _rpcHandlerDecorator = mobileHeadquartersEntity.RpcHandlerDecorator;
             _gameManagerDecorator = mobileHeadquartersEntity.GameManagerDecorator;
         }
 
@@ -24,20 +22,22 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private readonly MobileHeadquartersEntity _mobileHeadquartersEntity;
         private readonly MobileHeadquartersReferences _references;
-        private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
         private readonly IGameManagerDecorator _gameManagerDecorator;
 
-        private bool _ignoreMainLeverEvents = true;
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void InitServerAndClient()
         {
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent += OnInteractWithLoadLocationLever;
             loadLocationLever.OnEnabledEvent += OnMainLeverPulled;
+
+            AnimationObserver animationObserver = _references.AnimationObserver;
+            animationObserver.OnDoorOpenedEvent += OnDoorOpened;
         }
-        
+
         public void InitServer()
         {
         }
@@ -45,21 +45,25 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void InitClient()
         {
         }
-        
+
         public void DespawnServerAndClient()
         {
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
+            
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent -= OnInteractWithLoadLocationLever;
             loadLocationLever.OnEnabledEvent -= OnMainLeverPulled;
+            
+            AnimationObserver animationObserver = _references.AnimationObserver;
+            animationObserver.OnDoorOpenedEvent -= OnDoorOpened;
         }
-        
+
         public void DespawnServer()
         {
         }
 
         public void DespawnClient()
         {
-            
         }
 
         public void ToggleDoorState(bool isOpen)
@@ -70,29 +74,68 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void LoadLocation()
+        private void HandleGameState(GameState gameState)
         {
-            SceneName locationName = _gameManagerDecorator.GetSelectedLocation();
-            _rpcHandlerDecorator.LoadLocation(locationName);
+            MobileHQMainLever mainLever = _references.MainLever;
+            
+            switch (gameState)
+            {
+                case GameState.ReadyToLeaveTheRoad:
+                    mainLever.InteractWithoutEvents(isLeverPulled: false);
+                    mainLever.ToggleInteract(canInteract: true);
+                    break;
+                
+                case GameState.ArrivedAtTheLocation:
+                    ToggleDoorState(isOpen: true);
+                    break;
+            }
         }
 
-        private void StartLeavingLocation() =>
-            _rpcHandlerDecorator.StartLeavingLocation();
+        private void MainLeverLogic()
+        {
+            GameState gameState = _mobileHeadquartersEntity.GameState;
+     
+            switch (gameState)
+            {
+                case GameState.WaitingForPlayers:
+                    _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad);
+                    break;
+                
+                case GameState.ReadyToLeaveTheRoad:
+                    _gameManagerDecorator.LoadSelectedLocation();
+                    break;
+                
+                case GameState.ReadyToLeaveTheLocation:
+                    _mobileHeadquartersEntity.StartLeavingLocationServerRpc();
+                    _gameManagerDecorator.ChangeGameState(GameState.HeadingToTheRoad);
+                    break;
+            }
+        }
+
+        private void DoorOpenedLogic()
+        {
+            GameState gameState = _mobileHeadquartersEntity.GameState;
+
+            if (gameState != GameState.ArrivedAtTheLocation)
+                return;
+            
+            MobileHQMainLever mainLever = _references.MainLever;
+            mainLever.InteractWithoutEvents(isLeverPulled: false);
+            mainLever.ToggleInteract(canInteract: true);
+            
+            if (_mobileHeadquartersEntity.IsOwner)
+                _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheLocation);
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
 
         private void OnInteractWithLoadLocationLever() =>
             _mobileHeadquartersEntity.LoadLocationServerRpc();
 
-        private void OnMainLeverPulled()
-        {
-            LocationState locationState = _gameManagerDecorator.GetLocationState();
-            bool isInRoadLocation = locationState == LocationState.Road;
+        private void OnMainLeverPulled() => MainLeverLogic();
 
-            if (isInRoadLocation)
-                LoadLocation();
-            else
-                StartLeavingLocation();
-        }
+        private void OnDoorOpened() => DoorOpenedLogic();
     }
 }

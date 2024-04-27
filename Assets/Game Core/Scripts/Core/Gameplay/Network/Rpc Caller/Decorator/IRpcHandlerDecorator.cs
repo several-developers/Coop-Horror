@@ -1,6 +1,5 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
-using GameCore.Enums.Global;
 using GameCore.Gameplay.Dungeons;
 
 namespace GameCore.Gameplay.Network
@@ -9,8 +8,6 @@ namespace GameCore.Gameplay.Network
     {
         event Action<int, int> OnCreateItemPreviewInnerEvent;
         event Action<int> OnDestroyItemPreviewInnerEvent;
-        event Action<SceneName> OnLoadLocationInnerEvent;
-        event Action OnStartLeavingLocationInnerEvent; // Mobile HQ starts leaving the location.
         event Action OnLocationLeftInnerEvent; // Mobile HQ left the location.
         event Action<DungeonsSeedData> OnGenerateDungeonsInnerEvent;
         event Action<Floor> OnStartElevatorInnerEvent;
@@ -20,8 +17,6 @@ namespace GameCore.Gameplay.Network
 
         void CreateItemPreview(int slotIndex, int itemID);
         void DestroyItemPreview(int slotIndex);
-        void LoadLocation(SceneName locationName);
-        void StartLeavingLocation();
         void LocationLeft();
         void GenerateDungeons(DungeonsSeedData data);
         void StartElevator(Floor floor);

@@ -9,7 +9,6 @@ namespace GameCore.Observers.Gameplay.Rpc
     {
         event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent;
         event Action<int> OnDestroyItemPreviewEvent;
-        event Action OnStartLeavingLocationEvent;
         event Action OnLocationLeftEvent;
         event Action<DungeonsSeedData> OnGenerateDungeonsEvent;
         event Action<Floor> OnStartElevatorEvent;
@@ -19,7 +18,6 @@ namespace GameCore.Observers.Gameplay.Rpc
         
         void CreateItemPreview(CreateItemPreviewStaticData data);
         void DestroyItemPreview(int slotIndex);
-        void StartLeavingLocation();
         void LocationLeft();
         void GenerateDungeons(DungeonsSeedData data);
         void StartElevator(Floor floor);

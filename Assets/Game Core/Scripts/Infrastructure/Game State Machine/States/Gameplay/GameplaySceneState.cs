@@ -81,7 +81,7 @@ namespace GameCore.Infrastructure.StateMachine
 
             _quitConfirmMenuView.OnConfirmClickedEvent += OnConfirmQuitClicked;
 
-            _gameManagerDecorator.OnLocationStateChangedEvent += OnLocationStateChanged;
+            _gameManagerDecorator.OnGameStateChangedEvent += GameStateChanged;
         }
 
         public void Exit()
@@ -105,7 +105,7 @@ namespace GameCore.Infrastructure.StateMachine
 
             _quitConfirmMenuView.OnConfirmClickedEvent -= OnConfirmQuitClicked;
             
-            _gameManagerDecorator.OnLocationStateChangedEvent -= OnLocationStateChanged;
+            _gameManagerDecorator.OnGameStateChangedEvent -= GameStateChanged;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -157,12 +157,6 @@ namespace GameCore.Infrastructure.StateMachine
         private void EnterQuitGameplayState() =>
             _gameStateMachine.ChangeState<QuitGameplaySceneState>();
 
-        private bool IsInRoadLocationState()
-        {
-            LocationState locationState = _gameManagerDecorator.GetLocationState();
-            return locationState == LocationState.Road;
-        }
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnOpenPauseMenu()
@@ -190,7 +184,10 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void OnOpenQuestsSelectionMenu()
         {
-            if (!IsInRoadLocationState())
+            GameState gameState = _gameManagerDecorator.GetGameState();
+            bool canOpenMenu = gameState == GameState.ReadyToLeaveTheRoad;
+            
+            if (!canOpenMenu)
                 return;
             
             if (_questsSelectionMenuView.IsShown)
@@ -201,7 +198,10 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void OnOpenLocationsSelectionMenu()
         {
-            if (!IsInRoadLocationState())
+            GameState gameState = _gameManagerDecorator.GetGameState();
+            bool canOpenMenu = gameState == GameState.ReadyToLeaveTheRoad;
+            
+            if (!canOpenMenu)
                 return;
             
             if (_locationsSelectionMenuView.IsShown)
@@ -229,7 +229,7 @@ namespace GameCore.Infrastructure.StateMachine
             CheckCursorState();
         }
 
-        private void OnLocationStateChanged(LocationState locationState)
+        private void GameStateChanged(GameState gameState)
         {
             if (_questsSelectionMenuView.IsShown)
                 _questsSelectionMenuView.Hide();

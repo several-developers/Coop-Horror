@@ -2,9 +2,9 @@
 using GameCore.Gameplay.GameManagement;
 using Zenject;
 
-namespace GameCore.Gameplay.Interactable
+namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 {
-    public class RoadLocationSimpleButton : SimpleButton
+    public class MobileHQCallDeliveryDroneButton : SimpleButton
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -13,16 +13,25 @@ namespace GameCore.Gameplay.Interactable
             _gameManagerDecorator = gameManagerDecorator;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
-        private IGameManagerDecorator _gameManagerDecorator;
 
+        private IGameManagerDecorator _gameManagerDecorator;
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override bool CanInteract()
         {
-            LocationState locationState = _gameManagerDecorator.GetLocationState();
-            bool isLocationStateValid = locationState == LocationState.Road;
-            return isLocationStateValid && IsInteractionEnabled;
+            GameState gameState = _gameManagerDecorator.GetGameState();
+            bool isGameStateValid = false;
+
+            switch (gameState)
+            {
+                case GameState.ReadyToLeaveTheRoad:
+                case GameState.QuestsChecking:
+                    isGameStateValid = true;
+                    break;
+            }
+
+            return isGameStateValid && IsInteractionEnabled;
         }
     }
 }
