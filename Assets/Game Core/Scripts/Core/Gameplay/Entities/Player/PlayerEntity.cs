@@ -67,7 +67,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<Vector2> OnMovementVectorChangedEvent;
+        public event Action<Vector2> OnMovementVectorChangedEvent = delegate { };
 
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
 
@@ -331,6 +331,13 @@ namespace GameCore.Gameplay.Entities.Player
 
         public void DropItem(bool destroy = false) =>
             _inventory.DropItem(destroy);
+        
+        public void KillSelf()
+        {
+            _inventory.DropAllItems();
+            _playerCamera.gameObject.SetActive(false);
+            //OnDiedEvent.Invoke();
+        }
 
         public Transform GetTransform() => transform;
 
@@ -401,7 +408,7 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         private void OnMove(Vector2 movementVector) =>
-            OnMovementVectorChangedEvent?.Invoke(movementVector);
+            OnMovementVectorChangedEvent.Invoke(movementVector);
 
         private void OnScroll(float scrollValue)
         {

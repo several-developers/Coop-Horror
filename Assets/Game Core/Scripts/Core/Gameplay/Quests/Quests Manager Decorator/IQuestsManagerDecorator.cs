@@ -18,6 +18,7 @@ namespace GameCore.Gameplay.Quests
         event Func<int> OnGetActiveQuestsAmountInnerEvent;
         event Func<bool> OnContainsCompletedQuestsInnerEvent;
         event Func<bool> OnContainsExpiredQuestsInnerEvent;
+        event Func<bool> OnContainsExpiredAndUncompletedQuestsInnerEvent;
         void SelectQuest(int questID);
         void SubmitQuestItem(int itemID);
         void CompleteQuests();
@@ -25,5 +26,6 @@ namespace GameCore.Gameplay.Quests
         int GetActiveQuestsAmount();
         bool ContainsCompletedQuests();
         bool ContainsExpiredQuests();
+        bool ContainsExpiredAndUncompletedQuests();
     }
 }

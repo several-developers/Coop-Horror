@@ -1,4 +1,6 @@
-﻿using GameCore.Gameplay.GameManagement;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.GameManagement;
+using GameCore.UI.Global;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -6,7 +8,7 @@ using Zenject;
 
 namespace GameCore.UI.Gameplay.HUD.GoldCounter
 {
-    public class GoldCounterView : MonoBehaviour
+    public class GoldCounterView : UIElement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -26,15 +28,37 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
+        private void Awake()
+        {
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
             _gameManagerDecorator.OnPlayersGoldChangedEvent += OnPlayersGoldChanged;
+        }
 
-        private void OnDestroy() =>
+        private void OnDestroy()
+        {
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
             _gameManagerDecorator.OnPlayersGoldChangedEvent -= OnPlayersGoldChanged;
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.KillPlayersOnTheRoad:
+                    Hide();
+                    break;
+            }
+        }
+
+        private void UpdateGoldText(int playersGold) =>
+            _goldTMP.text = $"Gold: {playersGold}";
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnPlayersGoldChanged(int playersGold) =>
-            _goldTMP.text = $"Gold: {playersGold}";
+        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
+
+        private void OnPlayersGoldChanged(int playersGold) => UpdateGoldText(playersGold);
     }
 }

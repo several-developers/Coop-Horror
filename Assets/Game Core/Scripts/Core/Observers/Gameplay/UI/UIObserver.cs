@@ -7,18 +7,22 @@ namespace GameCore.Observers.Gameplay.UI
     {
         // FIELDS: --------------------------------------------------------------------------------
         
-        public event Action<bool> OnGameplayHUDChangedEvent;
-        public event Action<PlayerEntity> OnInitPlayerEvent;
+        public event Action<bool> OnGameplayHUDChangedEvent = delegate { };
+        public event Action<PlayerEntity> OnInitPlayerEvent = delegate { };
+        public event Action<int> OnShowRewardMenuEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void ShowGameplayHUD() =>
-            OnGameplayHUDChangedEvent?.Invoke(true);
+            OnGameplayHUDChangedEvent.Invoke(true);
 
         public void HideGameplayHUD() =>
-            OnGameplayHUDChangedEvent?.Invoke(false);
+            OnGameplayHUDChangedEvent.Invoke(false);
 
         public void InitPlayer(PlayerEntity playerEntity) =>
-            OnInitPlayerEvent?.Invoke(playerEntity);
+            OnInitPlayerEvent.Invoke(playerEntity);
+
+        public void ShowRewardMenu(int reward) =>
+            OnShowRewardMenuEvent.Invoke(reward);
     }
 }

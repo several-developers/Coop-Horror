@@ -66,12 +66,13 @@ namespace GameCore.Gameplay.Quests
 
                     QuestPresetConfig questPresetConfig = GetQuestPresetConfig(difficulty);
                     int daysLeft = questPresetConfig.GetRandomDeadline();
+                    int reward = Random.Range(10, 100);
                     
                     IReadOnlyDictionary<int, QuestItemData> questItemsID =
                         CreateQuestItems(questPresetConfig, difficulty);
 
                     QuestRuntimeData questRuntimeData =
-                        new(difficulty, questID: _lastQuestID, reward: 0, daysLeft, questItemsID);
+                        new(difficulty, questID: _lastQuestID, reward, daysLeft, questItemsID);
 
                     _questsStorage.AddAwaitingQuestData(questRuntimeData);
                 }

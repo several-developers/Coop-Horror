@@ -17,6 +17,7 @@ namespace GameCore.Gameplay.Quests
         public event Func<int> OnGetActiveQuestsAmountInnerEvent;
         public event Func<bool> OnContainsCompletedQuestsInnerEvent;
         public event Func<bool> OnContainsExpiredQuestsInnerEvent;
+        public event Func<bool> OnContainsExpiredAndUncompletedQuestsInnerEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -49,5 +50,8 @@ namespace GameCore.Gameplay.Quests
 
         public bool ContainsExpiredQuests() =>
             OnContainsExpiredQuestsInnerEvent?.Invoke() ?? false;
+
+        public bool ContainsExpiredAndUncompletedQuests() =>
+            OnContainsExpiredAndUncompletedQuestsInnerEvent?.Invoke() ?? false;
     }
 }

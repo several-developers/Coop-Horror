@@ -1,5 +1,6 @@
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.HorrorStateMachineSpace;
@@ -9,6 +10,7 @@ using GameCore.UI.Gameplay.LocationsSelectionMenu;
 using GameCore.UI.Gameplay.PauseMenu;
 using GameCore.UI.Gameplay.Quests;
 using GameCore.UI.Gameplay.Quests.ActiveQuests;
+using GameCore.UI.Gameplay.RewardMenu;
 using GameCore.Utilities;
 using Zenject;
 
@@ -57,6 +59,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreateActiveQuestsView(); // TEMP
             CreateQuestsSelectionMenuView(); // TEMP
             CreateLocationsSelectionMenuView(); // TEMP
+            CreateRewardMenu(); // TEMP
             CreatePauseMenu(); // TEMP
             CreateQuitConfirmMenuView(); // TEMP
 
@@ -133,11 +136,8 @@ namespace GameCore.Infrastructure.StateMachine
         private void EnableGameplayInput() =>
             _inputReader.EnableGameplayInput();
 
-        private void CreatePauseMenu() =>
-            _pauseMenuView = MenuFactory.Create<PauseMenuView>(_diContainer);
-
-        private void CreateQuitConfirmMenuView() =>
-            _quitConfirmMenuView = MenuFactory.Create<QuitConfirmMenuView>(_diContainer);
+        private void CreateActiveQuestsView() =>
+            MenuFactory.Create<ActiveQuestsView>(_diContainer);
 
         private void CreateQuestsSelectionMenuView() =>
             _questsSelectionMenuView = MenuFactory.Create<QuestsSelectionMenuView>(_diContainer);
@@ -145,14 +145,41 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateLocationsSelectionMenuView() =>
             _locationsSelectionMenuView = MenuFactory.Create<LocationsSelectionMenuView>(_diContainer);
 
-        private void CreateActiveQuestsView() =>
-            MenuFactory.Create<ActiveQuestsView>(_diContainer);
+        private void CreateRewardMenu() =>
+            MenuFactory.Create<RewardMenuView>(_diContainer);
+
+        private void CreatePauseMenu() =>
+            _pauseMenuView = MenuFactory.Create<PauseMenuView>(_diContainer);
+
+        private void CreateQuitConfirmMenuView() =>
+            _quitConfirmMenuView = MenuFactory.Create<QuitConfirmMenuView>(_diContainer);
 
         private void ShowQuitConfirmMenu() =>
             _quitConfirmMenuView.Show();
 
         private void InitHorrorStateMachine() =>
             _horrorStateMachine.ChangeState<PrepareGameState>();
+
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.QuestsRewarding:
+                    // Open reward menu
+                    break;
+                
+                case GameState.KillPlayersOnTheRoad:
+                    PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+                    localPlayer.KillSelf();
+                    break;
+            }
+            
+            if (_questsSelectionMenuView.IsShown)
+                _questsSelectionMenuView.Hide();
+            
+            if (_locationsSelectionMenuView.IsShown)
+                _locationsSelectionMenuView.Hide();
+        }
 
         private void EnterQuitGameplayState() =>
             _gameStateMachine.ChangeState<QuitGameplaySceneState>();
@@ -229,13 +256,6 @@ namespace GameCore.Infrastructure.StateMachine
             CheckCursorState();
         }
 
-        private void GameStateChanged(GameState gameState)
-        {
-            if (_questsSelectionMenuView.IsShown)
-                _questsSelectionMenuView.Hide();
-            
-            if (_locationsSelectionMenuView.IsShown)
-                _locationsSelectionMenuView.Hide();
-        }
+        private void GameStateChanged(GameState gameState) => HandleGameState(gameState);
     }
 }

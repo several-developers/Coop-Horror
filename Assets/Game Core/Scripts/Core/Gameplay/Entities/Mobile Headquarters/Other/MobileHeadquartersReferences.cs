@@ -17,6 +17,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [SerializeField, Required]
         private AnimationObserver _animationObserver;
+
+        [SerializeField, Required]
+        private GameObject _deathCamera;
         
         [SerializeField, Required]
         private MobileHQMainLever _mainLever;
@@ -37,6 +40,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         public Animator Animator => _animator;
         public AnimationObserver AnimationObserver => _animationObserver;
+        public GameObject DeathCamera => _deathCamera;
         public MobileHQMainLever MainLever => _mainLever;
         public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
         public SimpleButton OpenLocationsSelectionMenuButton => _openLocationsSelectionMenuButton;

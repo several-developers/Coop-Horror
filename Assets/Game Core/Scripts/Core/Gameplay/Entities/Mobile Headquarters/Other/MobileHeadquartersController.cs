@@ -1,5 +1,6 @@
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Other;
@@ -33,6 +34,18 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
+            SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
+            openQuestsSelectionMenuButton.OnTriggerEvent += OnOpenQuestsSelectionMenu;
+
+            SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
+            openLocationsSelectionMenuButton.OnTriggerEvent += OnOpenLocationsSelectionMenu;
+
+            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
+            callDeliveryDroneButton.OnTriggerEvent += OnCallDeliveryDrone;
+
+            SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
+            completeQuestsButton.OnTriggerEvent += OnCompleteQuests;
+
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent += OnInteractWithLoadLocationLever;
             loadLocationLever.OnEnabledEvent += OnMainLeverPulled;
@@ -52,6 +65,18 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void DespawnServerAndClient()
         {
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
+
+            SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
+            openQuestsSelectionMenuButton.OnTriggerEvent -= OnOpenQuestsSelectionMenu;
+
+            SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
+            openLocationsSelectionMenuButton.OnTriggerEvent -= OnOpenLocationsSelectionMenu;
+
+            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
+            callDeliveryDroneButton.OnTriggerEvent -= OnCallDeliveryDrone;
+
+            SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
+            completeQuestsButton.OnTriggerEvent -= OnCompleteQuests;
 
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent -= OnInteractWithLoadLocationLever;
@@ -83,6 +108,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             switch (gameState)
             {
+                // Под вопросом это
+                case GameState.ArrivedAtTheRoad:
+                    _mobileHeadquartersEntity.ToggleMovement(canMove: false);
+                    _mobileHeadquartersEntity.ArrivedAtRoadLocation();
+                    break;
+
                 case GameState.ReadyToLeaveTheRoad:
                     mainLever.InteractWithoutEvents(isLeverPulled: false);
                     mainLever.ToggleInteract(canInteract: true);
@@ -91,8 +122,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 case GameState.ArrivedAtTheLocation:
                     ToggleDoorState(isOpen: true);
                     break;
-                
+
                 case GameState.KillPlayersOnTheRoad:
+                    GameObject deathCamera = _references.DeathCamera;
+                    deathCamera.SetActive(true);
+
                     ToggleDoorState(isOpen: true);
                     break;
             }
@@ -115,7 +149,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                         _gameManagerDecorator.ChangeGameState(GameState.KillPlayersOnTheRoad);
                     else
                         _gameManagerDecorator.LoadSelectedLocation();
-                    
+
                     break;
 
                 case GameState.ReadyToLeaveTheLocation:
@@ -136,13 +170,27 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             mainLever.InteractWithoutEvents(isLeverPulled: false);
             mainLever.ToggleInteract(canInteract: true);
 
-            if (_mobileHeadquartersEntity.IsOwner)
-                _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheLocation);
+            _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheLocation, ownerOnly: true);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
+
+        private void OnOpenQuestsSelectionMenu() =>
+            _mobileHeadquartersEntity.SendOpenQuestsSelectionMenu();
+
+        private void OnOpenLocationsSelectionMenu() =>
+            _mobileHeadquartersEntity.SendOpenLocationsSelectionMenu();
+
+        private void OnCallDeliveryDrone() =>
+            _mobileHeadquartersEntity.SendCallDeliveryDrone();
+
+        private void OnCompleteQuests()
+        {
+            _questsManagerDecorator.CompleteQuests();
+            _gameManagerDecorator.ChangeGameState(GameState.QuestsRewarding);
+        }
 
         private void OnInteractWithLoadLocationLever() =>
             _mobileHeadquartersEntity.LoadLocationServerRpc();

@@ -1,4 +1,6 @@
-﻿using GameCore.Gameplay.Quests;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
@@ -14,9 +16,11 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IQuestsManagerDecorator questsManagerDecorator, IItemsMetaProvider itemsMetaProvider)
+        private void Construct(IQuestsManagerDecorator questsManagerDecorator,
+            IGameManagerDecorator gameManagerDecorator, IItemsMetaProvider itemsMetaProvider)
         {
             _questsManagerDecorator = questsManagerDecorator;
+            _gameManagerDecorator = gameManagerDecorator;
 
             _activeQuestsFactory = new ActiveQuestsFactory(questsManagerDecorator, itemsMetaProvider,
                 _activeQuestViewPrefab, _activeQuestsContainer);
@@ -40,6 +44,7 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         // FIELDS: --------------------------------------------------------------------------------
 
         private IQuestsManagerDecorator _questsManagerDecorator;
+        private IGameManagerDecorator _gameManagerDecorator;
         private ActiveQuestsFactory _activeQuestsFactory;
         private LayoutFixHelper _layoutFixHelper;
 
@@ -52,12 +57,16 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
 
             _questsManagerDecorator.OnActiveQuestsDataReceivedEvent += OnActiveQuestsDataReceived;
             _questsManagerDecorator.OnUpdateQuestsProgressEvent += OnUpdateQuestsProgress;
+
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
 
         private void OnDestroy()
         {
             _questsManagerDecorator.OnActiveQuestsDataReceivedEvent -= OnActiveQuestsDataReceived;
             _questsManagerDecorator.OnUpdateQuestsProgressEvent -= OnUpdateQuestsProgress;
+            
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -66,6 +75,16 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         {
             _activeQuestsFactory.Create();
             _layoutFixHelper.FixLayout();
+        }
+
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.KillPlayersOnTheRoad:
+                    Hide();
+                    break;
+            }
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
@@ -78,5 +97,7 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
 
         private void OnUpdateQuestsProgress() =>
             _activeQuestsFactory.UpdateQuestsProgress();
+
+        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
     }
 }

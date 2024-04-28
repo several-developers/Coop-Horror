@@ -12,7 +12,7 @@ namespace GameCore.Gameplay.GameManagement
         public event Action<SceneName> OnSelectedLocationChangedEvent = delegate { };
         public event Action<int> OnPlayersGoldChangedEvent = delegate { };
 
-        public event Action<GameState> OnChangeGameStateInnerEvent = delegate { };
+        public event Action<GameState, bool> OnChangeGameStateInnerEvent = delegate { };
         public event Action<SceneName> OnSelectLocationInnerEvent = delegate { };
         public event Action OnLoadSelectedLocationInnerEvent = delegate { };
         public event Action<int> OnAddPlayersGoldInnerEvent = delegate { };
@@ -31,8 +31,8 @@ namespace GameCore.Gameplay.GameManagement
         public void PlayersGoldChanged(int playersGold) =>
             OnPlayersGoldChangedEvent.Invoke(playersGold);
 
-        public void ChangeGameState(GameState gameState) =>
-            OnChangeGameStateInnerEvent.Invoke(gameState);
+        public void ChangeGameState(GameState gameState, bool ownerOnly = false) =>
+            OnChangeGameStateInnerEvent.Invoke(gameState, ownerOnly);
 
         public void SelectLocation(SceneName locationName) =>
             OnSelectLocationInnerEvent.Invoke(locationName);

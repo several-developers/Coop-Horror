@@ -124,7 +124,7 @@ namespace GameCore.Gameplay.GameTimeManagement
                 
                 case GameState.ArrivedAtTheRoad:
                     _timeCycle.SetMidnight();
-                    _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad);
+                    _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad, ownerOnly: true);
                     break;
             }
         }

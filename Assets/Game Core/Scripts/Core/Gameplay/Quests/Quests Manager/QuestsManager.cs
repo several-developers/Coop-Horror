@@ -5,7 +5,9 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Observers.Gameplay.UI;
 using Unity.Netcode;
+using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Quests
@@ -16,10 +18,12 @@ namespace GameCore.Gameplay.Quests
 
         [Inject]
         private void Construct(IQuestsManagerDecorator questsManagerDecorator,
-            IGameManagerDecorator gameManagerDecorator, IGameplayConfigsProvider gameplayConfigsProvider)
+            IGameManagerDecorator gameManagerDecorator, IUIObserver uiObserver,
+            IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _questsManagerDecorator = questsManagerDecorator;
             _gameManagerDecorator = gameManagerDecorator;
+            _uiObserver = uiObserver;
             _questsConfig = gameplayConfigsProvider.GetQuestsConfig();
 
             QuestsItemsConfigMeta questsItemsConfig = gameplayConfigsProvider.GetQuestsItemsConfig();
@@ -32,6 +36,7 @@ namespace GameCore.Gameplay.Quests
 
         private IQuestsManagerDecorator _questsManagerDecorator;
         private IGameManagerDecorator _gameManagerDecorator;
+        private IUIObserver _uiObserver;
         private QuestsConfigMeta _questsConfig;
         private QuestsFactory _questsFactory;
         private QuestsStorage _questsStorage;
@@ -47,6 +52,8 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent += GetActiveQuestsAmount;
             _questsManagerDecorator.OnContainsCompletedQuestsInnerEvent += ContainsCompletedQuests;
             _questsManagerDecorator.OnContainsExpiredQuestsInnerEvent += ContainsExpiredQuests;
+            _questsManagerDecorator.OnContainsExpiredAndUncompletedQuestsInnerEvent +=
+                ContainsExpiredAndUncompletedQuests;
 
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
@@ -60,6 +67,8 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent -= GetActiveQuestsAmount;
             _questsManagerDecorator.OnContainsCompletedQuestsInnerEvent -= ContainsCompletedQuests;
             _questsManagerDecorator.OnContainsExpiredQuestsInnerEvent -= ContainsExpiredQuests;
+            _questsManagerDecorator.OnContainsExpiredAndUncompletedQuestsInnerEvent -=
+                ContainsExpiredAndUncompletedQuests;
 
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
 
@@ -123,6 +132,18 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.ActiveQuestsDataReceived();
         }
 
+        private void CalculateReward()
+        {
+            int reward = _questsStorage.CalculateReward();
+            Debug.LogWarning("Reward: " + reward);
+
+            _uiObserver.ShowRewardMenu(reward);
+            _questsStorage.ClearCompletedQuests();
+
+            if (IsOwner)
+                _gameManagerDecorator.AddPlayersGold(reward);
+        }
+
         private void HandleGameState(GameState gameState)
         {
             switch (gameState)
@@ -130,6 +151,13 @@ namespace GameCore.Gameplay.Quests
                 case GameState.ArrivedAtTheRoad:
                     _questsStorage.DecreaseDays();
                     _questsManagerDecorator.UpdateQuestsProgress();
+                    break;
+                
+                case GameState.QuestsRewarding:
+                    CalculateReward();
+                    _questsFactory.Create();
+                    _questsManagerDecorator.AwaitingQuestsDataReceived();
+                    _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad, ownerOnly: true);
                     break;
             }
         }
@@ -148,10 +176,13 @@ namespace GameCore.Gameplay.Quests
 
         private bool ContainsCompletedQuests() =>
             _questsStorage.ContainsCompletedQuests();
-        
+
         private bool ContainsExpiredQuests() =>
             _questsStorage.ContainsExpiredQuests();
-        
+
+        private bool ContainsExpiredAndUncompletedQuests() =>
+            _questsStorage.ContainsExpiredAndUncompletedQuests();
+
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc]

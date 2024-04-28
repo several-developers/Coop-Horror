@@ -110,8 +110,11 @@ namespace GameCore.Gameplay.GameManagement
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void ChangeGameState(GameState gameState)
+        private void ChangeGameState(GameState gameState, bool ownerOnly = false)
         {
+            if (ownerOnly && !IsOwner)
+                return;
+            
             if (IsOwner)
                 _gameState.Value = gameState;
             else

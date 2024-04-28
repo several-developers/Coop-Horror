@@ -3,14 +3,12 @@ using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Quests;
 using GameCore.Observers.Gameplay.Level;
-using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -25,14 +23,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [Inject]
         private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, IGameManagerDecorator gameManagerDecorator,
             ILocationManagerDecorator locationManagerDecorator, IQuestsManagerDecorator questsManagerDecorator,
-            ILevelObserver levelObserver, IRpcObserver rpcObserver)
+            ILevelObserver levelObserver)
         {
             RpcHandlerDecorator = rpcHandlerDecorator;
             GameManagerDecorator = gameManagerDecorator;
             QuestsManagerDecorator = questsManagerDecorator;
             _locationManagerDecorator = locationManagerDecorator;
             _levelObserver = levelObserver;
-            _rpcObserver = rpcObserver;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -61,10 +58,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private ILocationManagerDecorator _locationManagerDecorator;
         private ILevelObserver _levelObserver;
-        private IRpcObserver _rpcObserver;
-        
+
         private MobileHeadquartersController _mobileHeadquartersController;
         private RigidbodyPathMovement _pathMovement;
+        private bool _isInitialized;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -72,55 +69,28 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _mobileHeadquartersConfig);
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
-
-            SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
-            openQuestsSelectionMenuButton.OnTriggerEvent += OnOpenQuestsSelectionMenu;
-
-            SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
-            openLocationsSelectionMenuButton.OnTriggerEvent += OnOpenLocationsSelectionMenu;
-
-            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
-            callDeliveryDroneButton.OnTriggerEvent += OnCallDeliveryDrone;
-            
-            SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
-            completeQuestsButton.OnTriggerEvent += OnCompleteQuests;
         }
 
         private void Update()
         {
+            if (!_isInitialized)
+                return;
+
             TickServerAndClient();
             TickServer();
             TickClient();
-        }
-
-        public override void OnDestroy()
-        {
-            SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
-            openQuestsSelectionMenuButton.OnTriggerEvent -= OnOpenQuestsSelectionMenu;
-
-            SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
-            openLocationsSelectionMenuButton.OnTriggerEvent -= OnOpenLocationsSelectionMenu;
-
-            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
-            callDeliveryDroneButton.OnTriggerEvent -= OnCallDeliveryDrone;
-            
-            SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
-            completeQuestsButton.OnTriggerEvent -= OnCompleteQuests;
-
-            base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void InitServerAndClient()
         {
-            _mobileHeadquartersController.InitServerAndClient();
+            _isInitialized = true;
 
+            _mobileHeadquartersController.InitServerAndClient();
             ArrivedAtRoadLocation();
 
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
-
-            _rpcObserver.OnLocationLeftEvent += OnLocationLeft;
         }
 
         public void InitServer()
@@ -129,7 +99,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 return;
 
             _mobileHeadquartersController.InitServer();
-            
+
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
         }
 
@@ -164,8 +134,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersController.DespawnServerAndClient();
 
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
-
-            _rpcObserver.OnLocationLeftEvent -= OnLocationLeft;
         }
 
         public void DespawnServer()
@@ -174,7 +142,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 return;
 
             _mobileHeadquartersController.DespawnServer();
-            
+
             _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
         }
 
@@ -187,6 +155,26 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         }
 
         public void OpenDoor() => OpenDoorServerRpc();
+        
+        public void ToggleMovement(bool canMove) =>
+            _pathMovement.ToggleMovement(canMove);
+        
+        public void ArrivedAtRoadLocation()
+        {
+            RoadLocationManager roadLocationManager = RoadLocationManager.Get();
+            CinemachinePath path = roadLocationManager.GetPath();
+
+            ChangePath(path);
+        }
+
+        public void SendOpenQuestsSelectionMenu() =>
+            OnOpenQuestsSelectionMenuEvent.Invoke();
+
+        public void SendOpenLocationsSelectionMenu() =>
+            OnOpenLocationsSelectionMenuEvent.Invoke();
+
+        public void SendCallDeliveryDrone() =>
+            OnCallDeliveryDroneEvent.Invoke();
 
         public Transform GetTransform() => transform;
 
@@ -200,23 +188,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void ArrivedAtRoadLocation()
-        {
-            RoadLocationManager roadLocationManager = RoadLocationManager.Get();
-            CinemachinePath path = roadLocationManager.GetPath();
-
-            ChangePath(path);
-
-            MobileHQMainLever mainLever = _references.MainLever;
-            mainLever.InteractWithoutEvents(isLeverPulled: false);
-            mainLever.ToggleInteract(canInteract: true);
-        }
-
         private void ChangePath(CinemachinePath path) =>
             _pathMovement.ChangePath(path);
-
-        private void ToggleMovement(bool canMove) =>
-            _pathMovement.ToggleMovement(canMove);
 
         private void ToggleDoorState(bool isOpen) =>
             _mobileHeadquartersController.ToggleDoorState(isOpen);
@@ -248,7 +221,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             ToggleMovement(canMove: true);
             ToggleDoorState(isOpen: false);
         }
-        
+
         [ServerRpc]
         private void OpenDoorServerRpc() => OpenDoorClientRpc();
 
@@ -282,7 +255,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 case GameState.HeadingToTheLocation:
                     GameManagerDecorator.ChangeGameState(GameState.ArrivedAtTheLocation);
                     break;
-                
+
                 case GameState.HeadingToTheRoad:
                     _levelObserver.LocationLeft();
                     RpcHandlerDecorator.LocationLeft();
@@ -297,27 +270,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
             ToggleMovement(canMove: true);
-        }
-
-        private void OnLocationLeft()
-        {
-            ToggleMovement(canMove: false);
-            ArrivedAtRoadLocation();
-        }
-
-        private void OnOpenQuestsSelectionMenu() =>
-            OnOpenQuestsSelectionMenuEvent.Invoke();
-
-        private void OnOpenLocationsSelectionMenu() =>
-            OnOpenLocationsSelectionMenuEvent.Invoke();
-
-        private void OnCallDeliveryDrone() =>
-            OnCallDeliveryDroneEvent.Invoke();
-
-        private void OnCompleteQuests()
-        {
-            QuestsManagerDecorator.CompleteQuests();
-            GameManagerDecorator.ChangeGameState(GameState.QuestsRewarding);
         }
     }
 }

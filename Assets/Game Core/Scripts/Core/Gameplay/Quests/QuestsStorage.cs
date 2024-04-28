@@ -105,7 +105,10 @@ namespace GameCore.Gameplay.Quests
                 _activeQuestsData.RemoveAt(i);
             }
         }
-        
+
+        public void ClearCompletedQuests() =>
+            _completedQuestsData.Clear();
+
         public IReadOnlyList<QuestRuntimeData> GetAwaitingQuestsData() => _awaitingQuestsData;
         
         public IReadOnlyList<QuestRuntimeData> GetActiveQuestsData() => _activeQuestsData;
@@ -127,6 +130,16 @@ namespace GameCore.Gameplay.Quests
 
         public int GetActiveQuestsAmount() =>
             _activeQuestsData.Count;
+        
+        public int CalculateReward()
+        {
+            int reward = 0;
+
+            foreach (QuestRuntimeData questRuntimeData in _completedQuestsData)
+                reward += questRuntimeData.Reward;
+            
+            return reward;
+        }
 
         public bool ContainsCompletedQuests()
         {
@@ -148,6 +161,20 @@ namespace GameCore.Gameplay.Quests
                 bool isExpired = questRuntimeData.IsExpired();
 
                 if (isExpired)
+                    return true;
+            }
+
+            return false;
+        }
+        
+        public bool ContainsExpiredAndUncompletedQuests()
+        {
+            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
+            {
+                bool isExpired = questRuntimeData.IsExpired();
+                bool isCompleted = questRuntimeData.IsCompleted();
+
+                if (isExpired && !isCompleted)
                     return true;
             }
 
