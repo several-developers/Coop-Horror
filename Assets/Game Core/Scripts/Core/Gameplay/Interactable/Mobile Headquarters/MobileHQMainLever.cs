@@ -1,5 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.Quests;
 using Zenject;
 
 namespace GameCore.Gameplay.Interactable.MobileHeadquarters
@@ -9,12 +10,17 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator) =>
+        private void Construct(IGameManagerDecorator gameManagerDecorator,
+            IQuestsManagerDecorator questsManagerDecorator)
+        {
             _gameManagerDecorator = gameManagerDecorator;
+            _questsManagerDecorator = questsManagerDecorator;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private IGameManagerDecorator _gameManagerDecorator;
+        private IQuestsManagerDecorator _questsManagerDecorator;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -23,6 +29,11 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
         public override bool CanInteract()
         {
+            int activeQuestsAmount = _questsManagerDecorator.GetActiveQuestsAmount();
+
+            if (activeQuestsAmount <= 0)
+                return false;
+
             GameState gameState = _gameManagerDecorator.GetGameState();
             bool isGameStateValid = false;
 

@@ -12,7 +12,11 @@ namespace GameCore.Gameplay.Quests
         
         public event Action<int> OnSelectQuestInnerEvent = delegate { };
         public event Action<int> OnSubmitQuestItemInnerEvent = delegate { };
+        public event Action OnCompleteQuestsInnerEvent = delegate { };
         public event Func<QuestsStorage> OnGetQuestsStorageInnerEvent;
+        public event Func<int> OnGetActiveQuestsAmountInnerEvent;
+        public event Func<bool> OnContainsCompletedQuestsInnerEvent;
+        public event Func<bool> OnContainsExpiredQuestsInnerEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -31,7 +35,19 @@ namespace GameCore.Gameplay.Quests
         public void SubmitQuestItem(int itemID) =>
             OnSubmitQuestItemInnerEvent.Invoke(itemID);
 
+        public void CompleteQuests() =>
+            OnCompleteQuestsInnerEvent.Invoke();
+
         public QuestsStorage GetQuestsStorage() =>
             OnGetQuestsStorageInnerEvent?.Invoke();
+
+        public int GetActiveQuestsAmount() =>
+            OnGetActiveQuestsAmountInnerEvent?.Invoke() ?? 0;
+
+        public bool ContainsCompletedQuests() =>
+            OnContainsCompletedQuestsInnerEvent?.Invoke() ?? false;
+
+        public bool ContainsExpiredQuests() =>
+            OnContainsExpiredQuestsInnerEvent?.Invoke() ?? false;
     }
 }

@@ -12,11 +12,9 @@ namespace GameCore.Gameplay.GameTimeManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameTimeManagerDecorator gameTimeManagerDecorator,
-            IGameManagerDecorator gameManagerDecorator, ITimeCycle timeCycle)
+        private void Construct(IGameManagerDecorator gameManagerDecorator, ITimeCycle timeCycle)
         {
             _gameManagerDecorator = gameManagerDecorator;
-            _gameTimeManagerDecorator = gameTimeManagerDecorator;
             _timeCycle = timeCycle;
         }
 
@@ -24,7 +22,6 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private readonly NetworkVariable<MyDateTime> _gameTimer = new();
 
-        private IGameTimeManagerDecorator _gameTimeManagerDecorator;
         private IGameManagerDecorator _gameManagerDecorator;
         private ITimeCycle _timeCycle;
 
@@ -49,8 +46,6 @@ namespace GameCore.Gameplay.GameTimeManagement
             if (!IsOwner)
                 return;
 
-            _gameTimeManagerDecorator.OnIncreaseDayEvent += OnIncreaseDay;
-
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
             _timeCycle.OnHourPassedEvent += OnHourPassed;
@@ -65,7 +60,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         }
 
         public void TickServerAndClient() =>
-            _timeCycle.Tick();
+            _timeCycle.Tick(); // Check for optimization
 
         public void TickServer()
         {
@@ -92,8 +87,6 @@ namespace GameCore.Gameplay.GameTimeManagement
         {
             if (!IsOwner)
                 return;
-
-            _gameTimeManagerDecorator.OnIncreaseDayEvent -= OnIncreaseDay;
 
             _timeCycle.OnHourPassedEvent -= OnHourPassed;
         }
@@ -126,11 +119,12 @@ namespace GameCore.Gameplay.GameTimeManagement
             {
                 case GameState.HeadingToTheLocation:
                     _timeCycle.SetSunrise();
+                    IncreaseDay();
                     break;
                 
                 case GameState.ArrivedAtTheRoad:
                     _timeCycle.SetMidnight();
-                    _gameManagerDecorator.ChangeGameState(GameState.QuestsChecking);
+                    _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad);
                     break;
             }
         }
@@ -154,8 +148,6 @@ namespace GameCore.Gameplay.GameTimeManagement
 
             base.OnNetworkDespawn();
         }
-
-        private void OnIncreaseDay() => IncreaseDay();
 
         private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
 

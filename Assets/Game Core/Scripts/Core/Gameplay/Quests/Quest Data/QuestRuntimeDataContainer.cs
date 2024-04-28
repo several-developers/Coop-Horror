@@ -13,6 +13,7 @@ namespace GameCore.Gameplay.Quests
             _difficulty = questRuntimeData.Difficulty;
             _questID = questRuntimeData.QuestID;
             _reward = questRuntimeData.Reward;
+            _daysLeft = questRuntimeData.DaysLeft;
 
             IReadOnlyDictionary<int, QuestItemData> questItems = questRuntimeData.GetQuestItems();
             int questItemsAmount = questRuntimeData.GetQuestItemsAmount();
@@ -37,6 +38,7 @@ namespace GameCore.Gameplay.Quests
         public QuestDifficulty Difficulty => _difficulty;
         public int QuestID => _questID;
         public int Reward => _reward;
+        public int DaysLeft => _daysLeft;
 
         // FIELDS: --------------------------------------------------------------------------------
         
@@ -45,6 +47,7 @@ namespace GameCore.Gameplay.Quests
         private QuestDifficulty _difficulty;
         private int _questID;
         private int _reward;
+        private int _daysLeft;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -55,6 +58,7 @@ namespace GameCore.Gameplay.Quests
             serializer.SerializeValue(ref _difficulty);
             serializer.SerializeValue(ref _questID);
             serializer.SerializeValue(ref _reward);
+            serializer.SerializeValue(ref _daysLeft);
         }
     }
 }

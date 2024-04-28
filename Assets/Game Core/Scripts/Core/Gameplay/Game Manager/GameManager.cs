@@ -40,22 +40,22 @@ namespace GameCore.Gameplay.GameManagement
 
         private void Awake()
         {
-            _gameManagerDecorator.OnChangeGameStateInnerEvent += ChangeGameStateServerRpc;
-            _gameManagerDecorator.OnSelectLocationInnerEvent += SelectLocationServerRpc;
+            _gameManagerDecorator.OnChangeGameStateInnerEvent += ChangeGameState;
+            _gameManagerDecorator.OnSelectLocationInnerEvent += SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent += LoadSelectedLocationServerRpc;
-            _gameManagerDecorator.OnAddPlayersGoldInnerEvent += AddPlayersGoldServerRpc;
-            _gameManagerDecorator.OnSpendPlayersGoldInnerEvent += SpendPlayersGoldServerRpc;
+            _gameManagerDecorator.OnAddPlayersGoldInnerEvent += AddPlayersGold;
+            _gameManagerDecorator.OnSpendPlayersGoldInnerEvent += SpendPlayersGold;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent += GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent += GetGameState;
         }
 
         public override void OnDestroy()
         {
-            _gameManagerDecorator.OnChangeGameStateInnerEvent -= ChangeGameStateServerRpc;
-            _gameManagerDecorator.OnSelectLocationInnerEvent -= SelectLocationServerRpc;
+            _gameManagerDecorator.OnChangeGameStateInnerEvent -= ChangeGameState;
+            _gameManagerDecorator.OnSelectLocationInnerEvent -= SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent -= LoadSelectedLocationServerRpc;
-            _gameManagerDecorator.OnAddPlayersGoldInnerEvent -= AddPlayersGoldServerRpc;
-            _gameManagerDecorator.OnSpendPlayersGoldInnerEvent -= SpendPlayersGoldServerRpc;
+            _gameManagerDecorator.OnAddPlayersGoldInnerEvent -= AddPlayersGold;
+            _gameManagerDecorator.OnSpendPlayersGoldInnerEvent -= SpendPlayersGold;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent -= GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent -= GetGameState;
 
@@ -109,6 +109,38 @@ namespace GameCore.Gameplay.GameManagement
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void ChangeGameState(GameState gameState)
+        {
+            if (IsOwner)
+                _gameState.Value = gameState;
+            else
+                ChangeGameStateServerRpc(gameState);
+        }
+
+        private void SelectLocation(SceneName sceneName)
+        {
+            if (IsOwner)
+                _selectedLocation.Value = sceneName;
+            else
+                SelectLocationServerRpc(sceneName);
+        }
+
+        private void AddPlayersGold(int amount)
+        {
+            if (IsOwner)
+                _playersGold.Value += amount;
+            else
+                AddPlayersGoldServerRpc(amount);
+        }
+        
+        private void SpendPlayersGold(int amount)
+        {
+            if (IsOwner)
+                _playersGold.Value -= amount;
+            else
+                SpendPlayersGoldServerRpc(amount);
+        }
 
         private SceneName GetSelectedLocation() =>
             _selectedLocation.Value;
@@ -175,17 +207,17 @@ namespace GameCore.Gameplay.GameManagement
         private void OnPlayersGoldChanged(int previousValue, int newValue) =>
             _gameManagerDecorator.PlayersGoldChanged(playersGold: newValue);
 
-        private void OnLocationLoaded() => ChangeGameStateServerRpc(GameState.HeadingToTheLocation);
+        private void OnLocationLoaded() => ChangeGameState(GameState.HeadingToTheLocation);
 
-        private void OnLocationLeft() => ChangeGameStateServerRpc(GameState.ArrivedAtTheRoad);
+        private void OnLocationLeft() => ChangeGameState(GameState.ArrivedAtTheRoad);
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
         [Title(Constants.DebugButtons)]
         [Button(buttonSize: 35, ButtonStyle.FoldoutButton), DisableInEditorMode]
-        private void DebugAddPlayersGold(int amount) => AddPlayersGoldServerRpc(amount);
+        private void DebugAddPlayersGold(int amount) => AddPlayersGold(amount);
 
         [Button(buttonSize: 35, ButtonStyle.FoldoutButton), DisableInEditorMode]
-        private void DebugSpendPlayersGold(int amount) => SpendPlayersGoldServerRpc(amount);
+        private void DebugSpendPlayersGold(int amount) => SpendPlayersGold(amount);
     }
 }

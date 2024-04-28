@@ -3,6 +3,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Other;
+using GameCore.Gameplay.Quests;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
@@ -16,6 +17,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _references = mobileHeadquartersEntity.References;
             _gameManagerDecorator = mobileHeadquartersEntity.GameManagerDecorator;
+            _questsManagerDecorator = mobileHeadquartersEntity.QuestsManagerDecorator;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -23,6 +25,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private readonly MobileHeadquartersEntity _mobileHeadquartersEntity;
         private readonly MobileHeadquartersReferences _references;
         private readonly IGameManagerDecorator _gameManagerDecorator;
+        private readonly IQuestsManagerDecorator _questsManagerDecorator;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -49,11 +52,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void DespawnServerAndClient()
         {
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
-            
+
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent -= OnInteractWithLoadLocationLever;
             loadLocationLever.OnEnabledEvent -= OnMainLeverPulled;
-            
+
             AnimationObserver animationObserver = _references.AnimationObserver;
             animationObserver.OnDoorOpenedEvent -= OnDoorOpened;
         }
@@ -77,15 +80,19 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void HandleGameState(GameState gameState)
         {
             MobileHQMainLever mainLever = _references.MainLever;
-            
+
             switch (gameState)
             {
                 case GameState.ReadyToLeaveTheRoad:
                     mainLever.InteractWithoutEvents(isLeverPulled: false);
                     mainLever.ToggleInteract(canInteract: true);
                     break;
-                
+
                 case GameState.ArrivedAtTheLocation:
+                    ToggleDoorState(isOpen: true);
+                    break;
+                
+                case GameState.KillPlayersOnTheRoad:
                     ToggleDoorState(isOpen: true);
                     break;
             }
@@ -94,17 +101,23 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void MainLeverLogic()
         {
             GameState gameState = _mobileHeadquartersEntity.GameState;
-     
+
             switch (gameState)
             {
                 case GameState.WaitingForPlayers:
                     _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad);
                     break;
-                
+
                 case GameState.ReadyToLeaveTheRoad:
-                    _gameManagerDecorator.LoadSelectedLocation();
+                    bool containsExpiredQuests = _questsManagerDecorator.ContainsExpiredQuests();
+
+                    if (containsExpiredQuests)
+                        _gameManagerDecorator.ChangeGameState(GameState.KillPlayersOnTheRoad);
+                    else
+                        _gameManagerDecorator.LoadSelectedLocation();
+                    
                     break;
-                
+
                 case GameState.ReadyToLeaveTheLocation:
                     _mobileHeadquartersEntity.StartLeavingLocationServerRpc();
                     _gameManagerDecorator.ChangeGameState(GameState.HeadingToTheRoad);
@@ -118,11 +131,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             if (gameState != GameState.ArrivedAtTheLocation)
                 return;
-            
+
             MobileHQMainLever mainLever = _references.MainLever;
             mainLever.InteractWithoutEvents(isLeverPulled: false);
             mainLever.ToggleInteract(canInteract: true);
-            
+
             if (_mobileHeadquartersEntity.IsOwner)
                 _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheLocation);
         }

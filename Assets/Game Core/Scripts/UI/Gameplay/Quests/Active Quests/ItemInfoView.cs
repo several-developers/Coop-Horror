@@ -17,23 +17,23 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         private TextMeshProUGUI _titleTMP;
 
         // PROPERTIES: ----------------------------------------------------------------------------
-        
+
         public int ItemID { get; private set; }
 
         private string _itemName;
-        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Setup(Sprite itemIcon, string itemName, int itemQuantity, int itemID)
+        public void Setup(Sprite itemIcon, string itemName, int targetItemQuantity, int currentItemQuantity, int itemID)
         {
             _itemName = itemName;
             ItemID = itemID;
             _itemIcon.sprite = itemIcon;
-            
-            UpdateTitle(itemQuantity);
+
+            UpdateTitle(targetItemQuantity, currentItemQuantity);
         }
 
-        public void UpdateTitle(int itemQuantity) =>
-            _titleTMP.text = $"{_itemName} - x{itemQuantity}";
+        public void UpdateTitle(int targetItemQuantity, int currentItemQuantity) =>
+            _titleTMP.text = $"{_itemName} - {currentItemQuantity}/{targetItemQuantity}";
     }
 }

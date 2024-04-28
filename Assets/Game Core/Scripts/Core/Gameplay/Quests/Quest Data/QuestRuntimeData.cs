@@ -8,12 +8,13 @@ namespace GameCore.Gameplay.Quests
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public QuestRuntimeData(QuestDifficulty difficulty, int questID, int reward,
+        public QuestRuntimeData(QuestDifficulty difficulty, int questID, int reward, int daysLeft,
             IReadOnlyDictionary<int, QuestItemData> questItems)
         {
             Difficulty = difficulty;
             QuestID = questID;
             Reward = reward;
+            DaysLeft = daysLeft;
             _questItems = new Dictionary<int, QuestItemData>(capacity: questItems.Count);
 
             foreach (KeyValuePair<int, QuestItemData> pair in questItems)
@@ -25,6 +26,7 @@ namespace GameCore.Gameplay.Quests
             Difficulty = questRuntimeDataContainer.Difficulty;
             QuestID = questRuntimeDataContainer.QuestID;
             Reward = questRuntimeDataContainer.Reward;
+            DaysLeft = questRuntimeDataContainer.DaysLeft;
 
             int[] questItemsID = questRuntimeDataContainer.QuestItemsID;
             QuestItemData[] questItemsData = questRuntimeDataContainer.QuestItemsData;
@@ -52,6 +54,7 @@ namespace GameCore.Gameplay.Quests
         public QuestDifficulty Difficulty { get; }
         public int QuestID { get; }
         public int Reward { get; }
+        public int DaysLeft { get; private set; }
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -73,6 +76,14 @@ namespace GameCore.Gameplay.Quests
             questItemData.IncreaseItemQuantity();
 
             _questItems[itemID] = questItemData;
+        }
+
+        public void DecreaseDay()
+        {
+            if (DaysLeft <= 0)
+                return;
+
+            DaysLeft--;
         }
         
         public IReadOnlyDictionary<int, QuestItemData> GetQuestItems() => _questItems;
@@ -107,6 +118,9 @@ namespace GameCore.Gameplay.Quests
 
         public bool ContainsItem(int itemID) =>
             _questItems.ContainsKey(itemID);
+
+        public bool IsExpired() =>
+            DaysLeft <= 0;
 
         public bool IsCompleted()
         {

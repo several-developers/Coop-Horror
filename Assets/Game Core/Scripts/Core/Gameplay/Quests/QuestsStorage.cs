@@ -10,12 +10,14 @@ namespace GameCore.Gameplay.Quests
         {
             _awaitingQuestsData = new List<QuestRuntimeData>(capacity: 6);
             _activeQuestsData = new List<QuestRuntimeData>(capacity: 6);
+            _completedQuestsData = new List<QuestRuntimeData>(capacity: 6);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly List<QuestRuntimeData> _awaitingQuestsData;
         private readonly List<QuestRuntimeData> _activeQuestsData;
+        private readonly List<QuestRuntimeData> _completedQuestsData;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -80,6 +82,29 @@ namespace GameCore.Gameplay.Quests
                 break;
             }
         }
+
+        public void DecreaseDays()
+        {
+            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
+                questRuntimeData.DecreaseDay();
+        }
+
+        public void CompleteQuests()
+        {
+            int iterations = _activeQuestsData.Count;
+
+            for (int i = iterations - 1; i >= 0; i--)
+            {
+                QuestRuntimeData questRuntimeData = _activeQuestsData[i];
+                bool isCompleted = questRuntimeData.IsCompleted();
+
+                if (!isCompleted)
+                    continue;
+                
+                _completedQuestsData.Add(questRuntimeData);
+                _activeQuestsData.RemoveAt(i);
+            }
+        }
         
         public IReadOnlyList<QuestRuntimeData> GetAwaitingQuestsData() => _awaitingQuestsData;
         
@@ -102,6 +127,32 @@ namespace GameCore.Gameplay.Quests
 
         public int GetActiveQuestsAmount() =>
             _activeQuestsData.Count;
+
+        public bool ContainsCompletedQuests()
+        {
+            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
+            {
+                bool isCompleted = questRuntimeData.IsCompleted();
+
+                if (isCompleted)
+                    return true;
+            }
+
+            return false;
+        }
+        
+        public bool ContainsExpiredQuests()
+        {
+            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
+            {
+                bool isExpired = questRuntimeData.IsExpired();
+
+                if (isExpired)
+                    return true;
+            }
+
+            return false;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

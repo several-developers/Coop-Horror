@@ -8,6 +8,7 @@ using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
+using GameCore.Gameplay.Quests;
 using GameCore.Observers.Gameplay.Level;
 using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
@@ -23,10 +24,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [Inject]
         private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, IGameManagerDecorator gameManagerDecorator,
-            ILocationManagerDecorator locationManagerDecorator, ILevelObserver levelObserver, IRpcObserver rpcObserver)
+            ILocationManagerDecorator locationManagerDecorator, IQuestsManagerDecorator questsManagerDecorator,
+            ILevelObserver levelObserver, IRpcObserver rpcObserver)
         {
             RpcHandlerDecorator = rpcHandlerDecorator;
             GameManagerDecorator = gameManagerDecorator;
+            QuestsManagerDecorator = questsManagerDecorator;
             _locationManagerDecorator = locationManagerDecorator;
             _levelObserver = levelObserver;
             _rpcObserver = rpcObserver;
@@ -47,6 +50,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public MobileHeadquartersReferences References => _references;
         public IRpcHandlerDecorator RpcHandlerDecorator { get; private set; }
         public IGameManagerDecorator GameManagerDecorator { get; private set; }
+        public IQuestsManagerDecorator QuestsManagerDecorator { get; private set; }
         public GameState GameState => GameManagerDecorator.GetGameState();
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -77,6 +81,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
             callDeliveryDroneButton.OnTriggerEvent += OnCallDeliveryDrone;
+            
+            SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
+            completeQuestsButton.OnTriggerEvent += OnCompleteQuests;
         }
 
         private void Update()
@@ -96,6 +103,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
             callDeliveryDroneButton.OnTriggerEvent -= OnCallDeliveryDrone;
+            
+            SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
+            completeQuestsButton.OnTriggerEvent -= OnCompleteQuests;
 
             base.OnDestroy();
         }
@@ -208,6 +218,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
 
+        private void ToggleDoorState(bool isOpen) =>
+            _mobileHeadquartersController.ToggleDoorState(isOpen);
+
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
@@ -222,7 +235,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.InteractLogic();
 
-            _mobileHeadquartersController.ToggleDoorState(isOpen: false);
+            ToggleDoorState(isOpen: false);
         }
 
         [ClientRpc]
@@ -233,15 +246,14 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
             ToggleMovement(canMove: true);
-            _mobileHeadquartersController.ToggleDoorState(isOpen: false);
+            ToggleDoorState(isOpen: false);
         }
         
         [ServerRpc]
         private void OpenDoorServerRpc() => OpenDoorClientRpc();
 
         [ClientRpc]
-        private void OpenDoorClientRpc() =>
-            _mobileHeadquartersController.ToggleDoorState(isOpen: true);
+        private void OpenDoorClientRpc() => ToggleDoorState(isOpen: true);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -301,5 +313,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void OnCallDeliveryDrone() =>
             OnCallDeliveryDroneEvent.Invoke();
+
+        private void OnCompleteQuests()
+        {
+            QuestsManagerDecorator.CompleteQuests();
+            GameManagerDecorator.ChangeGameState(GameState.QuestsRewarding);
+        }
     }
 }

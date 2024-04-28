@@ -26,7 +26,6 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
             switch (gameState)
             {
                 case GameState.ReadyToLeaveTheRoad:
-                case GameState.QuestsChecking:
                     isGameStateValid = true;
                     break;
             }

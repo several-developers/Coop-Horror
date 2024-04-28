@@ -64,24 +64,30 @@ namespace GameCore.Gameplay.Quests
                 {
                     _lastQuestID++;
 
-                    IReadOnlyDictionary<int, QuestItemData> questItemsID = CreateQuestItems(difficulty);
-                    QuestRuntimeData questRuntimeData = new(difficulty, questID: _lastQuestID, reward: 0, questItemsID);
+                    QuestPresetConfig questPresetConfig = GetQuestPresetConfig(difficulty);
+                    int daysLeft = questPresetConfig.GetRandomDeadline();
+                    
+                    IReadOnlyDictionary<int, QuestItemData> questItemsID =
+                        CreateQuestItems(questPresetConfig, difficulty);
+
+                    QuestRuntimeData questRuntimeData =
+                        new(difficulty, questID: _lastQuestID, reward: 0, daysLeft, questItemsID);
 
                     _questsStorage.AddAwaitingQuestData(questRuntimeData);
                 }
             }
         }
 
-        private IReadOnlyDictionary<int, QuestItemData> CreateQuestItems(QuestDifficulty difficulty)
+        private IReadOnlyDictionary<int, QuestItemData> CreateQuestItems(QuestPresetConfig questPresetConfig,
+            QuestDifficulty difficulty)
         {
             Dictionary<int, QuestItemData> questItems = new();
-            QuestPresetConfig questPresetConfig = GetQuestPresetConfig(difficulty);
             int itemsListLength = questPresetConfig.GetRandomItemsListLength();
 
             ItemsReference itemsReference = _questsItemsConfig.GetItemsReference(difficulty);
             IReadOnlyList<ItemMeta> allItemsMeta = itemsReference.GetAllItemsMeta();
             int allItemsAmount = allItemsMeta.Count;
-            
+
             const int itemSearchAttempts = 10;
 
             for (int i = 0; i < itemsListLength; i++)
@@ -94,19 +100,19 @@ namespace GameCore.Gameplay.Quests
                 {
                     int itemIndex = Random.Range(0, allItemsAmount);
                     itemID = allItemsMeta[itemIndex].ItemID;
-                    
+
                     bool alreadyContainsItem = questItems.ContainsKey(itemID);
-                    
+
                     if (alreadyContainsItem)
                         continue;
 
                     uniqueItemFound = true;
                     break;
                 }
-                
+
                 if (!uniqueItemFound)
                     continue;
-                
+
                 int itemQuantity = questPresetConfig.GetRandomItemQuantity();
                 QuestItemData questItemData = new(itemQuantity);
                 questItems.Add(itemID, questItemData);

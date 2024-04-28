@@ -15,6 +15,9 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         [Title(Constants.References)]
         [SerializeField, Required]
         private TextMeshProUGUI _titleTMP;
+        
+        [SerializeField, Required]
+        private TextMeshProUGUI _daysLeftTMP;
 
         [SerializeField, Required]
         private ItemInfoView _itemInfoView;
@@ -41,8 +44,11 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
             questProgress = (int)(questProgress * 100f);
 
             int questID = _questRuntimeData.QuestID;
+            int daysLeft = _questRuntimeData.DaysLeft;
+            string dayText = daysLeft == 1 ? "day" : "days";
 
             _titleTMP.text = $"Quest #{questID} - <color=#59FF40>{questProgress}%</color>";
+            _daysLeftTMP.text = $"{daysLeft} {dayText} left";
         }
 
         public void UpdateQuestItemsInfo()
@@ -59,8 +65,11 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
                     continue;
 
                 QuestItemData questItemData = pair.Value;
-                int itemsLeft = questItemData.TargetItemQuantity - questItemData.CurrentItemQuantity;
-                itemInfoView.UpdateTitle(itemsLeft);
+                int targetItemQuantity = questItemData.TargetItemQuantity;
+                int currentItemQuantity = questItemData.CurrentItemQuantity;
+                //int itemsLeft = questItemData.TargetItemQuantity - questItemData.CurrentItemQuantity;
+                
+                itemInfoView.UpdateTitle(targetItemQuantity, currentItemQuantity);
             }
         }
 
@@ -86,8 +95,9 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
 
                 QuestItemData questItemData = pair.Value;
                 int targetItemQuantity = questItemData.TargetItemQuantity;
+                int currentItemQuantity = questItemData.CurrentItemQuantity;
                 ItemInfoView itemInfoView = Instantiate(_itemInfoView, transform);
-                itemInfoView.Setup(itemMeta.Icon, itemMeta.ItemName, targetItemQuantity, itemID);
+                itemInfoView.Setup(itemMeta.Icon, itemMeta.ItemName, targetItemQuantity, currentItemQuantity, itemID);
 
                 _itemsInfoList.Add(itemInfoView);
             }

@@ -1,5 +1,7 @@
 ﻿using GameCore.Configs.Gameplay.Quests;
 using GameCore.Configs.Gameplay.QuestsItems;
+using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -14,9 +16,10 @@ namespace GameCore.Gameplay.Quests
 
         [Inject]
         private void Construct(IQuestsManagerDecorator questsManagerDecorator,
-            IGameplayConfigsProvider gameplayConfigsProvider)
+            IGameManagerDecorator gameManagerDecorator, IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _questsManagerDecorator = questsManagerDecorator;
+            _gameManagerDecorator = gameManagerDecorator;
             _questsConfig = gameplayConfigsProvider.GetQuestsConfig();
 
             QuestsItemsConfigMeta questsItemsConfig = gameplayConfigsProvider.GetQuestsItemsConfig();
@@ -28,6 +31,7 @@ namespace GameCore.Gameplay.Quests
         // FIELDS: --------------------------------------------------------------------------------
 
         private IQuestsManagerDecorator _questsManagerDecorator;
+        private IGameManagerDecorator _gameManagerDecorator;
         private QuestsConfigMeta _questsConfig;
         private QuestsFactory _questsFactory;
         private QuestsStorage _questsStorage;
@@ -38,14 +42,26 @@ namespace GameCore.Gameplay.Quests
         {
             _questsManagerDecorator.OnSelectQuestInnerEvent += OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent += SubmitQuestItem;
+            _questsManagerDecorator.OnCompleteQuestsInnerEvent += CompleteQuests;
             _questsManagerDecorator.OnGetQuestsStorageInnerEvent += GetQuestsStorage;
+            _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent += GetActiveQuestsAmount;
+            _questsManagerDecorator.OnContainsCompletedQuestsInnerEvent += ContainsCompletedQuests;
+            _questsManagerDecorator.OnContainsExpiredQuestsInnerEvent += ContainsExpiredQuests;
+
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
 
         public override void OnDestroy()
         {
             _questsManagerDecorator.OnSelectQuestInnerEvent -= OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent -= SubmitQuestItem;
+            _questsManagerDecorator.OnCompleteQuestsInnerEvent -= CompleteQuests;
             _questsManagerDecorator.OnGetQuestsStorageInnerEvent -= GetQuestsStorage;
+            _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent -= GetActiveQuestsAmount;
+            _questsManagerDecorator.OnContainsCompletedQuestsInnerEvent -= ContainsCompletedQuests;
+            _questsManagerDecorator.OnContainsExpiredQuestsInnerEvent -= ContainsExpiredQuests;
+
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
 
             base.OnDestroy();
         }
@@ -95,20 +111,47 @@ namespace GameCore.Gameplay.Quests
         {
             QuestRuntimeDataContainer[] questsRuntimeDataContainers =
                 _questsStorage.GetAwaitingQuestsRuntimeDataContainers();
+
             SynchronizeAwaitingQuestsDataServerRpc(questsRuntimeDataContainers, requestedClientId);
         }
 
         private void SubmitQuestItem(int itemID) => SubmitQuestItemServerRpc(itemID);
 
+        private void CompleteQuests()
+        {
+            _questsStorage.CompleteQuests();
+            _questsManagerDecorator.ActiveQuestsDataReceived();
+        }
+
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.ArrivedAtTheRoad:
+                    _questsStorage.DecreaseDays();
+                    _questsManagerDecorator.UpdateQuestsProgress();
+                    break;
+            }
+        }
+
         private QuestsStorage GetQuestsStorage() => _questsStorage;
+
+        private int GetActiveQuestsAmount() =>
+            _questsStorage.GetActiveQuestsAmount();
 
         private bool CanGetNewQuest()
         {
-            int activeQuestsAmount = _questsStorage.GetActiveQuestsAmount();
+            int activeQuestsAmount = GetActiveQuestsAmount();
             bool canGetNewQuest = activeQuestsAmount < _questsConfig.MaxActiveQuests;
             return canGetNewQuest;
         }
 
+        private bool ContainsCompletedQuests() =>
+            _questsStorage.ContainsCompletedQuests();
+        
+        private bool ContainsExpiredQuests() =>
+            _questsStorage.ContainsExpiredQuests();
+        
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc]
@@ -127,7 +170,7 @@ namespace GameCore.Gameplay.Quests
 
         [ServerRpc(RequireOwnership = false)]
         private void SelectQuestServerRpc(int questID) => SelectQuestClientRpc(questID);
-        
+
         [ServerRpc(RequireOwnership = false)]
         private void SubmitQuestItemServerRpc(int itemID) => SubmitQuestItemClientRpc(itemID);
 
@@ -161,7 +204,7 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.ActiveQuestsDataReceived();
             _questsManagerDecorator.AwaitingQuestsDataReceived();
         }
-        
+
         [ClientRpc]
         private void SubmitQuestItemClientRpc(int itemID)
         {
@@ -196,5 +239,7 @@ namespace GameCore.Gameplay.Quests
 
             SelectQuestServerRpc(questID);
         }
+
+        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
     }
 }

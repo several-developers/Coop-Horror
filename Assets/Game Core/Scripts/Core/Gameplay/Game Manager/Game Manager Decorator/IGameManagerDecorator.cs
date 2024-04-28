@@ -6,11 +6,11 @@ namespace GameCore.Gameplay.GameManagement
 {
     public interface IGameManagerDecorator
     {
-        event Action<SceneName> OnSelectedLocationChangedEvent;
         event Action<GameState> OnGameStateChangedEvent;
-        event Action<int> OnPlayersGoldChangedEvent; 
-        void SelectedLocationChanged(SceneName locationName);
+        event Action<SceneName> OnSelectedLocationChangedEvent;
+        event Action<int> OnPlayersGoldChangedEvent;
         void GameStateChanged(GameState gameState);
+        void SelectedLocationChanged(SceneName locationName);
         void PlayersGoldChanged(int playersGold);
         
         event Action<GameState> OnChangeGameStateInnerEvent;
@@ -20,6 +20,9 @@ namespace GameCore.Gameplay.GameManagement
         event Action<int> OnSpendPlayersGoldInnerEvent;
         event Func<SceneName> OnGetSelectedLocationInnerEvent;
         event Func<GameState> OnGetGameStateInnerEvent;
+        /// <summary>
+        /// State should be changed only once!
+        /// </summary>
         void ChangeGameState(GameState gameState);
         void SelectLocation(SceneName locationName);
         void LoadSelectedLocation();

@@ -54,11 +54,11 @@ namespace GameCore.Infrastructure.StateMachine
             LockCursor();
             EnableGameplayInput();
 
-            CreatePauseMenu(); // TEMP
-            CreateQuitConfirmMenuView(); // TEMP
+            CreateActiveQuestsView(); // TEMP
             CreateQuestsSelectionMenuView(); // TEMP
             CreateLocationsSelectionMenuView(); // TEMP
-            CreateActiveQuestsView(); // TEMP
+            CreatePauseMenu(); // TEMP
+            CreateQuitConfirmMenuView(); // TEMP
 
             InitHorrorStateMachine();
 

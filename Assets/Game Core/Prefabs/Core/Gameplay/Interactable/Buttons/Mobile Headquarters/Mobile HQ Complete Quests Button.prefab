@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 5156389055976133539, guid: 362d027edf96f3d4994ef2aee72c0c78,
         type: 3}
       propertyPath: m_Name
-      value: Road Location Simple Button
+      value: Mobile HQ Complete Quests Button
       objectReference: {fileID: 0}
     - target: {fileID: 8725777861448799579, guid: 362d027edf96f3d4994ef2aee72c0c78,
         type: 3}
@@ -93,7 +93,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2383444323401737346}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &-2933290492377551738
+--- !u!114 &3952785545357713064
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7393957849428358945}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c89d6b4ca3948fe93fe2daac02f7a2e, type: 3}
+  m_Script: {fileID: 11500000, guid: 2117a46d2a6340cbbf5d53b5b43d93a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 3903829824320146929}
