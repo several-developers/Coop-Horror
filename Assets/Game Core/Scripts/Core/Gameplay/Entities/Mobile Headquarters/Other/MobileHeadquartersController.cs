@@ -104,7 +104,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void HandleGameState(GameState gameState)
         {
-            MobileHQMainLever mainLever = _references.MainLever;
+            GameObject deathCamera;
 
             switch (gameState)
             {
@@ -115,6 +115,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case GameState.ReadyToLeaveTheRoad:
+                    MobileHQMainLever mainLever = _references.MainLever;
                     mainLever.InteractWithoutEvents(isLeverPulled: false);
                     mainLever.ToggleInteract(canInteract: true);
                     break;
@@ -124,10 +125,17 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case GameState.KillPlayersOnTheRoad:
-                    GameObject deathCamera = _references.DeathCamera;
+                    deathCamera = _references.DeathCamera;
                     deathCamera.SetActive(true);
 
                     ToggleDoorState(isOpen: true);
+                    break;
+                
+                case GameState.RestartGame:
+                    deathCamera = _references.DeathCamera;
+                    deathCamera.SetActive(false);
+
+                    ToggleDoorState(isOpen: false);
                     break;
             }
         }

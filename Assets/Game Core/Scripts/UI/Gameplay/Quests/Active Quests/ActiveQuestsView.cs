@@ -84,6 +84,10 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
                 case GameState.KillPlayersOnTheRoad:
                     Hide();
                     break;
+                
+                case GameState.RestartGame:
+                    Show();
+                    break;
             }
         }
 

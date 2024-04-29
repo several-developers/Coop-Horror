@@ -86,8 +86,7 @@ namespace GameCore.Gameplay.Quests
             if (!IsOwner)
                 return;
 
-            _questsFactory.Create();
-            _questsManagerDecorator.AwaitingQuestsDataReceived();
+            CreateQuests();
         }
 
         public void InitClient()
@@ -115,6 +114,12 @@ namespace GameCore.Gameplay.Quests
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void CreateQuests()
+        {
+            _questsFactory.Create();
+            _questsManagerDecorator.AwaitingQuestsDataReceived();
+        }
 
         private void SynchronizeAwaitingQuestsData(ulong requestedClientId)
         {
@@ -155,9 +160,14 @@ namespace GameCore.Gameplay.Quests
                 
                 case GameState.QuestsRewarding:
                     CalculateReward();
-                    _questsFactory.Create();
-                    _questsManagerDecorator.AwaitingQuestsDataReceived();
+                    CreateQuests();
                     _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad, ownerOnly: true);
+                    break;
+                
+                case GameState.RestartGame:
+                    _questsStorage.ClearAll();
+                    _questsManagerDecorator.UpdateQuestsProgress();
+                    CreateQuests();
                     break;
             }
         }

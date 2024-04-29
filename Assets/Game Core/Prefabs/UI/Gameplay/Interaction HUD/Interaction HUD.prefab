@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1650463359775500566}
   - component: {fileID: 3322489204416818952}
   - component: {fileID: 1650463359775500567}
+  - component: {fileID: 3786323513249775983}
   m_Layer: 0
   m_Name: Interaction HUD
   m_TagString: Untagged
@@ -51,6 +52,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 927fd005d2a9437c934c16ea5b7365cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _hiddenByAwake: 0
+  _ignoreScaleTime: 0
+  _changeInteractableState: 0
+  _changeCanvasState: 0
+  _canvas: {fileID: 0}
+  _fadeTime: 0.25
+  _targetCG: {fileID: 3786323513249775983}
   _interactionTextSettings:
     _defaultDisabledInteractionText: Can't interact
     _interactionEnabledTextSettings:
@@ -98,6 +106,18 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!225 &3786323513249775983
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1650463359775500569}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1650463360097365777
 GameObject:
   m_ObjectHideFlags: 0

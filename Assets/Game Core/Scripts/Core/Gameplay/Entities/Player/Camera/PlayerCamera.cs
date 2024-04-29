@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.InputHandlerTEMP;
+﻿using System;
+using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -70,9 +71,14 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         {
             _instance = this;
             _transform = transform;
-            _transform.SetParent(null);
 
             _inputReader.OnLookEvent += OnLook;
+        }
+
+        private void Start()
+        {
+            _transform.SetParent(null);
+            _transform.SetAsLastSibling();
         }
 
         private void OnDestroy() =>

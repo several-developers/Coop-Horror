@@ -56,6 +56,11 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             _inputReader.OnJumpEvent -= OnJump;
         }
 
+        public void ToggleState(bool isEnabled)
+        {
+            
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

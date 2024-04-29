@@ -5,5 +5,6 @@
         void Tick();
         void FixedTick();
         void Dispose();
+        void ToggleState(bool isEnabled);
     }
 }

@@ -62,6 +62,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         private bool _isGrounded;
         private bool _isSloping;
+        private bool _isEnabled;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -73,7 +74,8 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             ControlDrag();
             ControlSpeed();
 
-            _jumpComponent.Jump();
+            if (_isEnabled)
+                _jumpComponent.Jump();
 
             GetMoveDirection();
 
@@ -93,6 +95,9 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             _inputReader.OnSprintCanceledEvent -= OnSprintCanceled;
             _inputReader.OnJumpEvent -= OnJump;
         }
+
+        public void ToggleState(bool isEnabled) =>
+            _isEnabled = isEnabled;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -234,6 +239,10 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         private void GetMoveDirection()
         {
             var moveVector = _inputReader.GameInput.Gameplay.Move.ReadValue<Vector2>();
+
+            if (!_isEnabled)
+                moveVector = Vector2.zero;
+            
             _globalMoveDirection = _transform.forward * moveVector.y + _transform.right * moveVector.x;
         }
 

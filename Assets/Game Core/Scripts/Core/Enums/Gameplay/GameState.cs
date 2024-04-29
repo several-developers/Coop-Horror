@@ -11,6 +11,7 @@
         ReadyToLeaveTheLocation = 6,
         KillPlayersOnTheRoad = 7,
         WaitingForPlayers = 8,
-        QuestsRewarding = 9
+        QuestsRewarding = 9,
+        RestartGame = 10,
     }
 }

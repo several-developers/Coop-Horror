@@ -1,7 +1,10 @@
-﻿using GameCore.Enums.Gameplay;
+﻿using System.Collections;
+using GameCore.Configs.Gameplay.Balance;
+using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network.Utilities;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -16,11 +19,12 @@ namespace GameCore.Gameplay.GameManagement
 
         [Inject]
         private void Construct(IGameManagerDecorator gameManagerDecorator, IHorrorStateMachine horrorStateMachine,
-            ILevelObserver levelObserver)
+            ILevelObserver levelObserver, IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _gameManagerDecorator = gameManagerDecorator;
             _horrorStateMachine = horrorStateMachine;
             _levelObserver = levelObserver;
+            _balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -35,6 +39,7 @@ namespace GameCore.Gameplay.GameManagement
         private IGameManagerDecorator _gameManagerDecorator;
         private IHorrorStateMachine _horrorStateMachine;
         private ILevelObserver _levelObserver;
+        private BalanceConfigMeta _balanceConfig;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -110,10 +115,26 @@ namespace GameCore.Gameplay.GameManagement
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.KillPlayersOnTheRoad:
+                    StartCoroutine(routine: RestartGameTimerCO());
+                    break;
+                
+                case GameState.RestartGame:
+                    ChangeGameState(GameState.ReadyToLeaveTheRoad);
+                    break;
+            }
+        }
+        
         private void ChangeGameState(GameState gameState, bool ownerOnly = false)
         {
             if (ownerOnly && !IsOwner)
                 return;
+            
+            Debug.LogWarning("----> GAME STATE changed!!!");
             
             if (IsOwner)
                 _gameState.Value = gameState;
@@ -150,6 +171,14 @@ namespace GameCore.Gameplay.GameManagement
 
         private GameState GetGameState() =>
             _gameState.Value;
+
+        private IEnumerator RestartGameTimerCO()
+        {
+            float delay = _balanceConfig.GameRestartDelay;
+            yield return new WaitForSeconds(delay);
+            
+            ChangeGameState(GameState.RestartGame);
+        }
 
         // RPC: -----------------------------------------------------------------------------------
 
@@ -205,6 +234,7 @@ namespace GameCore.Gameplay.GameManagement
             Debug.Log(log);
 
             _gameManagerDecorator.GameStateChanged(gameState: newValue);
+            HandleGameState(gameState: newValue);
         }
 
         private void OnPlayersGoldChanged(int previousValue, int newValue) =>

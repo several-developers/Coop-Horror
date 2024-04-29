@@ -109,6 +109,13 @@ namespace GameCore.Gameplay.Quests
         public void ClearCompletedQuests() =>
             _completedQuestsData.Clear();
 
+        public void ClearAll()
+        {
+            _awaitingQuestsData.Clear();
+            _activeQuestsData.Clear();
+            _completedQuestsData.Clear();
+        }
+
         public IReadOnlyList<QuestRuntimeData> GetAwaitingQuestsData() => _awaitingQuestsData;
         
         public IReadOnlyList<QuestRuntimeData> GetActiveQuestsData() => _activeQuestsData;

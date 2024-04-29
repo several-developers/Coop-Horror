@@ -1,6 +1,8 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Observers.Gameplay.PlayerInteraction;
+using GameCore.UI.Global;
 using GameCore.UI.Global.Animations;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -9,13 +11,17 @@ using Zenject;
 
 namespace GameCore.UI.Gameplay.Interaction
 {
-    public class InteractionHUD : MonoBehaviour
+    public class InteractionHUD : UIElement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IPlayerInteractionObserver playerInteractionObserver) =>
+        private void Construct(IGameManagerDecorator gameManagerDecorator,
+            IPlayerInteractionObserver playerInteractionObserver)
+        {
+            _gameManagerDecorator = gameManagerDecorator;
             _playerInteractionObserver = playerInteractionObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -33,6 +39,7 @@ namespace GameCore.UI.Gameplay.Interaction
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private IGameManagerDecorator _gameManagerDecorator;
         private IPlayerInteractionObserver _playerInteractionObserver;
         private IInteractable _lastInteractable;
 
@@ -42,6 +49,8 @@ namespace GameCore.UI.Gameplay.Interaction
         {
             _interactionTextSettings.Setup(_textTMP);
 
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+            
             _playerInteractionObserver.OnInteractionStartedEvent += OnCanInteract;
             _playerInteractionObserver.OnInteractionEndedEvent += OnInteractionEnded;
         }
@@ -54,6 +63,20 @@ namespace GameCore.UI.Gameplay.Interaction
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.KillPlayersOnTheRoad:
+                    Hide();
+                    break;
+                
+                case GameState.RestartGame:
+                    Show();
+                    break;
+            }
+        }
+        
         private void ShowInteractionInfo(IInteractable interactable)
         {
             InteractionType interactionType = interactable.GetInteractionType();
@@ -77,6 +100,8 @@ namespace GameCore.UI.Gameplay.Interaction
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
 
         private void OnCanInteract(IInteractable interactable)
         {

@@ -126,6 +126,12 @@ namespace GameCore.Gameplay.GameTimeManagement
                     _timeCycle.SetMidnight();
                     _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad, ownerOnly: true);
                     break;
+                
+                case GameState.RestartGame:
+                    MyDateTime dateTime = _timeCycle.GetDateTime();
+                    dateTime.ResetDay();
+                    _timeCycle.SyncDateTime(dateTime);
+                    break;
             }
         }
 

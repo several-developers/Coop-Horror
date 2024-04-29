@@ -62,6 +62,10 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
                 case GameState.KillPlayersOnTheRoad:
                     Hide();
                     break;
+                
+                case GameState.RestartGame:
+                    Show();
+                    break;
             }
         }
 

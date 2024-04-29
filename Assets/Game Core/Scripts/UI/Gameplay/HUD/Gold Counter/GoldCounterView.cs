@@ -49,6 +49,10 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
                 case GameState.KillPlayersOnTheRoad:
                     Hide();
                     break;
+                
+                case GameState.RestartGame:
+                    Show();
+                    break;
             }
         }
 

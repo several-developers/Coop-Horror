@@ -37,5 +37,8 @@ namespace GameCore.Gameplay.GameTimeManagement
             serializer.SerializeValue(ref _hour);
             serializer.SerializeValue(ref _day);
         }
+
+        public void ResetDay() =>
+            _day = 0;
     }
 }

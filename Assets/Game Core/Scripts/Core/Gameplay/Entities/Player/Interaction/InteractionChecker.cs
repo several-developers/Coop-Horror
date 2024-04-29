@@ -32,6 +32,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private readonly RaycastHit[] _hits;
 
         private int _lastInteractableItemIndex;
+        private int _lastInteractableItemUniqueID;
         private bool _isInteractionFound;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -98,6 +99,8 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
             if (!isInteractableComponentExists)
                 return false;
+            
+            
             
             //if (!interactable.CanInteract())
                 //return false;

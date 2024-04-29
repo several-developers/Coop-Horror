@@ -212,6 +212,7 @@ namespace GameCore.Gameplay.Entities.Player
             void InitMovement()
             {
                 _movementBehaviour = new PhysicalMovementBehaviour3(playerEntity: this);
+                _movementBehaviour.ToggleState(isEnabled: true);
             }
 
             void InitInteractionCheckerAndHandler()
@@ -334,9 +335,15 @@ namespace GameCore.Gameplay.Entities.Player
         
         public void KillSelf()
         {
+            _movementBehaviour.ToggleState(isEnabled: false);
             _inventory.DropAllItems();
             _playerCamera.gameObject.SetActive(false);
-            //OnDiedEvent.Invoke();
+        }
+
+        public void Revive()
+        {
+            _movementBehaviour.ToggleState(isEnabled: true);
+            _playerCamera.gameObject.SetActive(true);
         }
 
         public Transform GetTransform() => transform;

@@ -7,8 +7,8 @@
         public const string InputReader = "Input Reader"; // TEMP
         
         public const string GameConfig = GlobalConfigs + "Game Config";
-        public const string GameplayConfig = GlobalConfigs + "Gameplay Config";
         
+        public const string BalanceConfig = GameplayConfigs + "Balance Config";
         public const string ItemsListConfig = GameplayConfigs + "Items List Config";
         public const string LocationsListConfig = GameplayConfigs + "Locations List Config";
         public const string TimeConfig = GameplayConfigs + "Time Config";

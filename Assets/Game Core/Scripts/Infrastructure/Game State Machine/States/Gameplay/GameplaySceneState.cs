@@ -6,6 +6,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
+using GameCore.UI.Gameplay.GameOverMenu;
 using GameCore.UI.Gameplay.LocationsSelectionMenu;
 using GameCore.UI.Gameplay.PauseMenu;
 using GameCore.UI.Gameplay.Quests;
@@ -47,6 +48,7 @@ namespace GameCore.Infrastructure.StateMachine
         private QuitConfirmMenuView _quitConfirmMenuView;
         private QuestsSelectionMenuView _questsSelectionMenuView;
         private LocationsSelectionMenuView _locationsSelectionMenuView;
+        private GameOverMenuView _gameOverMenuView;
         private int _openedMenus; // TEMP
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -59,6 +61,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreateActiveQuestsView(); // TEMP
             CreateQuestsSelectionMenuView(); // TEMP
             CreateLocationsSelectionMenuView(); // TEMP
+            CreateGameOverMenu(); // TEMP
             CreateRewardMenu(); // TEMP
             CreatePauseMenu(); // TEMP
             CreateQuitConfirmMenuView(); // TEMP
@@ -145,6 +148,9 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateLocationsSelectionMenuView() =>
             _locationsSelectionMenuView = MenuFactory.Create<LocationsSelectionMenuView>(_diContainer);
 
+        private void CreateGameOverMenu() =>
+            _gameOverMenuView = MenuFactory.Create<GameOverMenuView>(_diContainer);
+
         private void CreateRewardMenu() =>
             MenuFactory.Create<RewardMenuView>(_diContainer);
 
@@ -162,6 +168,8 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void HandleGameState(GameState gameState)
         {
+            PlayerEntity localPlayer;
+            
             switch (gameState)
             {
                 case GameState.QuestsRewarding:
@@ -169,8 +177,15 @@ namespace GameCore.Infrastructure.StateMachine
                     break;
                 
                 case GameState.KillPlayersOnTheRoad:
-                    PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+                    localPlayer = PlayerEntity.GetLocalPlayer();
                     localPlayer.KillSelf();
+                    
+                    _gameOverMenuView.Show();
+                    break;
+                
+                case GameState.RestartGame:
+                    localPlayer = PlayerEntity.GetLocalPlayer();
+                    localPlayer.Revive();
                     break;
             }
             

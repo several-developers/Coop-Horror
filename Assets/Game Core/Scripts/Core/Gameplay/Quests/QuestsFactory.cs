@@ -26,7 +26,6 @@ namespace GameCore.Gameplay.Quests
         private readonly QuestsConfigMeta _questsConfig;
         private readonly QuestsItemsConfigMeta _questsItemsConfig;
 
-        private int _activeQuestsAmount;
         private int _lastQuestID;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -47,11 +46,11 @@ namespace GameCore.Gameplay.Quests
             void GetAvailableDifficulties()
             {
                 IReadOnlyCollection<QuestDifficulty> questsLookUpList = _questsConfig.GetQuestsLookUpList();
-                IReadOnlyList<QuestRuntimeData> activeQuestsData = _questsStorage.GetActiveQuestsData();
+                IReadOnlyList<QuestRuntimeData> awaitingQuestsData = _questsStorage.GetAwaitingQuestsData();
 
                 availableDifficulties.AddRange(questsLookUpList);
 
-                foreach (QuestRuntimeData questRuntimeData in activeQuestsData)
+                foreach (QuestRuntimeData questRuntimeData in awaitingQuestsData)
                 {
                     QuestDifficulty difficulty = questRuntimeData.Difficulty;
                     availableDifficulties.Remove(difficulty);
@@ -67,7 +66,7 @@ namespace GameCore.Gameplay.Quests
                     QuestPresetConfig questPresetConfig = GetQuestPresetConfig(difficulty);
                     int daysLeft = questPresetConfig.GetRandomDeadline();
                     int reward = Random.Range(10, 100);
-                    
+
                     IReadOnlyDictionary<int, QuestItemData> questItemsID =
                         CreateQuestItems(questPresetConfig, difficulty);
 

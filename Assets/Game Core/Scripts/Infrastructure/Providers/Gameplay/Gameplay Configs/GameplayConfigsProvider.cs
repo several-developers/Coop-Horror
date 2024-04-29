@@ -1,14 +1,14 @@
-﻿using GameCore.Configs.Gameplay;
+﻿using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Delivery;
 using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.LocationsList;
-using GameCore.Configs.Gameplay.Time;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
 using GameCore.Configs.Gameplay.Quests;
 using GameCore.Configs.Gameplay.QuestsItems;
+using GameCore.Configs.Gameplay.Time;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
 
@@ -20,7 +20,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
 
         public GameplayConfigsProvider()
         {
-            _gameplayConfig = Load<GameplayConfigMeta>(path: ConfigsPaths.GameplayConfig);
+            _balanceConfig = Load<BalanceConfigMeta>(path: ConfigsPaths.BalanceConfig);
             _playerConfig = Load<PlayerConfigMeta>(path: ConfigsPaths.PlayerConfig);
             _itemsListConfig = Load<ItemsListConfigMeta>(path: ConfigsPaths.ItemsListConfig);
             _locationsListConfig = Load<LocationsListConfigMeta>(path: ConfigsPaths.LocationsListConfig);
@@ -35,7 +35,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly GameplayConfigMeta _gameplayConfig;
+        private readonly BalanceConfigMeta _balanceConfig;
         private readonly PlayerConfigMeta _playerConfig;
         private readonly ItemsListConfigMeta _itemsListConfig;
         private readonly LocationsListConfigMeta _locationsListConfig;
@@ -49,7 +49,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public GameplayConfigMeta GetGameplayConfig() => _gameplayConfig;
+        public BalanceConfigMeta GetBalanceConfig() => _balanceConfig;
         public PlayerConfigMeta GetPlayerConfig() => _playerConfig;
         public ItemsListConfigMeta GetItemsListConfig() => _itemsListConfig;
         public LocationsListConfigMeta GetLocationsListConfig() => _locationsListConfig;

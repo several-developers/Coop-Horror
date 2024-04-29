@@ -1,5 +1,7 @@
-﻿using GameCore.Gameplay.Entities.Inventory;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using GameCore.Observers.Gameplay.UI;
@@ -17,8 +19,10 @@ namespace GameCore.UI.Gameplay.Inventory
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsMetaProvider itemsMetaProvider, IUIObserver uiObserver)
+        private void Construct(IGameManagerDecorator gameManagerDecorator, IItemsMetaProvider itemsMetaProvider,
+            IUIObserver uiObserver)
         {
+            _gameManagerDecorator = gameManagerDecorator;
             _itemsMetaProvider = itemsMetaProvider;
             _uiObserver = uiObserver;
         }
@@ -36,7 +40,8 @@ namespace GameCore.UI.Gameplay.Inventory
         private LayoutGroup _layoutGroup;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
+        private IGameManagerDecorator _gameManagerDecorator;
         private IItemsMetaProvider _itemsMetaProvider;
         private IUIObserver _uiObserver;
 
@@ -53,6 +58,8 @@ namespace GameCore.UI.Gameplay.Inventory
             _inventoryFactory = new InventoryFactory(_itemSlotViewPrefab, _slotsContainer);
             _layoutFixHelper = new LayoutFixHelper(coroutineRunner: this, _layoutGroup);
 
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+            
             _uiObserver.OnInitPlayerEvent += OnInitPlayer;
         }
 
@@ -69,7 +76,7 @@ namespace GameCore.UI.Gameplay.Inventory
 
             if (!_isInitialized)
                 return;
-            
+
             PlayerInventory inventory = _playerEntity.GetInventory();
 
             inventory.OnSelectedSlotChangedEvent -= OnSelectedSlotChanged;
@@ -89,6 +96,20 @@ namespace GameCore.UI.Gameplay.Inventory
             inventory.OnSelectedSlotChangedEvent += OnSelectedSlotChanged;
             inventory.OnItemEquippedEvent += OnItemEquipped;
             inventory.OnItemDroppedEvent += OnItemDropped;
+        }
+
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.KillPlayersOnTheRoad:
+                    Hide();
+                    break;
+                
+                case GameState.RestartGame:
+                    Show();
+                    break;
+            }
         }
         
         private void CreateItemsSlots()
@@ -137,7 +158,7 @@ namespace GameCore.UI.Gameplay.Inventory
 
             if (!isItemMetaFound)
                 return;
-            
+
             itemSlotView.SetIcon(itemMeta.Icon);
         }
 
@@ -156,11 +177,14 @@ namespace GameCore.UI.Gameplay.Inventory
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
+        
         private void OnInitPlayer(PlayerEntity playerEntity) => Init(playerEntity);
 
         private void OnSelectedSlotChanged(int selectedSlotIndex) => SelectSlot(selectedSlotIndex);
 
-        private void OnItemEquipped(int slotIndex, InventoryItemData inventoryItemData) => SetIcon(slotIndex, inventoryItemData);
+        private void OnItemEquipped(int slotIndex, InventoryItemData inventoryItemData) =>
+            SetIcon(slotIndex, inventoryItemData);
 
         private void OnItemDropped(ItemDropStaticData data)
         {
