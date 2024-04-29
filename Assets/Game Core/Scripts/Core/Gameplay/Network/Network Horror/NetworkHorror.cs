@@ -23,13 +23,15 @@ namespace GameCore.Gameplay.Network
 
         public static ulong ServerID { get; private set; }
         public static ulong ClientID { get; private set; }
-        
-        public bool IsOwner => _netcodeHooks.IsOwner;
 
+        public bool IsOwner => _netcodeHooks.IsOwner;
         private ulong OwnerClientId => _netcodeHooks.OwnerClientId;
         
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action<ulong> OnPlayerConnectedEvent = delegate { };
+        public event Action<ulong> OnPlayerDisconnectedEvent = delegate { };
+        
         private readonly INetcodeHooks _netcodeHooks;
         
         private NetworkManager _networkManager;
@@ -112,11 +114,15 @@ namespace GameCore.Gameplay.Network
         private void OnClientConnected(ulong clientId)
         {
             Debug.Log($"Client #{clientId} connected.");
+            
+            OnPlayerConnectedEvent.Invoke(clientId);
         }
 
         private void OnClientDisconnect(ulong clientId)
         {
             Debug.Log($"Client #{clientId} disconnect.");
+            
+            OnPlayerDisconnectedEvent.Invoke(clientId);
         }
 
         private void OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,

@@ -1,8 +1,11 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.HorrorStateMachineSpace;
+using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Level;
@@ -19,10 +22,12 @@ namespace GameCore.Gameplay.GameManagement
 
         [Inject]
         private void Construct(IGameManagerDecorator gameManagerDecorator, IHorrorStateMachine horrorStateMachine,
-            ILevelObserver levelObserver, IGameplayConfigsProvider gameplayConfigsProvider)
+            INetworkHorror networkHorror, ILevelObserver levelObserver,
+            IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _gameManagerDecorator = gameManagerDecorator;
             _horrorStateMachine = horrorStateMachine;
+            _networkHorror = networkHorror;
             _levelObserver = levelObserver;
             _balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
         }
@@ -36,8 +41,11 @@ namespace GameCore.Gameplay.GameManagement
         private readonly NetworkVariable<GameState> _gameState = new(DefaultGameState);
         private readonly NetworkVariable<int> _playersGold = new();
 
+        private readonly Dictionary<ulong, GameState> _playersStates = new(capacity: 8); // Server only.
+
         private IGameManagerDecorator _gameManagerDecorator;
         private IHorrorStateMachine _horrorStateMachine;
+        private INetworkHorror _networkHorror;
         private ILevelObserver _levelObserver;
         private BalanceConfigMeta _balanceConfig;
 
@@ -46,6 +54,7 @@ namespace GameCore.Gameplay.GameManagement
         private void Awake()
         {
             _gameManagerDecorator.OnChangeGameStateInnerEvent += ChangeGameState;
+            _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent += ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnSelectLocationInnerEvent += SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent += LoadSelectedLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent += AddPlayersGold;
@@ -57,6 +66,7 @@ namespace GameCore.Gameplay.GameManagement
         public override void OnDestroy()
         {
             _gameManagerDecorator.OnChangeGameStateInnerEvent -= ChangeGameState;
+            _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent -= ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnSelectLocationInnerEvent -= SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent -= LoadSelectedLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent -= AddPlayersGold;
@@ -81,6 +91,9 @@ namespace GameCore.Gameplay.GameManagement
             if (!IsOwner)
                 return;
 
+            _networkHorror.OnPlayerConnectedEvent += OnPlayerConnected;
+            _networkHorror.OnPlayerDisconnectedEvent += OnPlayerDisconnected;
+
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
             _levelObserver.OnLocationLeftEvent += OnLocationLeft;
         }
@@ -103,6 +116,9 @@ namespace GameCore.Gameplay.GameManagement
             if (!IsOwner)
                 return;
 
+            _networkHorror.OnPlayerConnectedEvent -= OnPlayerConnected;
+            _networkHorror.OnPlayerDisconnectedEvent -= OnPlayerDisconnected;
+
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
             _levelObserver.OnLocationLeftEvent -= OnLocationLeft;
         }
@@ -119,23 +135,37 @@ namespace GameCore.Gameplay.GameManagement
         {
             switch (gameState)
             {
+                case GameState.ArrivedAtTheRoad:
+                case GameState.QuestsRewarding:
+
+                    if (!IsOwner)
+                        return;
+
+                    ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
+                        previousState: gameState);
+                    break;
+
                 case GameState.KillPlayersOnTheRoad:
+
+                    if (!IsOwner)
+                        return;
+
                     StartCoroutine(routine: RestartGameTimerCO());
                     break;
-                
+
                 case GameState.RestartGame:
-                    ChangeGameState(GameState.ReadyToLeaveTheRoad);
+                    ResetGold();
+                    
+                    ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
+                        previousState: gameState);
                     break;
             }
         }
-        
-        private void ChangeGameState(GameState gameState, bool ownerOnly = false)
+
+        private void ChangeGameState(GameState gameState)
         {
-            if (ownerOnly && !IsOwner)
-                return;
-            
-            Debug.LogWarning("----> GAME STATE changed!!!");
-            
+            // Debug.LogWarning("----> GAME STATE changed!!! " + gameState);
+
             if (IsOwner)
                 _gameState.Value = gameState;
             else
@@ -157,7 +187,7 @@ namespace GameCore.Gameplay.GameManagement
             else
                 AddPlayersGoldServerRpc(amount);
         }
-        
+
         private void SpendPlayersGold(int amount)
         {
             if (IsOwner)
@@ -166,18 +196,69 @@ namespace GameCore.Gameplay.GameManagement
                 SpendPlayersGoldServerRpc(amount);
         }
 
+        private void ResetGold()
+        {
+            if (IsOwner)
+                _playersGold.Value = 0;
+            else
+                ResetGoldServerRpc();
+        }
+
         private SceneName GetSelectedLocation() =>
             _selectedLocation.Value;
 
         private GameState GetGameState() =>
             _gameState.Value;
 
+        private async void ChangeGameStateWhenAllPlayersReady(GameState newState, GameState previousState)
+        {
+            const int checkDelay = 100;
+            const int maxIterations = 100; // При 100 мс = 10 секунд проверка.
+            bool playersStatesAreSynchronized = false;
+
+            for (int i = 0; i < maxIterations; i++)
+            {
+                bool isCanceled = await UniTask
+                    .Delay(checkDelay, cancellationToken: this.GetCancellationTokenOnDestroy())
+                    .SuppressCancellationThrow();
+
+                if (isCanceled)
+                    break;
+
+                bool isSynchronized = true;
+
+                foreach (GameState playersState in _playersStates.Values)
+                {
+                    bool isMatches = playersState == previousState;
+
+                    if (isMatches)
+                        continue;
+
+                    isSynchronized = false;
+                    break;
+                }
+
+                if (!isSynchronized)
+                    continue;
+
+                playersStatesAreSynchronized = true;
+                break;
+            }
+
+            if (!playersStatesAreSynchronized)
+                Log.PrintError(log: "Players States was not synchronized!");
+
+            ChangeGameState(newState);
+        }
+
         private IEnumerator RestartGameTimerCO()
         {
             float delay = _balanceConfig.GameRestartDelay;
             yield return new WaitForSeconds(delay);
-            
-            ChangeGameState(GameState.RestartGame);
+
+            const GameState newState = GameState.RestartGame;
+            GameState previousState = _gameState.Value;
+            ChangeGameStateWhenAllPlayersReady(newState, previousState);
         }
 
         // RPC: -----------------------------------------------------------------------------------
@@ -205,6 +286,25 @@ namespace GameCore.Gameplay.GameManagement
         private void SpendPlayersGoldServerRpc(int amount) =>
             _playersGold.Value -= amount;
 
+        [ServerRpc(RequireOwnership = false)]
+        private void ResetGoldServerRpc() =>
+            _playersGold.Value = 0;
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SyncPlayerGameStateServerRpc(GameState gameState, ServerRpcParams serverRpcParams = default)
+        {
+            ulong clientID = serverRpcParams.Receive.SenderClientId;
+            bool containsPlayer = _playersStates.ContainsKey(clientID);
+
+            if (!containsPlayer)
+            {
+                Log.PrintError(log: $"Players States <rb>doesn't contains player</rb> with ID <gb>({clientID})</gb>!");
+                return;
+            }
+
+            _playersStates[clientID] = gameState;
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
@@ -225,6 +325,12 @@ namespace GameCore.Gameplay.GameManagement
             DespawnClient();
         }
 
+        private void OnPlayerConnected(ulong clientID) =>
+            _playersStates.TryAdd(clientID, _gameState.Value);
+
+        private void OnPlayerDisconnected(ulong clientID) =>
+            _playersStates.Remove(clientID);
+
         private void OnSelectedLocationChanged(SceneName previousValue, SceneName newValue) =>
             _gameManagerDecorator.SelectedLocationChanged(newValue);
 
@@ -232,6 +338,11 @@ namespace GameCore.Gameplay.GameManagement
         {
             string log = Log.HandleLog("Game State", $"<gb>{previousValue}</gb> ---> <gb>{newValue}</gb>");
             Debug.Log(log);
+
+            if (IsOwner)
+                _playersStates[OwnerClientId] = newValue;
+            else
+                SyncPlayerGameStateServerRpc(newValue);
 
             _gameManagerDecorator.GameStateChanged(gameState: newValue);
             HandleGameState(gameState: newValue);

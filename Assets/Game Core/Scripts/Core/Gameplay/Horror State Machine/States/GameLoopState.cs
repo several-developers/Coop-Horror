@@ -1,21 +1,19 @@
-﻿using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Network.Utilities;
-using GameCore.Observers.Gameplay.Level;
-using GameCore.Observers.Gameplay.Rpc;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.Network;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
-    public class GameLoopState : IEnterState, IExitState, INetcodeInitBehaviour, INetcodeDespawnBehaviour
+    public class GameLoopState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameLoopState(IHorrorStateMachine horrorStateMachine, INetworkHorror networkHorror,
-            ILevelObserver levelObserver, IRpcObserver rpcObserver)
+        public GameLoopState(IHorrorStateMachine horrorStateMachine, IGameManagerDecorator gameManagerDecorator,
+            INetworkHorror networkHorror)
         {
             _horrorStateMachine = horrorStateMachine;
+            _gameManagerDecorator = gameManagerDecorator;
             _networkHorror = networkHorror;
-            _rpcObserver = rpcObserver;
-            _levelObserver = levelObserver;
 
             horrorStateMachine.AddState(this);
         }
@@ -23,82 +21,43 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IHorrorStateMachine _horrorStateMachine;
+        private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly INetworkHorror _networkHorror;
-        private readonly ILevelObserver _levelObserver;
-        private readonly IRpcObserver _rpcObserver;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
-        {
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
+        public void Enter() =>
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
-        public void Exit()
-        {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
-        
-        public void InitServerAndClient()
-        {
-            
-        }
-
-        public void InitServer()
-        {
-            if (!IsServer())
-                return;
-
-            _levelObserver.OnLocationLeftEvent += OnLocationLeftServerLogic;
-        }
-
-        public void InitClient()
-        {
-            if (IsServer())
-                return;
-
-            _rpcObserver.OnLocationLeftEvent += OnLocationLeftClientLogic;
-        }
-
-        public void DespawnServerAndClient()
-        {
-        }
-
-        public void DespawnServer()
-        {
-            if (!IsServer())
-                return;
-
-            _levelObserver.OnLocationLeftEvent -= OnLocationLeftServerLogic;
-        }
-
-        public void DespawnClient()
-        {
-            if (IsServer())
-                return;
-
-            _rpcObserver.OnLocationLeftEvent -= OnLocationLeftClientLogic;
-        }
+        public void Exit() =>
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void HandleGameState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.ArrivedAtTheRoad:
+                    if (IsServer())
+                        EnterLeaveLocationServerState();
+                    else
+                        EnterLeaveLocationClientState();
+                    break;
+            }
+        }
 
         private bool IsServer() =>
             _networkHorror.IsOwner;
 
         private void EnterLeaveLocationServerState() =>
             _horrorStateMachine.ChangeState<LeaveLocationServerState>();
-        
+
         private void EnterLeaveLocationClientState() =>
             _horrorStateMachine.ChangeState<LeaveLocationClientState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnLocationLeftServerLogic() => EnterLeaveLocationServerState();
-        
-        private void OnLocationLeftClientLogic() => EnterLeaveLocationClientState();
+        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
     }
 }

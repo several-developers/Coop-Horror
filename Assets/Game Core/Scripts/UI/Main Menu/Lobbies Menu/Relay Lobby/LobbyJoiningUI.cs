@@ -93,15 +93,36 @@ namespace GameCore.UI.MainMenu.LobbiesMenu.RelayLobby
 
         private void UpdateUI(LobbyListFetchedMessage message)
         {
-            EnsureNumberOfActiveUISlots(message.LocalLobbies.Count);
-
-            for (var i = 0; i < message.LocalLobbies.Count; i++)
+            int lobbiesCount = message.LocalLobbies.Count;
+            int validLobbiesCount = 0;
+            
+            for (var i = 0; i < lobbiesCount; i++)
             {
                 LocalLobby localLobby = message.LocalLobbies[i];
+                string relayJoinCode = localLobby.RelayJoinCode;
+                bool isRelayJoinCodeValid = !string.IsNullOrEmpty(relayJoinCode);
+
+                if (!isRelayJoinCodeValid)
+                    continue;
+                
+                validLobbiesCount++;
+            }
+            
+            EnsureNumberOfActiveUISlots(validLobbiesCount);
+            
+            for (var i = 0; i < lobbiesCount; i++)
+            {
+                LocalLobby localLobby = message.LocalLobbies[i];
+                string relayJoinCode = localLobby.RelayJoinCode;
+                bool isRelayJoinCodeValid = !string.IsNullOrEmpty(relayJoinCode);
+
+                if (!isRelayJoinCodeValid)
+                    continue;
+                
                 _lobbyListItems[i].SetData(localLobby);
             }
 
-            if (message.LocalLobbies.Count == 0)
+            if (validLobbiesCount == 0)
                 _emptyLobbyListLabel.SetActive(true);
             else
                 _emptyLobbyListLabel.SetActive(false);

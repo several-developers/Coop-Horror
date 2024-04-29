@@ -26,7 +26,7 @@ namespace GameCore.Gameplay.Delivery
         
         public void InitServerAndClient()
         {
-            
+            _mobileHeadquartersEntity.OnCallDeliveryDroneEvent += OnCallDeliveryDrone;
         }
 
         public void InitServer()
@@ -39,8 +39,6 @@ namespace GameCore.Gameplay.Delivery
             _deliveryPoint.OnDroneLandedEvent += OnDroneLanded;
             _deliveryPoint.OnDroneLeftEvent += OnDroneLeft;
             _deliveryPoint.OnDroneTakeOffTimerFinishedEvent += OnDroneTakeOffTimerFinished;
-
-            _mobileHeadquartersEntity.OnCallDeliveryDroneEvent += OnCallDeliveryDrone;
         }
 
         public void InitClient()
@@ -51,7 +49,7 @@ namespace GameCore.Gameplay.Delivery
 
         public void DespawnServerAndClient()
         {
-            
+            _mobileHeadquartersEntity.OnCallDeliveryDroneEvent -= OnCallDeliveryDrone;
         }
 
         public void DespawnServer()
@@ -62,8 +60,6 @@ namespace GameCore.Gameplay.Delivery
             _deliveryPoint.OnDroneLandedEvent -= OnDroneLanded;
             _deliveryPoint.OnDroneLeftEvent -= OnDroneLeft;
             _deliveryPoint.OnDroneTakeOffTimerFinishedEvent -= OnDroneTakeOffTimerFinished;
-
-            _mobileHeadquartersEntity.OnCallDeliveryDroneEvent -= OnCallDeliveryDrone;
         }
 
         public void DespawnClient()

@@ -13,7 +13,8 @@ namespace GameCore.Gameplay.GameManagement
         void SelectedLocationChanged(SceneName locationName);
         void PlayersGoldChanged(int playersGold);
         
-        event Action<GameState, bool> OnChangeGameStateInnerEvent;
+        event Action<GameState> OnChangeGameStateInnerEvent;
+        event Action<GameState, GameState> OnChangeGameStateWhenAllPlayersReadyInnerEvent;
         event Action<SceneName> OnSelectLocationInnerEvent;
         event Action OnLoadSelectedLocationInnerEvent;
         event Action<int> OnAddPlayersGoldInnerEvent;
@@ -23,7 +24,8 @@ namespace GameCore.Gameplay.GameManagement
         /// <summary>
         /// State should be changed only once!
         /// </summary>
-        void ChangeGameState(GameState gameState, bool ownerOnly = false);
+        void ChangeGameState(GameState gameState);
+        void ChangeGameStateWhenAllPlayersReady(GameState newState, GameState previousState);
         void SelectLocation(SceneName locationName);
         void LoadSelectedLocation();
         void AddPlayersGold(int amount);

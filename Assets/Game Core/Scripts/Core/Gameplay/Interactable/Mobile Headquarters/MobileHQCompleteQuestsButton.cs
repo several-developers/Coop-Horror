@@ -35,6 +35,11 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
             if (containsExpiredAndUncompletedQuests)
                 return false;
+
+            bool containsCompletedQuests = _questsManagerDecorator.ContainsCompletedQuests();
+
+            if (!containsCompletedQuests)
+                return false;
             
             GameState gameState = _gameManagerDecorator.GetGameState();
             bool isGameStateValid = false;

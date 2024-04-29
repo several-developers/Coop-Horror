@@ -1,7 +1,8 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Other;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -10,13 +11,14 @@ namespace GameCore.Gameplay.Interactable
     public class SimpleButton : MonoBehaviour, IInteractable
     {
         // MEMBERS: -------------------------------------------------------------------------------
+
+        [Title(Constants.Settings)]
+        [SerializeField, Min(0)]
+        private float _delay = 0.15f;
         
         [Title(Constants.References)]
         [SerializeField, Required]
         private Animator _animator;
-
-        [SerializeField, Required]
-        private AnimationObserver _animationObserver;
         
         // FIELDS: --------------------------------------------------------------------------------
         
@@ -25,21 +27,17 @@ namespace GameCore.Gameplay.Interactable
         
         protected bool IsInteractionEnabled = true;
 
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
-
-        private void Awake() =>
-            _animationObserver.OnInteractEvent += OnButtonTriggered;
-
-        private void OnDestroy() =>
-            _animationObserver.OnInteractEvent -= OnButtonTriggered;
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void Interact(PlayerEntity playerEntity = null)
         {
             IsInteractionEnabled = false;
-            _animator.SetTrigger(id: AnimatorHashes.Trigger);
+            InteractLogic();
+            PlayInteractAnimation();
         }
+
+        public void PlayInteractAnimation() =>
+            _animator.SetTrigger(id: AnimatorHashes.Trigger);
 
         public void ToggleInteract(bool canInteract)
         {
@@ -53,16 +51,23 @@ namespace GameCore.Gameplay.Interactable
         public virtual bool CanInteract() => IsInteractionEnabled;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
-        private void SendInteractionStateChangedEvent() =>
-            OnInteractionStateChangedEvent?.Invoke();
 
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnButtonTriggered()
+        private async void InteractLogic()
         {
+            int delay = _delay.ConvertToMilliseconds();
+
+            bool isCanceled = await UniTask
+                .Delay(delay, cancellationToken: this.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+            
             IsInteractionEnabled = true;
             OnTriggerEvent.Invoke();
         }
+        
+        private void SendInteractionStateChangedEvent() =>
+            OnInteractionStateChangedEvent?.Invoke();
     }
 }

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a184ea0043ce46a786e2ca4551bf93e1, type: 3}
   m_Name: Balance Config
   m_EditorClassIdentifier: 
-  _metaName: 
-  _gameRestartDelay: 5
+  _metaName: Balance Config
+  _gameRestartDelay: 6

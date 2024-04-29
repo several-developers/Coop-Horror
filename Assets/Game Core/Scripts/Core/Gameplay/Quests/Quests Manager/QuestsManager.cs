@@ -47,7 +47,7 @@ namespace GameCore.Gameplay.Quests
         {
             _questsManagerDecorator.OnSelectQuestInnerEvent += OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent += SubmitQuestItem;
-            _questsManagerDecorator.OnCompleteQuestsInnerEvent += CompleteQuests;
+            _questsManagerDecorator.OnCompleteQuestsInnerEvent += CompleteQuestsServerRpc;
             _questsManagerDecorator.OnGetQuestsStorageInnerEvent += GetQuestsStorage;
             _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent += GetActiveQuestsAmount;
             _questsManagerDecorator.OnContainsCompletedQuestsInnerEvent += ContainsCompletedQuests;
@@ -62,7 +62,7 @@ namespace GameCore.Gameplay.Quests
         {
             _questsManagerDecorator.OnSelectQuestInnerEvent -= OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent -= SubmitQuestItem;
-            _questsManagerDecorator.OnCompleteQuestsInnerEvent -= CompleteQuests;
+            _questsManagerDecorator.OnCompleteQuestsInnerEvent -= CompleteQuestsServerRpc;
             _questsManagerDecorator.OnGetQuestsStorageInnerEvent -= GetQuestsStorage;
             _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent -= GetActiveQuestsAmount;
             _questsManagerDecorator.OnContainsCompletedQuestsInnerEvent -= ContainsCompletedQuests;
@@ -131,12 +131,6 @@ namespace GameCore.Gameplay.Quests
 
         private void SubmitQuestItem(int itemID) => SubmitQuestItemServerRpc(itemID);
 
-        private void CompleteQuests()
-        {
-            _questsStorage.CompleteQuests();
-            _questsManagerDecorator.ActiveQuestsDataReceived();
-        }
-
         private void CalculateReward()
         {
             int reward = _questsStorage.CalculateReward();
@@ -154,19 +148,20 @@ namespace GameCore.Gameplay.Quests
             switch (gameState)
             {
                 case GameState.ArrivedAtTheRoad:
-                    _questsStorage.DecreaseDays();
-                    _questsManagerDecorator.UpdateQuestsProgress();
+                    if (!IsOwner)
+                        return;
+                    
+                    DecreaseQuestsDaysServerRpc();
                     break;
-                
+
                 case GameState.QuestsRewarding:
                     CalculateReward();
                     CreateQuests();
-                    _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad, ownerOnly: true);
                     break;
-                
+
                 case GameState.RestartGame:
                     _questsStorage.ClearAll();
-                    _questsManagerDecorator.UpdateQuestsProgress();
+                    _questsManagerDecorator.ActiveQuestsDataReceived();
                     CreateQuests();
                     break;
             }
@@ -215,6 +210,12 @@ namespace GameCore.Gameplay.Quests
         [ServerRpc(RequireOwnership = false)]
         private void SubmitQuestItemServerRpc(int itemID) => SubmitQuestItemClientRpc(itemID);
 
+        [ServerRpc]
+        private void DecreaseQuestsDaysServerRpc() => DecreaseQuestsDaysClientRpc();
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CompleteQuestsServerRpc() => CompleteQuestsClientRpc();
+
         [ClientRpc]
         private void SynchronizeAwaitingQuestsDataClientRpc(QuestRuntimeDataContainer[] questsRuntimeDataContainers,
             ulong requestedClientId)
@@ -251,6 +252,20 @@ namespace GameCore.Gameplay.Quests
         {
             _questsStorage.SubmitQuestItem(itemID);
             _questsManagerDecorator.UpdateQuestsProgress();
+        }
+
+        [ClientRpc]
+        private void DecreaseQuestsDaysClientRpc()
+        {
+            _questsStorage.DecreaseDays();
+            _questsManagerDecorator.UpdateQuestsProgress();
+        }
+
+        [ClientRpc]
+        private void CompleteQuestsClientRpc()
+        {
+            _questsStorage.CompleteQuests();
+            _questsManagerDecorator.ActiveQuestsDataReceived();
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

@@ -3,6 +3,7 @@ using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
@@ -54,6 +55,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public event Action OnOpenQuestsSelectionMenuEvent = delegate { };
         public event Action OnOpenLocationsSelectionMenuEvent = delegate { };
+        public event Action OnOpenGameOverWarningMenuEvent = delegate { };
         public event Action OnCallDeliveryDroneEvent = delegate { };
 
         private ILocationManagerDecorator _locationManagerDecorator;
@@ -155,10 +157,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         }
 
         public void OpenDoor() => OpenDoorServerRpc();
-        
+
+        public void EnableMainLever() =>
+            _mobileHeadquartersController.EnableMainLever();
+
         public void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
-        
+
         public void ArrivedAtRoadLocation()
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
@@ -172,6 +177,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public void SendOpenLocationsSelectionMenu() =>
             OnOpenLocationsSelectionMenuEvent.Invoke();
+
+        public void SendOpenGameOverWarningMenu() =>
+            OnOpenGameOverWarningMenuEvent.Invoke();
 
         public void SendCallDeliveryDrone() =>
             OnCallDeliveryDroneEvent.Invoke();
@@ -194,39 +202,115 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private void ToggleDoorState(bool isOpen) =>
             _mobileHeadquartersController.ToggleDoorState(isOpen);
 
+        private static bool IsCurrentPlayer(ulong senderClientID) =>
+            NetworkHorror.ClientID == senderClientID;
+
         // RPC: -----------------------------------------------------------------------------------
 
+#warning TEMP
         [ServerRpc(RequireOwnership = false)]
-        public void LoadLocationServerRpc() => LoadLocationClientRpc();
-
-        [ServerRpc(RequireOwnership = false)]
-        public void StartLeavingLocationServerRpc() => StartLeavingLocationClientRpc();
-
-        [ClientRpc]
-        private void LoadLocationClientRpc()
-        {
-            MobileHQMainLever loadLocationLever = _references.MainLever;
-            loadLocationLever.InteractLogic();
-
-            ToggleDoorState(isOpen: false);
-        }
-
-        [ClientRpc]
-        private void StartLeavingLocationClientRpc()
+        public void StartLeavingLocationServerRpc()
         {
             CinemachinePath path = _locationManagerDecorator.GetExitPath();
 
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
-            ToggleMovement(canMove: true);
-            ToggleDoorState(isOpen: false);
+            StartLeavingLocationClientRpc();
         }
 
         [ServerRpc]
         private void OpenDoorServerRpc() => OpenDoorClientRpc();
 
+        [ServerRpc(RequireOwnership = false)]
+        public void MainLeverAnimationServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
+            MainLeverAnimationClientRpc(senderClientId);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void PlayQuestsButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
+            PlayQuestsButtonAnimationClientRpc(senderClientId);
+        }
+        
+        [ServerRpc(RequireOwnership = false)]
+        public void PlayLocationsButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
+            PlayLocationsButtonAnimationClientRpc(senderClientId);
+        }
+        
+        [ServerRpc(RequireOwnership = false)]
+        public void PlayDeliveryDroneButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
+            PlayDeliveryDroneButtonAnimationClientRpc(senderClientId);
+        }
+        
+        [ServerRpc(RequireOwnership = false)]
+        public void PlayCompleteQuestsButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
+            PlayCompleteQuestsButtonAnimationClientRpc(senderClientId);
+        }
+        
+        [ClientRpc]
+        private void StartLeavingLocationClientRpc() => ToggleMovement(canMove: true);
+
         [ClientRpc]
         private void OpenDoorClientRpc() => ToggleDoorState(isOpen: true);
+
+        [ClientRpc]
+        private void MainLeverAnimationClientRpc(ulong senderClientID)
+        {
+            if (IsCurrentPlayer(senderClientID))
+                return;
+
+            MobileHQMainLever mainLever = _references.MainLever;
+            mainLever.InteractWithoutEvents(isLeverPulled: true);
+        }
+        
+        [ClientRpc]
+        private void PlayQuestsButtonAnimationClientRpc(ulong senderClientID)
+        {
+            if (IsCurrentPlayer(senderClientID))
+                return;
+
+            SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
+            openQuestsSelectionMenuButton.PlayInteractAnimation();
+        }
+        
+        [ClientRpc]
+        private void PlayLocationsButtonAnimationClientRpc(ulong senderClientID)
+        {
+            if (IsCurrentPlayer(senderClientID))
+                return;
+            
+            SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
+            openLocationsSelectionMenuButton.PlayInteractAnimation();
+        }
+        
+        [ClientRpc]
+        private void PlayDeliveryDroneButtonAnimationClientRpc(ulong senderClientID)
+        {
+            if (IsCurrentPlayer(senderClientID))
+                return;
+            
+            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
+            callDeliveryDroneButton.PlayInteractAnimation();
+        }
+        
+        [ClientRpc]
+        private void PlayCompleteQuestsButtonAnimationClientRpc(ulong senderClientID)
+        {
+            if (IsCurrentPlayer(senderClientID))
+                return;
+            
+            SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
+            completeQuestsButton.PlayInteractAnimation();
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -253,7 +337,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             switch (GameState)
             {
                 case GameState.HeadingToTheLocation:
-                    GameManagerDecorator.ChangeGameState(GameState.ArrivedAtTheLocation);
+                    GameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.ArrivedAtTheLocation,
+                        previousState: GameState.HeadingToTheLocation);
                     break;
 
                 case GameState.HeadingToTheRoad:

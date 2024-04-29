@@ -31,8 +31,8 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private readonly LayerMask _interactionObstaclesLM;
         private readonly RaycastHit[] _hits;
 
+        private IInteractable _lastInteractable;
         private int _lastInteractableItemIndex;
-        private int _lastInteractableItemUniqueID;
         private bool _isInteractionFound;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -48,13 +48,13 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
                 return;
             }
 
-            if (IsObstaclesFound(out int interactableItemIndex))
+            if (IsObstaclesFound(out IInteractable interactable))
             {
                 SendInteractionEndedEvent();
                 return;
             }
 
-            SendCanInteract(interactableItemIndex);
+            SendCanInteract(interactable);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -68,14 +68,13 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             _playerInteractionObserver.SendInteractionEnded();
         }
 
-        private void SendCanInteract(int interactableItemIndex)
+        private void SendCanInteract(IInteractable interactable)
         {
-            if (_isInteractionFound && interactableItemIndex == _lastInteractableItemIndex)
+            if (_isInteractionFound && interactable == _lastInteractable)
                 return;
-
-            _lastInteractableItemIndex = interactableItemIndex;
+            
+            _lastInteractable = interactable;
             _isInteractionFound = true;
-            var interactable = _hits[interactableItemIndex].transform.GetComponent<IInteractable>();
 
             _playerInteractionObserver.SendCanInteract(interactable);
         }
@@ -99,25 +98,18 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
             if (!isInteractableComponentExists)
                 return false;
-            
-            
-            
-            //if (!interactable.CanInteract())
-                //return false;
 
             return true;
         }
 
-        private bool IsObstaclesFound(out int interactableItemIndex)
+        private bool IsObstaclesFound(out IInteractable interactable)
         {
             Ray ray = GetRay();
             int hitsAmount = Physics.RaycastNonAlloc(ray, _hits, _interactionMaxDistance, _interactionObstaclesLM);
+            interactable = null;
 
             if (hitsAmount == 0)
-            {
-                interactableItemIndex = 0;
                 return false;
-            }
 
             int closestObjectIndex = 0;
             float minDistance = float.MaxValue;
@@ -134,11 +126,13 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
                 minDistance = distance;
                 closestObjectIndex = i;
             }
-
-            interactableItemIndex = closestObjectIndex;
+            
             RaycastHit closestObjectHitInfo = _hits[closestObjectIndex];
             int objectLayer = closestObjectHitInfo.transform.gameObject.layer;
             bool isObstacle = !_interactionLm.Contains(objectLayer);
+
+            if (!isObstacle)
+                interactable = closestObjectHitInfo.transform.GetComponent<IInteractable>();
             
             return isObstacle;
         }

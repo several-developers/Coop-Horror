@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 8535677543243867004}
   - component: {fileID: 8535677543243866979}
   m_Layer: 0
-  m_Name: Reward (TMP)
+  m_Name: Title (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

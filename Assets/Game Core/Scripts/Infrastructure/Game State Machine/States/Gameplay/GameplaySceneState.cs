@@ -7,6 +7,7 @@ using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Gameplay.GameOverMenu;
+using GameCore.UI.Gameplay.GameOverWarningMenu;
 using GameCore.UI.Gameplay.LocationsSelectionMenu;
 using GameCore.UI.Gameplay.PauseMenu;
 using GameCore.UI.Gameplay.Quests;
@@ -49,6 +50,7 @@ namespace GameCore.Infrastructure.StateMachine
         private QuestsSelectionMenuView _questsSelectionMenuView;
         private LocationsSelectionMenuView _locationsSelectionMenuView;
         private GameOverMenuView _gameOverMenuView;
+        private GameOverWarningMenuView _gameOverWarningMenuView;
         private int _openedMenus; // TEMP
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -63,6 +65,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreateLocationsSelectionMenuView(); // TEMP
             CreateGameOverMenu(); // TEMP
             CreateRewardMenu(); // TEMP
+            CreateGameOverWarningMenuView(); // TEMP
             CreatePauseMenu(); // TEMP
             CreateQuitConfirmMenuView(); // TEMP
 
@@ -73,6 +76,7 @@ namespace GameCore.Infrastructure.StateMachine
 
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent += OnOpenLocationsSelectionMenu;
+            _mobileHeadquartersEntity.OnOpenGameOverWarningMenuEvent += OnOpenGameOverWarningMenu;
 
             _pauseMenuView.OnShowEvent += OnMenuShown;
             _pauseMenuView.OnHideEvent += OnMenuHidden;
@@ -85,7 +89,12 @@ namespace GameCore.Infrastructure.StateMachine
             _locationsSelectionMenuView.OnShowEvent += OnMenuShown;
             _locationsSelectionMenuView.OnHideEvent += OnMenuHidden;
 
-            _quitConfirmMenuView.OnConfirmClickedEvent += OnConfirmQuitClicked;
+            _gameOverWarningMenuView.OnShowEvent += OnMenuShown;
+            _gameOverWarningMenuView.OnHideEvent += OnMenuHidden;
+            _gameOverWarningMenuView.OnConfirmClickedEvent += OnGameOverWarningConfirmClicked;
+            _gameOverWarningMenuView.OnCancelClickedEvent += OnGameOverWarningCancelClicked;
+
+            _quitConfirmMenuView.OnConfirmClickedEvent += OnQuitConfirmClicked;
 
             _gameManagerDecorator.OnGameStateChangedEvent += GameStateChanged;
         }
@@ -97,6 +106,7 @@ namespace GameCore.Infrastructure.StateMachine
 
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent -= OnOpenLocationsSelectionMenu;
+            _mobileHeadquartersEntity.OnOpenGameOverWarningMenuEvent -= OnOpenGameOverWarningMenu;
 
             _pauseMenuView.OnShowEvent -= OnMenuShown;
             _pauseMenuView.OnHideEvent -= OnMenuHidden;
@@ -108,8 +118,13 @@ namespace GameCore.Infrastructure.StateMachine
 
             _locationsSelectionMenuView.OnShowEvent -= OnMenuShown;
             _locationsSelectionMenuView.OnHideEvent -= OnMenuHidden;
+            
+            _gameOverWarningMenuView.OnShowEvent -= OnMenuShown;
+            _gameOverWarningMenuView.OnHideEvent -= OnMenuHidden;
+            _gameOverWarningMenuView.OnConfirmClickedEvent -= OnGameOverWarningConfirmClicked;
+            _gameOverWarningMenuView.OnCancelClickedEvent -= OnGameOverWarningCancelClicked;
 
-            _quitConfirmMenuView.OnConfirmClickedEvent -= OnConfirmQuitClicked;
+            _quitConfirmMenuView.OnConfirmClickedEvent -= OnQuitConfirmClicked;
             
             _gameManagerDecorator.OnGameStateChangedEvent -= GameStateChanged;
         }
@@ -154,6 +169,9 @@ namespace GameCore.Infrastructure.StateMachine
         private void CreateRewardMenu() =>
             MenuFactory.Create<RewardMenuView>(_diContainer);
 
+        private void CreateGameOverWarningMenuView() =>
+            _gameOverWarningMenuView = MenuFactory.Create<GameOverWarningMenuView>(_diContainer);
+        
         private void CreatePauseMenu() =>
             _pauseMenuView = MenuFactory.Create<PauseMenuView>(_diContainer);
 
@@ -222,6 +240,12 @@ namespace GameCore.Infrastructure.StateMachine
                 _locationsSelectionMenuView.Hide();
                 return;
             }
+
+            if (_gameOverWarningMenuView.IsShown)
+            {
+                _gameOverWarningMenuView.Hide();
+                return;
+            }
         }
 
         private void OnOpenQuestsSelectionMenu()
@@ -252,12 +276,26 @@ namespace GameCore.Infrastructure.StateMachine
                 _locationsSelectionMenuView.Show();
         }
 
+        private void OnOpenGameOverWarningMenu()
+        {
+            if (_gameOverWarningMenuView.IsShown)
+                _gameOverWarningMenuView.Hide();
+            else
+                _gameOverWarningMenuView.Show();
+        }
+
         private void OnContinueClicked() =>
             _pauseMenuView.Hide();
 
         private void OnQuitClicked() => ShowQuitConfirmMenu();
 
-        private void OnConfirmQuitClicked() => EnterQuitGameplayState();
+        private void OnGameOverWarningConfirmClicked() =>
+            _gameManagerDecorator.ChangeGameState(GameState.KillPlayersOnTheRoad);
+
+        private void OnGameOverWarningCancelClicked() =>
+            _mobileHeadquartersEntity.EnableMainLever();
+
+        private void OnQuitConfirmClicked() => EnterQuitGameplayState();
 
         private void OnMenuShown()
         {

@@ -26539,11 +26539,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Interaction HUD
       objectReference: {fileID: 0}
-    - target: {fileID: 1650463360097365807, guid: 0153e930942f1b443a36c5980296dcb1,
-        type: 3}
-      propertyPath: m_fontColor32.rgba
-      value: 16777215
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0153e930942f1b443a36c5980296dcb1, type: 3}
 --- !u!4 &2536110931913429436

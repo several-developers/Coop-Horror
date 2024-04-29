@@ -19,6 +19,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _references = mobileHeadquartersEntity.References;
             _gameManagerDecorator = mobileHeadquartersEntity.GameManagerDecorator;
             _questsManagerDecorator = mobileHeadquartersEntity.QuestsManagerDecorator;
+
+            //EnableMainLever();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -47,7 +49,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             completeQuestsButton.OnTriggerEvent += OnCompleteQuests;
 
             MobileHQMainLever loadLocationLever = _references.MainLever;
-            loadLocationLever.OnInteractEvent += OnInteractWithLoadLocationLever;
+            loadLocationLever.OnInteractEvent += OnInteractWithMainLever;
             loadLocationLever.OnEnabledEvent += OnMainLeverPulled;
 
             AnimationObserver animationObserver = _references.AnimationObserver;
@@ -79,7 +81,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             completeQuestsButton.OnTriggerEvent -= OnCompleteQuests;
 
             MobileHQMainLever loadLocationLever = _references.MainLever;
-            loadLocationLever.OnInteractEvent -= OnInteractWithLoadLocationLever;
+            loadLocationLever.OnInteractEvent -= OnInteractWithMainLever;
             loadLocationLever.OnEnabledEvent -= OnMainLeverPulled;
 
             AnimationObserver animationObserver = _references.AnimationObserver;
@@ -100,6 +102,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             animator.SetBool(id: AnimatorHashes.IsOpen, isOpen);
         }
 
+        public void EnableMainLever()
+        {
+            MobileHQMainLever mainLever = _references.MainLever;
+            mainLever.InteractWithoutEvents(isLeverPulled: false);
+            mainLever.ToggleInteract(canInteract: true);
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void HandleGameState(GameState gameState)
@@ -115,9 +124,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case GameState.ReadyToLeaveTheRoad:
-                    MobileHQMainLever mainLever = _references.MainLever;
-                    mainLever.InteractWithoutEvents(isLeverPulled: false);
-                    mainLever.ToggleInteract(canInteract: true);
+                case GameState.ReadyToLeaveTheLocation:
+                    EnableMainLever();
                     break;
 
                 case GameState.ArrivedAtTheLocation:
@@ -130,7 +138,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
                     ToggleDoorState(isOpen: true);
                     break;
-                
+
                 case GameState.RestartGame:
                     deathCamera = _references.DeathCamera;
                     deathCamera.SetActive(false);
@@ -147,61 +155,81 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             switch (gameState)
             {
                 case GameState.WaitingForPlayers:
-                    _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad);
+                    //_gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad);
                     break;
 
                 case GameState.ReadyToLeaveTheRoad:
                     bool containsExpiredQuests = _questsManagerDecorator.ContainsExpiredQuests();
 
                     if (containsExpiredQuests)
-                        _gameManagerDecorator.ChangeGameState(GameState.KillPlayersOnTheRoad);
+                        _mobileHeadquartersEntity.SendOpenGameOverWarningMenu();
                     else
+                    {
+                        Debug.Log("----> LOAD LOCATION");
                         _gameManagerDecorator.LoadSelectedLocation();
+                    }
 
                     break;
 
                 case GameState.ReadyToLeaveTheLocation:
                     _mobileHeadquartersEntity.StartLeavingLocationServerRpc();
-                    _gameManagerDecorator.ChangeGameState(GameState.HeadingToTheRoad);
+                    
+                    _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.HeadingToTheRoad,
+                        previousState: GameState.ReadyToLeaveTheLocation);
                     break;
             }
         }
 
         private void DoorOpenedLogic()
         {
+            if (!_mobileHeadquartersEntity.IsOwner)
+                return;
+
             GameState gameState = _mobileHeadquartersEntity.GameState;
 
             if (gameState != GameState.ArrivedAtTheLocation)
                 return;
 
-            MobileHQMainLever mainLever = _references.MainLever;
-            mainLever.InteractWithoutEvents(isLeverPulled: false);
-            mainLever.ToggleInteract(canInteract: true);
-
-            _gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheLocation, ownerOnly: true);
+            const GameState newState = GameState.ReadyToLeaveTheLocation;
+            _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState, previousState: gameState);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
 
-        private void OnOpenQuestsSelectionMenu() =>
+        private void OnOpenQuestsSelectionMenu()
+        {
             _mobileHeadquartersEntity.SendOpenQuestsSelectionMenu();
+            _mobileHeadquartersEntity.PlayQuestsButtonAnimationServerRpc();
+        }
 
-        private void OnOpenLocationsSelectionMenu() =>
+        private void OnOpenLocationsSelectionMenu()
+        {
             _mobileHeadquartersEntity.SendOpenLocationsSelectionMenu();
+            _mobileHeadquartersEntity.PlayLocationsButtonAnimationServerRpc();
+        }
 
-        private void OnCallDeliveryDrone() =>
+        private void OnCallDeliveryDrone()
+        {
             _mobileHeadquartersEntity.SendCallDeliveryDrone();
+            _mobileHeadquartersEntity.PlayDeliveryDroneButtonAnimationServerRpc();
+        }
 
         private void OnCompleteQuests()
         {
+            _mobileHeadquartersEntity.PlayCompleteQuestsButtonAnimationServerRpc();
             _questsManagerDecorator.CompleteQuests();
             _gameManagerDecorator.ChangeGameState(GameState.QuestsRewarding);
         }
 
-        private void OnInteractWithLoadLocationLever() =>
-            _mobileHeadquartersEntity.LoadLocationServerRpc();
+        private void OnInteractWithMainLever()
+        {
+            MobileHQMainLever mainLever = _references.MainLever;
+            mainLever.InteractLogic();
+
+            _mobileHeadquartersEntity.MainLeverAnimationServerRpc();
+        }
 
         private void OnMainLeverPulled() => MainLeverLogic();
 
