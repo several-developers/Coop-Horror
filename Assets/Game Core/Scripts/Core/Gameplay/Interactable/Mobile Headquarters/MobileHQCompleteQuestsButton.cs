@@ -24,6 +24,14 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public override void InteractionStarted()
+        {
+        }
+
+        public override void InteractionEnded()
+        {
+        }
+
         public override bool CanInteract()
         {
             int activeQuestsAmount = _questsManagerDecorator.GetActiveQuestsAmount();
@@ -51,7 +59,10 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
                     break;
             }
 
-            return isGameStateValid && IsInteractionEnabled;
+            if (!isGameStateValid)
+                return false;
+
+            return IsInteractionEnabled;
         }
     }
 }

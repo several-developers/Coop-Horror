@@ -16,6 +16,7 @@ namespace GameCore.Gameplay.Quests
         event Action OnCompleteQuestsInnerEvent;
         event Func<QuestsStorage> OnGetQuestsStorageInnerEvent;
         event Func<int> OnGetActiveQuestsAmountInnerEvent;
+        event Func<int, bool> OnContainsItemInQuestsInnerEvent;
         event Func<bool> OnContainsCompletedQuestsInnerEvent;
         event Func<bool> OnContainsExpiredQuestsInnerEvent;
         event Func<bool> OnContainsExpiredAndUncompletedQuestsInnerEvent;
@@ -24,6 +25,7 @@ namespace GameCore.Gameplay.Quests
         void CompleteQuests();
         QuestsStorage GetQuestsStorage();
         int GetActiveQuestsAmount();
+        bool ContainsItemInQuests(int itemID);
         bool ContainsCompletedQuests();
         bool ContainsExpiredQuests();
         bool ContainsExpiredAndUncompletedQuests();

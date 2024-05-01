@@ -1,6 +1,8 @@
-﻿using GameCore.Gameplay.Entities.MobileHeadquarters;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Network.Utilities;
 using Unity.Netcode;
+using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Delivery
@@ -10,22 +12,44 @@ namespace GameCore.Gameplay.Delivery
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IDeliveryPoint deliveryPoint, IMobileHeadquartersEntity mobileHeadquartersEntity)
+        private void Construct(IDeliveryManagerDecorator deliveryManagerDecorator, IDeliveryPoint deliveryPoint,
+            IMobileHeadquartersEntity mobileHeadquartersEntity)
         {
+            _deliveryManagerDecorator = deliveryManagerDecorator;
             _deliveryPoint = deliveryPoint;
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
+        private readonly NetworkVariable<DroneState> _droneState = new();
+
+        private IDeliveryManagerDecorator _deliveryManagerDecorator;
         private IDeliveryPoint _deliveryPoint;
         private IMobileHeadquartersEntity _mobileHeadquartersEntity;
-        private bool _canCallDeliveryDrone;
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Awake()
+        {
+            _deliveryManagerDecorator.OnResetTakeOffTimerInnerEvent += OnResetTakeOffTimer;
+            _deliveryManagerDecorator.OnGetDroneStateInnerEvent += GetDroneState;
+        }
+
+        public override void OnDestroy()
+        {
+            _deliveryManagerDecorator.OnResetTakeOffTimerInnerEvent -= OnResetTakeOffTimer;
+            _deliveryManagerDecorator.OnGetDroneStateInnerEvent -= GetDroneState;
+
+            base.OnDestroy();
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void InitServerAndClient()
         {
+            _droneState.OnValueChanged += OnDroneStateChanged;
+            
             _mobileHeadquartersEntity.OnCallDeliveryDroneEvent += OnCallDeliveryDrone;
         }
 
@@ -34,11 +58,8 @@ namespace GameCore.Gameplay.Delivery
             if (!IsOwner)
                 return;
 
-            _canCallDeliveryDrone = true;
-            
-            _deliveryPoint.OnDroneLandedEvent += OnDroneLanded;
-            _deliveryPoint.OnDroneLeftEvent += OnDroneLeft;
             _deliveryPoint.OnDroneTakeOffTimerFinishedEvent += OnDroneTakeOffTimerFinished;
+            _deliveryPoint.OnDroneStateChangedEvent += ChangeDroneState;
         }
 
         public void InitClient()
@@ -49,6 +70,8 @@ namespace GameCore.Gameplay.Delivery
 
         public void DespawnServerAndClient()
         {
+            _droneState.OnValueChanged -= OnDroneStateChanged;
+            
             _mobileHeadquartersEntity.OnCallDeliveryDroneEvent -= OnCallDeliveryDrone;
         }
 
@@ -56,10 +79,9 @@ namespace GameCore.Gameplay.Delivery
         {
             if (!IsOwner)
                 return;
-            
-            _deliveryPoint.OnDroneLandedEvent -= OnDroneLanded;
-            _deliveryPoint.OnDroneLeftEvent -= OnDroneLeft;
+
             _deliveryPoint.OnDroneTakeOffTimerFinishedEvent -= OnDroneTakeOffTimerFinished;
+            _deliveryPoint.OnDroneStateChangedEvent -= ChangeDroneState;
         }
 
         public void DespawnClient()
@@ -68,6 +90,29 @@ namespace GameCore.Gameplay.Delivery
                 return;
         }
 
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void ChangeDroneState(DroneState droneState) =>
+            _droneState.Value = droneState;
+
+        private void HandleDroneStateServerLogic(DroneState droneState)
+        {
+            switch (droneState)
+            {
+                case DroneState.Landed:
+                    _deliveryPoint.StartTakeOffTimer();
+                    break;
+            }
+        }
+        
+        private void ResetTakeOffTimer()
+        {
+            _deliveryPoint.ResetTakeOffTimer();
+        }
+
+        private DroneState GetDroneState() =>
+            _droneState.Value;
+        
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
@@ -78,6 +123,9 @@ namespace GameCore.Gameplay.Delivery
 
         [ServerRpc]
         private void HideDeliveryPointServerRpc() => HideDeliveryPointClientRpc();
+        
+        [ServerRpc(RequireOwnership = false)]
+        private void ResetTakeOffTimerServerRpc() => ResetTakeOffTimer();
 
         [ClientRpc]
         private void CallDeliveryDroneClientRpc()
@@ -85,10 +133,11 @@ namespace GameCore.Gameplay.Delivery
             if (!IsOwner)
                 return;
 
-            if (!_canCallDeliveryDrone)
+            bool canCallDeliveryDrone = _droneState.Value == DroneState.WaitingForCall;
+            
+            if (!canCallDeliveryDrone)
                 return;
 
-            _canCallDeliveryDrone = false;
             _deliveryPoint.LandDrone();
             _mobileHeadquartersEntity.OpenDoor();
             ShowDeliveryPointServerRpc();
@@ -107,7 +156,7 @@ namespace GameCore.Gameplay.Delivery
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
+
             InitServerAndClient();
             InitServer();
             InitClient();
@@ -116,19 +165,29 @@ namespace GameCore.Gameplay.Delivery
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            
+
             DespawnServerAndClient();
             DespawnServer();
             DespawnClient();
         }
 
-        private void OnDroneLanded() =>
-            _deliveryPoint.StartTakeOffTimer();
-
-        private void OnDroneLeft() =>
-            _canCallDeliveryDrone = true;
+        private void OnResetTakeOffTimer()
+        {
+            if (IsOwner)
+                ResetTakeOffTimer();
+            else
+                ResetTakeOffTimerServerRpc();
+        }
 
         private void OnDroneTakeOffTimerFinished() => HideDeliveryPointServerRpc();
+
+        private void OnDroneStateChanged(DroneState previousValue, DroneState newValue)
+        {
+            if (IsOwner)
+                HandleDroneStateServerLogic(droneState: newValue);
+            
+            _deliveryManagerDecorator.DroneStateChanged(droneState: newValue);
+        }
 
         private void OnCallDeliveryDrone() => CallDeliveryDroneServerRpc();
     }

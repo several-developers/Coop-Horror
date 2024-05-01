@@ -55,7 +55,15 @@ namespace GameCore.Gameplay.Interactable
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
+        public virtual void InteractionStarted()
+        {
+        }
+
+        public virtual void InteractionEnded()
+        {
+        }
+
         public void Interact(PlayerEntity playerEntity = null)
         {
             IsInteractionEnabled = false;

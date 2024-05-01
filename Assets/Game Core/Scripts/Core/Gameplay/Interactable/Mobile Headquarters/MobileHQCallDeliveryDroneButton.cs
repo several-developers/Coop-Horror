@@ -1,4 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
 using Zenject;
 
@@ -9,14 +10,25 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator) =>
+        private void Construct(IGameManagerDecorator gameManagerDecorator,
+            IDeliveryManagerDecorator deliveryManagerDecorator)
+        {
             _gameManagerDecorator = gameManagerDecorator;
+            _deliveryManagerDecorator = deliveryManagerDecorator;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private IGameManagerDecorator _gameManagerDecorator;
-        
+        private IDeliveryManagerDecorator _deliveryManagerDecorator;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public override void InteractionStarted() =>
+            _deliveryManagerDecorator.OnDroneStateChangedEvent += OnDroneStateChanged;
+
+        public override void InteractionEnded() =>
+            _deliveryManagerDecorator.OnDroneStateChangedEvent -= OnDroneStateChanged;
 
         public override bool CanInteract()
         {
@@ -30,7 +42,20 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
                     break;
             }
 
-            return isGameStateValid && IsInteractionEnabled;
+            if (!isGameStateValid)
+                return false;
+
+            DroneState droneState = _deliveryManagerDecorator.GetDroneState();
+            bool canCallDeliveryDrone = droneState == DroneState.WaitingForCall;
+
+            if (!canCallDeliveryDrone)
+                return false;
+
+            return IsInteractionEnabled;
         }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnDroneStateChanged(DroneState droneState) => SendInteractionStateChangedEvent();
     }
 }

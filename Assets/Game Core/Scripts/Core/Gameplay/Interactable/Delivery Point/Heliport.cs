@@ -1,5 +1,6 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Items;
@@ -15,10 +16,12 @@ namespace GameCore.Gameplay.Interactable
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsProvider itemsProvider, IQuestsManagerDecorator questsManagerDecorator)
+        private void Construct(IItemsProvider itemsProvider, IQuestsManagerDecorator questsManagerDecorator,
+            IDeliveryManagerDecorator deliveryManagerDecorator)
         {
             _itemsProvider = itemsProvider;
             _questsManagerDecorator = questsManagerDecorator;
+            _deliveryManagerDecorator = deliveryManagerDecorator;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -27,10 +30,25 @@ namespace GameCore.Gameplay.Interactable
         
         private IItemsProvider _itemsProvider;
         private IQuestsManagerDecorator _questsManagerDecorator;
+        private IDeliveryManagerDecorator _deliveryManagerDecorator;
         private bool _canInteract = true;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
+        public void InteractionStarted()
+        {
+            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+            PlayerInventory inventory = localPlayer.GetInventory();
+            inventory.OnSelectedSlotChangedEvent += OnPlayerSelectedSlotChanged;
+        }
+
+        public void InteractionEnded()
+        {
+            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+            PlayerInventory inventory = localPlayer.GetInventory();
+            inventory.OnSelectedSlotChangedEvent -= OnPlayerSelectedSlotChanged;
+        }
+
         public void Interact(PlayerEntity playerEntity = null)
         {
             if (playerEntity == null)
@@ -48,8 +66,23 @@ namespace GameCore.Gameplay.Interactable
         public InteractionType GetInteractionType() =>
             InteractionType.Heliport;
 
-        public bool CanInteract() =>
-            _canInteract;
+        public bool CanInteract()
+        {
+            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+            PlayerInventory inventory = localPlayer.GetInventory();
+            var isItemInSelectedSlotExists = inventory.TryGetSelectedItemData(out InventoryItemData inventoryItemData);
+
+            if (!isItemInSelectedSlotExists)
+                return false;
+
+            int itemID = inventoryItemData.ItemID;
+            bool containsItemInQuests = _questsManagerDecorator.ContainsItemInQuests(itemID);
+
+            if (!containsItemInQuests)
+                return false;
+            
+            return _canInteract;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -69,9 +102,14 @@ namespace GameCore.Gameplay.Interactable
             
             playerEntity.DropItem(destroy: true);
             _questsManagerDecorator.SubmitQuestItem(item.ItemID);
+            _deliveryManagerDecorator.ResetTakeOffTimer();
         }
         
         private void SendInteractionStateChangedEvent() =>
             OnInteractionStateChangedEvent?.Invoke();
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnPlayerSelectedSlotChanged(int slotIndex) => SendInteractionStateChangedEvent();
     }
 }

@@ -83,6 +83,14 @@ namespace GameCore.Gameplay.Items
         public void Setup(int itemID) =>
             _itemID = itemID;
 
+        public virtual void InteractionStarted()
+        {
+        }
+
+        public virtual void InteractionEnded()
+        {
+        }
+
         public virtual void Interact(PlayerEntity playerEntity = null)
         {
             Debug.Log("Interacting with: " + name);

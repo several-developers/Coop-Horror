@@ -63,6 +63,14 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void InteractionStarted()
+        {
+        }
+
+        public void InteractionEnded()
+        {
+        }
+
         public void Interact(PlayerEntity playerEntity = null)
         {
             if (IsElevatorMoving())

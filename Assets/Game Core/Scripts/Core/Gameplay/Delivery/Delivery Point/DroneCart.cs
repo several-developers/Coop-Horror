@@ -1,5 +1,6 @@
 ﻿using Cinemachine;
 using GameCore.Configs.Gameplay.Delivery;
+using GameCore.Enums.Gameplay;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Delivery
@@ -30,6 +31,7 @@ namespace GameCore.Gameplay.Delivery
         private readonly CinemachinePath _takeOffPath;
         private readonly CinemachineDollyCart _deliveryCart;
 
+        private DroneState _droneState;
         private bool _isFlying;
         private bool _isLanding;
 
@@ -82,6 +84,7 @@ namespace GameCore.Gameplay.Delivery
             _deliveryCart.m_Path = _landingPath;
             _deliveryCart.m_Position = 0f;
 
+            ChangeState(DroneState.LandingInProgress);
             StartFlying();
         }
 
@@ -91,10 +94,17 @@ namespace GameCore.Gameplay.Delivery
             _deliveryCart.m_Path = _takeOffPath;
             _deliveryCart.m_Position = 0f;
 
+            ChangeState(DroneState.TakeOffInProgress);
             StartFlying();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void ChangeState(DroneState droneState)
+        {
+            _droneState = droneState;
+            _deliveryPoint.SendDroneStateChanged(droneState);
+        }
 
         private void StartFlying()
         {
@@ -106,11 +116,17 @@ namespace GameCore.Gameplay.Delivery
         {
             _isFlying = false;
             _deliveryCart.m_Speed = 0f;
-            
-            if (_isLanding)
-                _deliveryPoint.SendDroneLanded();
-            else
-                _deliveryPoint.SendDroneLeft();
+
+            switch (_droneState)
+            {
+                case DroneState.LandingInProgress:
+                    ChangeState(DroneState.Landed);
+                    break;
+                
+                case DroneState.TakeOffInProgress:
+                    ChangeState(DroneState.WaitingForCall);
+                    break;
+            }
         }
     }
 }

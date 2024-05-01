@@ -1,7 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Interactable;
-using GameCore.Gameplay.Items;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 
 namespace GameCore.Gameplay.Entities.Player.Interaction
@@ -16,7 +15,6 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             _playerEntity = playerEntity;
             _playerInventoryManager = playerInventoryManager;
             _playerInteractionObserver = playerInteractionObserver;
-            _interactableItems = new IInteractableItem[Constants.PlayerInventorySize];
 
             _playerInteractionObserver.OnInteractionStartedEvent += OnInteractionStarted;
             _playerInteractionObserver.OnInteractionEndedEvent += OnInteractionEnded;
@@ -27,7 +25,6 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private readonly PlayerEntity _playerEntity;
         private readonly PlayerInventoryManager _playerInventoryManager;
         private readonly IPlayerInteractionObserver _playerInteractionObserver;
-        private readonly IInteractableItem[] _interactableItems;
 
         private IInteractable _lastInteractable;
         private bool _isInteractableFound;
@@ -67,15 +64,30 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private void HandlePickUpItem() =>
             _playerInventoryManager.PickUpItem(_lastInteractable);
 
+        private void InteractionStarted() =>
+            _lastInteractable.InteractionStarted();
+
+        private void InteractionEnded() =>
+            _lastInteractable.InteractionEnded();
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnInteractionStarted(IInteractable interactable)
         {
+            if (_isInteractableFound)
+                InteractionEnded();
+
             _isInteractableFound = true;
             _lastInteractable = interactable;
+            
+            InteractionStarted();
         }
 
-        private void OnInteractionEnded() =>
+        private void OnInteractionEnded()
+        {
             _isInteractableFound = false;
+            
+            InteractionEnded();
+        }
     }
 }

@@ -148,6 +148,19 @@ namespace GameCore.Gameplay.Quests
             return reward;
         }
 
+        public bool ContainsItemInQuests(int itemID)
+        {
+            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
+            {
+                bool containsItem = questRuntimeData.ContainsItem(itemID);
+
+                if (containsItem)
+                    return true;
+            }
+
+            return false;
+        }
+
         public bool ContainsCompletedQuests()
         {
             foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
@@ -160,7 +173,7 @@ namespace GameCore.Gameplay.Quests
 
             return false;
         }
-        
+
         public bool ContainsExpiredQuests()
         {
             foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
@@ -173,7 +186,7 @@ namespace GameCore.Gameplay.Quests
 
             return false;
         }
-        
+
         public bool ContainsExpiredAndUncompletedQuests()
         {
             foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
@@ -190,9 +203,10 @@ namespace GameCore.Gameplay.Quests
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+
         private void AddActiveQuestData(QuestRuntimeData questRuntimeData) =>
             _activeQuestsData.Add(questRuntimeData);
-        
+
         private void ClearData() =>
             _activeQuestsData.Clear();
     }

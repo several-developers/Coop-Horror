@@ -1,3 +1,4 @@
+using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Levels.Elevator;
@@ -18,6 +19,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindElevatorsManagerDecorator();
             BindQuestsManagerDecorator();
             BindGameTimeManagerDecorator();
+            BindDeliveryManagerDecorator();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -54,6 +56,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<GameTimeManagerDecorator>()
+                .AsSingle();
+        }
+        
+        private void BindDeliveryManagerDecorator()
+        {
+            Container
+                .BindInterfacesTo<DeliveryManagerDecorator>()
                 .AsSingle();
         }
     }

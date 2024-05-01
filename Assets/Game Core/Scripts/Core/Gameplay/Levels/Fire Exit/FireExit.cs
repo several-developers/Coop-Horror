@@ -58,6 +58,14 @@ namespace GameCore.Gameplay.Levels
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void InteractionStarted()
+        {
+        }
+
+        public void InteractionEnded()
+        {
+        }
+
         public void Interact(PlayerEntity playerEntity = null) =>
             _rpcHandlerDecorator.TeleportToFireExit(_floor, _isInStairsLocation);
 

@@ -50,6 +50,7 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.OnCompleteQuestsInnerEvent += CompleteQuestsServerRpc;
             _questsManagerDecorator.OnGetQuestsStorageInnerEvent += GetQuestsStorage;
             _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent += GetActiveQuestsAmount;
+            _questsManagerDecorator.OnContainsItemInQuestsInnerEvent += ContainsItemInQuests;
             _questsManagerDecorator.OnContainsCompletedQuestsInnerEvent += ContainsCompletedQuests;
             _questsManagerDecorator.OnContainsExpiredQuestsInnerEvent += ContainsExpiredQuests;
             _questsManagerDecorator.OnContainsExpiredAndUncompletedQuestsInnerEvent +=
@@ -65,6 +66,7 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.OnCompleteQuestsInnerEvent -= CompleteQuestsServerRpc;
             _questsManagerDecorator.OnGetQuestsStorageInnerEvent -= GetQuestsStorage;
             _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent -= GetActiveQuestsAmount;
+            _questsManagerDecorator.OnContainsItemInQuestsInnerEvent -= ContainsItemInQuests;
             _questsManagerDecorator.OnContainsCompletedQuestsInnerEvent -= ContainsCompletedQuests;
             _questsManagerDecorator.OnContainsExpiredQuestsInnerEvent -= ContainsExpiredQuests;
             _questsManagerDecorator.OnContainsExpiredAndUncompletedQuestsInnerEvent -=
@@ -178,6 +180,9 @@ namespace GameCore.Gameplay.Quests
             bool canGetNewQuest = activeQuestsAmount < _questsConfig.MaxActiveQuests;
             return canGetNewQuest;
         }
+
+        private bool ContainsItemInQuests(int itemID) =>
+            _questsStorage.ContainsItemInQuests(itemID);
 
         private bool ContainsCompletedQuests() =>
             _questsStorage.ContainsCompletedQuests();

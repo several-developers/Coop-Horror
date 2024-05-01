@@ -28,7 +28,15 @@ namespace GameCore.Gameplay.Interactable
         protected bool IsInteractionEnabled = true;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
+        public virtual void InteractionStarted()
+        {
+        }
+
+        public virtual void InteractionEnded()
+        {
+        }
+
         public void Interact(PlayerEntity playerEntity = null)
         {
             IsInteractionEnabled = false;
@@ -50,6 +58,11 @@ namespace GameCore.Gameplay.Interactable
 
         public virtual bool CanInteract() => IsInteractionEnabled;
 
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+        
+        protected void SendInteractionStateChangedEvent() =>
+            OnInteractionStateChangedEvent?.Invoke();
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private async void InteractLogic()
@@ -66,8 +79,5 @@ namespace GameCore.Gameplay.Interactable
             IsInteractionEnabled = true;
             OnTriggerEvent.Invoke();
         }
-        
-        private void SendInteractionStateChangedEvent() =>
-            OnInteractionStateChangedEvent?.Invoke();
     }
 }

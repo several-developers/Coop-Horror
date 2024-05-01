@@ -3,6 +3,7 @@ using System.Collections;
 using Cinemachine;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Delivery;
+using GameCore.Enums.Gameplay;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -38,14 +39,13 @@ namespace GameCore.Gameplay.Delivery
         
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnDroneLandedEvent = delegate { };
-        public event Action OnDroneLeftEvent = delegate { };
+        public event Action<DroneState> OnDroneStateChangedEvent = delegate { };
         public event Action OnTeleportDroneToDroneCartEvent = delegate { };
         public event Action OnDroneTakeOffTimerFinishedEvent = delegate { };
 
         private DeliveryConfigMeta _deliveryConfig;
         private DroneCart _droneCart;
-        private bool _isTimerActive;
+        private Coroutine _takeOffTimerCO;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -76,17 +76,15 @@ namespace GameCore.Gameplay.Delivery
 
         public void StartTakeOffTimer()
         {
-            if (_isTimerActive)
-                return;
+            StopTakeOffTimer();
             
-            StartCoroutine(routine: DroneTakeOffTimeCO());
+            _takeOffTimerCO = StartCoroutine(routine: DroneTakeOffTimeCO());
         }
 
-        public void SendDroneLanded() =>
-            OnDroneLandedEvent.Invoke();
+        public void ResetTakeOffTimer() => StartTakeOffTimer();
 
-        public void SendDroneLeft() =>
-            OnDroneLeftEvent.Invoke();
+        public void SendDroneStateChanged(DroneState droneState) =>
+            OnDroneStateChangedEvent.Invoke(droneState);
 
         public Transform GetDroneCartTransform() =>
             _deliveryCart.transform;
@@ -96,7 +94,7 @@ namespace GameCore.Gameplay.Delivery
         private async void SendTeleportDroneToDroneCart()
         {
             bool isCanceled = await UniTask
-                .DelayFrame(delayFrameCount: 4, cancellationToken: this.GetCancellationTokenOnDestroy())
+                .DelayFrame(delayFrameCount: 5, cancellationToken: this.GetCancellationTokenOnDestroy())
                 .SuppressCancellationThrow();
 
             if (isCanceled)
@@ -105,14 +103,20 @@ namespace GameCore.Gameplay.Delivery
             OnTeleportDroneToDroneCartEvent.Invoke();
         }
 
+        private void StopTakeOffTimer()
+        {
+            if (_takeOffTimerCO == null)
+                return;
+            
+            StopCoroutine(_takeOffTimerCO);
+        }
+
         private IEnumerator DroneTakeOffTimeCO()
         {
-            _isTimerActive = true;
             float delay = _deliveryConfig.TakeOffDelay;
             
             yield return new WaitForSeconds(delay);
 
-            _isTimerActive = false;
             TakeOffDrone();
             OnDroneTakeOffTimerFinishedEvent.Invoke();
         }

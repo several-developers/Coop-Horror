@@ -1,12 +1,12 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Delivery
 {
     public interface IDeliveryPoint
     {
-        event Action OnDroneLandedEvent;
-        event Action OnDroneLeftEvent;
+        event Action<DroneState> OnDroneStateChangedEvent;
         event Action OnTeleportDroneToDroneCartEvent;
         event Action OnDroneTakeOffTimerFinishedEvent;
         void ShowPoint();
@@ -14,6 +14,7 @@ namespace GameCore.Gameplay.Delivery
         void LandDrone();
         void TakeOffDrone();
         void StartTakeOffTimer();
+        void ResetTakeOffTimer();
         Transform GetDroneCartTransform();
     }
 }
