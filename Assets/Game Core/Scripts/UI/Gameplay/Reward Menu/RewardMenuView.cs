@@ -32,11 +32,19 @@ namespace GameCore.UI.Gameplay.RewardMenu
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
+        protected override void Awake()
+        {
+            base.Awake();
+            
             _uiObserver.OnShowRewardMenuEvent += OnShowRewardMenu;
+        }
 
-        private void OnDestroy() =>
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            
             _uiObserver.OnShowRewardMenuEvent -= OnShowRewardMenu;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

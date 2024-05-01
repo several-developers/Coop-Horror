@@ -24,8 +24,10 @@ namespace GameCore.UI.MainMenu.LobbiesMenu.IPLobby
             _ipHostingUI.OnHostClickedEvent += OnHostClicked;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            
             _ipJoiningUI.OnJoinClickedEvent -= OnJoinClicked;
             _ipHostingUI.OnHostClickedEvent -= OnHostClicked;
         }

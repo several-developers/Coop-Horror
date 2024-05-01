@@ -38,11 +38,11 @@ namespace GameCore.UI.Global
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnShowEvent;
-        public event Action OnHideEvent;
-        public event Action OnShownEvent;
-        public event Action OnHiddenEvent;
-        public event Action OnDestroyEvent;
+        public event Action OnShowEvent = delegate { };
+        public event Action OnHideEvent = delegate { };
+        public event Action OnShownEvent = delegate { };
+        public event Action OnHiddenEvent = delegate { };
+        public event Action OnDestroyEvent = delegate { };
 
         private const string UIElementsSettings = "UI Elements Settings";
 
@@ -51,6 +51,22 @@ namespace GameCore.UI.Global
         private bool _ignoreDestroy;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        protected virtual void Awake()
+        {
+            OnShowEvent += OnShowMenu;
+            OnHideEvent += OnHideMenu;
+            OnShownEvent += OnMenuShown;
+            OnHiddenEvent += OnMenuHidden;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            OnShowEvent -= OnShowMenu;
+            OnHideEvent -= OnHideMenu;
+            OnShownEvent -= OnMenuShown;
+            OnHiddenEvent -= OnMenuHidden;
+        }
 
         protected virtual void OnEnable()
         {
@@ -86,9 +102,9 @@ namespace GameCore.UI.Global
             IsShown = show;
 
             if (show)
-                OnShowEvent?.Invoke();
+                OnShowEvent.Invoke();
             else
-                OnHideEvent?.Invoke();
+                OnHideEvent.Invoke();
 
             if (show && _changeCanvasState)
                 _canvas.enabled = true;
@@ -104,7 +120,7 @@ namespace GameCore.UI.Global
                         if (_changeInteractableState)
                             EnableInteraction();
 
-                        OnShownEvent?.Invoke();
+                        OnShownEvent.Invoke();
                     }
                     else
                     {
@@ -137,9 +153,27 @@ namespace GameCore.UI.Global
         private void DestroySelf()
         {
             OnHiddenEvent = null;
-            OnDestroyEvent?.Invoke();
+            OnDestroyEvent.Invoke();
 
             Destroy(gameObject);
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        protected virtual void OnShowMenu()
+        {
+        }
+
+        protected virtual void OnHideMenu()
+        {
+        }
+
+        protected virtual void OnMenuShown()
+        {
+        }
+
+        protected virtual void OnMenuHidden()
+        {
         }
     }
 }

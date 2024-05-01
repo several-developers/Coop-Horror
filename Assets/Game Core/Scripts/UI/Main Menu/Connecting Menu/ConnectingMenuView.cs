@@ -20,8 +20,10 @@ namespace GameCore.UI.MainMenu.ConnectingMenu
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _quitButton.onClick.AddListener(OnQuitClicked);
 
             DestroyOnHide();

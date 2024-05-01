@@ -8,7 +8,6 @@ namespace GameCore.Gameplay.Network
     {
         event Action<int, int> OnCreateItemPreviewInnerEvent;
         event Action<int> OnDestroyItemPreviewInnerEvent;
-        event Action OnLocationLeftInnerEvent; // Mobile HQ left the location.
         event Action<DungeonsSeedData> OnGenerateDungeonsInnerEvent;
         event Action<Floor> OnStartElevatorInnerEvent;
         event Action<Floor> OnOpenElevatorInnerEvent;
@@ -17,7 +16,6 @@ namespace GameCore.Gameplay.Network
 
         void CreateItemPreview(int slotIndex, int itemID);
         void DestroyItemPreview(int slotIndex);
-        void LocationLeft();
         void GenerateDungeons(DungeonsSeedData data);
         void StartElevator(Floor floor);
         void OpenElevator(Floor floor);

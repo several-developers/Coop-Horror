@@ -28,8 +28,9 @@ namespace GameCore.Infrastructure.Services.Global
 
         public override void OnDestroy()
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
             base.OnDestroy();
+            
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

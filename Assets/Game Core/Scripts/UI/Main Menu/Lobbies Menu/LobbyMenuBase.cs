@@ -33,8 +33,10 @@ namespace GameCore.UI.MainMenu.LobbiesMenu
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
         
-        protected virtual void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             DestroyOnHide();
             
             _joinTabButton.onClick.AddListener(OnJoinTabClicked);

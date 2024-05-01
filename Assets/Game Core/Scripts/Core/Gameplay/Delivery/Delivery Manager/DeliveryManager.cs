@@ -38,10 +38,10 @@ namespace GameCore.Gameplay.Delivery
 
         public override void OnDestroy()
         {
+            base.OnDestroy();
+
             _deliveryManagerDecorator.OnResetTakeOffTimerInnerEvent -= OnResetTakeOffTimer;
             _deliveryManagerDecorator.OnGetDroneStateInnerEvent -= GetDroneState;
-
-            base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

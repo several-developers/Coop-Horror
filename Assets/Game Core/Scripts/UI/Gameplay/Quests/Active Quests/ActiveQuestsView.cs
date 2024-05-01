@@ -50,8 +50,10 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _layoutFixHelper =
                 new LayoutFixHelper(coroutineRunner: this, _activeQuestsLayoutGroup, _activeQuestsSizeFitter);
 
@@ -61,8 +63,10 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            
             _questsManagerDecorator.OnActiveQuestsDataReceivedEvent -= OnActiveQuestsDataReceived;
             _questsManagerDecorator.OnUpdateQuestsProgressEvent -= OnUpdateQuestsProgress;
             

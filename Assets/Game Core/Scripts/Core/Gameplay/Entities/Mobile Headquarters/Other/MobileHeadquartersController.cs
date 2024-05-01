@@ -51,9 +51,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent += OnInteractWithMainLever;
             loadLocationLever.OnEnabledEvent += OnMainLeverPulled;
-
-            AnimationObserver animationObserver = _references.AnimationObserver;
-            animationObserver.OnDoorOpenedEvent += OnDoorOpened;
         }
 
         public void InitServer()
@@ -83,9 +80,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent -= OnInteractWithMainLever;
             loadLocationLever.OnEnabledEvent -= OnMainLeverPulled;
-
-            AnimationObserver animationObserver = _references.AnimationObserver;
-            animationObserver.OnDoorOpenedEvent -= OnDoorOpened;
         }
 
         public void DespawnServer()
@@ -180,20 +174,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             }
         }
 
-        private void DoorOpenedLogic()
-        {
-            if (!_mobileHeadquartersEntity.IsOwner)
-                return;
-
-            GameState gameState = _mobileHeadquartersEntity.GameState;
-
-            if (gameState != GameState.ArrivedAtTheLocation)
-                return;
-
-            const GameState newState = GameState.ReadyToLeaveTheLocation;
-            _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState, previousState: gameState);
-        }
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
@@ -232,7 +212,5 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         }
 
         private void OnMainLeverPulled() => MainLeverLogic();
-
-        private void OnDoorOpened() => DoorOpenedLogic();
     }
 }

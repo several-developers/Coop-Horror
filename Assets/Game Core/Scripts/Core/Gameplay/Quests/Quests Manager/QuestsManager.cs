@@ -62,6 +62,8 @@ namespace GameCore.Gameplay.Quests
 
         public override void OnDestroy()
         {
+            base.OnDestroy();
+
             _questsManagerDecorator.OnSelectQuestInnerEvent -= OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent -= SubmitQuestItem;
             _questsManagerDecorator.OnCompleteQuestsInnerEvent -= CompleteQuestsServerRpc;
@@ -74,8 +76,6 @@ namespace GameCore.Gameplay.Quests
                 ContainsExpiredAndUncompletedQuests;
 
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
-
-            base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

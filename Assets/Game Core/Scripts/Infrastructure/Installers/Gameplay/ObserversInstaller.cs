@@ -4,6 +4,7 @@ using GameCore.Observers.Gameplay.LevelManager;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.Observers.Gameplay.Rpc;
 using GameCore.Observers.Gameplay.UI;
+using GameCore.Observers.Gameplay.UIManager;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -20,6 +21,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindLevelObserver();
             BindLevelProviderObserver();
             BindRpcObserver();
+            BindUIManagerObserver();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -63,6 +65,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<RpcObserver>()
+                .AsSingle();
+        }
+
+        private void BindUIManagerObserver()
+        {
+            Container
+                .BindInterfacesTo<UIManagerObserver>()
                 .AsSingle();
         }
     }

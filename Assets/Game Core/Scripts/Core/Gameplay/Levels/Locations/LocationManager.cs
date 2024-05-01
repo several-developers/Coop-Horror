@@ -35,16 +35,16 @@ namespace GameCore.Gameplay.Levels.Locations
 
         private void Awake()
         {
-            _locationManagerDecorator.OnGetEnterPathEvent += GetEnterPath;
-            _locationManagerDecorator.OnGetExitPathEvent += GetExitPath;
+            _locationManagerDecorator.OnGetEnterPathInnerEvent += GetEnterPath;
+            _locationManagerDecorator.OnGetExitPathInnerEvent += GetExitPath;
         }
 
         private void Start() => SendLocationLoaded();
 
         private void OnDestroy()
         {
-            _locationManagerDecorator.OnGetEnterPathEvent -= GetEnterPath;
-            _locationManagerDecorator.OnGetExitPathEvent -= GetExitPath;
+            _locationManagerDecorator.OnGetEnterPathInnerEvent -= GetEnterPath;
+            _locationManagerDecorator.OnGetExitPathInnerEvent -= GetExitPath;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

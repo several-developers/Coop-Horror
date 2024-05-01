@@ -18,8 +18,10 @@ namespace GameCore.UI.Gameplay.DeveloperMenu
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _closeButton.onClick.AddListener(OnCloseClicked);
             _overlayCloseButton.onClick.AddListener(OnCloseClicked);
             

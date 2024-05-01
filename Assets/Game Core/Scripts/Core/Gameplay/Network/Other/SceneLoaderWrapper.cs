@@ -36,8 +36,9 @@ namespace GameCore.Gameplay.Network.Other
 
         public override void OnDestroy()
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
             base.OnDestroy();
+            
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         public override void OnNetworkDespawn()

@@ -43,10 +43,10 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         public override void OnDestroy()
         {
+            base.OnDestroy();
+
             _elevatorsManagerDecorator.OnGetCurrentFloorEvent -= GetCurrentFloor;
             _elevatorsManagerDecorator.OnIsElevatorMovingEvent -= IsElevatorMoving;
-
-            base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

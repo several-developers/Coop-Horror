@@ -24,8 +24,10 @@ namespace GameCore.UI.MainMenu.SelectLobbyMenu
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _startWithLobbyButton.onClick.AddListener(OnStartWithLobbyClicked);
             _startWithDirectIPButton.onClick.AddListener(OnStartWithDirectIPClicked);
             

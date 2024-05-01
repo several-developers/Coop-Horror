@@ -53,8 +53,10 @@ namespace GameCore.UI.Gameplay.Inventory
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _inventoryFactory = new InventoryFactory(_itemSlotViewPrefab, _slotsContainer);
             _layoutFixHelper = new LayoutFixHelper(coroutineRunner: this, _layoutGroup);
 
@@ -70,8 +72,10 @@ namespace GameCore.UI.Gameplay.Inventory
             Show();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            
             _uiObserver.OnInitPlayerEvent -= OnInitPlayer;
 
             if (!_isInitialized)

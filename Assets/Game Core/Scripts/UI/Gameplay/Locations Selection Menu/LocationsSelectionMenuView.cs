@@ -1,6 +1,7 @@
 ﻿using GameCore.Enums.Global;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Observers.Gameplay.UIManager;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -15,10 +16,11 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator,
+        private void Construct(IGameManagerDecorator gameManagerDecorator, IUIManagerObserver uiManagerObserver,
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _gameManagerDecorator = gameManagerDecorator;
+            _uiManagerObserver = uiManagerObserver;
 
             _locationsItemsFactory = new LocationsItemsFactory(gameplayConfigsProvider,
                 locationsSelectionMenuView: this, gameManagerDecorator, _locationsItemsContainer,
@@ -36,20 +38,23 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
 
         [SerializeField, Required]
         private LayoutGroup _locationsItemsLayoutGroup;
-        
+
         [SerializeField, Required]
         private ContentSizeFitter _locationsItemsSizeFitter;
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private IGameManagerDecorator _gameManagerDecorator;
+        private IUIManagerObserver _uiManagerObserver;
         private LocationsItemsFactory _locationsItemsFactory;
         private LayoutFixHelper _layoutFixHelper;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             _layoutFixHelper = new LayoutFixHelper(coroutineRunner: this, _locationsItemsLayoutGroup,
                 _locationsItemsSizeFitter);
 
@@ -58,8 +63,12 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
 
         private void Start() => CreateLocationsItems();
 
-        private void OnDestroy() =>
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
             _gameManagerDecorator.OnSelectedLocationChangedEvent -= OnSelectedLocationChanged;
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -75,6 +84,12 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        protected override void OnShowMenu() =>
+            _uiManagerObserver.MenuShown(menuView: this);
+
+        protected override void OnHideMenu() =>
+            _uiManagerObserver.MenuHidden(menuView: this);
 
         private void OnSelectedLocationChanged(SceneName locationName) =>
             _locationsItemsFactory.UpdateSelectionState();

@@ -7,15 +7,15 @@ namespace GameCore.Gameplay.Levels.Locations
     {
         // FIELDS: --------------------------------------------------------------------------------
         
-        public event Func<CinemachinePath> OnGetEnterPathEvent;
-        public event Func<CinemachinePath> OnGetExitPathEvent;
+        public event Func<CinemachinePath> OnGetEnterPathInnerEvent;
+        public event Func<CinemachinePath> OnGetExitPathInnerEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public CinemachinePath GetEnterPath() =>
-            OnGetEnterPathEvent?.Invoke();
+            OnGetEnterPathInnerEvent?.Invoke();
 
         public CinemachinePath GetExitPath() =>
-            OnGetExitPathEvent?.Invoke();
+            OnGetExitPathInnerEvent?.Invoke();
     }
 }

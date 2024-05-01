@@ -64,8 +64,12 @@ namespace GameCore.UI.MainMenu.LobbiesMenu.RelayLobby
             _lobbyJoiningUI.Show();
         }
 
-        private void OnDestroy() =>
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            
             _lobbyJoiningUI.Hide();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

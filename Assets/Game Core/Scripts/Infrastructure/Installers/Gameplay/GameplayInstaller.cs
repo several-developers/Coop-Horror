@@ -4,6 +4,7 @@ using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Levels;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Levels.Locations;
+using GameCore.Gameplay.UIManagement;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -37,6 +38,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindDungeonsManager();
             BindFireExitsManager();
             BindLocationManagerDecorator();
+            BindUIManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -109,6 +111,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .BindInterfacesTo<LocationManagerDecorator>()
                 .AsSingle();
+        }
+        
+        private void BindUIManager()
+        {
+            Container
+                .BindInterfacesTo<UIManager>()
+                .AsSingle()
+                .NonLazy();
         }
     }
 }

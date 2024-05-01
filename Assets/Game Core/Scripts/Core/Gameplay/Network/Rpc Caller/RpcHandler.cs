@@ -36,9 +36,6 @@ namespace GameCore.Gameplay.Network
         private void DestroyItemPreviewServerRpc(int slotIndex) => DestroyItemPreviewClientRpc(slotIndex);
 
         [ServerRpc(RequireOwnership = false)]
-        private void LeftLocationServerRpc() => LeftLocationClientRpc();
-
-        [ServerRpc(RequireOwnership = false)]
         private void GenerateDungeonsServerRpc(DungeonsSeedData data) => GenerateDungeonsClientRpc(data);
 
         [ServerRpc(RequireOwnership = false)]
@@ -71,10 +68,6 @@ namespace GameCore.Gameplay.Network
             _rpcObserver.DestroyItemPreview(slotIndex);
         
         [ClientRpc]
-        private void LeftLocationClientRpc() =>
-            _rpcObserver.LocationLeft();
-
-        [ClientRpc]
         private void GenerateDungeonsClientRpc(DungeonsSeedData data) =>
             _rpcObserver.GenerateDungeons(data);
 
@@ -102,7 +95,6 @@ namespace GameCore.Gameplay.Network
 
             _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent += OnCreateItemPreview;
             _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent += DestroyItemPreviewServerRpc;
-            _rpcHandlerDecorator.OnLocationLeftInnerEvent += LeftLocationServerRpc;
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent += GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
             _rpcHandlerDecorator.OnOpenElevatorInnerEvent += OpenElevatorServerRpc;
@@ -116,7 +108,6 @@ namespace GameCore.Gameplay.Network
             
             _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent -= OnCreateItemPreview;
             _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent -= DestroyItemPreviewServerRpc;
-            _rpcHandlerDecorator.OnLocationLeftInnerEvent -= LeftLocationServerRpc;
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent -= GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
             _rpcHandlerDecorator.OnOpenElevatorInnerEvent -= OpenElevatorServerRpc;

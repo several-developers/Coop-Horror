@@ -343,7 +343,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
                 case GameState.HeadingToTheRoad:
                     _levelObserver.LocationLeft();
-                    RpcHandlerDecorator.LocationLeft();
                     break;
             }
         }

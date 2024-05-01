@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.Quests;
+using GameCore.Observers.Gameplay.UIManager;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -13,9 +14,10 @@ namespace GameCore.UI.Gameplay.Quests
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IQuestsManagerDecorator questsManagerDecorator)
+        private void Construct(IQuestsManagerDecorator questsManagerDecorator, IUIManagerObserver uiManagerObserver)
         {
             _questsManagerDecorator = questsManagerDecorator;
+            _uiManagerObserver = uiManagerObserver;
 
             _questsSelectionMenuFactory = new QuestsSelectionMenuFactory(questsManagerDecorator, _questsItemsContainer,
                 _questItemButtonPrefab);
@@ -36,20 +38,27 @@ namespace GameCore.UI.Gameplay.Quests
         // FIELDS: --------------------------------------------------------------------------------
 
         private IQuestsManagerDecorator _questsManagerDecorator;
+        private IUIManagerObserver _uiManagerObserver;
         private QuestsSelectionMenuFactory _questsSelectionMenuFactory;
         private LayoutFixHelper _layoutFixHelper;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _layoutFixHelper = new LayoutFixHelper(coroutineRunner: this, _questsItemsLayoutGroup);
 
             _questsManagerDecorator.OnAwaitingQuestsDataReceivedEvent += AwaitingQuestsDataReceived;
         }
 
-        private void OnDestroy() =>
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            
             _questsManagerDecorator.OnAwaitingQuestsDataReceivedEvent -= AwaitingQuestsDataReceived;
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -68,6 +77,12 @@ namespace GameCore.UI.Gameplay.Quests
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        protected override void OnShowMenu() =>
+            _uiManagerObserver.MenuShown(menuView: this);
+
+        protected override void OnHideMenu() =>
+            _uiManagerObserver.MenuHidden(menuView: this);
 
         private void AwaitingQuestsDataReceived() => CreateQuestsItemsButtons();
     }

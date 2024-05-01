@@ -14,7 +14,11 @@ namespace GameCore.UI.MainMenu.SaveSelectionMenu
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() => DestroyOnHide();
+        protected override void Awake()
+        {
+            base.Awake();
+            DestroyOnHide();
+        }
 
         private void Start() => Show();
     }

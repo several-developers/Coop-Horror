@@ -10,7 +10,6 @@ namespace GameCore.Gameplay.Network
         
         public event Action<int, int> OnCreateItemPreviewInnerEvent = delegate { };
         public event Action<int> OnDestroyItemPreviewInnerEvent = delegate { };
-        public event Action OnLocationLeftInnerEvent = delegate { };
         public event Action<DungeonsSeedData> OnGenerateDungeonsInnerEvent = delegate { };
         public event Action<Floor> OnStartElevatorInnerEvent = delegate { };
         public event Action<Floor> OnOpenElevatorInnerEvent = delegate { };
@@ -24,9 +23,6 @@ namespace GameCore.Gameplay.Network
 
         public void DestroyItemPreview(int slotIndex) =>
             OnDestroyItemPreviewInnerEvent.Invoke(slotIndex);
-
-        public void LocationLeft() =>
-            OnLocationLeftInnerEvent.Invoke();
 
         public void GenerateDungeons(DungeonsSeedData data) => 
             OnGenerateDungeonsInnerEvent.Invoke(data);

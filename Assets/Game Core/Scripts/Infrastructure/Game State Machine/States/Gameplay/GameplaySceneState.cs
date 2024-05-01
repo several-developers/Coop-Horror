@@ -51,7 +51,6 @@ namespace GameCore.Infrastructure.StateMachine
         private LocationsSelectionMenuView _locationsSelectionMenuView;
         private GameOverMenuView _gameOverMenuView;
         private GameOverWarningMenuView _gameOverWarningMenuView;
-        private int _openedMenus; // TEMP
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -72,25 +71,14 @@ namespace GameCore.Infrastructure.StateMachine
             InitHorrorStateMachine();
 
             _inputReader.OnPauseEvent += OnOpenPauseMenu;
-            _inputReader.OnResumeEvent += OnResume;
 
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent += OnOpenLocationsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenGameOverWarningMenuEvent += OnOpenGameOverWarningMenu;
-
-            _pauseMenuView.OnShowEvent += OnMenuShown;
-            _pauseMenuView.OnHideEvent += OnMenuHidden;
+            
             _pauseMenuView.OnContinueClickedEvent += OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent += OnQuitClicked;
 
-            _questsSelectionMenuView.OnShowEvent += OnMenuShown;
-            _questsSelectionMenuView.OnHideEvent += OnMenuHidden;
-
-            _locationsSelectionMenuView.OnShowEvent += OnMenuShown;
-            _locationsSelectionMenuView.OnHideEvent += OnMenuHidden;
-
-            _gameOverWarningMenuView.OnShowEvent += OnMenuShown;
-            _gameOverWarningMenuView.OnHideEvent += OnMenuHidden;
             _gameOverWarningMenuView.OnConfirmClickedEvent += OnGameOverWarningConfirmClicked;
             _gameOverWarningMenuView.OnCancelClickedEvent += OnGameOverWarningCancelClicked;
 
@@ -102,25 +90,14 @@ namespace GameCore.Infrastructure.StateMachine
         public void Exit()
         {
             _inputReader.OnPauseEvent -= OnOpenPauseMenu;
-            _inputReader.OnResumeEvent -= OnResume;
 
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent -= OnOpenLocationsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenGameOverWarningMenuEvent -= OnOpenGameOverWarningMenu;
 
-            _pauseMenuView.OnShowEvent -= OnMenuShown;
-            _pauseMenuView.OnHideEvent -= OnMenuHidden;
             _pauseMenuView.OnContinueClickedEvent -= OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent -= OnQuitClicked;
 
-            _questsSelectionMenuView.OnShowEvent -= OnMenuShown;
-            _questsSelectionMenuView.OnHideEvent -= OnMenuHidden;
-
-            _locationsSelectionMenuView.OnShowEvent -= OnMenuShown;
-            _locationsSelectionMenuView.OnHideEvent -= OnMenuHidden;
-            
-            _gameOverWarningMenuView.OnShowEvent -= OnMenuShown;
-            _gameOverWarningMenuView.OnHideEvent -= OnMenuHidden;
             _gameOverWarningMenuView.OnConfirmClickedEvent -= OnGameOverWarningConfirmClicked;
             _gameOverWarningMenuView.OnCancelClickedEvent -= OnGameOverWarningCancelClicked;
 
@@ -130,20 +107,6 @@ namespace GameCore.Infrastructure.StateMachine
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void CheckCursorState()
-        {
-            if (_openedMenus > 0)
-            {
-                UnlockCursor();
-                _inputReader.EnableUIInput();
-            }
-            else
-            {
-                LockCursor();
-                _inputReader.EnableGameplayInput();
-            }
-        }
 
         private static void LockCursor() =>
             GameUtilities.ChangeCursorLockState(isLocked: true);
@@ -227,27 +190,6 @@ namespace GameCore.Infrastructure.StateMachine
             _pauseMenuView.Show();
         }
 
-        private void OnResume()
-        {
-            if (_questsSelectionMenuView.IsShown)
-            {
-                _questsSelectionMenuView.Hide();
-                return;
-            }
-
-            if (_locationsSelectionMenuView.IsShown)
-            {
-                _locationsSelectionMenuView.Hide();
-                return;
-            }
-
-            if (_gameOverWarningMenuView.IsShown)
-            {
-                _gameOverWarningMenuView.Hide();
-                return;
-            }
-        }
-
         private void OnOpenQuestsSelectionMenu()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
@@ -296,18 +238,6 @@ namespace GameCore.Infrastructure.StateMachine
             _mobileHeadquartersEntity.EnableMainLever();
 
         private void OnQuitConfirmClicked() => EnterQuitGameplayState();
-
-        private void OnMenuShown()
-        {
-            _openedMenus++;
-            CheckCursorState();
-        }
-
-        private void OnMenuHidden()
-        {
-            _openedMenus--;
-            CheckCursorState();
-        }
 
         private void GameStateChanged(GameState gameState) => HandleGameState(gameState);
     }

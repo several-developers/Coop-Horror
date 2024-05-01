@@ -65,6 +65,8 @@ namespace GameCore.Gameplay.GameManagement
 
         public override void OnDestroy()
         {
+            base.OnDestroy();
+
             _gameManagerDecorator.OnChangeGameStateInnerEvent -= ChangeGameState;
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent -= ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnSelectLocationInnerEvent -= SelectLocation;
@@ -73,8 +75,6 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent -= SpendPlayersGold;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent -= GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent -= GetGameState;
-
-            base.OnDestroy();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -137,7 +137,6 @@ namespace GameCore.Gameplay.GameManagement
             {
                 case GameState.ArrivedAtTheRoad:
                 case GameState.QuestsRewarding:
-
                     if (!IsOwner)
                         return;
 
@@ -145,8 +144,15 @@ namespace GameCore.Gameplay.GameManagement
                         previousState: gameState);
                     break;
 
-                case GameState.KillPlayersOnTheRoad:
+                case GameState.ArrivedAtTheLocation:
+                    if (!IsOwner)
+                        return;
+                    
+                    ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheLocation,
+                        previousState: gameState);
+                    break;
 
+                case GameState.KillPlayersOnTheRoad:
                     if (!IsOwner)
                         return;
 
@@ -155,7 +161,7 @@ namespace GameCore.Gameplay.GameManagement
 
                 case GameState.RestartGame:
                     ResetGold();
-                    
+
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
                         previousState: gameState);
                     break;

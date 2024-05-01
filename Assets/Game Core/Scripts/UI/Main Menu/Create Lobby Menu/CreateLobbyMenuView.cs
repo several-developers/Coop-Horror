@@ -23,9 +23,11 @@ namespace GameCore.UI.MainMenu.CreateLobbyMenu
         public event Action OnStartGameClickedEvent;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
-        
-        private void Awake()
+
+        protected override void Awake()
         {
+            base.Awake();
+            
             _backGameButton.onClick.AddListener(OnBackButtonClicked);
             _startGameButton.onClick.AddListener(OnStartGameClicked);
 

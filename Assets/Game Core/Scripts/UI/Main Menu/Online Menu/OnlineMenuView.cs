@@ -28,8 +28,10 @@ namespace GameCore.UI.MainMenu.OnlineMenu
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _backButton.onClick.AddListener(OnBackButtonClicked);
             _openRelayLobbyMenuButton.onClick.AddListener(OnOpenRelayLobbyMenuClicked);
             _openIPLobbyMenuButton.onClick.AddListener(OnOpenIPLobbyMenuClicked);

@@ -24,8 +24,10 @@ namespace GameCore.UI.MainMenu.PlayModeSelectionMenu
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _onlineButton.onClick.AddListener(OnOnlineClicked);
             _offlineButton.onClick.AddListener(OnOfflineClicked);
             

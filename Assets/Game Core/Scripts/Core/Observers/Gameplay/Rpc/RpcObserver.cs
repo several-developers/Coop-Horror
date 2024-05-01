@@ -11,7 +11,6 @@ namespace GameCore.Observers.Gameplay.Rpc
         
         public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent = delegate { };
         public event Action<int> OnDestroyItemPreviewEvent = delegate { };
-        public event Action OnLocationLeftEvent = delegate { };
         public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate { };
         public event Action<Floor> OnStartElevatorEvent = delegate { };
         public event Action<Floor> OnOpenElevatorEvent = delegate { };
@@ -25,9 +24,6 @@ namespace GameCore.Observers.Gameplay.Rpc
 
         public void DestroyItemPreview(int slotIndex) =>
             OnDestroyItemPreviewEvent.Invoke(slotIndex);
-
-        public void LocationLeft() =>
-            OnLocationLeftEvent.Invoke();
 
         public void GenerateDungeons(DungeonsSeedData data) =>
             OnGenerateDungeonsEvent.Invoke(data);
