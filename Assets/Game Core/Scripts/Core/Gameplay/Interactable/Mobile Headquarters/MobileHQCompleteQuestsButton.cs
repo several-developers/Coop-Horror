@@ -24,13 +24,11 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public override void InteractionStarted()
-        {
-        }
+        public override void InteractionStarted() =>
+            _questsManagerDecorator.OnActiveQuestsDataReceivedEvent += OnActiveQuestsDataReceived;
 
-        public override void InteractionEnded()
-        {
-        }
+        public override void InteractionEnded() =>
+            _questsManagerDecorator.OnActiveQuestsDataReceivedEvent -= OnActiveQuestsDataReceived;
 
         public override bool CanInteract()
         {
@@ -64,5 +62,9 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
             return IsInteractionEnabled;
         }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnActiveQuestsDataReceived() => SendInteractionStateChangedEvent();
     }
 }

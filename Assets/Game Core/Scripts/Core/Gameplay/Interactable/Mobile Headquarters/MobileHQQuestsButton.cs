@@ -18,6 +18,12 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public override void InteractionStarted() =>
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+
+        public override void InteractionEnded() =>
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
+
         public override bool CanInteract()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
@@ -32,5 +38,9 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
             return isGameStateValid && IsInteractionEnabled;
         }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnGameStateChanged(GameState gameState) => SendInteractionStateChangedEvent();
     }
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Delivery Config
   m_EditorClassIdentifier: 
   _metaName: Delivery Config
-  _takeOffDelay: 30
-  _droneCartFlySpeed: 45
-  _droneFlySpeed: 45
+  _takeOffDelay: 40
+  _droneCartFlySpeed: 65
+  _droneFlySpeed: 65
   _droneFlySpeedChangeRate: 0.2

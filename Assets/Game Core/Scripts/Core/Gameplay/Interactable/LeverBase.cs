@@ -98,6 +98,11 @@ namespace GameCore.Gameplay.Interactable
         public abstract InteractionType GetInteractionType();
 
         public virtual bool CanInteract() => IsInteractionEnabled;
+
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+        
+        protected void SendInteractionStateChangedEvent() =>
+            OnInteractionStateChangedEvent?.Invoke();
         
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -141,9 +146,6 @@ namespace GameCore.Gameplay.Interactable
             else
                 SendDisabledEvent();
         }
-
-        private void SendInteractionStateChangedEvent() =>
-            OnInteractionStateChangedEvent?.Invoke();
 
         private void SendEnabledEvent() =>
             OnEnabledEvent?.Invoke();

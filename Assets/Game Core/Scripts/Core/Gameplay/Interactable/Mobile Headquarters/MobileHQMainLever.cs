@@ -24,6 +24,18 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public override void InteractionStarted()
+        {
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+            _questsManagerDecorator.OnActiveQuestsDataReceivedEvent += OnActiveQuestsDataReceived;
+        }
+
+        public override void InteractionEnded()
+        {
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
+            _questsManagerDecorator.OnActiveQuestsDataReceivedEvent -= OnActiveQuestsDataReceived;
+        }
+
         public override InteractionType GetInteractionType() =>
             InteractionType.MobileHQMainLever;
 
@@ -48,5 +60,11 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
             return isGameStateValid && IsInteractionEnabled;
         }
+        
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnGameStateChanged(GameState gameState) => SendInteractionStateChangedEvent();
+
+        private void OnActiveQuestsDataReceived() => SendInteractionStateChangedEvent();
     }
 }

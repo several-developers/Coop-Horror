@@ -24,9 +24,15 @@ namespace GameCore.Gameplay.Quests
         public void AddAwaitingQuestData(QuestRuntimeData questRuntimeData) =>
             _awaitingQuestsData.Add(questRuntimeData);
 
+        public void AddActiveQuestData(QuestRuntimeData questRuntimeData) =>
+            _activeQuestsData.Add(questRuntimeData);
+
+        public void AddCompletedQuestData(QuestRuntimeData questRuntimeData) =>
+            _completedQuestsData.Add(questRuntimeData);
+
         public void UpdateAwaitingQuestsData(IEnumerable<QuestRuntimeDataContainer> questsRuntimeDataContainers)
         {
-            ClearData();
+            ClearActiveQuests();
 
             foreach (QuestRuntimeDataContainer dataContainer in questsRuntimeDataContainers)
             {
@@ -35,90 +41,27 @@ namespace GameCore.Gameplay.Quests
             }
         }
 
-        public void SelectQuest(int questID)
-        {
-            int awaitingQuestsAmount = _awaitingQuestsData.Count;
-            int questIndex = -1;
-            
-            for (int i = awaitingQuestsAmount - 1; i >= 0; i--)
-            {
-                bool isMatches = _awaitingQuestsData[i].QuestID == questID;
+        public void RemoveAwaitingQuestData(int index) =>
+            _awaitingQuestsData.RemoveAt(index);
 
-                if (!isMatches)
-                    continue;
-
-                questIndex = i;
-                break;
-            }
-
-            bool isAwaitingQuestFound = questIndex != -1;
-
-            if (!isAwaitingQuestFound)
-            {
-                Log.PrintError(log: $"Awaiting quest <gb>({questID})</gb> <rb>not found</rb>!");
-                return;
-            }
-
-            QuestRuntimeData questRuntimeData = _awaitingQuestsData[questIndex];
-            _awaitingQuestsData.RemoveAt(questIndex);
-            AddActiveQuestData(questRuntimeData);
-        }
-
-        public void SubmitQuestItem(int itemID)
-        {
-            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
-            {
-                bool isCompleted = questRuntimeData.IsCompleted();
-
-                if (isCompleted)
-                    continue;
-                
-                bool containsItem = questRuntimeData.ContainsItem(itemID);
-
-                if (!containsItem)
-                    continue;
-
-                questRuntimeData.SubmitQuestItem(itemID);
-                break;
-            }
-        }
-
-        public void DecreaseDays()
-        {
-            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
-                questRuntimeData.DecreaseDay();
-        }
-
-        public void CompleteQuests()
-        {
-            int iterations = _activeQuestsData.Count;
-
-            for (int i = iterations - 1; i >= 0; i--)
-            {
-                QuestRuntimeData questRuntimeData = _activeQuestsData[i];
-                bool isCompleted = questRuntimeData.IsCompleted();
-
-                if (!isCompleted)
-                    continue;
-                
-                _completedQuestsData.Add(questRuntimeData);
-                _activeQuestsData.RemoveAt(i);
-            }
-        }
+        public void RemoveActiveQuestData(int index) =>
+            _activeQuestsData.RemoveAt(index);
 
         public void ClearCompletedQuests() =>
             _completedQuestsData.Clear();
 
         public void ClearAll()
         {
-            _awaitingQuestsData.Clear();
-            _activeQuestsData.Clear();
-            _completedQuestsData.Clear();
+            ClearAwaitingQuests();
+            ClearActiveQuests();
+            ClearCompletedQuests();
         }
 
         public IReadOnlyList<QuestRuntimeData> GetAwaitingQuestsData() => _awaitingQuestsData;
-        
+
         public IReadOnlyList<QuestRuntimeData> GetActiveQuestsData() => _activeQuestsData;
+
+        public IReadOnlyList<QuestRuntimeData> GetCompletedQuestsData() => _completedQuestsData;
 
         public QuestRuntimeDataContainer[] GetAwaitingQuestsRuntimeDataContainers()
         {
@@ -137,77 +80,13 @@ namespace GameCore.Gameplay.Quests
 
         public int GetActiveQuestsAmount() =>
             _activeQuestsData.Count;
-        
-        public int CalculateReward()
-        {
-            int reward = 0;
-
-            foreach (QuestRuntimeData questRuntimeData in _completedQuestsData)
-                reward += questRuntimeData.Reward;
-            
-            return reward;
-        }
-
-        public bool ContainsItemInQuests(int itemID)
-        {
-            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
-            {
-                bool containsItem = questRuntimeData.ContainsItem(itemID);
-
-                if (containsItem)
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool ContainsCompletedQuests()
-        {
-            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
-            {
-                bool isCompleted = questRuntimeData.IsCompleted();
-
-                if (isCompleted)
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool ContainsExpiredQuests()
-        {
-            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
-            {
-                bool isExpired = questRuntimeData.IsExpired();
-
-                if (isExpired)
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool ContainsExpiredAndUncompletedQuests()
-        {
-            foreach (QuestRuntimeData questRuntimeData in _activeQuestsData)
-            {
-                bool isExpired = questRuntimeData.IsExpired();
-                bool isCompleted = questRuntimeData.IsCompleted();
-
-                if (isExpired && !isCompleted)
-                    return true;
-            }
-
-            return false;
-        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-
-        private void AddActiveQuestData(QuestRuntimeData questRuntimeData) =>
-            _activeQuestsData.Add(questRuntimeData);
-
-        private void ClearData() =>
+        private void ClearAwaitingQuests() =>
+            _awaitingQuestsData.Clear();
+        
+        private void ClearActiveQuests() =>
             _activeQuestsData.Clear();
     }
 }
