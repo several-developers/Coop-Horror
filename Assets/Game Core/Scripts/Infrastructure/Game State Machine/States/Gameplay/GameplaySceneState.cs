@@ -4,7 +4,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.HorrorStateMachineSpace;
-using GameCore.Gameplay.InputHandlerTEMP;
+using GameCore.Gameplay.InputManagement;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Gameplay.GameOverMenu;
 using GameCore.UI.Gameplay.GameOverWarningMenu;

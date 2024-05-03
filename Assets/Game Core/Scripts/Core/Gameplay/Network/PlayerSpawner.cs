@@ -64,7 +64,7 @@ namespace GameCore.Gameplay.Network
                 return;
             }
 
-            bool persistentPlayerExists = playerNetworkObject.TryGetComponent(out PersistentPlayer persistentPlayer);
+            bool persistentPlayerExists = playerNetworkObject.TryGetComponent(out PersistentPlayer _);
 
             Assert.IsTrue(persistentPlayerExists,
                 $"Matching persistent PersistentPlayer for client {clientId} not found!");

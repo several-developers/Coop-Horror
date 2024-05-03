@@ -1,5 +1,5 @@
 ﻿using GameCore.Configs.Global.Game;
-using GameCore.Gameplay.InputHandlerTEMP;
+using GameCore.Gameplay.InputManagement;
 using GameCore.Utilities;
 
 namespace GameCore.Infrastructure.Providers.Global

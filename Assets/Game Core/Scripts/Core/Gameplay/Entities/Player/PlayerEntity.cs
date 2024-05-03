@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using ECM2;
+using ECM2.Walkthrough.Ex91;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Factories.ItemsPreview;
-using GameCore.Gameplay.InputHandlerTEMP;
+using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Observers.Gameplay.PlayerInteraction;
@@ -65,8 +67,6 @@ namespace GameCore.Gameplay.Entities.Player
         public PlayerReferences References => _references;
 
         // FIELDS: --------------------------------------------------------------------------------
-
-        public event Action<Vector2> OnMovementVectorChangedEvent = delegate { };
 
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
 
@@ -201,7 +201,6 @@ namespace GameCore.Gameplay.Entities.Player
             {
                 InputReader inputReader = _references.InputReader; // TEMP
 
-                inputReader.OnMoveEvent += OnMove;
                 inputReader.OnScrollEvent += OnScroll;
                 inputReader.OnInteractEvent += OnInteract;
                 inputReader.OnDropItemEvent += OnDropItem;
@@ -209,6 +208,14 @@ namespace GameCore.Gameplay.Entities.Player
 
             void InitMovement()
             {
+                Character character = _references.Character;
+                character.camera = _playerCamera.CameraReferences.MainCamera;
+
+                PlayerMovementController playerMovementController = _references.PlayerMovementController;
+                playerMovementController.Setup(playerEntity: this);
+
+                MyAnimationController animationController = _references.AnimationController;
+                animationController.Setup(character);
             }
 
             void InitInteractionCheckerAndHandler()
@@ -228,6 +235,7 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             BasicInit();
+            DisableMovement();
             FixInvisiblePlayerBug();
 
             // LOCAL METHODS: -----------------------------
@@ -235,6 +243,17 @@ namespace GameCore.Gameplay.Entities.Player
             void BasicInit()
             {
                 _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
+            }
+
+            void DisableMovement()
+            {
+                Character character = _references.Character;
+                CharacterMovement characterMovement = _references.CharacterMovement;
+                PlayerMovementController playerMovementController = _references.PlayerMovementController;
+                
+                character.enabled = false;
+                characterMovement.enabled = false;
+                playerMovementController.enabled = false;
             }
 
             void FixInvisiblePlayerBug()
@@ -259,6 +278,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (Input.GetKeyDown(KeyCode.T))
                 GameUtilities.SwapCursorLockState();
             
+            _references.HeadLookObject.position = _lookAtPosition.Value;
             _interactionChecker.Check();
         }
 
@@ -290,7 +310,6 @@ namespace GameCore.Gameplay.Entities.Player
 
             InputReader inputReader = _references.InputReader; // TEMP
 
-            inputReader.OnMoveEvent -= OnMove;
             inputReader.OnScrollEvent -= OnScroll;
             inputReader.OnInteractEvent -= OnInteract;
             inputReader.OnDropItemEvent -= OnDropItem;
@@ -402,10 +421,7 @@ namespace GameCore.Gameplay.Entities.Player
             DespawnServer();
             DespawnClient();
         }
-
-        private void OnMove(Vector2 movementVector) =>
-            OnMovementVectorChangedEvent.Invoke(movementVector);
-
+        
         private void OnScroll(float scrollValue)
         {
             bool switchToNextSlot = scrollValue <= 0;

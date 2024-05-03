@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore.Gameplay.InputHandlerTEMP;
+using GameCore.Gameplay.InputManagement;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Observers.Gameplay.UIManager;
 using GameCore.UI.Global.MenuView;

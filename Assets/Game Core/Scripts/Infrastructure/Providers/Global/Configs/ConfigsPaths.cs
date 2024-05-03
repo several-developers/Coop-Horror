@@ -18,8 +18,8 @@
         public const string QuestsConfig = GameplayConfigs + "Quests Config";
         public const string QuestsItemsConfig = GameplayConfigs + "Quests Items Config";
         public const string DeliveryConfig = GameplayConfigs + "Delivery Config";
+        public const string PlayerConfig = GameplayConfigs + "Player Config";
         
-        public const string PlayerConfig = Configs + "Player/Player Config";
         public const string GameBalanceConfig = Configs + "Game Balance Config";
         
         private const string GameData = "Game Data/";

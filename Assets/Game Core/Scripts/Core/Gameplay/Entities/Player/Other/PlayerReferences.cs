@@ -1,6 +1,7 @@
 ﻿using System;
+using ECM2;
 using GameCore.Configs.Gameplay.Player;
-using GameCore.Gameplay.InputHandlerTEMP;
+using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -46,6 +47,18 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField, Required]
         private Transform _headLookObject;
 
+        [SerializeField, Required]
+        private Character _character;
+
+        [SerializeField, Required]
+        private CharacterMovement _characterMovement;
+
+        [SerializeField, Required]
+        private PlayerMovementController _playerMovementController;
+
+        [SerializeField, Required]
+        private MyAnimationController _animationController;
+
         [SerializeField, Required, Space(height: 5)]
         private GameObject[] _playerModelParts;
 
@@ -62,6 +75,10 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform HeadPoint => _headPoint;
         public Transform PlayerItemPivot => _playerItemPivot;
         public Transform HeadLookObject => _headLookObject;
+        public Character Character => _character;
+        public CharacterMovement CharacterMovement => _characterMovement;
+        public PlayerMovementController PlayerMovementController => _playerMovementController;
+        public MyAnimationController AnimationController => _animationController;
         public GameObject[] PlayerModelParts => _playerModelParts;
     }
 }

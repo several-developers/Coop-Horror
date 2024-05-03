@@ -8,11 +8,15 @@ namespace GameCore
         
         public static readonly int Speed = Animator.StringToHash(name: "Speed");
         public static readonly int MotionSpeed = Animator.StringToHash(name: "MotionSpeed");
-        public static readonly int MoveSpeedBlend = Animator.StringToHash(name: "MoveSpeedBlend");
+        public static readonly int Forward = Animator.StringToHash(name: "Forward");
+        public static readonly int Turn = Animator.StringToHash(name: "Turn");
         public static readonly int CanMove = Animator.StringToHash(name: "CanMove");
         public static readonly int HitReaction = Animator.StringToHash(name: "HitReaction");
         public static readonly int Attack = Animator.StringToHash(name: "Attack");
         public static readonly int Jump = Animator.StringToHash(name: "Jump");
+        public static readonly int Crouch = Animator.StringToHash(name: "Crouch");
+        public static readonly int Sprint = Animator.StringToHash(name: "Sprint");
+        public static readonly int Ground = Animator.StringToHash(name: "OnGround");
         public static readonly int Reload = Animator.StringToHash(name: "Reload");
         public static readonly int ReloadMultiplier = Animator.StringToHash(name: "ReloadMultiplier");
         public static readonly int Scream = Animator.StringToHash(name: "Scream");

@@ -86,6 +86,8 @@ namespace ECM2.Walkthrough.Ex91
         private void Awake()
         {
             _character = GetComponent<Character>();
+            crouchedCamera.transform.SetParent(null);
+            unCrouchedCamera.transform.SetParent(null);
         }
         
         private void Start()

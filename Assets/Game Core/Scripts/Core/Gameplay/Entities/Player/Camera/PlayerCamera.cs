@@ -1,5 +1,4 @@
-﻿using System;
-using GameCore.Gameplay.InputHandlerTEMP;
+﻿using GameCore.Gameplay.InputManagement;
 using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -71,8 +70,6 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         {
             _instance = this;
             _transform = transform;
-
-            _inputReader.OnLookEvent += OnLook;
         }
 
         private void Start()
@@ -80,9 +77,6 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
             _transform.SetParent(null);
             _transform.SetAsLastSibling();
         }
-
-        private void OnDestroy() =>
-            _inputReader.OnLookEvent -= OnLook;
 
         private void LateUpdate()
         {
@@ -106,8 +100,8 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
                     Vector3.Lerp(_transform.position, _headPoint.position, _cameraSpeed * Time.deltaTime);
             }
 
-            _transform.localRotation = finalRotation;
-            _target.rotation = Quaternion.Euler(0, yRotation, 0);
+            //_transform.localRotation = finalRotation;
+            //_target.rotation = Quaternion.Euler(0, yRotation, 0);
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -116,7 +110,7 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         {
             _target = playerEntity.transform;
             _headPoint = playerEntity.References.HeadPoint;
-            _isInitialized = true;
+            //_isInitialized = true;
         }
 
         public void Disable()
@@ -129,10 +123,5 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
             _snap = true;
 
         public static PlayerCamera Get() => _instance;
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnLook(Vector2 lookVector) =>
-            _lookVector = lookVector;
     }
 }
