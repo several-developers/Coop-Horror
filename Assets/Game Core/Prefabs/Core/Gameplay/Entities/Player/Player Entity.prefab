@@ -2800,7 +2800,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4251873558
+  GlobalObjectIdHash: 2175522384
   InScenePlacedSourceGlobalObjectIdHash: 4251873558
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2809,22 +2809,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &5172439601526341163
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4628898490251457778}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15892eeb402046518f4608f00925f53b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _currentVelocity: {x: 0, y: 0, z: 0}
-  _globalMoveDirection: {x: 0, y: 0, z: 0}
-  _isGrounded: 0
-  _performSprint: 0
 --- !u!114 &5174800490687240705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2971,7 +2955,7 @@ MonoBehaviour:
     _headPoint: {fileID: 260123221838165337}
     _playerItemPivot: {fileID: 5349528989671250131}
     _headLookObject: {fileID: 9134056129469926704}
-    _movementInfoDebug: {fileID: 5172439601526341163}
+    _movementInfoDebug: {fileID: 0}
     _playerModelParts:
     - {fileID: 8983818321146185806}
   _networkTransform: {fileID: 5356547518013829562}

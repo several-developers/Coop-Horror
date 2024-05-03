@@ -4,7 +4,6 @@ using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
-using GameCore.Gameplay.Entities.Player.Movement;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Gameplay.Network;
@@ -88,7 +87,6 @@ namespace GameCore.Gameplay.Entities.Player
         private PlayerCamera _playerCamera;
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
-        private IMovementBehaviour _movementBehaviour;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
 
@@ -211,9 +209,6 @@ namespace GameCore.Gameplay.Entities.Player
 
             void InitMovement()
             {
-                //_movementBehaviour = new PhysicalMovementBehaviour3(playerEntity: this);
-                _movementBehaviour = new PhysicalMovementBehaviour4(playerEntity: this);
-                _movementBehaviour.ToggleState(isEnabled: true);
             }
 
             void InitInteractionCheckerAndHandler()
@@ -264,7 +259,6 @@ namespace GameCore.Gameplay.Entities.Player
             if (Input.GetKeyDown(KeyCode.T))
                 GameUtilities.SwapCursorLockState();
             
-            _movementBehaviour.Tick();
             _interactionChecker.Check();
         }
 
@@ -336,16 +330,12 @@ namespace GameCore.Gameplay.Entities.Player
         
         public void KillSelf()
         {
-            _movementBehaviour.ToggleState(isEnabled: false);
             _inventory.DropAllItems();
             _playerCamera.gameObject.SetActive(false);
         }
 
-        public void Revive()
-        {
-            _movementBehaviour.ToggleState(isEnabled: true);
+        public void Revive() =>
             _playerCamera.gameObject.SetActive(true);
-        }
 
         public Transform GetTransform() => transform;
 
@@ -369,8 +359,6 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!IsOwner)
                 return;
-
-            _movementBehaviour.FixedTick();
         }
 
         private void LateUpdateServer()

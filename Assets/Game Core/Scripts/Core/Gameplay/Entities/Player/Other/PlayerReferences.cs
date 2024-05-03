@@ -1,6 +1,5 @@
 ﻿using System;
 using GameCore.Configs.Gameplay.Player;
-using GameCore.Gameplay.Entities.Player.Movement;
 using GameCore.Gameplay.InputHandlerTEMP;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
@@ -47,9 +46,6 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField, Required]
         private Transform _headLookObject;
 
-        [SerializeField, Required]
-        private MovementInfoDebug _movementInfoDebug;
-
         [SerializeField, Required, Space(height: 5)]
         private GameObject[] _playerModelParts;
 
@@ -66,7 +62,6 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform HeadPoint => _headPoint;
         public Transform PlayerItemPivot => _playerItemPivot;
         public Transform HeadLookObject => _headLookObject;
-        public MovementInfoDebug MovementInfoDebug => _movementInfoDebug;
         public GameObject[] PlayerModelParts => _playerModelParts;
     }
 }

@@ -7,7 +7,6 @@
         public const string GameMenuName = "🕹 Horror";
         
         public const string GlobalConfigsCategory = ConfigsCategory + "/Global";
-        public const string PlayerConfigsCategory = ConfigsCategory + "/Player";
         public const string GameplayConfigsCategory = ConfigsCategory + "/Gameplay";
         public const string ItemsCategory = "Items";
         public const string LocationsCategory = "Locations";
