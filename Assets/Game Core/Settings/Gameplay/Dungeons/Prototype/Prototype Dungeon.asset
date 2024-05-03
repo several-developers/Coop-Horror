@@ -15,8 +15,8 @@ MonoBehaviour:
   globalPropGroupID_obsolete: 
   globalPropRanges_obsolete: []
   Length:
-    Min: 12
-    Max: 16
+    Min: 32
+    Max: 40
   BranchMode: 0
   BranchCount:
     Min: 1
@@ -58,6 +58,15 @@ MonoBehaviour:
     NodeType: 2
     Position: 1
     Label: Goal
+    Keys: []
+    Locks: []
+    LockPlacement: 0
+  - Graph: {fileID: 11400000}
+    TileSets:
+    - {fileID: 11400000, guid: d5c21b160a8eb2d4cbb3f12f01b492d8, type: 2}
+    NodeType: 0
+    Position: 0
+    Label: Enter Room
     Keys: []
     Locks: []
     LockPlacement: 0

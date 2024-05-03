@@ -211,7 +211,8 @@ namespace GameCore.Gameplay.Entities.Player
 
             void InitMovement()
             {
-                _movementBehaviour = new PhysicalMovementBehaviour3(playerEntity: this);
+                //_movementBehaviour = new PhysicalMovementBehaviour3(playerEntity: this);
+                _movementBehaviour = new PhysicalMovementBehaviour4(playerEntity: this);
                 _movementBehaviour.ToggleState(isEnabled: true);
             }
 

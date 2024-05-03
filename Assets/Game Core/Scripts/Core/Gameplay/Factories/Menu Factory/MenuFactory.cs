@@ -24,7 +24,6 @@ namespace GameCore.Gameplay.Factories
 
         private static DiContainer _diContainer;
         private static Dictionary<Type, MenuView> _menusDictionary;
-        private static Dictionary<Type, MenuView> _menusInstancesDictionary;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

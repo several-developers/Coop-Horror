@@ -34,6 +34,17 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         [SerializeField, Min(0)]
         private float _jumpForce = 6f;
 
+        [Title("Step specifics")]
+        [SerializeField, Min(0)]
+        private float _stepHeight = 0.3f;
+        
+        [SerializeField, Min(0)]
+        private float _stepSmooth = 0.1f;
+
+        [SerializeField, Min(0)]
+        [Tooltip("Distance from the player center used to check if the player is touching a step")]
+        private float _stepCheckerThreshold = 0.6f;
+
         [Title("Slope specifics")]
         [SerializeField, Range(0, 95)]
         private float _maxSlopeAngle = 55f;
@@ -76,6 +87,11 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         
         // Jump
         public float JumpForce => _jumpForce;
+        
+        // Step
+        public float StepHeight => _stepHeight;
+        public float StepSmooth => _stepSmooth;
+        public float StepCheckerThreshold => _stepCheckerThreshold;
         
         // Slope
         public float MaxSlopeAngle => _maxSlopeAngle;

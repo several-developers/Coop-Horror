@@ -158,10 +158,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     if (containsExpiredQuests)
                         _mobileHeadquartersEntity.SendOpenGameOverWarningMenu();
                     else
-                    {
-                        Debug.Log("----> LOAD LOCATION");
                         _gameManagerDecorator.LoadSelectedLocation();
-                    }
 
                     break;
 

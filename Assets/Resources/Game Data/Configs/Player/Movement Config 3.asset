@@ -21,6 +21,9 @@ MonoBehaviour:
   _groundDrag: 6
   _airDrag: 2
   _jumpForce: 14
+  _stepHeight: 0.6
+  _stepSmooth: 1.66
+  _stepCheckerThreshold: 0.6
   _maxSlopeAngle: 40
   _speedMultiplierOnAngle:
     serializedVersion: 2

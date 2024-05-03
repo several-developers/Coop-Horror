@@ -32,7 +32,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public bool IsGrounded => _isGrounded;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly InputReader _inputReader;
@@ -48,9 +48,8 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
         private Vector3 _moveDirection;
         private Vector3 _globalMoveDirection;
-        private Vector3 _downDirection;
         private Vector3 _globalDownDirection;
-        
+
         private RaycastHit _groundHitInfo;
         private Vector3 _groundPoint;
         private Vector3 _groundNormal;
@@ -109,6 +108,66 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             _isGrounded = Physics.CheckSphere(position, radius, _groundMask);
         }
 
+        private void CheckStep()
+        {
+            float stepHeight = _movementConfig.StepHeight;
+            float stepSmooth = _movementConfig.StepSmooth;
+            float stepCheckerThreshold = _movementConfig.StepCheckerThreshold;
+
+            Vector3 bottomStepPos = _transform.position
+                                    - new Vector3(x: 0f, y: _collider.height / 2f, z: 0f)
+                                    + new Vector3(x: 0f, y: 0.05f, z: 0f);
+
+            Vector3 upperStepPos = bottomStepPos + new Vector3(0f, stepHeight, 0f);
+            Vector3 direction = _transform.TransformDirection(Vector3.forward);
+
+            Debug.DrawRay(bottomStepPos, direction * stepCheckerThreshold, Color.red, 0.1f);
+            Debug.DrawRay(upperStepPos, direction * (stepCheckerThreshold + 0.05f), Color.blue, 0.1f);
+
+            // Hit lower
+            if (Physics.Raycast(bottomStepPos, direction, out RaycastHit _, stepCheckerThreshold))
+            {
+                // Hit upper
+                if (!Physics.Raycast(upperStepPos, direction, out RaycastHit tt, stepCheckerThreshold + 0.05f))
+                {
+                    //_rigidbody.position -= new Vector3(0f, -stepSmooth * Time.deltaTime, 0f);
+                    _rigidbody.position = tt.point;
+                }
+            }
+
+            direction = _transform.TransformDirection(1.5f, 0, 1);
+
+            Debug.DrawRay(bottomStepPos, direction * stepCheckerThreshold, Color.green, 0.1f);
+            Debug.DrawRay(upperStepPos, direction * (stepCheckerThreshold + 0.05f), Color.cyan, 0.1f);
+
+            // Hit lower 45
+            if (Physics.Raycast(bottomStepPos, direction, out RaycastHit _, stepCheckerThreshold))
+            {
+                // Hit upper 45
+                if (!Physics.Raycast(upperStepPos, direction, out RaycastHit tt, stepCheckerThreshold + 0.05f))
+                {
+                    //_rigidbody.position -= new Vector3(0f, -stepSmooth * Time.deltaTime, 0f);
+                    _rigidbody.position = tt.point;
+                }
+            }
+
+            direction = _transform.TransformDirection(-1.5f, 0, 1);
+
+            Debug.DrawRay(bottomStepPos, direction * stepCheckerThreshold, Color.yellow, 0.1f);
+            Debug.DrawRay(upperStepPos, direction * (stepCheckerThreshold + 0.05f), Color.magenta, 0.1f);
+
+            // Hit lower minus 45
+            if (Physics.Raycast(bottomStepPos, direction, out RaycastHit _, stepCheckerThreshold))
+            {
+                // Hit upper minus 45
+                if (!Physics.Raycast(upperStepPos, direction, out RaycastHit tt, stepCheckerThreshold + 0.05f))
+                {
+                    //_rigidbody.position -= new Vector3(0f, -stepSmooth * Time.deltaTime, 0f);
+                    _rigidbody.position = tt.point;
+                }
+            }
+        }
+
         private void CheckSlopeAndDirections()
         {
             _moveDirection = _globalMoveDirection;
@@ -123,7 +182,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
             {
                 _groundNormal = _groundHitInfo.normal;
                 _groundPoint = _groundHitInfo.point;
-                
+
                 bool equalsOne = Mathf.Approximately(a: _groundHitInfo.normal.y, b: 1f);
 
                 if (equalsOne)
@@ -157,12 +216,9 @@ namespace GameCore.Gameplay.Entities.Player.Movement
                     _slopeAngle = Vector3.Angle(Vector3.up, _groundNormal);
                     _isSloping = true;
                 }
-
-                _downDirection = Vector3.ProjectOnPlane(Vector3.down, _groundNormal);
             }
             else
             {
-                _downDirection = Vector3.down.normalized;
                 _groundNormal = Vector3.zero;
                 _isSloping = false;
 
@@ -210,7 +266,7 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
             float forceMagnitude = Mathf.Min(_moveDirection.normalized.magnitude, 0.51f);
             bool canMove = forceMagnitude > 0.05f;
-            
+
             _animator.SetFloat(id: AnimatorHashes.MoveSpeedBlend, forceMagnitude);
             _animator.SetBool(id: AnimatorHashes.CanMove, canMove);
         }
@@ -225,24 +281,24 @@ namespace GameCore.Gameplay.Entities.Player.Movement
 
             if (!hitRigidbody)
                 return;
-            
+
             float moveSpeedMultiplier = _movementConfig.MoveSpeedMultiplier;
             float fdt = Time.fixedDeltaTime;
-            
+
             Vector3 velocity = rigidbody.GetVelocityAtPoint(_groundPoint);
             //_rigidbody.velocity += velocity;
-            
+
             velocity *= moveSpeedMultiplier * fdt;
             _rigidbody.AddForce(velocity, ForceMode.Acceleration);
         }
-        
+
         private void GetMoveDirection()
         {
             var moveVector = _inputReader.GameInput.Gameplay.Move.ReadValue<Vector2>();
 
             if (!_isEnabled)
                 moveVector = Vector2.zero;
-            
+
             _globalMoveDirection = _transform.forward * moveVector.y + _transform.right * moveVector.x;
         }
 

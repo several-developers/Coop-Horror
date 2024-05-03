@@ -1,5 +1,5 @@
-﻿using GameCore.Gameplay.Entities.Player;
-using CustomEditors;
+﻿using CustomEditors;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.Movement;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -11,13 +11,13 @@ namespace GameCore.Configs.Gameplay.Player
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField]
-        private MovementConfig2 _movementConfig2;
+        private MovementConfig3 _movementConfig3;
         
         [SerializeField]
-        private MovementConfig3 _movementConfig3;
+        private MovementConfig4 _movementConfig4;
 
-        public MovementConfig2 MovementConfig2 => _movementConfig2;
         public MovementConfig3 MovementConfig3 => _movementConfig3;
+        public MovementConfig4 MovementConfig4 => _movementConfig4;
 
         [Title("Movement specifics")]
         [Tooltip("Layers where the player can stand on")]

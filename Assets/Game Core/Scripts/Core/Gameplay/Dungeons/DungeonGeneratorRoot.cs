@@ -40,5 +40,14 @@ namespace GameCore.Gameplay.Dungeons
             DungeonWrapper dungeonWrapper = new(_runtimeDungeon, _floor);
             _levelProviderObserver.RegisterDungeon(dungeonWrapper);
         }
+        
+        // DEBUG BUTTONS: -------------------------------------------------------------------------
+
+        [Title(Constants.DebugButtons)]
+        [Button(35), DisableInEditorMode]
+        private void DebugGenerateDungeon()
+        {
+            _runtimeDungeon.Generate();
+        }
     }
 }
