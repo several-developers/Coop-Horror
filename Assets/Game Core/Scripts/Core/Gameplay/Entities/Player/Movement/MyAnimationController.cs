@@ -1,5 +1,4 @@
-﻿using System;
-using ECM2;
+﻿using ECM2;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player
@@ -45,12 +44,11 @@ namespace GameCore.Gameplay.Entities.Player
 
             if (isMovingBackwards)
                 forwardAmount *= -1f;
-
-            Debug.LogWarning(move);
+            else
+                animator.SetFloat(id: AnimatorHashes.Turn, value: Mathf.Atan2(y: move.x, x: move.z), dampTime: 0.1f, deltaTime);
 
             animator.SetFloat(id: AnimatorHashes.Forward, value: forwardAmount, dampTime: 0.1f, deltaTime);
-            animator.SetFloat(id: AnimatorHashes.Turn, value: Mathf.Atan2(y: move.x, x: move.z), dampTime: 0.1f, deltaTime);
-            animator.SetFloat(id: AnimatorHashes.Sprint, value: _sprintAbility.IsSprinting() ? forwardAmount : 0.0f);
+            animator.SetFloat(id: AnimatorHashes.Sprint, value: _sprintAbility.IsSprinting() ? forwardAmount : 0.0f, dampTime: 0.3f, deltaTime);
 
             animator.SetBool(id: AnimatorHashes.Ground, value: _character.IsGrounded());
             animator.SetBool(id: AnimatorHashes.Crouch, value: _character.IsCrouched());
