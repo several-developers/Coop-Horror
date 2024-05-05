@@ -69,6 +69,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        public static event Action OnPlayerSpawnedEvent = delegate { };
+        public static event Action OnPlayerDespawnedEvent = delegate { };
+        
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
@@ -418,6 +421,8 @@ namespace GameCore.Gameplay.Entities.Player
             InitClient();
 
             _isInitialized = true;
+            
+            OnPlayerSpawnedEvent.Invoke();
         }
 
         public override void OnNetworkDespawn()
@@ -427,6 +432,10 @@ namespace GameCore.Gameplay.Entities.Player
             DespawnServerAndClient();
             DespawnServer();
             DespawnClient();
+
+            _isInitialized = false;
+            
+            OnPlayerDespawnedEvent.Invoke();
         }
         
         private void OnScroll(float scrollValue)

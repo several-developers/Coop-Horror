@@ -15,13 +15,17 @@ MonoBehaviour:
   _metaName: Test Item Cube
   _icon: {fileID: 21300000, guid: 62dfd2a271ca75c4e8b516bda82cc902, type: 3}
   _itemName: Test Item Cube
+  _rigPresetType: 1
   _itemID: -2
-  _itemCameraPreviewPosition: {x: 0.45, y: -0.24, z: 0.6}
-  _itemCameraPreviewRotation: {x: 0, y: 0, z: 0}
-  _itemCameraPreviewScale: {x: 1, y: 1, z: 1}
-  _itemPlayerPreviewPosition: {x: -0.069, y: -0.148, z: -0.039}
-  _itemPlayerPreviewRotation: {x: 0, y: 0, z: 0}
-  _itemPlayerPreviewScale: {x: 1.6, y: 1.6, z: 1.6}
+  _fpsItemPreview:
+    _position: {x: 0, y: 0, z: 0}
+    _eulerRotation: {x: 0, y: 0, z: 0}
+    _scale: {x: 1, y: 1, z: 1}
+  _fpsTransformSmoothDampTime: 0.1
+  _tpsItemPreview:
+    _position: {x: -0.069, y: -0.148, z: -0.039}
+    _eulerRotation: {x: 0, y: 0, z: 0}
+    _scale: {x: 1.6, y: 1.6, z: 1.6}
   _itemPrefab: {fileID: 6402857742088489240, guid: bb915ccb5b7e65c47a23dc6686b66190,
     type: 3}
   _itemPreviewPrefab: {fileID: 8255347702447654125, guid: e8f4dd848ed42d34a95114e6f60f950e,

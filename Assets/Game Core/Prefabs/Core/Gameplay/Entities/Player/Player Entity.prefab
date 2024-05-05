@@ -3054,7 +3054,7 @@ PrefabInstance:
     - target: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 970.75
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,
         type: 3}
@@ -3400,8 +3400,8 @@ MonoBehaviour:
     _collider: {fileID: 1967799250354909116}
     _networkTransform: {fileID: 5356547518013829562}
     _headPoint: {fileID: 260123221838165337}
-    _rightHandItemsHolder: {fileID: 3303857306865714120}
     _leftHandItemsHolder: {fileID: 5978814505450677389}
+    _rightHandItemsHolder: {fileID: 3303857306865714120}
     _headLookObject: {fileID: 8459922248943539644}
     _character: {fileID: 4617892838296297533}
     _characterMovement: {fileID: 3301787368083257467}

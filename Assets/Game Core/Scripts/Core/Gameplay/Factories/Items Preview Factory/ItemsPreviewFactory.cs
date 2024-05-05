@@ -36,16 +36,17 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
                 LogItemPrefabNotFound(itemID);
                 return false;
             }
-
+            
             itemPreviewObject = Object.Instantiate(itemPreviewPrefab, parent);
 
-            Vector3 position = cameraPivot ? itemMeta.ItemCameraPreviewPosition : itemMeta.ItemPlayerPreviewPosition;
-            Vector3 rotation = cameraPivot ? itemMeta.ItemCameraPreviewRotation : itemMeta.ItemPlayerPreviewRotation;
-            Vector3 scale = cameraPivot ? itemMeta.ItemCameraPreviewScale : itemMeta.ItemPlayerPreviewScale;
+            ItemMeta.ItemPose itemPose = cameraPivot ? itemMeta.FpsItemPreview : itemMeta.TpsItemPreview;
+            Vector3 position = itemPose.Position;
+            Vector3 eulerRotation = itemPose.EulerRotation;
+            Vector3 scale = itemPose.Scale;
 
             Transform itemTransform = itemPreviewObject.transform;
             itemTransform.localPosition = position;
-            itemTransform.localRotation = Quaternion.Euler(rotation);
+            itemTransform.localRotation = Quaternion.Euler(eulerRotation);
             itemTransform.localScale = scale;
 
             if (cameraPivot)

@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using CustomEditors;
+using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -20,29 +22,25 @@ namespace GameCore.Gameplay.Items
 
         [VerticalGroup(RowRight), SerializeField]
         private string _itemName = "item_name";
+
+        [VerticalGroup(RowRight), SerializeField]
+        private RigPresetType _rigPresetType;
         
         [VerticalGroup(RowRight), SerializeField, EnableIf(nameof(_canEditItemID))]
         private int _itemID;
 
-        [Title("Item Preview Settings")]
+        [Title("First Person Preview Settings")]
         [SerializeField]
-        private Vector3 _itemCameraPreviewPosition;
+        private ItemPose _fpsItemPreview;
         
+        [SerializeField, Min(0)]
+        [Tooltip("Blend time when transitioning into this pose.\n1 unit = 1 second.")]
+        private float _fpsTransformSmoothDampTime = 0.1f;
+        
+        [Title("Third Person Preview Settings")]
         [SerializeField]
-        private Vector3 _itemCameraPreviewRotation;
+        private ItemPose _tpsItemPreview;
         
-        [SerializeField]
-        private Vector3 _itemCameraPreviewScale = Vector3.one;
-        
-        [SerializeField, Space(height: 5)]
-        private Vector3 _itemPlayerPreviewPosition;
-        
-        [SerializeField]
-        private Vector3 _itemPlayerPreviewRotation;
-        
-        [SerializeField]
-        private Vector3 _itemPlayerPreviewScale = Vector3.one;
-
         [Title(Constants.References)]
         [SerializeField, Required]
         private ItemObjectBase _itemPrefab;
@@ -57,13 +55,10 @@ namespace GameCore.Gameplay.Items
 
         public Sprite Icon => _icon;
         public string ItemName => _itemName;
+        public RigPresetType RigPresetType => _rigPresetType;
         public int ItemID => _itemID;
-        public Vector3 ItemCameraPreviewPosition => _itemCameraPreviewPosition;
-        public Vector3 ItemCameraPreviewRotation => _itemCameraPreviewRotation;
-        public Vector3 ItemCameraPreviewScale => _itemCameraPreviewScale;
-        public Vector3 ItemPlayerPreviewPosition => _itemPlayerPreviewPosition;
-        public Vector3 ItemPlayerPreviewRotation => _itemPlayerPreviewRotation;
-        public Vector3 ItemPlayerPreviewScale => _itemPlayerPreviewScale;
+        public ItemPose FpsItemPreview => _fpsItemPreview;
+        public ItemPose TpsItemPreview => _tpsItemPreview;
         public ItemObjectBase ItemPrefab => _itemPrefab;
         public ItemPreviewObject ItemPreviewPrefab => _itemPreviewPrefab;
 
@@ -123,5 +118,26 @@ namespace GameCore.Gameplay.Items
             SaveItemID();
         }
 #endif
+
+        [Serializable]
+        public class ItemPose
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+            
+            [SerializeField]
+            private Vector3 _position;
+        
+            [SerializeField]
+            private Vector3 _eulerRotation;
+        
+            [SerializeField]
+            private Vector3 _scale = Vector3.one;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public Vector3 Position => _position;
+            public Vector3 EulerRotation => _eulerRotation;
+            public Vector3 Scale => _scale;
+        }
     }
 }

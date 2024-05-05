@@ -1,6 +1,7 @@
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Infrastructure.Providers.Gameplay.RigPresets;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -14,6 +15,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindGameplayConfigsProvider();
             BindItemsMetaProvider();
             BindItemsProvider();
+            BindRigPresetsProvider();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -37,6 +39,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<ItemsProvider>()
+                .AsSingle();
+        }
+        
+        private void BindRigPresetsProvider()
+        {
+            Container
+                .BindInterfacesTo<RigPresetsProvider>()
                 .AsSingle();
         }
     }

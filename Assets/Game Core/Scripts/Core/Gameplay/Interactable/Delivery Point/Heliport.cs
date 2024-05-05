@@ -70,7 +70,7 @@ namespace GameCore.Gameplay.Interactable
         {
             PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
             PlayerInventory inventory = localPlayer.GetInventory();
-            var isItemInSelectedSlotExists = inventory.TryGetSelectedItemData(out InventoryItemData inventoryItemData);
+            bool isItemInSelectedSlotExists = inventory.TryGetSelectedItemData(out InventoryItemData inventoryItemData);
 
             if (!isItemInSelectedSlotExists)
                 return false;

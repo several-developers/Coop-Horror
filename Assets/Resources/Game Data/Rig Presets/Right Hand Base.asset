@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af69b67c29aa4915a67fd22a51bbcd5b, type: 3}
+  m_Name: Right Hand Base
+  m_EditorClassIdentifier: 
+  _metaName: Right Hand Base
+  _rigType: 2
+  _fpsTargetPose:
+    _position: {x: 0.739, y: 2.9, z: 0.592}
+    _eulerRotation: {x: 0, y: 0, z: 0}
+    _scale: {x: 1, y: 1, z: 1}
+    _transformSmoothDampTime: 0.1
+  _fpsHintPose:
+    _position: {x: 1.113, y: 2.636, z: -0.051}
+    _eulerRotation: {x: 0, y: 0, z: 0}
+    _scale: {x: 1, y: 1, z: 1}
+    _transformSmoothDampTime: 0.1

@@ -8,6 +8,7 @@ using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
 using GameCore.Configs.Gameplay.Quests;
 using GameCore.Configs.Gameplay.QuestsItems;
+using GameCore.Configs.Gameplay.RigPresets;
 using GameCore.Configs.Gameplay.Time;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
@@ -25,5 +26,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         QuestsConfigMeta GetQuestsConfig();
         QuestsItemsConfigMeta GetQuestsItemsConfig();
         DeliveryConfigMeta GetDeliveryConfig();
+        RigPresetsConfigMeta GetRigPresetsConfig();
     }
 }
