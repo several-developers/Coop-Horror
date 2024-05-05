@@ -13,15 +13,23 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         private Camera _mainCamera;
         
         [SerializeField, Required]
-        private Transform _itemPivot;
+        private Transform _leftHandItemsHolder;
+        
+        [SerializeField, Required]
+        private Transform _rightHandItemsHolder;
         
         [SerializeField, Required]
         private Transform _lookAtObject;
 
+        [SerializeField, Required]
+        private Animator _playerArmsAnimator;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public Camera MainCamera => _mainCamera;
-        public Transform ItemPivot => _itemPivot;
+        public Transform LeftHandItemsHolder => _leftHandItemsHolder;
+        public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public Transform LookAtObject => _lookAtObject;
+        public Animator PlayerArmsAnimator => _playerArmsAnimator;
     }
 }

@@ -21,7 +21,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInventory = playerEntity.GetInventory();
             _cameraItemPivot = playerEntity.GetCameraItemPivot();
-            _playerItemPivot = playerEntity.GetPlayerItemPivot();
+            _playerItemPivot = playerEntity.GetRightHandItemsHolder();
             _interactableItems = new IInteractableItem[Constants.PlayerInventorySize];
             _itemsPreviewObjects = new ItemPreviewObject[Constants.PlayerInventorySize];
 

@@ -18,6 +18,7 @@ using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Player
@@ -90,7 +91,7 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
 
-        private Transform _cameraItemPivot;
+        private Transform _cameraRightHandItemsHolder;
         private Transform _lookAtObject;
 
         private bool _isInitialized;
@@ -146,7 +147,7 @@ namespace GameCore.Gameplay.Entities.Player
 
                 if (_playerCamera != null)
                 {
-                    _cameraItemPivot = _playerCamera.CameraReferences.ItemPivot;
+                    _cameraRightHandItemsHolder = _playerCamera.CameraReferences.RightHandItemsHolder;
                     return;
                 }
 
@@ -188,8 +189,14 @@ namespace GameCore.Gameplay.Entities.Player
                 _playerCamera.Init(playerEntity: this);
                 _uiObserver.InitPlayer(playerEntity: this);
 
-                foreach (GameObject modelPart in _references.PlayerModelParts)
-                    modelPart.SetActive(false);
+                foreach (GameObject activeObject in _references.LocalPlayerActiveObjects)
+                    activeObject.SetActive(true);
+                
+                foreach (GameObject inactiveObject in _references.LocalPlayerInactiveObjects)
+                    inactiveObject.SetActive(false);
+
+                foreach (SkinnedMeshRenderer meshRenderer in _references.HiddenMeshes)
+                    meshRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
 
                 _localPlayer = this;
                 _lookAtObject = _playerCamera.CameraReferences.LookAtObject;
@@ -215,7 +222,7 @@ namespace GameCore.Gameplay.Entities.Player
                 playerMovementController.Setup(playerEntity: this);
 
                 MyAnimationController animationController = _references.AnimationController;
-                animationController.Setup(character);
+                animationController.Setup(character, _playerCamera);
             }
 
             void InitInteractionCheckerAndHandler()
@@ -358,10 +365,10 @@ namespace GameCore.Gameplay.Entities.Player
 
         public Transform GetTransform() => transform;
 
-        public Transform GetCameraItemPivot() => _cameraItemPivot;
+        public Transform GetCameraItemPivot() => _cameraRightHandItemsHolder;
 
-        public Transform GetPlayerItemPivot() =>
-            _references.PlayerItemPivot;
+        public Transform GetRightHandItemsHolder() =>
+            _references.RightHandItemsHolder;
 
         public PlayerInventory GetInventory() => _inventory;
         

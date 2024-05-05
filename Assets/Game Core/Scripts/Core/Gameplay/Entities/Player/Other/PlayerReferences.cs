@@ -22,7 +22,7 @@ namespace GameCore.Gameplay.Entities.Player
         
         [SerializeField, Required]
         private Animator _animator;
-
+        
         [SerializeField, Required]
         private OwnerNetworkAnimator _networkAnimator;
 
@@ -42,7 +42,10 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _headPoint;
 
         [SerializeField, Required]
-        private Transform _playerItemPivot;
+        private Transform _leftHandItemsHolder;
+
+        [SerializeField, Required]
+        private Transform _rightHandItemsHolder;
 
         [SerializeField, Required]
         private Transform _headLookObject;
@@ -60,7 +63,13 @@ namespace GameCore.Gameplay.Entities.Player
         private MyAnimationController _animationController;
 
         [SerializeField, Required, Space(height: 5)]
-        private GameObject[] _playerModelParts;
+        private SkinnedMeshRenderer[] _hiddenMeshes;
+        
+        [SerializeField, Required]
+        private GameObject[] _localPlayerActiveObjects;
+        
+        [SerializeField, Required]
+        private GameObject[] _localPlayerInactiveObjects;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -73,12 +82,15 @@ namespace GameCore.Gameplay.Entities.Player
         public CapsuleCollider Collider => _collider;
         public ClientNetworkTransform NetworkTransform => _networkTransform;
         public Transform HeadPoint => _headPoint;
-        public Transform PlayerItemPivot => _playerItemPivot;
+        public Transform LeftHandItemsHolder => _leftHandItemsHolder;
+        public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public Transform HeadLookObject => _headLookObject;
         public Character Character => _character;
         public CharacterMovement CharacterMovement => _characterMovement;
         public PlayerMovementController PlayerMovementController => _playerMovementController;
         public MyAnimationController AnimationController => _animationController;
-        public GameObject[] PlayerModelParts => _playerModelParts;
+        public SkinnedMeshRenderer[] HiddenMeshes => _hiddenMeshes;
+        public GameObject[] LocalPlayerActiveObjects => _localPlayerActiveObjects;
+        public GameObject[] LocalPlayerInactiveObjects => _localPlayerInactiveObjects;
     }
 }
