@@ -1,5 +1,4 @@
-﻿using System;
-using GameCore.Gameplay.Factories.Items;
+﻿using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.Network;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -38,7 +37,13 @@ namespace GameCore.Gameplay.Items.Spawners
 
         private void Awake() =>
             _netcodeHooks.OnNetworkSpawnHookEvent += OnNetworkSpawnHook;
-        
+
+        private void Start()
+        {
+            if (_netcodeHooks.IsSpawned)
+                TrySpawnItem();
+        }
+
         private void OnDestroy() =>
             _netcodeHooks.OnNetworkSpawnHookEvent -= OnNetworkSpawnHook;
 
@@ -49,6 +54,17 @@ namespace GameCore.Gameplay.Items.Spawners
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void TrySpawnItem()
+        {
+            if (!_spawnAtStart)
+                return;
+
+            if (!_netcodeHooks.IsOwner)
+                return;
+            
+            SpawnItem();
+        }
+        
         private void SpawnItem()
         {
             if (!IsItemMetaValid())
@@ -74,16 +90,7 @@ namespace GameCore.Gameplay.Items.Spawners
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnNetworkSpawnHook()
-        {
-            if (!_spawnAtStart)
-                return;
-
-            if (!_netcodeHooks.IsOwner)
-                return;
-            
-            SpawnItem();
-        }
+        private void OnNetworkSpawnHook() => TrySpawnItem();
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

@@ -1,11 +1,12 @@
 namespace GameCore.Gameplay.Entities.Inventory
 {
-    public struct ItemDropStaticData
+    public struct DroppedItemStaticData
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ItemDropStaticData(int slotIndex, bool randomPosition = false, bool destroy = false)
+        public DroppedItemStaticData(ulong clientID, int slotIndex, bool randomPosition = false, bool destroy = false)
         {
+            ClientID = clientID;
             SlotIndex = slotIndex;
             RandomPosition = randomPosition;
             Destroy = destroy;
@@ -13,6 +14,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         
         // PROPERTIES: ----------------------------------------------------------------------------
         
+        public ulong ClientID { get; }
         public int SlotIndex { get; }
         public bool RandomPosition { get; }
         public bool Destroy { get; }

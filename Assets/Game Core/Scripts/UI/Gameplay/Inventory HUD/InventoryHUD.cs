@@ -4,7 +4,6 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
-using GameCore.Observers.Gameplay.UI;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -19,12 +18,10 @@ namespace GameCore.UI.Gameplay.Inventory
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator, IItemsMetaProvider itemsMetaProvider,
-            IUIObserver uiObserver)
+        private void Construct(IGameManagerDecorator gameManagerDecorator, IItemsMetaProvider itemsMetaProvider)
         {
             _gameManagerDecorator = gameManagerDecorator;
             _itemsMetaProvider = itemsMetaProvider;
-            _uiObserver = uiObserver;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -43,13 +40,10 @@ namespace GameCore.UI.Gameplay.Inventory
 
         private IGameManagerDecorator _gameManagerDecorator;
         private IItemsMetaProvider _itemsMetaProvider;
-        private IUIObserver _uiObserver;
 
         private InventoryFactory _inventoryFactory;
         private LayoutFixHelper _layoutFixHelper;
-        private PlayerEntity _playerEntity;
         private int _lastSlotIndex;
-        private bool _isInitialized;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -60,9 +54,10 @@ namespace GameCore.UI.Gameplay.Inventory
             _inventoryFactory = new InventoryFactory(_itemSlotViewPrefab, _slotsContainer);
             _layoutFixHelper = new LayoutFixHelper(coroutineRunner: this, _layoutGroup);
 
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+            PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
             
-            _uiObserver.OnInitPlayerEvent += OnInitPlayer;
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
 
         private void Start()
@@ -76,31 +71,13 @@ namespace GameCore.UI.Gameplay.Inventory
         {
             base.OnDestroy();
             
-            _uiObserver.OnInitPlayerEvent -= OnInitPlayer;
-
-            if (!_isInitialized)
-                return;
-
-            PlayerInventory inventory = _playerEntity.GetInventory();
-
-            inventory.OnSelectedSlotChangedEvent -= OnSelectedSlotChanged;
-            inventory.OnItemEquippedEvent -= OnItemEquipped;
-            inventory.OnItemDroppedEvent -= OnItemDropped;
+            PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
+            
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void Init(PlayerEntity playerEntity)
-        {
-            _playerEntity = playerEntity;
-            _isInitialized = true;
-
-            PlayerInventory inventory = _playerEntity.GetInventory();
-
-            inventory.OnSelectedSlotChangedEvent += OnSelectedSlotChanged;
-            inventory.OnItemEquippedEvent += OnItemEquipped;
-            inventory.OnItemDroppedEvent += OnItemDropped;
-        }
 
         private void HandleGameState(GameState gameState)
         {
@@ -181,19 +158,40 @@ namespace GameCore.UI.Gameplay.Inventory
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnPlayerSpawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+
+            PlayerInventory inventory = playerEntity.GetInventory();
+
+            inventory.OnSelectedSlotChangedEvent += OnSelectedSlotChanged;
+            inventory.OnItemEquippedEvent += OnItemEquipped;
+            inventory.OnItemDroppedEvent += OnItemDropped;
+        }
+
+        private void OnPlayerDespawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+            
+            PlayerInventory inventory = playerEntity.GetInventory();
+
+            inventory.OnSelectedSlotChangedEvent -= OnSelectedSlotChanged;
+            inventory.OnItemEquippedEvent -= OnItemEquipped;
+            inventory.OnItemDroppedEvent -= OnItemDropped;
+        }
+        
         private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
         
-        private void OnInitPlayer(PlayerEntity playerEntity) => Init(playerEntity);
+        private void OnSelectedSlotChanged(ChangedSlotStaticData data) => SelectSlot(data.SlotIndex);
 
-        private void OnSelectedSlotChanged(int selectedSlotIndex) => SelectSlot(selectedSlotIndex);
+        private void OnItemEquipped(EquippedItemStaticData data) => SetIcon(data.SlotIndex, data.InventoryItemData);
 
-        private void OnItemEquipped(int slotIndex, InventoryItemData inventoryItemData) =>
-            SetIcon(slotIndex, inventoryItemData);
-
-        private void OnItemDropped(ItemDropStaticData data)
-        {
-            int slotIndex = data.SlotIndex;
-            ClearSlot(slotIndex);
-        }
+        private void OnItemDropped(DroppedItemStaticData data) => ClearSlot(data.SlotIndex);
     }
 }

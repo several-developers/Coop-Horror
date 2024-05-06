@@ -53,6 +53,12 @@ namespace GameCore.Gameplay.Entities.Player
         
         // Current camera target pitch
         private float _cameraTargetPitch;
+        
+        private bool _isInitialized;
+        private bool _performJump;
+        private bool _cancelJump;
+        private bool _performCrouch;
+        private bool _cancelCrouch;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -60,21 +66,21 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _character = GetComponent<Character>();
             _sprintAbility = GetComponent<MySprintAbility>();
-            _crouchedCamera.transform.SetParent(null);
-            _unCrouchedCamera.transform.SetParent(null);
+            _crouchedCamera.SetActive(false);
+            _unCrouchedCamera.SetActive(false);
         }
 
         private void Start()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-
             // Disable Character's rotation mode, we'll handle it here
-
             _character.SetRotationMode(Character.RotationMode.None);
         }
 
         private void Update()
         {
+            if (!_isInitialized)
+                return;
+            
             // Movement direction relative to Character's forward
 
             Vector3 movementDirection = Vector3.zero;
@@ -100,17 +106,44 @@ namespace GameCore.Gameplay.Entities.Player
 
             // Crouch input
 
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.C))
+            if (_performCrouch)
+            {
+                _performCrouch = false;
                 _character.Crouch();
-            else if (Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.C))
+            }
+            else if (_cancelCrouch)
+            {
+                _cancelCrouch = false;
                 _character.UnCrouch();
+            }
 
             // Jump input
-
-            if (Input.GetButtonDown("Jump"))
+            
+            if (_performJump)
+            {
+                _performJump = false;
                 _character.Jump();
-            else if (Input.GetButtonUp("Jump"))
+            }
+            else if (_cancelJump)
+            {
+                _cancelJump = false;
                 _character.StopJumping();
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (!_isInitialized)
+                return;
+            
+            _inputReader.OnMoveEvent -= OnMove;
+            _inputReader.OnJumpEvent -= OnJump;
+            _inputReader.OnJumpCanceledEvent -= OnJumpCanceled;
+            _inputReader.OnCrouchEvent -= OnCrouch;
+            _inputReader.OnCrouchCanceledEvent -= OnCrouchCanceled;
+            _inputReader.OnLookEvent -= OnLook;
+            _inputReader.OnSprintEvent -= OnSprint;
+            _inputReader.OnSprintCanceledEvent -= OnSprintCanceled;
         }
 
         private void OnEnable()
@@ -133,10 +166,19 @@ namespace GameCore.Gameplay.Entities.Player
 
         public void Setup(PlayerEntity playerEntity)
         {
-            PlayerReferences playerReferences = playerEntity.References;
-            _inputReader = playerReferences.InputReader; // TEMP
+            _isInitialized = true;
+            _inputReader = playerEntity.InputReader;
             
+            _crouchedCamera.SetActive(false);
+            _unCrouchedCamera.SetActive(true);
+            _crouchedCamera.transform.SetParent(null);
+            _unCrouchedCamera.transform.SetParent(null);
+
             _inputReader.OnMoveEvent += OnMove;
+            _inputReader.OnJumpEvent += OnJump;
+            _inputReader.OnJumpCanceledEvent += OnJumpCanceled;
+            _inputReader.OnCrouchEvent += OnCrouch;
+            _inputReader.OnCrouchCanceledEvent += OnCrouchCanceled;
             _inputReader.OnLookEvent += OnLook;
             _inputReader.OnSprintEvent += OnSprint;
             _inputReader.OnSprintCanceledEvent += OnSprintCanceled;
@@ -186,7 +228,19 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnMove(Vector2 movementVector) =>
             _moveInput = movementVector;
-        
+
+        private void OnJump() =>
+            _performJump = true;
+
+        private void OnJumpCanceled() =>
+            _cancelJump = true;
+
+        private void OnCrouch() =>
+            _performCrouch = true;
+
+        private void OnCrouchCanceled() =>
+            _cancelCrouch = true;
+
         private void OnLook(Vector2 lookVector) =>
             _lookVector = lookVector;
 

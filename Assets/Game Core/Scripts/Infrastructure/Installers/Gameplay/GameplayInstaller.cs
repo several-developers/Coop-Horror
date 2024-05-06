@@ -1,6 +1,7 @@
 using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Levels;
 using GameCore.Gameplay.Levels.Locations;
@@ -24,6 +25,9 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         [SerializeField, Required]
         private DeliveryPoint _deliveryPoint;
+        
+        [SerializeField, Required]
+        private PlayerCamera _playerCamera;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -39,6 +43,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindFireExitsManager();
             BindLocationManagerDecorator();
             BindUIManager();
+            BindPlayerCamera();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -119,6 +124,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .BindInterfacesTo<UIManager>()
                 .AsSingle()
                 .NonLazy();
+        }
+        
+        private void BindPlayerCamera()
+        {
+            Container
+                .Bind<PlayerCamera>()
+                .FromInstance(_playerCamera)
+                .AsSingle();
         }
     }
 }

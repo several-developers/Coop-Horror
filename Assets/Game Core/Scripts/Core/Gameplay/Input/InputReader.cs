@@ -18,6 +18,9 @@ namespace GameCore.Gameplay.InputManagement
         public event Action OnSprintEvent = delegate { };
         public event Action OnSprintCanceledEvent = delegate { };
         public event Action OnJumpEvent = delegate { };
+        public event Action OnJumpCanceledEvent = delegate { };
+        public event Action OnCrouchEvent = delegate { };
+        public event Action OnCrouchCanceledEvent = delegate { };
         public event Action<Vector2> OnLookEvent = delegate { };
         public event Action OnAttackEvent = delegate { };
         public event Action OnAttackCanceledEvent = delegate { };
@@ -87,19 +90,41 @@ namespace GameCore.Gameplay.InputManagement
             switch (context.phase)
             {
                 case InputActionPhase.Performed:
-                    OnSprintEvent?.Invoke();
+                    OnSprintEvent.Invoke();
                     break;
 
                 case InputActionPhase.Canceled:
-                    OnSprintCanceledEvent?.Invoke();
+                    OnSprintCanceledEvent.Invoke();
                     break;
             }
         }
 
         public void OnJump(InputAction.CallbackContext context)
         {
-            if (context.performed)
-                OnJumpEvent.Invoke();
+            switch (context.phase)
+            {
+                case InputActionPhase.Performed:
+                    OnJumpEvent.Invoke();
+                    break;
+                
+                case InputActionPhase.Canceled:
+                    OnJumpCanceledEvent.Invoke();
+                    break;
+            }
+        }
+
+        public void OnCrouch(InputAction.CallbackContext context)
+        {
+            switch (context.phase)
+            {
+                case InputActionPhase.Performed:
+                    OnCrouchEvent.Invoke();
+                    break;
+                
+                case InputActionPhase.Canceled:
+                    OnCrouchCanceledEvent.Invoke();
+                    break;
+            }
         }
 
         public void OnLook(InputAction.CallbackContext context)

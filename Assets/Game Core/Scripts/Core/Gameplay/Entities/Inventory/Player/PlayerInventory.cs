@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Gameplay.Network;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Inventory
@@ -16,9 +17,9 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        public event Action<int> OnSelectedSlotChangedEvent;
-        public event Action<int, InventoryItemData> OnItemEquippedEvent;
-        public event Action<ItemDropStaticData> OnItemDroppedEvent;
+        public event Action<EquippedItemStaticData> OnItemEquippedEvent;
+        public event Action<DroppedItemStaticData> OnItemDroppedEvent;
+        public event Action<ChangedSlotStaticData> OnSelectedSlotChangedEvent;
 
         private readonly Inventory<InventoryItemData> _inventory;
 
@@ -67,8 +68,10 @@ namespace GameCore.Gameplay.Entities.Inventory
             // Item wasn't equipped.
             if (slotIndex < 0)
                 return false;
-            
-            OnItemEquippedEvent?.Invoke(slotIndex, inventoryItemData);
+
+            ulong clientID = GetClientID();
+            EquippedItemStaticData data = new(inventoryItemData, clientID, slotIndex);
+            OnItemEquippedEvent?.Invoke(data);
 
             return true;
         }
@@ -85,35 +88,35 @@ namespace GameCore.Gameplay.Entities.Inventory
             int slotIndex = _inventory.DropSelectedItem();
             const bool randomPosition = false;
 
-            ItemDropStaticData data = new(slotIndex, randomPosition, destroy);
+            ulong clientID = GetClientID();
+            DroppedItemStaticData data = new(clientID, slotIndex, randomPosition, destroy);
             OnItemDroppedEvent?.Invoke(data);
         }
         
         public void DropAllItems()
         {
             int iterations = _inventory.Size;
+            ulong clientID = GetClientID();
             const bool randomPosition = true;
 
             for (int i = 0; i < iterations; i++)
             {
                 _inventory.DropItem(i);
 
-                ItemDropStaticData data = new(i, randomPosition, destroy: true);
+                DroppedItemStaticData data = new(clientID, i, randomPosition, destroy: true);
                 OnItemDroppedEvent?.Invoke(data);
             }
         }
 
-        public void MoveItems()
-        {
-            
-        }
+        public ulong GetClientID() =>
+            NetworkHorror.ClientID;
+        
+        public int GetSelectedSlotIndex() =>
+            _inventory.GetSelectedSlotIndex();
 
         public bool TryGetSelectedItemData(out InventoryItemData inventoryItemData) =>
             _inventory.TryGetSelectedItemData(out inventoryItemData);
 
-        public int GetSelectedSlotIndex() =>
-            _inventory.GetSelectedSlotIndex();
-        
         public bool IsInventoryFull() =>
             _inventory.IsInventoryFull();
 
@@ -122,13 +125,12 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void CreateItemInHand()
+        private void SendSelectedSlotChangedEvent(int selectedSlotIndex)
         {
-            
+            ulong clientID = GetClientID();
+            ChangedSlotStaticData data = new(clientID, selectedSlotIndex);
+            OnSelectedSlotChangedEvent?.Invoke(data);
         }
-        
-        private void SendSelectedSlotChangedEvent(int selectedSlotIndex) =>
-            OnSelectedSlotChangedEvent?.Invoke(selectedSlotIndex);
 
         private static void LogPickUpItem(int itemID)
         {

@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Rig Presets Config
   _presetsReferences:
+  - _presetType: 0
+    _presetMeta: {fileID: 11400000, guid: 287fba0580419c54ab46c65a9c9cc869, type: 2}
   - _presetType: 1
     _presetMeta: {fileID: 11400000, guid: 6debe8d163e7f8940844e30cc79ad44d, type: 2}

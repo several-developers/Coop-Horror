@@ -1,18 +1,18 @@
-﻿namespace GameCore.Gameplay.Network
+﻿namespace GameCore.Gameplay.Entities.Inventory
 {
-    public struct CreateItemPreviewStaticData
+    public struct ChangedSlotStaticData
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CreateItemPreviewStaticData(int slotIndex, int itemID)
+        public ChangedSlotStaticData(ulong clientID, int slotIndex)
         {
+            ClientID = clientID;
             SlotIndex = slotIndex;
-            ItemID = itemID;
         }
 
         // PROPERTIES: ----------------------------------------------------------------------------
-
+        
+        public ulong ClientID { get; }
         public int SlotIndex { get; }
-        public int ItemID { get; }
     }
 }

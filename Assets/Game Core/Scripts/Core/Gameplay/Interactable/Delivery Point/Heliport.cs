@@ -110,6 +110,6 @@ namespace GameCore.Gameplay.Interactable
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnPlayerSelectedSlotChanged(int slotIndex) => SendInteractionStateChangedEvent();
+        private void OnPlayerSelectedSlotChanged(ChangedSlotStaticData data) => SendInteractionStateChangedEvent();
     }
 }

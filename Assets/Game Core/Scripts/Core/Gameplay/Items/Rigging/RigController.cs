@@ -1,6 +1,8 @@
-﻿using GameCore.Enums.Gameplay;
+﻿using DG.Tweening;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using GameCore.Infrastructure.Providers.Gameplay.RigPresets;
 using Sirenix.OdinInspector;
@@ -15,10 +17,17 @@ namespace GameCore.Gameplay.Items.Rigging
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsMetaProvider itemsMetaProvider, IRigPresetsProvider rigPresetsProvider)
+        private void Construct(IItemsMetaProvider itemsMetaProvider, IRigPresetsProvider rigPresetsProvider,
+            PlayerCamera playerCamera)
         {
             _itemsMetaProvider = itemsMetaProvider;
             _rigPresetsProvider = rigPresetsProvider;
+            
+            CameraReferences cameraReferences = playerCamera.CameraReferences;
+            _playersArmsAnimator = cameraReferences.PlayerArmsAnimator;
+            
+            _leftHandLayerIndex = _playersArmsAnimator.GetLayerIndex("Left Hand");
+            _rightHandLayerIndex = _playersArmsAnimator.GetLayerIndex("Right Hand");
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -46,7 +55,12 @@ namespace GameCore.Gameplay.Items.Rigging
 
         private IItemsMetaProvider _itemsMetaProvider;
         private IRigPresetsProvider _rigPresetsProvider;
-        private PlayerInventory _playerInventory;
+        private Animator _playersArmsAnimator;
+
+        private Sequence _sequence;
+
+        private int _leftHandLayerIndex;
+        private int _rightHandLayerIndex;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -64,14 +78,22 @@ namespace GameCore.Gameplay.Items.Rigging
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void TryUpdateRig()
+        private void TryUpdateRig(ulong clientID)
         {
+            bool isPlayerFound = PlayerEntity.TryGetPlayer(clientID, out PlayerEntity playerEntity);
+
+            if (!isPlayerFound)
+                return;
+
+            PlayerInventory playerInventory = playerEntity.GetInventory();
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
             bool isItemInSelectedSlotExists =
-                _playerInventory.TryGetSelectedItemData(out InventoryItemData inventoryItemData);
+                playerInventory.TryGetSelectedItemData(out InventoryItemData inventoryItemData);
 
             if (!isItemInSelectedSlotExists)
             {
-                ResetRig();
+                ResetRig(isLocalPlayer);
                 return;
             }
 
@@ -80,19 +102,15 @@ namespace GameCore.Gameplay.Items.Rigging
 
             if (!isItemMetaFound)
             {
-                ResetRig();
+                ResetRig(isLocalPlayer);
                 return;
             }
 
             RigPresetType presetType = itemMeta.RigPresetType;
-            
-            if (presetType == RigPresetType.None)
-                ResetRig();
-            else
-                UpdateRig(presetType);
+            UpdateRig(presetType, isLocalPlayer);
         }
 
-        private void UpdateRig(RigPresetType presetType)
+        private void UpdateRig(RigPresetType presetType, bool isLocalPlayer)
         {
             bool isPresetFound = _rigPresetsProvider.TryGetPresetMeta(presetType, out RigPresetMeta rigPresetMeta);
 
@@ -101,43 +119,111 @@ namespace GameCore.Gameplay.Items.Rigging
                 Log.PrintError(log: $"Rig Preset of type <gb>{presetType}</gb> <rb>not found</rb>!");
                 return;
             }
+            
+            _sequence.Kill();
+            _sequence = DOTween.Sequence();
+            _sequence.SetLink(gameObject);
 
             RigType rigType = rigPresetMeta.RigType;
-            float leftHandRigWeight = rigType is RigType.LeftHand or RigType.BothHands ? 1f : 0f;
-            float rightHandRigWeight = rigType is RigType.RightHand or RigType.BothHands ? 1f : 0f;
+            bool showLeftHand = rigType is RigType.LeftHand or RigType.BothHands;
+            bool showRightHand = rigType is RigType.RightHand or RigType.BothHands;
+            float leftHandRigWeight = showLeftHand ? 1f : 0f;
+            float rightHandRigWeight = showRightHand ? 1f : 0f;
+            
+            RigPresetMeta.RigPose leftHandTargetPose;
+            RigPresetMeta.RigPose rightHandTargetPose;
+            RigPresetMeta.RigPose leftHandHintPose;
+            RigPresetMeta.RigPose rightHandHintPose;
 
-            //_leftHandRig.weight = leftHandRigWeight;
-            _rightHandRig.weight = rightHandRigWeight;
-
-            RigPresetMeta.RigPose fpsTargetPose = rigPresetMeta.FPSTargetPose;
-            RigPresetMeta.RigPose fpsHintPose = rigPresetMeta.FPSHintPose;
-
-            _rightHandTarget.localPosition = fpsTargetPose.Position;
-            _rightHandTarget.localRotation = Quaternion.Euler(fpsTargetPose.EulerRotation);
-
-            _rightHandHint.localPosition = fpsHintPose.Position;
-            _rightHandHint.localRotation = Quaternion.Euler(fpsHintPose.EulerRotation);
+            if (isLocalPlayer)
+            {
+                leftHandTargetPose = rigPresetMeta.FPSLeftHandTargetPose;
+                rightHandTargetPose = rigPresetMeta.FPSRightHandTargetPose;
+                leftHandHintPose = rigPresetMeta.FPSLeftHandHintPose;
+                rightHandHintPose = rigPresetMeta.FPSRightHandHintPose;
+            }
+            else
+            {
+                leftHandTargetPose = rigPresetMeta.FPSLeftHandTargetPose;
+                rightHandTargetPose = rigPresetMeta.FPSRightHandTargetPose;
+                leftHandHintPose = rigPresetMeta.FPSLeftHandHintPose;
+                rightHandHintPose = rigPresetMeta.FPSRightHandHintPose;
+            }
+            
+            ChangeRightHandRig(targetPose: rightHandTargetPose, hintPose: rightHandHintPose,
+                rigChangeDuration: rigPresetMeta.RigWeightChangeDuration, targetWeight: rightHandRigWeight);
+            
+            ChangeRightHandAnimatorLayer(rigPresetMeta, rightHandRigWeight);
         }
 
-        private void ResetRig()
+        private void ResetRig(bool isLocalPlayer) => UpdateRig(RigPresetType.None, isLocalPlayer);
+
+        private void ChangeRightHandRig(RigPresetMeta.RigPose targetPose, RigPresetMeta.RigPose hintPose,
+            float rigChangeDuration, float targetWeight)
         {
-            //_leftHandRig.weight = 0f;
-            _rightHandRig.weight = 0f;
+            FloatAnimation(from: _rightHandRig.weight, to: targetWeight, rigChangeDuration,
+                onVirtualUpdate: weight => _rightHandRig.weight = weight);
+
+            LocalMoveAnimation(_rightHandTarget, targetPose.Position, targetPose.Duration);
+            LocalMoveAnimation(_rightHandHint, hintPose.Position, hintPose.Duration);
+            LocalRotateAnimation(_rightHandTarget, targetPose.EulerRotation, targetPose.Duration);
+            LocalRotateAnimation(_rightHandHint, hintPose.EulerRotation, hintPose.Duration);
         }
+
+        private void ChangeRightHandAnimatorLayer(RigPresetMeta rigPresetMeta, float targetWeight)
+        {
+            float from = _playersArmsAnimator.GetLayerWeight(_rightHandLayerIndex);
+            float duration = rigPresetMeta.AnimatorLayerWeightChangeTime;
+            
+            FloatAnimation(from, to: targetWeight, duration,
+                onVirtualUpdate: weight => _playersArmsAnimator.SetLayerWeight(_rightHandLayerIndex, weight));
+        }
+
+        private void FloatAnimation(float from, float to, float duration, TweenCallback<float> onVirtualUpdate) =>
+            _sequence.Join(DOVirtual.Float(from, to, duration, onVirtualUpdate));
+
+        private void LocalMoveAnimation(Transform target, Vector3 position, float duration) =>
+            _sequence.Join(target.DOLocalMove(position, duration));
+
+        private void LocalRotateAnimation(Transform target, Vector3 eulerRotation, float duration) =>
+            _sequence.Join(target.DOLocalRotate(eulerRotation, duration));
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnPlayerSpawned()
+        private void OnPlayerSpawned(PlayerEntity playerEntity)
         {
-            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
-            _playerInventory = localPlayer.GetInventory();
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
 
-            _playerInventory.OnSelectedSlotChangedEvent += OnInventorySelectedSlotChanged;
+            if (!isLocalPlayer)
+                return;
+            
+            ResetRig(isLocalPlayer: true);
+
+            PlayerInventory playerInventory = playerEntity.GetInventory();
+
+            playerInventory.OnItemEquippedEvent += OnItemEquipped;
+            playerInventory.OnItemDroppedEvent += OnItemDropped;
+            playerInventory.OnSelectedSlotChangedEvent += OnInventorySelectedSlotChanged;
         }
 
-        private void OnPlayerDespawned() =>
-            _playerInventory.OnSelectedSlotChangedEvent -= OnInventorySelectedSlotChanged;
+        private void OnPlayerDespawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
 
-        private void OnInventorySelectedSlotChanged(int slotIndex) => TryUpdateRig();
+            if (!isLocalPlayer)
+                return;
+            
+            PlayerInventory playerInventory = playerEntity.GetInventory();
+
+            playerInventory.OnItemEquippedEvent -= OnItemEquipped;
+            playerInventory.OnItemDroppedEvent -= OnItemDropped;
+            playerInventory.OnSelectedSlotChangedEvent -= OnInventorySelectedSlotChanged;
+        }
+
+        private void OnItemEquipped(EquippedItemStaticData data) => TryUpdateRig(data.ClientID);
+
+        private void OnItemDropped(DroppedItemStaticData data) => TryUpdateRig(data.ClientID);
+
+        private void OnInventorySelectedSlotChanged(ChangedSlotStaticData data) => TryUpdateRig(data.ClientID);
     }
 }

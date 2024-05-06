@@ -89,7 +89,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private bool IsLocalPlayerInTheElevator()
         {
-            var localPlayer = PlayerEntity.GetLocalPlayer();
+            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
             bool isLocalPlayerInTheElevator = false;
 
             foreach (PlayerEntity playerEntity in _playersList)

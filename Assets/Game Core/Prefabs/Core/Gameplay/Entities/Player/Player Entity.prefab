@@ -3189,7 +3189,7 @@ MonoBehaviour:
   _useFlatBaseForGroundChecks: 0
   _collisionLayers:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 65
   _triggerInteraction: 1
   _advanced:
     minMoveDistance: 0
@@ -3392,7 +3392,6 @@ MonoBehaviour:
     m_Bits: 439
   _references:
     _playerConfig: {fileID: 11400000, guid: 623c9235cd286bb45b0104795538e690, type: 2}
-    _inputReader: {fileID: 11400000, guid: 7489e65eb9ef65948896268ef22c23cd, type: 2}
     _animator: {fileID: 525677325976158156}
     _networkAnimator: {fileID: 6870201392219023364}
     _networkObject: {fileID: -4117527861951101490}

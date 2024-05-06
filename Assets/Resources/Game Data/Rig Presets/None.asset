@@ -10,33 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af69b67c29aa4915a67fd22a51bbcd5b, type: 3}
-  m_Name: Right Hand Base
+  m_Name: None
   m_EditorClassIdentifier: 
-  _metaName: Right Hand Base
-  _rigType: 2
+  _metaName: None
+  _rigType: 0
   _rigWeightChangeDuration: 0.3
   _animatorLayerWeightChangeTime: 0.3
-  _fpsTargetPose:
-    _position: {x: 0.837, y: 3.111, z: 0.833}
-    _eulerRotation: {x: -15.178, y: -94.453, z: -88.687}
-    _transformSmoothDampTime: 0.3
   _fpsLeftHandTargetPose:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}
-    _transformSmoothDampTime: 0.1
-  _fpsRightHandTargetPose:
-    _position: {x: 0.837, y: 3.111, z: 0.833}
-    _eulerRotation: {x: -15.178, y: -94.453, z: -88.687}
     _transformSmoothDampTime: 0.3
-  _fpsHintPose:
-    _position: {x: 1.113, y: 2.912, z: 0.118}
+  _fpsRightHandTargetPose:
+    _position: {x: 0.833, y: 2.505, z: 0.327}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _transformSmoothDampTime: 0.3
   _fpsLeftHandHintPose:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}
-    _transformSmoothDampTime: 0.1
+    _transformSmoothDampTime: 0.3
   _fpsRightHandHintPose:
-    _position: {x: 1.113, y: 2.912, z: 0.118}
+    _position: {x: 1.301, y: 2.665, z: 0.059}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _transformSmoothDampTime: 0.3

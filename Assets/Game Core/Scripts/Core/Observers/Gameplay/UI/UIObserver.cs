@@ -1,5 +1,4 @@
 ﻿using System;
-using GameCore.Gameplay.Entities.Player;
 
 namespace GameCore.Observers.Gameplay.UI
 {
@@ -8,7 +7,6 @@ namespace GameCore.Observers.Gameplay.UI
         // FIELDS: --------------------------------------------------------------------------------
         
         public event Action<bool> OnGameplayHUDChangedEvent = delegate { };
-        public event Action<PlayerEntity> OnInitPlayerEvent = delegate { };
         public event Action<int> OnShowRewardMenuEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -18,9 +16,6 @@ namespace GameCore.Observers.Gameplay.UI
 
         public void HideGameplayHUD() =>
             OnGameplayHUDChangedEvent.Invoke(false);
-
-        public void InitPlayer(PlayerEntity playerEntity) =>
-            OnInitPlayerEvent.Invoke(playerEntity);
 
         public void ShowRewardMenu(int reward) =>
             OnShowRewardMenuEvent.Invoke(reward);

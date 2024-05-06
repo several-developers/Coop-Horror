@@ -1,5 +1,4 @@
 ﻿using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Items;
@@ -169,7 +168,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         private void CreateItemPreviewServerSide(int slotIndex, int itemID) =>
             _rpcHandlerDecorator.CreateItemPreview(slotIndex, itemID);
 
-        private void DropItem(ItemDropStaticData data)
+        private void DropItem(DroppedItemStaticData data)
         {
             int slotIndex = data.SlotIndex;
             bool randomPosition = data.RandomPosition;
@@ -201,8 +200,8 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnSelectedSlotChanged(int selectedSlotIndex) => ToggleItemsState();
+        private void OnSelectedSlotChanged(ChangedSlotStaticData data) => ToggleItemsState();
 
-        private void OnItemDropped(ItemDropStaticData data) => DropItem(data);
+        private void OnItemDropped(DroppedItemStaticData data) => DropItem(data);
     }
 }

@@ -52,8 +52,6 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private static PlayerCamera _instance;
-
         private InputReader _inputReader;
         private Transform _transform;
         private Transform _target;
@@ -66,11 +64,8 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
-        {
-            _instance = this;
+        private void Awake() =>
             _transform = transform;
-        }
 
         private void Start()
         {
@@ -85,7 +80,7 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
 
             _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
             MouseVerticalValue = _lookVector.y;
-            
+
             float yRotation = _target.rotation.eulerAngles.y + _lookVector.x * _sensitivity;
             Quaternion finalRotation = Quaternion.Euler(-MouseVerticalValue, yRotation, 0);
 
@@ -121,7 +116,5 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
 
         public void EnableSnap() =>
             _snap = true;
-
-        public static PlayerCamera Get() => _instance;
     }
 }

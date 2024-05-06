@@ -25,12 +25,8 @@ namespace GameCore.Gameplay.Network
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
-        private void CreateItemPreviewServerRpc(int slotIndex, int itemID, ServerRpcParams serverRpcParams = default)
-        {
-            ulong clientID = serverRpcParams.Receive.SenderClientId;
-
-            CreateItemPreviewClientRpc(clientID, slotIndex, itemID);
-        }
+        private void CreateItemPreviewServerRpc(int slotIndex, int itemID) =>
+            CreateItemPreviewClientRpc(slotIndex, itemID);
 
         [ServerRpc(RequireOwnership = false)]
         private void DestroyItemPreviewServerRpc(int slotIndex) => DestroyItemPreviewClientRpc(slotIndex);
@@ -57,9 +53,9 @@ namespace GameCore.Gameplay.Network
         }
 
         [ClientRpc]
-        private void CreateItemPreviewClientRpc(ulong clientID, int slotIndex, int itemID)
+        private void CreateItemPreviewClientRpc(int slotIndex, int itemID)
         {
-            CreateItemPreviewStaticData data = new(clientID, slotIndex, itemID);
+            CreateItemPreviewStaticData data = new(slotIndex, itemID);
             _rpcObserver.CreateItemPreview(data);
         }
 
@@ -93,7 +89,7 @@ namespace GameCore.Gameplay.Network
         {
             base.OnNetworkSpawn();
 
-            _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent += OnCreateItemPreview;
+            _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent += CreateItemPreviewServerRpc;
             _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent += DestroyItemPreviewServerRpc;
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent += GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
@@ -106,7 +102,7 @@ namespace GameCore.Gameplay.Network
         {
             base.OnNetworkDespawn();
             
-            _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent -= OnCreateItemPreview;
+            _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent -= CreateItemPreviewServerRpc;
             _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent -= DestroyItemPreviewServerRpc;
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent -= GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
@@ -115,8 +111,6 @@ namespace GameCore.Gameplay.Network
             _rpcHandlerDecorator.OnTeleportToFireExitInnerEvent -= OnTeleportToFireExit;
         }
         
-        private void OnCreateItemPreview(int slotIndex, int itemID) => CreateItemPreviewServerRpc(slotIndex, itemID);
-
         private void OnTeleportToFireExit(Floor floor, bool isInStairsLocation) =>
             TeleportToFireExitServerRpc(floor, isInStairsLocation);
     }

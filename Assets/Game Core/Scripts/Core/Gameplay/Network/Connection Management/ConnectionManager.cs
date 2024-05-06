@@ -48,7 +48,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         internal StartingHostState StartingHostState;
         internal HostingState HostingState;
 
-        private const int MaxReconnectAttempts = 2; // TEMP
+        private const int MaxReconnectAttempts = 0; // TEMP
 
         private static ConnectionManager _instance;
 

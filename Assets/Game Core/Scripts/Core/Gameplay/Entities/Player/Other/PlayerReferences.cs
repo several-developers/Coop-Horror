@@ -1,7 +1,6 @@
 ﻿using System;
 using ECM2;
 using GameCore.Configs.Gameplay.Player;
-using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -16,9 +15,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         [SerializeField, Required]
         private PlayerConfigMeta _playerConfig;
-        
-        [SerializeField, Required]
-        private InputReader _inputReader;
         
         [SerializeField, Required]
         private Animator _animator;
@@ -74,7 +70,6 @@ namespace GameCore.Gameplay.Entities.Player
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public PlayerConfigMeta PlayerConfig => _playerConfig;
-        public InputReader InputReader => _inputReader;
         public Animator Animator => _animator;
         public OwnerNetworkAnimator NetworkAnimator => _networkAnimator;
         public NetworkObject NetworkObject => _networkObject;

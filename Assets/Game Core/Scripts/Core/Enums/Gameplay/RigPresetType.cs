@@ -4,5 +4,7 @@
     {
         None = 0,
         RightHandBase = 1,
+        LeftHandBase = 2,
+        BothHandsBase = 3,
     }
 }
