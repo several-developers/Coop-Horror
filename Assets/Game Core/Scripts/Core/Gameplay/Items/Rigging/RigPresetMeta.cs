@@ -2,7 +2,6 @@
 using CustomEditors;
 using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Items.Rigging
@@ -23,21 +22,41 @@ namespace GameCore.Gameplay.Items.Rigging
         [Tooltip("Blend time when changing layer weight in the animator.\n1 unit = 1 second.")]
         private float _animatorLayerWeightChangeTime = 0.3f;
         
+        [Title("FPS Left Hand")]
         [SerializeField]
         [ShowIf(nameof(ShowLeftHand))]
         private RigPose _fpsLeftHandTargetPose;
-        
-        [SerializeField]
-        [ShowIf(nameof(ShowRightHand))]
-        private RigPose _fpsRightHandTargetPose;
-        
+
         [SerializeField]
         [ShowIf(nameof(ShowLeftHand))]
         private RigPose _fpsLeftHandHintPose;
-        
+
+        [Title("FPS Right Hand")]
+        [SerializeField]
+        [ShowIf(nameof(ShowRightHand))]
+        private RigPose _fpsRightHandTargetPose;
+
         [SerializeField]
         [ShowIf(nameof(ShowRightHand))]
         private RigPose _fpsRightHandHintPose;
+        
+        [Title("TPS Left Hand")]
+        [SerializeField]
+        [ShowIf(nameof(ShowLeftHand))]
+        private RigPose _tpsLeftHandTargetPose;
+
+        [SerializeField]
+        [ShowIf(nameof(ShowLeftHand))]
+        private RigPose _tpsLeftHandHintPose;
+        
+        [Title("TPS Right Hand")]
+        [SerializeField]
+        [ShowIf(nameof(ShowRightHand))]
+        private RigPose _tpsRightHandTargetPose;
+
+        [SerializeField]
+        [ShowIf(nameof(ShowRightHand))]
+        private RigPose _tpsRightHandHintPose;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -48,6 +67,10 @@ namespace GameCore.Gameplay.Items.Rigging
         public RigPose FPSRightHandTargetPose => _fpsRightHandTargetPose;
         public RigPose FPSLeftHandHintPose => _fpsLeftHandHintPose;
         public RigPose FPSRightHandHintPose => _fpsRightHandHintPose;
+        public RigPose TPSLeftHandTargetPose => _tpsLeftHandTargetPose;
+        public RigPose TPSRightHandTargetPose => _tpsRightHandTargetPose;
+        public RigPose TPSLeftHandHintPose => _tpsLeftHandHintPose;
+        public RigPose TPSRightHandHintPose => _tpsRightHandHintPose;
 
         private bool ShowLeftHand => _rigType is RigType.LeftHand or RigType.BothHands or RigType.None;
         private bool ShowRightHand => _rigType is RigType.RightHand or RigType.BothHands or RigType.None;

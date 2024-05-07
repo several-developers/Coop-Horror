@@ -22,10 +22,10 @@ namespace GameCore.Gameplay.Items.Rigging
         {
             _itemsMetaProvider = itemsMetaProvider;
             _rigPresetsProvider = rigPresetsProvider;
-            
+
             CameraReferences cameraReferences = playerCamera.CameraReferences;
             _playersArmsAnimator = cameraReferences.PlayerArmsAnimator;
-            
+
             _leftHandLayerIndex = _playersArmsAnimator.GetLayerIndex("Left Hand");
             _rightHandLayerIndex = _playersArmsAnimator.GetLayerIndex("Right Hand");
         }
@@ -56,9 +56,7 @@ namespace GameCore.Gameplay.Items.Rigging
         private IItemsMetaProvider _itemsMetaProvider;
         private IRigPresetsProvider _rigPresetsProvider;
         private Animator _playersArmsAnimator;
-
         private Sequence _sequence;
-
         private int _leftHandLayerIndex;
         private int _rightHandLayerIndex;
 
@@ -119,7 +117,7 @@ namespace GameCore.Gameplay.Items.Rigging
                 Log.PrintError(log: $"Rig Preset of type <gb>{presetType}</gb> <rb>not found</rb>!");
                 return;
             }
-            
+
             _sequence.Kill();
             _sequence = DOTween.Sequence();
             _sequence.SetLink(gameObject);
@@ -129,7 +127,7 @@ namespace GameCore.Gameplay.Items.Rigging
             bool showRightHand = rigType is RigType.RightHand or RigType.BothHands;
             float leftHandRigWeight = showLeftHand ? 1f : 0f;
             float rightHandRigWeight = showRightHand ? 1f : 0f;
-            
+
             RigPresetMeta.RigPose leftHandTargetPose;
             RigPresetMeta.RigPose rightHandTargetPose;
             RigPresetMeta.RigPose leftHandHintPose;
@@ -144,39 +142,56 @@ namespace GameCore.Gameplay.Items.Rigging
             }
             else
             {
-                leftHandTargetPose = rigPresetMeta.FPSLeftHandTargetPose;
-                rightHandTargetPose = rigPresetMeta.FPSRightHandTargetPose;
-                leftHandHintPose = rigPresetMeta.FPSLeftHandHintPose;
-                rightHandHintPose = rigPresetMeta.FPSRightHandHintPose;
+                leftHandTargetPose = rigPresetMeta.TPSLeftHandTargetPose;
+                rightHandTargetPose = rigPresetMeta.TPSRightHandTargetPose;
+                leftHandHintPose = rigPresetMeta.TPSLeftHandHintPose;
+                rightHandHintPose = rigPresetMeta.TPSRightHandHintPose;
             }
+
+            ChangeHandRig(
+                handTarget: _leftHandTarget,
+                handHint: _leftHandHint,
+                handRig: _leftHandRig,
+                targetPose: leftHandTargetPose,
+                hintPose: leftHandHintPose,
+                rigChangeDuration: rigPresetMeta.RigWeightChangeDuration,
+                targetWeight: leftHandRigWeight);
             
-            ChangeRightHandRig(targetPose: rightHandTargetPose, hintPose: rightHandHintPose,
-                rigChangeDuration: rigPresetMeta.RigWeightChangeDuration, targetWeight: rightHandRigWeight);
-            
-            ChangeRightHandAnimatorLayer(rigPresetMeta, rightHandRigWeight);
+            ChangeHandRig(
+                handTarget: _rightHandTarget,
+                handHint: _rightHandHint,
+                handRig: _rightHandRig,
+                targetPose: rightHandTargetPose,
+                hintPose: rightHandHintPose,
+                rigChangeDuration: rigPresetMeta.RigWeightChangeDuration,
+                targetWeight: rightHandRigWeight);
+
+            ChangeHandAnimatorLayer(rigPresetMeta, _leftHandLayerIndex, leftHandRigWeight);
+            ChangeHandAnimatorLayer(rigPresetMeta, _rightHandLayerIndex, rightHandRigWeight);
         }
 
         private void ResetRig(bool isLocalPlayer) => UpdateRig(RigPresetType.None, isLocalPlayer);
 
-        private void ChangeRightHandRig(RigPresetMeta.RigPose targetPose, RigPresetMeta.RigPose hintPose,
-            float rigChangeDuration, float targetWeight)
+        private void ChangeHandRig(Transform handTarget, Transform handHint, Rig handRig,
+            RigPresetMeta.RigPose targetPose, RigPresetMeta.RigPose hintPose, float rigChangeDuration,
+            float targetWeight)
         {
-            FloatAnimation(from: _rightHandRig.weight, to: targetWeight, rigChangeDuration,
-                onVirtualUpdate: weight => _rightHandRig.weight = weight);
+            FloatAnimation(from: handRig.weight, to: targetWeight, rigChangeDuration,
+                onVirtualUpdate: weight => handRig.weight = weight);
 
-            LocalMoveAnimation(_rightHandTarget, targetPose.Position, targetPose.Duration);
-            LocalMoveAnimation(_rightHandHint, hintPose.Position, hintPose.Duration);
-            LocalRotateAnimation(_rightHandTarget, targetPose.EulerRotation, targetPose.Duration);
-            LocalRotateAnimation(_rightHandHint, hintPose.EulerRotation, hintPose.Duration);
+            LocalMoveAnimation(handTarget, targetPose.Position, targetPose.Duration);
+            LocalMoveAnimation(handHint, hintPose.Position, hintPose.Duration);
+            LocalRotateAnimation(handTarget, targetPose.EulerRotation, targetPose.Duration);
+            LocalRotateAnimation(handHint, hintPose.EulerRotation, hintPose.Duration);
         }
 
-        private void ChangeRightHandAnimatorLayer(RigPresetMeta rigPresetMeta, float targetWeight)
+        private void ChangeHandAnimatorLayer(RigPresetMeta rigPresetMeta, int layerIndex, float targetWeight)
         {
-            float from = _playersArmsAnimator.GetLayerWeight(_rightHandLayerIndex);
+            float from = _playersArmsAnimator.GetLayerWeight(layerIndex);
             float duration = rigPresetMeta.AnimatorLayerWeightChangeTime;
-            
+
             FloatAnimation(from, to: targetWeight, duration,
-                onVirtualUpdate: weight => _playersArmsAnimator.SetLayerWeight(_rightHandLayerIndex, weight));
+                onVirtualUpdate: weight => _playersArmsAnimator.SetLayerWeight(layerIndex, weight));
         }
 
         private void FloatAnimation(float from, float to, float duration, TweenCallback<float> onVirtualUpdate) =>
@@ -196,7 +211,7 @@ namespace GameCore.Gameplay.Items.Rigging
 
             if (!isLocalPlayer)
                 return;
-            
+
             ResetRig(isLocalPlayer: true);
 
             PlayerInventory playerInventory = playerEntity.GetInventory();
@@ -212,7 +227,7 @@ namespace GameCore.Gameplay.Items.Rigging
 
             if (!isLocalPlayer)
                 return;
-            
+
             PlayerInventory playerInventory = playerEntity.GetInventory();
 
             playerInventory.OnItemEquippedEvent -= OnItemEquipped;

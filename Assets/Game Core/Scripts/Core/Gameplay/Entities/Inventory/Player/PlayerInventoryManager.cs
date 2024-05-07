@@ -16,8 +16,6 @@ namespace GameCore.Gameplay.Entities.Inventory
             _playerEntity = playerEntity;
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInventory = playerEntity.GetInventory();
-            _cameraItemPivot = playerEntity.GetCameraItemPivot();
-            _playerItemPivot = playerEntity.GetRightHandItemsHolder();
             _interactableItems = new IInteractableItem[Constants.PlayerInventorySize];
             _itemsPreviewObjects = new ItemPreviewObject[Constants.PlayerInventorySize];
 
@@ -29,8 +27,6 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         private readonly PlayerEntity _playerEntity;
         private readonly PlayerInventory _playerInventory;
-        private readonly Transform _cameraItemPivot;
-        private readonly Transform _playerItemPivot;
         private readonly IItemsPreviewFactory _itemsPreviewFactory;
         private readonly IInteractableItem[] _interactableItems;
         private readonly ItemPreviewObject[] _itemsPreviewObjects;
@@ -62,7 +58,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             // Not added.
             if (!isItemAdded)
                 return;
-            
+
             interactableItem.PickUp();
 
             _interactableItems[slotIndex] = interactableItem;
@@ -95,10 +91,10 @@ namespace GameCore.Gameplay.Entities.Inventory
             if (isItemPreviewExists)
                 return;
 
-            Transform itemPivot = isFirstPerson ? _cameraItemPivot : _playerItemPivot;
-
-            bool isItemCreated = _itemsPreviewFactory.Create(itemID, itemPivot, isFirstPerson,
-                out ItemPreviewObject itemPreview);
+            ulong clientID = _playerEntity.OwnerClientId;
+            
+            bool isItemCreated =
+                _itemsPreviewFactory.Create(clientID, itemID, isFirstPerson, out ItemPreviewObject itemPreview);
 
             if (!isItemCreated)
                 return;
@@ -169,7 +165,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             int slotIndex = data.SlotIndex;
             bool randomPosition = data.RandomPosition;
             bool destroy = data.Destroy;
-            
+
             IInteractableItem interactableItem = _interactableItems[slotIndex];
             Vector3 position;
             Quaternion rotation;
@@ -191,7 +187,8 @@ namespace GameCore.Gameplay.Entities.Inventory
 
             _interactableItems[slotIndex] = null;
 
-            _playerEntity.DestroyItemPreviewServerRpc(slotIndex);
+            DestroyItemPreview(slotIndex); // Client side
+            _playerEntity.DestroyItemPreviewServerRpc(slotIndex); // Server side
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

@@ -33,10 +33,6 @@ namespace GameCore.Gameplay.Items
         [SerializeField]
         private ItemPose _fpsItemPreview;
         
-        [SerializeField, Min(0)]
-        [Tooltip("Blend time when transitioning into this pose.\n1 unit = 1 second.")]
-        private float _fpsTransformSmoothDampTime = 0.1f;
-        
         [Title("Third Person Preview Settings")]
         [SerializeField]
         private ItemPose _tpsItemPreview;

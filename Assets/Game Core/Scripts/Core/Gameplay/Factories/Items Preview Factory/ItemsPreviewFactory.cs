@@ -1,4 +1,7 @@
-﻿using GameCore.Gameplay.Items;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Entities.Player.CameraManagement;
+using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using UnityEngine;
 
@@ -8,22 +11,26 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ItemsPreviewFactory(IItemsMetaProvider itemsMetaProvider) =>
+        public ItemsPreviewFactory(IItemsMetaProvider itemsMetaProvider, PlayerCamera playerCamera)
+        {
             _itemsMetaProvider = itemsMetaProvider;
+            _cameraReferences = playerCamera.CameraReferences;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IItemsMetaProvider _itemsMetaProvider;
+        private readonly CameraReferences _cameraReferences;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public bool Create(int itemID, Transform parent, bool cameraPivot, out ItemPreviewObject itemPreviewObject)
+        public bool Create(ulong clientID, int itemID, bool isFirstPerson, out ItemPreviewObject itemPreviewObject)
         {
+            itemPreviewObject = null;
             bool isItemMetaExists = _itemsMetaProvider.TryGetItemMeta(itemID, out ItemMeta itemMeta);
 
             if (!isItemMetaExists)
             {
-                itemPreviewObject = null;
                 LogItemNotFound(itemID);
                 return false;
             }
@@ -32,14 +39,50 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
 
             if (itemPreviewPrefab == null)
             {
-                itemPreviewObject = null;
                 LogItemPrefabNotFound(itemID);
                 return false;
             }
             
+            RigPresetType rigPresetType = itemMeta.RigPresetType;
+            Transform parent = null;
+
+            if (isFirstPerson)
+            {
+                switch (rigPresetType)
+                {
+                    case RigPresetType.LeftHandBase:
+                        parent = _cameraReferences.LeftHandItemsHolder;
+                        break;
+                    
+                    case RigPresetType.RightHandBase:
+                        parent = _cameraReferences.RightHandItemsHolder;
+                        break;
+                }
+            }
+            else
+            {
+                bool isPlayerFound = PlayerEntity.TryGetPlayer(clientID, out PlayerEntity playerEntity);
+
+                if (!isPlayerFound)
+                    return false;
+
+                PlayerReferences playerReferences = playerEntity.References;
+
+                switch (rigPresetType)
+                {
+                    case RigPresetType.LeftHandBase:
+                        parent = playerReferences.LeftHandItemsHolder;
+                        break;
+                    
+                    case RigPresetType.RightHandBase:
+                        parent = playerReferences.RightHandItemsHolder;
+                        break;
+                }
+            }
+            
             itemPreviewObject = Object.Instantiate(itemPreviewPrefab, parent);
 
-            ItemMeta.ItemPose itemPose = cameraPivot ? itemMeta.FpsItemPreview : itemMeta.TpsItemPreview;
+            ItemMeta.ItemPose itemPose = isFirstPerson ? itemMeta.FpsItemPreview : itemMeta.TpsItemPreview;
             Vector3 position = itemPose.Position;
             Vector3 eulerRotation = itemPose.EulerRotation;
             Vector3 scale = itemPose.Scale;
@@ -49,7 +92,7 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
             itemTransform.localRotation = Quaternion.Euler(eulerRotation);
             itemTransform.localScale = scale;
 
-            if (cameraPivot)
+            if (isFirstPerson)
                 itemPreviewObject.ChangeLayer();
 
             return true;

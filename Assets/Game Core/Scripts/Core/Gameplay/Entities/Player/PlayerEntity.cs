@@ -90,7 +90,6 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
 
-        private Transform _cameraRightHandItemsHolder;
         private Transform _lookAtObject;
 
         private bool _isInsideMobileHQ;
@@ -129,12 +128,7 @@ namespace GameCore.Gameplay.Entities.Player
             _playerCamera.gameObject.SetActive(true);
 
         public Transform GetTransform() => transform;
-
-        public Transform GetCameraItemPivot() => _cameraRightHandItemsHolder;
-
-        public Transform GetRightHandItemsHolder() =>
-            _references.RightHandItemsHolder;
-
+        
         public PlayerInventory GetInventory() => _inventory;
 
         public bool IsDead() => _isDead;
@@ -148,9 +142,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         protected override void InitServerAndClientOnce()
         {
+            Debug.LogWarning("Once");
             CameraReferences cameraReferences = _playerCamera.CameraReferences;
             _lookAtObject = cameraReferences.LookAtObject;
-            _cameraRightHandItemsHolder = cameraReferences.RightHandItemsHolder;
             
             _inventory = new PlayerInventory();
 
@@ -223,8 +217,11 @@ namespace GameCore.Gameplay.Entities.Player
             }
         }
 
-        protected override void InitServerAndClient() =>
+        protected override void InitServerAndClient()
+        {
+            Debug.LogWarning("Many");
             AllPlayers.TryAdd(OwnerClientId, this);
+        }
 
         protected override void InitClient() =>
             _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
@@ -325,6 +322,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             base.OnNetworkSpawn();
             
+            Debug.LogWarning("SPAWNED SYKA " + OwnerClientId);
             OnPlayerSpawnedEvent.Invoke(this);
         }
 

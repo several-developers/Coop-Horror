@@ -18,10 +18,10 @@ MonoBehaviour:
   _rigPresetType: 1
   _itemID: -1
   _fpsItemPreview:
-    _position: {x: 0.033, y: 0.088, z: 0.085}
+    _position: {x: 0.042, y: 0.034, z: 0.072}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _scale: {x: 1, y: 1, z: 1}
-  _fpsTransformSmoothDampTime: 0.1
+  _fpsTransformSmoothDampTime: 1
   _tpsItemPreview:
     _position: {x: -0.069, y: -0.148, z: -0.039}
     _eulerRotation: {x: 0, y: 0, z: 0}

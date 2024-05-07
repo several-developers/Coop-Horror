@@ -17,9 +17,9 @@ namespace GameCore.Gameplay.Entities.Inventory
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        public event Action<EquippedItemStaticData> OnItemEquippedEvent;
-        public event Action<DroppedItemStaticData> OnItemDroppedEvent;
-        public event Action<ChangedSlotStaticData> OnSelectedSlotChangedEvent;
+        public event Action<EquippedItemStaticData> OnItemEquippedEvent = delegate { };
+        public event Action<DroppedItemStaticData> OnItemDroppedEvent = delegate { };
+        public event Action<ChangedSlotStaticData> OnSelectedSlotChangedEvent = delegate { };
 
         private readonly Inventory<InventoryItemData> _inventory;
 
@@ -71,7 +71,7 @@ namespace GameCore.Gameplay.Entities.Inventory
 
             ulong clientID = GetClientID();
             EquippedItemStaticData data = new(inventoryItemData, clientID, slotIndex);
-            OnItemEquippedEvent?.Invoke(data);
+            OnItemEquippedEvent.Invoke(data);
 
             return true;
         }
@@ -90,7 +90,7 @@ namespace GameCore.Gameplay.Entities.Inventory
 
             ulong clientID = GetClientID();
             DroppedItemStaticData data = new(clientID, slotIndex, randomPosition, destroy);
-            OnItemDroppedEvent?.Invoke(data);
+            OnItemDroppedEvent.Invoke(data);
         }
         
         public void DropAllItems()
@@ -104,13 +104,10 @@ namespace GameCore.Gameplay.Entities.Inventory
                 _inventory.DropItem(i);
 
                 DroppedItemStaticData data = new(clientID, i, randomPosition, destroy: true);
-                OnItemDroppedEvent?.Invoke(data);
+                OnItemDroppedEvent.Invoke(data);
             }
         }
 
-        public ulong GetClientID() =>
-            NetworkHorror.ClientID;
-        
         public int GetSelectedSlotIndex() =>
             _inventory.GetSelectedSlotIndex();
 
@@ -131,6 +128,9 @@ namespace GameCore.Gameplay.Entities.Inventory
             ChangedSlotStaticData data = new(clientID, selectedSlotIndex);
             OnSelectedSlotChangedEvent?.Invoke(data);
         }
+        
+        private static ulong GetClientID() =>
+            NetworkHorror.ClientID;
 
         private static void LogPickUpItem(int itemID)
         {
