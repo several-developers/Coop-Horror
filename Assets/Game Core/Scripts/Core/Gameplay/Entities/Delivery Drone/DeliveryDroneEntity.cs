@@ -1,16 +1,15 @@
 ﻿using DG.Tweening;
 using GameCore.Configs.Gameplay.Delivery;
 using GameCore.Gameplay.Delivery;
-using GameCore.Gameplay.Network.Utilities;
+using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
-using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.DeliveryDrone
 {
-    public class DeliveryDroneEntity : NetworkBehaviour, IEntity, INetcodeBehaviour
+    public class DeliveryDroneEntity : NetcodeBehaviour, IEntity
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -51,72 +50,24 @@ namespace GameCore.Gameplay.Entities.DeliveryDrone
 
         private void Awake() => PlayLightPulseAnimation(fadeIn: false);
 
-        private void Update()
-        {
-            TickServerAndClient();
-            TickServer();
-            TickClient();
-        }
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void InitServerAndClient()
-        {
-        }
+        public Transform GetTransform() => transform;
 
-        public void InitServer()
-        {
-            if (!IsOwner)
-                return;
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
+        protected override void InitServer()
+        {
             _droneMovement.TeleportDroneToDroneCart();
             
             _deliveryPoint.OnTeleportDroneToDroneCartEvent += OnTeleportDroneToDroneCart;
         }
 
-        public void InitClient()
-        {
-            if (IsOwner)
-                return;
-        }
-        
-        public void TickServerAndClient()
-        {
-        }
-
-        public void TickServer()
-        {
-            if (!IsOwner)
-                return;
-            
+        protected override void TickServer() =>
             _droneMovement.Tick();
-        }
 
-        public void TickClient()
-        {
-            if (IsOwner)
-                return;
-        }
-        
-        public void DespawnServerAndClient()
-        {
-        }
-
-        public void DespawnServer()
-        {
-            if (!IsOwner)
-                return;
-            
+        protected override void DespawnServer() =>
             _deliveryPoint.OnTeleportDroneToDroneCartEvent -= OnTeleportDroneToDroneCart;
-        }
-
-        public void DespawnClient()
-        {
-            if (IsOwner)
-                return;
-        }
-        
-        public Transform GetTransform() => transform;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -136,24 +87,6 @@ namespace GameCore.Gameplay.Entities.DeliveryDrone
         }
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-            
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-            
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
 
         private void OnTeleportDroneToDroneCart() =>
             _droneMovement.TeleportDroneToDroneCart();

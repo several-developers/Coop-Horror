@@ -4,6 +4,10 @@ namespace GameCore.Gameplay.Network
 {
     public class NetcodeBehaviour : NetworkBehaviour
     {
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        protected bool IsInitialized => _isInitialized;
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private bool _isLocalPlayer;
@@ -20,167 +24,190 @@ namespace GameCore.Gameplay.Network
         {
             if (!_isInitialized)
                 return;
-            
+
             TickServerAndClient();
-            TickServer();
-            TickClient();
-            TickLocalPlayer();
+
+            if (IsOwner)
+                TickServer();
+            else
+                TickClient();
+
+            if (_isLocalPlayer)
+                TickLocalPlayer();
+        }
+
+        protected void LateUpdate()
+        {
+            if (_isInitialized)
+                return;
+
+            LateTickServerAndClient();
+
+            if (IsOwner)
+                LateTickServer();
+            else
+                LateTickClient();
+
+            if (_isLocalPlayer)
+                LateTickLocalPlayer();
         }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected virtual void InitServerAndClient()
-        {
-            
-        }
-        
-        protected virtual void InitServer()
-        {
-            if (!IsOwner)
-                return;
-        }
-        
-        protected virtual void InitClient()
-        {
-            if (IsOwner)
-                return;
-        }
-        
-        protected virtual void InitLocalPlayer()
-        {
-            if (!_isLocalPlayer)
-                return;
-        }
-        
         protected virtual void InitServerAndClientOnce()
         {
-            
         }
-        
+
         protected virtual void InitServerOnce()
         {
-            if (!IsOwner)
-                return;
         }
-        
+
         protected virtual void InitClientOnce()
         {
-            if (IsOwner)
-                return;
         }
-        
+
         protected virtual void InitLocalPlayerOnce()
         {
-            if (!_isLocalPlayer)
-                return;
         }
-        
+
+        protected virtual void InitServerAndClient()
+        {
+        }
+
+        protected virtual void InitServer()
+        {
+        }
+
+        protected virtual void InitClient()
+        {
+        }
+
+        protected virtual void InitLocalPlayer()
+        {
+        }
+
         protected virtual void TickServerAndClient()
         {
         }
-        
+
         protected virtual void TickServer()
         {
-            if (!IsOwner)
-                return;
         }
-        
+
         protected virtual void TickClient()
         {
-            if (IsOwner)
-                return;
         }
 
         protected virtual void TickLocalPlayer()
         {
-            if (!_isLocalPlayer)
-                return;
         }
-        
-        protected virtual void DespawnServerAndClient()
+
+        protected virtual void LateTickServerAndClient()
         {
-            
         }
-        
-        protected virtual void DespawnServer()
+
+        protected virtual void LateTickServer()
         {
-            if (!IsOwner)
-                return;
         }
-        
-        protected virtual void DespawnClient()
+
+        protected virtual void LateTickClient()
         {
-            if (IsOwner)
-                return;
         }
-        
-        protected virtual void DespawnLocalPlayer()
+
+        protected virtual void LateTickLocalPlayer()
         {
-            if (!_isLocalPlayer)
-                return;
         }
-        
+
         protected virtual void DespawnServerAndClientOnce()
         {
-            
         }
-        
+
         protected virtual void DespawnServerOnce()
         {
-            if (!IsOwner)
-                return;
         }
-        
+
         protected virtual void DespawnClientOnce()
         {
-            if (IsOwner)
-                return;
         }
-        
+
         protected virtual void DespawnLocalPlayerOnce()
         {
-            if (!_isLocalPlayer)
-                return;
+        }
+
+        protected virtual void DespawnServerAndClient()
+        {
+        }
+
+        protected virtual void DespawnServer()
+        {
+        }
+
+        protected virtual void DespawnClient()
+        {
+        }
+
+        protected virtual void DespawnLocalPlayer()
+        {
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
-        private void MultipleInitialization()
-        {
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-            InitLocalPlayer();
-        }
-        
+
         private void SingleInitialization()
         {
             if (_isInitialized)
                 return;
 
             InitServerAndClientOnce();
-            InitServerOnce();
-            InitClientOnce();
-            InitLocalPlayerOnce();
+
+            if (IsOwner)
+                InitServerOnce();
+            else
+                InitClientOnce();
+
+            if (_isLocalPlayer)
+                InitLocalPlayerOnce();
         }
-        
-        private void MultipleDespawn()
+
+        private void MultipleInitialization()
         {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-            DespawnLocalPlayer();
+            InitServerAndClient();
+
+            if (IsOwner)
+                InitServer();
+            else
+                InitClient();
+
+            if (_isLocalPlayer)
+                InitLocalPlayer();
         }
-        
+
         private void SingleDespawn()
         {
             if (_isDespawned)
                 return;
-            
+
             DespawnServerAndClientOnce();
-            DespawnServerOnce();
-            DespawnClientOnce();
-            DespawnLocalPlayerOnce();
+
+            if (IsOwner)
+                DespawnServerOnce();
+            else
+                DespawnClientOnce();
+
+            if (_isLocalPlayer)
+                DespawnLocalPlayerOnce();
+        }
+
+        private void MultipleDespawn()
+        {
+            DespawnServerAndClient();
+
+            if (IsOwner)
+                DespawnServer();
+            else
+                DespawnClient();
+
+            if (_isLocalPlayer)
+                DespawnLocalPlayer();
         }
 
         private void CheckIfLocalPlayer() =>
@@ -193,9 +220,9 @@ namespace GameCore.Gameplay.Network
             base.OnNetworkSpawn();
 
             CheckIfLocalPlayer();
-            MultipleInitialization();
             SingleInitialization();
-            
+            MultipleInitialization();
+
             _isInitialized = true;
             _isDespawned = false;
         }
@@ -203,9 +230,9 @@ namespace GameCore.Gameplay.Network
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            
-            MultipleDespawn();
+
             SingleDespawn();
+            MultipleDespawn();
 
             _isInitialized = false;
             _isDespawned = true;

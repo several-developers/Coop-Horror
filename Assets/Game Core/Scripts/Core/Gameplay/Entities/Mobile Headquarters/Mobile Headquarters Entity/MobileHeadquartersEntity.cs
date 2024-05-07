@@ -7,7 +7,6 @@ using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Quests;
 using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
@@ -17,7 +16,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
-    public class MobileHeadquartersEntity : NetworkBehaviour, IMobileHeadquartersEntity, INetcodeBehaviour
+    public class MobileHeadquartersEntity : NetcodeBehaviour, IMobileHeadquartersEntity
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -63,7 +62,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private MobileHeadquartersController _mobileHeadquartersController;
         private RigidbodyPathMovement _pathMovement;
-        private bool _isInitialized;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -73,88 +71,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
         }
 
-        private void Update()
-        {
-            if (!_isInitialized)
-                return;
-
-            TickServerAndClient();
-            TickServer();
-            TickClient();
-        }
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void InitServerAndClient()
-        {
-            _isInitialized = true;
-
-            _mobileHeadquartersController.InitServerAndClient();
-            ArrivedAtRoadLocation();
-
-            _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
-        }
-
-        public void InitServer()
-        {
-            if (!IsOwner)
-                return;
-
-            _mobileHeadquartersController.InitServer();
-
-            _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
-        }
-
-        public void InitClient()
-        {
-            if (IsOwner)
-                return;
-
-            _mobileHeadquartersController.InitClient();
-        }
-
-        public void TickServerAndClient()
-        {
-        }
-
-        public void TickServer()
-        {
-            if (!IsOwner)
-                return;
-
-            _pathMovement.Movement();
-        }
-
-        public void TickClient()
-        {
-            if (IsOwner)
-                return;
-        }
-
-        public void DespawnServerAndClient()
-        {
-            _mobileHeadquartersController.DespawnServerAndClient();
-
-            _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
-        }
-
-        public void DespawnServer()
-        {
-            if (!IsOwner)
-                return;
-
-            _mobileHeadquartersController.DespawnServer();
-
-            _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
-        }
-
-        public void DespawnClient()
-        {
-            if (IsOwner)
-                return;
-
-            _mobileHeadquartersController.DespawnClient();
-        }
 
         public void OpenDoor() => OpenDoorServerRpc();
 
@@ -188,11 +105,45 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public NetworkObject GetNetworkObject() => NetworkObject;
 
-        public Vector3 GetVelocity()
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected override void InitServerAndClient()
         {
-            Vector3 direction = transform.forward;
-            return direction;
+            _mobileHeadquartersController.InitServerAndClient();
+            ArrivedAtRoadLocation();
+
+            _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
         }
+
+        protected override void InitServer()
+        {
+            _mobileHeadquartersController.InitServer();
+
+            _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
+        }
+
+        protected override void InitClient() =>
+            _mobileHeadquartersController.InitClient();
+
+        protected override void TickServer() =>
+            _pathMovement.Movement();
+
+        protected override void DespawnServerAndClient()
+        {
+            _mobileHeadquartersController.DespawnServerAndClient();
+
+            _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
+        }
+
+        protected override void DespawnServer()
+        {
+            _mobileHeadquartersController.DespawnServer();
+
+            _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
+        }
+
+        protected override void DespawnClient() =>
+            _mobileHeadquartersController.DespawnClient();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -234,28 +185,28 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             ulong senderClientId = serverRpcParams.Receive.SenderClientId;
             PlayQuestsButtonAnimationClientRpc(senderClientId);
         }
-        
+
         [ServerRpc(RequireOwnership = false)]
         public void PlayLocationsButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
         {
             ulong senderClientId = serverRpcParams.Receive.SenderClientId;
             PlayLocationsButtonAnimationClientRpc(senderClientId);
         }
-        
+
         [ServerRpc(RequireOwnership = false)]
         public void PlayDeliveryDroneButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
         {
             ulong senderClientId = serverRpcParams.Receive.SenderClientId;
             PlayDeliveryDroneButtonAnimationClientRpc(senderClientId);
         }
-        
+
         [ServerRpc(RequireOwnership = false)]
         public void PlayCompleteQuestsButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
         {
             ulong senderClientId = serverRpcParams.Receive.SenderClientId;
             PlayCompleteQuestsButtonAnimationClientRpc(senderClientId);
         }
-        
+
         [ClientRpc]
         private void StartLeavingLocationClientRpc() => ToggleMovement(canMove: true);
 
@@ -271,7 +222,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             MobileHQMainLever mainLever = _references.MainLever;
             mainLever.InteractWithoutEvents(isLeverPulled: true);
         }
-        
+
         [ClientRpc]
         private void PlayQuestsButtonAnimationClientRpc(ulong senderClientID)
         {
@@ -281,56 +232,38 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
             openQuestsSelectionMenuButton.PlayInteractAnimation();
         }
-        
+
         [ClientRpc]
         private void PlayLocationsButtonAnimationClientRpc(ulong senderClientID)
         {
             if (IsCurrentPlayer(senderClientID))
                 return;
-            
+
             SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
             openLocationsSelectionMenuButton.PlayInteractAnimation();
         }
-        
+
         [ClientRpc]
         private void PlayDeliveryDroneButtonAnimationClientRpc(ulong senderClientID)
         {
             if (IsCurrentPlayer(senderClientID))
                 return;
-            
+
             SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
             callDeliveryDroneButton.PlayInteractAnimation();
         }
-        
+
         [ClientRpc]
         private void PlayCompleteQuestsButtonAnimationClientRpc(ulong senderClientID)
         {
             if (IsCurrentPlayer(senderClientID))
                 return;
-            
+
             SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
             completeQuestsButton.PlayInteractAnimation();
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
 
         private void OnDestinationReached()
         {

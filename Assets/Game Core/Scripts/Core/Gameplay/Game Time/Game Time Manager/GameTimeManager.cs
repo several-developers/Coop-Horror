@@ -1,13 +1,13 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Network.Utilities;
+using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Zenject;
 
 namespace GameCore.Gameplay.GameTimeManagement
 {
-    public class GameTimeManager : NetworkBehaviour, INetcodeBehaviour
+    public class GameTimeManager : NetcodeBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -25,79 +25,30 @@ namespace GameCore.Gameplay.GameTimeManagement
         private IGameManagerDecorator _gameManagerDecorator;
         private ITimeCycle _timeCycle;
 
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        private void Update()
+        protected override void InitServer()
         {
-            TickServerAndClient();
-            TickServer();
-            TickClient();
-        }
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void InitServerAndClient()
-        {
-            // TO DO
-        }
-
-        public void InitServer()
-        {
-            if (!IsOwner)
-                return;
-
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
             _timeCycle.OnHourPassedEvent += OnHourPassed;
         }
 
-        public void InitClient()
-        {
-            if (IsOwner)
-                return;
-
+        protected override void InitClient() =>
             _gameTimer.OnValueChanged += OnGameTimerUpdated;
-        }
 
-        public void TickServerAndClient() =>
+        protected override void TickServerAndClient() =>
             _timeCycle.Tick(); // Check for optimization
 
-        public void TickServer()
+        protected override void DespawnServer()
         {
-            if (!IsOwner)
-                return;
-
-            // TO DO
-        }
-
-        public void TickClient()
-        {
-            if (IsOwner)
-                return;
-
-            // TO DO
-        }
-
-        public void DespawnServerAndClient()
-        {
-            // TO DO
-        }
-
-        public void DespawnServer()
-        {
-            if (!IsOwner)
-                return;
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
 
             _timeCycle.OnHourPassedEvent -= OnHourPassed;
         }
 
-        public void DespawnClient()
-        {
-            if (IsOwner)
-                return;
-
+        protected override void DespawnClient() =>
             _gameTimer.OnValueChanged -= OnGameTimerUpdated;
-        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -121,11 +72,11 @@ namespace GameCore.Gameplay.GameTimeManagement
                     _timeCycle.SetSunrise();
                     IncreaseDay();
                     break;
-                
+
                 case GameState.ArrivedAtTheRoad:
                     _timeCycle.SetMidnight();
                     break;
-                
+
                 case GameState.RestartGame:
                     MyDateTime dateTime = _timeCycle.GetDateTime();
                     dateTime.ResetDay();
@@ -135,24 +86,6 @@ namespace GameCore.Gameplay.GameTimeManagement
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-
-            base.OnNetworkDespawn();
-        }
 
         private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
 

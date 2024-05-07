@@ -1,6 +1,6 @@
 namespace GameCore.Gameplay.Network.Utilities
 {
-    public interface INetcodeBehaviour : INetcodeInitBehaviour, INetcodeTickBehaviour, INetcodeDespawnBehaviour
+    public interface INetcodeBehaviour
     {
     }
 

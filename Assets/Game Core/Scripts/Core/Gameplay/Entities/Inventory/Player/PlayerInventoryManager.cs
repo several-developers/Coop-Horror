@@ -2,7 +2,6 @@
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Items;
-using GameCore.Gameplay.Network;
 using GameCore.Utilities;
 using UnityEngine;
 
@@ -12,11 +11,9 @@ namespace GameCore.Gameplay.Entities.Inventory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PlayerInventoryManager(PlayerEntity playerEntity, IRpcHandlerDecorator rpcHandlerDecorator,
-            IItemsPreviewFactory itemsPreviewFactory)
+        public PlayerInventoryManager(PlayerEntity playerEntity, IItemsPreviewFactory itemsPreviewFactory)
         {
             _playerEntity = playerEntity;
-            _rpcHandlerDecorator = rpcHandlerDecorator;
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInventory = playerEntity.GetInventory();
             _cameraItemPivot = playerEntity.GetCameraItemPivot();
@@ -31,7 +28,6 @@ namespace GameCore.Gameplay.Entities.Inventory
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly PlayerEntity _playerEntity;
-        private readonly IRpcHandlerDecorator _rpcHandlerDecorator;
         private readonly PlayerInventory _playerInventory;
         private readonly Transform _cameraItemPivot;
         private readonly Transform _playerItemPivot;
@@ -71,7 +67,7 @@ namespace GameCore.Gameplay.Entities.Inventory
 
             _interactableItems[slotIndex] = interactableItem;
 
-            CreateItemPreviewClientSide(slotIndex, itemID, cameraPivot: true);
+            CreateItemPreviewClientSide(slotIndex, itemID, isFirstPerson: true);
             CreateItemPreviewServerSide(slotIndex, itemID);
             ToggleItemsState();
 
@@ -91,7 +87,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             }
         }
 
-        public void CreateItemPreviewClientSide(int slotIndex, int itemID, bool cameraPivot)
+        public void CreateItemPreviewClientSide(int slotIndex, int itemID, bool isFirstPerson)
         {
             bool isItemPreviewExists = _itemsPreviewObjects[slotIndex] != null;
 
@@ -99,9 +95,9 @@ namespace GameCore.Gameplay.Entities.Inventory
             if (isItemPreviewExists)
                 return;
 
-            Transform itemPivot = cameraPivot ? _cameraItemPivot : _playerItemPivot;
+            Transform itemPivot = isFirstPerson ? _cameraItemPivot : _playerItemPivot;
 
-            bool isItemCreated = _itemsPreviewFactory.Create(itemID, itemPivot, cameraPivot,
+            bool isItemCreated = _itemsPreviewFactory.Create(itemID, itemPivot, isFirstPerson,
                 out ItemPreviewObject itemPreview);
 
             if (!isItemCreated)
@@ -166,7 +162,7 @@ namespace GameCore.Gameplay.Entities.Inventory
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CreateItemPreviewServerSide(int slotIndex, int itemID) =>
-            _rpcHandlerDecorator.CreateItemPreview(slotIndex, itemID);
+            _playerEntity.CreateItemPreviewServerRpc(slotIndex, itemID);
 
         private void DropItem(DroppedItemStaticData data)
         {
@@ -195,7 +191,7 @@ namespace GameCore.Gameplay.Entities.Inventory
 
             _interactableItems[slotIndex] = null;
 
-            _rpcHandlerDecorator.DestroyItemPreview(slotIndex);
+            _playerEntity.DestroyItemPreviewServerRpc(slotIndex);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

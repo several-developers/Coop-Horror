@@ -1,7 +1,6 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
-using GameCore.Gameplay.Network;
 
 namespace GameCore.Observers.Gameplay.Rpc
 {
@@ -9,8 +8,6 @@ namespace GameCore.Observers.Gameplay.Rpc
     {
         // FIELDS: --------------------------------------------------------------------------------
         
-        public event Action<CreateItemPreviewStaticData> OnCreateItemPreviewEvent = delegate { };
-        public event Action<int> OnDestroyItemPreviewEvent = delegate { };
         public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate { };
         public event Action<Floor> OnStartElevatorEvent = delegate { };
         public event Action<Floor> OnOpenElevatorEvent = delegate { };
@@ -19,12 +16,6 @@ namespace GameCore.Observers.Gameplay.Rpc
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void CreateItemPreview(CreateItemPreviewStaticData data) =>
-            OnCreateItemPreviewEvent.Invoke(data);
-
-        public void DestroyItemPreview(int slotIndex) =>
-            OnDestroyItemPreviewEvent.Invoke(slotIndex);
-
         public void GenerateDungeons(DungeonsSeedData data) =>
             OnGenerateDungeonsEvent.Invoke(data);
 

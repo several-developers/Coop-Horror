@@ -8,7 +8,6 @@ using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Network.Utilities;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.Observers.Gameplay.Rpc;
@@ -22,19 +21,17 @@ using Zenject;
 namespace GameCore.Gameplay.Entities.Player
 {
     [RequireComponent(typeof(PlayerInput))]
-    public class PlayerEntity : NetworkBehaviour, IPlayerEntity, INetcodeBehaviour
+    public class PlayerEntity : NetcodeBehaviour, IPlayerEntity
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
         private void Construct(IItemsPreviewFactory itemsPreviewFactory,
-            IMobileHeadquartersEntity mobileHeadquartersEntity, IRpcHandlerDecorator rpcHandlerDecorator,
-            IPlayerInteractionObserver playerInteractionObserver, IRpcObserver rpcObserver, PlayerCamera playerCamera,
-            IConfigsProvider configsProvider)
+            IMobileHeadquartersEntity mobileHeadquartersEntity, IPlayerInteractionObserver playerInteractionObserver,
+            IRpcObserver rpcObserver, PlayerCamera playerCamera, IConfigsProvider configsProvider)
         {
             _itemsPreviewFactory = itemsPreviewFactory;
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
-            _rpcHandlerDecorator = rpcHandlerDecorator;
             _playerInteractionObserver = playerInteractionObserver;
             _rpcObserver = rpcObserver;
             _playerCamera = playerCamera;
@@ -78,13 +75,12 @@ namespace GameCore.Gameplay.Entities.Player
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
         private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: OwnerPermission);
-        private readonly NetworkVariable<int> _currentSelectedSlotIndex = new();
+        private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
 
         private static PlayerEntity _localPlayer;
 
         private IItemsPreviewFactory _itemsPreviewFactory;
         private IMobileHeadquartersEntity _mobileHeadquartersEntity;
-        private IRpcHandlerDecorator _rpcHandlerDecorator;
         private IPlayerInteractionObserver _playerInteractionObserver;
         private IRpcObserver _rpcObserver;
 
@@ -97,125 +93,9 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _cameraRightHandItemsHolder;
         private Transform _lookAtObject;
 
-        private bool _isInitialized;
         private bool _isInsideMobileHQ;
-        private bool _isLocalPlayer;
-
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
-
-        private void Update()
-        {
-            if (!_isInitialized)
-                return;
-
-            TickServerAndClient();
-            TickServer();
-            TickClient();
-        }
-
-        private void LateUpdate()
-        {
-            if (!_isInitialized)
-                return;
-
-            LateUpdateServer();
-        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void InitServerAndClient()
-        {
-            BasicInit();
-            InitInventory();
-            FixInvisiblePlayerBug();
-            
-            _rpcObserver.OnCreateItemPreviewEvent += OnCreateItemPreview;
-            _rpcObserver.OnDestroyItemPreviewEvent += OnDestroyItemPreview;
-            _rpcObserver.OnTogglePlayerInsideMobileHQEvent += OnTogglePlayerInsideMobileHQ;
-
-            // LOCAL METHODS: -----------------------------
-
-            void BasicInit()
-            {
-                AllPlayers.TryAdd(OwnerClientId, this);
-                
-                _cameraRightHandItemsHolder = _playerCamera.CameraReferences.RightHandItemsHolder;
-            }
-            
-            void InitInventory()
-            {
-                _inventory = new PlayerInventory();
-
-                _inventoryManager = new PlayerInventoryManager(playerEntity: this, _rpcHandlerDecorator,
-                    _itemsPreviewFactory);
-            }
-
-            void FixInvisiblePlayerBug()
-            {
-                Transform thisTransform = transform;
-                Vector3 startPosition = thisTransform.position;
-                startPosition.x += 0.05f;
-                thisTransform.position = startPosition;
-            }
-        }
-
-        public void InitServer()
-        {
-            if (!IsOwner)
-                return;
-        }
-
-        public void InitClient()
-        {
-            if (IsOwner)
-                return;
-            
-            _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
-        }
-
-        public void TickServerAndClient()
-        {
-        }
-
-        public void TickServer()
-        {
-            if (!IsOwner)
-                return;
-
-            _references.HeadLookObject.position = _lookAtPosition.Value;
-            
-            if (_isLocalPlayer)
-                _interactionChecker.Check();
-        }
-
-        public void TickClient()
-        {
-            if (IsOwner)
-                return;
-
-            _references.HeadLookObject.position = _lookAtPosition.Value;
-        }
-
-        public void DespawnServerAndClient()
-        {
-            _rpcObserver.OnCreateItemPreviewEvent -= OnCreateItemPreview;
-            _rpcObserver.OnDestroyItemPreviewEvent -= OnDestroyItemPreview;
-            _rpcObserver.OnTogglePlayerInsideMobileHQEvent -= OnTogglePlayerInsideMobileHQ;
-        }
-
-        public void DespawnServer()
-        {
-            if (!IsOwner)
-                return;
-            
-            _currentSelectedSlotIndex.OnValueChanged -= OnClientSelectedSlotChanged;
-        }
-
-        public void DespawnClient()
-        {
-            if (IsOwner)
-                return;
-        }
 
         public void TakeDamage(IEntity source, float damage)
         {
@@ -257,8 +137,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         public PlayerInventory GetInventory() => _inventory;
 
-        public new bool IsLocalPlayer() => _isLocalPlayer;
-        
         public bool IsDead() => _isDead;
 
         public static PlayerEntity GetLocalPlayer() => _localPlayer;
@@ -266,42 +144,44 @@ namespace GameCore.Gameplay.Entities.Player
         public static bool TryGetPlayer(ulong clientID, out PlayerEntity playerEntity) =>
             AllPlayers.TryGetValue(clientID, out playerEntity);
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        private void LateUpdateServer()
+        protected override void InitServerAndClientOnce()
         {
-            if (!IsOwner)
-                return;
+            CameraReferences cameraReferences = _playerCamera.CameraReferences;
+            _lookAtObject = cameraReferences.LookAtObject;
+            _cameraRightHandItemsHolder = cameraReferences.RightHandItemsHolder;
+            
+            _inventory = new PlayerInventory();
 
-            _lookAtPosition.Value = _lookAtObject.position;
+            _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
         }
 
-        private void InitLocalPlayer()
+        protected override void InitLocalPlayerOnce()
         {
-            _isLocalPlayer = NetworkHorror.ClientID == OwnerClientId;
+            Other();
+            DeactivatePlayerMesh();
+            InitInteractionSystem();
+            InitPlayerMovement();
+            FixInvisiblePlayerBug(); // TEMP
+
+            InputReader.OnScrollEvent += OnScroll;
+            InputReader.OnInteractEvent += OnInteract;
+            InputReader.OnDropItemEvent += OnDropItem;
             
-            Debug.LogWarning($"Is Local: {_isLocalPlayer}, " +
-                             $"Client ID: {NetworkHorror.ClientID}, " +
-                             $"Owner Client ID: {OwnerClientId}");
+            _rpcObserver.OnTogglePlayerInsideMobileHQEvent += OnTogglePlayerInsideMobileHQ;
 
-            if (_isLocalPlayer)
-            {
-                BasicInit();
-                InitInput();
-                InitMovement();
-                InitInteractionCheckerAndHandler();
-                
-                _inventory.OnSelectedSlotChangedEvent += OnLocalPlayerSelectedSlotChanged;
-            }
-
+            _inventory.OnSelectedSlotChangedEvent += OnLocalPlayerSelectedSlotChanged;
+            
             // LOCAL METHODS: -----------------------------
 
-            void BasicInit()
+            void Other()
             {
                 _localPlayer = this;
-                _lookAtObject = _playerCamera.CameraReferences.LookAtObject;
-                _playerCamera.Init(playerEntity: this);
-
+            }
+            
+            void DeactivatePlayerMesh()
+            {
                 foreach (GameObject activeObject in _references.LocalPlayerActiveObjects)
                     activeObject.SetActive(true);
                 
@@ -312,14 +192,17 @@ namespace GameCore.Gameplay.Entities.Player
                     meshRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             }
 
-            void InitInput()
+            void InitInteractionSystem()
             {
-                InputReader.OnScrollEvent += OnScroll;
-                InputReader.OnInteractEvent += OnInteract;
-                InputReader.OnDropItemEvent += OnDropItem;
+                _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform,
+                    _playerCamera.CameraReferences.MainCamera, _interactionMaxDistance,
+                    interactionLM: _interactionLM, _interactionObstaclesLM);
+
+                _interactionHandler =
+                    new InteractionHandler(playerEntity: this, _inventoryManager, _playerInteractionObserver);
             }
 
-            void InitMovement()
+            void InitPlayerMovement()
             {
                 Character character = _references.Character;
                 character.camera = _playerCamera.CameraReferences.MainCamera;
@@ -331,34 +214,57 @@ namespace GameCore.Gameplay.Entities.Player
                 animationController.Setup(character, _playerCamera);
             }
             
-            void InitInteractionCheckerAndHandler()
+            void FixInvisiblePlayerBug()
             {
-                _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform,
-                    _playerCamera.CameraReferences.MainCamera, _interactionMaxDistance,
-                    interactionLM: _interactionLM, _interactionObstaclesLM);
-
-                _interactionHandler =
-                    new InteractionHandler(playerEntity: this, _inventoryManager, _playerInteractionObserver);
+                Transform thisTransform = transform;
+                Vector3 startPosition = thisTransform.position;
+                startPosition.x += 0.05f;
+                thisTransform.position = startPosition;
             }
         }
 
-        private void DespawnLocalPlayer()
+        protected override void InitServerAndClient() =>
+            AllPlayers.TryAdd(OwnerClientId, this);
+
+        protected override void InitClient() =>
+            _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
+
+        protected override void TickServer() =>
+            _references.HeadLookObject.position = _lookAtPosition.Value;
+
+        protected override void TickClient() =>
+            _references.HeadLookObject.position = _lookAtPosition.Value;
+
+        protected override void TickLocalPlayer() =>
+            _interactionChecker.Check();
+
+        protected override void LateTickServer() =>
+            _lookAtPosition.Value = _lookAtObject.position;
+
+        protected override void DespawnLocalPlayerOnce()
         {
-            if (!_isLocalPlayer)
-                return;
-            
             _inventory.DropAllItems();
             _inventoryManager.Dispose();
             _interactionHandler.Dispose();
-            _playerCamera.Disable();
-
-            _inventory.OnSelectedSlotChangedEvent -= OnLocalPlayerSelectedSlotChanged;
             
             InputReader.OnScrollEvent -= OnScroll;
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
+
+            
+            _rpcObserver.OnTogglePlayerInsideMobileHQEvent -= OnTogglePlayerInsideMobileHQ;
+            
+            _inventory.OnSelectedSlotChangedEvent -= OnLocalPlayerSelectedSlotChanged;
         }
-        
+
+        protected override void DespawnServerAndClient() =>
+            AllPlayers.Remove(OwnerClientId);
+
+        protected override void DespawnClient() =>
+            _currentSelectedSlotIndex.OnValueChanged -= OnClientSelectedSlotChanged;
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
         private void Interact() =>
             _interactionHandler.Interact();
 
@@ -377,18 +283,47 @@ namespace GameCore.Gameplay.Entities.Player
         private void ChangeSelectedSlotServerRpc(int slotIndex) =>
             _currentSelectedSlotIndex.Value = slotIndex;
 
+        [ServerRpc(RequireOwnership = false)]
+        public void CreateItemPreviewServerRpc(int slotIndex, int itemID, ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+            CreateItemPreviewClientRpc(senderClientID, slotIndex, itemID);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void DestroyItemPreviewServerRpc(int slotIndex, ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+            DestroyItemPreviewClientRpc(senderClientID, slotIndex);
+        }
+
+        [ClientRpc]
+        private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)
+        {
+            bool isMatches = senderClientID == NetworkHorror.ClientID;
+
+            if (isMatches)
+                return;
+
+            _inventoryManager.CreateItemPreviewClientSide(slotIndex, itemID, isFirstPerson: false);
+        }
+
+        [ClientRpc]
+        private void DestroyItemPreviewClientRpc(ulong senderClientID, int slotIndex)
+        {
+            bool isMatches = senderClientID == NetworkHorror.ClientID;
+
+            if (isMatches)
+                return;
+            
+            _inventoryManager.DestroyItemPreview(slotIndex);
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-            InitLocalPlayer();
-
-            _isInitialized = true;
             
             OnPlayerSpawnedEvent.Invoke(this);
         }
@@ -397,13 +332,6 @@ namespace GameCore.Gameplay.Entities.Player
         {
             base.OnNetworkDespawn();
 
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-            DespawnLocalPlayer();
-
-            _isInitialized = false;
-            
             OnPlayerDespawnedEvent.Invoke(this);
         }
         
@@ -420,17 +348,20 @@ namespace GameCore.Gameplay.Entities.Player
         private void OnInteract() => Interact();
 
         private void OnDropItem() => DropItem();
-
-        private void OnCreateItemPreview(CreateItemPreviewStaticData data)
+        
+        private void OnTogglePlayerInsideMobileHQ(ulong clientID, bool isInside)
         {
-            if (!_isLocalPlayer)
+            if (isInside == _isInsideMobileHQ)
                 return;
 
-            _inventoryManager.CreateItemPreviewClientSide(data.SlotIndex, data.ItemID, cameraPivot: false);
-        }
+            bool isMatches = clientID == OwnerClientId;
 
-        private void OnDestroyItemPreview(int slotIndex) =>
-            _inventoryManager.DestroyItemPreview(slotIndex);
+            if (!isMatches)
+                return;
+
+            _isInsideMobileHQ = isInside;
+            _networkTransform.InLocalSpace = isInside;
+        }
 
         private void OnLocalPlayerSelectedSlotChanged(ChangedSlotStaticData data)
         {
@@ -446,20 +377,6 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _inventory.SetSelectedSlotIndex(newValue);
             _inventoryManager.ToggleItemsState();
-        }
-
-        private void OnTogglePlayerInsideMobileHQ(ulong clientID, bool isInside)
-        {
-            if (isInside == _isInsideMobileHQ)
-                return;
-
-            bool isMatches = clientID == OwnerClientId;
-
-            if (!isMatches)
-                return;
-
-            _isInsideMobileHQ = isInside;
-            _networkTransform.InLocalSpace = isInside;
         }
     }
 }

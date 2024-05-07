@@ -25,13 +25,6 @@ namespace GameCore.Gameplay.Network
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
-        private void CreateItemPreviewServerRpc(int slotIndex, int itemID) =>
-            CreateItemPreviewClientRpc(slotIndex, itemID);
-
-        [ServerRpc(RequireOwnership = false)]
-        private void DestroyItemPreviewServerRpc(int slotIndex) => DestroyItemPreviewClientRpc(slotIndex);
-
-        [ServerRpc(RequireOwnership = false)]
         private void GenerateDungeonsServerRpc(DungeonsSeedData data) => GenerateDungeonsClientRpc(data);
 
         [ServerRpc(RequireOwnership = false)]
@@ -52,17 +45,6 @@ namespace GameCore.Gameplay.Network
             TeleportToFireExitClientRpc(clientID, floor, isInStairsLocation);
         }
 
-        [ClientRpc]
-        private void CreateItemPreviewClientRpc(int slotIndex, int itemID)
-        {
-            CreateItemPreviewStaticData data = new(slotIndex, itemID);
-            _rpcObserver.CreateItemPreview(data);
-        }
-
-        [ClientRpc]
-        private void DestroyItemPreviewClientRpc(int slotIndex) =>
-            _rpcObserver.DestroyItemPreview(slotIndex);
-        
         [ClientRpc]
         private void GenerateDungeonsClientRpc(DungeonsSeedData data) =>
             _rpcObserver.GenerateDungeons(data);
@@ -89,8 +71,6 @@ namespace GameCore.Gameplay.Network
         {
             base.OnNetworkSpawn();
 
-            _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent += CreateItemPreviewServerRpc;
-            _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent += DestroyItemPreviewServerRpc;
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent += GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
             _rpcHandlerDecorator.OnOpenElevatorInnerEvent += OpenElevatorServerRpc;
@@ -102,15 +82,13 @@ namespace GameCore.Gameplay.Network
         {
             base.OnNetworkDespawn();
             
-            _rpcHandlerDecorator.OnCreateItemPreviewInnerEvent -= CreateItemPreviewServerRpc;
-            _rpcHandlerDecorator.OnDestroyItemPreviewInnerEvent -= DestroyItemPreviewServerRpc;
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent -= GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
             _rpcHandlerDecorator.OnOpenElevatorInnerEvent -= OpenElevatorServerRpc;
             _rpcHandlerDecorator.OnTogglePlayerInsideMobileHQInnerEvent -= TogglePlayerInsideMobileHQServerRpc;
             _rpcHandlerDecorator.OnTeleportToFireExitInnerEvent -= OnTeleportToFireExit;
         }
-        
+
         private void OnTeleportToFireExit(Floor floor, bool isInStairsLocation) =>
             TeleportToFireExitServerRpc(floor, isInStairsLocation);
     }

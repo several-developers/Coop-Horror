@@ -101,19 +101,6 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Init(PlayerEntity playerEntity)
-        {
-            _target = playerEntity.transform;
-            _headPoint = playerEntity.References.HeadPoint;
-            //_isInitialized = true;
-        }
-
-        public void Disable()
-        {
-            _isInitialized = false;
-            Destroy(gameObject);
-        }
-
         public void EnableSnap() =>
             _snap = true;
     }
