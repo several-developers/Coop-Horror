@@ -34,10 +34,6 @@ namespace GameCore.Gameplay.Network
         private void OpenElevatorServerRpc(Floor floor) => OpenElevatorClientRpc(floor);
 
         [ServerRpc(RequireOwnership = false)]
-        private void TogglePlayerInsideMobileHQServerRpc(ulong clientID, bool isInside) =>
-            TogglePlayerInsideMobileHQClientRpc(clientID, isInside);
-
-        [ServerRpc(RequireOwnership = false)]
         private void TeleportToFireExitServerRpc(Floor floor, bool isInStairsLocation,
             ServerRpcParams serverRpcParams = default)
         {
@@ -58,10 +54,6 @@ namespace GameCore.Gameplay.Network
             _rpcObserver.OpenElevator(floor);
 
         [ClientRpc]
-        private void TogglePlayerInsideMobileHQClientRpc(ulong clientID, bool isInside) =>
-            _rpcObserver.TogglePlayerInsideMobileHQ(clientID, isInside);
-
-        [ClientRpc]
         private void TeleportToFireExitClientRpc(ulong clientID, Floor floor, bool isInStairsLocation) =>
             _rpcObserver.TeleportToFireExit(clientID, floor, isInStairsLocation);
 
@@ -74,7 +66,6 @@ namespace GameCore.Gameplay.Network
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent += GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
             _rpcHandlerDecorator.OnOpenElevatorInnerEvent += OpenElevatorServerRpc;
-            _rpcHandlerDecorator.OnTogglePlayerInsideMobileHQInnerEvent += TogglePlayerInsideMobileHQServerRpc;
             _rpcHandlerDecorator.OnTeleportToFireExitInnerEvent += OnTeleportToFireExit;
         }
 
@@ -85,7 +76,6 @@ namespace GameCore.Gameplay.Network
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent -= GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
             _rpcHandlerDecorator.OnOpenElevatorInnerEvent -= OpenElevatorServerRpc;
-            _rpcHandlerDecorator.OnTogglePlayerInsideMobileHQInnerEvent -= TogglePlayerInsideMobileHQServerRpc;
             _rpcHandlerDecorator.OnTeleportToFireExitInnerEvent -= OnTeleportToFireExit;
         }
 

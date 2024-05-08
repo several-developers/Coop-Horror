@@ -16,6 +16,8 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: 3b448d5b0a945f743bfc6be7504299f7, type: 3}
   _itemName: Test Flashlight
   _itemID: 0
+  _rigPresetType: 1
+  _itemHandPlacement: 1
   _fpsItemPreview:
     _position: {x: 0.612, y: -0.28, z: 0.619}
     _eulerRotation: {x: 0, y: 14.5, z: 45}
@@ -24,12 +26,6 @@ MonoBehaviour:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _scale: {x: 1, y: 1, z: 1}
-  _itemCameraPreviewPosition: {x: 0.612, y: -0.28, z: 0.619}
-  _itemCameraPreviewRotation: {x: 0, y: 14.5, z: 45}
-  _itemCameraPreviewScale: {x: 1, y: 1, z: 1}
-  _itemPlayerPreviewPosition: {x: 0, y: 0, z: 0}
-  _itemPlayerPreviewRotation: {x: 0, y: 0, z: 0}
-  _itemPlayerPreviewScale: {x: 1, y: 1, z: 1}
   _itemPrefab: {fileID: 3527205337265419951, guid: 907b7152f39d9824c9bac4bf17e3da9e,
     type: 3}
   _itemPreviewPrefab: {fileID: 8255347702447654125, guid: af5e517ad69b2ad4bb70d1d319afdcea,

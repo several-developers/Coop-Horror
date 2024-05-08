@@ -21,6 +21,7 @@ namespace GameCore.Gameplay.Network.Utilities
 
         [Title(Constants.References)]
         [SerializeField, Required]
+        [ListDrawerSettings(AlwaysAddDefaultValue = true)]
         private List<GameObject> _prefabs;
         
         // FIELDS: --------------------------------------------------------------------------------

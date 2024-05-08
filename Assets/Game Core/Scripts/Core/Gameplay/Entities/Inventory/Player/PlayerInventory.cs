@@ -117,9 +117,6 @@ namespace GameCore.Gameplay.Entities.Inventory
         public bool IsInventoryFull() =>
             _inventory.IsInventoryFull();
 
-        public bool IsItemInSelectedSlotExists() =>
-            _inventory.HasItemInSelectedSlot();
-
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void SendSelectedSlotChangedEvent(int selectedSlotIndex)

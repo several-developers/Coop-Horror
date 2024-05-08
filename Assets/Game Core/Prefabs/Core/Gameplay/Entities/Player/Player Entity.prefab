@@ -1765,7 +1765,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3899032711484485059}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.65, z: 0.15002441}
+  m_LocalPosition: {x: 0, y: 1.65, z: 0.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3399,9 +3399,9 @@ MonoBehaviour:
     _collider: {fileID: 1967799250354909116}
     _networkTransform: {fileID: 5356547518013829562}
     _headPoint: {fileID: 260123221838165337}
+    _headLookAtObject: {fileID: 8459922248943539644}
     _leftHandItemsHolder: {fileID: 5978814505450677389}
     _rightHandItemsHolder: {fileID: 3303857306865714120}
-    _headLookObject: {fileID: 8459922248943539644}
     _character: {fileID: 4617892838296297533}
     _characterMovement: {fileID: 3301787368083257467}
     _playerMovementController: {fileID: 7014763259676313825}

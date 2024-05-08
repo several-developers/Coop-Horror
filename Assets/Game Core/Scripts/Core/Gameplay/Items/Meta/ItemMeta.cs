@@ -23,11 +23,15 @@ namespace GameCore.Gameplay.Items
         [VerticalGroup(RowRight), SerializeField]
         private string _itemName = "item_name";
 
-        [VerticalGroup(RowRight), SerializeField]
-        private RigPresetType _rigPresetType;
-        
         [VerticalGroup(RowRight), SerializeField, EnableIf(nameof(_canEditItemID))]
         private int _itemID;
+        
+        [Title("Common")]
+        [SerializeField]
+        private RigPresetType _rigPresetType = RigPresetType.RightHandBase;
+
+        [SerializeField]
+        private ItemHandPlacement _itemHandPlacement = ItemHandPlacement.Right;
 
         [Title("First Person Preview Settings")]
         [SerializeField]
@@ -52,6 +56,7 @@ namespace GameCore.Gameplay.Items
         public Sprite Icon => _icon;
         public string ItemName => _itemName;
         public RigPresetType RigPresetType => _rigPresetType;
+        public ItemHandPlacement ItemHandPlacement => _itemHandPlacement;
         public int ItemID => _itemID;
         public ItemPose FpsItemPreview => _fpsItemPreview;
         public ItemPose TpsItemPreview => _tpsItemPreview;

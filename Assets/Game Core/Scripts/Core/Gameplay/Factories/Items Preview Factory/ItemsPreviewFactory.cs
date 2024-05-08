@@ -42,22 +42,15 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
                 LogItemPrefabNotFound(itemID);
                 return false;
             }
-            
-            RigPresetType rigPresetType = itemMeta.RigPresetType;
+
+            ItemHandPlacement itemHandPlacement = itemMeta.ItemHandPlacement;
             Transform parent = null;
 
             if (isFirstPerson)
             {
-                switch (rigPresetType)
-                {
-                    case RigPresetType.LeftHandBase:
-                        parent = _cameraReferences.LeftHandItemsHolder;
-                        break;
-                    
-                    case RigPresetType.RightHandBase:
-                        parent = _cameraReferences.RightHandItemsHolder;
-                        break;
-                }
+                parent = itemHandPlacement == ItemHandPlacement.Left
+                    ? _cameraReferences.LeftHandItemsHolder
+                    : _cameraReferences.RightHandItemsHolder;
             }
             else
             {
@@ -68,18 +61,11 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
 
                 PlayerReferences playerReferences = playerEntity.References;
 
-                switch (rigPresetType)
-                {
-                    case RigPresetType.LeftHandBase:
-                        parent = playerReferences.LeftHandItemsHolder;
-                        break;
-                    
-                    case RigPresetType.RightHandBase:
-                        parent = playerReferences.RightHandItemsHolder;
-                        break;
-                }
+                parent = itemHandPlacement == ItemHandPlacement.Left
+                    ? playerReferences.LeftHandItemsHolder
+                    : playerReferences.RightHandItemsHolder;
             }
-            
+
             itemPreviewObject = Object.Instantiate(itemPreviewPrefab, parent);
 
             ItemMeta.ItemPose itemPose = isFirstPerson ? itemMeta.FpsItemPreview : itemMeta.TpsItemPreview;

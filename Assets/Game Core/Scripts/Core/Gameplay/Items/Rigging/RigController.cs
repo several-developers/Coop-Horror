@@ -118,6 +118,15 @@ namespace GameCore.Gameplay.Items.Rigging
                 return;
             }
 
+            bool isDefaultPresetFound =
+                _rigPresetsProvider.TryGetPresetMeta(RigPresetType.Default, out RigPresetMeta defaultRigPresetMeta);
+
+            if (!isDefaultPresetFound)
+            {
+                Log.PrintError(log: $"Rig Preset of type <gb>{RigPresetType.Default}</gb> <rb>not found</rb>!");
+                return;
+            }
+
             _sequence.Kill();
             _sequence = DOTween.Sequence();
             _sequence.SetLink(gameObject);
@@ -135,17 +144,55 @@ namespace GameCore.Gameplay.Items.Rigging
 
             if (isLocalPlayer)
             {
-                leftHandTargetPose = rigPresetMeta.FPSLeftHandTargetPose;
-                rightHandTargetPose = rigPresetMeta.FPSRightHandTargetPose;
-                leftHandHintPose = rigPresetMeta.FPSLeftHandHintPose;
-                rightHandHintPose = rigPresetMeta.FPSRightHandHintPose;
+                switch (rigType)
+                {
+                    case RigType.LeftHand:
+                        leftHandTargetPose = rigPresetMeta.FPSLeftHandTargetPose;
+                        leftHandHintPose = rigPresetMeta.FPSLeftHandHintPose;
+                        rightHandTargetPose = defaultRigPresetMeta.FPSRightHandTargetPose;
+                        rightHandHintPose = defaultRigPresetMeta.FPSRightHandHintPose;
+                        break;
+                    
+                    case RigType.RightHand:
+                        leftHandTargetPose = defaultRigPresetMeta.FPSLeftHandTargetPose;
+                        leftHandHintPose = defaultRigPresetMeta.FPSLeftHandHintPose;
+                        rightHandTargetPose = rigPresetMeta.FPSRightHandTargetPose;
+                        rightHandHintPose = rigPresetMeta.FPSRightHandHintPose;
+                        break;
+                    
+                    default:
+                        leftHandTargetPose = rigPresetMeta.FPSLeftHandTargetPose;
+                        rightHandTargetPose = rigPresetMeta.FPSRightHandTargetPose;
+                        leftHandHintPose = rigPresetMeta.FPSLeftHandHintPose;
+                        rightHandHintPose = rigPresetMeta.FPSRightHandHintPose;
+                        break;
+                }
             }
             else
             {
-                leftHandTargetPose = rigPresetMeta.TPSLeftHandTargetPose;
-                rightHandTargetPose = rigPresetMeta.TPSRightHandTargetPose;
-                leftHandHintPose = rigPresetMeta.TPSLeftHandHintPose;
-                rightHandHintPose = rigPresetMeta.TPSRightHandHintPose;
+                switch (rigType)
+                {
+                    case RigType.LeftHand:
+                        leftHandTargetPose = rigPresetMeta.TPSLeftHandTargetPose;
+                        leftHandHintPose = rigPresetMeta.TPSLeftHandHintPose;
+                        rightHandTargetPose = defaultRigPresetMeta.TPSRightHandTargetPose;
+                        rightHandHintPose = defaultRigPresetMeta.TPSRightHandHintPose;
+                        break;
+                    
+                    case RigType.RightHand:
+                        leftHandTargetPose = defaultRigPresetMeta.TPSLeftHandTargetPose;
+                        leftHandHintPose = defaultRigPresetMeta.TPSLeftHandHintPose;
+                        rightHandTargetPose = rigPresetMeta.TPSRightHandTargetPose;
+                        rightHandHintPose = rigPresetMeta.TPSRightHandHintPose;
+                        break;
+                    
+                    default:
+                        leftHandTargetPose = rigPresetMeta.TPSLeftHandTargetPose;
+                        rightHandTargetPose = rigPresetMeta.TPSRightHandTargetPose;
+                        leftHandHintPose = rigPresetMeta.TPSLeftHandHintPose;
+                        rightHandHintPose = rigPresetMeta.TPSRightHandHintPose;
+                        break;
+                }
             }
 
             ChangeHandRig(
@@ -156,7 +203,7 @@ namespace GameCore.Gameplay.Items.Rigging
                 hintPose: leftHandHintPose,
                 rigChangeDuration: rigPresetMeta.RigWeightChangeDuration,
                 targetWeight: leftHandRigWeight);
-            
+
             ChangeHandRig(
                 handTarget: _rightHandTarget,
                 handHint: _rightHandHint,
@@ -170,7 +217,7 @@ namespace GameCore.Gameplay.Items.Rigging
             ChangeHandAnimatorLayer(rigPresetMeta, _rightHandLayerIndex, rightHandRigWeight);
         }
 
-        private void ResetRig(bool isLocalPlayer) => UpdateRig(RigPresetType.None, isLocalPlayer);
+        private void ResetRig(bool isLocalPlayer) => UpdateRig(RigPresetType.Default, isLocalPlayer);
 
         private void ChangeHandRig(Transform handTarget, Transform handHint, Rig handRig,
             RigPresetMeta.RigPose targetPose, RigPresetMeta.RigPose hintPose, float rigChangeDuration,

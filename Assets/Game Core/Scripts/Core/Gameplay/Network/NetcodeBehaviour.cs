@@ -12,7 +12,6 @@ namespace GameCore.Gameplay.Network
 
         private bool _isLocalPlayer;
         private bool _isInitialized;
-        private bool _isDespawned;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -27,6 +26,12 @@ namespace GameCore.Gameplay.Network
 
             TickServerAndClient();
 
+            if (IsServer)
+                TickRealServer();
+            
+            if (IsOwnedByServer)
+                TickOwnerByServer();
+            
             if (IsOwner)
                 TickServer();
             else
@@ -38,7 +43,7 @@ namespace GameCore.Gameplay.Network
 
         protected void LateUpdate()
         {
-            if (_isInitialized)
+            if (!_isInitialized)
                 return;
 
             LateTickServerAndClient();
@@ -53,23 +58,7 @@ namespace GameCore.Gameplay.Network
         }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
-
-        protected virtual void InitServerAndClientOnce()
-        {
-        }
-
-        protected virtual void InitServerOnce()
-        {
-        }
-
-        protected virtual void InitClientOnce()
-        {
-        }
-
-        protected virtual void InitLocalPlayerOnce()
-        {
-        }
-
+        
         protected virtual void InitServerAndClient()
         {
         }
@@ -118,22 +107,6 @@ namespace GameCore.Gameplay.Network
         {
         }
 
-        protected virtual void DespawnServerAndClientOnce()
-        {
-        }
-
-        protected virtual void DespawnServerOnce()
-        {
-        }
-
-        protected virtual void DespawnClientOnce()
-        {
-        }
-
-        protected virtual void DespawnLocalPlayerOnce()
-        {
-        }
-
         protected virtual void DespawnServerAndClient()
         {
         }
@@ -152,24 +125,24 @@ namespace GameCore.Gameplay.Network
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SingleInitialization()
+        private void CheckIfLocalPlayer() =>
+            _isLocalPlayer = NetworkHorror.ClientID == OwnerClientId;
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        protected virtual void TickRealServer()
         {
-            if (_isInitialized)
-                return;
-
-            InitServerAndClientOnce();
-
-            if (IsOwner)
-                InitServerOnce();
-            else
-                InitClientOnce();
-
-            if (_isLocalPlayer)
-                InitLocalPlayerOnce();
         }
 
-        private void MultipleInitialization()
+        protected virtual void TickOwnerByServer()
         {
+        }
+        
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            CheckIfLocalPlayer();
             InitServerAndClient();
 
             if (IsOwner)
@@ -179,26 +152,14 @@ namespace GameCore.Gameplay.Network
 
             if (_isLocalPlayer)
                 InitLocalPlayer();
+
+            _isInitialized = true;
         }
 
-        private void SingleDespawn()
+        public override void OnNetworkDespawn()
         {
-            if (_isDespawned)
-                return;
+            base.OnNetworkDespawn();
 
-            DespawnServerAndClientOnce();
-
-            if (IsOwner)
-                DespawnServerOnce();
-            else
-                DespawnClientOnce();
-
-            if (_isLocalPlayer)
-                DespawnLocalPlayerOnce();
-        }
-
-        private void MultipleDespawn()
-        {
             DespawnServerAndClient();
 
             if (IsOwner)
@@ -208,34 +169,8 @@ namespace GameCore.Gameplay.Network
 
             if (_isLocalPlayer)
                 DespawnLocalPlayer();
-        }
-
-        private void CheckIfLocalPlayer() =>
-            _isLocalPlayer = NetworkHorror.ClientID == OwnerClientId;
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            CheckIfLocalPlayer();
-            SingleInitialization();
-            MultipleInitialization();
-
-            _isInitialized = true;
-            _isDespawned = false;
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-
-            SingleDespawn();
-            MultipleDespawn();
 
             _isInitialized = false;
-            _isDespawned = true;
         }
     }
 }
