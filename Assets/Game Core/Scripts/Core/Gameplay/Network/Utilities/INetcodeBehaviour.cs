@@ -17,11 +17,4 @@ namespace GameCore.Gameplay.Network.Utilities
         void DespawnServer();
         void DespawnClient();
     }
-    
-    public interface INetcodeTickBehaviour
-    {
-        void TickServerAndClient();
-        void TickServer();
-        void TickClient();
-    }
 }

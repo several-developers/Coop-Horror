@@ -35,9 +35,6 @@ namespace GameCore.Gameplay.Entities.Player
         private ClientNetworkTransform _networkTransform;
 
         [SerializeField, Required]
-        private Transform _headPoint;
-
-        [SerializeField, Required]
         private Transform _headLookAtObject;
 
         [SerializeField, Required]
@@ -76,7 +73,6 @@ namespace GameCore.Gameplay.Entities.Player
         public Rigidbody Rigidbody => _rigidbody;
         public CapsuleCollider Collider => _collider;
         public ClientNetworkTransform NetworkTransform => _networkTransform;
-        public Transform HeadPoint => _headPoint;
         public Transform HeadLookAtObject => _headLookAtObject;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;

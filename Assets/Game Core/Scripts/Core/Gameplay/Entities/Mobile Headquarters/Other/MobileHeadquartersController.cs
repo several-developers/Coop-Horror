@@ -2,14 +2,12 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
-using GameCore.Gameplay.Network.Utilities;
-using GameCore.Gameplay.Other;
 using GameCore.Gameplay.Quests;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
-    public class MobileHeadquartersController : INetcodeInitBehaviour, INetcodeDespawnBehaviour
+    public class MobileHeadquartersController
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -53,14 +51,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             loadLocationLever.OnEnabledEvent += OnMainLeverPulled;
         }
 
-        public void InitServer()
-        {
-        }
-
-        public void InitClient()
-        {
-        }
-
         public void DespawnServerAndClient()
         {
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
@@ -80,14 +70,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent -= OnInteractWithMainLever;
             loadLocationLever.OnEnabledEvent -= OnMainLeverPulled;
-        }
-
-        public void DespawnServer()
-        {
-        }
-
-        public void DespawnClient()
-        {
         }
 
         public void ToggleDoorState(bool isOpen)

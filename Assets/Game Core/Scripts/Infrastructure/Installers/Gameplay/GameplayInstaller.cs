@@ -18,14 +18,11 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private Sun _sun;
-
-        [SerializeField, Required]
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
 
         [SerializeField, Required]
         private DeliveryPoint _deliveryPoint;
-        
+
         [SerializeField, Required]
         private PlayerCamera _playerCamera;
 
@@ -35,7 +32,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             BindMobileHeadquartersEntity();
             BindDeliveryPoint();
-            BindSun();
             BindTimeCycle();
             BindLocationsLoader();
             BindLevelProvider();
@@ -55,20 +51,12 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .FromInstance(_mobileHeadquartersEntity)
                 .AsSingle();
         }
-        
+
         private void BindDeliveryPoint()
         {
             Container
                 .Bind<IDeliveryPoint>()
                 .FromInstance(_deliveryPoint)
-                .AsSingle();
-        }
-
-        private void BindSun()
-        {
-            Container
-                .Bind<Sun>()
-                .FromInstance(_sun)
                 .AsSingle();
         }
 
@@ -102,7 +90,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle()
                 .NonLazy();
         }
-        
+
         private void BindFireExitsManager()
         {
             Container
@@ -110,14 +98,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle()
                 .NonLazy();
         }
-        
+
         private void BindLocationManagerDecorator()
         {
             Container
                 .BindInterfacesTo<LocationManagerDecorator>()
                 .AsSingle();
         }
-        
+
         private void BindUIManager()
         {
             Container
@@ -125,7 +113,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle()
                 .NonLazy();
         }
-        
+
         private void BindPlayerCamera()
         {
             Container

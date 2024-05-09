@@ -1,5 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,7 +8,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Delivery
 {
-    public class DeliveryManager : NetworkBehaviour, INetcodeInitBehaviour, INetcodeDespawnBehaviour
+    public class DeliveryManager : NetcodeBehaviour, INetcodeInitBehaviour, INetcodeDespawnBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 

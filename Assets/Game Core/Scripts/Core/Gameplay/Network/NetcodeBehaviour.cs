@@ -24,21 +24,18 @@ namespace GameCore.Gameplay.Network
             if (!_isInitialized)
                 return;
 
-            TickServerAndClient();
+            TickAll();
+            
+            if (IsServer && IsOwner)
+                TickServerOnly();
 
             if (IsServer)
-                TickRealServer();
-            
-            if (IsOwnedByServer)
-                TickOwnerByServer();
-            
-            if (IsOwner)
                 TickServer();
-            else
-                TickClient();
 
-            if (_isLocalPlayer)
-                TickLocalPlayer();
+            if (IsOwner)
+                TickOwner();
+            else
+                TickNotOwner();
         }
 
         protected void LateUpdate()
@@ -46,12 +43,18 @@ namespace GameCore.Gameplay.Network
             if (!_isInitialized)
                 return;
 
-            LateTickServerAndClient();
+            LateTickAll();
+            
+            if (IsServer && IsOwner)
+                LateTickServerOnly();
+
+            if (IsServer)
+                LateTickServer();
 
             if (IsOwner)
-                LateTickServer();
+                LateTickOwner();
             else
-                LateTickClient();
+                LateTickNotOwner();
 
             if (_isLocalPlayer)
                 LateTickLocalPlayer();
@@ -59,47 +62,108 @@ namespace GameCore.Gameplay.Network
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
         
-        protected virtual void InitServerAndClient()
+        /// <summary>
+        /// Вызывается у сервера и клиента (на каждом объекте).
+        /// </summary>
+        protected virtual void InitAll()
         {
         }
 
+        /// <summary>
+        /// Вызывается только у сервера у локального владельца объекта (у локального игрока-сервера).
+        /// </summary>
+        protected virtual void InitServerOnly()
+        {
+        }
+        
+        /// <summary>
+        /// Вызывается только у сервера (на каждом объекте).
+        /// </summary>
         protected virtual void InitServer()
         {
         }
 
-        protected virtual void InitClient()
+        /// <summary>
+        /// Вызывается только у локального владельца объекта (у локального игрока).
+        /// </summary>
+        protected virtual void InitOwner()
         {
         }
 
-        protected virtual void InitLocalPlayer()
+        /// <summary>
+        /// Вызывается у всех кроме локального владельца объекта (кроме локального игрока).
+        /// </summary>
+        protected virtual void InitNotOwner()
         {
         }
 
-        protected virtual void TickServerAndClient()
+        /// <summary>
+        /// Вызывается у сервера и клиента (на каждом объекте).
+        /// </summary>
+        protected virtual void TickAll()
         {
         }
 
+        /// <summary>
+        /// Вызывается только у сервера у локального владельца объекта (у локального игрока-сервера).
+        /// </summary>
+        protected virtual void TickServerOnly()
+        {
+        }
+        
+        /// <summary>
+        /// Вызывается только у сервера (на каждом объекте).
+        /// </summary>
         protected virtual void TickServer()
         {
         }
 
-        protected virtual void TickClient()
+        /// <summary>
+        /// Вызывается только у локального владельца объекта (у локального игрока).
+        /// </summary>
+        protected virtual void TickOwner()
         {
         }
 
-        protected virtual void TickLocalPlayer()
+        /// <summary>
+        /// Вызывается у всех кроме локального владельца объекта (кроме локального игрока).
+        /// </summary>
+        protected virtual void TickNotOwner()
         {
         }
 
-        protected virtual void LateTickServerAndClient()
+        /// <summary>
+        /// Вызывается у сервера и клиента (на каждом объекте).
+        /// </summary>
+        protected virtual void LateTickAll()
         {
         }
 
+        /// <summary>
+        /// Вызывается только у сервера у локального владельца объекта (у локального игрока-сервера).
+        /// </summary>
+        protected virtual void LateTickServerOnly()
+        {
+        }
+        
+        /// <summary>
+        /// Вызывается только у сервера (на каждом объекте).
+        /// </summary>
         protected virtual void LateTickServer()
         {
         }
 
-        protected virtual void LateTickClient()
+        /// <summary>
+        /// Вызывается только у локального владельца объекта (у локального игрока).
+        /// </summary>
+        protected virtual void LateTickOwner()
+        {
+        }
+
+        /// <summary>
+        /// Вызывается у всех кроме локального владельца объекта (кроме локального игрока).
+        /// </summary>
+        protected virtual void LateTickNotOwner()
         {
         }
 
@@ -107,19 +171,38 @@ namespace GameCore.Gameplay.Network
         {
         }
 
-        protected virtual void DespawnServerAndClient()
+        /// <summary>
+        /// Вызывается у сервера и клиента (на каждом объекте).
+        /// </summary>
+        protected virtual void DespawnAll()
         {
         }
 
+        /// <summary>
+        /// Вызывается только у сервера у локального владельца объекта (у локального игрока-сервера).
+        /// </summary>
+        protected virtual void DespawnServerOnly()
+        {
+        }
+        
+        /// <summary>
+        /// Вызывается только у сервера (на каждом объекте).
+        /// </summary>
         protected virtual void DespawnServer()
         {
         }
 
-        protected virtual void DespawnClient()
+        /// <summary>
+        /// Вызывается только у локального владельца объекта (у локального игрока).
+        /// </summary>
+        protected virtual void DespawnOwner()
         {
         }
 
-        protected virtual void DespawnLocalPlayer()
+        /// <summary>
+        /// Вызывается у всех кроме локального владельца объекта (кроме локального игрока).
+        /// </summary>
+        protected virtual void DespawnNotOwner()
         {
         }
 
@@ -130,28 +213,23 @@ namespace GameCore.Gameplay.Network
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        protected virtual void TickRealServer()
-        {
-        }
-
-        protected virtual void TickOwnerByServer()
-        {
-        }
-        
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
 
             CheckIfLocalPlayer();
-            InitServerAndClient();
+            InitAll();
+
+            if (IsServer && IsOwner)
+                InitServerOnly();
+            
+            if (IsServer)
+                InitServer();
 
             if (IsOwner)
-                InitServer();
+                InitOwner();
             else
-                InitClient();
-
-            if (_isLocalPlayer)
-                InitLocalPlayer();
+                InitNotOwner();
 
             _isInitialized = true;
         }
@@ -160,15 +238,18 @@ namespace GameCore.Gameplay.Network
         {
             base.OnNetworkDespawn();
 
-            DespawnServerAndClient();
+            DespawnAll();
+            
+            if (IsServer && IsOwner)
+                DespawnServerOnly();
+            
+            if (IsServer)
+                DespawnServer();
 
             if (IsOwner)
-                DespawnServer();
+                DespawnOwner();
             else
-                DespawnClient();
-
-            if (_isLocalPlayer)
-                DespawnLocalPlayer();
+                DespawnNotOwner();
 
             _isInitialized = false;
         }

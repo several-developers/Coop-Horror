@@ -12,11 +12,9 @@ namespace GameCore.Gameplay.GameTimeManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public TimeCycle(IGameplayConfigsProvider gameplayConfigsProvider, Sun sun)
+        public TimeCycle(IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _timeConfig = gameplayConfigsProvider.GetTimeConfig();
-            _sun = sun.Light;
-            _sunTransform = _sun.transform;
             _simulate = _timeConfig.Simulate;
             _stopAtNight = _timeConfig.StopAtNight;
 
@@ -55,8 +53,6 @@ namespace GameCore.Gameplay.GameTimeManagement
         public event Action OnHourPassedEvent = delegate { };
 
         private readonly TimeConfigMeta _timeConfig;
-        private readonly Transform _sunTransform;
-        private readonly Light _sun;
 
         private DayTime _dayTime;
         private DateTime _date;
@@ -72,7 +68,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         public void Initialize()
         {
-            UpdateVisual();
+            UpdateDayTime();
             SendTimeUpdatedEvent();
         }
 
@@ -87,7 +83,7 @@ namespace GameCore.Gameplay.GameTimeManagement
                 _minute = 0;
                 _hour = 0;
 
-                UpdateVisual();
+                UpdateDayTime();
                 SendHourPassedEvent();
                 return;
             }
@@ -125,7 +121,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         public void SyncDateTime(MyDateTime dateTime)
         {
             SetDateTime(dateTime.Second, dateTime.Minute, dateTime.Hour, dateTime.Day);
-            UpdateVisual();
+            UpdateDayTime();
         }
 
         public void SetMidnight()
@@ -161,6 +157,20 @@ namespace GameCore.Gameplay.GameTimeManagement
             return dateTime;
         }
 
+        public float GetTimeOfDay()
+        {
+            const int secondsInDay = 86400;
+            const int secondsInHour = 3600;
+            const int secondsInMinute = 60;
+
+            float totalSeconds = _hour * secondsInHour +
+                                 _minute * secondsInMinute +
+                                 _second;
+
+            float timeOfDay = Mathf.Clamp01(totalSeconds / (float)secondsInDay);
+            return timeOfDay;
+        }
+
         public bool GetSimulateState() => _simulate;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -183,16 +193,7 @@ namespace GameCore.Gameplay.GameTimeManagement
                 _internalTimeOverflow = 0f;
 
             SetDateTime(_second, _minute, _hour, _day);
-            UpdateVisual();
-        }
-
-        private void UpdateVisual()
-        {
-            float timeOfDay = GetTimeOfDay();
-
             UpdateDayTime();
-            UpdateLighting(timeOfDay);
-            UpdateSunRotation(timeOfDay);
         }
 
         private void UpdateDayTime()
@@ -212,39 +213,6 @@ namespace GameCore.Gameplay.GameTimeManagement
                     _dayTime = DayTime.Night;
                     break;
             }
-        }
-
-        private void UpdateLighting(float timeOfDay)
-        {
-            RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
-            RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
-
-            if (_sun != null)
-                _sun.color = _timeConfig.SunColor.Evaluate(timeOfDay);
-        }
-
-        private void UpdateSunRotation(float timeOfDay)
-        {
-            Quaternion sunRotation = _sunTransform.rotation;
-            float x = Mathf.Lerp(-90f, 270f, timeOfDay);
-            float y = sunRotation.y;
-            float z = sunRotation.z;
-
-            _sunTransform.rotation = Quaternion.Euler(x, y, z);
-        }
-
-        private float GetTimeOfDay()
-        {
-            const int secondsInDay = 86400;
-            const int secondsInHour = 3600;
-            const int secondsInMinute = 60;
-
-            float totalSeconds = _hour * secondsInHour +
-                                 _minute * secondsInMinute +
-                                 _second;
-
-            float timeOfDay = Mathf.Clamp01(totalSeconds / (float)secondsInDay);
-            return timeOfDay;
         }
 
         private void SendTimeUpdatedEvent()

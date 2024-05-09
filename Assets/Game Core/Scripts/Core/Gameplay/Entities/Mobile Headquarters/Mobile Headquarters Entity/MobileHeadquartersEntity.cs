@@ -21,11 +21,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, IGameManagerDecorator gameManagerDecorator,
+        private void Construct(IGameManagerDecorator gameManagerDecorator,
             ILocationManagerDecorator locationManagerDecorator, IQuestsManagerDecorator questsManagerDecorator,
             ILevelObserver levelObserver)
         {
-            RpcHandlerDecorator = rpcHandlerDecorator;
             GameManagerDecorator = gameManagerDecorator;
             QuestsManagerDecorator = questsManagerDecorator;
             _locationManagerDecorator = locationManagerDecorator;
@@ -45,7 +44,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public MobileHeadquartersReferences References => _references;
-        public IRpcHandlerDecorator RpcHandlerDecorator { get; private set; }
         public IGameManagerDecorator GameManagerDecorator { get; private set; }
         public IQuestsManagerDecorator QuestsManagerDecorator { get; private set; }
         public GameState GameState => GameManagerDecorator.GetGameState();
@@ -107,7 +105,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitServerAndClient()
+        protected override void InitAll()
         {
             _mobileHeadquartersController.InitServerAndClient();
             ArrivedAtRoadLocation();
@@ -115,35 +113,26 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
         }
 
-        protected override void InitServer()
-        {
-            _mobileHeadquartersController.InitServer();
-
+        protected override void InitOwner() =>
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
-        }
 
-        protected override void InitClient() =>
-            _mobileHeadquartersController.InitClient();
-
-        protected override void TickServer() =>
+        protected override void TickServer()
+        {
+            if (!IsLocalPlayer())
+                return;
+            
             _pathMovement.Movement();
-
-        protected override void DespawnServerAndClient()
+        }
+        
+        protected override void DespawnAll()
         {
             _mobileHeadquartersController.DespawnServerAndClient();
 
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
         }
 
-        protected override void DespawnServer()
-        {
-            _mobileHeadquartersController.DespawnServer();
-
+        protected override void DespawnOwner() =>
             _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
-        }
-
-        protected override void DespawnClient() =>
-            _mobileHeadquartersController.DespawnClient();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

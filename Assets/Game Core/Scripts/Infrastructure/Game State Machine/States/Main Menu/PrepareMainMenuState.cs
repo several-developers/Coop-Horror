@@ -23,24 +23,10 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
-        {
-            EnterSignInState();
-            return;
-
-            CreatePlayModeSelectionMenu();
-
-            _playModeSelectionMenu.OnOnlineClickedEvent += OnOnlineClicked;
-            _playModeSelectionMenu.OnOfflineClickedEvent += OnOfflineClicked;
-        }
+        public void Enter() => EnterSignInState();
 
         public void Exit()
         {
-            if (_playModeSelectionMenu != null)
-            {
-                _playModeSelectionMenu.OnOnlineClickedEvent -= OnOnlineClicked;
-                _playModeSelectionMenu.OnOfflineClickedEvent -= OnOfflineClicked;
-            }
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

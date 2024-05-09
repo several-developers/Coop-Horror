@@ -27,27 +27,27 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitServer()
+        protected override void InitOwner()
         {
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
             _timeCycle.OnHourPassedEvent += OnHourPassed;
         }
 
-        protected override void InitClient() =>
+        protected override void InitNotOwner() =>
             _gameTimer.OnValueChanged += OnGameTimerUpdated;
 
-        protected override void TickServerAndClient() =>
+        protected override void TickAll() =>
             _timeCycle.Tick(); // Check for optimization
 
-        protected override void DespawnServer()
+        protected override void DespawnOwner()
         {
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
 
             _timeCycle.OnHourPassedEvent -= OnHourPassed;
         }
 
-        protected override void DespawnClient() =>
+        protected override void DespawnNotOwner() =>
             _gameTimer.OnValueChanged -= OnGameTimerUpdated;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

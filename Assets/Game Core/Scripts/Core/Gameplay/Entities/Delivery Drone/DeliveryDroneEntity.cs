@@ -56,17 +56,17 @@ namespace GameCore.Gameplay.Entities.DeliveryDrone
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitServer()
+        protected override void InitServerOnly()
         {
             _droneMovement.TeleportDroneToDroneCart();
             
             _deliveryPoint.OnTeleportDroneToDroneCartEvent += OnTeleportDroneToDroneCart;
         }
 
-        protected override void TickServer() =>
+        protected override void TickServerOnly() =>
             _droneMovement.Tick();
 
-        protected override void DespawnServer() =>
+        protected override void DespawnServerOnly() =>
             _deliveryPoint.OnTeleportDroneToDroneCartEvent -= OnTeleportDroneToDroneCart;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

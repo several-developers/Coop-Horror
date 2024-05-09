@@ -45,8 +45,10 @@ namespace GameCore.UI.Gameplay.Interaction
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _interactionTextSettings.Setup(_textTMP);
 
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
@@ -55,8 +57,10 @@ namespace GameCore.UI.Gameplay.Interaction
             _playerInteractionObserver.OnInteractionEndedEvent += OnInteractionEnded;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            
             _playerInteractionObserver.OnInteractionStartedEvent -= OnCanInteract;
             _playerInteractionObserver.OnInteractionEndedEvent -= OnInteractionEnded;
         }

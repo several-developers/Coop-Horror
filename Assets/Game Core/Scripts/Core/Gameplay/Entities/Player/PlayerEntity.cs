@@ -72,6 +72,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
+        private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
 
         private static PlayerEntity _localPlayer;
@@ -87,7 +88,6 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionHandler _interactionHandler;
 
         private Transform _cameraLookAtObject;
-        private Transform _lookAtObject;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
         
-        protected override void InitServerAndClient()
+        protected override void InitAll()
         {
             AllPlayers.TryAdd(OwnerClientId, this);
 
@@ -149,10 +149,7 @@ namespace GameCore.Gameplay.Entities.Player
             _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
         }
 
-        protected override void InitClient() =>
-            _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
-
-        protected override void InitLocalPlayer()
+        protected override void InitOwner()
         {
             Other();
             DeactivatePlayerMesh();
@@ -219,50 +216,31 @@ namespace GameCore.Gameplay.Entities.Player
             }
         }
 
-        protected override void TickRealServer()
-        {
-            Debug.LogWarning($"Tick REAL Server: {OwnerClientId} / {NetworkHorror.ClientID}");
-        }
+        protected override void InitNotOwner() =>
+            _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
 
-        protected override void TickOwnerByServer()
+        protected override void TickOwner()
         {
-            Debug.LogWarning($"Tick Owner By Server: {OwnerClientId} / {NetworkHorror.ClientID}");
-        }
-
-        protected override void TickServerAndClient()
-        {
-            if (_lookAtObject != null)
-                _references.HeadLookAtObject.position = _lookAtObject.position;
-        }
-
-        protected override void TickServer()
-        {
-            Debug.LogWarning($"Tick Server: {OwnerClientId} / {NetworkHorror.ClientID}");
-        }
-
-        protected override void TickClient()
-        {
-            Debug.LogWarning($"Tick Client: {OwnerClientId} / {NetworkHorror.ClientID}");
-        }
-
-        protected override void TickLocalPlayer()
-        {
-            if (_lookAtObject != null)
-                _lookAtObject.position = _cameraLookAtObject.position;
-
+            _lookAtPosition.Value = _cameraLookAtObject.position;
             _interactionChecker.Check();
         }
 
-        public void SetLookAtObject(Transform lookAtObject) =>
-            _lookAtObject = lookAtObject;
+        protected override void TickNotOwner() =>
+            _references.HeadLookAtObject.position = _lookAtPosition.Value;
 
-        protected override void DespawnServerAndClient()
+        protected override void DespawnAll()
         {
             _inventory.DropAllItems();
             _inventoryManager.Dispose();
             
             AllPlayers.Remove(OwnerClientId);
-            
+
+        }
+
+        protected override void DespawnOwner()
+        {
+            _interactionHandler.Dispose();
+
             InputReader.OnScrollEvent -= OnScroll;
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
@@ -270,11 +248,8 @@ namespace GameCore.Gameplay.Entities.Player
             _inventory.OnSelectedSlotChangedEvent -= OnLocalPlayerSelectedSlotChanged;
         }
 
-        protected override void DespawnClient() =>
+        protected override void DespawnNotOwner() =>
             _currentSelectedSlotIndex.OnValueChanged -= OnClientSelectedSlotChanged;
-
-        protected override void DespawnLocalPlayer() =>
-            _interactionHandler.Dispose();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

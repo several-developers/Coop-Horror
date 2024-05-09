@@ -32,14 +32,14 @@ namespace GameCore.Gameplay.Delivery
         private readonly CinemachineDollyCart _deliveryCart;
 
         private DroneState _droneState;
-        private bool _isFlying;
-        private bool _isLanding;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Tick()
         {
-            if (!_isFlying)
+            bool isStateValid = _droneState is DroneState.LandingInProgress or DroneState.TakeOffInProgress;
+            
+            if (!isStateValid)
                 return;
 
             float targetSpeed = _deliveryConfig.DroneCartFlySpeed;
@@ -80,22 +80,19 @@ namespace GameCore.Gameplay.Delivery
 
         public void Land()
         {
-            _isLanding = true;
             _deliveryCart.m_Path = _landingPath;
             _deliveryCart.m_Position = 0f;
+            _deliveryCart.m_Speed = 0f;
 
             ChangeState(DroneState.LandingInProgress);
-            StartFlying();
         }
 
         public void TakeOff()
         {
-            _isLanding = false;
             _deliveryCart.m_Path = _takeOffPath;
             _deliveryCart.m_Position = 0f;
 
             ChangeState(DroneState.TakeOffInProgress);
-            StartFlying();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -106,15 +103,8 @@ namespace GameCore.Gameplay.Delivery
             _deliveryPoint.SendDroneStateChanged(droneState);
         }
 
-        private void StartFlying()
-        {
-            _isFlying = true;
-            _deliveryCart.m_Speed = 0f;
-        }
-
         private void StopFlying()
         {
-            _isFlying = false;
             _deliveryCart.m_Speed = 0f;
 
             switch (_droneState)

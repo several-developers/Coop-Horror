@@ -28,14 +28,18 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
             _gameManagerDecorator.OnPlayersGoldChangedEvent += OnPlayersGoldChanged;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
             _gameManagerDecorator.OnPlayersGoldChangedEvent -= OnPlayersGoldChanged;
         }

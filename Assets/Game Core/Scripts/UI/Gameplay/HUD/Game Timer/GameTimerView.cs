@@ -33,8 +33,10 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
             _timeCycle.OnHourPassedEvent += OnHourPassed;
@@ -46,8 +48,10 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
             Show();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
             
             _timeCycle.OnHourPassedEvent -= OnHourPassed;

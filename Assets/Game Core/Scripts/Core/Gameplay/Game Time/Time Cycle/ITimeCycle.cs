@@ -14,6 +14,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         void ToggleSimulate(bool simulate);
         void IncreaseDay();
         MyDateTime GetDateTime();
+        float GetTimeOfDay();
         bool GetSimulateState();
     }
 }
