@@ -20320,7 +20320,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19e618604ab44a5db61d89dbfe209a6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sun: {fileID: 3599611373000801}
   _mobileHeadquartersEntity: {fileID: 6195987239777192163}
   _deliveryPoint: {fileID: 1821289971}
   _playerCamera: {fileID: 9036817174673113880}
@@ -41633,18 +41632,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 827936e1c85312844a6899af149e4971, type: 3}
---- !u!114 &3599611373000801 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1014992048837080089, guid: 827936e1c85312844a6899af149e4971,
-    type: 3}
-  m_PrefabInstance: {fileID: 3599611373000800}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 833dfc0ed7d64526abca7c727e0dd80f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1650463358226223246
 PrefabInstance:
   m_ObjectHideFlags: 0
