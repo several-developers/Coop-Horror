@@ -116,14 +116,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         protected override void InitOwner() =>
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
 
-        protected override void TickServer()
-        {
-            if (!IsLocalPlayer())
-                return;
-            
+        protected override void TickServerOnly() =>
             _pathMovement.Movement();
-        }
-        
+
         protected override void DespawnAll()
         {
             _mobileHeadquartersController.DespawnServerAndClient();

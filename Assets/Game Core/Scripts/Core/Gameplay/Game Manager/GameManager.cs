@@ -6,7 +6,6 @@ using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Network.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
@@ -16,7 +15,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.GameManagement
 {
-    public class GameManager : NetworkBehaviour, INetcodeInitBehaviour, INetcodeDespawnBehaviour
+    public class GameManager : NetcodeBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -77,56 +76,38 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnGetGameStateInnerEvent -= GetGameState;
         }
 
-        // PUBLIC METHODS: ------------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        public void InitServerAndClient()
+        protected override void InitAll()
         {
             _selectedLocation.OnValueChanged += OnSelectedLocationChanged;
             _gameState.OnValueChanged += OnGameStateChanged;
             _playersGold.OnValueChanged += OnPlayersGoldChanged;
         }
 
-        public void InitServer()
+        protected override void InitServerOnly()
         {
-            if (!IsOwner)
-                return;
-
             _networkHorror.OnPlayerConnectedEvent += OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent += OnPlayerDisconnected;
-
+            
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
             _levelObserver.OnLocationLeftEvent += OnLocationLeft;
         }
 
-        public void InitClient()
-        {
-            if (IsOwner)
-                return;
-        }
-
-        public void DespawnServerAndClient()
+        protected override void DespawnAll()
         {
             _selectedLocation.OnValueChanged -= OnSelectedLocationChanged;
             _gameState.OnValueChanged -= OnGameStateChanged;
             _playersGold.OnValueChanged -= OnPlayersGoldChanged;
         }
 
-        public void DespawnServer()
+        protected override void DespawnServerOnly()
         {
-            if (!IsOwner)
-                return;
-
             _networkHorror.OnPlayerConnectedEvent -= OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent -= OnPlayerDisconnected;
-
+            
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
             _levelObserver.OnLocationLeftEvent -= OnLocationLeft;
-        }
-
-        public void DespawnClient()
-        {
-            if (IsOwner)
-                return;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -137,7 +118,7 @@ namespace GameCore.Gameplay.GameManagement
             {
                 case GameState.ArrivedAtTheRoad:
                 case GameState.QuestsRewarding:
-                    if (!IsOwner)
+                    if (!IsServerOnly)
                         return;
 
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
@@ -145,7 +126,7 @@ namespace GameCore.Gameplay.GameManagement
                     break;
 
                 case GameState.ArrivedAtTheLocation:
-                    if (!IsOwner)
+                    if (!IsServerOnly)
                         return;
                     
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheLocation,
@@ -153,7 +134,7 @@ namespace GameCore.Gameplay.GameManagement
                     break;
 
                 case GameState.KillPlayersOnTheRoad:
-                    if (!IsOwner)
+                    if (!IsServerOnly)
                         return;
 
                     StartCoroutine(routine: RestartGameTimerCO());
@@ -172,7 +153,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             // Debug.LogWarning("----> GAME STATE changed!!! " + gameState);
 
-            if (IsOwner)
+            if (IsServerOnly)
                 _gameState.Value = gameState;
             else
                 ChangeGameStateServerRpc(gameState);
@@ -180,7 +161,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private void SelectLocation(SceneName sceneName)
         {
-            if (IsOwner)
+            if (IsServerOnly)
                 _selectedLocation.Value = sceneName;
             else
                 SelectLocationServerRpc(sceneName);
@@ -188,7 +169,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private void AddPlayersGold(int amount)
         {
-            if (IsOwner)
+            if (IsServerOnly)
                 _playersGold.Value += amount;
             else
                 AddPlayersGoldServerRpc(amount);
@@ -196,7 +177,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private void SpendPlayersGold(int amount)
         {
-            if (IsOwner)
+            if (IsServerOnly)
                 _playersGold.Value -= amount;
             else
                 SpendPlayersGoldServerRpc(amount);
@@ -204,7 +185,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private void ResetGold()
         {
-            if (IsOwner)
+            if (IsServerOnly)
                 _playersGold.Value = 0;
             else
                 ResetGoldServerRpc();
@@ -313,24 +294,6 @@ namespace GameCore.Gameplay.GameManagement
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
-
         private void OnPlayerConnected(ulong clientID) =>
             _playersStates.TryAdd(clientID, _gameState.Value);
 
@@ -345,7 +308,7 @@ namespace GameCore.Gameplay.GameManagement
             string log = Log.HandleLog("Game State", $"<gb>{previousValue}</gb> ---> <gb>{newValue}</gb>");
             Debug.Log(log);
 
-            if (IsOwner)
+            if (IsServerOnly)
                 _playersStates[OwnerClientId] = newValue;
             else
                 SyncPlayerGameStateServerRpc(newValue);

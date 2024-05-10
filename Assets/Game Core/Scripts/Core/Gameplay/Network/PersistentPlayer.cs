@@ -51,8 +51,8 @@ namespace GameCore.Gameplay.Network
 
         public override void OnNetworkDespawn()
         {
-            RemovePersistentPlayer();
             base.OnNetworkDespawn();
+            RemovePersistentPlayer();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

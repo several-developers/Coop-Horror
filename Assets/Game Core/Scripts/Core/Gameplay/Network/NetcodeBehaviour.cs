@@ -6,6 +6,8 @@ namespace GameCore.Gameplay.Network
     {
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public bool IsServerOnly => IsServer && IsOwner;
+        
         protected bool IsInitialized => _isInitialized;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -26,7 +28,7 @@ namespace GameCore.Gameplay.Network
 
             TickAll();
             
-            if (IsServer && IsOwner)
+            if (IsServerOnly)
                 TickServerOnly();
 
             if (IsServer)
@@ -45,7 +47,7 @@ namespace GameCore.Gameplay.Network
 
             LateTickAll();
             
-            if (IsServer && IsOwner)
+            if (IsServerOnly)
                 LateTickServerOnly();
 
             if (IsServer)
@@ -220,7 +222,7 @@ namespace GameCore.Gameplay.Network
             CheckIfLocalPlayer();
             InitAll();
 
-            if (IsServer && IsOwner)
+            if (IsServerOnly)
                 InitServerOnly();
             
             if (IsServer)
@@ -240,7 +242,7 @@ namespace GameCore.Gameplay.Network
 
             DespawnAll();
             
-            if (IsServer && IsOwner)
+            if (IsServerOnly)
                 DespawnServerOnly();
             
             if (IsServer)

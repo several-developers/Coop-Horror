@@ -3,7 +3,6 @@ using GameCore.Configs.Gameplay.QuestsItems;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Network.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.UI;
 using Unity.Netcode;
@@ -11,7 +10,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Quests
 {
-    public class QuestsManager : NetworkBehaviour, INetcodeInitBehaviour, INetcodeDespawnBehaviour
+    public class QuestsManager : NetcodeBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -78,43 +77,11 @@ namespace GameCore.Gameplay.Quests
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
         }
 
-        // PUBLIC METHODS: ------------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        public void InitServerAndClient()
-        {
-        }
+        protected override void InitServerOnly() => CreateQuests();
 
-        public void InitServer()
-        {
-            if (!IsOwner)
-                return;
-
-            CreateQuests();
-        }
-
-        public void InitClient()
-        {
-            if (IsOwner)
-                return;
-
-            RequestQuestsDataServerRpc();
-        }
-
-        public void DespawnServerAndClient()
-        {
-        }
-
-        public void DespawnServer()
-        {
-            if (!IsOwner)
-                return;
-        }
-
-        public void DespawnClient()
-        {
-            if (IsOwner)
-                return;
-        }
+        protected override void InitNotOwner() => SynchronizeAwaitingQuestsDataServerRpc();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -122,14 +89,6 @@ namespace GameCore.Gameplay.Quests
         {
             _questsFactory.Create();
             _questsManagerDecorator.AwaitingQuestsDataReceived();
-        }
-
-        private void SynchronizeAwaitingQuestsData(ulong requestedClientId)
-        {
-            QuestRuntimeDataContainer[] questsRuntimeDataContainers =
-                _questsStorage.GetAwaitingQuestsRuntimeDataContainers();
-
-            SynchronizeAwaitingQuestsDataServerRpc(questsRuntimeDataContainers, requestedClientId);
         }
 
         private void SubmitQuestItem(int itemID) => SubmitQuestItemServerRpc(itemID);
@@ -141,7 +100,7 @@ namespace GameCore.Gameplay.Quests
             _uiObserver.ShowRewardMenu(reward);
             _questsStorage.ClearCompletedQuests();
 
-            if (IsOwner)
+            if (IsServerOnly)
                 _gameManagerDecorator.AddPlayersGold(reward);
         }
 
@@ -150,9 +109,9 @@ namespace GameCore.Gameplay.Quests
             switch (gameState)
             {
                 case GameState.ArrivedAtTheRoad:
-                    if (!IsOwner)
+                    if (!IsServerOnly)
                         return;
-                    
+
                     DecreaseQuestsDaysServerRpc();
                     break;
 
@@ -195,18 +154,15 @@ namespace GameCore.Gameplay.Quests
 
         // RPC: -----------------------------------------------------------------------------------
 
-        [ServerRpc]
-        private void SynchronizeAwaitingQuestsDataServerRpc(QuestRuntimeDataContainer[] questsRuntimeDataContainers,
-            ulong requestedClientId)
-        {
-            SynchronizeAwaitingQuestsDataClientRpc(questsRuntimeDataContainers, requestedClientId);
-        }
-
         [ServerRpc(RequireOwnership = false)]
-        private void RequestQuestsDataServerRpc(ServerRpcParams serverRpcParams = default)
+        private void SynchronizeAwaitingQuestsDataServerRpc(ServerRpcParams serverRpcParams = default)
         {
-            ulong clientId = serverRpcParams.Receive.SenderClientId;
-            RequestQuestsDataClientRpc(clientId);
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+
+            QuestRuntimeDataContainer[] questsRuntimeDataContainers =
+                _questsStorage.GetAwaitingQuestsRuntimeDataContainers();
+
+            SynchronizeAwaitingQuestsDataClientRpc(questsRuntimeDataContainers, senderClientID);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -225,7 +181,7 @@ namespace GameCore.Gameplay.Quests
         private void SynchronizeAwaitingQuestsDataClientRpc(QuestRuntimeDataContainer[] questsRuntimeDataContainers,
             ulong requestedClientId)
         {
-            if (IsOwner)
+            if (IsServerOnly)
                 return;
 
             if (NetworkHorror.ClientID != requestedClientId)
@@ -233,15 +189,6 @@ namespace GameCore.Gameplay.Quests
 
             _questsStorage.UpdateAwaitingQuestsData(questsRuntimeDataContainers);
             _questsManagerDecorator.AwaitingQuestsDataReceived();
-        }
-
-        [ClientRpc]
-        private void RequestQuestsDataClientRpc(ulong requestedClientId)
-        {
-            if (!IsOwner)
-                return;
-
-            SynchronizeAwaitingQuestsData(requestedClientId);
         }
 
         [ClientRpc]
@@ -274,24 +221,6 @@ namespace GameCore.Gameplay.Quests
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
 
         private void OnSelectQuest(int questID)
         {

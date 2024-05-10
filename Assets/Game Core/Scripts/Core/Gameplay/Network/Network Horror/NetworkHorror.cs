@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using GameCore.Gameplay.Network.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace GameCore.Gameplay.Network
 {
-    public class NetworkHorror : INetworkHorror, IDisposable, INetcodeInitBehaviour, INetcodeDespawnBehaviour
+    public class NetworkHorror : INetworkHorror, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -44,11 +43,14 @@ namespace GameCore.Gameplay.Network
             _netcodeHooks.OnNetworkSpawnHookEvent -= OnNetworkSpawnHook;
             _netcodeHooks.OnNetworkDespawnHookEvent -= OnNetworkDespawnHook;
         }
-        
-        public void InitServerAndClient()
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void InitAll()
         {
-            ServerID = OwnerClientId;
             _networkManager = NetworkManager.Singleton;
+            ServerID = OwnerClientId;
+            ClientID = _networkManager.LocalClientId;
             
             _networkManager.OnClientConnectedCallback += OnClientConnected;
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
@@ -56,60 +58,17 @@ namespace GameCore.Gameplay.Network
             //_networkManager.SceneManager.OnSynchronizeComplete += OnSynchronizeComplete;
         }
 
-        public void InitServer()
-        {
-            if (!IsOwner)
-                return;
-            
-            ClientID = _netcodeHooks.OwnerClientId;
-        }
-
-        public void InitClient()
-        {
-            if (IsOwner)
-                return;
-            
-            ClientID = _networkManager.LocalClientId;
-        }
-
-        public void DespawnServerAndClient()
+        private void DespawnAll()
         {
             _networkManager.OnClientConnectedCallback -= OnClientConnected;
             _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
         }
 
-        public void DespawnServer()
-        {
-            if (!IsOwner)
-                return;
-            
-        }
-
-        public void DespawnClient()
-        {
-            if (IsOwner)
-                return;
-        }
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private bool IsNetworkOwner() => IsOwner;
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnNetworkSpawnHook()
-        {
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
+        private void OnNetworkSpawnHook() => InitAll();
 
-        private void OnNetworkDespawnHook()
-        {
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
+        private void OnNetworkDespawnHook() => DespawnAll();
 
         private void OnClientConnected(ulong clientId)
         {

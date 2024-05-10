@@ -161,7 +161,7 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
             
-            _inventory.OnSelectedSlotChangedEvent += OnLocalPlayerSelectedSlotChanged;
+            _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
             
             // LOCAL METHODS: -----------------------------
 
@@ -217,7 +217,7 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         protected override void InitNotOwner() =>
-            _currentSelectedSlotIndex.OnValueChanged += OnClientSelectedSlotChanged;
+            _currentSelectedSlotIndex.OnValueChanged += OnNotOwnerSelectedSlotChanged;
 
         protected override void TickOwner()
         {
@@ -245,11 +245,11 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
             
-            _inventory.OnSelectedSlotChangedEvent -= OnLocalPlayerSelectedSlotChanged;
+            _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
         }
 
         protected override void DespawnNotOwner() =>
-            _currentSelectedSlotIndex.OnValueChanged -= OnClientSelectedSlotChanged;
+            _currentSelectedSlotIndex.OnValueChanged -= OnNotOwnerSelectedSlotChanged;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -341,7 +341,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnDropItem() => DropItem();
         
-        private void OnLocalPlayerSelectedSlotChanged(ChangedSlotStaticData data)
+        private void OnOwnerSelectedSlotChanged(ChangedSlotStaticData data)
         {
             int slotIndex = data.SlotIndex;
             
@@ -351,7 +351,7 @@ namespace GameCore.Gameplay.Entities.Player
                 ChangeSelectedSlotServerRpc(slotIndex);
         }
 
-        private void OnClientSelectedSlotChanged(int previousValue, int newValue)
+        private void OnNotOwnerSelectedSlotChanged(int previousValue, int newValue)
         {
             _inventory.SetSelectedSlotIndex(newValue);
             _inventoryManager.ToggleItemsState();
