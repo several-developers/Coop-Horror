@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e4db6514a2e4e194bbd1c6bdae54f388, type: 3}
-  m_Name: Start Tiles
+  m_Name: Start Tile Set
   m_EditorClassIdentifier: 
   TileWeights:
     Weights:
-    - Value: {fileID: 7531489911938548663, guid: c837e24cc242b404d8d89dfecdc0f4e2,
+    - Value: {fileID: 7199327630827045595, guid: 76d5809f6a2daed45a3917070ce9e181,
         type: 3}
       MainPathWeight: 1
       BranchPathWeight: 1
@@ -42,5 +42,5 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      TileSet: {fileID: 11400000}
+      TileSet: {fileID: 0}
   LockPrefabs: []

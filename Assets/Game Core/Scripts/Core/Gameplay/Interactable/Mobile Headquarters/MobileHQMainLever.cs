@@ -1,6 +1,8 @@
-﻿using GameCore.Enums.Gameplay;
+﻿using GameCore.Configs.Gameplay.Quests;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Quests;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Zenject;
 
 namespace GameCore.Gameplay.Interactable.MobileHeadquarters
@@ -11,16 +13,18 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
 
         [Inject]
         private void Construct(IGameManagerDecorator gameManagerDecorator,
-            IQuestsManagerDecorator questsManagerDecorator)
+            IQuestsManagerDecorator questsManagerDecorator, IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _gameManagerDecorator = gameManagerDecorator;
             _questsManagerDecorator = questsManagerDecorator;
+            _questsConfig = gameplayConfigsProvider.GetQuestsConfig();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private IGameManagerDecorator _gameManagerDecorator;
         private IQuestsManagerDecorator _questsManagerDecorator;
+        private QuestsConfigMeta _questsConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -42,8 +46,9 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
         public override bool CanInteract()
         {
             int activeQuestsAmount = _questsManagerDecorator.GetActiveQuestsAmount();
+            bool ignoreQuestsCheck = _questsConfig.IgnoreMobileHQQuestsCheck;
 
-            if (activeQuestsAmount <= 0)
+            if (activeQuestsAmount <= 0 && !ignoreQuestsCheck)
                 return false;
 
             GameState gameState = _gameManagerDecorator.GetGameState();

@@ -103,7 +103,7 @@ namespace GameCore.Gameplay.Levels
 
         private void RegisterStairsFireExit()
         {
-            if (!_isInStairsLocation)
+            if (!_isInStairsLocation || _levelProviderObserver == null)
                 return;
 
             _levelProviderObserver.RegisterStairsFireExit(_floor, fireExit: this);
@@ -111,7 +111,7 @@ namespace GameCore.Gameplay.Levels
 
         private void RegisterLocationSurfaceFireExit()
         {
-            if (_isInStairsLocation || _floor != Floor.Surface)
+            if (_isInStairsLocation || _floor != Floor.Surface || _levelProviderObserver == null)
                 return;
             
             _levelProviderObserver.RegisterOtherFireExit(_floor, fireExit: this);

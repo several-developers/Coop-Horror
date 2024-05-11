@@ -14,7 +14,7 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
+  m_Fog: 1
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
   m_FogDensity: 0.01
@@ -23,11 +23,11 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1
+  m_AmbientIntensity: 0.15
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: 572bc52aefb37b843ad458ce063484a8, type: 2}
-  m_HaloStrength: 0.5
+  m_HaloStrength: 0.231
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
   m_HaloTexture: {fileID: 0}
@@ -35,10 +35,10 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 256
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 1
+  m_ReflectionIntensity: 0.05
   m_CustomReflection: {fileID: 582638537}
   m_Sun: {fileID: 410087040}
-  m_IndirectSpecularColor: {r: 0.09903865, g: 0.14377682, b: 0.22680153, a: 1}
+  m_IndirectSpecularColor: {r: 0.004951933, g: 0.0071888412, b: 0.011340077, a: 0.05}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2664,6 +2664,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2195564044846364809, guid: 259f11aa5ba99bd4bbcca4bb448956fa,
+        type: 3}
+      propertyPath: Generator.DungeonFlow
+      value: 
+      objectReference: {fileID: 11400000, guid: d93c569910cf91e48b5bec37b3a1f7a0,
+        type: 2}
     - target: {fileID: 2195564044846364811, guid: 259f11aa5ba99bd4bbcca4bb448956fa,
         type: 3}
       propertyPath: m_Name
@@ -3768,6 +3774,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2195564044846364809, guid: af7ceeab27128dc42884520f7d4a34fb,
+        type: 3}
+      propertyPath: Generator.DungeonFlow
+      value: 
+      objectReference: {fileID: 11400000, guid: d93c569910cf91e48b5bec37b3a1f7a0,
+        type: 2}
     - target: {fileID: 2195564044846364811, guid: af7ceeab27128dc42884520f7d4a34fb,
         type: 3}
       propertyPath: m_Name
@@ -11234,8 +11246,14 @@ PrefabInstance:
     - target: {fileID: 2195564044846364809, guid: faba3c9203568bb4c9a9a4830be82718,
         type: 3}
       propertyPath: Generator.DebugRender
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2195564044846364809, guid: faba3c9203568bb4c9a9a4830be82718,
+        type: 3}
+      propertyPath: Generator.DungeonFlow
+      value: 
+      objectReference: {fileID: 11400000, guid: d93c569910cf91e48b5bec37b3a1f7a0,
+        type: 2}
     - target: {fileID: 2195564044846364811, guid: faba3c9203568bb4c9a9a4830be82718,
         type: 3}
       propertyPath: m_Name
