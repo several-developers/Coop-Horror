@@ -44,6 +44,11 @@ namespace GameCore.Gameplay.Dungeons
         private void RegisterDungeonRoot() =>
             _levelProviderObserver.RegisterDungeonRoot(_floor, dungeonRoot: this);
 
+        private void CheckDungeon(Dungeon dungeon)
+        {
+            
+        }
+
         private async void SendDungeonGenerationCompleted()
         {
             bool isCanceled = await UniTask
@@ -58,6 +63,10 @@ namespace GameCore.Gameplay.Dungeons
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        public void OnDungeonComplete(Dungeon dungeon) => SendDungeonGenerationCompleted();
+        public void OnDungeonComplete(Dungeon dungeon)
+        {
+            CheckDungeon(dungeon);
+            SendDungeonGenerationCompleted();
+        }
     }
 }

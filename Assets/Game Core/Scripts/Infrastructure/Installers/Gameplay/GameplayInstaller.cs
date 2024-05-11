@@ -86,7 +86,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private void BindDungeonsManager()
         {
             Container
-                .BindInterfacesTo<DungeonsManager>()
+                .BindInterfacesAndSelfTo<DungeonsManager>()
                 .AsSingle()
                 .NonLazy();
         }

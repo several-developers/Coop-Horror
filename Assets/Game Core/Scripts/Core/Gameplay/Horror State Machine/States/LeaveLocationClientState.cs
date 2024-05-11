@@ -7,11 +7,13 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LeaveLocationClientState(IHorrorStateMachine horrorStateMachine, ILevelProvider levelProvider)
+        public LeaveLocationClientState(IHorrorStateMachine horrorStateMachine, ILevelProvider levelProvider,
+            DungeonsManager dungeonsManager)
         {
             _horrorStateMachine = horrorStateMachine;
             _levelProvider = levelProvider;
-            
+            _dungeonsManager = dungeonsManager;
+
             horrorStateMachine.AddState(this);
         }
 
@@ -19,6 +21,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILevelProvider _levelProvider;
+        private readonly DungeonsManager _dungeonsManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -31,11 +34,8 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static void ClearDungeons()
-        {
-            DungeonsManager dungeonsManager = DungeonsManager.Get();
-            dungeonsManager.ClearDungeons();
-        }
+        private void ClearDungeons() =>
+            _dungeonsManager.ClearDungeons();
 
         private void ClearLevelProvider() =>
             _levelProvider.Clear();

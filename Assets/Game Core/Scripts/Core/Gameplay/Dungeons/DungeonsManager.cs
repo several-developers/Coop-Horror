@@ -29,16 +29,12 @@ namespace GameCore.Gameplay.Dungeons
         private readonly IRpcObserver _rpcObserver;
         private readonly List<DungeonWrapper> _dungeonsList;
 
-        private static DungeonsManager _instance;
-
         private int _generatedDungeonsAmount;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Initialize()
         {
-            _instance = this;
-
             GetDungeons();
             SetDungeonsRoots();
 
@@ -61,8 +57,6 @@ namespace GameCore.Gameplay.Dungeons
             foreach (DungeonWrapper dungeonWrapper in _dungeonsList)
                 dungeonWrapper.Clear();
         }
-
-        public static DungeonsManager Get() => _instance;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
