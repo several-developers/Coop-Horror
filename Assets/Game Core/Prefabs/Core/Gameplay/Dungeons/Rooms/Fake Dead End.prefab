@@ -56,7 +56,7 @@ MonoBehaviour:
   socketGroup_obsolete: -1
   doorPrefabs_obsolete: []
   blockerPrefabs_obsolete: []
-  socket: {fileID: -7054458011644034208, guid: 67a4b824109bd554c9a67260ed8fbb9b, type: 2}
+  socket: {fileID: 11400000, guid: 2c0e0f70020900d46b955d5d35a9c6d5, type: 2}
   doorPrefabInstance: {fileID: 0}
   doorComponent: {fileID: 0}
   tile: {fileID: 0}
@@ -110,7 +110,7 @@ PrefabInstance:
     - target: {fileID: 1352476092370570137, guid: f647a68cf4c46ce49ac52e499e01a85d,
         type: 3}
       propertyPath: m_Name
-      value: Fake Enter Room
+      value: Fake Dead End
       objectReference: {fileID: 0}
     - target: {fileID: 1626678699038666815, guid: f647a68cf4c46ce49ac52e499e01a85d,
         type: 3}
@@ -166,6 +166,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2544661535531294718, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f647a68cf4c46ce49ac52e499e01a85d, type: 3}

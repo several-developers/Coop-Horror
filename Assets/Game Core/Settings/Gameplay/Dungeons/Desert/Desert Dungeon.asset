@@ -23,9 +23,21 @@ MonoBehaviour:
     Max: 5
   GlobalProps: []
   KeyManager: {fileID: 0}
-  DoorwayConnectionChance: 0
+  DoorwayConnectionChance: 0.1
   RestrictConnectionToSameSection: 0
-  TileInjectionRules: []
+  TileInjectionRules:
+  - TileSet: {fileID: 11400000, guid: 11bf22139f144c247ae2dc2f97e6c661, type: 2}
+    NormalizedPathDepth:
+      Min: 0
+      Max: 1
+    NormalizedBranchDepth:
+      Min: 0
+      Max: 1
+    CanAppearOnMainPath: 1
+    CanAppearOnBranchPath: 1
+    IsRequired: 1
+    IsLocked: 0
+    LockID: 0
   TileTagConnectionMode: 0
   TileConnectionTags: []
   BranchTagPruneMode: 1
