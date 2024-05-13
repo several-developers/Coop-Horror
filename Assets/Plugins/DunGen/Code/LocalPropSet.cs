@@ -46,8 +46,12 @@ namespace DunGen
 			}
 
 			foreach (var prop in Props.Weights)
+			{
 				if (!toKeep.Contains(prop.Value))
 					UnityUtil.Destroy(prop.Value);
+				else
+					prop.Value.SetActive(true); // Added by ubicapaukov.
+			}
 		}
 
 		#region GetCount Methods

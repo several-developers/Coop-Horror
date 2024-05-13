@@ -62,6 +62,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3615795059259026717, guid: a6767bbb2f93b3a4d8c272d763eaa99c,
+        type: 3}
+      propertyPath: Generator.DungeonFlow
+      value: 
+      objectReference: {fileID: 11400000, guid: d93c569910cf91e48b5bec37b3a1f7a0,
+        type: 2}
     - target: {fileID: 3615795059259026719, guid: a6767bbb2f93b3a4d8c272d763eaa99c,
         type: 3}
       propertyPath: m_Name

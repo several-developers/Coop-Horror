@@ -51,7 +51,8 @@ namespace GameCore.Gameplay.Levels
             Transform teleportPoint = fireExit.GetTeleportPoint();
             Vector3 position = teleportPoint.position;
             Quaternion rotation = teleportPoint.rotation;
-            
+
+            playerEntity.References.Rigidbody.velocity = Vector3.zero;
             playerEntity.TeleportPlayer(position, rotation);
         }
 
