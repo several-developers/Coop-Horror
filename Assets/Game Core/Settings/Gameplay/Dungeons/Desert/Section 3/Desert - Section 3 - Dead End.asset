@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e4db6514a2e4e194bbd1c6bdae54f388, type: 3}
-  m_Name: Desert - Section 1 - Dead End
+  m_Name: Desert - Section 3 - Dead End
   m_EditorClassIdentifier: 
   TileWeights:
     Weights:
-    - Value: {fileID: 6131022174296919621, guid: c3a880a15c1290f44abaab4bddc482a5,
+    - Value: {fileID: 6131022174296919621, guid: 7b4be3121e7ae5c4facdd0f72447a223,
         type: 3}
       MainPathWeight: 1
       BranchPathWeight: 1

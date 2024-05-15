@@ -54,7 +54,7 @@ MonoBehaviour:
     LockPlacement: 0
   - Graph: {fileID: 11400000}
     TileSets:
-    - {fileID: 11400000, guid: 21cb134c9dc9de245941fc0b43d23748, type: 2}
+    - {fileID: 11400000, guid: b742c638d76a1a34fad71435816c9170, type: 2}
     NodeType: 2
     Position: 1
     Label: Goal
