@@ -26,7 +26,7 @@ MonoBehaviour:
   DoorwayConnectionChance: 0.1
   RestrictConnectionToSameSection: 0
   TileInjectionRules:
-  - TileSet: {fileID: 11400000, guid: 11bf22139f144c247ae2dc2f97e6c661, type: 2}
+  - TileSet: {fileID: 11400000, guid: e0e1bc32ff87125499c6694eb181ba61, type: 2}
     NormalizedPathDepth:
       Min: 0
       Max: 1
