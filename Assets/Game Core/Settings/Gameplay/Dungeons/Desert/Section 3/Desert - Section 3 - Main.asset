@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TileWeights:
     Weights:
-    - Value: {fileID: 4325329224878659205, guid: 9846f498992df0545ae0edf758b928bf,
+    - Value: {fileID: 4325329224878659205, guid: bb34d59a53779ee4da48e0ea7c3bedf9,
         type: 3}
       MainPathWeight: 1
       BranchPathWeight: 1
@@ -43,7 +43,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
       TileSet: {fileID: 11400000}
-    - Value: {fileID: 4225431749270979022, guid: 21ed6e6dca06a5148b67beef7a113cca,
+    - Value: {fileID: 4492721913966629218, guid: 12121c3be34e2a541b3d5de2a6d47e5f,
         type: 3}
       MainPathWeight: 1
       BranchPathWeight: 1
@@ -100,5 +100,5 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      TileSet: {fileID: 0}
+      TileSet: {fileID: 11400000}
   LockPrefabs: []
