@@ -34,10 +34,10 @@ namespace GameCore.Gameplay.Items.Rigging
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private Rig _leftHandRig;
+        private TwoBoneIKConstraint _leftHandRig;
 
         [SerializeField, Required]
-        private Rig _rightHandRig;
+        private TwoBoneIKConstraint _rightHandRig;
 
         [SerializeField, Required]
         private Transform _leftHandTarget;
@@ -219,7 +219,7 @@ namespace GameCore.Gameplay.Items.Rigging
 
         private void ResetRig(bool isLocalPlayer) => UpdateRig(RigPresetType.Default, isLocalPlayer);
 
-        private void ChangeHandRig(Transform handTarget, Transform handHint, Rig handRig,
+        private void ChangeHandRig(Transform handTarget, Transform handHint, TwoBoneIKConstraint handRig,
             RigPresetMeta.RigPose targetPose, RigPresetMeta.RigPose hintPose, float rigChangeDuration,
             float targetWeight)
         {

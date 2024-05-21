@@ -17,11 +17,11 @@ MonoBehaviour:
   _rigWeightChangeDuration: 0.3
   _animatorLayerWeightChangeTime: 0.3
   _fpsLeftHandTargetPose:
-    _position: {x: -0.837, y: 3.111, z: 0.833}
+    _position: {x: -0.471, y: 1.75, z: 0.469}
     _eulerRotation: {x: 15.178, y: 94.453, z: 88.687}
     _duration: 0.3
   _fpsLeftHandHintPose:
-    _position: {x: -1.113, y: 2.912, z: 0.118}
+    _position: {x: -0.626, y: 1.638, z: 0.066}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _duration: 0.3
   _fpsRightHandTargetPose:
