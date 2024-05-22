@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using ECM2;
 using GameCore.Gameplay.Entities.Inventory;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Factories.ItemsPreview;
@@ -26,11 +26,10 @@ namespace GameCore.Gameplay.Entities.Player
 
         [Inject]
         private void Construct(IItemsPreviewFactory itemsPreviewFactory,
-            IMobileHeadquartersEntity mobileHeadquartersEntity, IPlayerInteractionObserver playerInteractionObserver,
-            PlayerCamera playerCamera, IConfigsProvider configsProvider)
+            IPlayerInteractionObserver playerInteractionObserver, PlayerCamera playerCamera,
+            IConfigsProvider configsProvider)
         {
             _itemsPreviewFactory = itemsPreviewFactory;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _playerInteractionObserver = playerInteractionObserver;
             _playerCamera = playerCamera;
             InputReader = configsProvider.GetInputReader();
@@ -54,10 +53,7 @@ namespace GameCore.Gameplay.Entities.Player
         [Title(Constants.References)]
         [SerializeField]
         private PlayerReferences _references;
-
-        [SerializeField, Required]
-        private ClientNetworkTransform _networkTransform;
-
+        
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public PlayerReferences References => _references;
@@ -67,7 +63,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         public static event Action<PlayerEntity> OnPlayerSpawnedEvent = delegate { };
         public static event Action<PlayerEntity> OnPlayerDespawnedEvent = delegate { };
-        
+
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
@@ -78,7 +74,6 @@ namespace GameCore.Gameplay.Entities.Player
         private static PlayerEntity _localPlayer;
 
         private IItemsPreviewFactory _itemsPreviewFactory;
-        private IMobileHeadquartersEntity _mobileHeadquartersEntity;
         private IPlayerInteractionObserver _playerInteractionObserver;
 
         private PlayerCamera _playerCamera;
@@ -88,6 +83,7 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionHandler _interactionHandler;
 
         private Transform _cameraLookAtObject;
+        private bool _canChangeParent = true;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -96,28 +92,51 @@ namespace GameCore.Gameplay.Entities.Player
             // TO DO
         }
 
-        public void TeleportPlayer(Vector3 position, Quaternion rotation)
+        public void TeleportPlayer(Vector3 position, Quaternion rotation) =>
+            _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
+
+        public void SetParent(NetworkObject parentNetworkObject, bool inLocalSpace = false)
         {
-            _playerCamera.EnableSnap();
-            _networkTransform.Teleport(position, rotation, transform.localScale);
+            if (!_canChangeParent)
+                return;
+            
+            if (IsOwnedByServer)
+                TrySetParent(parentNetworkObject);
+            else
+                TrySetParentServerRpc(parentNetworkObject);
+
+            StartCoroutine(Test());
+
+            //_references.NetworkTransform.InLocalSpace = inLocalSpace;
         }
 
-        public void ToggleInsideMobileHQ(bool isInside)
+        public void RemoveParent(bool inLocalSpace = false)
         {
-            if (isInside)
-                SetMobileHQAsParent();
-            else
-                RemoveParent();
+            if (!_canChangeParent)
+                return;
             
-            if (IsOwner)
-                _networkTransform.InLocalSpace = isInside;
+            if (IsOwnedByServer)
+                TryRemoveParent();
             else
-                TogglePlayerInsideMobileHQServerRpc(isInside);
+                TryRemoveParentServerRpc();
+            
+            StartCoroutine(Test());
+
+            //_references.NetworkTransform.InLocalSpace = inLocalSpace;
+        }
+
+        private IEnumerator Test()
+        {
+            _canChangeParent = false;
+
+            yield return new WaitForSeconds(0.1f);
+
+            _canChangeParent = true;
         }
 
         public void DropItem(bool destroy = false) =>
             _inventory.DropItem(destroy);
-        
+
         public void KillSelf()
         {
             _inventory.DropAllItems();
@@ -128,7 +147,7 @@ namespace GameCore.Gameplay.Entities.Player
             _playerCamera.gameObject.SetActive(true);
 
         public Transform GetTransform() => transform;
-        
+
         public PlayerInventory GetInventory() => _inventory;
 
         public bool IsDead() => _isDead;
@@ -139,7 +158,7 @@ namespace GameCore.Gameplay.Entities.Player
             AllPlayers.TryGetValue(clientID, out playerEntity);
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
-        
+
         protected override void InitAll()
         {
             AllPlayers.TryAdd(OwnerClientId, this);
@@ -155,29 +174,28 @@ namespace GameCore.Gameplay.Entities.Player
             DeactivatePlayerMesh();
             InitInteractionSystem();
             InitPlayerMovement();
-            FixInvisiblePlayerBug(); // TEMP
 
             InputReader.OnScrollEvent += OnScroll;
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
-            
+
             _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
-            
+
             // LOCAL METHODS: -----------------------------
 
             void Other()
             {
                 _localPlayer = this;
-                
+
                 CameraReferences cameraReferences = _playerCamera.CameraReferences;
                 _cameraLookAtObject = cameraReferences.LookAtObject;
             }
-            
+
             void DeactivatePlayerMesh()
             {
                 foreach (GameObject activeObject in _references.LocalPlayerActiveObjects)
                     activeObject.SetActive(true);
-                
+
                 foreach (GameObject inactiveObject in _references.LocalPlayerInactiveObjects)
                     inactiveObject.SetActive(false);
 
@@ -206,6 +224,15 @@ namespace GameCore.Gameplay.Entities.Player
                 MyAnimationController animationController = _references.AnimationController;
                 animationController.Setup(character, _playerCamera);
             }
+        }
+
+        protected override void InitNotOwner()
+        {
+            FixInvisiblePlayerBug(); // TEMP
+
+            _currentSelectedSlotIndex.OnValueChanged += OnNotOwnerSelectedSlotChanged;
+            
+            // LOCAL METHODS: -----------------------------
             
             void FixInvisiblePlayerBug()
             {
@@ -215,9 +242,6 @@ namespace GameCore.Gameplay.Entities.Player
                 thisTransform.position = startPosition;
             }
         }
-
-        protected override void InitNotOwner() =>
-            _currentSelectedSlotIndex.OnValueChanged += OnNotOwnerSelectedSlotChanged;
 
         protected override void TickOwner()
         {
@@ -232,9 +256,8 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _inventory.DropAllItems();
             _inventoryManager.Dispose();
-            
-            AllPlayers.Remove(OwnerClientId);
 
+            AllPlayers.Remove(OwnerClientId);
         }
 
         protected override void DespawnOwner()
@@ -244,7 +267,7 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnScrollEvent -= OnScroll;
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
-            
+
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
         }
 
@@ -256,13 +279,10 @@ namespace GameCore.Gameplay.Entities.Player
         private void Interact() =>
             _interactionHandler.Interact();
 
-        private void SetMobileHQAsParent()
-        {
-            NetworkObject networkObject = _mobileHeadquartersEntity.GetNetworkObject();
+        private void TrySetParent(NetworkObject networkObject) =>
             NetworkObject.TrySetParent(networkObject);
-        }
 
-        private void RemoveParent() =>
+        private void TryRemoveParent() =>
             NetworkObject.TryRemoveParent();
 
         // RPC: -----------------------------------------------------------------------------------
@@ -286,8 +306,18 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void TogglePlayerInsideMobileHQServerRpc(bool isInside) =>
-            _networkTransform.InLocalSpace = isInside;
+        private void TrySetParentServerRpc(NetworkObjectReference networkObjectReference)
+        {
+            bool isNetworkObjectFound = networkObjectReference.TryGet(out NetworkObject networkObject);
+
+            if (!isNetworkObjectFound)
+                return;
+
+            TrySetParent(networkObject);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void TryRemoveParentServerRpc() => TryRemoveParent();
 
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)
@@ -307,7 +337,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             if (isMatches)
                 return;
-            
+
             _inventoryManager.DestroyItemPreview(slotIndex);
         }
 
@@ -316,7 +346,7 @@ namespace GameCore.Gameplay.Entities.Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
+
             OnPlayerSpawnedEvent.Invoke(this);
         }
 
@@ -326,7 +356,18 @@ namespace GameCore.Gameplay.Entities.Player
 
             OnPlayerDespawnedEvent.Invoke(this);
         }
-        
+
+        private void OnTransformParentChanged()
+        {
+            bool inLocalSpace = transform.parent != null;
+            _references.NetworkTransform.InLocalSpace = inLocalSpace;
+        }
+
+        public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
+        {
+            base.OnNetworkObjectParentChanged(parentNetworkObject);
+        }
+
         private void OnScroll(float scrollValue)
         {
             bool switchToNextSlot = scrollValue <= 0;
@@ -340,11 +381,11 @@ namespace GameCore.Gameplay.Entities.Player
         private void OnInteract() => Interact();
 
         private void OnDropItem() => DropItem();
-        
+
         private void OnOwnerSelectedSlotChanged(ChangedSlotStaticData data)
         {
             int slotIndex = data.SlotIndex;
-            
+
             if (IsOwner)
                 _currentSelectedSlotIndex.Value = slotIndex;
             else

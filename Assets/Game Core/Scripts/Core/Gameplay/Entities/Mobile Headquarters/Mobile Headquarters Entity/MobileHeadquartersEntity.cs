@@ -113,7 +113,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
         }
 
-        protected override void InitOwner() =>
+        protected override void InitServerOnly() =>
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
 
         protected override void TickServerOnly() =>
@@ -126,7 +126,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
         }
 
-        protected override void DespawnOwner() =>
+        protected override void DespawnServerOnly() =>
             _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -260,6 +260,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
                 case GameState.HeadingToTheRoad:
                     _levelObserver.LocationLeft();
+                    break;
+                
+                default:
+                    _pathMovement.ResetDistance();
+                    _pathMovement.ToggleArrived(isArrived: false);
                     break;
             }
         }

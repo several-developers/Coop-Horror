@@ -12,12 +12,12 @@ namespace GameCore.Gameplay.Network
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private bool _isLocalPlayer;
         private bool _isInitialized;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public new bool IsLocalPlayer() => _isLocalPlayer;
+        public new bool IsLocalPlayer() =>
+            NetworkHorror.ClientID == OwnerClientId;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ namespace GameCore.Gameplay.Network
             else
                 LateTickNotOwner();
 
-            if (_isLocalPlayer)
+            if (IsLocalPlayer())
                 LateTickLocalPlayer();
         }
 
@@ -208,18 +208,12 @@ namespace GameCore.Gameplay.Network
         {
         }
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void CheckIfLocalPlayer() =>
-            _isLocalPlayer = NetworkHorror.ClientID == OwnerClientId;
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
 
-            CheckIfLocalPlayer();
             InitAll();
 
             if (IsServerOnly)

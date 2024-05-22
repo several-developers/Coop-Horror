@@ -23,6 +23,7 @@ namespace GameCore.Gameplay.Network
         public static ulong ServerID { get; private set; }
         public static ulong ClientID { get; private set; }
 
+        public bool IsTrueServer => ServerID == ClientID;
         public bool IsOwner => _netcodeHooks.IsOwner;
         private ulong OwnerClientId => _netcodeHooks.OwnerClientId;
         

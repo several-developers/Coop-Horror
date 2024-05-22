@@ -92,6 +92,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void ToggleArrived(bool isArrived) =>
             _isArrived = isArrived;
 
+        public void ResetDistance() =>
+            _distance = 0;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void MoveRigidbody(float distance)
