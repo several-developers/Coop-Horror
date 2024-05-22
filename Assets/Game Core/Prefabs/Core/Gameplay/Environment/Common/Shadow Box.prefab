@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4339522662329109251}
   - component: {fileID: 123223914701027061}
   m_Layer: 0
-  m_Name: Black Box
+  m_Name: Shadow Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,7 +49,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3999445403626301931}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 3
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 1
