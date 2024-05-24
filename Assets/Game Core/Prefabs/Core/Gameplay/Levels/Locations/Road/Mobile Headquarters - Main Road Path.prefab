@@ -512,6 +512,11 @@ PrefabInstance:
       propertyPath: m_Waypoints.Array.data[32].position.z
       value: -680
       objectReference: {fileID: 0}
+    - target: {fileID: 2189888883755623744, guid: 5c8b32584c35981469c78440904a537c,
+        type: 3}
+      propertyPath: m_Waypoints.Array.data[33].position.z
+      value: -15
+      objectReference: {fileID: 0}
     - target: {fileID: 2189888883882043060, guid: 5c8b32584c35981469c78440904a537c,
         type: 3}
       propertyPath: m_RootOrder

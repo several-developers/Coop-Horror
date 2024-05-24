@@ -95,8 +95,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             {
                 // Под вопросом это
                 case GameState.ArrivedAtTheRoad:
-                    _mobileHeadquartersEntity.ToggleMovement(canMove: false);
-                    _mobileHeadquartersEntity.ArrivedAtRoadLocation();
+                    _mobileHeadquartersEntity.PathMovement.ToggleArrived(isArrived: false);
+                    _mobileHeadquartersEntity.ChangeToRoadPath();
                     break;
 
                 case GameState.ReadyToLeaveTheRoad:
@@ -140,8 +140,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     if (containsExpiredQuests)
                         _mobileHeadquartersEntity.SendOpenGameOverWarningMenu();
                     else
-                        _gameManagerDecorator.LoadSelectedLocation();
-
+                        _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.LeavingRoadLocation,
+                            previousState: GameState.ReadyToLeaveTheRoad);
                     break;
 
                 case GameState.ReadyToLeaveTheLocation:

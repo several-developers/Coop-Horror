@@ -1,4 +1,5 @@
-﻿using Cinemachine;
+﻿using System;
+using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using UnityEngine;
 
@@ -8,111 +9,126 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PathMovement(Transform transform, Animator animator, CinemachineDollyCart dollyCart, CinemachinePathBase cinemachinePath,
+        public PathMovement(MobileHeadquartersEntity mobileHeadquartersEntity,
             MobileHeadquartersConfigMeta mobileHeadquartersConfig)
         {
-            _transform = transform;
-            _animator = animator;
-            _dollyCart = dollyCart;
-            _dollyCart.m_Path = cinemachinePath;
+            _transform = mobileHeadquartersEntity.transform;
+            _animator = mobileHeadquartersEntity.References.Animator;
             _mobileHeadquartersConfig = mobileHeadquartersConfig;
-
-            _dollyCart.enabled = true;
         }
-        
+
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnDestinationReachedEvent;
+
         private readonly Transform _transform;
-        private readonly CinemachineDollyCart _dollyCart;
         private readonly Animator _animator;
         private readonly MobileHeadquartersConfigMeta _mobileHeadquartersConfig;
-        
-        private CinemachinePathBase _nextPath;
+
+        private CinemachinePathBase _path;
         private float _animationBlend;
-        private bool _canMove;
-        
+        private float _distance;
+        private float _syncCurrentTime;
+        private bool _isArrived;
+        private bool _canMove = true;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Movement()
         {
-            bool isPathFinished = _dollyCart.m_Path == null;
+            if (_path == null)
+                return;
+
             float targetSpeed = _canMove ? _mobileHeadquartersConfig.MovementSpeed : 0f;
             float speedChangeRate = _mobileHeadquartersConfig.SpeedChangeRate;
 
-            if (isPathFinished)
-            {
-                targetSpeed = 0;
+            _distance += targetSpeed * Time.fixedDeltaTime;
 
-                ToggleMoveAnimation(canMove: false);
-            }
-            else
+            if (_distance > _path.PathLength)
             {
-                ToggleMoveAnimation(canMove: true);
+                if (!_isArrived)
+                {
+                    _isArrived = true;
+                    OnDestinationReachedEvent?.Invoke();
+                }
+                else
+                {
+                    _distance = _path.PathLength;
+                }
             }
-            
+
+            MoveRigidbody(_distance);
+
             float inputMagnitude = _mobileHeadquartersConfig.MotionSpeed; // 1f
-            const float speedOffset = 0.1f;
-            
-            float finalSpeed;
-            float currentSpeed = _dollyCart.m_Speed;
-            bool changeSpeedSmoothly = currentSpeed < targetSpeed - speedOffset ||
-                                       currentSpeed > targetSpeed + speedOffset;
-
-            // accelerate or decelerate to target speed
-            if (changeSpeedSmoothly)
-            {
-                // creates curved result rather than a linear one giving a more organic speed change
-                // note T in Lerp is clamped, so we don't need to clamp our speed
-                finalSpeed = Mathf.Lerp(currentSpeed, targetSpeed * inputMagnitude, Time.deltaTime * speedChangeRate);
-
-                // round speed to 3 decimal places
-                finalSpeed = Mathf.Round(finalSpeed * 1000f) / 1000f;
-            }
-            else
-            {
-                finalSpeed = targetSpeed;
-            }
 
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * speedChangeRate);
-            _dollyCart.m_Speed = finalSpeed;
-            
-            if (finalSpeed < speedOffset)
-                ToggleMoveAnimation(canMove: false);
-            
+
             // update animator if using character
             _animator.SetFloat(AnimatorHashes.Speed, _animationBlend);
             _animator.SetFloat(AnimatorHashes.MotionSpeed, inputMagnitude);
-
-            if (isPathFinished)
-                return;
-
-            float pathLength = _dollyCart.m_Path.PathLength;
-            float position = _dollyCart.m_Position;
-            bool changePath = _nextPath == null && position >= pathLength;
-
-            if (changePath)
-                ChangeToNextPath();
         }
 
         public void ToggleMovement(bool canMove) =>
             _canMove = canMove;
 
+        public void ToggleMoveAnimation(bool canMove) =>
+            _animator.SetBool(id: AnimatorHashes.CanMove, value: canMove);
+
+        public void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false)
+        {
+            _path = path;
+            startDistancePercent = Mathf.Clamp01(startDistancePercent);
+            
+            float startDistance = 0;
+
+            if (startDistancePercent > 0.0f)
+                startDistance = _path.PathLength * startDistancePercent;
+
+            if (stayAtSamePosition)
+            {
+                float newDistance = GetDistanceAtPosition(_transform.position);
+                Debug.LogWarning("New Distance: " + newDistance);
+                _distance = startDistance;
+            }
+            else
+            {
+                _distance = startDistance;
+            }
+
+            Vector3 position = EvaluatePositionAtUnit(distance: 0f);
+            Quaternion rotation = EvaluateOrientationAtUnit(distance: 0f);
+
+            _transform.position = position;
+            _transform.rotation = rotation;
+        }
+
+        public void ToggleArrived(bool isArrived) =>
+            _isArrived = isArrived;
+
+        public void ResetDistance()
+        {
+            float difference = _distance - _path.PathLength;
+            _distance = difference;
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void ChangeToNextPath()
+        private void MoveRigidbody(float distance)
         {
-            ChangePath(_nextPath);
+            Vector3 position = EvaluatePositionAtUnit(distance);
+            Quaternion rotation = EvaluateOrientationAtUnit(distance);
 
-            _nextPath = null;
+            _transform.position = position;
+            _transform.rotation = rotation;
         }
 
-        private void ChangePath(CinemachinePathBase path)
-        {
-            _dollyCart.m_Position = 0;
-            _dollyCart.m_Path = path;
-        }
+        private Vector3 EvaluatePositionAtUnit(float distance) =>
+            _path.EvaluatePositionAtUnit(distance, CinemachinePathBase.PositionUnits.Distance);
 
-        private void ToggleMoveAnimation(bool canMove) =>
-            _animator.SetBool(id: AnimatorHashes.CanMove, value: canMove);
+        private Quaternion EvaluateOrientationAtUnit(float distance) =>
+            _path.EvaluateOrientationAtUnit(distance, CinemachinePathBase.PositionUnits.Distance);
+
+        private float GetDistanceAtPosition(Vector3 position) =>
+            _path.FindClosestPoint(position, startSegment: 0, searchRadius: 1, stepsPerSegment: 1);
     }
 }

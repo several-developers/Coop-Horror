@@ -37,9 +37,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    Event: 300
-    _UseCustomDepthTexture: 0
-    _UseFogOffsetTexture: 0
+    Event: 550
+    _UseCustomDepthTexture: 1
+    _UseFogOffsetTexture: 1
 --- !u!114 &-37562814910962082
 MonoBehaviour:
   m_ObjectHideFlags: 0

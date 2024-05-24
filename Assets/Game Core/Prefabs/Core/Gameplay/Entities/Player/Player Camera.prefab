@@ -92,7 +92,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.01
-  far clip plane: 300
+  far clip plane: 600
   field of view: 65
   orthographic: 0
   orthographic size: 5
@@ -151,7 +151,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -257,10 +257,10 @@ MonoBehaviour:
   m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 0
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 1
+  m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -319,9 +319,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e656cb26a6b4b77a40a497dbd253b25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxVerticalAngle: 60
-  _sensitivity: 0.8
-  _cameraSpeed: 1
   _cameraReferences:
     _mainCamera: {fileID: 9036817173485120049}
     _leftHandItemsHolder: {fileID: 871671499395680150}

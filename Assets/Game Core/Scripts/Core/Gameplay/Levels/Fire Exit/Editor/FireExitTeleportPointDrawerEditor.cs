@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.Levels
                 return;
 
             Color handlesColor = Handles.color;
-            Handles.color = ColorsConstants.PlayerTriggerColor;
+            Handles.color = ColorsConstants.ZoneColor;
 
             Handles.DrawWireDisc(center: obj.transform.position, normal: Vector3.up, Radius, thickness: 3);
 

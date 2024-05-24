@@ -1,4 +1,5 @@
 ﻿using System;
+using Cinemachine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
@@ -10,5 +11,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         event Action OnCallDeliveryDroneEvent;
         void OpenDoor();
         void EnableMainLever();
+        void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false);
     }
 }

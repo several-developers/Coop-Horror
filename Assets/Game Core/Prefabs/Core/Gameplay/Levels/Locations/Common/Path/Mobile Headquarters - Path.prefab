@@ -51,10 +51,10 @@ MonoBehaviour:
     width: 0.2
   m_Looped: 0
   m_Waypoints:
-  - position: {x: 0, y: 0, z: 0}
+  - position: {x: 0, y: 0, z: 330}
     tangent: {x: 0, y: 0, z: 1}
     roll: 0
-  - position: {x: 0, y: 0, z: 5}
+  - position: {x: 0, y: 0, z: 560}
     tangent: {x: 0, y: 0, z: 1}
     roll: 0
 --- !u!1 &2189888883882043061

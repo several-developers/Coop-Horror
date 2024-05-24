@@ -18,11 +18,15 @@ namespace GameCore.Configs.Gameplay.MobileHeadquarters
         [SerializeField, Min(0)]
         private float _speedChangeRate = 5f;
 
+        [SerializeField, Range(0f, 1f), SuffixLabel("%", overlay: true)]
+        private float _startPositionAtRoadLocation;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float MovementSpeed => _movementSpeed;
         public float MotionSpeed => _motionSpeed;
         public float SpeedChangeRate => _speedChangeRate;
+        public float StartPositionAtRoadLocation => _startPositionAtRoadLocation;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

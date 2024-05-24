@@ -46,6 +46,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public MobileHeadquartersReferences References => _references;
         public IGameManagerDecorator GameManagerDecorator { get; private set; }
         public IQuestsManagerDecorator QuestsManagerDecorator { get; private set; }
+        public PathMovement PathMovement => _pathMovement;
         public GameState GameState => GameManagerDecorator.GetGameState();
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -59,13 +60,13 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private ILevelObserver _levelObserver;
 
         private MobileHeadquartersController _mobileHeadquartersController;
-        private RigidbodyPathMovement _pathMovement;
+        private PathMovement _pathMovement;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
-            _pathMovement = new RigidbodyPathMovement(mobileHeadquartersEntity: this, _mobileHeadquartersConfig);
+            _pathMovement = new PathMovement(mobileHeadquartersEntity: this, _mobileHeadquartersConfig);
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
         }
 
@@ -76,15 +77,16 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void EnableMainLever() =>
             _mobileHeadquartersController.EnableMainLever();
 
-        public void ToggleMovement(bool canMove) =>
-            _pathMovement.ToggleMovement(canMove);
+        public void ChangePath(CinemachinePath path, float startDistancePercent = 0, bool stayAtSamePosition = false) =>
+            _pathMovement.ChangePath(path, startDistancePercent, stayAtSamePosition);
 
-        public void ArrivedAtRoadLocation()
+        public void ChangeToRoadPath()
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
             CinemachinePath path = roadLocationManager.GetPath();
+            float startPositionAtRoadLocation = _mobileHeadquartersConfig.StartPositionAtRoadLocation;
 
-            ChangePath(path);
+            ChangePath(path, startPositionAtRoadLocation);
         }
 
         public void SendOpenQuestsSelectionMenu() =>
@@ -108,7 +110,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         protected override void InitAll()
         {
             _mobileHeadquartersController.InitServerAndClient();
-            ArrivedAtRoadLocation();
+            ChangeToRoadPath();
 
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
         }
@@ -131,8 +133,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void ChangePath(CinemachinePath path) =>
-            _pathMovement.ChangePath(path);
+        private void ToggleMovement(bool canMove) =>
+            _pathMovement.ToggleMovement(canMove);
 
         private void ToggleDoorState(bool isOpen) =>
             _mobileHeadquartersController.ToggleDoorState(isOpen);
@@ -261,7 +263,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 case GameState.HeadingToTheRoad:
                     _levelObserver.LocationLeft();
                     break;
-                
+
+                case GameState.LeavingRoadLocation:
+                    GameManagerDecorator.LoadSelectedLocation();
+                    break;
+
                 default:
                     _pathMovement.ResetDistance();
                     _pathMovement.ToggleArrived(isArrived: false);
