@@ -37,7 +37,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             bool isPathFinished = _dollyCart.m_Path == null;
             float targetSpeed = _canMove ? _mobileHeadquartersConfig.MovementSpeed : 0f;
-            float speedChangeRate = _mobileHeadquartersConfig.SpeedChangeRate;
+            float speedChangeRate = 5f;
 
             if (isPathFinished)
             {
@@ -50,7 +50,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 ToggleMoveAnimation(canMove: true);
             }
             
-            float inputMagnitude = _mobileHeadquartersConfig.MotionSpeed; // 1f
+            float inputMagnitude = 1f;
             const float speedOffset = 0.1f;
             
             float finalSpeed;

@@ -13,6 +13,7 @@
         WaitingForPlayers = 8,
         QuestsRewarding = 9,
         RestartGame = 10,
-        LeavingRoadLocation = 11,
+        LeavingMainRoad = 11,
+        EnteringMainRoad = 12,
     }
 }

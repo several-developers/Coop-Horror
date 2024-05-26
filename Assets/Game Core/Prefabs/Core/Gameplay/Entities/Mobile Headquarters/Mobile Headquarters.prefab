@@ -1532,6 +1532,7 @@ GameObject:
   - component: {fileID: 2871681218726240799}
   - component: {fileID: 8649101030545050085}
   - component: {fileID: 6425260825504610594}
+  - component: {fileID: 7222222120550699953}
   m_Layer: 0
   m_Name: Mobile Headquarters
   m_TagString: Untagged
@@ -1624,6 +1625,7 @@ MonoBehaviour:
   _mobileHeadquartersConfig: {fileID: 11400000, guid: 42fa32de715f30247b6994951dad2972,
     type: 2}
   _references:
+    _moveSpeedController: {fileID: 7222222120550699953}
     _animator: {fileID: 1830334093793617745}
     _animationObserver: {fileID: 7144477240461052206}
     _deathCamera: {fileID: 5818113469004927134}
@@ -1676,6 +1678,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 14, y: 8, z: 14}
   m_Center: {x: 0, y: 3.25, z: 0.25}
+--- !u!114 &7222222120550699953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195987239533786563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec306e25e09e482581c5187a8440bb19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _currentSpeedDebug: 0
 --- !u!1 &6195987239724444557
 GameObject:
   m_ObjectHideFlags: 0

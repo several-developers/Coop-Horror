@@ -11,6 +11,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
     public class MobileHeadquartersReferences
     {
         // MEMBERS: -------------------------------------------------------------------------------
+
+        [SerializeField, Required]
+        private MoveSpeedController _moveSpeedController;
         
         [SerializeField, Required]
         private Animator _animator;
@@ -37,7 +40,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private SimpleButton _completeQuestsButton;
 
         // PROPERTIES: ----------------------------------------------------------------------------
-        
+
+        public MoveSpeedController MoveSpeedController => _moveSpeedController;
         public Animator Animator => _animator;
         public AnimationObserver AnimationObserver => _animationObserver;
         public GameObject DeathCamera => _deathCamera;

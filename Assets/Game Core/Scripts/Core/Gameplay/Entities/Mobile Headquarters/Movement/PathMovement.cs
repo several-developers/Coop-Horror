@@ -1,6 +1,5 @@
 ﻿using System;
 using Cinemachine;
-using GameCore.Configs.Gameplay.MobileHeadquarters;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
@@ -9,12 +8,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PathMovement(MobileHeadquartersEntity mobileHeadquartersEntity,
-            MobileHeadquartersConfigMeta mobileHeadquartersConfig)
+        public PathMovement(MobileHeadquartersEntity mobileHeadquartersEntity)
         {
+            MobileHeadquartersReferences references = mobileHeadquartersEntity.References;
+            
             _transform = mobileHeadquartersEntity.transform;
-            _animator = mobileHeadquartersEntity.References.Animator;
-            _mobileHeadquartersConfig = mobileHeadquartersConfig;
+            _animator = references.Animator;
+            _moveSpeedController = references.MoveSpeedController;
+
+            _moveSpeedController.OnDistanceChangedEvent += OnDistanceChanged;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -23,7 +25,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private readonly Transform _transform;
         private readonly Animator _animator;
-        private readonly MobileHeadquartersConfigMeta _mobileHeadquartersConfig;
+        private readonly MoveSpeedController _moveSpeedController;
 
         private CinemachinePathBase _path;
         private float _animationBlend;
@@ -39,10 +41,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             if (_path == null)
                 return;
 
-            float targetSpeed = _canMove ? _mobileHeadquartersConfig.MovementSpeed : 0f;
-            float speedChangeRate = _mobileHeadquartersConfig.SpeedChangeRate;
-
-            _distance += targetSpeed * Time.fixedDeltaTime;
+            float targetSpeed = _canMove ? _moveSpeedController.GetCurrentSpeed() : 0f;
+            _distance += targetSpeed * Time.deltaTime;
 
             if (_distance > _path.PathLength)
             {
@@ -57,15 +57,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 }
             }
 
-            MoveRigidbody(_distance);
-
-            float inputMagnitude = _mobileHeadquartersConfig.MotionSpeed; // 1f
-
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * speedChangeRate);
-
-            // update animator if using character
-            _animator.SetFloat(AnimatorHashes.Speed, _animationBlend);
-            _animator.SetFloat(AnimatorHashes.MotionSpeed, inputMagnitude);
+            Move(_distance, targetSpeed);
         }
 
         public void ToggleMovement(bool canMove) =>
@@ -77,26 +69,24 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false)
         {
             _path = path;
-            startDistancePercent = Mathf.Clamp01(startDistancePercent);
-            
-            float startDistance = 0;
-
-            if (startDistancePercent > 0.0f)
-                startDistance = _path.PathLength * startDistancePercent;
 
             if (stayAtSamePosition)
             {
                 float newDistance = GetDistanceAtPosition(_transform.position);
-                Debug.LogWarning("New Distance: " + newDistance);
-                _distance = startDistance;
+                _distance = newDistance;
             }
             else
             {
-                _distance = startDistance;
+                startDistancePercent = Mathf.Clamp01(startDistancePercent);
+
+                if (startDistancePercent > 0.0f)
+                    _distance = _path.PathLength * startDistancePercent;
+                else
+                    _distance = 0f;
             }
 
-            Vector3 position = EvaluatePositionAtUnit(distance: 0f);
-            Quaternion rotation = EvaluateOrientationAtUnit(distance: 0f);
+            Vector3 position = EvaluatePositionAtUnit(_distance);
+            Quaternion rotation = EvaluateOrientationAtUnit(_distance);
 
             _transform.position = position;
             _transform.rotation = rotation;
@@ -113,12 +103,16 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void MoveRigidbody(float distance)
+        private void Move(float distance, float targetSpeed)
         {
             Vector3 position = EvaluatePositionAtUnit(distance);
             Quaternion rotation = EvaluateOrientationAtUnit(distance);
+            Vector3 movePosition = Vector3.MoveTowards(_transform.position, position, targetSpeed * Time.deltaTime);
 
-            _transform.position = position;
+            Debug.DrawLine(position, new Vector3(position.x, position.y + 2f, position.z), Color.red);
+            Debug.DrawLine(movePosition, new Vector3(movePosition.x, movePosition.y + 2f, movePosition.z), Color.blue);
+
+            _transform.position = movePosition;
             _transform.rotation = rotation;
         }
 
@@ -128,7 +122,32 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private Quaternion EvaluateOrientationAtUnit(float distance) =>
             _path.EvaluateOrientationAtUnit(distance, CinemachinePathBase.PositionUnits.Distance);
 
-        private float GetDistanceAtPosition(Vector3 position) =>
-            _path.FindClosestPoint(position, startSegment: 0, searchRadius: 1, stepsPerSegment: 1);
+        private float GetDistanceAtPosition(Vector3 worldPosition)
+        {
+            float distanceAtPathUnits =
+                _path.FindClosestPoint(worldPosition, startSegment: 0, searchRadius: -1, stepsPerSegment: 50);
+
+            float pathDistance =
+                _path.FromPathNativeUnits(distanceAtPathUnits, CinemachinePathBase.PositionUnits.Distance);
+            
+            return pathDistance;
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnDistanceChanged(float distance)
+        {
+            if (_path == null)
+                return;
+
+            float newDistance = _path.PathLength * distance;
+            _distance = newDistance;
+            
+            Vector3 position = EvaluatePositionAtUnit(_distance);
+            Quaternion rotation = EvaluateOrientationAtUnit(_distance);
+
+            _transform.position = position;
+            _transform.rotation = rotation;
+        }
     }
 }

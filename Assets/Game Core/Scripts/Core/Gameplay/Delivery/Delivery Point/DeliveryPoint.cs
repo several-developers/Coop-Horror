@@ -20,6 +20,7 @@ namespace GameCore.Gameplay.Delivery
         {
             _deliveryConfig = gameplayConfigsProvider.GetDeliveryConfig();
             _droneCart = new DroneCart(_deliveryConfig, deliveryPoint: this, _landingPath, _takeOffPath, _deliveryCart);
+            _isInitialized = true;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -46,13 +47,19 @@ namespace GameCore.Gameplay.Delivery
         private DeliveryConfigMeta _deliveryConfig;
         private DroneCart _droneCart;
         private Coroutine _takeOffTimerCO;
+        private bool _isInitialized;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Start() => HidePoint();
 
-        private void Update() =>
+        private void Update()
+        {
+            if (!_isInitialized)
+                return;
+            
             _droneCart.Tick();
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

@@ -50,6 +50,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public GameState GameState => GameManagerDecorator.GetGameState();
 
         // FIELDS: --------------------------------------------------------------------------------
+        
+        public static int LastPathID = -1;
 
         public event Action OnOpenQuestsSelectionMenuEvent = delegate { };
         public event Action OnOpenLocationsSelectionMenuEvent = delegate { };
@@ -60,14 +62,24 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private ILevelObserver _levelObserver;
 
         private MobileHeadquartersController _mobileHeadquartersController;
+        private MoveSpeedController _moveSpeedController;
         private PathMovement _pathMovement;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
-            _pathMovement = new PathMovement(mobileHeadquartersEntity: this, _mobileHeadquartersConfig);
+            _pathMovement = new PathMovement(mobileHeadquartersEntity: this);
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
+            _moveSpeedController = _references.MoveSpeedController;
+            
+            _moveSpeedController.Init(_mobileHeadquartersConfig, GameManagerDecorator);
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            _moveSpeedController.Dispose();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -77,14 +89,33 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void EnableMainLever() =>
             _mobileHeadquartersController.EnableMainLever();
 
-        public void ChangePath(CinemachinePath path, float startDistancePercent = 0, bool stayAtSamePosition = false) =>
+        public void ChangePath(CinemachinePath path, float startDistancePercent = 0, bool stayAtSamePosition = false)
+        {
             _pathMovement.ChangePath(path, startDistancePercent, stayAtSamePosition);
+            HandlePathChange();
+        }
 
         public void ChangeToRoadPath()
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
-            CinemachinePath path = roadLocationManager.GetPath();
-            float startPositionAtRoadLocation = _mobileHeadquartersConfig.StartPositionAtRoadLocation;
+            CinemachinePath path;
+            float startPositionAtRoadLocation = 0f;
+
+            if (LastPathID == -1)
+            {
+                path = roadLocationManager.GetMainPath();
+                startPositionAtRoadLocation = _mobileHeadquartersConfig.StartPositionAtRoadLocation;
+            }
+            else
+            {
+                bool isPathFound = roadLocationManager.TryGetEnterPathByID(LastPathID, out path);
+
+                if (!isPathFound)
+                {
+                    path = roadLocationManager.GetMainPath();
+                    Log.PrintError(log: $"Path with ID <gb>({LastPathID})</gb> <rb>not found</rb>!");
+                }
+            }
 
             ChangePath(path, startPositionAtRoadLocation);
         }
@@ -109,7 +140,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         protected override void InitAll()
         {
-            _mobileHeadquartersController.InitServerAndClient();
+            _mobileHeadquartersController.InitAll();
             ChangeToRoadPath();
 
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
@@ -118,12 +149,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         protected override void InitServerOnly() =>
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
 
-        protected override void TickServerOnly() =>
+        protected override void TickServerOnly()
+        {
+            _moveSpeedController.Tick();
             _pathMovement.Movement();
+        }
 
         protected override void DespawnAll()
         {
-            _mobileHeadquartersController.DespawnServerAndClient();
+            _mobileHeadquartersController.DespawnAll();
 
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
         }
@@ -138,6 +172,17 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void ToggleDoorState(bool isOpen) =>
             _mobileHeadquartersController.ToggleDoorState(isOpen);
+
+        private void HandlePathChange()
+        {
+            switch (GameState)
+            {
+                case GameState.EnteringMainRoad:
+                    GameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
+                        previousState: GameState.EnteringMainRoad);
+                    break;
+            }
+        }
 
         private static bool IsCurrentPlayer(ulong senderClientID) =>
             NetworkHorror.ClientID == senderClientID;
@@ -264,7 +309,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     _levelObserver.LocationLeft();
                     break;
 
-                case GameState.LeavingRoadLocation:
+                case GameState.LeavingMainRoad:
                     GameManagerDecorator.LoadSelectedLocation();
                     break;
 

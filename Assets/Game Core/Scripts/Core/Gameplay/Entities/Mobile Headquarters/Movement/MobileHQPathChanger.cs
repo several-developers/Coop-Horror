@@ -21,6 +21,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [Title(Constants.Settings)]
         [SerializeField]
+        private GameState _targetGameState = GameState.LeavingMainRoad;
+        
+        [SerializeField]
         private bool _drawSphere = true;
 
         [Title(Constants.References)]
@@ -59,8 +62,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             if (!isMobileHQ)
                 return;
             
-            Debug.LogWarning("Trying change the path...");
-
             if (_targetPath == null)
             {
                 Log.PrintError(log: "Target Path <rb>not found</rb>!");
@@ -68,7 +69,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             }
 
             GameState gameState = _gameManagerDecorator.GetGameState();
-            bool isGameStateValid = gameState == GameState.LeavingRoadLocation;
+            bool isGameStateValid = gameState == _targetGameState;
 
             if (!isGameStateValid)
                 return;

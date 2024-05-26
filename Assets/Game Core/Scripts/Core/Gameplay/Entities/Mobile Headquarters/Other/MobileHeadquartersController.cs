@@ -30,7 +30,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void InitServerAndClient()
+        public void InitAll()
         {
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
@@ -51,7 +51,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             loadLocationLever.OnEnabledEvent += OnMainLeverPulled;
         }
 
-        public void DespawnServerAndClient()
+        public void DespawnAll()
         {
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
 
@@ -140,7 +140,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     if (containsExpiredQuests)
                         _mobileHeadquartersEntity.SendOpenGameOverWarningMenu();
                     else
-                        _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.LeavingRoadLocation,
+                        _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.LeavingMainRoad,
                             previousState: GameState.ReadyToLeaveTheRoad);
                     break;
 

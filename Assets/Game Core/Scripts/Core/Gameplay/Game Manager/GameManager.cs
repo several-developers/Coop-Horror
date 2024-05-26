@@ -117,12 +117,19 @@ namespace GameCore.Gameplay.GameManagement
             switch (gameState)
             {
                 case GameState.ArrivedAtTheRoad:
+                    if (!IsServerOnly)
+                        return;
+
+                    ChangeGameStateWhenAllPlayersReady(newState: GameState.EnteringMainRoad,
+                        previousState: GameState.ArrivedAtTheRoad);
+                    break;
+                
                 case GameState.QuestsRewarding:
                     if (!IsServerOnly)
                         return;
 
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
-                        previousState: gameState);
+                        previousState: GameState.QuestsRewarding);
                     break;
 
                 case GameState.ArrivedAtTheLocation:
@@ -130,7 +137,7 @@ namespace GameCore.Gameplay.GameManagement
                         return;
                     
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheLocation,
-                        previousState: gameState);
+                        previousState: GameState.ArrivedAtTheLocation);
                     break;
 
                 case GameState.KillPlayersOnTheRoad:
@@ -144,7 +151,7 @@ namespace GameCore.Gameplay.GameManagement
                     ResetGold();
 
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
-                        previousState: gameState);
+                        previousState: GameState.RestartGame);
                     break;
             }
         }
