@@ -53,10 +53,12 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void SetElevatorFloor(Floor floor) =>
-            _floor = floor;
-
         public Floor GetElevatorFloor() => _floor;
+        
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+        
+        protected void SetElevatorFloor(Floor floor) =>
+            _floor = floor;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -83,6 +85,9 @@ namespace GameCore.Gameplay.Levels.Elevator
 
             if (!isSameFloor)
                 return;
+
+            if (!_isOpen)
+                return;
             
             CloseElevator();
         }
@@ -99,6 +104,9 @@ namespace GameCore.Gameplay.Levels.Elevator
 
             if (!isSameFloor)
                 return;
+
+            if (_isOpen)
+                return;
             
             OpenElevator();
         }
@@ -108,6 +116,9 @@ namespace GameCore.Gameplay.Levels.Elevator
             bool isSameFloor = floor == _floor;
 
             if (!isSameFloor)
+                return;
+
+            if (_isOpen)
                 return;
             
             OpenElevator();

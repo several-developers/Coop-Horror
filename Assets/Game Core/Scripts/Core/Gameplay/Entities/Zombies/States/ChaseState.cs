@@ -10,7 +10,7 @@ namespace GameCore.Gameplay.Entities.Zombies.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ChaseState(ZombieEntity zombieEntity, IPlayerEntity playerEntity)
+        public ChaseState(ZombieEntity zombieEntity, PlayerEntity playerEntity)
         {
             _zombieEntity = zombieEntity;
             _agent = zombieEntity.GetAgent();

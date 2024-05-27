@@ -33,14 +33,6 @@ namespace GameCore.Gameplay.Network
         [ServerRpc(RequireOwnership = false)]
         private void OpenElevatorServerRpc(Floor floor) => OpenElevatorClientRpc(floor);
 
-        [ServerRpc(RequireOwnership = false)]
-        private void TeleportToFireExitServerRpc(Floor floor, bool isInStairsLocation,
-            ServerRpcParams serverRpcParams = default)
-        {
-            ulong clientID = serverRpcParams.Receive.SenderClientId;
-            TeleportToFireExitClientRpc(clientID, floor, isInStairsLocation);
-        }
-
         [ClientRpc]
         private void GenerateDungeonsClientRpc(DungeonsSeedData data) =>
             _rpcObserver.GenerateDungeons(data);
@@ -53,10 +45,6 @@ namespace GameCore.Gameplay.Network
         private void OpenElevatorClientRpc(Floor floor) =>
             _rpcObserver.OpenElevator(floor);
 
-        [ClientRpc]
-        private void TeleportToFireExitClientRpc(ulong clientID, Floor floor, bool isInStairsLocation) =>
-            _rpcObserver.TeleportToFireExit(clientID, floor, isInStairsLocation);
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()
@@ -66,7 +54,6 @@ namespace GameCore.Gameplay.Network
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent += GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
             _rpcHandlerDecorator.OnOpenElevatorInnerEvent += OpenElevatorServerRpc;
-            _rpcHandlerDecorator.OnTeleportToFireExitInnerEvent += OnTeleportToFireExit;
         }
 
         public override void OnNetworkDespawn()
@@ -76,10 +63,6 @@ namespace GameCore.Gameplay.Network
             _rpcHandlerDecorator.OnGenerateDungeonsInnerEvent -= GenerateDungeonsServerRpc;
             _rpcHandlerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
             _rpcHandlerDecorator.OnOpenElevatorInnerEvent -= OpenElevatorServerRpc;
-            _rpcHandlerDecorator.OnTeleportToFireExitInnerEvent -= OnTeleportToFireExit;
         }
-
-        private void OnTeleportToFireExit(Floor floor, bool isInStairsLocation) =>
-            TeleportToFireExitServerRpc(floor, isInStairsLocation);
     }
 }

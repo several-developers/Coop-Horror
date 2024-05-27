@@ -11,7 +11,6 @@ namespace GameCore.Gameplay.Network
         public event Action<DungeonsSeedData> OnGenerateDungeonsInnerEvent = delegate { };
         public event Action<Floor> OnStartElevatorInnerEvent = delegate { };
         public event Action<Floor> OnOpenElevatorInnerEvent = delegate { };
-        public event Action<Floor, bool> OnTeleportToFireExitInnerEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -23,8 +22,5 @@ namespace GameCore.Gameplay.Network
 
         public void OpenElevator(Floor floor) => 
             OnOpenElevatorInnerEvent.Invoke(floor);
-
-        public void TeleportToFireExit(Floor floor, bool isInStairsLocation) =>
-            OnTeleportToFireExitInnerEvent.Invoke(floor, isInStairsLocation);
     }
 }

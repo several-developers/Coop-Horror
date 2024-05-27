@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using ECM2;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
@@ -20,7 +20,7 @@ using Zenject;
 namespace GameCore.Gameplay.Entities.Player
 {
     [RequireComponent(typeof(PlayerInput))]
-    public class PlayerEntity : NetcodeBehaviour, IPlayerEntity
+    public class PlayerEntity : NetcodeBehaviour, IEntity, IDamageable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ namespace GameCore.Gameplay.Entities.Player
         [Title(Constants.References)]
         [SerializeField]
         private PlayerReferences _references;
-        
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public PlayerReferences References => _references;
@@ -64,10 +64,13 @@ namespace GameCore.Gameplay.Entities.Player
         public static event Action<PlayerEntity> OnPlayerSpawnedEvent = delegate { };
         public static event Action<PlayerEntity> OnPlayerDespawnedEvent = delegate { };
 
+        public event Action<PlayerLocation> OnPlayerLocationChangedEvent = delegate { };
+
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
+        private readonly NetworkVariable<PlayerLocation> _playerLocation = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
 
@@ -83,7 +86,6 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionHandler _interactionHandler;
 
         private Transform _cameraLookAtObject;
-        private bool _canChangeParent = true;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -95,43 +97,29 @@ namespace GameCore.Gameplay.Entities.Player
         public void TeleportPlayer(Vector3 position, Quaternion rotation) =>
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
 
-        public void SetParent(NetworkObject parentNetworkObject, bool inLocalSpace = false)
+        public void SetParent(NetworkObject parentNetworkObject)
         {
-            if (!_canChangeParent)
-                return;
-            
             if (IsOwnedByServer)
                 TrySetParent(parentNetworkObject);
             else
                 TrySetParentServerRpc(parentNetworkObject);
-
-            StartCoroutine(Test());
-
-            //_references.NetworkTransform.InLocalSpace = inLocalSpace;
         }
 
-        public void RemoveParent(bool inLocalSpace = false)
+        public void RemoveParent()
         {
-            if (!_canChangeParent)
-                return;
-            
             if (IsOwnedByServer)
                 TryRemoveParent();
             else
                 TryRemoveParentServerRpc();
-            
-            StartCoroutine(Test());
-
-            //_references.NetworkTransform.InLocalSpace = inLocalSpace;
         }
 
-        private IEnumerator Test()
+#warning ПРОВЕРИТЬ ИЛИ КОРРЕКТНО РАБОТАЕТ, ДОБАВИТЬ СЕРВЕР РПС
+        public void ChangePlayerLocation(PlayerLocation playerLocation)
         {
-            _canChangeParent = false;
+            if (!IsOwner)
+                return;
 
-            yield return new WaitForSeconds(0.1f);
-
-            _canChangeParent = true;
+            _playerLocation.Value = playerLocation;
         }
 
         public void DropItem(bool destroy = false) =>
@@ -149,6 +137,9 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform GetTransform() => transform;
 
         public PlayerInventory GetInventory() => _inventory;
+
+        public PlayerLocation GetPlayerLocation() =>
+            _playerLocation.Value;
 
         public bool IsDead() => _isDead;
 
@@ -175,10 +166,11 @@ namespace GameCore.Gameplay.Entities.Player
             InitInteractionSystem();
             InitPlayerMovement();
 
-            InputReader.OnScrollEvent += OnScroll;
+            InputReader.OnScrollEvent += OnScrollInventory;
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
 
+            _playerLocation.OnValueChanged += OnOwnerPlayerLocationChanged;
             _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
 
             // LOCAL METHODS: -----------------------------
@@ -231,9 +223,9 @@ namespace GameCore.Gameplay.Entities.Player
             FixInvisiblePlayerBug(); // TEMP
 
             _currentSelectedSlotIndex.OnValueChanged += OnNotOwnerSelectedSlotChanged;
-            
+
             // LOCAL METHODS: -----------------------------
-            
+
             void FixInvisiblePlayerBug()
             {
                 Transform thisTransform = transform;
@@ -264,10 +256,11 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _interactionHandler.Dispose();
 
-            InputReader.OnScrollEvent -= OnScroll;
+            InputReader.OnScrollEvent -= OnScrollInventory;
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
 
+            _playerLocation.OnValueChanged -= OnOwnerPlayerLocationChanged;
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
         }
 
@@ -363,12 +356,7 @@ namespace GameCore.Gameplay.Entities.Player
             _references.NetworkTransform.InLocalSpace = inLocalSpace;
         }
 
-        public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
-        {
-            base.OnNetworkObjectParentChanged(parentNetworkObject);
-        }
-
-        private void OnScroll(float scrollValue)
+        private void OnScrollInventory(float scrollValue)
         {
             bool switchToNextSlot = scrollValue <= 0;
 
@@ -397,5 +385,8 @@ namespace GameCore.Gameplay.Entities.Player
             _inventory.SetSelectedSlotIndex(newValue);
             _inventoryManager.ToggleItemsState();
         }
+
+        private void OnOwnerPlayerLocationChanged(PlayerLocation previousValue, PlayerLocation newValue) =>
+            OnPlayerLocationChangedEvent.Invoke(newValue);
     }
 }

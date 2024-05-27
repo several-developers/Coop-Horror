@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.VisualManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Rpc;
 using Unity.Netcode;
@@ -15,10 +16,11 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         [Inject]
         private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator, IRpcObserver rpcObserver,
-            IGameplayConfigsProvider gameplayConfigsProvider)
+            IVisualManager visualManager, IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
             _rpcObserver = rpcObserver;
+            _visualManager = visualManager;
             _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
         }
 
@@ -30,6 +32,7 @@ namespace GameCore.Gameplay.Levels.Elevator
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private IRpcObserver _rpcObserver;
+        private IVisualManager _visualManager;
         private ElevatorConfigMeta _elevatorConfig;
         private Coroutine _movementCO;
 

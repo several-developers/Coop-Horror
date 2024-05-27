@@ -27,7 +27,7 @@ namespace GameCore.Gameplay.Triggers
                 return;
             
             NetworkObject networkObject = _mobileHeadquartersEntity.NetworkObject;
-            playerEntity.SetParent(networkObject, inLocalSpace: true);
+            playerEntity.SetParent(networkObject);
         }
 
         private void OnTriggerExit(Collider other)

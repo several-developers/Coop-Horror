@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Mobile Headquarters Config
   _movementSpeed: 40
-  _speedChangeRate: 0.5
+  _speedChangeRate: 0.65
   _leavingMainRoadSpeedMultiplier: 0.5
-  _startPositionAtRoadLocation: 0.9
+  _startPositionAtRoadLocation: 0.85

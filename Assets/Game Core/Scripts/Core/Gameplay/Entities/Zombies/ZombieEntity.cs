@@ -17,7 +17,7 @@ namespace GameCore.Gameplay.Entities.Zombies
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IPlayerEntity playerEntity)
+        private void Construct(PlayerEntity playerEntity)
         {
             _playerEntity = playerEntity;
         }
@@ -73,7 +73,7 @@ namespace GameCore.Gameplay.Entities.Zombies
 
         private StateMachine _zombieStateMachine;
         private IHealthSystem _healthSystem;
-        private IPlayerEntity _playerEntity;
+        private PlayerEntity _playerEntity;
         private ZombieCrawlingHandler _zombieCrawlingHandler;
 
         private float _currentMovementSpeed;

@@ -11,7 +11,6 @@ namespace GameCore.Observers.Gameplay.Rpc
         public event Action<DungeonsSeedData> OnGenerateDungeonsEvent = delegate { };
         public event Action<Floor> OnStartElevatorEvent = delegate { };
         public event Action<Floor> OnOpenElevatorEvent = delegate { };
-        public event Action<ulong, Floor, bool> OnTeleportToFireExitEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -23,8 +22,5 @@ namespace GameCore.Observers.Gameplay.Rpc
 
         public void OpenElevator(Floor floor) =>
             OnOpenElevatorEvent.Invoke(floor);
-
-        public void TeleportToFireExit(ulong clientID, Floor floor, bool isInStairsLocation) =>
-            OnTeleportToFireExitEvent.Invoke(clientID, floor, isInStairsLocation);
     }
 }

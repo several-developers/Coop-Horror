@@ -6,6 +6,7 @@ using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Levels;
 using GameCore.Gameplay.Levels.Locations;
 using GameCore.Gameplay.UIManagement;
+using GameCore.Gameplay.VisualManagement;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -26,6 +27,9 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         [SerializeField, Required]
         private PlayerCamera _playerCamera;
 
+        [SerializeField, Required]
+        private VisualManager _visualManager;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void InstallBindings()
@@ -39,6 +43,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindFireExitsManager();
             BindLocationManagerDecorator();
             BindUIManager();
+            BindVisualManager();
             BindPlayerCamera();
         }
 
@@ -112,6 +117,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .BindInterfacesTo<UIManager>()
                 .AsSingle()
                 .NonLazy();
+        }
+
+        private void BindVisualManager()
+        {
+            Container
+                .Bind<IVisualManager>()
+                .FromInstance(_visualManager)
+                .AsSingle();
         }
 
         private void BindPlayerCamera()

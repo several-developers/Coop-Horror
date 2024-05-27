@@ -10,7 +10,7 @@ namespace GameCore.Gameplay.Entities.Zombies.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public AttackState(ZombieEntity zombieEntity, IPlayerEntity playerEntity)
+        public AttackState(ZombieEntity zombieEntity, PlayerEntity playerEntity)
         {
             _zombieEntity = zombieEntity;
             _playerEntity = playerEntity;
@@ -24,7 +24,7 @@ namespace GameCore.Gameplay.Entities.Zombies.States
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly ZombieEntity _zombieEntity;
-        private readonly IPlayerEntity _playerEntity;
+        private readonly PlayerEntity _playerEntity;
         private readonly NavMeshAgent _agent;
         private readonly AnimationObserver _animationObserver;
         private readonly Animator _animator;

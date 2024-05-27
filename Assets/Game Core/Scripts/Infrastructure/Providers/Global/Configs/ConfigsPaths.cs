@@ -20,6 +20,7 @@
         public const string DeliveryConfig = GameplayConfigs + "Delivery Config";
         public const string PlayerConfig = GameplayConfigs + "Player Config";
         public const string RigPresetsConfig = GameplayConfigs + "Rig Presets Config";
+        public const string VisualConfig = GameplayConfigs + "Visual Config";
         
         public const string GameBalanceConfig = Configs + "Game Balance Config";
         

@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -81,7 +82,7 @@ namespace GameCore.Gameplay.GameManagement
         protected override void InitAll()
         {
             _selectedLocation.OnValueChanged += OnSelectedLocationChanged;
-            _gameState.OnValueChanged += OnGameStateChanged;
+            _gameState.OnValueChanged += OnAllGameStateChanged;
             _playersGold.OnValueChanged += OnPlayersGoldChanged;
         }
 
@@ -97,7 +98,7 @@ namespace GameCore.Gameplay.GameManagement
         protected override void DespawnAll()
         {
             _selectedLocation.OnValueChanged -= OnSelectedLocationChanged;
-            _gameState.OnValueChanged -= OnGameStateChanged;
+            _gameState.OnValueChanged -= OnAllGameStateChanged;
             _playersGold.OnValueChanged -= OnPlayersGoldChanged;
         }
 
@@ -114,8 +115,18 @@ namespace GameCore.Gameplay.GameManagement
 
         private void HandleGameState(GameState gameState)
         {
+            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+
             switch (gameState)
             {
+                case GameState.HeadingToTheRoad:
+                    localPlayer.ChangePlayerLocation(PlayerLocation.Road);
+                    break;
+                
+                case GameState.HeadingToTheLocation:
+                    localPlayer.ChangePlayerLocation(PlayerLocation.LocationSurface);
+                    break;
+
                 case GameState.ArrivedAtTheRoad:
                     if (!IsServerOnly)
                         return;
@@ -310,7 +321,7 @@ namespace GameCore.Gameplay.GameManagement
         private void OnSelectedLocationChanged(SceneName previousValue, SceneName newValue) =>
             _gameManagerDecorator.SelectedLocationChanged(newValue);
 
-        private void OnGameStateChanged(GameState previousValue, GameState newValue)
+        private void OnAllGameStateChanged(GameState previousValue, GameState newValue)
         {
             string log = Log.HandleLog("Game State", $"<gb>{previousValue}</gb> ---> <gb>{newValue}</gb>");
             Debug.Log(log);

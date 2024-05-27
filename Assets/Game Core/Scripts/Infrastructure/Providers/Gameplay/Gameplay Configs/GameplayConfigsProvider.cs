@@ -10,6 +10,7 @@ using GameCore.Configs.Gameplay.Quests;
 using GameCore.Configs.Gameplay.QuestsItems;
 using GameCore.Configs.Gameplay.RigPresets;
 using GameCore.Configs.Gameplay.Time;
+using GameCore.Configs.Gameplay.Visual;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
 
@@ -33,6 +34,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _questsItemsConfig = Load<QuestsItemsConfigMeta>(path: ConfigsPaths.QuestsItemsConfig);
             _deliveryConfig = Load<DeliveryConfigMeta>(path: ConfigsPaths.DeliveryConfig);
             _rigPresetsConfig = Load<RigPresetsConfigMeta>(path: ConfigsPaths.RigPresetsConfig);
+            _visualConfig = Load<VisualConfigMeta>(path: ConfigsPaths.VisualConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -49,6 +51,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly QuestsItemsConfigMeta _questsItemsConfig;
         private readonly DeliveryConfigMeta _deliveryConfig;
         private readonly RigPresetsConfigMeta _rigPresetsConfig;
+        private readonly VisualConfigMeta _visualConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -64,5 +67,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public QuestsItemsConfigMeta GetQuestsItemsConfig() => _questsItemsConfig;
         public DeliveryConfigMeta GetDeliveryConfig() => _deliveryConfig;
         public RigPresetsConfigMeta GetRigPresetsConfig() => _rigPresetsConfig;
+        public VisualConfigMeta GetVisualConfig() => _visualConfig;
     }
 }

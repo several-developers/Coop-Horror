@@ -3,7 +3,6 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable;
-using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.LevelManager;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -17,10 +16,10 @@ namespace GameCore.Gameplay.Levels
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator, ILevelProviderObserver levelProviderObserver)
+        private void Construct(IFireExitsManager fireExitsManager, ILevelProviderObserver levelProviderObserver)
         {
-            _rpcHandlerDecorator = rpcHandlerDecorator;
             _levelProviderObserver = levelProviderObserver;
+            _fireExitsManager = fireExitsManager;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -43,7 +42,7 @@ namespace GameCore.Gameplay.Levels
 
         public event Action OnInteractionStateChangedEvent;
 
-        private IRpcHandlerDecorator _rpcHandlerDecorator;
+        private IFireExitsManager _fireExitsManager;
         private ILevelProviderObserver _levelProviderObserver;
         private bool _canInteract = true;
 
@@ -67,7 +66,7 @@ namespace GameCore.Gameplay.Levels
         }
 
         public void Interact(PlayerEntity playerEntity = null) =>
-            _rpcHandlerDecorator.TeleportToFireExit(_floor, _isInStairsLocation);
+            _fireExitsManager.TeleportToFireExit(_floor, _isInStairsLocation);
 
         public void ToggleInteract(bool canInteract)
         {
@@ -89,9 +88,32 @@ namespace GameCore.Gameplay.Levels
             if (_isInStairsLocation || _isSurfaceFireExit)
                 return;
 
-            bool isFound = transform.parent.parent.TryGetComponent(out DungeonRoot dungeonRoot);
+            DungeonRoot dungeonRoot = null;
+            Transform parent = transform.parent;
+            bool isParentFound = parent != null;
+            bool isDungeonRootFound = false;
+            int iterations = 0;
 
-            if (!isFound)
+            while (isParentFound)
+            {
+                isDungeonRootFound = parent.TryGetComponent(out dungeonRoot);
+
+                if (isDungeonRootFound)
+                    break;
+                
+                parent = parent.parent;
+                isParentFound = parent != null;
+
+                if (iterations > 100)
+                {
+                    Debug.LogError("Infinity loop!");
+                    break;
+                }
+                
+                iterations++;
+            }
+
+            if (!isDungeonRootFound)
             {
                 Log.PrintError(log: $"<gb>{nameof(DungeonRoot).GetNiceName()}</gb> component <rb>not found</rb>!");
                 return;
