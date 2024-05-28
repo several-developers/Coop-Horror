@@ -48,7 +48,7 @@ namespace GameCore.Gameplay.Levels
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void ChangePlayerLocation(PlayerEntity playerEntity, Floor floor, bool isInStairsLocation,
+        private static void ChangePlayerLocation(PlayerEntity playerEntity, Floor floor, bool isInStairsLocation,
             out PlayerLocation playerLocation)
         {
             playerLocation = PlayerLocation.Stairs;

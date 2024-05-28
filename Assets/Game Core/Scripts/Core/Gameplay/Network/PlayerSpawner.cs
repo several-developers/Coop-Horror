@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Player;
+using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.Other;
@@ -22,15 +23,16 @@ namespace GameCore.Gameplay.Network
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ILevelObserver levelObserver, IGameplayConfigsProvider gameplayConfigsProvider)
+        private void Construct(IMobileHeadquartersEntity mobileHeadquartersEntity,
+            IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            _levelObserver = levelObserver;
+            _mobileHeadquartersEntity = mobileHeadquartersEntity;
             _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ILevelObserver _levelObserver;
+        private IMobileHeadquartersEntity _mobileHeadquartersEntity;
         private PlayerConfigMeta _playerConfig;
         private NetworkManager _networkManager;
         private bool _initialSpawnDone;
@@ -82,6 +84,9 @@ namespace GameCore.Gameplay.Network
                     playerInstance.transform.SetPositionAndRotation(position, rotation);
                 }
             }
+
+            NetworkObject parent = _mobileHeadquartersEntity.GetNetworkObject();
+            playerInstance.NetworkObject.TrySetParent(parent, worldPositionStays: false);
 
             // Spawn players characters with 'destroyWithScene = true'.
             //playerInstance.NetworkObject.SpawnWithOwnership(clientId, destroyWithScene: true);

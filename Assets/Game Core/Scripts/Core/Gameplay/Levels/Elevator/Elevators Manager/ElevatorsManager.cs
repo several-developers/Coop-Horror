@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Network;
 using GameCore.Gameplay.VisualManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Rpc;
@@ -10,7 +11,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
-    public class ElevatorsManager : NetworkBehaviour
+    public class ElevatorsManager : NetcodeBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -60,51 +61,23 @@ namespace GameCore.Gameplay.Levels.Elevator
         public bool IsElevatorMoving() =>
             _isElevatorMoving.Value;
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        private void InitServerAndClient()
+        protected override void InitAll()
         {
             _currentFloor.OnValueChanged += OnCurrentFloorChanged;
 
             _rpcObserver.OnStartElevatorEvent += OnStartElevator;
         }
 
-        private void InitServer()
-        {
-            if (!IsOwner)
-                return;
-
-            // TO DO
-        }
-
-        private void InitClient()
-        {
-            if (IsOwner)
-                return;
-
-            // TO DO
-        }
-
-        private void DespawnServerAndClient()
+        protected override void DespawnAll()
         {
             _currentFloor.OnValueChanged -= OnCurrentFloorChanged;
-        }
-
-        private void DespawnServer()
-        {
-            if (!IsOwner)
-                return;
-
+            
             _rpcObserver.OnStartElevatorEvent -= OnStartElevator;
         }
 
-        private void DespawnClient()
-        {
-            if (IsOwner)
-                return;
-
-            // TO DO
-        }
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void TryStartElevator(Floor floor)
         {
@@ -216,24 +189,6 @@ namespace GameCore.Gameplay.Levels.Elevator
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            InitServerAndClient();
-            InitServer();
-            InitClient();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-
-            DespawnServerAndClient();
-            DespawnServer();
-            DespawnClient();
-        }
 
         private void OnStartElevator(Floor floor) => TryStartElevator(floor);
 

@@ -41,6 +41,18 @@ namespace GameCore.Utilities
             return transform.position + offset;
         }
         
+        public static Vector3 GetRandomLocalPosition(this Transform transform, float radius = 1f)
+        {
+            if (radius <= 0.01f)
+                return transform.localPosition;
+
+            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            float rad = Random.Range(0f, radius);
+            Vector3 offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * rad;
+            
+            return transform.localPosition + offset;
+        }
+        
         public static Vector3 GetRandomPosition(this Vector3 position, float radius = 1f)
         {
             if (radius <= 0.01f)

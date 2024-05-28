@@ -7,7 +7,6 @@ using Zenject;
 
 namespace GameCore.Gameplay.GameTimeManagement
 {
-#warning REMOVE sun from here
     public class TimeCycle : ITimeCycle, IInitializable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------

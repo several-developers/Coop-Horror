@@ -45,9 +45,7 @@ namespace GameCore.Gameplay.Dungeons
 
         [Title(Constants.DebugButtons)]
         [Button(35), DisableInEditorMode]
-        private void DebugGenerateDungeon()
-        {
+        private void DebugGenerateDungeon() =>
             _runtimeDungeon.Generate();
-        }
     }
 }

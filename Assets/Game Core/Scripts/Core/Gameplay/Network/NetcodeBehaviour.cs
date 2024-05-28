@@ -2,7 +2,7 @@
 
 namespace GameCore.Gameplay.Network
 {
-    public class NetcodeBehaviour : NetworkBehaviour
+    public abstract class NetcodeBehaviour : NetworkBehaviour
     {
         // PROPERTIES: ----------------------------------------------------------------------------
 

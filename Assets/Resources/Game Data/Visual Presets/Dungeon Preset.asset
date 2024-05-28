@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Dungeon Preset
   m_EditorClassIdentifier: 
   _metaName: Dungeon Preset
-  _presetType: 0
+  _presetType: 1
   _changeDuration: 2
   _changeEase: 5
   _useVolumeProfile: 0

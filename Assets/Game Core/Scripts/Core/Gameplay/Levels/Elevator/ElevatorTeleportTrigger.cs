@@ -29,6 +29,10 @@ namespace GameCore.Gameplay.Levels.Elevator
         [SerializeField, Required]
         private ElevatorBase _elevator;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public bool DrawTrigger => _drawTrigger;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly List<PlayerEntity> _playersList = new();
@@ -55,10 +59,6 @@ namespace GameCore.Gameplay.Levels.Elevator
             if (other.TryGetComponent(out PlayerEntity playerEntity))
                 _playersList.Remove(playerEntity);
         }
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public bool DrawTrigger() => _drawTrigger;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

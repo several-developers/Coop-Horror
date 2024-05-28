@@ -5,6 +5,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -44,6 +45,7 @@ namespace GameCore.Gameplay.VisualManagement
         private Tweener _volumeTN;
         private Tweener _nativeFogTN;
         private Tweener _cameraTN;
+        private VisualPresetType _previousPresetType;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -69,6 +71,11 @@ namespace GameCore.Gameplay.VisualManagement
         [Button(ButtonStyle.FoldoutButton)]
         public void ChangePreset(VisualPresetType presetType, bool instant = false)
         {
+            bool isPresetTypeValid = presetType != _previousPresetType;
+
+            if (!isPresetTypeValid)
+                return;
+            
             bool isPresetFound = TryGetPresetConfig(presetType, out VisualPresetConfig presetConfig);
 
             if (!isPresetFound)
@@ -77,6 +84,11 @@ namespace GameCore.Gameplay.VisualManagement
                 return;
             }
 
+            string log = Log.HandleLog($"Changing visual preset to the <gb>{presetType.GetNiceName()}</gb>.");
+            Debug.Log(log);
+
+            _previousPresetType = presetType;
+            
             ApplyEffects(presetConfig, instant);
         }
 

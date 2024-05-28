@@ -1,4 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -6,7 +7,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Levels.Elevator
 {
-    public abstract class ElevatorBase : MonoBehaviour
+    public abstract class ElevatorBase : NetcodeBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -43,8 +44,10 @@ namespace GameCore.Gameplay.Levels.Elevator
             _rpcObserver.OnOpenElevatorEvent += OnOpenElevator;
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            base.OnDestroy();
+            
             _elevatorsManagerDecorator.OnElevatorStartedEvent -= OnElevatorsStarted;
             _elevatorsManagerDecorator.OnFloorChangedEvent -= OnFloorChanged;
 

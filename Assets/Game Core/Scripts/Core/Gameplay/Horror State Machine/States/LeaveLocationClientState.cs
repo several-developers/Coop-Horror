@@ -18,13 +18,13 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILevelProvider _levelProvider;
         private readonly DungeonsManager _dungeonsManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void Enter()
         {
             ClearDungeons();

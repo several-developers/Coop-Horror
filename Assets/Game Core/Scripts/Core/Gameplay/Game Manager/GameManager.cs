@@ -146,7 +146,12 @@ namespace GameCore.Gameplay.GameManagement
                 case GameState.ArrivedAtTheLocation:
                     if (!IsServerOnly)
                         return;
+
+                    IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
                     
+                    foreach (PlayerEntity playerEntity in allPlayers.Values)
+                        playerEntity.RemoveParent();
+
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheLocation,
                         previousState: GameState.ArrivedAtTheLocation);
                     break;

@@ -2,8 +2,9 @@
 {
     public enum VisualPresetType
     {
-        Dungeon = 0,
-        RoadLocation = 1,
-        DefaultLocation = 2,
+        _ = 0,
+        Dungeon = 1,
+        RoadLocation = 2,
+        DefaultLocation = 3,
     }
 }

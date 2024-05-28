@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.Dungeons;
+using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.LevelManager;
 using GameCore.Utilities;
 using UnityEngine;
@@ -20,10 +21,25 @@ namespace GameCore.Gameplay.Levels.Elevator
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start() => RegisterDungeon();
+        private void Start()
+        {
+            RegisterDungeon();
+            TrySpawnNetworkObject();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void TrySpawnNetworkObject()
+        {
+            if (!NetworkHorror.IsTrueServer)
+                return;
+
+            if (IsSpawned)
+                return;
+            
+            NetworkObject.Spawn();
+        }
+        
         private void RegisterDungeon()
         {
             DungeonRoot dungeonRoot = null;

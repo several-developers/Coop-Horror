@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Road Location Preset
   m_EditorClassIdentifier: 
   _metaName: Road Location Preset
-  _presetType: 1
+  _presetType: 2
   _changeDuration: 2
   _changeEase: 5
   _useVolumeProfile: 1

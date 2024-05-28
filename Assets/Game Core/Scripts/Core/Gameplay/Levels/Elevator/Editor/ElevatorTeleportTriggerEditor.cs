@@ -13,7 +13,7 @@ namespace GameCore.Gameplay.Levels.Elevator.Editor
                    GizmoType.NotInSelectionHierarchy)]
         public static void RenderCustomGizmo(ElevatorTeleportTrigger obj, GizmoType gizmo)
         {
-            bool drawTrigger = obj.DrawTrigger();
+            bool drawTrigger = obj.DrawTrigger;
 
             if (!drawTrigger)
                 return;

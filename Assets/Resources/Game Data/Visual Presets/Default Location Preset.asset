@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Default Location Preset
   m_EditorClassIdentifier: 
   _metaName: Default Location Preset
-  _presetType: 2
+  _presetType: 3
   _changeDuration: 1
   _changeEase: 5
   _useVolumeProfile: 0

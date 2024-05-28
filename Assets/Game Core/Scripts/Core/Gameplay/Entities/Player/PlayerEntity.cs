@@ -94,12 +94,15 @@ namespace GameCore.Gameplay.Entities.Player
             // TO DO
         }
 
-        public void TeleportPlayer(Vector3 position, Quaternion rotation) =>
+        public void TeleportPlayer(Vector3 position, Quaternion rotation)
+        {
+            _references.NetworkTransform.InLocalSpace = false;
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
+        }
 
         public void SetParent(NetworkObject parentNetworkObject)
         {
-            if (IsOwnedByServer)
+            if (IsServer)
                 TrySetParent(parentNetworkObject);
             else
                 TrySetParentServerRpc(parentNetworkObject);
@@ -107,7 +110,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         public void RemoveParent()
         {
-            if (IsOwnedByServer)
+            if (IsServer)
                 TryRemoveParent();
             else
                 TryRemoveParentServerRpc();
@@ -142,6 +145,8 @@ namespace GameCore.Gameplay.Entities.Player
             _playerLocation.Value;
 
         public bool IsDead() => _isDead;
+
+        public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
 
         public static PlayerEntity GetLocalPlayer() => _localPlayer;
 
@@ -352,8 +357,12 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnTransformParentChanged()
         {
-            bool inLocalSpace = transform.parent != null;
-            _references.NetworkTransform.InLocalSpace = inLocalSpace;
+            bool hasParent = transform.parent != null;
+            _references.NetworkTransform.InLocalSpace = hasParent;
+            
+            _references.Rigidbody.interpolation = hasParent 
+                ? RigidbodyInterpolation.None
+                : RigidbodyInterpolation.Interpolate;
         }
 
         private void OnScrollInventory(float scrollValue)

@@ -44,7 +44,7 @@ namespace GameCore.Gameplay.Network.Other
 
         public Vector3 GetRandomPosition()
         {
-            Vector3 spawnPosition = transform.GetRandomPosition(_radius);
+            Vector3 spawnPosition = transform.GetRandomLocalPosition(_radius);
             spawnPosition.y += _yOffset;
             return spawnPosition;
         }
