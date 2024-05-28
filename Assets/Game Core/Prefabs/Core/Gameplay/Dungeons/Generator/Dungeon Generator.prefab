@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3615795059259026716}
   - component: {fileID: 8784849530468549190}
   - component: {fileID: 3615795059259026717}
+  - component: {fileID: 4745107726485903480}
   m_Layer: 0
   m_Name: Dungeon Generator
   m_TagString: Untagged
@@ -91,3 +92,30 @@ MonoBehaviour:
     fileVersion: 1
   GenerateOnStart: 0
   Root: {fileID: 0}
+--- !u!114 &4745107726485903480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3615795059259026719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f76f356143a516846a54607aa83a9ae8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority: 0
+  BakeMode: 1
+  LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  AddNavMeshLinksBetweenRooms: 1
+  NavMeshAgentTypes:
+  - AgentTypeID: 0
+    AreaTypeID: 0
+    DisableLinkWhenDoorIsClosed: 1
+  NavMeshLinkDistanceFromDoorway: 2.5
+  AutoGenerateFullRebakeSurfaces: 1
+  FullRebakeTargets: []
+  UseAutomaticLinkDistance: 0
+  AutomaticLinkDistanceOffset: 0.1

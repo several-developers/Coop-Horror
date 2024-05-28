@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Levels;
+using GameCore.Gameplay.Level;
 using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;

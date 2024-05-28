@@ -5,7 +5,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
-using GameCore.Gameplay.Levels.Locations;
+using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
 using GameCore.Observers.Gameplay.Level;

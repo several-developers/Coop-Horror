@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Levels;
-using GameCore.Gameplay.Levels.Elevator;
-using GameCore.Gameplay.Levels.Locations;
+using GameCore.Gameplay.Level;
+using GameCore.Gameplay.Level.Elevator;
+using GameCore.Gameplay.Level.Locations;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {

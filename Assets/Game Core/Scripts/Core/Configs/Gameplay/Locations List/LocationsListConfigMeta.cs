@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameCore.Gameplay.Levels.Locations;
+using GameCore.Gameplay.Level.Locations;
 using CustomEditors;
 using Sirenix.OdinInspector;
 using UnityEngine;

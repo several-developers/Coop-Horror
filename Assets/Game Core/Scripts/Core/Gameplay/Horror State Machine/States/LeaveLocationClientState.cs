@@ -1,5 +1,5 @@
 ﻿using GameCore.Gameplay.Dungeons;
-using GameCore.Gameplay.Levels;
+using GameCore.Gameplay.Level;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {

@@ -2684,6 +2684,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dungeon Elevator
       objectReference: {fileID: 0}
+    - target: {fileID: 8446322314574394841, guid: 4c20e379e3bc2e7408f28b3db0bdfece,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4000610408
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4c20e379e3bc2e7408f28b3db0bdfece, type: 3}
 --- !u!1001 &5050089907060249078

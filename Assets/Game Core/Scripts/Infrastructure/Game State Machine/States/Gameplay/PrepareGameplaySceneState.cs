@@ -2,7 +2,7 @@
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Levels.Elevator;
+using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;

@@ -1,8 +1,8 @@
 using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
-using GameCore.Gameplay.Levels;
-using GameCore.Gameplay.Levels.Elevator;
+using GameCore.Gameplay.Level;
+using GameCore.Gameplay.Level.Elevator;
 
 namespace GameCore.Observers.Gameplay.LevelManager
 {

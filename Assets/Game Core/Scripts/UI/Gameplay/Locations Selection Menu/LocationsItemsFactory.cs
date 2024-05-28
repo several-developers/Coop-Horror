@@ -2,7 +2,7 @@
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Levels.Locations;
+using GameCore.Gameplay.Level.Locations;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using UnityEngine;
 

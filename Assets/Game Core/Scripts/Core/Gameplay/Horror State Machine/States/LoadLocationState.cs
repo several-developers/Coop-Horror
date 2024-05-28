@@ -1,5 +1,5 @@
 ﻿using GameCore.Enums.Global;
-using GameCore.Gameplay.Levels.Locations;
+using GameCore.Gameplay.Level.Locations;
 using GameCore.Observers.Gameplay.Level;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace

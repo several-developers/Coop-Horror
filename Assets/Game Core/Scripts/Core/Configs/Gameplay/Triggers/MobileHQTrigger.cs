@@ -1,19 +1,10 @@
-using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player;
-using Sirenix.OdinInspector;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Triggers
 {
     public class MobileHQTrigger : MonoBehaviour
     {
-        // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title(Constants.References)]
-        [SerializeField, Required]
-        private MobileHeadquartersEntity _mobileHeadquartersEntity;
-
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void OnTriggerEnter(Collider other)
@@ -25,9 +16,6 @@ namespace GameCore.Gameplay.Triggers
 
             if (!isLocalPlayer)
                 return;
-            
-            NetworkObject networkObject = _mobileHeadquartersEntity.NetworkObject;
-            playerEntity.SetParent(networkObject);
         }
 
         private void OnTriggerExit(Collider other)
@@ -39,8 +27,6 @@ namespace GameCore.Gameplay.Triggers
 
             if (!isLocalPlayer)
                 return;
-
-            playerEntity.RemoveParent();
         }
     }
 }
