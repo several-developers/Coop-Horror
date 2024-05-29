@@ -21,6 +21,8 @@
         public const string PlayerConfig = GameplayConfigs + "Player Config";
         public const string RigPresetsConfig = GameplayConfigs + "Rig Presets Config";
         public const string VisualConfig = GameplayConfigs + "Visual Config";
+
+        public const string BeetleAIConfig = MonstersAIConfigs + "Beetle AI";
         
         public const string GameBalanceConfig = Configs + "Game Balance Config";
         
@@ -28,5 +30,6 @@
         private const string Configs = GameData + "Configs/";
         private const string GlobalConfigs = Configs + "Global/";
         private const string GameplayConfigs = Configs + "Gameplay/";
+        private const string MonstersAIConfigs = "Monsters AI/";
     }
 }

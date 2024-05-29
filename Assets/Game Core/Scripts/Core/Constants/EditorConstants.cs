@@ -12,6 +12,7 @@
         public const string LocationsCategory = "Locations";
         public const string RigPresetsCategory = "Rig Presets";
         public const string VisualPresetsCategory = "Visual Presets";
+        public const string MonstersAICategory = "Monsters AI";
 
         public const string MetaSettings = "Meta Settings";
         public const string MetaSettingsIn = "Meta Settings/In";

@@ -1,6 +1,7 @@
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Infrastructure.Providers.Gameplay.RigPresets;
 using Zenject;
 
@@ -13,6 +14,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         public override void InstallBindings()
         {
             BindGameplayConfigsProvider();
+            BindMonstersAIConfigsProvider();
             BindItemsMetaProvider();
             BindItemsProvider();
             BindRigPresetsProvider();
@@ -24,6 +26,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<GameplayConfigsProvider>()
+                .AsSingle();
+        }
+        
+        private void BindMonstersAIConfigsProvider()
+        {
+            Container
+                .BindInterfacesTo<MonstersAIConfigsProvider>()
                 .AsSingle();
         }
         
