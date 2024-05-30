@@ -42,9 +42,12 @@ namespace GameCore.Gameplay.Network.Other
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public Vector3 GetRandomPosition()
+        public Vector3 GetRandomPosition(bool localPosition = false)
         {
-            Vector3 spawnPosition = transform.GetRandomLocalPosition(_radius);
+            Vector3 spawnPosition = localPosition
+                ? transform.GetRandomLocalPosition(_radius)
+                : transform.GetRandomPosition(_radius);
+            
             spawnPosition.y += _yOffset;
             return spawnPosition;
         }

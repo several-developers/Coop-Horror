@@ -8,7 +8,6 @@ using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.Session_Manager;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
-using GameCore.Observers.Gameplay.Level;
 using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -32,6 +31,8 @@ namespace GameCore.Gameplay.Network
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private const bool SpawnAsChild = true;
+        
         private IMobileHeadquartersEntity _mobileHeadquartersEntity;
         private PlayerConfigMeta _playerConfig;
         private NetworkManager _networkManager;
@@ -84,9 +85,12 @@ namespace GameCore.Gameplay.Network
                     playerInstance.transform.SetPositionAndRotation(position, rotation);
                 }
             }
-
-            NetworkObject parent = _mobileHeadquartersEntity.GetNetworkObject();
-            playerInstance.NetworkObject.TrySetParent(parent, worldPositionStays: false);
+            
+            if (SpawnAsChild)
+            {
+                NetworkObject parent = _mobileHeadquartersEntity.GetNetworkObject();
+                playerInstance.NetworkObject.TrySetParent(parent, worldPositionStays: false);
+            }
 
             // Spawn players characters with 'destroyWithScene = true'.
             //playerInstance.NetworkObject.SpawnWithOwnership(clientId, destroyWithScene: true);
@@ -105,7 +109,7 @@ namespace GameCore.Gameplay.Network
         private Vector3 GetSpawnPosition()
         {
             bool isSpawnPointFound = PlayerSpawnPoint.GetRandomSpawnPoint(out PlayerSpawnPoint spawnPoint);
-            return isSpawnPointFound ? spawnPoint.GetRandomPosition() : transform.GetRandomPosition();
+            return isSpawnPointFound ? spawnPoint.GetRandomPosition(SpawnAsChild) : transform.GetRandomPosition();
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

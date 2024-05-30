@@ -12,4 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38be29230d4846f09a925b66ebd5dc02, type: 3}
   m_Name: Beetle AI
   m_EditorClassIdentifier: 
-  _metaName: 
+  _metaName: Beetle AI
+  _wanderingMinDelay: 0.5
+  _wanderingMaxDelay: 5
+  _wanderingMinSpeed: 1
+  _wanderingMaxSpeed: 2
+  _wanderingMinDistance: 2
+  _wanderingMaxDistance: 10
+  _triggerDistanceCheckInterval: 0.2
+  _triggerDistance: 5
+  _aggressionScale: 100
+  _aggressionIncreaseSpeed: 15
+  _aggressionDecreaseSpeed: 6
+  _screamDistance: 15
+  _screamCooldown: 5
+  _chaseSpeed: 5
+  _minChaseDistance: 0.5
+  _maxChaseDistance: 10
+  _chaseEndDelay: 5
+  _attackDistance: 1
+  _attackCooldown: 2
+  _damage: 20

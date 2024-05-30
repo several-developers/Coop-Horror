@@ -16,11 +16,11 @@ MonoBehaviour:
   _presetType: 2
   _changeDuration: 2
   _changeEase: 5
-  _useVolumeProfile: 0
+  _useVolumeProfile: 1
   _volumeProfile: {fileID: 11400000, guid: 97b773c9ebdac8249baaa366309ed38b, type: 2}
   _useNativeFog: 0
   _nativeFogColor: {r: 0, g: 0, b: 0, a: 1}
   _nativeFogDensity: 0.05
-  _changeCameraDistance: 0
+  _changeCameraDistance: 1
   _cameraDistance: 160
   _useSkybox: 1

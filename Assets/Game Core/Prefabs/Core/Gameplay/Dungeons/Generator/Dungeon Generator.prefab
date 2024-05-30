@@ -109,7 +109,7 @@ MonoBehaviour:
   LayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  AddNavMeshLinksBetweenRooms: 1
+  AddNavMeshLinksBetweenRooms: 0
   NavMeshAgentTypes:
   - AgentTypeID: 0
     AreaTypeID: 0

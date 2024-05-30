@@ -30,6 +30,7 @@
         private const string Configs = GameData + "Configs/";
         private const string GlobalConfigs = Configs + "Global/";
         private const string GameplayConfigs = Configs + "Gameplay/";
-        private const string MonstersAIConfigs = "Monsters AI/";
+        
+        private const string MonstersAIConfigs = GameData + "Monsters AI/";
     }
 }

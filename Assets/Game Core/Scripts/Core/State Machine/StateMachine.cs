@@ -7,9 +7,11 @@ namespace GameCore
     public class StateMachine
     {
         // FIELDS: --------------------------------------------------------------------------------
+        
+        public event Action<IState> OnStateChangedEvent = delegate { }; 
 
         private readonly Dictionary<Type, IState> _states = new();
-
+        
         private IState _currentState;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -70,6 +72,7 @@ namespace GameCore
             }
 
             _currentState = _states[type];
+            OnStateChangedEvent.Invoke(_currentState);
 
             switch (_currentState)
             {
@@ -100,6 +103,7 @@ namespace GameCore
             }
 
             _currentState = _states[type];
+            OnStateChangedEvent.Invoke(_currentState);
 
             switch (_currentState)
             {
