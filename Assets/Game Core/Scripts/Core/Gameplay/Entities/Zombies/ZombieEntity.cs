@@ -12,7 +12,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.Zombies
 {
-    public class ZombieEntity : MonoBehaviour, ITarget
+    public class ZombieEntity : MonoBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -69,7 +69,6 @@ namespace GameCore.Gameplay.Entities.Zombies
 
         public event Action OnAnimatorMoveEvent;
         public event Action OnMovementSpeedUpdatedEvent;
-        public event Action<ITarget> OnDeathEvent;
 
         private StateMachine _zombieStateMachine;
         private IHealthSystem _healthSystem;
@@ -131,8 +130,9 @@ namespace GameCore.Gameplay.Entities.Zombies
                 hitBox.SetActive(false);
         }
 
-        public void SendDeathEvent() =>
-            OnDeathEvent?.Invoke(this);
+        public void SendDeathEvent()
+        {
+        }
 
         public void EnterIdleState() => EnterState<IdleState>();
 

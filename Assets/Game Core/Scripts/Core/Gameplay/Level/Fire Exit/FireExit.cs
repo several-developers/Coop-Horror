@@ -1,6 +1,7 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable;
 using GameCore.Observers.Gameplay.LevelManager;
@@ -48,7 +49,7 @@ namespace GameCore.Gameplay.Level
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
+        private void Awake()
         {
             FindDungeonRoot();
             RegisterStairsFireExit();
@@ -65,8 +66,18 @@ namespace GameCore.Gameplay.Level
         {
         }
 
-        public void Interact(PlayerEntity playerEntity = null) =>
-            _fireExitsManager.TeleportToFireExit(_floor, _isInStairsLocation);
+        public void Interact(IEntity entity = null)
+        {
+            if (entity == null)
+                return;
+
+            bool isPlayer = entity.GetType() == typeof(PlayerEntity);
+            
+            if (isPlayer)
+                _fireExitsManager.TeleportLocalPlayerToFireExit(_floor, _isInStairsLocation);
+            else
+                _fireExitsManager.TeleportEntityToFireExit(entity, _floor, _isInStairsLocation);
+        }
 
         public void ToggleInteract(bool canInteract)
         {

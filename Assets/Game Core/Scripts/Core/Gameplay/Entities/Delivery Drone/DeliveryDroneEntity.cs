@@ -52,6 +52,10 @@ namespace GameCore.Gameplay.Entities.DeliveryDrone
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void Teleport(Vector3 position, Quaternion rotation)
+        {
+        }
+        
         public Transform GetTransform() => transform;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------

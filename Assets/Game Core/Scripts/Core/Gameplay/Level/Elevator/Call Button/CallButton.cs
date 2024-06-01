@@ -1,5 +1,6 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Network;
@@ -71,7 +72,7 @@ namespace GameCore.Gameplay.Level.Elevator
         {
         }
 
-        public void Interact(PlayerEntity playerEntity = null)
+        public void Interact(IEntity entity = null)
         {
             if (IsElevatorMoving())
                 return;

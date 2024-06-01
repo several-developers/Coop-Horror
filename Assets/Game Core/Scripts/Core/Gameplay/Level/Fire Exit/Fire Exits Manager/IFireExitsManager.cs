@@ -1,9 +1,11 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities;
 
 namespace GameCore.Gameplay.Level
 {
     public interface IFireExitsManager
     {
-        void TeleportToFireExit(Floor floor, bool isInStairsLocation);
+        void TeleportLocalPlayerToFireExit(Floor floor, bool isInStairsLocation);
+        void TeleportEntityToFireExit(IEntity entity, Floor floor, bool isInStairsLocation);
     }
 }

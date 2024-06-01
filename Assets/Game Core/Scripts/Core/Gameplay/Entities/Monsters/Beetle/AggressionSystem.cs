@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Monsters.Beetle.States;
@@ -9,7 +10,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 {
     public class AggressionSystem
     {
-        private enum AggressionStatus
+        public enum AggressionStatus
         {
             Increase = 0,
             Decrease = 1
@@ -47,11 +48,24 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             TryEnterScreamState();
         }
 
-        public void ToggleTriggerCheckState(bool isEnabled) =>
+        public void ToggleTriggerCheckState(bool isEnabled)
+        {
             _triggerCheckEnabled = isEnabled;
 
-        public void ToggleIgnoreAggressionScale(bool ignore) =>
-            _ignoreAggressionScale = ignore;
+            CheckTriggerState();
+            UpdateAggressionScale();
+            UpdateAggressionText();
+        }
+
+        public void SetAggressionStatus(AggressionStatus aggressionStatus) =>
+            _aggressionStatus = aggressionStatus;
+        
+        public void SetMaxAggressionScale()
+        {
+            _currentAggressionScale = _beetleAIConfig.AggressionScale;
+            UpdateAggressionScale();
+            UpdateAggressionText();
+        }
 
         public void Reset()
         {
@@ -99,6 +113,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             
             foreach (PlayerEntity playerEntity in allPlayers.Values)
             {
+                if (playerEntity == null)
+                    continue;
+                
                 Vector3 playerPosition = playerEntity.transform.position;
                 float distance = Vector3.Distance(a: beetlePosition, b: playerPosition);
                 bool isTriggered = distance < triggerDistance;
@@ -122,14 +139,16 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
                 TryLeaveTriggerState();
             }
         }
-        
-        private void SetAggressionStatus(AggressionStatus aggressionStatus) =>
-            _aggressionStatus = aggressionStatus;
 
         private void TryEnterTriggerState()
         {
             bool isStateFound = _beetleEntity.TryGetCurrentState(out IState state);
-            bool isStateValid = isStateFound && state.GetType() != typeof(TriggerState);
+
+            if (!isStateFound)
+                return;
+            
+            Type stateType = state.GetType();
+            bool isStateValid = stateType == typeof(IdleState) || stateType == typeof(WanderingState);
 
             if (!isStateValid)
                 return;
@@ -162,6 +181,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             if (!isStateValid)
                 return;
             
+            //_currentAggressionScale = Mathf.
             EnterIdleState();
         }
 

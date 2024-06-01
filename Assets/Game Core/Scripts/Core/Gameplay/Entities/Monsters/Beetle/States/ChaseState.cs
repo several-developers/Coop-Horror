@@ -27,7 +27,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         private Coroutine _chaseCO;
         private Coroutine _distanceCheckCO;
+        private Coroutine _chasingEndTimerCO;
         private float _startStoppingDistance;
+        private bool _isStopChasingTimerEnabled;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -94,10 +96,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             float distance = Vector3.Distance(a: beetlePosition, b: targetPosition);
             bool isTooFar = distance > _beetleAIConfig.MaxChaseDistance;
 
-            if (!isTooFar)
-                return;
-            
-            EnterTriggerState();
+            if (isTooFar)
+                StartChasingEndTimer();
+            else
+                StopChasingEndTimer();
         }
         
         private void StartChasing()
@@ -127,12 +129,34 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             
             _beetleEntity.StopCoroutine(_distanceCheckCO);
         }
+
+        private void StartChasingEndTimer()
+        {
+            if (_isStopChasingTimerEnabled)
+                return;
+
+            IEnumerator routine = ChasingEndTimerCO();
+            _chasingEndTimerCO = _beetleEntity.StartCoroutine(routine);
+            _isStopChasingTimerEnabled = true;
+        }
+
+        private void StopChasingEndTimer()
+        {
+            if (!_isStopChasingTimerEnabled)
+                return;
+
+            if (_chasingEndTimerCO == null)
+                return;
+
+            _beetleEntity.StopCoroutine(_chasingEndTimerCO);
+            _isStopChasingTimerEnabled = false;
+        }
         
         private IEnumerator ChaseCO()
         {
             while (true)
             {
-                float checkInterval = _beetleAIConfig.ChasePlayerPositionCheckInterval;
+                float checkInterval = _beetleAIConfig.ChasePositionCheckInterval;
                 yield return new WaitForSeconds(checkInterval);
                 
                 SetDestination();
@@ -148,6 +172,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
                 
                 CheckDistance();
             }
+        }
+        
+        private IEnumerator ChasingEndTimerCO()
+        {
+            float delay = _beetleAIConfig.ChaseEndDelay;
+            yield return new WaitForSeconds(delay);
+                
+            EnterTriggerState();
         }
         
         private void EnterTriggerState() =>

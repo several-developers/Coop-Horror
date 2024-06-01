@@ -84,7 +84,7 @@ namespace GameCore.Gameplay.Level.Elevator
             Transform parent2 = targetElevator.transform;
 
             GameUtilities.Teleport(target, parent1, parent2, out Vector3 position, out Quaternion rotation);
-            playerEntity.TeleportPlayer(position, rotation);
+            playerEntity.Teleport(position, rotation);
         }
 
         private bool IsLocalPlayerInTheElevator()

@@ -1,6 +1,7 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Delivery;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Items;
@@ -49,10 +50,17 @@ namespace GameCore.Gameplay.Interactable
             inventory.OnSelectedSlotChangedEvent -= OnPlayerSelectedSlotChanged;
         }
 
-        public void Interact(PlayerEntity playerEntity = null)
+        public void Interact(IEntity entity = null)
         {
-            if (playerEntity == null)
+            if (entity == null)
                 return;
+
+            bool isPlayer = entity.GetType() == typeof(PlayerEntity);
+
+            if (!isPlayer)
+                return;
+            
+            var playerEntity = entity as PlayerEntity;
             
             TryDropPlayerItem(playerEntity);
         }

@@ -120,6 +120,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             ChangePath(path, startPositionAtRoadLocation);
         }
 
+        public void Teleport(Vector3 position, Quaternion rotation)
+        {
+        }
+        
         public void SendOpenQuestsSelectionMenu() =>
             OnOpenQuestsSelectionMenuEvent.Invoke();
 

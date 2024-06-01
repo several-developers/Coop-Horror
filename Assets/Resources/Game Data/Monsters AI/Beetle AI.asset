@@ -20,14 +20,16 @@ MonoBehaviour:
   _wanderingMinDistance: 2
   _wanderingMaxDistance: 10
   _triggerDistanceCheckInterval: 0.2
-  _triggerDistance: 5
+  _triggerDistance: 6
   _aggressionScale: 100
-  _aggressionIncreaseSpeed: 15
-  _aggressionDecreaseSpeed: 6
-  _screamDistance: 15
+  _aggressionIncreaseSpeed: 20
+  _aggressionDecreaseSpeed: 10
+  _screamDistance: 25
   _screamCooldown: 5
+  _chasePositionCheckInterval: 0.1
   _chaseSpeed: 5
-  _minChaseDistance: 0.5
+  _chaseDistanceCheckInterval: 0.1
+  _chaseStoppingDistance: 0.5
   _maxChaseDistance: 10
   _chaseEndDelay: 5
   _attackDistance: 1

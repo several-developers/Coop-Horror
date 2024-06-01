@@ -7,6 +7,19 @@ namespace GameCore.Configs.Gameplay.Enemies
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [TitleGroup(title: CommonSettings)]
+        [BoxGroup(CommonGroup, showLabel: false), SerializeField, Min(0f)]
+        private float _fireExitInteractionDistance = 0.5f;
+        
+        [BoxGroup(CommonGroup), SerializeField, Min(0f)]
+        private float _fireExitInteractionDuration = 0.5f;
+        
+        [BoxGroup(CommonGroup), SerializeField, Min(0f)]
+        private float _fireExitDistanceCheckInterval = 0.2f;
+        
+        [BoxGroup(CommonGroup), SerializeField, Min(0f)]
+        private float _moveToDungeonSpeed = 1f;
+
         [TitleGroup(title: IdleStateSettings)]
         [BoxGroup(IdleStateGroup, showLabel: false), SerializeField, Min(0f)]
         private float _wanderingMinDelay = 0.5f;
@@ -52,7 +65,7 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         [TitleGroup(title: ChaseStateSettings)]
         [BoxGroup(ChaseStateGroup, showLabel: false), SerializeField, Min(0f)]
-        private float _chasePlayerPositionCheckInterval = 0.15f;
+        private float _chasePositionCheckInterval = 0.1f;
         
         [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
         private float _chaseSpeed = 5f;
@@ -78,9 +91,14 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         [BoxGroup(AttackStateGroup), SerializeField, Min(0f)]
         private float _damage = 20f;
-
+        
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public float FireExitInteractionDistance => _fireExitInteractionDistance;
+        public float FireExitInteractionDuration => _fireExitInteractionDuration;
+        public float FireExitDistanceCheckInterval => _fireExitDistanceCheckInterval;
+        public float MoveToDungeonSpeed => _moveToDungeonSpeed;
+        
         public float WanderingMinDelay => _wanderingMinDelay;
         public float WanderingMaxDelay => _wanderingMaxDelay;
         
@@ -95,14 +113,19 @@ namespace GameCore.Configs.Gameplay.Enemies
         public float AggressionIncreaseSpeed => _aggressionIncreaseSpeed;
         public float AggressionDecreaseSpeed => _aggressionDecreaseSpeed;
 
-        public float ChasePlayerPositionCheckInterval => _chasePlayerPositionCheckInterval;
+        public float ScreamDistance => _screamDistance;
+        public float ScreamCooldown => _screamCooldown;
+
+        public float ChasePositionCheckInterval => _chasePositionCheckInterval;
         public float ChaseSpeed => _chaseSpeed;
         public float ChaseDistanceCheckInterval => _chaseDistanceCheckInterval;
         public float ChaseStoppingDistance => _chaseStoppingDistance;
         public float MaxChaseDistance => _maxChaseDistance;
+        public float ChaseEndDelay => _chaseEndDelay;
         
         // FIELDS: --------------------------------------------------------------------------------
 
+        private const string CommonSettings = "Common Settings";
         private const string IdleStateSettings = "Idle State Settings";
         private const string WanderingStateSettings = "Wandering State Settings";
         private const string TriggerStateSettings = "Trigger State Settings";
@@ -110,6 +133,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string ChaseStateSettings = "Chase State Settings";
         private const string AttackStateSettings = "Attack State Settings";
         
+        private const string CommonGroup = CommonSettings + "/Group";
         private const string IdleStateGroup = IdleStateSettings + "/Group";
         private const string WanderingStateGroup = WanderingStateSettings + "/Group";
         private const string TriggerStateGroup = TriggerStateSettings + "/Group";

@@ -1,6 +1,6 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Entities;
 
 namespace GameCore.Gameplay.Interactable
 {
@@ -9,7 +9,7 @@ namespace GameCore.Gameplay.Interactable
         event Action OnInteractionStateChangedEvent;
         void InteractionStarted();
         void InteractionEnded();
-        void Interact(PlayerEntity playerEntity = null);
+        void Interact(IEntity entity = null);
         void ToggleInteract(bool canInteract);
         InteractionType GetInteractionType();
         bool CanInteract();

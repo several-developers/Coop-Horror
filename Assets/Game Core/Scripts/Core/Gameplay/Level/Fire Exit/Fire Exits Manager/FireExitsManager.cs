@@ -1,4 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.VisualManagement;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace GameCore.Gameplay.Level
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void TeleportToFireExit(Floor floor, bool isInStairsLocation)
+        public void TeleportLocalPlayerToFireExit(Floor floor, bool isInStairsLocation)
         {
             PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
             FireExit fireExit;
@@ -40,10 +41,30 @@ namespace GameCore.Gameplay.Level
             Quaternion rotation = teleportPoint.rotation;
 
             playerEntity.References.Rigidbody.velocity = Vector3.zero;
-            playerEntity.TeleportPlayer(position, rotation);
+            playerEntity.Teleport(position, rotation);
 
             ChangePlayerLocation(playerEntity, floor, isInStairsLocation, out PlayerLocation playerLocation);
             ChangeVisualPreset(playerLocation);
+        }
+
+        public void TeleportEntityToFireExit(IEntity entity, Floor floor, bool isInStairsLocation)
+        {
+            FireExit fireExit;
+
+            // Reversed
+            bool isFireExitFound = isInStairsLocation
+                ? _levelProvider.TryGetOtherFireExit(floor, out fireExit)
+                : _levelProvider.TryGetStairsFireExit(floor, out fireExit);
+
+            if (!isFireExitFound)
+                return;
+
+            Transform teleportPoint = fireExit.GetTeleportPoint();
+            Vector3 position = teleportPoint.position;
+            Quaternion rotation = teleportPoint.rotation;
+
+            //entity.Rigidbody.velocity = Vector3.zero;
+            entity.Teleport(position, rotation);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

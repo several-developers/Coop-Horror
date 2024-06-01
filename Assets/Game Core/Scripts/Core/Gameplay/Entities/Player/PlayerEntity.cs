@@ -33,6 +33,8 @@ namespace GameCore.Gameplay.Entities.Player
             _playerInteractionObserver = playerInteractionObserver;
             _playerCamera = playerCamera;
             InputReader = configsProvider.GetInputReader();
+            
+            Debug.LogWarning("CONSTRUCTOR " + (playerCamera == null));
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -94,7 +96,7 @@ namespace GameCore.Gameplay.Entities.Player
             // TO DO
         }
 
-        public void TeleportPlayer(Vector3 position, Quaternion rotation)
+        public void Teleport(Vector3 position, Quaternion rotation)
         {
             _references.NetworkTransform.InLocalSpace = false;
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);

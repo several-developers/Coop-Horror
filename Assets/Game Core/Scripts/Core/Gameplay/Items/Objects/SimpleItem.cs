@@ -1,10 +1,10 @@
-﻿using GameCore.Gameplay.Entities.Player;
+﻿using GameCore.Gameplay.Entities;
 
 namespace GameCore.Gameplay.Items
 {
     public class SimpleItem : ItemObjectBase
     {
-        public override void Interact(PlayerEntity playerEntity = null)
+        public override void Interact(IEntity entity = null)
         {
             
         }

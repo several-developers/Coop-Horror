@@ -138,7 +138,6 @@ namespace GameCore.Gameplay.Entities.Zombies.States
             if (IsPlayerDead())
                 return;
             
-            _playerEntity.TakeDamage(_zombieEntity, damage: 0f);
         }
 
         private bool IsPlayerDead() =>

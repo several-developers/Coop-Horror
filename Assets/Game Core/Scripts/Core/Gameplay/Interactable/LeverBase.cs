@@ -1,6 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -64,7 +65,7 @@ namespace GameCore.Gameplay.Interactable
         {
         }
 
-        public void Interact(PlayerEntity playerEntity = null)
+        public void Interact(IEntity entity = null)
         {
             IsInteractionEnabled = false;
             OnInteractEvent?.Invoke();

@@ -11,6 +11,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         [Title(Constants.References)]
         [SerializeField, Required]
+        private ClientNetworkTransform _networkTransform;
+        
+        [SerializeField, Required]
         protected NavMeshAgent _agent;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -18,6 +21,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         protected virtual void Awake() => CheckAgentState();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public virtual void Teleport(Vector3 position, Quaternion rotation)
+        {
+            _networkTransform.Teleport(position, rotation, transform.localScale);
+        }
         
         public Transform GetTransform() => transform;
 
