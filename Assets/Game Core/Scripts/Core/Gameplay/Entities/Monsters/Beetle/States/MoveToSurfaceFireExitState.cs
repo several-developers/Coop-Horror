@@ -7,11 +7,11 @@ using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 {
-    public class MoveToStairsState : IEnterState, IExitState
+    public class MoveToSurfaceFireExitState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MoveToStairsState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig,
+        public MoveToSurfaceFireExitState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig,
             ILevelProvider levelProvider)
         {
             _beetleEntity = beetleEntity;
@@ -42,11 +42,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             EnableAgent();
             StartDistanceCheck();
             SetDestinationPoint();
+
+            _beetleEntity.OnEntityTeleportedEvent += OnEntityTeleported;
         }
 
         public void Exit()
         {
             StopDistanceCheck();
+            
+            _beetleEntity.OnEntityTeleportedEvent -= OnEntityTeleported;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -111,5 +115,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         private void EnterIdleState() =>
             _beetleEntity.EnterIdleState();
+
+        private void EnterMoveToDungeonFireExitState() =>
+            _beetleEntity.EnterMoveToDungeonFireExitState();
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnEntityTeleported() => EnterMoveToDungeonFireExitState();
     }
 }

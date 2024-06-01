@@ -33,8 +33,6 @@ namespace GameCore.Gameplay.Entities.Player
             _playerInteractionObserver = playerInteractionObserver;
             _playerCamera = playerCamera;
             InputReader = configsProvider.GetInputReader();
-            
-            Debug.LogWarning("CONSTRUCTOR " + (playerCamera == null));
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

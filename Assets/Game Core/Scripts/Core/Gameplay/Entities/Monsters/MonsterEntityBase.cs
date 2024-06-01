@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.Network;
+﻿using System;
+using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
@@ -15,6 +16,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         
         [SerializeField, Required]
         protected NavMeshAgent _agent;
+
+        // FIELDS: --------------------------------------------------------------------------------
+
+        public event Action OnEntityTeleportedEvent = delegate { };
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -24,7 +29,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         public virtual void Teleport(Vector3 position, Quaternion rotation)
         {
+            _agent.enabled = false;
             _networkTransform.Teleport(position, rotation, transform.localScale);
+            _agent.enabled = true;
+            
+            OnEntityTeleportedEvent.Invoke();
         }
         
         public Transform GetTransform() => transform;

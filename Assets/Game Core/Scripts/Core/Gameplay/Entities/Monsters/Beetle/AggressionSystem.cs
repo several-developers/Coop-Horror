@@ -23,6 +23,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             _beetleEntity = beetleEntity;
             _beetleAIConfig = beetleAIConfig;
             _transform = beetleEntity.transform;
+            _aggressionStatus = AggressionStatus.Decrease;
+            _triggerCheckEnabled = true;
 
             IEnumerator routine = TriggerCheckCO();
             beetleEntity.StartCoroutine(routine);

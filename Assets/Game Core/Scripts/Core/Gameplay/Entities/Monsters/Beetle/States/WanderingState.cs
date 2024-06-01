@@ -18,7 +18,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const float MinDistance = 0.2f;
+        private const float MinDistance = 0.5f;
         
         private readonly BeetleEntity _beetleEntity;
         private readonly BeetleAIConfigMeta _beetleAIConfig;
@@ -106,7 +106,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         private bool IsStuck()
         {
             NavMeshPathStatus pathStatus = _agent.pathStatus;
-            bool isStatusValid = pathStatus == NavMeshPathStatus.PathComplete;
+            bool isStatusValid = pathStatus == NavMeshPathStatus.PathComplete && _agent.hasPath;
             float velocity = _agent.velocity.magnitude;
             bool isStuck = !isStatusValid && velocity < 0.1f;
             return isStuck;

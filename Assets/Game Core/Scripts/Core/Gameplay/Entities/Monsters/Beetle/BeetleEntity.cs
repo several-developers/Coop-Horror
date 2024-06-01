@@ -30,10 +30,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         [SerializeField, Required]
         private TextMeshPro _stateTMP;
-        
+
         [SerializeField, Required]
         private TextMeshPro _aggressionTMP;
-        
+
         [SerializeField, Required]
         private TextMeshPro _rageTMP;
 
@@ -41,13 +41,13 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         public TextMeshPro AggressionTMP => _aggressionTMP;
         public TextMeshPro RageTMP => _rageTMP;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private static readonly List<BeetleEntity> AllBeetles = new();
 
         private ILevelProvider _levelProvider;
-        
+
         private BeetleAIConfigMeta _beetleAIConfig;
         private StateMachine _beetleStateMachine;
         private AggressionSystem _aggressionSystem;
@@ -58,6 +58,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
+        protected override void Awake()
+        {
+            base.Awake();
+            CheckIfOutside();
+        }
+
         private void Start()
         {
             if (!IsSpawned && NetworkHorror.IsTrueServer)
@@ -65,13 +71,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public override void Teleport(Vector3 position, Quaternion rotation)
-        {
-            base.Teleport(position, rotation);
-            
-            EnterIdleState();
-        }
 
         public void SetTargetPlayer(PlayerEntity playerEntity) =>
             _targetPlayer = playerEntity;
@@ -82,23 +81,27 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         public void EnterIdleState() => ChangeState<IdleState>();
 
         public void EnterWanderingState() => ChangeState<WanderingState>();
-        
+
         public void EnterTriggerState() => ChangeState<TriggerState>();
 
         public void EnterScreamState() => ChangeState<ScreamState>();
-        
+
         public void EnterChaseState() => ChangeState<ChaseState>();
 
         public void EnterAttackState() => ChangeState<AttackState>();
 
-        public void EnterMoveToStairsState() => ChangeState<MoveToStairsState>();
+        public void EnterMoveToSurfaceFireExitState() => ChangeState<MoveToSurfaceFireExitState>();
+
+        public void EnterMoveToDungeonFireExitState() => ChangeState<MoveToDungeonFireExitState>();
 
         public static IReadOnlyList<BeetleEntity> GetAllBeetles() => AllBeetles;
 
         public AggressionSystem GetAggressionSystem() => _aggressionSystem;
 
         public PlayerEntity GetTargetPlayer() => _targetPlayer;
-        
+
+        public Floor GetDungeonFloor() => _dungeonFloor;
+
         public bool TryGetCurrentState(out IState state) =>
             _beetleStateMachine.TryGetCurrentState(out state);
 
@@ -110,10 +113,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
             InitSystems();
             SetupStates();
-            CheckIfOutside();
-            
+
             if (_isOutside)
-                EnterMoveToStairsState();
+                EnterMoveToSurfaceFireExitState();
             else
                 EnterIdleState();
         }
@@ -130,17 +132,17 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         {
             _beetleStateMachine = new StateMachine();
             _aggressionSystem = new AggressionSystem(beetleEntity: this, _beetleAIConfig);
-            
+
             _beetleStateMachine.OnStateChangedEvent += state =>
             {
                 string stateName = state.GetType().Name.GetNiceName();
                 _stateTMP.text = $"State: {stateName}";
 
-                string log = Log.HandleLog($"New state = <gb>{stateName}</gb>");
-                Debug.Log(log);
+                // string log = Log.HandleLog($"New state = <gb>{stateName}</gb>");
+                // Debug.Log(log);
             };
         }
-        
+
         private void SetupStates()
         {
             IdleState idleState = new(beetleEntity: this, _beetleAIConfig);
@@ -149,8 +151,13 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             ScreamState screamState = new(beetleEntity: this, _beetleAIConfig);
             ChaseState chaseState = new(beetleEntity: this, _beetleAIConfig);
             AttackState attackState = new(beetleEntity: this, _beetleAIConfig);
-            MoveToStairsState moveToStairsState = new(beetleEntity: this, _beetleAIConfig, _levelProvider);
             DeathState deathState = new(beetleEntity: this);
+
+            MoveToSurfaceFireExitState moveToSurfaceFireExitState =
+                new(beetleEntity: this, _beetleAIConfig, _levelProvider);
+            
+            MoveToDungeonFireExitState moveToDungeonFireExitState =
+                new(beetleEntity: this, _beetleAIConfig, _levelProvider);
 
             _beetleStateMachine.AddState(idleState);
             _beetleStateMachine.AddState(wanderingState);
@@ -158,18 +165,19 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             _beetleStateMachine.AddState(screamState);
             _beetleStateMachine.AddState(chaseState);
             _beetleStateMachine.AddState(attackState);
-            _beetleStateMachine.AddState(moveToStairsState);
             _beetleStateMachine.AddState(deathState);
+            _beetleStateMachine.AddState(moveToSurfaceFireExitState);
+            _beetleStateMachine.AddState(moveToDungeonFireExitState);
         }
 
         private void CheckIfOutside()
         {
             Transform parent = transform.parent;
-            
+
             while (parent != null)
             {
                 bool isDungeonRootFound = parent.TryGetComponent(out DungeonRoot dungeonRoot);
-                
+
                 parent = parent.parent;
 
                 if (!isDungeonRootFound)
@@ -195,26 +203,29 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         [Title(Constants.DebugButtons)]
         [Button(buttonSize: 30, ButtonStyle.FoldoutButton), DisableInEditorMode]
         private void DebugToggleOutsideState(bool isOutside) => ToggleOutsideState(isOutside);
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterIdleState() => EnterIdleState();
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterWanderingState() => EnterWanderingState();
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterTriggerState() => EnterTriggerState();
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterScreamState() => EnterScreamState();
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterChaseState() => EnterChaseState();
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterAttackState() => EnterAttackState();
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
-        private void DebugEnterMoveToStairsState() => EnterMoveToStairsState();
+        private void DebugEnterMoveToStairsState() => EnterMoveToSurfaceFireExitState();
+
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugEnterMoveToDungeonFireExitState() => EnterMoveToDungeonFireExitState();
     }
 }

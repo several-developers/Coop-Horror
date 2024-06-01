@@ -26,24 +26,21 @@ namespace GameCore.Gameplay.Network.Utilities
         
         // FIELDS: --------------------------------------------------------------------------------
 
-        private static bool _isInitialized;
-        
         private DiContainer _diContainer;
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void OnDestroy() => RemovePrefabs();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void RegisterPrefabs()
         {
-            if (_isInitialized)
-                return;
-            
             NetworkManager networkManager = NetworkManager.Singleton;
 
             if (networkManager == null)
                 return;
             
-            _isInitialized = true;
-
             foreach (GameObject prefab in _prefabs)
             {
                 bool containsNetworkObject = prefab.GetComponent<NetworkObject>() != null;
@@ -58,6 +55,27 @@ namespace GameCore.Gameplay.Network.Utilities
 
                 networkManager.PrefabHandler.AddHandler(prefab,
                     instanceHandler: new ZenjectNetCodeFactory(prefab, _diContainer));
+            }
+        }
+
+        private void RemovePrefabs()
+        {
+            NetworkManager networkManager = NetworkManager.Singleton;
+
+            if (networkManager == null)
+                return;
+            
+            foreach (GameObject prefab in _prefabs)
+            {
+                bool containsNetworkObject = prefab.GetComponent<NetworkObject>() != null;
+
+                if (!containsNetworkObject)
+                {
+                    Log.PrintError(log: $"Prefab <gb>{prefab.name}</gb> <rb>doesn't contains</rb> Network Object!");
+                    continue;
+                }
+                
+                networkManager.RemoveNetworkPrefab(prefab);
             }
         }
     }

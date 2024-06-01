@@ -109,13 +109,13 @@ MonoBehaviour:
   LayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  AddNavMeshLinksBetweenRooms: 0
+  AddNavMeshLinksBetweenRooms: 1
   NavMeshAgentTypes:
   - AgentTypeID: 0
     AreaTypeID: 0
     DisableLinkWhenDoorIsClosed: 1
-  NavMeshLinkDistanceFromDoorway: 2.5
+  NavMeshLinkDistanceFromDoorway: 1
   AutoGenerateFullRebakeSurfaces: 1
   FullRebakeTargets: []
-  UseAutomaticLinkDistance: 0
+  UseAutomaticLinkDistance: 1
   AutomaticLinkDistanceOffset: 0.1
