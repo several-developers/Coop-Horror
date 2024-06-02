@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Beetle AI
   m_EditorClassIdentifier: 
   _metaName: Beetle AI
+  _isDamageable: 1
+  _health: 50
   _fireExitInteractionDistance: 0.5
   _fireExitInteractionDuration: 0.5
   _fireExitDistanceCheckInterval: 0.2
@@ -24,7 +26,7 @@ MonoBehaviour:
   _wanderingMinDistance: 2
   _wanderingMaxDistance: 10
   _triggerDistanceCheckInterval: 0.2
-  _triggerDistance: 0.01
+  _triggerDistance: 8
   _aggressionScale: 100
   _aggressionIncreaseSpeed: 20
   _aggressionDecreaseSpeed: 10

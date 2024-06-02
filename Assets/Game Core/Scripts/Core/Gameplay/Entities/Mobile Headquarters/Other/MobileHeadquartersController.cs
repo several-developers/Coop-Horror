@@ -89,8 +89,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private void HandleGameState(GameState gameState)
         {
-            GameObject deathCamera;
-
             switch (gameState)
             {
                 // Под вопросом это
@@ -109,16 +107,10 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case GameState.KillPlayersOnTheRoad:
-                    deathCamera = _references.DeathCamera;
-                    deathCamera.SetActive(true);
-
                     ToggleDoorState(isOpen: true);
                     break;
 
                 case GameState.RestartGame:
-                    deathCamera = _references.DeathCamera;
-                    deathCamera.SetActive(false);
-
                     ToggleDoorState(isOpen: false);
                     break;
             }

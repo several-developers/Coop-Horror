@@ -1,4 +1,4 @@
-﻿namespace GameCore.Gameplay.Entities.Inventory
+﻿namespace GameCore.Gameplay.EntitiesSystems.Inventory
 {
     public class Inventory<TItem> where TItem : class
     {

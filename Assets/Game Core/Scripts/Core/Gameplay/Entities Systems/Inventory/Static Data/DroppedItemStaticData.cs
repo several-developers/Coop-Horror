@@ -1,4 +1,4 @@
-namespace GameCore.Gameplay.Entities.Inventory
+namespace GameCore.Gameplay.EntitiesSystems.Inventory
 {
     public struct DroppedItemStaticData
     {

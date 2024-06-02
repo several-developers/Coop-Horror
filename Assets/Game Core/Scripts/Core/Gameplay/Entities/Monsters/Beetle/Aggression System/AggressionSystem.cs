@@ -69,7 +69,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             UpdateAggressionText();
         }
 
-        public void Reset()
+        public void Disable()
         {
             _currentAggressionScale = 0f;
             _ignoreAggressionScale = true;

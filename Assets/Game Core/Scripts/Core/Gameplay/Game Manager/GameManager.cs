@@ -148,9 +148,9 @@ namespace GameCore.Gameplay.GameManagement
                         return;
 
                     IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
-                    
+
                     foreach (PlayerEntity playerEntity in allPlayers.Values)
-                        playerEntity.RemoveParent();
+                        playerEntity.NetworkObject.TryRemoveParent();
 
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheLocation,
                         previousState: GameState.ArrivedAtTheLocation);

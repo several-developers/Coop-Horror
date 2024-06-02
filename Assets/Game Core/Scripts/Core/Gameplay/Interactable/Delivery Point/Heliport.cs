@@ -2,7 +2,7 @@
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Entities;
-using GameCore.Gameplay.Entities.Inventory;
+using GameCore.Gameplay.EntitiesSystems.Inventory;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Quests;

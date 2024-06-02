@@ -5,7 +5,7 @@ using GameCore.Gameplay.Items;
 using GameCore.Utilities;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Entities.Inventory
+namespace GameCore.Gameplay.EntitiesSystems.Inventory
 {
     public class PlayerInventoryManager
     {

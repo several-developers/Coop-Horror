@@ -1,4 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameManagement;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
@@ -8,7 +9,7 @@ using Zenject;
 
 namespace GameCore.UI.Gameplay.HUD.GoldCounter
 {
-    public class GoldCounterView : UIElement
+    public class GoldCounterUI : UIElement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -32,6 +33,9 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
         {
             base.Awake();
             
+            PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
+            
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
             _gameManagerDecorator.OnPlayersGoldChangedEvent += OnPlayersGoldChanged;
         }
@@ -39,6 +43,9 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            
+            PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
             
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
             _gameManagerDecorator.OnPlayersGoldChangedEvent -= OnPlayersGoldChanged;
@@ -68,5 +75,31 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
         private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
 
         private void OnPlayersGoldChanged(int playersGold) => UpdateGoldText(playersGold);
+        
+        private void OnPlayerSpawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+
+            playerEntity.OnDiedEvent += OnPlayerDied;
+            playerEntity.OnRevivedEvent += OnPlayerRevived;
+        }
+
+        private void OnPlayerDespawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+            
+            playerEntity.OnDiedEvent -= OnPlayerDied;
+            playerEntity.OnRevivedEvent -= OnPlayerRevived;
+        }
+        
+        private void OnPlayerDied() => Hide();
+
+        private void OnPlayerRevived() => Show();
     }
 }

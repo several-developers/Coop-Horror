@@ -89,10 +89,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Setup(Character character, PlayerCamera playerCamera)
+        public void Setup(Character character, CameraReferences cameraReferences)
         {
-            CameraReferences cameraReferences = playerCamera.CameraReferences;
-            
             _character = character;
             _playerAnimator = character.GetAnimator();
             _playerArmsAnimator = cameraReferences.PlayerArmsAnimator;

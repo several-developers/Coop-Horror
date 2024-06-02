@@ -1,3 +1,4 @@
+using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
@@ -45,6 +46,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindUIManager();
             BindVisualManager();
             BindPlayerCamera();
+            BindCamerasManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -132,6 +134,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .Bind<PlayerCamera>()
                 .FromInstance(_playerCamera)
+                .AsSingle();
+        }
+
+        private void BindCamerasManager()
+        {
+            Container
+                .BindInterfacesTo<CamerasManager>()
                 .AsSingle();
         }
     }

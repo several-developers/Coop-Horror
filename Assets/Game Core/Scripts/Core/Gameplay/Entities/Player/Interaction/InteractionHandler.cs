@@ -1,5 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Inventory;
+using GameCore.Gameplay.EntitiesSystems.Inventory;
 using GameCore.Gameplay.Interactable;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 

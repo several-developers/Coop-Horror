@@ -128,23 +128,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
                 EnterMoveToSurfaceFireExitState();
             else
                 EnterIdleState();
-        }
 
-        protected override void TickServerOnly()
-        {
-            _aggressionSystem.Tick();
-            _beetleStateMachine.Tick();
-        }
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void InitSystems()
-        {
-            _beetleStateMachine = new StateMachine();
-            _aggressionSystem = new AggressionSystem(beetleEntity: this, _beetleAIConfig);
-
-            float health = _beetleAIConfig.Health;
-            _healthSystem.Setup(health);
+            _healthSystem.OnHealthChangedEvent += OnHealthChanged;
 
             _beetleStateMachine.OnStateChangedEvent += state =>
             {
@@ -154,34 +139,56 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
                 // string log = Log.HandleLog($"New state = <gb>{stateName}</gb>");
                 // Debug.Log(log);
             };
-        }
 
-        private void SetupStates()
-        {
-            IdleState idleState = new(beetleEntity: this, _beetleAIConfig);
-            WanderingState wanderingState = new(beetleEntity: this, _beetleAIConfig);
-            TriggerState triggerState = new(beetleEntity: this, _beetleAIConfig);
-            ScreamState screamState = new(beetleEntity: this, _beetleAIConfig);
-            ChaseState chaseState = new(beetleEntity: this, _beetleAIConfig);
-            AttackState attackState = new(beetleEntity: this, _beetleAIConfig);
-            DeathState deathState = new(beetleEntity: this);
-
-            MoveToSurfaceFireExitState moveToSurfaceFireExitState =
-                new(beetleEntity: this, _beetleAIConfig, _levelProvider);
+            // LOCAL METHODS: -----------------------------
             
-            MoveToDungeonFireExitState moveToDungeonFireExitState =
-                new(beetleEntity: this, _beetleAIConfig, _levelProvider);
+            void InitSystems()
+            {
+                _beetleStateMachine = new StateMachine();
+                _aggressionSystem = new AggressionSystem(beetleEntity: this, _beetleAIConfig);
 
-            _beetleStateMachine.AddState(idleState);
-            _beetleStateMachine.AddState(wanderingState);
-            _beetleStateMachine.AddState(triggerState);
-            _beetleStateMachine.AddState(screamState);
-            _beetleStateMachine.AddState(chaseState);
-            _beetleStateMachine.AddState(attackState);
-            _beetleStateMachine.AddState(deathState);
-            _beetleStateMachine.AddState(moveToSurfaceFireExitState);
-            _beetleStateMachine.AddState(moveToDungeonFireExitState);
+                float health = _beetleAIConfig.Health;
+                _healthSystem.Setup(health);
+            }
+            
+            void SetupStates()
+            {
+                IdleState idleState = new(beetleEntity: this, _beetleAIConfig);
+                WanderingState wanderingState = new(beetleEntity: this, _beetleAIConfig);
+                TriggerState triggerState = new(beetleEntity: this, _beetleAIConfig);
+                ScreamState screamState = new(beetleEntity: this, _beetleAIConfig);
+                ChaseState chaseState = new(beetleEntity: this, _beetleAIConfig);
+                AttackState attackState = new(beetleEntity: this, _beetleAIConfig);
+                DeathState deathState = new(beetleEntity: this);
+
+                MoveToSurfaceFireExitState moveToSurfaceFireExitState =
+                    new(beetleEntity: this, _beetleAIConfig, _levelProvider);
+            
+                MoveToDungeonFireExitState moveToDungeonFireExitState =
+                    new(beetleEntity: this, _beetleAIConfig, _levelProvider);
+
+                _beetleStateMachine.AddState(idleState);
+                _beetleStateMachine.AddState(wanderingState);
+                _beetleStateMachine.AddState(triggerState);
+                _beetleStateMachine.AddState(screamState);
+                _beetleStateMachine.AddState(chaseState);
+                _beetleStateMachine.AddState(attackState);
+                _beetleStateMachine.AddState(deathState);
+                _beetleStateMachine.AddState(moveToSurfaceFireExitState);
+                _beetleStateMachine.AddState(moveToDungeonFireExitState);
+            }
         }
+
+        protected override void TickServerOnly()
+        {
+            _aggressionSystem.Tick();
+            _beetleStateMachine.Tick();
+        }
+
+        protected override void DespawnServerOnly() =>
+            _healthSystem.OnHealthChangedEvent -= OnHealthChanged;
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CheckIfOutside()
         {
@@ -207,9 +214,28 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             int randomFloor = Random.Range(1, 4);
             _dungeonFloor = (Floor)randomFloor;
         }
+
+        private void EnterDeathState() => ChangeState<DeathState>();
         
         private void ChangeState<TState>() where TState : IState =>
             _beetleStateMachine.ChangeState<TState>();
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnHealthChanged(HealthData healthData)
+        {
+            if (_isDead)
+                return;
+            
+            float currentHealth = healthData.CurrentHealth;
+            bool isDead = Mathf.Approximately(a: currentHealth, b: 0f);
+            
+            if (!isDead)
+                return;
+
+            _isDead = true;
+            EnterDeathState();
+        }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

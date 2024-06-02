@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Player;
+using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.ConnectionManagement;
@@ -22,25 +23,27 @@ namespace GameCore.Gameplay.Network
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IMobileHeadquartersEntity mobileHeadquartersEntity,
+        private void Construct(IMobileHeadquartersEntity mobileHeadquartersEntity, ICamerasManager camerasManager,
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _camerasManager = camerasManager;
             _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private const bool SpawnAsChild = true;
-        
+
         private IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private ICamerasManager _camerasManager;
         private PlayerConfigMeta _playerConfig;
         private NetworkManager _networkManager;
         private bool _initialSpawnDone;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async void SpawnPlayer(ulong clientId, bool lateJoin)
+        private async void SpawnPlayer(ulong clientID, bool lateJoin)
         {
             bool isCanceled = await UniTask
                 .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
@@ -49,7 +52,13 @@ namespace GameCore.Gameplay.Network
             if (isCanceled)
                 return;
 
-            NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId);
+            SpawnPlayerLogic(clientID, lateJoin);
+            SetCameraFirstPersonStatus();
+        }
+
+        private void SpawnPlayerLogic(ulong clientID, bool lateJoin)
+        {
+            NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
 
             Vector3 spawnPosition = GetSpawnPosition();
             PlayerEntity playerEntityPrefab = _playerConfig.PlayerPrefab;
@@ -57,7 +66,7 @@ namespace GameCore.Gameplay.Network
 
             //PlayerEntity playerInstance = Instantiate(_playerConfig.PlayerPrefab, spawnPosition, Quaternion.identity);
             NetworkObject playerNetworkObjectInstance = _networkManager.SpawnManager
-                .InstantiateAndSpawn(playerNetworkObjectPrefab, clientId, position: spawnPosition);
+                .InstantiateAndSpawn(playerNetworkObjectPrefab, clientID, position: spawnPosition);
 
             bool isPlayerEntityFound = playerNetworkObjectInstance.TryGetComponent(out PlayerEntity playerInstance);
 
@@ -70,13 +79,13 @@ namespace GameCore.Gameplay.Network
             bool persistentPlayerExists = playerNetworkObject.TryGetComponent(out PersistentPlayer _);
 
             Assert.IsTrue(persistentPlayerExists,
-                $"Matching persistent PersistentPlayer for client {clientId} not found!");
+                $"Matching persistent PersistentPlayer for client {clientID} not found!");
 
             // If reconnecting, set the player's position and rotation to its previous state.
             if (lateJoin)
             {
                 SessionPlayerData? sessionPlayerData = SessionManager<SessionPlayerData>.Instance
-                    .GetPlayerData(clientId);
+                    .GetPlayerData(clientID);
 
                 if (sessionPlayerData is { HasCharacterSpawned: true })
                 {
@@ -85,7 +94,7 @@ namespace GameCore.Gameplay.Network
                     playerInstance.transform.SetPositionAndRotation(position, rotation);
                 }
             }
-            
+
             if (SpawnAsChild)
             {
                 NetworkObject parent = _mobileHeadquartersEntity.GetNetworkObject();
@@ -96,15 +105,8 @@ namespace GameCore.Gameplay.Network
             //playerInstance.NetworkObject.SpawnWithOwnership(clientId, destroyWithScene: true);
         }
 
-        private IEnumerator WaitToCheckForGameOver()
-        {
-            // Wait until next frame so that the client's player character has despawned.
-
-            yield return null;
-            //CheckForGameOver();
-
-            Debug.Log("Game Over");
-        }
+        private void SetCameraFirstPersonStatus() =>
+            _camerasManager.SetCameraStatus(CameraStatus.FirstPerson);
 
         private Vector3 GetSpawnPosition()
         {
@@ -145,11 +147,11 @@ namespace GameCore.Gameplay.Network
         {
             Debug.Log($"Client #{clientId} disconnect.");
 
-            if (clientId != NetworkManager.Singleton.LocalClientId)
-            {
-                // If a client disconnects, check for game over in case all other players are already down.
-                StartCoroutine(WaitToCheckForGameOver());
-            }
+            if (!NetworkHorror.IsTrueServer)
+                return;
+
+            // If a client disconnects, check for game over in case all other players are already down.
+            //StartCoroutine(WaitToCheckForGameOver());
         }
 
 #warning Перенести в отдельный скрипт

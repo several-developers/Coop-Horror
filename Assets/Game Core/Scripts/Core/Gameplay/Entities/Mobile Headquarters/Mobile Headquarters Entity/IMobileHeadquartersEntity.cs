@@ -1,5 +1,6 @@
 ﻿using System;
 using Cinemachine;
+using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
@@ -12,5 +13,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         void OpenDoor();
         void EnableMainLever();
         void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false);
+        Camera GetOutsideCamera();
     }
 }

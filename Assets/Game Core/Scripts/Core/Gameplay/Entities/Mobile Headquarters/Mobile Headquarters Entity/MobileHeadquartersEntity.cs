@@ -94,7 +94,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _pathMovement.ChangePath(path, startDistancePercent, stayAtSamePosition);
             HandlePathChange();
         }
-
+        
         public void ChangeToRoadPath()
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
@@ -139,6 +139,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public Transform GetTransform() => transform;
 
         public NetworkObject GetNetworkObject() => NetworkObject;
+        
+        public Camera GetOutsideCamera() => _references.OutsideCamera;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 

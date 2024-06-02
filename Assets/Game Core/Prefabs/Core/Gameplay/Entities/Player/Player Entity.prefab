@@ -1727,8 +1727,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f53ec34d48f434e8725e77944fb7605, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealthDebug: 0
-  _currentHealthDebug: 0
+  _maxHealthInfo: 0
+  _currentHealthInfo: 0
 --- !u!114 &3301787368083257467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1948,7 +1948,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44a6423fb52a47a689e6534bba62a694, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isDead: 0
   _interactionMaxDistance: 2.2
   _interactionLM:
     serializedVersion: 2

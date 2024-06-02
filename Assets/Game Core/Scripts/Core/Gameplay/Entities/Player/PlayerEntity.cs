@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using ECM2;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Inventory;
+using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
+using GameCore.Gameplay.Entities.Player.States;
 using GameCore.Gameplay.EntitiesSystems.Health;
+using GameCore.Gameplay.EntitiesSystems.Inventory;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
@@ -28,24 +30,21 @@ namespace GameCore.Gameplay.Entities.Player
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsPreviewFactory itemsPreviewFactory,
-            IPlayerInteractionObserver playerInteractionObserver, PlayerCamera playerCamera,
-            IGameplayConfigsProvider gameplayConfigsProvider, IConfigsProvider configsProvider)
+        private void Construct(IItemsPreviewFactory itemsPreviewFactory, ICamerasManager camerasManager,
+            IPlayerInteractionObserver playerInteractionObserver, IGameplayConfigsProvider gameplayConfigsProvider,
+            IConfigsProvider configsProvider)
         {
             _itemsPreviewFactory = itemsPreviewFactory;
+            _camerasManager = camerasManager;
             _playerInteractionObserver = playerInteractionObserver;
 
             _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
-            _playerCamera = playerCamera;
             InputReader = configsProvider.GetInputReader();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
-        [SerializeField]
-        private bool _isDead;
-
         [SerializeField, Min(0)]
         private float _interactionMaxDistance = 2f;
 
@@ -70,6 +69,8 @@ namespace GameCore.Gameplay.Entities.Player
         public static event Action<PlayerEntity> OnPlayerDespawnedEvent = delegate { };
 
         public event Action<EntityLocation> OnPlayerLocationChangedEvent = delegate { };
+        public event Action OnDiedEvent = delegate { };
+        public event Action OnRevivedEvent = delegate { };
 
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
 
@@ -78,50 +79,33 @@ namespace GameCore.Gameplay.Entities.Player
         private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<bool> _isDead = new();
 
         private static PlayerEntity _localPlayer;
 
         private IItemsPreviewFactory _itemsPreviewFactory;
+        private ICamerasManager _camerasManager;
         private IPlayerInteractionObserver _playerInteractionObserver;
 
         private PlayerConfigMeta _playerConfig;
         private StateMachine _playerStateMachine;
-        private PlayerCamera _playerCamera;
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
+        private HealthSystem _healthSystem;
 
         private Transform _cameraLookAtObject;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void TakeDamage(float damage, IEntity source = null)
-        {
-            HealthSystem healthSystem = _references.HealthSystem;
-            healthSystem.TakeDamage(damage);
-        }
+        public void TakeDamage(float damage, IEntity source = null) =>
+            _healthSystem.TakeDamage(damage);
 
         public void Teleport(Vector3 position, Quaternion rotation)
         {
             _references.NetworkTransform.InLocalSpace = false;
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
-        }
-
-        public void SetParent(NetworkObject parentNetworkObject)
-        {
-            if (IsServer)
-                TrySetParent(parentNetworkObject);
-            else
-                TrySetParentServerRpc(parentNetworkObject);
-        }
-
-        public void RemoveParent()
-        {
-            if (IsServer)
-                TryRemoveParent();
-            else
-                TryRemoveParentServerRpc();
         }
 
 #warning ПРОВЕРИТЬ ИЛИ КОРРЕКТНО РАБОТАЕТ, ДОБАВИТЬ СЕРВЕР РПС
@@ -133,33 +117,52 @@ namespace GameCore.Gameplay.Entities.Player
             _entityLocation.Value = entityLocation;
         }
 
-        public void DropItem(bool destroy = false) =>
-            _inventory.DropItem(destroy);
-
-        public void KillSelf()
+        public void DropItem(bool destroy = false)
         {
-            _inventory.DropAllItems();
-            _playerCamera.gameObject.SetActive(false);
+            if (IsDead())
+                return;
+            
+            _inventory.DropItem(destroy);
         }
 
-        public void Revive() =>
-            _playerCamera.gameObject.SetActive(true);
+        public void Kill(PlayerDeathReason deathReason)
+        {
+            if (!IsOwner)
+                return;
+            
+            EnterDeathState();
+        }
 
-        public Transform GetTransform() => transform;
+        public void SendDiedEvent() =>
+            OnDiedEvent.Invoke();
 
-        public PlayerInventory GetInventory() => _inventory;
+        public void SendRevivedEvent() =>
+            OnRevivedEvent.Invoke();
+        
+        public void EnterAliveState() => ChangeState<AliveState>();
 
-        public EntityLocation GeEntityLocation() =>
-            _entityLocation.Value;
+        public void EnterReviveState()
+        {
+            _isDead.Value = false;
 
-        public bool IsDead() => _isDead;
+            ChangeState<ReviveState>();
+        }
 
         public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
 
         public static PlayerEntity GetLocalPlayer() => _localPlayer;
+        public Transform GetTransform() => transform;
+
+        public PlayerInventory GetInventory() => _inventory;
+        
+        public EntityLocation GeEntityLocation() =>
+            _entityLocation.Value;
 
         public static bool TryGetPlayer(ulong clientID, out PlayerEntity playerEntity) =>
             AllPlayers.TryGetValue(clientID, out playerEntity);
+
+        public bool IsDead() =>
+            _isDead.Value;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -174,39 +177,45 @@ namespace GameCore.Gameplay.Entities.Player
 
         protected override void InitOwner()
         {
+            PlayerCamera playerCamera = _camerasManager.GetPlayerCamera();
+            CameraReferences cameraReferences = playerCamera.CameraReferences;
+            Camera mainCamera = cameraReferences.MainCamera;
+            
             Other();
             InitSystems();
             InitPlayerMovement();
             DeactivatePlayerMesh();
+            SetupStates();
+            EnterAliveState();
 
             InputReader.OnScrollEvent += OnScrollInventory;
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
 
             _entityLocation.OnValueChanged += OnOwnerPlayerLocationChanged;
+
             _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
+
+            _healthSystem.OnHealthChangedEvent += OnHealthChanged;
 
             // LOCAL METHODS: -----------------------------
 
             void Other()
             {
                 _localPlayer = this;
-
-                CameraReferences cameraReferences = _playerCamera.CameraReferences;
                 _cameraLookAtObject = cameraReferences.LookAtObject;
             }
 
             void InitSystems()
             {
-                HealthSystem healthSystem = _references.HealthSystem;
+                _healthSystem = _references.HealthSystem;
                 float health = _playerConfig.Health;
-                healthSystem.Setup(health);
+                _healthSystem.Setup(health);
 
                 _playerStateMachine = new StateMachine();
-                
+
                 _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform,
-                    _playerCamera.CameraReferences.MainCamera, _interactionMaxDistance,
-                    interactionLM: _interactionLM, _interactionObstaclesLM);
+                    mainCamera, _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);
 
                 _interactionHandler = new InteractionHandler(playerEntity: this, _inventoryManager,
                     _playerInteractionObserver);
@@ -215,13 +224,13 @@ namespace GameCore.Gameplay.Entities.Player
             void InitPlayerMovement()
             {
                 Character character = _references.Character;
-                character.camera = _playerCamera.CameraReferences.MainCamera;
+                character.camera = mainCamera;
 
                 PlayerMovementController playerMovementController = _references.PlayerMovementController;
                 playerMovementController.Setup(playerEntity: this);
 
                 MyAnimationController animationController = _references.AnimationController;
-                animationController.Setup(character, _playerCamera);
+                animationController.Setup(character, cameraReferences);
             }
 
             void DeactivatePlayerMesh()
@@ -234,6 +243,17 @@ namespace GameCore.Gameplay.Entities.Player
 
                 foreach (SkinnedMeshRenderer meshRenderer in _references.HiddenMeshes)
                     meshRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+            }
+
+            void SetupStates()
+            {
+                AliveState aliveState = new();
+                DeathState deathState = new(playerEntity: this, _camerasManager);
+                ReviveState reviveState = new(playerEntity: this, _camerasManager);
+
+                _playerStateMachine.AddState(aliveState);
+                _playerStateMachine.AddState(deathState);
+                _playerStateMachine.AddState(reviveState);
             }
         }
 
@@ -280,7 +300,10 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnDropItemEvent -= OnDropItem;
 
             _entityLocation.OnValueChanged -= OnOwnerPlayerLocationChanged;
+
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
+
+            _healthSystem.OnHealthChangedEvent -= OnHealthChanged;
         }
 
         protected override void DespawnNotOwner() =>
@@ -288,14 +311,32 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void Interact() =>
-            _interactionHandler.Interact();
+        private void CheckDeadStatus(HealthData healthData)
+        {
+            if (IsDead())
+                return;
 
-        private void TrySetParent(NetworkObject networkObject) =>
-            NetworkObject.TrySetParent(networkObject);
+            float currentHealth = healthData.CurrentHealth;
+            bool isDead = Mathf.Approximately(a: currentHealth, b: 0f);
 
-        private void TryRemoveParent() =>
-            NetworkObject.TryRemoveParent();
+            if (!isDead)
+                return;
+
+            _isDead.Value = true;
+
+            bool isStateFound = _playerStateMachine.TryGetCurrentState(out IState state);
+            bool isStateValid = isStateFound && state.GetType() != typeof(DeathState);
+
+            if (!isStateValid)
+                return;
+            
+            EnterDeathState();
+        }
+        
+        private void EnterDeathState() => ChangeState<DeathState>();
+        
+        private void ChangeState<TState>() where TState : IState =>
+            _playerStateMachine.ChangeState<TState>();
 
         // RPC: -----------------------------------------------------------------------------------
 
@@ -316,20 +357,6 @@ namespace GameCore.Gameplay.Entities.Player
             ulong senderClientID = serverRpcParams.Receive.SenderClientId;
             DestroyItemPreviewClientRpc(senderClientID, slotIndex);
         }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void TrySetParentServerRpc(NetworkObjectReference networkObjectReference)
-        {
-            bool isNetworkObjectFound = networkObjectReference.TryGet(out NetworkObject networkObject);
-
-            if (!isNetworkObjectFound)
-                return;
-
-            TrySetParent(networkObject);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void TryRemoveParentServerRpc() => TryRemoveParent();
 
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)
@@ -373,14 +400,17 @@ namespace GameCore.Gameplay.Entities.Player
         {
             bool hasParent = transform.parent != null;
             _references.NetworkTransform.InLocalSpace = hasParent;
-            
-            _references.Rigidbody.interpolation = hasParent 
+
+            _references.Rigidbody.interpolation = hasParent
                 ? RigidbodyInterpolation.None
                 : RigidbodyInterpolation.Interpolate;
         }
 
         private void OnScrollInventory(float scrollValue)
         {
+            if (IsDead())
+                return;
+            
             bool switchToNextSlot = scrollValue <= 0;
 
             if (switchToNextSlot)
@@ -389,7 +419,13 @@ namespace GameCore.Gameplay.Entities.Player
                 _inventory.SwitchToPreviousSlot();
         }
 
-        private void OnInteract() => Interact();
+        private void OnInteract()
+        {
+            if (IsDead())
+                return;
+            
+            _interactionHandler.Interact();
+        }
 
         private void OnDropItem() => DropItem();
 
@@ -411,5 +447,22 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnOwnerPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue) =>
             OnPlayerLocationChangedEvent.Invoke(newValue);
+
+        private void OnHealthChanged(HealthData healthData) => CheckDeadStatus(healthData);
+
+        // DEBUG BUTTONS: -------------------------------------------------------------------------
+
+        [Title(Constants.DebugButtons)]
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugKill() => Kill(PlayerDeathReason._);
+        
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugEnterAliveState() => EnterAliveState();
+        
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugEnterDeathState() => EnterDeathState();
+        
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugEnterReviveState() => EnterReviveState();
     }
 }

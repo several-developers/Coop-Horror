@@ -159,14 +159,14 @@ namespace GameCore.Infrastructure.StateMachine
                 
                 case GameState.KillPlayersOnTheRoad:
                     localPlayer = PlayerEntity.GetLocalPlayer();
-                    localPlayer.KillSelf();
+                    localPlayer.Kill(PlayerDeathReason.FailedQuests);
                     
                     _gameOverMenuView.Show();
                     break;
                 
                 case GameState.RestartGame:
                     localPlayer = PlayerEntity.GetLocalPlayer();
-                    localPlayer.Revive();
+                    localPlayer.EnterReviveState();
                     break;
             }
             

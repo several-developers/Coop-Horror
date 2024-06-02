@@ -60,6 +60,8 @@ namespace GameCore.Gameplay.Entities.Player
         private bool _performCrouch;
         private bool _cancelCrouch;
 
+        private bool _isEnabled;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
@@ -78,7 +80,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void Update()
         {
-            if (!_isInitialized)
+            if (!_isInitialized || !_isEnabled)
                 return;
             
             // Movement direction relative to Character's forward
@@ -167,6 +169,7 @@ namespace GameCore.Gameplay.Entities.Player
         public void Setup(PlayerEntity playerEntity)
         {
             _isInitialized = true;
+            _isEnabled = true;
             _inputReader = playerEntity.InputReader;
             
             _crouchedCamera.SetActive(false);
@@ -183,6 +186,9 @@ namespace GameCore.Gameplay.Entities.Player
             _inputReader.OnSprintEvent += OnSprint;
             _inputReader.OnSprintCanceledEvent += OnSprintCanceled;
         }
+
+        public void ToggleMovementState(bool isEnabled) =>
+            _isEnabled = isEnabled;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -229,25 +235,60 @@ namespace GameCore.Gameplay.Entities.Player
         private void OnMove(Vector2 movementVector) =>
             _moveInput = movementVector;
 
-        private void OnJump() =>
+        private void OnJump()
+        {
+            if (!_isEnabled)
+                return;
+            
             _performJump = true;
+        }
 
-        private void OnJumpCanceled() =>
+        private void OnJumpCanceled()
+        {
+            if (!_isEnabled)
+                return;
+            
             _cancelJump = true;
+        }
 
-        private void OnCrouch() =>
+        private void OnCrouch()
+        {
+            if (!_isEnabled)
+                return;
+            
             _performCrouch = true;
+        }
 
-        private void OnCrouchCanceled() =>
+        private void OnCrouchCanceled()
+        {
+            if (!_isEnabled)
+                return;
+            
             _cancelCrouch = true;
+        }
 
-        private void OnLook(Vector2 lookVector) =>
+        private void OnLook(Vector2 lookVector)
+        {
+            if (!_isEnabled)
+                return;
+            
             _lookVector = lookVector;
+        }
 
-        private void OnSprint() =>
+        private void OnSprint()
+        {
+            if (!_isEnabled)
+                return;
+            
             _sprintAbility.Sprint();
+        }
 
-        private void OnSprintCanceled() =>
+        private void OnSprintCanceled()
+        {
+            if (!_isEnabled)
+                return;
+            
             _sprintAbility.StopSprinting();
+        }
     }
 }

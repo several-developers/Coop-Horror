@@ -2,7 +2,7 @@
 using GameCore.Gameplay.Network;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Entities.Inventory
+namespace GameCore.Gameplay.EntitiesSystems.Inventory
 {
     public class PlayerInventory
     {
@@ -103,7 +103,7 @@ namespace GameCore.Gameplay.Entities.Inventory
             {
                 _inventory.DropItem(i);
 
-                DroppedItemStaticData data = new(clientID, i, randomPosition, destroy: true);
+                DroppedItemStaticData data = new(clientID, i, randomPosition);
                 OnItemDroppedEvent.Invoke(data);
             }
         }

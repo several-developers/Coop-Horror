@@ -12,16 +12,16 @@ namespace GameCore.Gameplay.EntitiesSystems.Health
 
         [Title(Constants.DebugInfo)]
         [SerializeField, ReadOnly]
-        private float _maxHealthDebug;
+        private float _maxHealthInfo;
         
         [SerializeField, ReadOnly]
-        private float _currentHealthDebug;
+        private float _currentHealthInfo;
         
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<HealthData> OnHealthChangedEvent = delegate { }; 
 
-        private readonly NetworkVariable<HealthData> _currentHealth = new();
+        private readonly NetworkVariable<HealthData> _healthData = new();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Health
                 return;
                 
             HealthData healthData = new(maxHealth);
-            _currentHealth.Value = healthData;
+            SetHealth(healthData);
         }
         
         public void TakeDamage(float damage)
@@ -44,24 +44,43 @@ namespace GameCore.Gameplay.EntitiesSystems.Health
             else
                 TakeDamageServerRpc(damage);
         }
+
+        public void Kill() => TakeDamage(damage: 10000f);
+
+        public void Reset()
+        {
+            HealthData healthData = GetHealthData();
+            float maxHealth = healthData.MaxHealth;
+            healthData.SetCurrentHealth(maxHealth);
+
+            SetHealth(healthData);
+        }
         
+        public HealthData GetHealthData() =>
+            _healthData.Value;
+
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void InitAll() =>
-            _currentHealth.OnValueChanged += OnHealthChangedDebug;
+            _healthData.OnValueChanged += OnHealthChangedDebug;
 
         protected override void DespawnAll() =>
-            _currentHealth.OnValueChanged -= OnHealthChangedDebug;
+            _healthData.OnValueChanged -= OnHealthChangedDebug;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void TakeDamageLogic(float damage)
         {
-            HealthData healthData = _currentHealth.Value;
+            HealthData healthData = GetHealthData();
             float newHealth = Mathf.Max(a: healthData.CurrentHealth - damage, b: 0f);
             healthData.SetCurrentHealth(newHealth);
-            
-            _currentHealth.Value = healthData;
+
+            SetHealth(healthData);
+        }
+
+        private void SetHealth(HealthData healthData)
+        {
+            _healthData.Value = healthData;
             OnHealthChangedEvent.Invoke(healthData);
         }
 
@@ -74,8 +93,8 @@ namespace GameCore.Gameplay.EntitiesSystems.Health
 
         private void OnHealthChangedDebug(HealthData previousValue, HealthData newValue)
         {
-            _maxHealthDebug = newValue.MaxHealth;
-            _currentHealthDebug = newValue.CurrentHealth;
+            _maxHealthInfo = newValue.MaxHealth;
+            _currentHealthInfo = newValue.CurrentHealth;
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

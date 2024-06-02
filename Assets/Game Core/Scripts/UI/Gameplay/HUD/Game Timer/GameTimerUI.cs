@@ -9,7 +9,7 @@ using Zenject;
 
 namespace GameCore.UI.Gameplay.HUD.GameTimer
 {
-    public class GameTimerView : UIElement
+    public class GameTimerUI : UIElement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
