@@ -14,6 +14,7 @@
         public const string Animation = "Animation";
         public const string AnimationIn = "Animation/In";
         public const string Events = "Events";
+        public const string DebugInfo = "Debug Info";
 
         public const string GamesDataKey = "GamesData";
         public const string GameSettingsDataKey = "GameSettingsData";

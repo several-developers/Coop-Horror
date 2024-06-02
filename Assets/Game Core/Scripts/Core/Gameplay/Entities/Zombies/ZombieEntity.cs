@@ -1,10 +1,7 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.Entities.Other;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Zombies.States;
 using GameCore.Gameplay.Other;
-using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
@@ -59,9 +56,6 @@ namespace GameCore.Gameplay.Entities.Zombies
         [SerializeField, Required]
         private CapsuleCollider _aimTarget;
         
-        [SerializeField, Required]
-        private RagdollEnabler _ragdollEnabler;
-
         [SerializeField, Required, Space(5)]
         private GameObject[] _hitBoxes;
 
@@ -71,9 +65,7 @@ namespace GameCore.Gameplay.Entities.Zombies
         public event Action OnMovementSpeedUpdatedEvent;
 
         private StateMachine _zombieStateMachine;
-        private IHealthSystem _healthSystem;
         private PlayerEntity _playerEntity;
-        private ZombieCrawlingHandler _zombieCrawlingHandler;
 
         private float _currentMovementSpeed;
         private float _currentInputMagnitude;
@@ -113,15 +105,8 @@ namespace GameCore.Gameplay.Entities.Zombies
         {
             _currentMovementSpeed = _movementSpeed;
             _currentInputMagnitude = _movementInputMagnitude;
-
-            _zombieCrawlingHandler = new ZombieCrawlingHandler(_healthSystem, _animator);
             
             CreateAndSetupStateMachine();
-
-            _healthSystem.OnHealthUpdatedEvent += OnHealthUpdated;
-            _healthSystem.OnDeathEvent += OnDeath;
-
-            _zombieCrawlingHandler.OnCrawlingEnabledEvent += OnCrawlingEnabled;
         }
 
         public void DisableHitBoxes()
@@ -136,50 +121,9 @@ namespace GameCore.Gameplay.Entities.Zombies
 
         public void EnterIdleState() => EnterState<IdleState>();
 
-        public void EnterScreamState() => EnterState<ScreamState>();
-
         public void EnterChaseState() => EnterState<ChaseState>();
 
         public void EnterAttackState() => EnterState<AttackState>();
-
-        public void EnterChaseStateWithChance()
-        {
-            if (GlobalUtilities.IsRandomSuccessful(chance: 10))
-                EnterScreamState();
-            else
-                EnterChaseState();
-        }
-
-        public async void ActivateChase(float delay)
-        {
-            int delayInMilliseconds = delay.ConvertToMilliseconds();
-
-            bool isCanceled = await UniTask
-                .Delay(delayInMilliseconds, cancellationToken: gameObject.GetCancellationTokenOnDestroy())
-                .SuppressCancellationThrow();
-
-            if (isCanceled)
-                return;
-
-            EnterChaseState();
-        }
-
-        public async void ActivateChaseWithChance(float delay)
-        {
-            int delayInMilliseconds = delay.ConvertToMilliseconds();
-
-            bool isCanceled = await UniTask
-                .Delay(delayInMilliseconds, cancellationToken: gameObject.GetCancellationTokenOnDestroy())
-                .SuppressCancellationThrow();
-
-            if (isCanceled)
-                return;
-
-            if (GlobalUtilities.IsRandomSuccessful(chance: 10))
-                EnterScreamState();
-            else
-                EnterChaseState();
-        }
 
         public Transform GetTransform() => transform;
 
@@ -204,63 +148,18 @@ namespace GameCore.Gameplay.Entities.Zombies
             _zombieStateMachine = new StateMachine();
 
             IdleState idleState = new(zombieEntity: this);
-            ScreamState screamState = new(zombieEntity: this);
             ChaseState chaseState = new(zombieEntity: this, _playerEntity);
             AttackState attackState = new(zombieEntity: this, _playerEntity);
-            DeathState deathState = new(zombieEntity: this, _ragdollEnabler, _aimTarget);
+            DeathState deathState = new(zombieEntity: this, _aimTarget);
 
             _zombieStateMachine.AddState(idleState);
-            _zombieStateMachine.AddState(screamState);
             _zombieStateMachine.AddState(chaseState);
             _zombieStateMachine.AddState(attackState);
             _zombieStateMachine.AddState(deathState);
         }
 
-        private void TryEnterScreamStateFromIdleState()
-        {
-            if (!_zombieStateMachine.TryGetCurrentState(out IState state))
-                return;
-
-            bool isIdleState = state is IdleState;
-
-            if (!isIdleState)
-                return;
-
-            EnterScreamState();
-        }
-
         private void EnterState<TState>() where TState : IState =>
             _zombieStateMachine.ChangeState<TState>();
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnHealthUpdated(HealthStaticData healthData)
-        {
-            //string log = Log.HandleLog($"Health: <gb>({healthData.CurrentHealth:F0}/{healthData.MaxHealth:F0})</gb>.");
-            //Debug.Log(log);
-
-            _animator.SetTrigger(id: AnimatorHashes.HitReaction);
-
-            TryEnterScreamStateFromIdleState();
-        }
-
-        private void OnCrawlingEnabled()
-        {
-            _currentMovementSpeed = _crawlingSpeed;
-            _currentInputMagnitude = _crawlingInputMagnitude;
-
-            OnMovementSpeedUpdatedEvent?.Invoke();
-        }
-
-        private void OnDeath()
-        {
-            _healthSystem.OnHealthUpdatedEvent -= OnHealthUpdated;
-            _healthSystem.OnDeathEvent -= OnDeath;
-
-            _isDead = true;
-
-            EnterState<DeathState>();
-        }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

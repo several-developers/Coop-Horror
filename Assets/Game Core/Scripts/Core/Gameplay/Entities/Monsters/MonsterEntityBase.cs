@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -20,6 +21,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnEntityTeleportedEvent = delegate { };
+
+        private EntityLocation _entityLocation;
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 

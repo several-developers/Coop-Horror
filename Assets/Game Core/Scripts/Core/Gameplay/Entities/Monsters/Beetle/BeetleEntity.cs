@@ -4,6 +4,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Monsters.Beetle.States;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
@@ -15,7 +16,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.Beetle
 {
-    public class BeetleEntity : MonsterEntityBase
+    public class BeetleEntity : MonsterEntityBase, IDamageable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -29,6 +30,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField, Required]
+        private HealthSystem _healthSystem;
+        
+        [SerializeField, Required, Space(height: 5)]
         private TextMeshPro _stateTMP;
 
         [SerializeField, Required]
@@ -55,6 +59,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         private Floor _dungeonFloor;
         private bool _isOutside = true;
+        private bool _isDead;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -71,6 +76,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void TakeDamage(float damage, IEntity source = null) =>
+            _healthSystem.TakeDamage(damage);
 
         public void SetTargetPlayer(PlayerEntity playerEntity) =>
             _targetPlayer = playerEntity;
@@ -104,6 +112,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         public bool TryGetCurrentState(out IState state) =>
             _beetleStateMachine.TryGetCurrentState(out state);
+        
+        public bool IsDead() => _isDead;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -132,6 +142,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         {
             _beetleStateMachine = new StateMachine();
             _aggressionSystem = new AggressionSystem(beetleEntity: this, _beetleAIConfig);
+
+            float health = _beetleAIConfig.Health;
+            _healthSystem.Setup(health);
 
             _beetleStateMachine.OnStateChangedEvent += state =>
             {

@@ -1,5 +1,4 @@
-﻿using GameCore.Gameplay.Entities.Other;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Zombies.States
@@ -8,10 +7,9 @@ namespace GameCore.Gameplay.Entities.Zombies.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public DeathState(ZombieEntity zombieEntity, RagdollEnabler ragdollEnabler, CapsuleCollider aimTarget)
+        public DeathState(ZombieEntity zombieEntity, CapsuleCollider aimTarget)
         {
             _zombieEntity = zombieEntity;
-            _ragdollEnabler = ragdollEnabler;
             _aimTarget = aimTarget;
         }
 
@@ -20,7 +18,6 @@ namespace GameCore.Gameplay.Entities.Zombies.States
         private const float DestroyDelay = 20f;
         
         private readonly ZombieEntity _zombieEntity;
-        private readonly RagdollEnabler _ragdollEnabler;
         private readonly CapsuleCollider _aimTarget;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -56,8 +53,10 @@ namespace GameCore.Gameplay.Entities.Zombies.States
             _zombieEntity.DisableHitBoxes();
         }
 
-        private void EnabledRagdoll() =>
-            _ragdollEnabler.EnableRagdoll();
+        private void EnabledRagdoll()
+        {
+            //_ragdollEnabler.EnableRagdoll();
+        }
 
         private void DestroyZombie() =>
             Object.Destroy(_zombieEntity.gameObject, DestroyDelay);

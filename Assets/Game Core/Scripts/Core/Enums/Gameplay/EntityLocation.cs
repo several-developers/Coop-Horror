@@ -1,6 +1,6 @@
 ﻿namespace GameCore.Enums.Gameplay
 {
-    public enum PlayerLocation
+    public enum EntityLocation
     {
         Road = 0,
         LocationSurface = 1,

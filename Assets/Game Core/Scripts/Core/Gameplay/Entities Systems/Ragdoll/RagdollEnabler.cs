@@ -1,7 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Entities.Other
+namespace GameCore.Gameplay.EntitiesSystems.Ragdoll
 {
     public class RagdollEnabler : MonoBehaviour
     {

@@ -1715,6 +1715,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxSprintSpeed: 8
+--- !u!114 &2451543691127853220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4628898490251457778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f53ec34d48f434e8725e77944fb7605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealthDebug: 0
+  _currentHealthDebug: 0
 --- !u!114 &3301787368083257467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1943,20 +1957,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 439
   _references:
-    _playerConfig: {fileID: 11400000, guid: 623c9235cd286bb45b0104795538e690, type: 2}
-    _animator: {fileID: 3950089553986008439}
+    _networkTransform: {fileID: 5356547518013829562}
     _networkAnimator: {fileID: 2697201924501294874}
-    _networkObject: {fileID: -4117527861951101490}
+    _animator: {fileID: 3950089553986008439}
     _rigidbody: {fileID: 7127189264355523618}
     _collider: {fileID: 1967799250354909116}
-    _networkTransform: {fileID: 5356547518013829562}
     _headLookAtObject: {fileID: 6594660051373803502}
     _leftHandItemsHolder: {fileID: 6063633776828955810}
     _rightHandItemsHolder: {fileID: 700559707678698584}
     _character: {fileID: 4617892838296297533}
-    _characterMovement: {fileID: 3301787368083257467}
     _playerMovementController: {fileID: 7014763259676313825}
     _animationController: {fileID: 6374830896270361772}
+    _healthSystem: {fileID: 2451543691127853220}
     _hiddenMeshes:
     - {fileID: 5259845183061806199}
     - {fileID: 1924828364643335496}

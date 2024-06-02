@@ -1,5 +1,4 @@
-﻿using GameCore.Gameplay.Entities.Other;
-using GameCore.Gameplay.Entities.Player;
+﻿using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Other;
 using UnityEngine;
 using UnityEngine.AI;

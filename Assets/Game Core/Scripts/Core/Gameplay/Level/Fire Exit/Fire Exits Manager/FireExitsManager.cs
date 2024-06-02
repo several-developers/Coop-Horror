@@ -43,7 +43,7 @@ namespace GameCore.Gameplay.Level
             playerEntity.References.Rigidbody.velocity = Vector3.zero;
             playerEntity.Teleport(position, rotation);
 
-            ChangePlayerLocation(playerEntity, floor, isInStairsLocation, out PlayerLocation playerLocation);
+            ChangePlayerLocation(playerEntity, floor, isInStairsLocation, out EntityLocation playerLocation);
             ChangeVisualPreset(playerLocation);
         }
 
@@ -70,28 +70,28 @@ namespace GameCore.Gameplay.Level
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private static void ChangePlayerLocation(PlayerEntity playerEntity, Floor floor, bool isInStairsLocation,
-            out PlayerLocation playerLocation)
+            out EntityLocation entityLocation)
         {
-            playerLocation = PlayerLocation.Stairs;
+            entityLocation = EntityLocation.Stairs;
 
             if (isInStairsLocation)
             {
-                playerLocation = floor == Floor.Surface
-                    ? PlayerLocation.LocationSurface
-                    : PlayerLocation.Dungeon;
+                entityLocation = floor == Floor.Surface
+                    ? EntityLocation.LocationSurface
+                    : EntityLocation.Dungeon;
             }
 
-            playerEntity.ChangePlayerLocation(playerLocation);
+            playerEntity.ChangePlayerLocation(entityLocation);
         }
 
-        private void ChangeVisualPreset(PlayerLocation playerLocation)
+        private void ChangeVisualPreset(EntityLocation entityLocation)
         {
             VisualPresetType visualPresetType = VisualPresetType.DefaultLocation;
             
-            switch (playerLocation)
+            switch (entityLocation)
             {
-                case PlayerLocation.Dungeon:
-                case PlayerLocation.Stairs:
+                case EntityLocation.Dungeon:
+                case EntityLocation.Stairs:
                     visualPresetType = VisualPresetType.Dungeon;
                     break;
             }

@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using ECM2;
+using GameCore.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Inventory;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
+using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using Sirenix.OdinInspector;
@@ -27,10 +30,12 @@ namespace GameCore.Gameplay.Entities.Player
         [Inject]
         private void Construct(IItemsPreviewFactory itemsPreviewFactory,
             IPlayerInteractionObserver playerInteractionObserver, PlayerCamera playerCamera,
-            IConfigsProvider configsProvider)
+            IGameplayConfigsProvider gameplayConfigsProvider, IConfigsProvider configsProvider)
         {
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInteractionObserver = playerInteractionObserver;
+
+            _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
             _playerCamera = playerCamera;
             InputReader = configsProvider.GetInputReader();
         }
@@ -64,13 +69,13 @@ namespace GameCore.Gameplay.Entities.Player
         public static event Action<PlayerEntity> OnPlayerSpawnedEvent = delegate { };
         public static event Action<PlayerEntity> OnPlayerDespawnedEvent = delegate { };
 
-        public event Action<PlayerLocation> OnPlayerLocationChangedEvent = delegate { };
+        public event Action<EntityLocation> OnPlayerLocationChangedEvent = delegate { };
 
         private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
-        private readonly NetworkVariable<PlayerLocation> _playerLocation = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
 
@@ -79,6 +84,8 @@ namespace GameCore.Gameplay.Entities.Player
         private IItemsPreviewFactory _itemsPreviewFactory;
         private IPlayerInteractionObserver _playerInteractionObserver;
 
+        private PlayerConfigMeta _playerConfig;
+        private StateMachine _playerStateMachine;
         private PlayerCamera _playerCamera;
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
@@ -89,9 +96,10 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void TakeDamage(IEntity source, float damage)
+        public void TakeDamage(float damage, IEntity source = null)
         {
-            // TO DO
+            HealthSystem healthSystem = _references.HealthSystem;
+            healthSystem.TakeDamage(damage);
         }
 
         public void Teleport(Vector3 position, Quaternion rotation)
@@ -117,12 +125,12 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
 #warning ПРОВЕРИТЬ ИЛИ КОРРЕКТНО РАБОТАЕТ, ДОБАВИТЬ СЕРВЕР РПС
-        public void ChangePlayerLocation(PlayerLocation playerLocation)
+        public void ChangePlayerLocation(EntityLocation entityLocation)
         {
             if (!IsOwner)
                 return;
 
-            _playerLocation.Value = playerLocation;
+            _entityLocation.Value = entityLocation;
         }
 
         public void DropItem(bool destroy = false) =>
@@ -141,8 +149,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         public PlayerInventory GetInventory() => _inventory;
 
-        public PlayerLocation GetPlayerLocation() =>
-            _playerLocation.Value;
+        public EntityLocation GeEntityLocation() =>
+            _entityLocation.Value;
 
         public bool IsDead() => _isDead;
 
@@ -167,15 +175,15 @@ namespace GameCore.Gameplay.Entities.Player
         protected override void InitOwner()
         {
             Other();
-            DeactivatePlayerMesh();
-            InitInteractionSystem();
+            InitSystems();
             InitPlayerMovement();
+            DeactivatePlayerMesh();
 
             InputReader.OnScrollEvent += OnScrollInventory;
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
 
-            _playerLocation.OnValueChanged += OnOwnerPlayerLocationChanged;
+            _entityLocation.OnValueChanged += OnOwnerPlayerLocationChanged;
             _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
 
             // LOCAL METHODS: -----------------------------
@@ -188,26 +196,20 @@ namespace GameCore.Gameplay.Entities.Player
                 _cameraLookAtObject = cameraReferences.LookAtObject;
             }
 
-            void DeactivatePlayerMesh()
+            void InitSystems()
             {
-                foreach (GameObject activeObject in _references.LocalPlayerActiveObjects)
-                    activeObject.SetActive(true);
+                HealthSystem healthSystem = _references.HealthSystem;
+                float health = _playerConfig.Health;
+                healthSystem.Setup(health);
 
-                foreach (GameObject inactiveObject in _references.LocalPlayerInactiveObjects)
-                    inactiveObject.SetActive(false);
-
-                foreach (SkinnedMeshRenderer meshRenderer in _references.HiddenMeshes)
-                    meshRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
-            }
-
-            void InitInteractionSystem()
-            {
+                _playerStateMachine = new StateMachine();
+                
                 _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform,
                     _playerCamera.CameraReferences.MainCamera, _interactionMaxDistance,
                     interactionLM: _interactionLM, _interactionObstaclesLM);
 
-                _interactionHandler =
-                    new InteractionHandler(playerEntity: this, _inventoryManager, _playerInteractionObserver);
+                _interactionHandler = new InteractionHandler(playerEntity: this, _inventoryManager,
+                    _playerInteractionObserver);
             }
 
             void InitPlayerMovement()
@@ -220,6 +222,18 @@ namespace GameCore.Gameplay.Entities.Player
 
                 MyAnimationController animationController = _references.AnimationController;
                 animationController.Setup(character, _playerCamera);
+            }
+
+            void DeactivatePlayerMesh()
+            {
+                foreach (GameObject activeObject in _references.LocalPlayerActiveObjects)
+                    activeObject.SetActive(true);
+
+                foreach (GameObject inactiveObject in _references.LocalPlayerInactiveObjects)
+                    inactiveObject.SetActive(false);
+
+                foreach (SkinnedMeshRenderer meshRenderer in _references.HiddenMeshes)
+                    meshRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
             }
         }
 
@@ -265,7 +279,7 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
 
-            _playerLocation.OnValueChanged -= OnOwnerPlayerLocationChanged;
+            _entityLocation.OnValueChanged -= OnOwnerPlayerLocationChanged;
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
         }
 
@@ -395,7 +409,7 @@ namespace GameCore.Gameplay.Entities.Player
             _inventoryManager.ToggleItemsState();
         }
 
-        private void OnOwnerPlayerLocationChanged(PlayerLocation previousValue, PlayerLocation newValue) =>
+        private void OnOwnerPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue) =>
             OnPlayerLocationChangedEvent.Invoke(newValue);
     }
 }

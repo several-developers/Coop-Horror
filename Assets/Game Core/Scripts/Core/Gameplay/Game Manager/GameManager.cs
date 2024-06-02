@@ -120,11 +120,11 @@ namespace GameCore.Gameplay.GameManagement
             switch (gameState)
             {
                 case GameState.HeadingToTheRoad:
-                    localPlayer.ChangePlayerLocation(PlayerLocation.Road);
+                    localPlayer.ChangePlayerLocation(EntityLocation.Road);
                     break;
                 
                 case GameState.HeadingToTheLocation:
-                    localPlayer.ChangePlayerLocation(PlayerLocation.LocationSurface);
+                    localPlayer.ChangePlayerLocation(EntityLocation.LocationSurface);
                     break;
 
                 case GameState.ArrivedAtTheRoad:

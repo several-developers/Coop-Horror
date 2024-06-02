@@ -810,6 +810,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _networkTransform: {fileID: 8489144534259630346}
   _agent: {fileID: 4774057319621960311}
+  _healthSystem: {fileID: 8589363837555790808}
   _stateTMP: {fileID: 7662605548189500675}
   _aggressionTMP: {fileID: 5703743261529812817}
   _rageTMP: {fileID: 2595021910976240186}
@@ -844,3 +845,17 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &8589363837555790808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7800537933201022181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f53ec34d48f434e8725e77944fb7605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealthDebug: 0
+  _currentHealthDebug: 0

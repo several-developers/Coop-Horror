@@ -1,6 +1,7 @@
 ﻿using System;
 using ECM2;
 using GameCore.Configs.Gameplay.Player;
+using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -14,25 +15,19 @@ namespace GameCore.Gameplay.Entities.Player
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField, Required]
-        private PlayerConfigMeta _playerConfig;
-        
-        [SerializeField, Required]
-        private Animator _animator;
-        
+        private ClientNetworkTransform _networkTransform;
+
         [SerializeField, Required]
         private OwnerNetworkAnimator _networkAnimator;
 
         [SerializeField, Required]
-        private NetworkObject _networkObject;
+        private Animator _animator;
 
         [SerializeField, Required]
         private Rigidbody _rigidbody;
 
         [SerializeField, Required]
         private CapsuleCollider _collider;
-
-        [SerializeField, Required]
-        private ClientNetworkTransform _networkTransform;
 
         [SerializeField, Required]
         private Transform _headLookAtObject;
@@ -47,13 +42,13 @@ namespace GameCore.Gameplay.Entities.Player
         private Character _character;
 
         [SerializeField, Required]
-        private CharacterMovement _characterMovement;
-
-        [SerializeField, Required]
         private PlayerMovementController _playerMovementController;
 
         [SerializeField, Required]
         private MyAnimationController _animationController;
+
+        [SerializeField, Required]
+        private HealthSystem _healthSystem;
 
         [SerializeField, Required, Space(height: 5)]
         private SkinnedMeshRenderer[] _hiddenMeshes;
@@ -66,20 +61,18 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public PlayerConfigMeta PlayerConfig => _playerConfig;
-        public Animator Animator => _animator;
+        public ClientNetworkTransform NetworkTransform => _networkTransform;
         public OwnerNetworkAnimator NetworkAnimator => _networkAnimator;
-        public NetworkObject NetworkObject => _networkObject;
+        public Animator Animator => _animator;
         public Rigidbody Rigidbody => _rigidbody;
         public CapsuleCollider Collider => _collider;
-        public ClientNetworkTransform NetworkTransform => _networkTransform;
         public Transform HeadLookAtObject => _headLookAtObject;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public Character Character => _character;
-        public CharacterMovement CharacterMovement => _characterMovement;
         public PlayerMovementController PlayerMovementController => _playerMovementController;
         public MyAnimationController AnimationController => _animationController;
+        public HealthSystem HealthSystem => _healthSystem;
         public SkinnedMeshRenderer[] HiddenMeshes => _hiddenMeshes;
         public GameObject[] LocalPlayerActiveObjects => _localPlayerActiveObjects;
         public GameObject[] LocalPlayerInactiveObjects => _localPlayerInactiveObjects;

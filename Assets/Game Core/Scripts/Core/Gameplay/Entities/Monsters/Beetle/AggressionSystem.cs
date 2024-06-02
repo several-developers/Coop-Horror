@@ -171,7 +171,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             if (!isStateValid)
                 return;
 
-            ToggleTriggerCheckState(isEnabled: false);
             EnterScreamState();
         }
 
