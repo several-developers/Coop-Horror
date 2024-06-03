@@ -19,9 +19,9 @@ MonoBehaviour:
   _rigPresetType: 1
   _itemHandPlacement: 1
   _fpsItemPreview:
-    _position: {x: 0.041, y: -0.02, z: 0.028}
+    _position: {x: 0.06, y: 0.151, z: 0.13}
     _eulerRotation: {x: 0, y: 0, z: 0}
-    _scale: {x: 0.6, y: 0.6, z: 0.6}
+    _scale: {x: 1.2, y: 1.2, z: 1.2}
   _tpsItemPreview:
     _position: {x: -0.069, y: -0.148, z: -0.039}
     _eulerRotation: {x: 0, y: 0, z: 0}

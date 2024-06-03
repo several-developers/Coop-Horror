@@ -25,11 +25,11 @@ MonoBehaviour:
     _eulerRotation: {x: 0, y: 0, z: 0}
     _duration: 0.3
   _fpsRightHandTargetPose:
-    _position: {x: 0.471, y: 1.75, z: 0.469}
+    _position: {x: 0.942, y: 3.5, z: 0.938}
     _eulerRotation: {x: -15.178, y: -94.453, z: -88.687}
     _duration: 0.3
   _fpsRightHandHintPose:
-    _position: {x: 0.626, y: 1.638, z: 0.066}
+    _position: {x: 1.252, y: 3.276, z: 0.132}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _duration: 0.3
   _tpsLeftHandTargetPose:
