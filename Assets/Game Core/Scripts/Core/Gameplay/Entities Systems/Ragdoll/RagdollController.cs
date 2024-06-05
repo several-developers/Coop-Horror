@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.EntitiesSystems.Ragdoll
 {
-    public class RagdollEnabler : MonoBehaviour
+    public class RagdollController : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -25,10 +25,18 @@ namespace GameCore.Gameplay.EntitiesSystems.Ragdoll
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() => EnableAnimator();
+        private void Awake() => DisableRagdoll();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void ToggleRagdoll(bool enable)
+        {
+            if (enable)
+                EnableRagdoll();
+            else
+                DisableRagdoll();
+        }
+        
         public void EnableRagdoll()
         {
             _animator.enabled = false;
@@ -47,7 +55,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Ragdoll
             }
         }
 
-        public void EnableAnimator()
+        public void DisableRagdoll()
         {
             _animator.enabled = true;
 
@@ -82,7 +90,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Ragdoll
         private void DebugEnableRagdoll() => EnableRagdoll();
 
         [Button(buttonSize: 25), DisableInEditorMode]
-        private void DebugEnableAnimator() => EnableAnimator();
+        private void DebugEnableAnimator() => DisableRagdoll();
 #endif
     }
 }

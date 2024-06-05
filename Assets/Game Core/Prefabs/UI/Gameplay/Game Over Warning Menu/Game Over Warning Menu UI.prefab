@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 1858713010386980752}
   - component: {fileID: 1858713010386980755}
   m_Layer: 0
-  m_Name: Game Over Warning Menu View
+  m_Name: Game Over Warning Menu UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

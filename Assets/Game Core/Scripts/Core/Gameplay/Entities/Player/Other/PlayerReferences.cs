@@ -2,6 +2,7 @@
 using ECM2;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Gameplay.EntitiesSystems.Health;
+using GameCore.Gameplay.EntitiesSystems.Ragdoll;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -39,6 +40,9 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _rightHandItemsHolder;
 
         [SerializeField, Required]
+        private RagdollController _ragdollController;
+
+        [SerializeField, Required]
         private Character _character;
 
         [SerializeField, Required]
@@ -69,6 +73,7 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform HeadLookAtObject => _headLookAtObject;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
+        public RagdollController RagdollController => _ragdollController;
         public Character Character => _character;
         public PlayerMovementController PlayerMovementController => _playerMovementController;
         public MyAnimationController AnimationController => _animationController;

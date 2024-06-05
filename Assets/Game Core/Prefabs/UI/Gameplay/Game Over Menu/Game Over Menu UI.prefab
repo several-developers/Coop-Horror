@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8535677541822094090}
   - component: {fileID: 8535677541822094089}
   m_Layer: 0
-  m_Name: Game Over Menu View
+  m_Name: Game Over Menu UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

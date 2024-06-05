@@ -9,6 +9,7 @@ using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
 using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.EntitiesSystems.Inventory;
+using GameCore.Gameplay.EntitiesSystems.Ragdoll;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
@@ -71,15 +72,13 @@ namespace GameCore.Gameplay.Entities.Player
         public event Action<EntityLocation> OnPlayerLocationChangedEvent = delegate { };
         public event Action OnDiedEvent = delegate { };
         public event Action OnRevivedEvent = delegate { };
-
-        private const NetworkVariableWritePermission OwnerPermission = NetworkVariableWritePermission.Owner;
-
+        
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
-        private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: OwnerPermission);
-        private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: OwnerPermission);
-        private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
-        private readonly NetworkVariable<bool> _isDead = new();
+        private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: Constants.OwnerPermission);
+        private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: Constants.OwnerPermission);
+        private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: Constants.OwnerPermission);
+        private readonly NetworkVariable<bool> _isDead = new(writePerm: Constants.OwnerPermission);
 
         private static PlayerEntity _localPlayer;
 
@@ -133,20 +132,17 @@ namespace GameCore.Gameplay.Entities.Player
             EnterDeathState();
         }
 
-        public void SendDiedEvent() =>
-            OnDiedEvent.Invoke();
+        public void ToggleDead(bool isDead)
+        {
+            if (_isDead.Value == isDead)
+                return;
+            
+            _isDead.Value = isDead;
+        }
 
-        public void SendRevivedEvent() =>
-            OnRevivedEvent.Invoke();
-        
         public void EnterAliveState() => ChangeState<AliveState>();
 
-        public void EnterReviveState()
-        {
-            _isDead.Value = false;
-
-            ChangeState<ReviveState>();
-        }
+        public void EnterReviveState() => ChangeState<ReviveState>();
 
         public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
 
@@ -173,6 +169,8 @@ namespace GameCore.Gameplay.Entities.Player
             _inventory = new PlayerInventory();
 
             _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
+
+            _isDead.OnValueChanged += OnDead;
         }
 
         protected override void InitOwner()
@@ -247,9 +245,9 @@ namespace GameCore.Gameplay.Entities.Player
 
             void SetupStates()
             {
-                AliveState aliveState = new();
+                AliveState aliveState = new(playerEntity: this, _camerasManager);
                 DeathState deathState = new(playerEntity: this, _camerasManager);
-                ReviveState reviveState = new(playerEntity: this, _camerasManager);
+                ReviveState reviveState = new(playerEntity: this);
 
                 _playerStateMachine.AddState(aliveState);
                 _playerStateMachine.AddState(deathState);
@@ -289,6 +287,8 @@ namespace GameCore.Gameplay.Entities.Player
             _inventoryManager.Dispose();
 
             AllPlayers.Remove(OwnerClientId);
+            
+            _isDead.OnValueChanged -= OnDead;
         }
 
         protected override void DespawnOwner()
@@ -322,8 +322,6 @@ namespace GameCore.Gameplay.Entities.Player
             if (!isDead)
                 return;
 
-            _isDead.Value = true;
-
             bool isStateFound = _playerStateMachine.TryGetCurrentState(out IState state);
             bool isStateValid = isStateFound && state.GetType() != typeof(DeathState);
 
@@ -332,7 +330,7 @@ namespace GameCore.Gameplay.Entities.Player
             
             EnterDeathState();
         }
-        
+
         private void EnterDeathState() => ChangeState<DeathState>();
         
         private void ChangeState<TState>() where TState : IState =>
@@ -358,6 +356,9 @@ namespace GameCore.Gameplay.Entities.Player
             DestroyItemPreviewClientRpc(senderClientID, slotIndex);
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        public void ToggleRagdollServerRpc(bool enable) => ToggleRagdollClientRpc(enable);
+
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)
         {
@@ -378,6 +379,16 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             _inventoryManager.DestroyItemPreview(slotIndex);
+        }
+
+        [ClientRpc]
+        private void ToggleRagdollClientRpc(bool enable)
+        {
+            CapsuleCollider capsuleCollider = _references.Collider;
+            capsuleCollider.isTrigger = enable;
+            
+            RagdollController ragdollController = _references.RagdollController;
+            ragdollController.ToggleRagdoll(enable);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
@@ -449,6 +460,14 @@ namespace GameCore.Gameplay.Entities.Player
             OnPlayerLocationChangedEvent.Invoke(newValue);
 
         private void OnHealthChanged(HealthData healthData) => CheckDeadStatus(healthData);
+
+        private void OnDead(bool previousValue, bool newValue)
+        {
+            if (newValue)
+                OnDiedEvent.Invoke();
+            else
+                OnRevivedEvent.Invoke();
+        }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

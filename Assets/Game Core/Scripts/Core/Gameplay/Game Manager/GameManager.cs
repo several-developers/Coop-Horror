@@ -61,6 +61,9 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent += SpendPlayersGold;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent += GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent += GetGameState;
+
+            PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
         }
 
         public override void OnDestroy()
@@ -75,6 +78,9 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent -= SpendPlayersGold;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent -= GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent -= GetGameState;
+            
+            PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
         }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
@@ -119,6 +125,13 @@ namespace GameCore.Gameplay.GameManagement
 
             switch (gameState)
             {
+                case GameState.GameOver:
+                    if (!IsServerOnly)
+                        return;
+                    
+                    StartCoroutine(routine: RestartGameTimerCO());
+                    break;
+                
                 case GameState.HeadingToTheRoad:
                     localPlayer.ChangePlayerLocation(EntityLocation.Road);
                     break;
@@ -157,10 +170,6 @@ namespace GameCore.Gameplay.GameManagement
                     break;
 
                 case GameState.KillPlayersOnTheRoad:
-                    if (!IsServerOnly)
-                        return;
-
-                    StartCoroutine(routine: RestartGameTimerCO());
                     break;
 
                 case GameState.RestartGame:
@@ -214,12 +223,33 @@ namespace GameCore.Gameplay.GameManagement
                 ResetGoldServerRpc();
         }
 
-        private SceneName GetSelectedLocation() =>
-            _selectedLocation.Value;
+        private void CheckGameOverOnServer()
+        {
+            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
+            int deadPlayersAmount = 0;
 
-        private GameState GetGameState() =>
-            _gameState.Value;
+            foreach (PlayerEntity playerEntity in allPlayers.Values)
+            {
+                bool isDead = playerEntity.IsDead();
 
+                if (!isDead)
+                    continue;
+
+                deadPlayersAmount++;
+            }
+
+            int totalPlayersAmount = allPlayers.Count;
+            bool isGameOver = totalPlayersAmount == deadPlayersAmount;
+            
+            string log = Log.HandleLog($"Is Game Over: <gb>{isGameOver}</gb>.");
+            Debug.Log(log);
+
+            if (!isGameOver)
+                return;
+
+            ChangeGameState(GameState.GameOver);
+        }
+        
         private async void ChangeGameStateWhenAllPlayersReady(GameState newState, GameState previousState)
         {
             const int checkDelay = 100;
@@ -266,10 +296,15 @@ namespace GameCore.Gameplay.GameManagement
             float delay = _balanceConfig.GameRestartDelay;
             yield return new WaitForSeconds(delay);
 
-            const GameState newState = GameState.RestartGame;
             GameState previousState = _gameState.Value;
-            ChangeGameStateWhenAllPlayersReady(newState, previousState);
+            ChangeGameStateWhenAllPlayersReady(newState: GameState.RestartGame, previousState);
         }
+
+        private SceneName GetSelectedLocation() =>
+            _selectedLocation.Value;
+
+        private GameState GetGameState() =>
+            _gameState.Value;
 
         // RPC: -----------------------------------------------------------------------------------
 
@@ -346,6 +381,18 @@ namespace GameCore.Gameplay.GameManagement
         private void OnLocationLoaded() => ChangeGameState(GameState.HeadingToTheLocation);
 
         private void OnLocationLeft() => ChangeGameState(GameState.ArrivedAtTheRoad);
+
+        private void OnPlayerSpawned(PlayerEntity playerEntity) =>
+            playerEntity.OnDiedEvent += OnPlayerDied;
+
+        private void OnPlayerDespawned(PlayerEntity playerEntity)
+        {
+            CheckGameOverOnServer();
+            
+            playerEntity.OnDiedEvent -= OnPlayerDied;
+        }
+
+        private void OnPlayerDied() => CheckGameOverOnServer();
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

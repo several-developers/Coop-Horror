@@ -21,7 +21,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Health
 
         public event Action<HealthData> OnHealthChangedEvent = delegate { }; 
 
-        private readonly NetworkVariable<HealthData> _healthData = new();
+        private readonly NetworkVariable<HealthData> _healthData = new(writePerm: Constants.OwnerPermission);
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

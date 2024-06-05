@@ -1,6 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.EntitiesSystems.Inventory;
 
@@ -30,8 +29,9 @@ namespace GameCore.Gameplay.Entities.Player.States
             SetZeroHealth();
             DropAllItems();
             DisableMovement();
+            EnableRagdoll();
+            ToggleDead();
             SetCameraSpectatorStatus();
-            SendDiedEvent();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -54,10 +54,13 @@ namespace GameCore.Gameplay.Entities.Player.States
             movementController.ToggleMovementState(isEnabled: false);
         }
 
+        private void EnableRagdoll() =>
+            _playerEntity.ToggleRagdollServerRpc(enable: true);
+
+        private void ToggleDead() =>
+            _playerEntity.ToggleDead(isDead: true);
+
         private void SetCameraSpectatorStatus() =>
             _camerasManager.SetCameraStatus(CameraStatus.Spectator);
-        
-        private void SendDiedEvent() =>
-            _playerEntity.SendDiedEvent();
     }
 }

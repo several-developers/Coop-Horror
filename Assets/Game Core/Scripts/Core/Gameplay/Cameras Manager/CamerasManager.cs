@@ -4,11 +4,10 @@ using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using UnityEngine;
-using Zenject;
 
 namespace GameCore.Gameplay.CamerasManagement
 {
-    public class CamerasManager : ICamerasManager, IInitializable
+    public class CamerasManager : ICamerasManager
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -24,8 +23,6 @@ namespace GameCore.Gameplay.CamerasManagement
         private readonly PlayerCamera _playerCamera;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void Initialize() => SetCameraStatus(CameraStatus.OutsideMobileHQ);
 
         public void SetCameraStatus(CameraStatus cameraStatus)
         {

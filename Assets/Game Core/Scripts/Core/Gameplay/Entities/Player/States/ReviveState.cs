@@ -1,6 +1,4 @@
-﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.EntitiesSystems.Health;
+﻿using GameCore.Gameplay.EntitiesSystems.Health;
 
 namespace GameCore.Gameplay.Entities.Player.States
 {
@@ -8,18 +6,16 @@ namespace GameCore.Gameplay.Entities.Player.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ReviveState(PlayerEntity playerEntity, ICamerasManager camerasManager)
+        public ReviveState(PlayerEntity playerEntity)
         {
             _playerEntity = playerEntity;
             _playerReferences = playerEntity.References;
-            _camerasManager = camerasManager;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly PlayerEntity _playerEntity;
         private readonly PlayerReferences _playerReferences;
-        private readonly ICamerasManager _camerasManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -27,8 +23,8 @@ namespace GameCore.Gameplay.Entities.Player.States
         {
             ResetHealth();
             EnableMovement();
-            SetCameraFirstPersonStatus();
-            SendRevivedEvent();
+            DisableRagdoll();
+            ToggleNotDead();
             EnterAliveState();
         }
 
@@ -46,11 +42,11 @@ namespace GameCore.Gameplay.Entities.Player.States
             movementController.ToggleMovementState(isEnabled: true);
         }
 
-        private void SetCameraFirstPersonStatus() =>
-            _camerasManager.SetCameraStatus(CameraStatus.FirstPerson);
+        private void DisableRagdoll() =>
+            _playerEntity.ToggleRagdollServerRpc(enable: false);
 
-        private void SendRevivedEvent() =>
-            _playerEntity.SendRevivedEvent();
+        private void ToggleNotDead() =>
+            _playerEntity.ToggleDead(isDead: false);
 
         private void EnterAliveState() =>
             _playerEntity.EnterAliveState();

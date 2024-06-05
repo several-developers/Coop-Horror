@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Balance Config
   m_EditorClassIdentifier: 
   _metaName: Balance Config
-  _gameRestartDelay: 6
+  _gameRestartDelay: 4

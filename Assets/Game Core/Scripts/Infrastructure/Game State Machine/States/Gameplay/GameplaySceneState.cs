@@ -153,6 +153,10 @@ namespace GameCore.Infrastructure.StateMachine
             
             switch (gameState)
             {
+                case GameState.GameOver:
+                    _gameOverMenuView.Show();
+                    break;
+                
                 case GameState.QuestsRewarding:
                     // Open reward menu
                     break;
@@ -160,13 +164,13 @@ namespace GameCore.Infrastructure.StateMachine
                 case GameState.KillPlayersOnTheRoad:
                     localPlayer = PlayerEntity.GetLocalPlayer();
                     localPlayer.Kill(PlayerDeathReason.FailedQuests);
-                    
-                    _gameOverMenuView.Show();
                     break;
                 
                 case GameState.RestartGame:
                     localPlayer = PlayerEntity.GetLocalPlayer();
                     localPlayer.EnterReviveState();
+                    
+                    _gameOverMenuView.Hide();
                     break;
             }
             
