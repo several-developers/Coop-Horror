@@ -95,7 +95,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             HandlePathChange();
         }
         
-        public void ChangeToRoadPath()
+        public void ChangeToTheRoadPath()
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
             CinemachinePath path;
@@ -118,6 +118,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             }
 
             ChangePath(path, startPositionAtRoadLocation);
+        }
+
+        public void TeleportToTheRoad()
+        {
+            LastPathID = -1;
+            _pathMovement.ResetDistance();
+            _pathMovement.ToggleArrived(isArrived: false);
+            _mobileHeadquartersController.EnableMainLever();
+            ChangeToTheRoadPath();
         }
 
         public void Teleport(Vector3 position, Quaternion rotation)
@@ -147,7 +156,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         protected override void InitAll()
         {
             _mobileHeadquartersController.InitAll();
-            ChangeToRoadPath();
+            ChangeToTheRoadPath();
 
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
         }

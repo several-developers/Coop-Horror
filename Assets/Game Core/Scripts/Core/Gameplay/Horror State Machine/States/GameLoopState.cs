@@ -8,12 +8,10 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameLoopState(IHorrorStateMachine horrorStateMachine, IGameManagerDecorator gameManagerDecorator,
-            INetworkHorror networkHorror)
+        public GameLoopState(IHorrorStateMachine horrorStateMachine, IGameManagerDecorator gameManagerDecorator)
         {
             _horrorStateMachine = horrorStateMachine;
             _gameManagerDecorator = gameManagerDecorator;
-            _networkHorror = networkHorror;
 
             horrorStateMachine.AddState(this);
         }
@@ -22,7 +20,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly IGameManagerDecorator _gameManagerDecorator;
-        private readonly INetworkHorror _networkHorror;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -39,16 +36,14 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             switch (gameState)
             {
                 case GameState.ArrivedAtTheRoad:
-                    if (IsServer())
+                case GameState.RestartGame:
+                    if (NetworkHorror.IsTrueServer)
                         EnterLeaveLocationServerState();
                     else
                         EnterLeaveLocationClientState();
                     break;
             }
         }
-
-        private bool IsServer() =>
-            _networkHorror.IsOwner;
 
         private void EnterLeaveLocationServerState() =>
             _horrorStateMachine.ChangeState<LeaveLocationServerState>();

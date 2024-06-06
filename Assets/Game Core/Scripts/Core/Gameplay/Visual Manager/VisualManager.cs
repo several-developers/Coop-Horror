@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.VisualManagement
         {
             _gameManagerDecorator = gameManagerDecorator;
             _playerCamera = playerCamera;
-            
+
             SetupPresetsDictionary(gameplayConfigsProvider);
         }
 
@@ -56,10 +56,10 @@ namespace GameCore.Gameplay.VisualManagement
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
             bool isGameStateValid = gameState == GameState.ReadyToLeaveTheRoad;
-            
+
             if (!isGameStateValid)
                 return;
-            
+
             ChangePreset(VisualPresetType.RoadLocation, instant: true);
         }
 
@@ -75,7 +75,7 @@ namespace GameCore.Gameplay.VisualManagement
 
             if (!isPresetTypeValid)
                 return;
-            
+
             bool isPresetFound = TryGetPresetConfig(presetType, out VisualPresetConfig presetConfig);
 
             if (!isPresetFound)
@@ -88,7 +88,7 @@ namespace GameCore.Gameplay.VisualManagement
             Debug.Log(log);
 
             _previousPresetType = presetType;
-            
+
             ApplyEffects(presetConfig, instant);
         }
 
@@ -121,7 +121,7 @@ namespace GameCore.Gameplay.VisualManagement
                 case GameState.ArrivedAtTheRoad:
                     ChangePreset(VisualPresetType.RoadLocation);
                     break;
-                
+
                 case GameState.HeadingToTheLocation:
                     ChangePreset(VisualPresetType.DefaultLocation);
                     break;
@@ -142,11 +142,11 @@ namespace GameCore.Gameplay.VisualManagement
             Ease ease = presetConfig.ChangeEase;
 
             _volumeTN.Kill();
-            
+
             _volumeTwo.profile = presetConfig.UseVolumeProfile ? presetConfig.VolumeProfile : null;
             _volumeOne.weight = 1f;
             _volumeTwo.weight = 0f;
-            
+
             _volumeTN = DOVirtual
                 .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
                 {
@@ -178,9 +178,9 @@ namespace GameCore.Gameplay.VisualManagement
 
             if (useNativeFog && !RenderSettings.fog)
                 RenderSettings.fog = true;
-            
+
             _nativeFogTN.Kill();
-            
+
             _nativeFogTN = DOVirtual
                 .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
                 {
@@ -191,10 +191,7 @@ namespace GameCore.Gameplay.VisualManagement
                     RenderSettings.fogColor = color;
                 })
                 .SetEase(ease)
-                .OnComplete(() =>
-                {
-                    RenderSettings.fog = useNativeFog;
-                });
+                .OnComplete(() => { RenderSettings.fog = useNativeFog; });
         }
 
         private void ChangeCameraDistance(VisualPresetConfig presetConfig, bool instant = false)
@@ -206,7 +203,7 @@ namespace GameCore.Gameplay.VisualManagement
             Ease ease = presetConfig.ChangeEase;
 
             _cameraTN.Kill();
-            
+
             _cameraTN = DOVirtual
                 .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
                 {

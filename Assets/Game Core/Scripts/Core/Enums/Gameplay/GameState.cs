@@ -15,5 +15,6 @@
         RestartGame = 10,
         LeavingMainRoad = 11,
         EnteringMainRoad = 12,
+        RestartGameCompleted = 13,
     }
 }

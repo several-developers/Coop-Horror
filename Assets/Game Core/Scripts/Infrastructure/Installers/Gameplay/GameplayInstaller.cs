@@ -3,6 +3,7 @@ using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Locations;
@@ -47,6 +48,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindVisualManager();
             BindPlayerCamera();
             BindCamerasManager();
+            BindGameResetManager();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -142,6 +144,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .BindInterfacesTo<CamerasManager>()
                 .AsSingle();
+        }
+
+        private void BindGameResetManager()
+        {
+            Container
+                .BindInterfacesTo<GameResetManager>()
+                .AsSingle()
+                .NonLazy();
         }
     }
 }

@@ -59,6 +59,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent += LoadSelectedLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent += AddPlayersGold;
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent += SpendPlayersGold;
+            _gameManagerDecorator.OnResetPlayersGoldInnerEvent += ResetGold;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent += GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent += GetGameState;
 
@@ -76,6 +77,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent -= LoadSelectedLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent -= AddPlayersGold;
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent -= SpendPlayersGold;
+            _gameManagerDecorator.OnResetPlayersGoldInnerEvent -= ResetGold;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent -= GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent -= GetGameState;
             
@@ -118,6 +120,16 @@ namespace GameCore.Gameplay.GameManagement
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void ChangeGameState(GameState gameState)
+        {
+            // Debug.LogWarning("----> GAME STATE changed!!! " + gameState);
+
+            if (IsServerOnly)
+                _gameState.Value = gameState;
+            else
+                ChangeGameStateServerRpc(gameState);
+        }
 
         private void HandleGameState(GameState gameState)
         {
@@ -169,26 +181,16 @@ namespace GameCore.Gameplay.GameManagement
                         previousState: GameState.ArrivedAtTheLocation);
                     break;
 
-                case GameState.KillPlayersOnTheRoad:
-                    break;
-
                 case GameState.RestartGame:
-                    ResetGold();
-
-                    ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
+                    ChangeGameStateWhenAllPlayersReady(newState: GameState.RestartGameCompleted,
                         previousState: GameState.RestartGame);
                     break;
+                
+                case GameState.RestartGameCompleted:
+                    ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
+                        previousState: GameState.RestartGameCompleted);
+                    break;
             }
-        }
-
-        private void ChangeGameState(GameState gameState)
-        {
-            // Debug.LogWarning("----> GAME STATE changed!!! " + gameState);
-
-            if (IsServerOnly)
-                _gameState.Value = gameState;
-            else
-                ChangeGameStateServerRpc(gameState);
         }
 
         private void SelectLocation(SceneName sceneName)

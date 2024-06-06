@@ -13,6 +13,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         void OpenDoor();
         void EnableMainLever();
         void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false);
+        void TeleportToTheRoad();
         Camera GetOutsideCamera();
     }
 }

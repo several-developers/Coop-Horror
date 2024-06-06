@@ -149,8 +149,6 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void HandleGameState(GameState gameState)
         {
-            PlayerEntity localPlayer;
-            
             switch (gameState)
             {
                 case GameState.GameOver:
@@ -162,14 +160,11 @@ namespace GameCore.Infrastructure.StateMachine
                     break;
                 
                 case GameState.KillPlayersOnTheRoad:
-                    localPlayer = PlayerEntity.GetLocalPlayer();
+                    PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
                     localPlayer.Kill(PlayerDeathReason.FailedQuests);
                     break;
                 
                 case GameState.RestartGame:
-                    localPlayer = PlayerEntity.GetLocalPlayer();
-                    localPlayer.EnterReviveState();
-                    
                     _gameOverMenuView.Hide();
                     break;
             }

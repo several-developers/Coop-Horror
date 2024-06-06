@@ -129,6 +129,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         protected override void InitServerOnly()
         {
+            base.InitServerOnly();
+            
             AllBeetles.Add(item: this);
 
             InitSystems();
@@ -191,8 +193,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             _beetleStateMachine.Tick();
         }
 
-        protected override void DespawnServerOnly() =>
+        protected override void DespawnServerOnly()
+        {
+            base.DespawnServerOnly();
+            
+            AllBeetles.Remove(item: this);
+            
             _healthSystem.OnHealthChangedEvent -= OnHealthChanged;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

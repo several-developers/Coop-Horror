@@ -1,4 +1,5 @@
-﻿using GameCore.Enums.Gameplay;
+﻿using System;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
@@ -12,8 +13,10 @@ namespace GameCore.Gameplay.GameTimeManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator, ITimeCycle timeCycle)
+        private void Construct(IGameTimeManagerDecorator gameTimeManagerDecorator,
+            IGameManagerDecorator gameManagerDecorator, ITimeCycle timeCycle)
         {
+            _gameTimeManagerDecorator = gameTimeManagerDecorator;
             _gameManagerDecorator = gameManagerDecorator;
             _timeCycle = timeCycle;
         }
@@ -22,8 +25,25 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private readonly NetworkVariable<MyDateTime> _gameTimer = new();
 
+        private IGameTimeManagerDecorator _gameTimeManagerDecorator;
         private IGameManagerDecorator _gameManagerDecorator;
         private ITimeCycle _timeCycle;
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Awake()
+        {
+            _gameTimeManagerDecorator.OnResetDayInnerEvent += ResetDay;
+            _gameTimeManagerDecorator.OnSetMidnightInnerEvent += SetMidnight;
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            
+            _gameTimeManagerDecorator.OnResetDayInnerEvent -= ResetDay;
+            _gameTimeManagerDecorator.OnSetMidnightInnerEvent -= SetMidnight;
+        }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -74,16 +94,20 @@ namespace GameCore.Gameplay.GameTimeManagement
                     break;
 
                 case GameState.ArrivedAtTheRoad:
-                    _timeCycle.SetMidnight();
-                    break;
-
-                case GameState.RestartGame:
-                    MyDateTime dateTime = _timeCycle.GetDateTime();
-                    dateTime.ResetDay();
-                    _timeCycle.SyncDateTime(dateTime);
+                    SetMidnight();
                     break;
             }
         }
+
+        private void ResetDay()
+        {
+            MyDateTime dateTime = _timeCycle.GetDateTime();
+            dateTime.ResetDay();
+            _timeCycle.SyncDateTime(dateTime);
+        }
+
+        private void SetMidnight() =>
+            _timeCycle.SetMidnight();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

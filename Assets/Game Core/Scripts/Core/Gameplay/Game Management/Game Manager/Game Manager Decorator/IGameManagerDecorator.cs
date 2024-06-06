@@ -19,6 +19,7 @@ namespace GameCore.Gameplay.GameManagement
         event Action OnLoadSelectedLocationInnerEvent;
         event Action<int> OnAddPlayersGoldInnerEvent;
         event Action<int> OnSpendPlayersGoldInnerEvent;
+        event Action OnResetPlayersGoldInnerEvent;
         event Func<SceneName> OnGetSelectedLocationInnerEvent;
         event Func<GameState> OnGetGameStateInnerEvent;
         /// <summary>
@@ -30,6 +31,7 @@ namespace GameCore.Gameplay.GameManagement
         void LoadSelectedLocation();
         void AddPlayersGold(int amount);
         void SpendPlayersGold(int amount);
+        void ResetPlayersGold();
         SceneName GetSelectedLocation();
         GameState GetGameState();
     }

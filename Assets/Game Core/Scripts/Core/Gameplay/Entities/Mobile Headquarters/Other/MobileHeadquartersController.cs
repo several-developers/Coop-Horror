@@ -94,7 +94,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                 // Под вопросом это
                 case GameState.ArrivedAtTheRoad:
                     _mobileHeadquartersEntity.PathMovement.ToggleArrived(isArrived: false);
-                    _mobileHeadquartersEntity.ChangeToRoadPath();
+                    _mobileHeadquartersEntity.ChangeToTheRoadPath();
                     break;
 
                 case GameState.ReadyToLeaveTheRoad:

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
@@ -26,6 +27,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         public event Action OnEntityTeleportedEvent = delegate { };
 
+        private static readonly List<MonsterEntityBase> AllMonsters = new();
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         protected virtual void Awake() => CheckAgentState();
@@ -43,13 +46,21 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         public void SetEntityLocation(EntityLocation entityLocation) =>
             EntityLocation = entityLocation;
+
+        public static IReadOnlyList<MonsterEntityBase> GetAllMonsters() => AllMonsters;
         
         public Transform GetTransform() => transform;
 
         public NavMeshAgent GetAgent() => _agent;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
-        
+
+        protected override void InitServerOnly() =>
+            AllMonsters.Add(item: this);
+
+        protected override void DespawnServerOnly() =>
+            AllMonsters.Remove(item: this);
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CheckAgentState()
