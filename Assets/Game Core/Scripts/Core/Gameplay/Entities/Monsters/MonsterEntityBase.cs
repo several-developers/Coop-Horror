@@ -18,12 +18,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         [SerializeField, Required]
         protected NavMeshAgent _agent;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        protected EntityLocation EntityLocation { get; private set; } = EntityLocation.LocationSurface;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnEntityTeleportedEvent = delegate { };
 
-        private EntityLocation _entityLocation;
-        
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         protected virtual void Awake() => CheckAgentState();
@@ -38,6 +40,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             
             OnEntityTeleportedEvent.Invoke();
         }
+
+        public void SetEntityLocation(EntityLocation entityLocation) =>
+            EntityLocation = entityLocation;
         
         public Transform GetTransform() => transform;
 

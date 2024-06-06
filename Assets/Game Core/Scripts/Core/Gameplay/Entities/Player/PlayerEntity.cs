@@ -283,8 +283,11 @@ namespace GameCore.Gameplay.Entities.Player
 
         protected override void DespawnAll()
         {
-            _inventory.DropAllItems();
-            _inventoryManager.Dispose();
+            if (!IsServerOnly)
+            {
+                _inventory.DropAllItems();
+                _inventoryManager.Dispose();
+            }
 
             AllPlayers.Remove(OwnerClientId);
             

@@ -35,6 +35,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         public void Enter()
         {
+            ToggleTriggerCheckState(isEnabled: false);
             EnableAgent();
             StartChasing();
             StartDistanceCheck();
@@ -42,12 +43,19 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         public void Exit()
         {
+            ToggleTriggerCheckState(isEnabled: true);
             ResetAgent();
             StopChasing();
             StopDistanceCheck();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void ToggleTriggerCheckState(bool isEnabled)
+        {
+            AggressionSystem aggressionSystem = _beetleEntity.GetAggressionSystem();
+            aggressionSystem.ToggleTriggerCheckState(isEnabled);
+        }
 
         private void EnableAgent()
         {
@@ -64,7 +72,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             NavMeshAgent agent = _beetleEntity.GetAgent();
             agent.stoppingDistance = _startStoppingDistance;
         }
-        
+
         private void SetDestination()
         {
             PlayerEntity targetPlayer = _beetleEntity.GetTargetPlayer();
@@ -95,7 +103,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             Vector3 beetlePosition = _transform.position;
             float distance = Vector3.Distance(a: beetlePosition, b: targetPosition);
             bool isTooFar = distance > _beetleAIConfig.MaxChaseDistance;
+            bool canAttack = distance <= _beetleAIConfig.AttackDistance;
 
+            if (canAttack)
+            {
+                EnterAttackState();
+                return;
+            }
+            
             if (isTooFar)
                 StartChasingEndTimer();
             else
@@ -184,5 +199,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         
         private void EnterTriggerState() =>
             _beetleEntity.EnterTriggerState();
+
+        private void EnterAttackState() =>
+            _beetleEntity.EnterAttackState();
     }
 }

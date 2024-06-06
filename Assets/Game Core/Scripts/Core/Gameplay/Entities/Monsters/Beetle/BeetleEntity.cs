@@ -58,7 +58,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         private PlayerEntity _targetPlayer;
 
         private Floor _dungeonFloor;
-        private bool _isOutside = true;
         private bool _isDead;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -66,7 +65,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         protected override void Awake()
         {
             base.Awake();
-            CheckIfOutside();
+            CheckEntityLocation();
         }
 
         private void Start()
@@ -83,9 +82,24 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         public void SetTargetPlayer(PlayerEntity playerEntity) =>
             _targetPlayer = playerEntity;
 
-        public void ToggleOutsideState(bool isOutside) =>
-            _isOutside = isOutside;
-
+        public void DecideStateByLocation()
+        {
+            switch (EntityLocation)
+            {
+                case EntityLocation.LocationSurface:
+                    EnterMoveToSurfaceFireExitState();
+                    break;
+                
+                case EntityLocation.Stairs:
+                    EnterMoveToDungeonFireExitState();
+                    break;
+                
+                case EntityLocation.Dungeon:
+                    EnterIdleState();
+                    break;
+            }
+        }
+        
         public void EnterIdleState() => ChangeState<IdleState>();
 
         public void EnterWanderingState() => ChangeState<WanderingState>();
@@ -97,10 +111,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         public void EnterChaseState() => ChangeState<ChaseState>();
 
         public void EnterAttackState() => ChangeState<AttackState>();
-
-        public void EnterMoveToSurfaceFireExitState() => ChangeState<MoveToSurfaceFireExitState>();
-
-        public void EnterMoveToDungeonFireExitState() => ChangeState<MoveToDungeonFireExitState>();
 
         public static IReadOnlyList<BeetleEntity> GetAllBeetles() => AllBeetles;
 
@@ -123,11 +133,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
             InitSystems();
             SetupStates();
-
-            if (_isOutside)
-                EnterMoveToSurfaceFireExitState();
-            else
-                EnterIdleState();
+            DecideStateByLocation();
 
             _healthSystem.OnHealthChangedEvent += OnHealthChanged;
 
@@ -190,9 +196,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void CheckIfOutside()
+        private void CheckEntityLocation()
         {
             Transform parent = transform.parent;
+            bool inDungeon = false;
 
             while (parent != null)
             {
@@ -204,18 +211,25 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
                     continue;
 
                 _dungeonFloor = dungeonRoot.Floor;
-                _isOutside = false;
+                inDungeon = true;
                 break;
             }
 
-            if (!_isOutside)
+            if (inDungeon)
+            {
+                SetEntityLocation(EntityLocation.Dungeon);
                 return;
-
+            }
+            
             int randomFloor = Random.Range(1, 4);
             _dungeonFloor = (Floor)randomFloor;
         }
 
         private void EnterDeathState() => ChangeState<DeathState>();
+        
+        private void EnterMoveToSurfaceFireExitState() => ChangeState<MoveToSurfaceFireExitState>();
+
+        private void EnterMoveToDungeonFireExitState() => ChangeState<MoveToDungeonFireExitState>();
         
         private void ChangeState<TState>() where TState : IState =>
             _beetleStateMachine.ChangeState<TState>();
@@ -240,9 +254,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
         [Title(Constants.DebugButtons)]
-        [Button(buttonSize: 30, ButtonStyle.FoldoutButton), DisableInEditorMode]
-        private void DebugToggleOutsideState(bool isOutside) => ToggleOutsideState(isOutside);
-
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterIdleState() => EnterIdleState();
 

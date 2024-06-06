@@ -150,7 +150,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
                 return;
             
             Type stateType = state.GetType();
-            bool isStateValid = stateType == typeof(IdleState) || stateType == typeof(WanderingState);
+            bool isStateValid = stateType == typeof(IdleState)
+                                || stateType == typeof(WanderingState)
+                                || stateType == typeof(MoveToSurfaceFireExitState)
+                                || stateType == typeof(MoveToDungeonFireExitState);
 
             if (!isStateValid)
                 return;
@@ -181,9 +184,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
             if (!isStateValid)
                 return;
-            
-            //_currentAggressionScale = Mathf.
-            EnterIdleState();
+           
+            DecideStateByLocation();
         }
 
         private IEnumerator TriggerCheckCO()
@@ -200,8 +202,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             }
         }
 
-        private void EnterIdleState() =>
-            _beetleEntity.EnterIdleState();
+        private void DecideStateByLocation() =>
+            _beetleEntity.DecideStateByLocation();
 
         private void EnterTriggerState() =>
             _beetleEntity.EnterTriggerState();

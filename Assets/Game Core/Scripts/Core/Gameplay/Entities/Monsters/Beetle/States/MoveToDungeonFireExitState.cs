@@ -114,11 +114,18 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             }
         }
 
+        private void DecideStateByLocation() =>
+            _beetleEntity.DecideStateByLocation();
+
         private void EnterIdleState() =>
             _beetleEntity.EnterIdleState();
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnEntityTeleported() => EnterIdleState();
+        private void OnEntityTeleported()
+        {
+            _beetleEntity.SetEntityLocation(EntityLocation.Dungeon);
+            DecideStateByLocation();
+        }
     }
 }

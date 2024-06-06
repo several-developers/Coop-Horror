@@ -123,6 +123,10 @@ namespace GameCore.Configs.Gameplay.Enemies
         public float MaxChaseDistance => _maxChaseDistance;
         public float ChaseEndDelay => _chaseEndDelay;
         
+        public float AttackDistance => _attackDistance;
+        public float AttackCooldown => _attackCooldown;
+        public float Damage => _damage;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         private const string CommonSettings = "Common Settings";

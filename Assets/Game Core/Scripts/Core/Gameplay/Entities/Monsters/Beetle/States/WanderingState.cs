@@ -67,9 +67,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             _agent.speed = GetWanderingSpeed();
         }
 
-        private void EnterIdleState() =>
-            _beetleEntity.EnterIdleState();
-        
         private Vector3 GetRandomPosition()
         {
             float minDistance = _beetleAIConfig.WanderingMinDistance;
@@ -93,7 +90,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             float speed = Random.Range(minSpeed, maxSpeed);
             return speed;
         }
-        
+
         private bool IsArrivedToTargetPoint()
         {
             Vector3 position = _transform.position;
@@ -111,8 +108,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             bool isStuck = !isStatusValid && velocity < 0.1f;
             return isStuck;
         }
-        
+
         private bool IsOnNavMesh() =>
             _agent.isOnNavMesh;
+
+        private void EnterIdleState() =>
+            _beetleEntity.EnterIdleState();
     }
 }
