@@ -47,7 +47,7 @@ namespace GameCore.Gameplay.Level
             ChangeVisualPreset(playerLocation);
         }
 
-        public void TeleportEntityToFireExit(IEntity entity, Floor floor, bool isInStairsLocation)
+        public void TeleportEntityToFireExit(ITeleportableEntity entity, Floor floor, bool isInStairsLocation)
         {
             FireExit fireExit;
 

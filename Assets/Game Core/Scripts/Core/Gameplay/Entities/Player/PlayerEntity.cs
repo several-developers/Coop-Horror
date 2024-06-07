@@ -26,18 +26,20 @@ using Zenject;
 namespace GameCore.Gameplay.Entities.Player
 {
     [RequireComponent(typeof(PlayerInput))]
-    public class PlayerEntity : NetcodeBehaviour, IEntity, IDamageable
+    public class PlayerEntity : NetcodeBehaviour, ITeleportableEntity, IDamageable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsPreviewFactory itemsPreviewFactory, ICamerasManager camerasManager,
-            IPlayerInteractionObserver playerInteractionObserver, IGameplayConfigsProvider gameplayConfigsProvider,
+        private void Construct(IItemsPreviewFactory itemsPreviewFactory,
+            IPlayerInteractionObserver playerInteractionObserver,
+            ICamerasManager camerasManager,
+            IGameplayConfigsProvider gameplayConfigsProvider,
             IConfigsProvider configsProvider)
         {
             _itemsPreviewFactory = itemsPreviewFactory;
-            _camerasManager = camerasManager;
             _playerInteractionObserver = playerInteractionObserver;
+            _camerasManager = camerasManager;
 
             _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
             InputReader = configsProvider.GetInputReader();
@@ -83,8 +85,8 @@ namespace GameCore.Gameplay.Entities.Player
         private static PlayerEntity _localPlayer;
 
         private IItemsPreviewFactory _itemsPreviewFactory;
-        private ICamerasManager _camerasManager;
         private IPlayerInteractionObserver _playerInteractionObserver;
+        private ICamerasManager _camerasManager;
 
         private PlayerConfigMeta _playerConfig;
         private StateMachine _playerStateMachine;
@@ -107,13 +109,12 @@ namespace GameCore.Gameplay.Entities.Player
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
         }
 
-#warning ПРОВЕРИТЬ ИЛИ КОРРЕКТНО РАБОТАЕТ, ДОБАВИТЬ СЕРВЕР РПС
         public void ChangePlayerLocation(EntityLocation entityLocation)
         {
-            if (!IsOwner)
-                return;
-
-            _entityLocation.Value = entityLocation;
+            if (IsOwner)
+                _entityLocation.Value = entityLocation;
+            else
+                ChangePlayerLocationServerRpc(entityLocation);
         }
 
         public void DropItem(bool destroy = false)
@@ -362,6 +363,10 @@ namespace GameCore.Gameplay.Entities.Player
         [ServerRpc(RequireOwnership = false)]
         public void ToggleRagdollServerRpc(bool enable) => ToggleRagdollClientRpc(enable);
 
+        [ServerRpc(RequireOwnership = false)]
+        private void ChangePlayerLocationServerRpc(EntityLocation entityLocation) =>
+            _entityLocation.Value = entityLocation;
+
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)
         {
@@ -486,5 +491,9 @@ namespace GameCore.Gameplay.Entities.Player
         
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterReviveState() => EnterReviveState();
+
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugSetCameraStatus(CameraStatus cameraStatus) =>
+            _camerasManager.SetCameraStatus(cameraStatus);
     }
 }

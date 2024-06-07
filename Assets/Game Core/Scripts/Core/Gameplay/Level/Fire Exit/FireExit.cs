@@ -72,11 +72,19 @@ namespace GameCore.Gameplay.Level
                 return;
 
             bool isPlayer = entity.GetType() == typeof(PlayerEntity);
-            
-            if (isPlayer)
-                _fireExitsManager.TeleportLocalPlayerToFireExit(_floor, _isInStairsLocation);
+
+            if (!isPlayer)
+            {
+                bool isTeleportableEntity = entity is ITeleportableEntity;
+
+                if (!isTeleportableEntity)
+                    return;
+
+                var teleportableEntity = (ITeleportableEntity)entity;
+                _fireExitsManager.TeleportEntityToFireExit(teleportableEntity, _floor, _isInStairsLocation);
+            }
             else
-                _fireExitsManager.TeleportEntityToFireExit(entity, _floor, _isInStairsLocation);
+                _fireExitsManager.TeleportLocalPlayerToFireExit(_floor, _isInStairsLocation);
         }
 
         public void ToggleInteract(bool canInteract)

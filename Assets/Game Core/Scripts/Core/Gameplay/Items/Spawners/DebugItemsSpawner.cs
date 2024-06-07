@@ -2,6 +2,7 @@
 using GameCore.Gameplay.Network;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
@@ -23,6 +24,9 @@ namespace GameCore.Gameplay.Items.Spawners
         [Title(Constants.Settings)]
         [SerializeField]
         private bool _spawnAtStart = true;
+
+        [SerializeField]
+        private bool _markDestroyOnUnloadScene = true;
         
         [Title(Constants.References)]
         [SerializeField, Required]
@@ -59,7 +63,7 @@ namespace GameCore.Gameplay.Items.Spawners
             if (!_spawnAtStart)
                 return;
 
-            if (!_netcodeHooks.IsOwner)
+            if (!NetworkHorror.IsTrueServer)
                 return;
             
             SpawnItem();
@@ -74,7 +78,14 @@ namespace GameCore.Gameplay.Items.Spawners
             position.y += 0.25f;
             position = position.GetRandomPosition(radius: 0.25f);
 
-            _itemsFactory.CreateItem(_itemMeta.ItemID, position, out _);
+            _itemsFactory.CreateItem(_itemMeta.ItemID, position, out NetworkObject networkObject);
+
+            bool isItemObjectFound = networkObject.TryGetComponent(out ItemObjectBase itemObject);
+
+            if (!isItemObjectFound)
+                return;
+            
+            itemObject.ToggleDestroyOnSceneUnload(_markDestroyOnUnloadScene);
         }
 
         private bool IsItemMetaValid()

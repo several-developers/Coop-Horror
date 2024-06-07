@@ -100,7 +100,7 @@ namespace GameCore.Gameplay.GameManagement
                 Vector3 scale = Vector3.one;
                 Quaternion rotation = Quaternion.identity;
 
-                playerEntity.References.NetworkTransform.Teleport(spawnPosition, rotation, scale);
+                playerEntity.Teleport(spawnPosition, rotation);
                 playerEntity.NetworkObject.TrySetParent(parent, worldPositionStays: false);
             }
 

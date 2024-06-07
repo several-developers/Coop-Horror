@@ -8,7 +8,7 @@ using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.Beetle
 {
-    public abstract class MonsterEntityBase : NetcodeBehaviour, IEntity
+    public abstract class MonsterEntityBase : NetcodeBehaviour, ITeleportableEntity
     {
         // MEMBERS: -------------------------------------------------------------------------------
 

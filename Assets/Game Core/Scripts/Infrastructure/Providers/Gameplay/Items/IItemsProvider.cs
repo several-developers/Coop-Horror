@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.Items;
+﻿using System.Collections.Generic;
+using GameCore.Gameplay.Items;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.Items
 {
@@ -6,6 +7,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.Items
     {
         void RegisterItem(ItemObjectBase item);
         void RemoveItem(int uniqueItemID);
+        IReadOnlyDictionary<int, ItemObjectBase> GetAllItems();
         bool TryGetItem(int uniqueItemID, out ItemObjectBase item);
     }
 }

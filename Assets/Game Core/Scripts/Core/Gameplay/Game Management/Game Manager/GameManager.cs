@@ -124,7 +124,10 @@ namespace GameCore.Gameplay.GameManagement
         private void ChangeGameState(GameState gameState)
         {
             // Debug.LogWarning("----> GAME STATE changed!!! " + gameState);
-
+            
+            if (!IsSpawned)
+                return;
+            
             if (IsServerOnly)
                 _gameState.Value = gameState;
             else

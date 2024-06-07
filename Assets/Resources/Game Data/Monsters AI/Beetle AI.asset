@@ -40,4 +40,4 @@ MonoBehaviour:
   _chaseEndDelay: 5
   _attackDistance: 2
   _attackCooldown: 2
-  _damage: 20
+  _damage: 25

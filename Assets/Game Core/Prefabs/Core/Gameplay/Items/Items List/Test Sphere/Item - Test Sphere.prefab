@@ -297,6 +297,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _changeItemIDAtAwake: 1
   _startItemID: -1
+  _itemIDDebug: 0
+  _uniqueItemIDInfo: 0
 --- !u!4 &8347643275052558915 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5225906074662672360, guid: 9a4e2523f6834bf418c688f91493518e,

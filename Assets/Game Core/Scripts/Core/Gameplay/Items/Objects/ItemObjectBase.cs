@@ -33,10 +33,19 @@ namespace GameCore.Gameplay.Items
         [ShowIf(nameof(_changeItemIDAtAwake))]
         private int _startItemID;
 
+        [SerializeField, ReadOnly]
+        [LabelText("Item ID")]
+        private int _itemIDDebug;
+        
+        [SerializeField, ReadOnly]
+        [LabelText("Unique Item ID")]
+        private int _uniqueItemIDInfo;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public int ItemID => _itemID;
         public int UniqueItemID => _uniqueItemID;
+        public bool DestroyOnSceneUnload => _destroyOnSceneUnload;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -52,13 +61,11 @@ namespace GameCore.Gameplay.Items
         private Rigidbody _rigidbody;
         private Collider _collider;
         private GameObject _child; // Model container
-        private bool _isPickedUpLocal;
-
-        [ShowInInspector]
+        
         private int _itemID;
-
-        [ShowInInspector]
         private int _uniqueItemID;
+        private bool _isPickedUpLocal;
+        private bool _destroyOnSceneUnload;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -71,7 +78,10 @@ namespace GameCore.Gameplay.Items
             _child = transform.GetChild(0).gameObject;
 
             if (_changeItemIDAtAwake)
+            {
                 _itemID = _startItemID;
+                _itemIDDebug = _startItemID;
+            }
 
             SetupItemUniqueID();
             RegisterItem();
@@ -80,9 +90,6 @@ namespace GameCore.Gameplay.Items
         private void OnCollisionEnter(Collision collision) => IgnorePlayerCollision(collision);
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void Setup(int itemID) =>
-            _itemID = itemID;
 
         public virtual void InteractionStarted()
         {
@@ -100,6 +107,9 @@ namespace GameCore.Gameplay.Items
         public void ToggleInteract(bool canInteract)
         {
         }
+
+        public void ToggleDestroyOnSceneUnload(bool destroy) =>
+            _destroyOnSceneUnload = destroy;
 
         public void PickUp()
         {
@@ -189,6 +199,7 @@ namespace GameCore.Gameplay.Items
         {
             maxUniqueItemID++;
             _uniqueItemID = maxUniqueItemID;
+            _uniqueItemIDInfo = maxUniqueItemID;
         }
 
         private void RegisterItem() =>

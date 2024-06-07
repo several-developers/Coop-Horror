@@ -6,6 +6,6 @@ namespace GameCore.Gameplay.Level
     public interface IFireExitsManager
     {
         void TeleportLocalPlayerToFireExit(Floor floor, bool isInStairsLocation);
-        void TeleportEntityToFireExit(IEntity entity, Floor floor, bool isInStairsLocation);
+        void TeleportEntityToFireExit(ITeleportableEntity entity, Floor floor, bool isInStairsLocation);
     }
 }

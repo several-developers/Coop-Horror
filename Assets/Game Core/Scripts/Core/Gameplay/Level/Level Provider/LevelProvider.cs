@@ -52,7 +52,6 @@ namespace GameCore.Gameplay.Level
         public void Clear()
         {
             _elevatorsReferences.Clear();
-            _stairsFireExits.Clear();
             _otherFireExits.Clear();
         }
 
