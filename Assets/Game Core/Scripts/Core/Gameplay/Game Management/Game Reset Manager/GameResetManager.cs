@@ -97,7 +97,6 @@ namespace GameCore.Gameplay.GameManagement
                     continue;
 
                 Vector3 spawnPosition = GetSpawnPosition();
-                Vector3 scale = Vector3.one;
                 Quaternion rotation = Quaternion.identity;
 
                 playerEntity.Teleport(spawnPosition, rotation);

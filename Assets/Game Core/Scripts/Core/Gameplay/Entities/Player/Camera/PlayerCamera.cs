@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using Cinemachine;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player.CameraManagement
@@ -28,6 +29,19 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         {
             _transform.SetParent(null);
             _transform.SetAsLastSibling();
+        }
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void ToggleCameraState(bool isEnabled)
+        {
+            Camera mainCamera = _cameraReferences.MainCamera;
+            Camera itemsCamera = _cameraReferences.ItemsCamera;
+            CinemachineBrain cinemachineBrain = _cameraReferences.CinemachineBrain;
+
+            mainCamera.enabled = isEnabled;
+            itemsCamera.enabled = isEnabled;
+            cinemachineBrain.enabled = isEnabled;
         }
     }
 }

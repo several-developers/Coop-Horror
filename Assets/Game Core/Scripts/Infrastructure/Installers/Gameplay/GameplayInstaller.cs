@@ -30,6 +30,9 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private PlayerCamera _playerCamera;
 
         [SerializeField, Required]
+        private SpectatorCamera _spectatorCamera;
+        
+        [SerializeField, Required]
         private VisualManager _visualManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -47,6 +50,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindUIManager();
             BindVisualManager();
             BindPlayerCamera();
+            BindSpectatorCamera();
             BindCamerasManager();
             BindGameResetManager();
         }
@@ -136,6 +140,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .Bind<PlayerCamera>()
                 .FromInstance(_playerCamera)
+                .AsSingle();
+        }
+
+        private void BindSpectatorCamera()
+        {
+            Container
+                .Bind<SpectatorCamera>()
+                .FromInstance(_spectatorCamera)
                 .AsSingle();
         }
 

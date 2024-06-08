@@ -6,6 +6,7 @@ namespace GameCore.Gameplay.CamerasManagement
     public interface ICamerasManager
     {
         void SetCameraStatus(CameraStatus cameraStatus);
+        void SwitchToNextPlayer();
         PlayerCamera GetPlayerCamera();
     }
 }

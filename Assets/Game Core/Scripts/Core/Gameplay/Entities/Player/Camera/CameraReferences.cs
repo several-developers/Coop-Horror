@@ -1,4 +1,5 @@
 ﻿using System;
+using Cinemachine;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,6 +12,12 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
 
         [SerializeField, Required]
         private Camera _mainCamera;
+        
+        [SerializeField, Required]
+        private Camera _itemsCamera;
+
+        [SerializeField, Required]
+        private CinemachineBrain _cinemachineBrain;
         
         [SerializeField, Required]
         private Transform _leftHandItemsHolder;
@@ -27,6 +34,8 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public Camera MainCamera => _mainCamera;
+        public Camera ItemsCamera => _itemsCamera;
+        public CinemachineBrain CinemachineBrain => _cinemachineBrain;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public Transform LookAtObject => _lookAtObject;

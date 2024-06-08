@@ -72,6 +72,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _pathMovement = new PathMovement(mobileHeadquartersEntity: this);
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
             _moveSpeedController = _references.MoveSpeedController;
+            LastPathID = -1;
             
             _moveSpeedController.Init(_mobileHeadquartersConfig, GameManagerDecorator);
         }

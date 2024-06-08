@@ -50,10 +50,10 @@ namespace GameCore.Gameplay.Entities.Player
         private MySprintAbility _sprintAbility;
         private Vector2 _moveInput;
         private Vector2 _lookVector;
-        
+
         // Current camera target pitch
         private float _cameraTargetPitch;
-        
+
         private bool _isInitialized;
         private bool _performJump;
         private bool _cancelJump;
@@ -61,6 +61,7 @@ namespace GameCore.Gameplay.Entities.Player
         private bool _cancelCrouch;
 
         private bool _isEnabled;
+        private bool _isCameraEnabled;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -82,7 +83,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isInitialized || !_isEnabled)
                 return;
-            
+
             // Movement direction relative to Character's forward
 
             Vector3 movementDirection = Vector3.zero;
@@ -94,17 +95,20 @@ namespace GameCore.Gameplay.Entities.Player
 
             _character.SetMovementDirection(movementDirection);
 
-            // Look input
+            if (_isCameraEnabled)
+            {
+                // Look input
 
-            _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
+                _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
 
-            // Add yaw input, this update character's yaw rotation
+                // Add yaw input, this update character's yaw rotation
 
-            AddControlYawInput(_lookVector.x * _lookSensitivity.x);
+                AddControlYawInput(_lookVector.x * _lookSensitivity.x);
 
-            // Add pitch input (look up / look down), this update cameraTarget's local rotation
+                // Add pitch input (look up / look down), this update cameraTarget's local rotation
 
-            AddControlPitchInput(_lookVector.y * _lookSensitivity.y, _minPitch, _maxPitch);
+                AddControlPitchInput(_lookVector.y * _lookSensitivity.y, _minPitch, _maxPitch);
+            }
 
             // Crouch input
 
@@ -120,7 +124,7 @@ namespace GameCore.Gameplay.Entities.Player
             }
 
             // Jump input
-            
+
             if (_performJump)
             {
                 _performJump = false;
@@ -137,7 +141,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isInitialized)
                 return;
-            
+
             _inputReader.OnMoveEvent -= OnMove;
             _inputReader.OnJumpEvent -= OnJump;
             _inputReader.OnJumpCanceledEvent -= OnJumpCanceled;
@@ -170,8 +174,9 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _isInitialized = true;
             _isEnabled = true;
+            _isCameraEnabled = true;
             _inputReader = playerEntity.InputReader;
-            
+
             _crouchedCamera.SetActive(false);
             _unCrouchedCamera.SetActive(true);
             _crouchedCamera.transform.SetParent(null);
@@ -189,6 +194,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         public void ToggleMovementState(bool isEnabled) =>
             _isEnabled = isEnabled;
+
+        public void ToggleCameraState(bool isEnabled) =>
+            _isCameraEnabled = isEnabled;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -239,7 +247,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isEnabled)
                 return;
-            
+
             _performJump = true;
         }
 
@@ -247,7 +255,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isEnabled)
                 return;
-            
+
             _cancelJump = true;
         }
 
@@ -255,7 +263,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isEnabled)
                 return;
-            
+
             _performCrouch = true;
         }
 
@@ -263,7 +271,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isEnabled)
                 return;
-            
+
             _cancelCrouch = true;
         }
 
@@ -271,7 +279,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isEnabled)
                 return;
-            
+
             _lookVector = lookVector;
         }
 
@@ -279,7 +287,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isEnabled)
                 return;
-            
+
             _sprintAbility.Sprint();
         }
 
@@ -287,7 +295,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!_isEnabled)
                 return;
-            
+
             _sprintAbility.StopSprinting();
         }
     }

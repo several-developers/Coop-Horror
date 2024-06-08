@@ -321,6 +321,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cameraReferences:
     _mainCamera: {fileID: 9036817173485120049}
+    _itemsCamera: {fileID: 9036817173687927966}
+    _cinemachineBrain: {fileID: 5875149446594489196}
     _leftHandItemsHolder: {fileID: 875171220624664058}
     _rightHandItemsHolder: {fileID: 4044904638685934641}
     _lookAtObject: {fileID: 9036817174264414836}

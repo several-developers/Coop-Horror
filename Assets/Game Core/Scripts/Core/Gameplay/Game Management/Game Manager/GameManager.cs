@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
+using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network;
@@ -21,14 +22,18 @@ namespace GameCore.Gameplay.GameManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator, IHorrorStateMachine horrorStateMachine,
-            INetworkHorror networkHorror, ILevelObserver levelObserver,
+        private void Construct(IGameManagerDecorator gameManagerDecorator,
+            IHorrorStateMachine horrorStateMachine,
+            INetworkHorror networkHorror,
+            ILevelObserver levelObserver,
+            ICamerasManager camerasManager,
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _gameManagerDecorator = gameManagerDecorator;
             _horrorStateMachine = horrorStateMachine;
             _networkHorror = networkHorror;
             _levelObserver = levelObserver;
+            _camerasManager = camerasManager;
             _balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
         }
 
@@ -47,6 +52,7 @@ namespace GameCore.Gameplay.GameManagement
         private IHorrorStateMachine _horrorStateMachine;
         private INetworkHorror _networkHorror;
         private ILevelObserver _levelObserver;
+        private ICamerasManager _camerasManager;
         private BalanceConfigMeta _balanceConfig;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -125,9 +131,6 @@ namespace GameCore.Gameplay.GameManagement
         {
             // Debug.LogWarning("----> GAME STATE changed!!! " + gameState);
             
-            if (!IsSpawned)
-                return;
-            
             if (IsServerOnly)
                 _gameState.Value = gameState;
             else
@@ -141,6 +144,8 @@ namespace GameCore.Gameplay.GameManagement
             switch (gameState)
             {
                 case GameState.GameOver:
+                    _camerasManager.SetCameraStatus(CameraStatus.OutsideMobileHQ);
+                    
                     if (!IsServerOnly)
                         return;
                     
@@ -392,7 +397,8 @@ namespace GameCore.Gameplay.GameManagement
 
         private void OnPlayerDespawned(PlayerEntity playerEntity)
         {
-            CheckGameOverOnServer();
+            if (!playerEntity.IsServerOnly)
+                CheckGameOverOnServer();
             
             playerEntity.OnDiedEvent -= OnPlayerDied;
         }

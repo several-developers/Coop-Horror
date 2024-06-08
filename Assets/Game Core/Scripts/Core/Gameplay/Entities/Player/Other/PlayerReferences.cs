@@ -34,6 +34,9 @@ namespace GameCore.Gameplay.Entities.Player
         private Transform _headLookAtObject;
 
         [SerializeField, Required]
+        private Transform _spectatorCameraTarget;
+
+        [SerializeField, Required]
         private Transform _leftHandItemsHolder;
 
         [SerializeField, Required]
@@ -71,6 +74,7 @@ namespace GameCore.Gameplay.Entities.Player
         public Rigidbody Rigidbody => _rigidbody;
         public CapsuleCollider Collider => _collider;
         public Transform HeadLookAtObject => _headLookAtObject;
+        public Transform SpectatorCameraTarget => _spectatorCameraTarget;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public RagdollController RagdollController => _ragdollController;
