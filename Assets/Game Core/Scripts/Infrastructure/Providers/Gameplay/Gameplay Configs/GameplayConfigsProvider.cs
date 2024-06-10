@@ -3,6 +3,7 @@ using GameCore.Configs.Gameplay.Delivery;
 using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
+using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
@@ -35,6 +36,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _deliveryConfig = Load<DeliveryConfigMeta>(path: ConfigsPaths.DeliveryConfig);
             _rigPresetsConfig = Load<RigPresetsConfigMeta>(path: ConfigsPaths.RigPresetsConfig);
             _visualConfig = Load<VisualConfigMeta>(path: ConfigsPaths.VisualConfig);
+            _itemsSpawnConfig = Load<ItemsSpawnConfigMeta>(path: ConfigsPaths.ItemsSpawnConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -52,6 +54,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly DeliveryConfigMeta _deliveryConfig;
         private readonly RigPresetsConfigMeta _rigPresetsConfig;
         private readonly VisualConfigMeta _visualConfig;
+        private readonly ItemsSpawnConfigMeta _itemsSpawnConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -68,5 +71,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public DeliveryConfigMeta GetDeliveryConfig() => _deliveryConfig;
         public RigPresetsConfigMeta GetRigPresetsConfig() => _rigPresetsConfig;
         public VisualConfigMeta GetVisualConfig() => _visualConfig;
+        public ItemsSpawnConfigMeta GetItemsSpawnConfig() => _itemsSpawnConfig;
     }
 }

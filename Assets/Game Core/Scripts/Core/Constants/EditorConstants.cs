@@ -9,6 +9,7 @@
         public const string GlobalConfigsCategory = ConfigsCategory + "/Global";
         public const string GameplayConfigsCategory = ConfigsCategory + "/Gameplay";
         public const string ItemsCategory = "Items";
+        public const string ItemsSpawnCategory = "Items Spawn";
         public const string LocationsCategory = "Locations";
         public const string RigPresetsCategory = "Rig Presets";
         public const string VisualPresetsCategory = "Visual Presets";

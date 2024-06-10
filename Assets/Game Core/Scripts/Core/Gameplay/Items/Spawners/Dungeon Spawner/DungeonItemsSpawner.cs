@@ -84,9 +84,6 @@ namespace GameCore.Gameplay.Items.Spawners
         public Vector3 GetSpawnPointPosition(int spawnPointIndex) =>
             _spawnPoints[spawnPointIndex].Position;
 
-        public string GetSpawnerName() =>
-            $"'Items: {_itemsAmount.x}-{_itemsAmount.y}',  'Spawn Points: {_spawnPoints.Count}'";
-
         public int GetSpawnPointsAmount() =>
             _spawnPoints.Count;
 

@@ -64,7 +64,7 @@ namespace GameCore.Utilities
         /// <returns></returns>
         public static bool IsRandomSuccessful(int chance)
         {
-            chance = Mathf.Clamp(chance, 0, 100);
+            chance = Mathf.Clamp(value: chance, min: 0, max: 100);
             return Random.Range(0, 99) < chance;
         }
 

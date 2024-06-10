@@ -5,6 +5,7 @@ using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
+using GameCore.Gameplay.Items.SpawnSystem;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.UIManagement;
@@ -53,6 +54,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindSpectatorCamera();
             BindCamerasManager();
             BindGameResetManager();
+            BindItemsSpawnSystem();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -164,6 +166,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .BindInterfacesTo<GameResetManager>()
                 .AsSingle()
                 .NonLazy();
+        }
+
+        private void BindItemsSpawnSystem()
+        {
+            Container
+                .BindInterfacesTo<ItemsSpawnSystem>()
+                .AsSingle();
         }
     }
 }

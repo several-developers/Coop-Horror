@@ -14,7 +14,7 @@ namespace CustomEditors
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void OnEnable() =>
+        protected virtual void OnEnable() =>
             _metaName = name;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------

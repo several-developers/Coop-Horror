@@ -21,6 +21,7 @@
         public const string PlayerConfig = GameplayConfigs + "Player Config";
         public const string RigPresetsConfig = GameplayConfigs + "Rig Presets Config";
         public const string VisualConfig = GameplayConfigs + "Visual Config";
+        public const string ItemsSpawnConfig = GameplayConfigs + "Items Spawn Config";
 
         public const string BeetleAIConfig = MonstersAIConfigs + "Beetle AI";
         

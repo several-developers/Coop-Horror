@@ -79,7 +79,7 @@ namespace GameCore.Gameplay.Items.Spawners.Editor
             if (!EditorGUI.EndChangeCheck())
                 return;
             
-            Undo.RecordObject(_dungeonItemsSpawner, name: "Move Spawn Point");
+            Undo.RecordObject(_dungeonItemsSpawner, name: "Move Item Spawn Point");
                 
             Vector3 undoPosition = newTargetPosition - roomPosition;
             _dungeonItemsSpawner.SetSpawnPointPosition(index, undoPosition);
