@@ -56,16 +56,14 @@ namespace GameCore.Gameplay.Items.Spawners
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public Floor Floor { get; private set; }
-        public float Depth => _depth;
-        public int AvailableItemsAmount => _availableItemsAmount;
+        public float Depth { get; private set; }
+        public int ItemsSlotsAmount { get; private set; }
+        public int ItemsAmountToSpawn { get; private set; }
         public bool EditMode => _editMode;
 
         // FIELDS: --------------------------------------------------------------------------------
 
         public static event Action<DungeonItemsSpawner> OnRegisterItemsSpawnerEvent = delegate { };
-
-        private float _depth;
-        private int _availableItemsAmount;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -76,8 +74,9 @@ namespace GameCore.Gameplay.Items.Spawners
 
             FindDungeonRoot();
             
-            _depth = tile.Placement.NormalizedDepth;
-            _availableItemsAmount = Random.Range(_itemsAmount.x, _itemsAmount.y + 1);
+            Depth = tile.Placement.NormalizedDepth;
+            ItemsSlotsAmount = Random.Range(_itemsAmount.x, _itemsAmount.y + 1);
+            ItemsAmountToSpawn = 0;
             
             OnRegisterItemsSpawnerEvent.Invoke(this);
         }
@@ -85,12 +84,15 @@ namespace GameCore.Gameplay.Items.Spawners
         public void SetSpawnPointPosition(int spawnPointIndex, Vector3 position) =>
             _spawnPoints[spawnPointIndex].SetPosition(position);
 
-        public void DecreaseAvailableItemsAmount() =>
-            _availableItemsAmount -= 1;
+        public void IncreaseItemsAmountToSpawn() =>
+            ItemsAmountToSpawn += 1;
 
-        public void ClearAvailableItemsAmount() =>
-            _availableItemsAmount = 0;
-        
+        public void DecreaseItemsAmountToSpawn() =>
+            ItemsAmountToSpawn -= 1;
+
+        public void ClearItemsSlotsAmount() =>
+            ItemsSlotsAmount = 0;
+
         public IReadOnlyList<SpawnPoint> GetAllSpawnPoints() => _spawnPoints;
 
         public Vector3 GetRandomSpawnWorldPosition()
@@ -107,7 +109,8 @@ namespace GameCore.Gameplay.Items.Spawners
             randomPositionInSphere *= spawnPoint.Radius;
             randomPositionInSphere.y = 0f;
 
-            Vector3 spawnPosition = spawnPoint.Position + randomPositionInSphere + position;
+            Vector3 localSpawnPosition = spawnPoint.Position + randomPositionInSphere;
+            Vector3 spawnPosition = transform.TransformPoint(localSpawnPosition);
             return spawnPosition;
         }
         
@@ -118,7 +121,7 @@ namespace GameCore.Gameplay.Items.Spawners
             _spawnPoints.Count;
 
         public bool CanSpawnItem() =>
-            _availableItemsAmount > 0 && _spawnPoints.Count > 0;
+            ItemsSlotsAmount > 0 && _spawnPoints.Count > 0;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

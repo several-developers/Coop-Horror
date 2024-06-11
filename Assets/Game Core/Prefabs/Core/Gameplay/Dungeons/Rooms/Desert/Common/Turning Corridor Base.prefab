@@ -1537,6 +1537,61 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _itemsAmount.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[0]._radius
+      value: 4.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[1]._radius
+      value: 4.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[2]._radius
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[0]._position.x
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[0]._position.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[1]._position.x
+      value: -15.235207
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[1]._position.z
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[2]._position.x
+      value: -14.254438
+      objectReference: {fileID: 0}
+    - target: {fileID: 8324816206123685951, guid: f647a68cf4c46ce49ac52e499e01a85d,
+        type: 3}
+      propertyPath: _spawnPoints.Array.data[2]._position.z
+      value: 5.5848064
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f647a68cf4c46ce49ac52e499e01a85d, type: 3}
 --- !u!4 &808183041732236713 stripped

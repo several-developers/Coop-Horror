@@ -6,9 +6,12 @@ using GameCore.Enums.Global;
 using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items.Spawners;
+using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Utilities;
+using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -21,12 +24,15 @@ namespace GameCore.Gameplay.Items.SpawnSystem
         public ItemsSpawnSystem(IQuestsManagerDecorator questsManagerDecorator,
             IGameManagerDecorator gameManagerDecorator,
             IItemsFactory itemsFactory,
+            IDungeonsObserver dungeonsObserver,
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _questsManagerDecorator = questsManagerDecorator;
             _gameManagerDecorator = gameManagerDecorator;
             _itemsFactory = itemsFactory;
+            _dungeonsObserver = dungeonsObserver;
             _itemsSpawnConfig = gameplayConfigsProvider.GetItemsSpawnConfig();
+            _rawItemsSpawners = new List<DungeonItemsSpawner>();
 
             _itemsSpawners = new Dictionary<Floor, List<DungeonItemsSpawner>>
             {
@@ -36,6 +42,8 @@ namespace GameCore.Gameplay.Items.SpawnSystem
             };
 
             DungeonItemsSpawner.OnRegisterItemsSpawnerEvent += OnRegisterItemsSpawner;
+
+            _dungeonsObserver.OnDungeonsGenerationCompletedEvent += OnDungeonsGenerationCompleted;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -43,50 +51,71 @@ namespace GameCore.Gameplay.Items.SpawnSystem
         private readonly IQuestsManagerDecorator _questsManagerDecorator;
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly IItemsFactory _itemsFactory;
+        private readonly IDungeonsObserver _dungeonsObserver;
         private readonly ItemsSpawnConfigMeta _itemsSpawnConfig;
+        private readonly List<DungeonItemsSpawner> _rawItemsSpawners;
         private readonly Dictionary<Floor, List<DungeonItemsSpawner>> _itemsSpawners;
+
+        private int _itemsToSpawn;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Dispose() =>
+        public void Dispose()
+        {
             DungeonItemsSpawner.OnRegisterItemsSpawnerEvent -= OnRegisterItemsSpawner;
+            
+            _dungeonsObserver.OnDungeonsGenerationCompletedEvent -= OnDungeonsGenerationCompleted;
+        }
 
         public void SpawnItems()
         {
+            PrepareItemsSpawners();
             SpawnQuestsItems();
-            //SpawnQuestsItems();
             SpawnLocationItems();
             ClearItemsSpawners();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private bool TrySelectItemsSpawner(Floor floor, out DungeonItemsSpawner result)
+        private void PrepareItemsSpawners()
         {
-            while (_itemsSpawners[floor].Count > 0)
+            AnimationCurve itemsDistribution = _itemsSpawnConfig.ItemsDistribution;
+            _itemsToSpawn = 0;
+
+            foreach (DungeonItemsSpawner itemsSpawner in _rawItemsSpawners)
             {
-                int randomIndex = Random.Range(0, _itemsSpawners[floor].Count);
-                DungeonItemsSpawner itemsSpawner = _itemsSpawners[floor][randomIndex];
                 bool canSpawnItem = itemsSpawner.CanSpawnItem();
 
-                if (canSpawnItem)
+                if (!canSpawnItem)
+                    continue;
+
+                float depth = itemsSpawner.Depth;
+                int itemsSlotsAmount = itemsSpawner.ItemsSlotsAmount;
+                bool addToDictionary = false;
+
+                for (int i = 0; i < itemsSlotsAmount; i++)
                 {
-                    itemsSpawner.DecreaseAvailableItemsAmount();
+                    float distributionValue = itemsDistribution.Evaluate(depth);
+                    int spawnChance = Mathf.FloorToInt(f: distributionValue * 100f);
+                    bool spawnItem = GlobalUtilities.IsRandomSuccessful(spawnChance);
 
-                    result = itemsSpawner;
-                    canSpawnItem = itemsSpawner.CanSpawnItem();
+                    if (!spawnItem)
+                        continue;
 
-                    if (!canSpawnItem)
-                        _itemsSpawners[floor].RemoveAt(randomIndex);
+                    _itemsToSpawn += 1;
+                    addToDictionary = true;
 
-                    return true;
+                    itemsSpawner.IncreaseItemsAmountToSpawn();
                 }
 
-                _itemsSpawners[floor].RemoveAt(randomIndex);
-            }
+                if (addToDictionary)
+                {
+                    Floor floor = itemsSpawner.Floor;
+                    _itemsSpawners[floor].Add(itemsSpawner);
+                }
 
-            result = null;
-            return false;
+                itemsSpawner.ClearItemsSlotsAmount();
+            }
         }
 
         private void SpawnQuestsItems()
@@ -112,13 +141,19 @@ namespace GameCore.Gameplay.Items.SpawnSystem
 
                     for (int i = 0; i < itemQuantity; i++)
                     {
-                        Floor floor = GetRandomFloor(firstFloorChance, secondFloorChance);
-                        bool success = SpawnItem(itemID, floor);
+                        int firstFloorSpawnersAmount = _itemsSpawners[Floor.One].Count;
+                        int secondFloorSpawnersAmount = _itemsSpawners[Floor.Two].Count;
+                        int thirdFloorSpawnersAmount = _itemsSpawners[Floor.Three].Count;
 
-                        if (success)
-                            continue;
+                        bool isSpawnerFound = GetRandomFloor2(firstFloorChance, secondFloorChance,
+                            firstFloorSpawnersAmount, secondFloorSpawnersAmount, thirdFloorSpawnersAmount,
+                            out Floor floor);
 
-                        Log.PrintError(log: $"Item spawn error! Floor: {floor}");
+                        if (!isSpawnerFound)
+                            return;
+
+                        DungeonItemsSpawner itemsSpawner = GetRandomItemsSpawner(floor);
+                        SpawnItem(itemsSpawner, itemID);
                         return;
                     }
                 }
@@ -136,129 +171,197 @@ namespace GameCore.Gameplay.Items.SpawnSystem
                 return;
 
             IReadOnlyList<ItemSpawnConfig> allConfigs = itemsSpawnConfig.GetAllConfigs();
-            AnimationCurve itemsDistribution = _itemsSpawnConfig.ItemsDistribution;
-            int configsAmount = allConfigs.Count;
+            int itemsTotalAmount = allConfigs.Count;
 
-            if (configsAmount == 0)
-                return;
-
-            double[] chances = new double[configsAmount];
-
-            for (int i = 0; i < configsAmount; i++)
-                chances[i] = allConfigs[i].SpawnChance;
-
-            List<DungeonItemsSpawner> allItemsSpawners = new();
-
-            foreach (List<DungeonItemsSpawner> itemsSpawners in _itemsSpawners.Values)
-                allItemsSpawners.AddRange(itemsSpawners);
-
-            int itemsSpawnersAmount = allItemsSpawners.Count;
-
-            // Пробегаемся по всем спавнерам на всех этажах.
-            for (int i = itemsSpawnersAmount - 1; i >= 0; i--)
+            for (int i = 0; i < _itemsToSpawn; i++)
             {
-                DungeonItemsSpawner itemsSpawner = allItemsSpawners[i];
-                bool canSpawnItem = itemsSpawner.CanSpawnItem();
+                // ПЕРЕДЕЛАТЬ, ВРЕМЕННО
+                int randomItemIndex = Random.Range(0, itemsTotalAmount); // REPLACE FOR PERCENTAGE
+                ItemSpawnConfig itemSpawnConfig = allConfigs[randomItemIndex];
 
-                if (!canSpawnItem)
-                {
-                    allItemsSpawners.RemoveAt(i);
-                    continue;
-                }
+                int firstFloorChance = itemSpawnConfig.FirstFloorChance;
+                int secondFloorChance = itemSpawnConfig.SecondFloorChance;
 
-                Floor spawnerFloor = itemsSpawner.Floor;
-                float depth = itemsSpawner.Depth;
-                int availableItemsAmount = itemsSpawner.AvailableItemsAmount;
+                int firstFloorSpawnersAmount = _itemsSpawners[Floor.One].Count;
+                int secondFloorSpawnersAmount = _itemsSpawners[Floor.Two].Count;
+                int thirdFloorSpawnersAmount = _itemsSpawners[Floor.Three].Count;
 
-                // Пробегаемся по кол-ву возможных предметов в комнате.
-                for (int j = 0; j < availableItemsAmount; j++)
-                {
-                    canSpawnItem = itemsSpawner.CanSpawnItem();
+                bool isSpawnerFound = GetRandomFloor2(firstFloorChance, secondFloorChance, firstFloorSpawnersAmount,
+                    secondFloorSpawnersAmount, thirdFloorSpawnersAmount, out Floor floor);
 
-                    if (!canSpawnItem)
-                    {
-                        allItemsSpawners.RemoveAt(i);
-                        break;
-                    }
+                if (!isSpawnerFound)
+                    break;
 
-                    float distributionValue = itemsDistribution.Evaluate(depth);
-                    int spawnChance = Mathf.FloorToInt(f: distributionValue * 100f);
-                    bool canItemSpawn = GlobalUtilities.IsRandomSuccessful(spawnChance);
+                DungeonItemsSpawner itemsSpawner = GetRandomItemsSpawner(floor);
+                int itemID = itemSpawnConfig.GetItemID();
 
-                    // Смог ли выпасть шанс на спавн предмета.
-                    if (!canItemSpawn)
-                    {
-                        itemsSpawner.DecreaseAvailableItemsAmount();
-                        continue;
-                    }
-
-                    // Пытаемся найти предмет, который может появится на этом этаже.
-                    while (true)
-                    {
-                        int randomIndex = GlobalUtilities.GetRandomIndex();
-                        ItemSpawnConfig itemSpawnConfig = allConfigs[randomIndex];
-                        int itemID = itemSpawnConfig.GetItemID();
-
-                        int firstFloorChance = itemSpawnConfig.FirstFloorChance;
-                        int secondFloorChance = itemSpawnConfig.SecondFloorChance;
-
-                        Floor floor = GetRandomFloor(firstFloorChance, secondFloorChance);
-                        bool isFloorMatches = spawnerFloor == floor;
-
-                        if (!isFloorMatches)
-                            continue;
-
-                        Debug.Log($"Spawn: '{itemSpawnConfig.ItemMeta.ItemName}' with chance '{spawnChance}%'");
-                        
-                        SpawnItem(itemsSpawner, itemID);
-
-                        break;
-                    }
-                }
+                SpawnItem(itemsSpawner, itemID);
             }
-        }
-
-        private bool SpawnItem(int itemID, Floor floor)
-        {
-            bool isItemsSpawnerFound = TrySelectItemsSpawner(floor, out DungeonItemsSpawner itemsSpawner);
-
-            if (!isItemsSpawnerFound)
-                return false;
-
-            SpawnItem(itemsSpawner, itemID);
-            return true;
         }
 
         private void SpawnItem(DungeonItemsSpawner itemsSpawner, int itemID)
         {
             Vector3 worldPosition = itemsSpawner.GetRandomSpawnWorldPosition();
+            worldPosition.y += 1f;
+            
             _itemsFactory.CreateItem(itemID, worldPosition, out _);
         }
 
-        private void ClearItemsSpawners() =>
-            _itemsSpawners.Clear();
-
-        private static Floor GetRandomFloor(int firstFloorChance, int secondFloorChance)
+        private void ClearItemsSpawners()
         {
-            bool isRandomSuccessful = GlobalUtilities.IsRandomSuccessful(firstFloorChance);
-
-            if (isRandomSuccessful)
-                return Floor.One;
-
-            isRandomSuccessful = GlobalUtilities.IsRandomSuccessful(secondFloorChance);
-
-            if (isRandomSuccessful)
-                return Floor.Two;
-
-            return Floor.Three;
+            _rawItemsSpawners.Clear();
+            _itemsSpawners.Clear();
         }
+
+        private DungeonItemsSpawner GetRandomItemsSpawner(Floor floor)
+        {
+            int spawnersAmount = _itemsSpawners[floor].Count;
+            int randomIndex = Random.Range(0, spawnersAmount);
+            DungeonItemsSpawner itemsSpawner = _itemsSpawners[floor][randomIndex];
+
+            itemsSpawner.DecreaseItemsAmountToSpawn();
+            int itemsAmountToSpawn = itemsSpawner.ItemsAmountToSpawn;
+            bool canSpawnItems = itemsAmountToSpawn > 0;
+
+            // Удаляем спавнер в котором уже нельзя создавать предметы.
+            if (!canSpawnItems)
+                _itemsSpawners[floor].RemoveAt(randomIndex);
+
+            return itemsSpawner;
+        }
+
+        private static bool GetRandomFloor(int firstFloorChance, int secondFloorChance, int firstFloorSpawnersAmount,
+            int secondFloorSpawnersAmount, int thirdFloorSpawnersAmount, out Floor floor)
+        {
+            floor = Floor.Three;
+
+            bool isRandomSuccessful = firstFloorSpawnersAmount > 0 && IsRandomSuccessful(firstFloorChance);
+
+            if (isRandomSuccessful)
+            {
+                floor = Floor.One;
+                return true;
+            }
+
+            isRandomSuccessful = secondFloorSpawnersAmount > 0 && IsRandomSuccessful(secondFloorChance);
+
+            if (isRandomSuccessful)
+            {
+                floor = Floor.Two;
+                return true;
+            }
+
+            if (thirdFloorSpawnersAmount == 0)
+            {
+                if (firstFloorSpawnersAmount > 0 && secondFloorSpawnersAmount > 0)
+                {
+                    if (firstFloorChance > 0 && secondFloorChance > 0)
+                    {
+                        if (IsRandomSuccessful(secondFloorChance))
+                            floor = Floor.Two;
+                        else
+                            floor = Floor.One;
+                    }
+                    else if (secondFloorChance > 0)
+                    {
+                        floor = Floor.Two;
+                    }
+                    else if (firstFloorChance > 0)
+                    {
+                        floor = Floor.One;
+                    }
+                    else
+                    {
+                        if (Random.Range(0, 2) == 0)
+                            floor = Floor.Two;
+                        else
+                            floor = Floor.One;
+                    }
+                }
+                else if (secondFloorSpawnersAmount > 0)
+                {
+                    floor = Floor.Two;
+                }
+                else if (firstFloorSpawnersAmount > 0)
+                {
+                    floor = Floor.One;
+                }
+                else
+                {
+                    Log.PrintError(log: $"No more spawners left!");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool GetRandomFloor2(int firstFloorChance, int secondFloorChance, int firstFloorSpawnersAmount,
+            int secondFloorSpawnersAmount, int thirdFloorSpawnersAmount, out Floor floor)
+        {
+            if (thirdFloorSpawnersAmount == 0)
+            {
+                if (firstFloorSpawnersAmount > 0 && secondFloorSpawnersAmount > 0)
+                {
+                    if (firstFloorChance > 0 && secondFloorChance > 0)
+                        floor = IsRandomSuccessful(secondFloorChance) ? Floor.Two : Floor.One;
+                    else if (secondFloorChance > 0)
+                        floor = Floor.Two;
+                    else if (firstFloorChance > 0)
+                        floor = Floor.One;
+                    else
+                        floor = Random.Range(0, 2) == 0 ? Floor.Two : Floor.One;
+                }
+                else if (secondFloorSpawnersAmount > 0)
+                    floor = Floor.Two;
+                else if (firstFloorSpawnersAmount > 0)
+                    floor = Floor.One;
+                else
+                {
+                    Log.PrintError(log: $"No more spawners left!");
+                    
+                    floor = Floor.Three;
+                    return false;
+                }
+            }
+            else
+            {
+                bool isRandomSuccessful = firstFloorSpawnersAmount > 0 && IsRandomSuccessful(firstFloorChance);
+
+                if (isRandomSuccessful)
+                {
+                    floor = Floor.One;
+                    return true;
+                }
+
+                isRandomSuccessful = secondFloorSpawnersAmount > 0 && IsRandomSuccessful(secondFloorChance);
+
+                if (isRandomSuccessful)
+                {
+                    floor = Floor.Two;
+                    return true;
+                }
+                
+                floor = Floor.Three;
+            }
+            
+            return true;
+        }
+        
+        private static bool IsRandomSuccessful(int chance) =>
+            GlobalUtilities.IsRandomSuccessful(chance);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnRegisterItemsSpawner(DungeonItemsSpawner dungeonItemsSpawner)
+        private void OnRegisterItemsSpawner(DungeonItemsSpawner dungeonItemsSpawner) =>
+            _rawItemsSpawners.Add(dungeonItemsSpawner);
+
+        private void OnDungeonsGenerationCompleted()
         {
-            Floor floor = dungeonItemsSpawner.Floor;
-            _itemsSpawners[floor].Add(dungeonItemsSpawner);
+            if (!NetworkHorror.IsTrueServer)
+                return;
+            
+            SpawnItems();
         }
     }
 }

@@ -7,7 +7,6 @@ using GameCore.Enums.Global;
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.HorrorStateMachineSpace;
-using GameCore.Gameplay.Items.SpawnSystem;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Level;
@@ -28,10 +27,8 @@ namespace GameCore.Gameplay.GameManagement
             INetworkHorror networkHorror,
             ILevelObserver levelObserver,
             ICamerasManager camerasManager,
-            IItemsSpawnSystem itemsSpawnSystem,
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            _itemsSpawnSystem = itemsSpawnSystem;
             _gameManagerDecorator = gameManagerDecorator;
             _horrorStateMachine = horrorStateMachine;
             _networkHorror = networkHorror;
@@ -56,7 +53,6 @@ namespace GameCore.Gameplay.GameManagement
         private INetworkHorror _networkHorror;
         private ILevelObserver _levelObserver;
         private ICamerasManager _camerasManager;
-        private IItemsSpawnSystem _itemsSpawnSystem;
         private BalanceConfigMeta _balanceConfig;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -162,11 +158,6 @@ namespace GameCore.Gameplay.GameManagement
                 
                 case GameState.HeadingToTheLocation:
                     localPlayer.ChangePlayerLocation(EntityLocation.LocationSurface);
-
-                    if (!IsServerOnly)
-                        return;
-                    
-                    _itemsSpawnSystem.SpawnItems();
                     break;
 
                 case GameState.ArrivedAtTheRoad:

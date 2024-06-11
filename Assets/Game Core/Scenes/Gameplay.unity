@@ -3322,11 +3322,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dungeon Generator #2
       objectReference: {fileID: 0}
-    - target: {fileID: 2195564044846364811, guid: af7ceeab27128dc42884520f7d4a34fb,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: af7ceeab27128dc42884520f7d4a34fb, type: 3}
 --- !u!4 &570960103 stripped
@@ -10682,11 +10677,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Dungeon Generator #3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2195564044846364811, guid: faba3c9203568bb4c9a9a4830be82718,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: faba3c9203568bb4c9a9a4830be82718, type: 3}

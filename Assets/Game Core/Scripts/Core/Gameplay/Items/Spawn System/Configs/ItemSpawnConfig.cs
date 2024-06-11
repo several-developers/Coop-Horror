@@ -28,7 +28,6 @@ namespace GameCore.Gameplay.Items.SpawnSystem
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public ItemMeta ItemMeta => _itemMeta;
         public int SpawnChance => _spawnChance;
         public int FirstFloorChance => _firstFloorChance;
         public int SecondFloorChance => _secondFloorChance;

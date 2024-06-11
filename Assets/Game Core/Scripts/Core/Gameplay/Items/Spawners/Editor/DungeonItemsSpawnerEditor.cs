@@ -50,11 +50,12 @@ namespace GameCore.Gameplay.Items.Spawners.Editor
             Handles.color = ColorsConstants.BaseObjectColor;
             
             IReadOnlyList<DungeonItemsSpawner.SpawnPoint> allSpawnPoints = obj.GetAllSpawnPoints();
-            Vector3 roomPosition = obj.transform.position;
+            Transform transform = obj.transform;
             
             foreach (DungeonItemsSpawner.SpawnPoint spawnPoint in allSpawnPoints)
             {
-                Vector3 pointPosition = roomPosition + spawnPoint.Position;
+                // Переводим локальную позицию в мировую с учётом локального поворота объекта.
+                Vector3 pointPosition = transform.TransformPoint(spawnPoint.Position);
                 float radius = spawnPoint.Radius;
                 
                 Handles.DrawWireDisc(center: pointPosition, normal: Vector3.up, radius, thickness: 3);
