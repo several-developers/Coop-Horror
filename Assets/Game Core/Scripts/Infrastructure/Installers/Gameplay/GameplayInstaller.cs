@@ -172,7 +172,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<ItemsSpawnSystem>()
-                .AsSingle();
+                .AsSingle()
+                .NonLazy();
         }
     }
 }

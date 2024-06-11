@@ -28,8 +28,13 @@ namespace GameCore.Gameplay.Items.SpawnSystem
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public ItemMeta ItemMeta => _itemMeta;
+        public int SpawnChance => _spawnChance;
+        public int FirstFloorChance => _firstFloorChance;
+        public int SecondFloorChance => _secondFloorChance;
+        
         // ReSharper disable once UnusedMember.Local
-        private string Label => $"'Item: {GetItemName()}',   " +
+        private string Label => $"'Item: {(_itemMeta == null ? "none" : _itemMeta.ItemName)}',   " +
                                 $"'Spawn Chance: {_spawnChance}%,   '" +
                                 $"'Chances: {_firstFloorChance}% | {_secondFloorChance}% | {_thirdFloorChance}%'";
 
@@ -38,9 +43,7 @@ namespace GameCore.Gameplay.Items.SpawnSystem
         public void CalculateThirdFloorChance() =>
             _thirdFloorChance = 100 - (_firstFloorChance + _secondFloorChance);
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private string GetItemName() =>
-            _itemMeta == null ? "none" : _itemMeta.ItemName;
+        public int GetItemID() =>
+            _itemMeta.ItemID;
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using DunGen;
 using GameCore.Enums.Gameplay;
 using GameCore.Observers.Gameplay.Dungeons;
@@ -33,8 +32,6 @@ namespace GameCore.Gameplay.Dungeons
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public static event Action<Floor> OnDungeonGenerationCompletedEvent = delegate { };
-        
         private IDungeonsObserver _dungeonsObserver;
         private ILevelProviderObserver _levelProviderObserver;
 
@@ -62,7 +59,6 @@ namespace GameCore.Gameplay.Dungeons
                 return;
 
             _dungeonsObserver.DungeonGenerationCompleted(_floor);
-            OnDungeonGenerationCompletedEvent.Invoke(_floor);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
