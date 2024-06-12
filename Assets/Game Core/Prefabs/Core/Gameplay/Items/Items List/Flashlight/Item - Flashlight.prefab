@@ -185,7 +185,7 @@ PrefabInstance:
     - target: {fileID: 6991939310031778443, guid: 9a4e2523f6834bf418c688f91493518e,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1818386951
+      value: 3453153672
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9a4e2523f6834bf418c688f91493518e, type: 3}
@@ -211,8 +211,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.2
-  m_Height: 0.97
+  m_Radius: 0.065
+  m_Height: 0.35
   m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3527205337265419951
@@ -237,87 +237,60 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 4278116969741073835}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &6307960931069596684
+--- !u!1001 &7154368651477699594
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 912884765742615430}
     m_Modifications:
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 1245392932827506, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
+      propertyPath: m_Name
+      value: SM_Prop_Flashlight_04
+      objectReference: {fileID: 0}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 80
-      objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 80
-      objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 80
-      objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
+      propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.099
-      objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.35
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.17334676
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.010226448
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.057997033
+      value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.9830985
+      value: -0
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -6.752
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1200015527806442104, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
+    - target: {fileID: 4702253801761002, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 160
-      objectReference: {fileID: 0}
-    - target: {fileID: 2012158433178632386, guid: eea9190f3abd68440aa1670d2821d28c,
-        type: 3}
-      propertyPath: m_Name
-      value: Flashlight Model
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: eea9190f3abd68440aa1670d2821d28c, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 29c1cdb8c85e80f4bbe9c153ea2145ed, type: 3}

@@ -11,7 +11,6 @@ using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Utilities;
-using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -145,7 +144,7 @@ namespace GameCore.Gameplay.Items.SpawnSystem
                         int secondFloorSpawnersAmount = _itemsSpawners[Floor.Two].Count;
                         int thirdFloorSpawnersAmount = _itemsSpawners[Floor.Three].Count;
 
-                        bool isSpawnerFound = GetRandomFloor2(firstFloorChance, secondFloorChance,
+                        bool isSpawnerFound = GetRandomFloor(firstFloorChance, secondFloorChance,
                             firstFloorSpawnersAmount, secondFloorSpawnersAmount, thirdFloorSpawnersAmount,
                             out Floor floor);
 
@@ -154,7 +153,6 @@ namespace GameCore.Gameplay.Items.SpawnSystem
 
                         DungeonItemsSpawner itemsSpawner = GetRandomItemsSpawner(floor);
                         SpawnItem(itemsSpawner, itemID);
-                        return;
                     }
                 }
             }
@@ -186,7 +184,7 @@ namespace GameCore.Gameplay.Items.SpawnSystem
                 int secondFloorSpawnersAmount = _itemsSpawners[Floor.Two].Count;
                 int thirdFloorSpawnersAmount = _itemsSpawners[Floor.Three].Count;
 
-                bool isSpawnerFound = GetRandomFloor2(firstFloorChance, secondFloorChance, firstFloorSpawnersAmount,
+                bool isSpawnerFound = GetRandomFloor(firstFloorChance, secondFloorChance, firstFloorSpawnersAmount,
                     secondFloorSpawnersAmount, thirdFloorSpawnersAmount, out Floor floor);
 
                 if (!isSpawnerFound)
@@ -229,74 +227,8 @@ namespace GameCore.Gameplay.Items.SpawnSystem
 
             return itemsSpawner;
         }
-
+        
         private static bool GetRandomFloor(int firstFloorChance, int secondFloorChance, int firstFloorSpawnersAmount,
-            int secondFloorSpawnersAmount, int thirdFloorSpawnersAmount, out Floor floor)
-        {
-            floor = Floor.Three;
-
-            bool isRandomSuccessful = firstFloorSpawnersAmount > 0 && IsRandomSuccessful(firstFloorChance);
-
-            if (isRandomSuccessful)
-            {
-                floor = Floor.One;
-                return true;
-            }
-
-            isRandomSuccessful = secondFloorSpawnersAmount > 0 && IsRandomSuccessful(secondFloorChance);
-
-            if (isRandomSuccessful)
-            {
-                floor = Floor.Two;
-                return true;
-            }
-
-            if (thirdFloorSpawnersAmount == 0)
-            {
-                if (firstFloorSpawnersAmount > 0 && secondFloorSpawnersAmount > 0)
-                {
-                    if (firstFloorChance > 0 && secondFloorChance > 0)
-                    {
-                        if (IsRandomSuccessful(secondFloorChance))
-                            floor = Floor.Two;
-                        else
-                            floor = Floor.One;
-                    }
-                    else if (secondFloorChance > 0)
-                    {
-                        floor = Floor.Two;
-                    }
-                    else if (firstFloorChance > 0)
-                    {
-                        floor = Floor.One;
-                    }
-                    else
-                    {
-                        if (Random.Range(0, 2) == 0)
-                            floor = Floor.Two;
-                        else
-                            floor = Floor.One;
-                    }
-                }
-                else if (secondFloorSpawnersAmount > 0)
-                {
-                    floor = Floor.Two;
-                }
-                else if (firstFloorSpawnersAmount > 0)
-                {
-                    floor = Floor.One;
-                }
-                else
-                {
-                    Log.PrintError(log: $"No more spawners left!");
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private static bool GetRandomFloor2(int firstFloorChance, int secondFloorChance, int firstFloorSpawnersAmount,
             int secondFloorSpawnersAmount, int thirdFloorSpawnersAmount, out Floor floor)
         {
             if (thirdFloorSpawnersAmount == 0)

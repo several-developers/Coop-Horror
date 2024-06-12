@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97b3d40f10b3486cb980964da827dba5, type: 3}
+  m_Name: Item - Walkie Talkie
+  m_EditorClassIdentifier: 
+  _metaName: Item - Walkie Talkie
+  _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
+  _itemName: Walkie Talkie
+  _itemID: 9
+  _rigPresetType: 1
+  _itemHandPlacement: 1
+  _fpsItemPreview:
+    _position: {x: 0, y: 0, z: 0}
+    _eulerRotation: {x: 0, y: 0, z: 0}
+    _scale: {x: 1, y: 1, z: 1}
+  _tpsItemPreview:
+    _position: {x: 0, y: 0, z: 0}
+    _eulerRotation: {x: 0, y: 0, z: 0}
+    _scale: {x: 1, y: 1, z: 1}
+  _itemPrefab: {fileID: 928934607214742596, guid: c0a6a5a3108b3094e864920c7448dc98,
+    type: 3}
+  _itemPreviewPrefab: {fileID: 1063181044141629135, guid: 9564af36299873a41994666bc933fe17,
+    type: 3}
