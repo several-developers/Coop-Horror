@@ -1,4 +1,5 @@
 ﻿using CustomEditors;
+using GameCore.Gameplay.ChatManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
@@ -35,6 +36,9 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         
         [SerializeField, Required]
         private GameManager _gameManager;
+        
+        [SerializeField, Required]
+        private ChatManager _chatManager;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -45,6 +49,7 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         public QuestsManager QuestsManager => _questsManager;
         public DeliveryManager DeliveryManager => _deliveryManager;
         public GameManager GameManager => _gameManager;
+        public ChatManager ChatManager => _chatManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

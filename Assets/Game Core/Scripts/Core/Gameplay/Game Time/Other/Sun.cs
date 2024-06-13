@@ -1,4 +1,6 @@
 ﻿using GameCore.Configs.Gameplay.Time;
+using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -29,13 +31,23 @@ namespace GameCore.Gameplay.GameTimeManagement
         private TimeConfigMeta _timeConfig;
         private Transform _transform;
 
+        private bool _changeAmbientSkyColor = true;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
+        private void Awake()
+        {
             _timeCycle.OnTimeUpdatedEvent += OnTimeUpdated;
 
-        private void OnDestroy() =>
+            PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
+        }
+
+        private void OnDestroy()
+        {
             _timeCycle.OnTimeUpdatedEvent -= OnTimeUpdated;
+            
+            PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -52,7 +64,9 @@ namespace GameCore.Gameplay.GameTimeManagement
         private void UpdateLighting(float timeOfDay)
         {
             RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
-            //RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
+            
+            if (_changeAmbientSkyColor)
+                RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
             
             _light.color = _timeConfig.SunColor.Evaluate(timeOfDay);
         }
@@ -65,6 +79,25 @@ namespace GameCore.Gameplay.GameTimeManagement
 
             UpdateSunRotation(timeOfDay);
             UpdateLighting(timeOfDay);
+        }
+
+        private void OnPlayerSpawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+
+            playerEntity.OnPlayerLocationChangedEvent += OnPlayerLocationChanged;
+        }
+
+        private void OnPlayerLocationChanged(EntityLocation location)
+        {
+            _changeAmbientSkyColor = location switch
+            {
+                EntityLocation.Dungeon => false,
+                _ => true
+            };
         }
     }
 }

@@ -29,9 +29,11 @@ namespace GameCore.Gameplay.InputManagement
         public event Action<float> OnScrollEvent = delegate { };
         public event Action OnPauseEvent = delegate { };
         public event Action OnInteractWithTabletEvent = delegate { };
+        public event Action OnOpenChatEvent = delegate { };
 
         // Menus
         public event Action OnResumeEvent = delegate { };
+        public event Action OnSubmitEvent = delegate { };
 
         private GameInput _gameInput;
 
@@ -185,12 +187,24 @@ namespace GameCore.Gameplay.InputManagement
             OnInteractWithTabletEvent.Invoke();
         }
 
+        public void OnOpenChat(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
+                return;
+            
+            OnOpenChatEvent.Invoke();
+        }
+
         public void OnNavigate(InputAction.CallbackContext context)
         {
         }
 
         public void OnSubmit(InputAction.CallbackContext context)
         {
+            if (!context.performed)
+                return;
+            
+            OnSubmitEvent.Invoke();
         }
 
         public void OnCancel(InputAction.CallbackContext context)

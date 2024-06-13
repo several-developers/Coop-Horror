@@ -1,4 +1,5 @@
 ﻿using GameCore.Configs.Gameplay.PrefabsList;
+using GameCore.Gameplay.ChatManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
@@ -58,6 +59,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreateQuestsManager();
             CreateDeliveryManager();
             CreateGameTimeManager();
+            CreateChatManager();
         }
 
         private void CreateGameManager()
@@ -100,6 +102,12 @@ namespace GameCore.Infrastructure.StateMachine
         {
             GameTimeManager gameTimeManagerPrefab = _prefabsListConfig.GameTimeManager;
             CreateNetworkPrefab(gameTimeManagerPrefab.gameObject);
+        }
+
+        private void CreateChatManager()
+        {
+            ChatManager chatManagerPrefab = _prefabsListConfig.ChatManager;
+            CreateNetworkPrefab(chatManagerPrefab.gameObject);
         }
 
         private void CreateNetworkPrefab(GameObject gameObject)

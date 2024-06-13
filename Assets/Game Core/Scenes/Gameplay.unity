@@ -26400,50 +26400,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 417260728}
     m_Modifications:
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
+    - target: {fileID: 2610325709499942999, guid: ba1e71538d8404642af98abf0510fc2f,
         type: 3}
-      propertyPath: m_Pivot.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_Pivot.y
-      value: 0
+      propertyPath: m_HorizontalAlignment
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
         type: 3}
       propertyPath: m_RootOrder
       value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
         type: 3}
@@ -26453,41 +26418,6 @@ PrefabInstance:
     - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2610325709890716163, guid: ba1e71538d8404642af98abf0510fc2f,
@@ -26579,12 +26509,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3129854756967810925, guid: ee388355d46fd3c4aab703c260359cf8,
-        type: 3}
-      propertyPath: _prefabs.Array.data[8]
-      value: 
-      objectReference: {fileID: 1865760671945909350, guid: b9715ba1c2defc74093991e70ec901e0,
-        type: 3}
     - target: {fileID: 3129854756967810925, guid: ee388355d46fd3c4aab703c260359cf8,
         type: 3}
       propertyPath: _prefabs.Array.data[9]

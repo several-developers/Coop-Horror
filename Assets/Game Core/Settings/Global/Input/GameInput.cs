@@ -125,6 +125,15 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""OpenChat"",
+                    ""type"": ""Button"",
+                    ""id"": ""774f8ac5-a076-4f13-9b84-af339eb402ff"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -477,6 +486,17 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7c8f4094-c5c5-4974-ac9c-ae4a32bc7ccc"",
+                    ""path"": ""<Keyboard>/slash"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""OpenChat"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1075,6 +1095,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Gameplay_Scroll = m_Gameplay.FindAction("Scroll", throwIfNotFound: true);
         m_Gameplay_Pause = m_Gameplay.FindAction("Pause", throwIfNotFound: true);
         m_Gameplay_InteractWithTablet = m_Gameplay.FindAction("InteractWithTablet", throwIfNotFound: true);
+        m_Gameplay_OpenChat = m_Gameplay.FindAction("OpenChat", throwIfNotFound: true);
         // Menus
         m_Menus = asset.FindActionMap("Menus", throwIfNotFound: true);
         m_Menus_Navigate = m_Menus.FindAction("Navigate", throwIfNotFound: true);
@@ -1159,6 +1180,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Scroll;
     private readonly InputAction m_Gameplay_Pause;
     private readonly InputAction m_Gameplay_InteractWithTablet;
+    private readonly InputAction m_Gameplay_OpenChat;
     public struct GameplayActions
     {
         private @GameInput m_Wrapper;
@@ -1174,6 +1196,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         public InputAction @Scroll => m_Wrapper.m_Gameplay_Scroll;
         public InputAction @Pause => m_Wrapper.m_Gameplay_Pause;
         public InputAction @InteractWithTablet => m_Wrapper.m_Gameplay_InteractWithTablet;
+        public InputAction @OpenChat => m_Wrapper.m_Gameplay_OpenChat;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1216,6 +1239,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @InteractWithTablet.started += instance.OnInteractWithTablet;
             @InteractWithTablet.performed += instance.OnInteractWithTablet;
             @InteractWithTablet.canceled += instance.OnInteractWithTablet;
+            @OpenChat.started += instance.OnOpenChat;
+            @OpenChat.performed += instance.OnOpenChat;
+            @OpenChat.canceled += instance.OnOpenChat;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -1253,6 +1279,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @InteractWithTablet.started -= instance.OnInteractWithTablet;
             @InteractWithTablet.performed -= instance.OnInteractWithTablet;
             @InteractWithTablet.canceled -= instance.OnInteractWithTablet;
+            @OpenChat.started -= instance.OnOpenChat;
+            @OpenChat.performed -= instance.OnOpenChat;
+            @OpenChat.canceled -= instance.OnOpenChat;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -1446,6 +1475,7 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         void OnScroll(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
         void OnInteractWithTablet(InputAction.CallbackContext context);
+        void OnOpenChat(InputAction.CallbackContext context);
     }
     public interface IMenusActions
     {

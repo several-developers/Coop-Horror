@@ -1,6 +1,5 @@
 ﻿using System;
 using DG.Tweening;
-using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -15,13 +14,16 @@ namespace GameCore.UI.Global
         private bool _hiddenByAwake;
 
         [SerializeField]
-        private bool _ignoreScaleTime;
-
-        [SerializeField]
-        private bool _changeInteractableState;
+        private bool _changeInteractableState = true;
 
         [SerializeField]
         private bool _changeCanvasState;
+
+        [SerializeField]
+        private bool _ignoreScaleTime;
+
+        [SerializeField]
+        private bool _ignoreCanvasGroupFade;
 
         [SerializeField, Required, ShowIf(nameof(_changeCanvasState))]
         private Canvas _canvas;
@@ -35,6 +37,9 @@ namespace GameCore.UI.Global
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public bool IsShown { get; private set; }
+
+        protected float FadeTime => _fadeTime;
+        protected CanvasGroup TargetCG => _targetCG;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -84,9 +89,9 @@ namespace GameCore.UI.Global
         public virtual void Show() =>
             VisibilityState(show: true);
 
-        public void Hide() => Hide(ignoreDestroy: false);
+        public virtual void Hide() => Hide(ignoreDestroy: false);
 
-        public void Hide(bool ignoreDestroy)
+        public virtual void Hide(bool ignoreDestroy)
         {
             _ignoreDestroy = ignoreDestroy;
             VisibilityState(show: false);
@@ -97,7 +102,17 @@ namespace GameCore.UI.Global
         protected void DestroyOnHide() =>
             _destroyOnHide = true;
 
-        protected void VisibilityState(bool show)
+        protected void EnableInteraction() => SetInteractableState(isInteractable: true);
+
+        protected void DisableInteraction() => SetInteractableState(isInteractable: false);
+
+        protected virtual float GetFadeInDuration() => _fadeTime;
+        
+        protected virtual float GetFadeOutDuration() => _fadeTime;
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void VisibilityState(bool show)
         {
             IsShown = show;
 
@@ -109,41 +124,50 @@ namespace GameCore.UI.Global
             if (show && _changeCanvasState)
                 _canvas.enabled = true;
 
+            float endValue = show ? 1f : 0f;
+            float duration = show ? GetFadeInDuration() : GetFadeOutDuration();
+
             _fadeTN.Kill(complete: true);
+
+            if (_ignoreCanvasGroupFade)
+            {
+                Complete();
+                return;
+            }
+
             _fadeTN = _targetCG
-                .VisibilityState(show, _fadeTime, _ignoreScaleTime)
+                .DOFade(endValue, duration)
+                .SetUpdate(_ignoreScaleTime)
                 .SetLink(gameObject)
-                .OnComplete(() =>
+                .OnComplete(Complete);
+
+            // LOCAL METHODS: -----------------------------
+
+            void Complete()
+            {
+                if (show)
                 {
-                    if (show)
-                    {
-                        if (_changeInteractableState)
-                            EnableInteraction();
+                    if (_changeInteractableState)
+                        EnableInteraction();
 
-                        OnShownEvent.Invoke();
-                    }
-                    else
-                    {
-                        if (_changeInteractableState)
-                            DisableInteraction();
+                    OnShownEvent.Invoke();
+                }
+                else
+                {
+                    if (_changeInteractableState)
+                        DisableInteraction();
 
-                        if (_changeCanvasState)
-                            _canvas.enabled = false;
+                    if (_changeCanvasState)
+                        _canvas.enabled = false;
 
-                        if (_destroyOnHide && !_ignoreDestroy)
-                            DestroySelf();
+                    if (_destroyOnHide && !_ignoreDestroy)
+                        DestroySelf();
 
-                        OnHiddenEvent?.Invoke();
-                    }
-                });
+                    OnHiddenEvent?.Invoke();
+                }
+            }
         }
-
-        protected void EnableInteraction() => SetInteractableState(isInteractable: true);
-
-        protected void DisableInteraction() => SetInteractableState(isInteractable: false);
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
+        
         private void SetInteractableState(bool isInteractable)
         {
             _targetCG.interactable = isInteractable;

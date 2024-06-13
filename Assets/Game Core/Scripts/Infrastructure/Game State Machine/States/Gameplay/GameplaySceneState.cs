@@ -6,6 +6,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Infrastructure.Providers.Global;
+using GameCore.UI.Gameplay.Chat;
 using GameCore.UI.Gameplay.GameOverMenu;
 using GameCore.UI.Gameplay.GameOverWarningMenu;
 using GameCore.UI.Gameplay.LocationsSelectionMenu;
@@ -51,6 +52,7 @@ namespace GameCore.Infrastructure.StateMachine
         private LocationsSelectionMenuView _locationsSelectionMenuView;
         private GameOverMenuView _gameOverMenuView;
         private GameOverWarningMenuView _gameOverWarningMenuView;
+        private ChatMenuUI _chatMenuUI;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -59,6 +61,7 @@ namespace GameCore.Infrastructure.StateMachine
             LockCursor();
             EnableGameplayInput();
 
+            CreateChatMenu();
             CreateActiveQuestsView(); // TEMP
             CreateQuestsSelectionMenuView(); // TEMP
             CreateLocationsSelectionMenuView(); // TEMP
@@ -71,6 +74,8 @@ namespace GameCore.Infrastructure.StateMachine
             InitHorrorStateMachine();
 
             _inputReader.OnPauseEvent += OnOpenPauseMenu;
+            _inputReader.OnOpenChatEvent += OnOpenChatMenu;
+            _inputReader.OnSubmitEvent += OnSendChatMessage;
 
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent += OnOpenLocationsSelectionMenu;
@@ -90,6 +95,7 @@ namespace GameCore.Infrastructure.StateMachine
         public void Exit()
         {
             _inputReader.OnPauseEvent -= OnOpenPauseMenu;
+            _inputReader.OnOpenChatEvent -= OnOpenChatMenu;
 
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent -= OnOpenLocationsSelectionMenu;
@@ -116,6 +122,9 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void EnableGameplayInput() =>
             _inputReader.EnableGameplayInput();
+
+        private void CreateChatMenu() =>
+            _chatMenuUI = MenuFactory.Create<ChatMenuUI>(_diContainer);
 
         private void CreateActiveQuestsView() =>
             MenuFactory.Create<ActiveQuestsView>(_diContainer);
@@ -187,6 +196,23 @@ namespace GameCore.Infrastructure.StateMachine
                 return;
 
             _pauseMenuView.Show();
+        }
+
+        private void OnOpenChatMenu()
+        {
+            if (_chatMenuUI.IsShown)
+                return;
+            
+            _chatMenuUI.ActivateChat();
+            _chatMenuUI.Show();
+        }
+
+        private void OnSendChatMessage()
+        {
+            if (!_chatMenuUI.IsShown)
+                return;
+
+            _chatMenuUI.TrySendChatMessage();
         }
 
         private void OnOpenQuestsSelectionMenu()

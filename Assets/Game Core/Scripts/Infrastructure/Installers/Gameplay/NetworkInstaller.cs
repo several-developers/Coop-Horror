@@ -1,3 +1,4 @@
+using GameCore.Gameplay.ChatManagement;
 using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
@@ -20,6 +21,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindQuestsManagerDecorator();
             BindGameTimeManagerDecorator();
             BindDeliveryManagerDecorator();
+            BindChatManagerDecorator();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -63,6 +65,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<DeliveryManagerDecorator>()
+                .AsSingle();
+        }
+        
+        private void BindChatManagerDecorator()
+        {
+            Container
+                .BindInterfacesTo<ChatManagerDecorator>()
                 .AsSingle();
         }
     }
