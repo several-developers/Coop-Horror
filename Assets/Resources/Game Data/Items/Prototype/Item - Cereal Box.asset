@@ -16,12 +16,13 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
   _itemName: Cereal Box
   _itemID: 5
+  _scaleMultiplier: 1.5
   _rigPresetType: 1
   _itemHandPlacement: 1
   _fpsItemPreview:
-    _position: {x: 0, y: 0, z: 0}
-    _eulerRotation: {x: 0, y: 0, z: 0}
-    _scale: {x: 1, y: 1, z: 1}
+    _position: {x: -0.027, y: 0.368, z: 0.108}
+    _eulerRotation: {x: 315, y: 39, z: 55.999992}
+    _scale: {x: 1.5, y: 1.5, z: 1.5}
   _tpsItemPreview:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}

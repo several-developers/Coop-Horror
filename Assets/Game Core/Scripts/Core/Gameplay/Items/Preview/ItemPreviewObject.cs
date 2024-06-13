@@ -13,10 +13,10 @@ namespace GameCore.Gameplay.Items
         public void ChangeLayer()
         {
             Transform child = transform.GetChild(0);
-            int childCount = child.childCount;
-            
-            for (int i = 0; i < childCount; i++)
-                child.GetChild(i).gameObject.layer = LayerMask.NameToLayer(CameraItemLayer);
+            Transform[] transforms = child.GetComponentsInChildren<Transform>();
+
+            foreach (Transform target in transforms)
+                target.gameObject.layer = LayerMask.NameToLayer(CameraItemLayer);
         }
 
         public void Show() => SetActive(show: true);

@@ -16,12 +16,13 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
   _itemName: Binoculars
   _itemID: 2
+  _scaleMultiplier: 2
   _rigPresetType: 1
   _itemHandPlacement: 1
   _fpsItemPreview:
-    _position: {x: 0, y: 0, z: 0}
-    _eulerRotation: {x: 0, y: 0, z: 0}
-    _scale: {x: 1, y: 1, z: 1}
+    _position: {x: 0.031, y: 0.244, z: 0}
+    _eulerRotation: {x: 25, y: -75, z: -6}
+    _scale: {x: 2.3, y: 2.3, z: 2.3}
   _tpsItemPreview:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}

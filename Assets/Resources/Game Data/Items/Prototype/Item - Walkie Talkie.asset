@@ -16,12 +16,13 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
   _itemName: Walkie Talkie
   _itemID: 9
+  _scaleMultiplier: 2
   _rigPresetType: 1
   _itemHandPlacement: 1
   _fpsItemPreview:
-    _position: {x: 0, y: 0, z: 0}
-    _eulerRotation: {x: 0, y: 0, z: 0}
-    _scale: {x: 1, y: 1, z: 1}
+    _position: {x: 0.02, y: 0.188, z: -0.003}
+    _eulerRotation: {x: 17, y: 354, z: 80.99999}
+    _scale: {x: 1.7, y: 1.7, z: 1.7}
   _tpsItemPreview:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}

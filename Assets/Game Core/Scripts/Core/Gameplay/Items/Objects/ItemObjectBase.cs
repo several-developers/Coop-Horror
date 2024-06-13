@@ -91,6 +91,9 @@ namespace GameCore.Gameplay.Items
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void Setup(int itemID) =>
+            _itemID = itemID;
+        
         public virtual void InteractionStarted()
         {
         }
@@ -130,7 +133,8 @@ namespace GameCore.Gameplay.Items
                 if (randomPosition)
                     position = position.GetRandomPosition(radius: 0.5f);
 
-                _networkTransform.Teleport(position, rotation, newScale: Vector3.one);
+                Vector3 scale = _networkTransform.transform.localScale; 
+                _networkTransform.Teleport(position, rotation, scale);
 
                 DropClientLogic();
             }

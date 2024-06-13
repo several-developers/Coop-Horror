@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using GameCore.Configs.Gameplay.ItemsList;
+using GameCore.Gameplay.Items;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,9 +14,11 @@ namespace GameCore.Gameplay.Network.Utilities
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(DiContainer diContainer)
+        private void Construct(DiContainer diContainer, IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _diContainer = diContainer;
+            _itemsListConfig = gameplayConfigsProvider.GetItemsListConfig();
+            
             RegisterPrefabs();
         }
 
@@ -26,7 +31,10 @@ namespace GameCore.Gameplay.Network.Utilities
         
         // FIELDS: --------------------------------------------------------------------------------
 
+        private readonly List<GameObject> _prefabsToRegister = new();
+        
         private DiContainer _diContainer;
+        private ItemsListConfigMeta _itemsListConfig;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -40,8 +48,11 @@ namespace GameCore.Gameplay.Network.Utilities
 
             if (networkManager == null)
                 return;
-            
-            foreach (GameObject prefab in _prefabs)
+
+            AddItemsPrefabs();
+            _prefabsToRegister.AddRange(_prefabs);
+
+            foreach (GameObject prefab in _prefabsToRegister)
             {
                 bool containsNetworkObject = prefab.GetComponent<NetworkObject>() != null;
 
@@ -57,6 +68,17 @@ namespace GameCore.Gameplay.Network.Utilities
                     instanceHandler: new ZenjectNetCodeFactory(prefab, _diContainer));
             }
         }
+        
+        private void AddItemsPrefabs()
+        {
+            IEnumerable<ItemMeta> allItems = _itemsListConfig.GetAllItems();
+
+            foreach (ItemMeta itemMeta in allItems)
+            {
+                GameObject prefab = itemMeta.ItemPrefab.gameObject;
+                _prefabsToRegister.Add(prefab);
+            }
+        }
 
         private void RemovePrefabs()
         {
@@ -65,7 +87,7 @@ namespace GameCore.Gameplay.Network.Utilities
             if (networkManager == null)
                 return;
             
-            foreach (GameObject prefab in _prefabs)
+            foreach (GameObject prefab in _prefabsToRegister)
             {
                 bool containsNetworkObject = prefab.GetComponent<NetworkObject>() != null;
 

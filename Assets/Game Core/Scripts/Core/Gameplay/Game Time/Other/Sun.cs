@@ -52,7 +52,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         private void UpdateLighting(float timeOfDay)
         {
             RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
-            RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
+            //RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
             
             _light.color = _timeConfig.SunColor.Evaluate(timeOfDay);
         }

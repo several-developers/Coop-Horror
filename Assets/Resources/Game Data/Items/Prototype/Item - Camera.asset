@@ -16,12 +16,13 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
   _itemName: Camera
   _itemID: 3
+  _scaleMultiplier: 2
   _rigPresetType: 1
   _itemHandPlacement: 1
   _fpsItemPreview:
-    _position: {x: 0, y: 0, z: 0}
-    _eulerRotation: {x: 0, y: 0, z: 0}
-    _scale: {x: 1, y: 1, z: 1}
+    _position: {x: 0.101, y: 0.239, z: 0.201}
+    _eulerRotation: {x: 9.6, y: -162, z: -68}
+    _scale: {x: 2.5, y: 2.5, z: 2.5}
   _tpsItemPreview:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}

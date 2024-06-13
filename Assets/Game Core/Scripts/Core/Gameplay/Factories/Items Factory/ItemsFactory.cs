@@ -37,10 +37,13 @@ namespace GameCore.Gameplay.Factories.Items
             if (!isNetworkObjectFound)
                 return false;
 
-            networkObject = _networkManager.SpawnManager
-                .InstantiateAndSpawn(prefabNetworkObject, _clientID, destroyWithScene: true);
+            networkObject = _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, _clientID,
+                destroyWithScene: true, position: position);
 
-            networkObject.transform.position = position;
+            networkObject.transform.localScale *= itemMeta.ScaleMultiplier;
+            
+            var itemObject = networkObject.GetComponent<ItemObjectBase>();
+            itemObject.Setup(itemID);
 
             return true;
         }

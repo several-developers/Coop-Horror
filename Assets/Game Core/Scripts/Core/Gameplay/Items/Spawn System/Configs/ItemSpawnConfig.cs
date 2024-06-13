@@ -7,6 +7,11 @@ namespace GameCore.Gameplay.Items.SpawnSystem
     [Serializable]
     public class ItemSpawnConfig
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        public ItemSpawnConfig() =>
+            CalculateThirdFloorChance();
+        
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField, Required]
