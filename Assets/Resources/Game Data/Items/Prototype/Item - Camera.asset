@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Item - Camera
   m_EditorClassIdentifier: 
   _metaName: Item - Camera
-  _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
+  _icon: {fileID: 21300000, guid: 7936eef528a0f0f48bd067f5483dd94f, type: 3}
   _itemName: Camera
   _itemID: 3
   _scaleMultiplier: 2

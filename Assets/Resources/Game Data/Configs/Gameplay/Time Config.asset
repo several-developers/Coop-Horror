@@ -149,3 +149,4 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
+  _ambientColor: {r: 0.26666668, g: 0.26666668, b: 0.2901961, a: 1}

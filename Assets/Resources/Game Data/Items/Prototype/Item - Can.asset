@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Item - Can
   m_EditorClassIdentifier: 
   _metaName: Item - Can
-  _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
+  _icon: {fileID: 21300000, guid: 88289ddcccf4b0b4cba8d2ac935ad5ec, type: 3}
   _itemName: Can
   _itemID: 4
   _scaleMultiplier: 2

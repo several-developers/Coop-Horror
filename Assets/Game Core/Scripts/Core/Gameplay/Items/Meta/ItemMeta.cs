@@ -158,6 +158,10 @@ namespace GameCore.Gameplay.Items
                     return;
 
                 Transform transform = transforms[0];
+
+                Vector3 localPosition = transform.localPosition;
+                decimal positionX = Math.Round((decimal)localPosition.x, 3);
+                
                 _position = transform.localPosition;
                 _eulerRotation = transform.localEulerAngles;
                 _scale = transform.localScale;

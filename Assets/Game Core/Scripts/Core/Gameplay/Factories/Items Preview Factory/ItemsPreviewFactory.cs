@@ -78,9 +78,6 @@ namespace GameCore.Gameplay.Factories.ItemsPreview
             itemTransform.localRotation = Quaternion.Euler(eulerRotation);
             itemTransform.localScale = scale;
 
-            if (isFirstPerson)
-                itemPreviewObject.ChangeLayer();
-
             return true;
         }
 

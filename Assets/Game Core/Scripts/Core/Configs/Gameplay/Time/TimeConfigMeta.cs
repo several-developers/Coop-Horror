@@ -30,7 +30,7 @@ namespace GameCore.Configs.Gameplay.Time
         [SerializeField]
         private bool _stopAtNight;
 
-        [Title("Visual Settings")]
+        [Title("Location Visual Settings")]
         [SerializeField]
         private AnimationCurve _sunIntensityCurve;
 
@@ -42,6 +42,10 @@ namespace GameCore.Configs.Gameplay.Time
 
         [SerializeField]
         private Gradient _sunColor;
+
+        [Title("Dungeons Visual Settings")]
+        [SerializeField]
+        private Color _ambientColor = Color.black;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -55,6 +59,7 @@ namespace GameCore.Configs.Gameplay.Time
         public Gradient SkyColor => _skyColor;
         public Gradient EquatorColor => _equatorColor;
         public Gradient SunColor => _sunColor;
+        public Color AmbientColor => _ambientColor;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

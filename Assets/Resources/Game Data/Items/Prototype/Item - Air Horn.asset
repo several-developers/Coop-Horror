@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Item - Air Horn
   m_EditorClassIdentifier: 
   _metaName: Item - Air Horn
-  _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
+  _icon: {fileID: 21300000, guid: f3e4a4f5d94c67c449cc5a277ca32fb7, type: 3}
   _itemName: Air Horn
   _itemID: 0
   _scaleMultiplier: 2

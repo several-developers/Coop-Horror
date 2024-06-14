@@ -15,17 +15,17 @@ PrefabInstance:
     - target: {fileID: 3469534860093310949, guid: ccf3348006d206643bf18a15cc192663,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.87
+      value: 0.398
       objectReference: {fileID: 0}
     - target: {fileID: 3469534860093310949, guid: ccf3348006d206643bf18a15cc192663,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.87
+      value: 0.398
       objectReference: {fileID: 0}
     - target: {fileID: 3469534860093310949, guid: ccf3348006d206643bf18a15cc192663,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.87
+      value: 0.398
       objectReference: {fileID: 0}
     - target: {fileID: 3469534860093310949, guid: ccf3348006d206643bf18a15cc192663,
         type: 3}
@@ -80,7 +80,7 @@ PrefabInstance:
     - target: {fileID: 4282240716220013919, guid: ccf3348006d206643bf18a15cc192663,
         type: 3}
       propertyPath: m_Name
-      value: Player Model - Entity
+      value: Player Model - Ragdoll
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ccf3348006d206643bf18a15cc192663, type: 3}

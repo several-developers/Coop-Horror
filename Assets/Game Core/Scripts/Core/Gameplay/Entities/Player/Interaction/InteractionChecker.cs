@@ -1,4 +1,5 @@
-﻿using GameCore.Gameplay.Interactable;
+﻿using System;
+using GameCore.Gameplay.Interactable;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using GameCore.Utilities;
 using UnityEngine;
@@ -94,7 +95,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             if (!isInteractableObjectFound)
                 return false;
             
-            bool isInteractableComponentExists = hitInfo.transform.TryGetComponent(out IInteractable interactable);
+            bool isInteractableComponentExists = hitInfo.transform.TryGetComponent(out IInteractable _);
 
             if (!isInteractableComponentExists)
                 return false;

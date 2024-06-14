@@ -36,11 +36,9 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         public void ToggleCameraState(bool isEnabled)
         {
             Camera mainCamera = _cameraReferences.MainCamera;
-            Camera itemsCamera = _cameraReferences.ItemsCamera;
             CinemachineBrain cinemachineBrain = _cameraReferences.CinemachineBrain;
 
             mainCamera.enabled = isEnabled;
-            itemsCamera.enabled = isEnabled;
             cinemachineBrain.enabled = isEnabled;
         }
     }

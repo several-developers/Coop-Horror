@@ -4,6 +4,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Zenject;
 
 namespace GameCore.Gameplay.GameTimeManagement
@@ -64,9 +65,21 @@ namespace GameCore.Gameplay.GameTimeManagement
         private void UpdateLighting(float timeOfDay)
         {
             RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
-            
+
             if (_changeAmbientSkyColor)
+            {
+                if (RenderSettings.ambientMode != AmbientMode.Skybox)
+                    RenderSettings.ambientMode = AmbientMode.Skybox;
+                
                 RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
+            }
+            else
+            {
+                if (RenderSettings.ambientMode != AmbientMode.Flat)
+                    RenderSettings.ambientMode = AmbientMode.Flat;
+                
+                RenderSettings.ambientSkyColor = _timeConfig.AmbientColor;
+            }
             
             _light.color = _timeConfig.SunColor.Evaluate(timeOfDay);
         }

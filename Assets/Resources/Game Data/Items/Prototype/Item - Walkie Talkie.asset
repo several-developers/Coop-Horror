@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Item - Walkie Talkie
   m_EditorClassIdentifier: 
   _metaName: Item - Walkie Talkie
-  _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
+  _icon: {fileID: 21300000, guid: 50165e8562157ea409892cf630a679e6, type: 3}
   _itemName: Walkie Talkie
   _itemID: 9
   _scaleMultiplier: 2

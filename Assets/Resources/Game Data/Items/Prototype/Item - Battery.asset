@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Item - Battery
   m_EditorClassIdentifier: 
   _metaName: Item - Battery
-  _icon: {fileID: 21300000, guid: 6d58f232604d1a54ea188908c9035f21, type: 3}
+  _icon: {fileID: 21300000, guid: b4d6c9f56fed4ed418cc7af36f34a02b, type: 3}
   _itemName: Battery
   _itemID: 1
   _scaleMultiplier: 2.5
