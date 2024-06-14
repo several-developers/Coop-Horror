@@ -159,12 +159,29 @@ namespace GameCore.Gameplay.Items
 
                 Transform transform = transforms[0];
 
-                Vector3 localPosition = transform.localPosition;
-                decimal positionX = Math.Round((decimal)localPosition.x, 3);
+                Vector3 position = transform.localPosition;
+                Vector3 rotation = transform.localEulerAngles;
+                Vector3 scale = transform.localScale;
                 
-                _position = transform.localPosition;
-                _eulerRotation = transform.localEulerAngles;
-                _scale = transform.localScale;
+                float positionX = (float)Math.Round((decimal)position.x, 3);
+                float positionY = (float)Math.Round((decimal)position.y, 3);
+                float positionZ = (float)Math.Round((decimal)position.z, 3);
+                
+                float rotationX = Mathf.FloorToInt(rotation.x);
+                float rotationY = Mathf.FloorToInt(rotation.y);
+                float rotationZ = Mathf.FloorToInt(rotation.z);
+                
+                float scaleX = (float)Math.Round((decimal)scale.x, 3);
+                float scaleY = (float)Math.Round((decimal)scale.y, 3);
+                float scaleZ = (float)Math.Round((decimal)scale.z, 3);
+
+                position = new Vector3(positionX, positionY, positionZ);
+                rotation = new Vector3(rotationX, rotationY, rotationZ);
+                scale = new Vector3(scaleX, scaleY, scaleZ);
+                
+                _position = position;
+                _eulerRotation = rotation;
+                _scale = scale;
             }
 
             private static bool HasValidSelection()
