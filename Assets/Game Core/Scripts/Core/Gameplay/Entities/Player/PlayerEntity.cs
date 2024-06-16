@@ -72,12 +72,14 @@ namespace GameCore.Gameplay.Entities.Player
         public static event Action<PlayerEntity> OnPlayerDespawnedEvent = delegate { };
 
         public event Action<EntityLocation> OnPlayerLocationChangedEvent = delegate { };
+        public event Action<float> OnSanityChangedEvent = delegate { }; 
         public event Action OnDiedEvent = delegate { };
         public event Action OnRevivedEvent = delegate { };
         
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
         private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: Constants.OwnerPermission);
+        private readonly NetworkVariable<float> _sanity = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<bool> _isDead = new(writePerm: Constants.OwnerPermission);
 
@@ -152,6 +154,9 @@ namespace GameCore.Gameplay.Entities.Player
         public EntityLocation GeEntityLocation() =>
             _entityLocation.Value;
 
+        public float GetSanity() =>
+            _sanity.Value;
+
         public static bool TryGetPlayer(ulong clientID, out PlayerEntity playerEntity) =>
             AllPlayers.TryGetValue(clientID, out playerEntity);
 
@@ -168,6 +173,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
 
+            _sanity.OnValueChanged += OnSanityChanged;
             _isDead.OnValueChanged += OnDead;
         }
 
@@ -282,6 +288,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             AllPlayers.Remove(OwnerClientId);
             
+            _sanity.OnValueChanged -= OnSanityChanged;
             _isDead.OnValueChanged -= OnDead;
         }
 
@@ -456,6 +463,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnOwnerPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue) =>
             OnPlayerLocationChangedEvent.Invoke(newValue);
+
+        private void OnSanityChanged(float previousValue, float newValue) =>
+            OnSanityChangedEvent.Invoke(newValue);
 
         private void OnHealthChanged(HealthData healthData) => CheckDeadStatus(healthData);
 

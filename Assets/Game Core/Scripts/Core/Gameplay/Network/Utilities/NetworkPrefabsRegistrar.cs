@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GameCore.Configs.Gameplay.ItemsList;
+using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
@@ -16,10 +17,10 @@ namespace GameCore.Gameplay.Network.Utilities
         [Inject]
         private void Construct(DiContainer diContainer, IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            _diContainer = diContainer;
             _itemsListConfig = gameplayConfigsProvider.GetItemsListConfig();
+            _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
             
-            RegisterPrefabs();
+            RegisterPrefabs(diContainer);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -33,8 +34,8 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private readonly List<GameObject> _prefabsToRegister = new();
         
-        private DiContainer _diContainer;
         private ItemsListConfigMeta _itemsListConfig;
+        private MonstersListConfigMeta _monstersListConfig;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -42,15 +43,16 @@ namespace GameCore.Gameplay.Network.Utilities
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void RegisterPrefabs()
+        private void RegisterPrefabs(DiContainer diContainer)
         {
             NetworkManager networkManager = NetworkManager.Singleton;
 
             if (networkManager == null)
                 return;
 
+            AddLocalListPrefabs();
             AddItemsPrefabs();
-            _prefabsToRegister.AddRange(_prefabs);
+            AddMonstersPrefabs();
 
             foreach (GameObject prefab in _prefabsToRegister)
             {
@@ -65,10 +67,13 @@ namespace GameCore.Gameplay.Network.Utilities
                 networkManager.AddNetworkPrefab(prefab);
 
                 networkManager.PrefabHandler.AddHandler(prefab,
-                    instanceHandler: new ZenjectNetCodeFactory(prefab, _diContainer));
+                    instanceHandler: new ZenjectNetCodeFactory(prefab, diContainer));
             }
         }
-        
+
+        private void AddLocalListPrefabs() =>
+            _prefabsToRegister.AddRange(_prefabs);
+
         private void AddItemsPrefabs()
         {
             IEnumerable<ItemMeta> allItems = _itemsListConfig.GetAllItems();
@@ -76,6 +81,17 @@ namespace GameCore.Gameplay.Network.Utilities
             foreach (ItemMeta itemMeta in allItems)
             {
                 GameObject prefab = itemMeta.ItemPrefab.gameObject;
+                _prefabsToRegister.Add(prefab);
+            }
+        }
+        
+        private void AddMonstersPrefabs()
+        {
+            IReadOnlyList<MonsterReference> allItems = _monstersListConfig.GetAllReferences();
+
+            foreach (MonsterReference monsterReference in allItems)
+            {
+                GameObject prefab = monsterReference.MonsterPrefab.gameObject;
                 _prefabsToRegister.Add(prefab);
             }
         }

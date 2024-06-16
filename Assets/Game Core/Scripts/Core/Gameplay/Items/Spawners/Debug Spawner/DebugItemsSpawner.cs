@@ -78,11 +78,9 @@ namespace GameCore.Gameplay.Items.Spawners
             position.y += 0.25f;
             position = position.GetRandomPosition(radius: 0.25f);
 
-            _itemsFactory.CreateItem(_itemMeta.ItemID, position, out NetworkObject networkObject);
-
-            bool isItemObjectFound = networkObject.TryGetComponent(out ItemObjectBase itemObject);
-
-            if (!isItemObjectFound)
+            bool isItemCreated = _itemsFactory.CreateItem(_itemMeta.ItemID, position, out ItemObjectBase itemObject);
+            
+            if (!isItemCreated)
                 return;
             
             itemObject.ToggleDestroyOnSceneUnload(_markDestroyOnUnloadScene);

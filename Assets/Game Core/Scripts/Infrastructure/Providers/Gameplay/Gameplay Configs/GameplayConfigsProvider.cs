@@ -5,6 +5,7 @@ using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Configs.Gameplay.LocationsList;
+using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
 using GameCore.Configs.Gameplay.Quests;
@@ -37,6 +38,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _rigPresetsConfig = Load<RigPresetsConfigMeta>(path: ConfigsPaths.RigPresetsConfig);
             _visualConfig = Load<VisualConfigMeta>(path: ConfigsPaths.VisualConfig);
             _itemsSpawnConfig = Load<ItemsSpawnConfigMeta>(path: ConfigsPaths.ItemsSpawnConfig);
+            _monstersListConfig = Load<MonstersListConfigMeta>(path: ConfigsPaths.MonstersListConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -55,6 +57,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly RigPresetsConfigMeta _rigPresetsConfig;
         private readonly VisualConfigMeta _visualConfig;
         private readonly ItemsSpawnConfigMeta _itemsSpawnConfig;
+        private readonly MonstersListConfigMeta _monstersListConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -72,5 +75,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public RigPresetsConfigMeta GetRigPresetsConfig() => _rigPresetsConfig;
         public VisualConfigMeta GetVisualConfig() => _visualConfig;
         public ItemsSpawnConfigMeta GetItemsSpawnConfig() => _itemsSpawnConfig;
+        public MonstersListConfigMeta GetMonstersListConfig() => _monstersListConfig;
     }
 }

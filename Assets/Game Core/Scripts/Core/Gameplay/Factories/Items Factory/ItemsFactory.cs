@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.Items;
+using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using Unity.Netcode;
 using UnityEngine;
@@ -13,21 +14,21 @@ namespace GameCore.Gameplay.Factories.Items
         {
             _itemsMetaProvider = itemsMetaProvider;
             _networkManager = NetworkManager.Singleton;
-            _clientID = _networkManager.LocalClientId;
+            _serverID = NetworkHorror.ServerID;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IItemsMetaProvider _itemsMetaProvider;
         private readonly NetworkManager _networkManager;
-        private readonly ulong _clientID;
+        private readonly ulong _serverID;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public bool CreateItem(int itemID, Vector3 position, out NetworkObject networkObject)
+        public bool CreateItem(int itemID, Vector3 worldPosition, out ItemObjectBase itemObject)
         {
             bool isItemMetaFound = TryGetItemMeta(itemID, out ItemMeta itemMeta);
-            networkObject = null;
+            itemObject = null;
 
             if (!isItemMetaFound)
                 return false;
@@ -37,12 +38,12 @@ namespace GameCore.Gameplay.Factories.Items
             if (!isNetworkObjectFound)
                 return false;
 
-            networkObject = _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, _clientID,
-                destroyWithScene: true, position: position);
+            NetworkObject networkObject = _networkManager.SpawnManager
+                .InstantiateAndSpawn(prefabNetworkObject, _serverID, destroyWithScene: true, position: worldPosition);
 
             networkObject.transform.localScale *= itemMeta.ScaleMultiplier;
             
-            var itemObject = networkObject.GetComponent<ItemObjectBase>();
+            itemObject = networkObject.GetComponent<ItemObjectBase>();
             itemObject.Setup(itemID);
 
             return true;

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2610325709499942998}
   - component: {fileID: 2610325709499942999}
   m_Layer: 0
-  m_Name: Health (TMP)
+  m_Name: Sanity (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Health: 0/0'
+  m_text: 'Sanity: 100%'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
@@ -144,10 +144,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2610325709890716163}
-  - component: {fileID: 6307937846703476698}
+  - component: {fileID: 4273730680721578589}
   - component: {fileID: 2006511416069030455}
   m_Layer: 0
-  m_Name: Player Health UI
+  m_Name: Player Sanity UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -174,7 +174,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 1, y: 0}
---- !u!114 &6307937846703476698
+--- !u!114 &4273730680721578589
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2610325709890716164}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be03df94bab64a29b0608050804b5005, type: 3}
+  m_Script: {fileID: 11500000, guid: 4d378d48c4344a13883a227275de7566, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _hiddenByAwake: 0
@@ -194,7 +194,7 @@ MonoBehaviour:
   _canvas: {fileID: 0}
   _fadeTime: 0.25
   _targetCG: {fileID: 2006511416069030455}
-  _healthTMP: {fileID: 2610325709499942999}
+  _sanityTMP: {fileID: 2610325709499942999}
 --- !u!225 &2006511416069030455
 CanvasGroup:
   m_ObjectHideFlags: 0
