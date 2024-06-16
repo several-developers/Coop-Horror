@@ -10,6 +10,7 @@ namespace GameCore.Gameplay.InputManagement
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public GameInput GameInput => _gameInput;
+        public bool MovementInputDetected => _movementInputDetected;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -36,6 +37,8 @@ namespace GameCore.Gameplay.InputManagement
         public event Action OnSubmitEvent = delegate { };
 
         private GameInput _gameInput;
+
+        private bool _movementInputDetected;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -84,6 +87,7 @@ namespace GameCore.Gameplay.InputManagement
         public void OnMove(InputAction.CallbackContext context)
         {
             var moveVector = context.ReadValue<Vector2>();
+            _movementInputDetected = moveVector.magnitude > 0f;
             OnMoveEvent.Invoke(moveVector);
         }
 

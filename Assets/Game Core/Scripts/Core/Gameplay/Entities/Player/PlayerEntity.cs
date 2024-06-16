@@ -183,13 +183,16 @@ namespace GameCore.Gameplay.Entities.Player
             Other();
             InitSystems();
             InitPlayerMovement();
-            DeactivatePlayerMesh();
+            //DeactivatePlayerMesh();
             SetupStates();
             EnterAliveState();
 
             InputReader.OnScrollEvent += OnScrollInventory;
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
+
+            _references.Character.Crouched += OnCrouched;
+            _references.Character.UnCrouched += OnUnCrouched;
 
             _entityLocation.OnValueChanged += OnOwnerPlayerLocationChanged;
 
@@ -229,7 +232,7 @@ namespace GameCore.Gameplay.Entities.Player
                 playerMovementController.Setup(playerEntity: this);
 
                 MyAnimationController animationController = _references.AnimationController;
-                animationController.Setup(character, cameraReferences);
+                animationController.Setup(character, playerMovementController, InputReader, cameraReferences);
             }
 
             void DeactivatePlayerMesh()
@@ -302,6 +305,9 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnScrollEvent -= OnScrollInventory;
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
+            
+            _references.Character.Crouched -= OnCrouched;
+            _references.Character.UnCrouched -= OnUnCrouched;
 
             _entityLocation.OnValueChanged -= OnOwnerPlayerLocationChanged;
 
@@ -447,6 +453,22 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         private void OnDropItem() => DropItem();
+
+        private void OnCrouched()
+        {
+            Transform headLookTransform = _references.HeadLookAtObject.transform;
+            Vector3 position = headLookTransform.localPosition;
+            position.y = 4.467f * 0.5f;
+            headLookTransform.localPosition = position;
+        }
+
+        private void OnUnCrouched()
+        {
+            Transform headLookTransform = _references.HeadLookAtObject.transform;
+            Vector3 position = headLookTransform.localPosition;
+            position.y = 4.467f;
+            headLookTransform.localPosition = position;
+        }
 
         private void OnOwnerSelectedSlotChanged(ChangedSlotStaticData data)
         {

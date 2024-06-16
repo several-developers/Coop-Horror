@@ -16,6 +16,10 @@ namespace GameCore.Gameplay.Entities.Player
         [Title(Constants.Settings)]
         [SerializeField, Min(0)]
         private float _maxSprintSpeed = 10.0f;
+
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public float MaxSprintSpeed => _maxSprintSpeed;
         
         // FIELDS: --------------------------------------------------------------------------------
         
