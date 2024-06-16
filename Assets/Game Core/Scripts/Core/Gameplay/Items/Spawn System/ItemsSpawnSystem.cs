@@ -208,7 +208,9 @@ namespace GameCore.Gameplay.Items.SpawnSystem
         private void ClearItemsSpawners()
         {
             _rawItemsSpawners.Clear();
-            _itemsSpawners.Clear();
+            _itemsSpawners[Floor.One].Clear();
+            _itemsSpawners[Floor.Two].Clear();
+            _itemsSpawners[Floor.Three].Clear();
         }
 
         private DungeonItemsSpawner GetRandomItemsSpawner(Floor floor)

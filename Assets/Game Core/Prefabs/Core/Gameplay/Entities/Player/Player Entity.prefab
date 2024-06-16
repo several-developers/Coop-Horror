@@ -1825,12 +1825,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1593678e31704425885d68b1de711d63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &747475656781361352 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1636072205746781461, guid: 488b74f8770b1e643b27b3be5c19a5a5,
-    type: 3}
-  m_PrefabInstance: {fileID: 2084021103639481821}
-  m_PrefabAsset: {fileID: 0}
 --- !u!137 &993997831751653183 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 1234142308422228706, guid: 488b74f8770b1e643b27b3be5c19a5a5,
@@ -2060,7 +2054,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2175522384
+  GlobalObjectIdHash: 4251873558
   InScenePlacedSourceGlobalObjectIdHash: 4251873558
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2328,7 +2322,6 @@ MonoBehaviour:
     _animator: {fileID: 8350890957917597247}
     _rigidbody: {fileID: 7127189264355523618}
     _collider: {fileID: 1967799250354909116}
-    _headLookAtObject: {fileID: 747475656781361352}
     _spectatorCameraTarget: {fileID: 8717597456961597742}
     _leftHandItemsHolder: {fileID: 7841224976178631010}
     _rightHandItemsHolder: {fileID: 6401576952175673513}

@@ -4,24 +4,24 @@ using GameCore.Gameplay.Entities.Player;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
+namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 {
     public class ChaseState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
-        
-        public ChaseState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig)
+
+        public ChaseState(EvilClownEntity evilClownEntity, EvilClownAIConfigMeta evilClownAIConfig)
         {
-            _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleAIConfig;
-            _transform = beetleEntity.transform;
-            _agent = beetleEntity.GetAgent();
+            _evilClownEntity = evilClownEntity;
+            _evilClownAIConfig = evilClownAIConfig;
+            _transform = evilClownEntity.transform;
+            _agent = evilClownEntity.GetAgent();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        private readonly BeetleEntity _beetleEntity;
-        private readonly BeetleAIConfigMeta _beetleAIConfig;
+        private readonly EvilClownEntity _evilClownEntity;
+        private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
 
@@ -30,12 +30,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         private Coroutine _chasingEndTimerCO;
         private float _cachedStoppingDistance;
         private bool _isStopChasingTimerEnabled;
-
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
-            ToggleTriggerCheckState(isEnabled: false);
             EnableAgent();
             StartChasing();
             StartDistanceCheck();
@@ -43,44 +42,37 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         public void Exit()
         {
-            ToggleTriggerCheckState(isEnabled: true);
             ResetAgent();
             StopChasing();
             StopDistanceCheck();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void ToggleTriggerCheckState(bool isEnabled)
-        {
-            AggressionSystem aggressionSystem = _beetleEntity.GetAggressionSystem();
-            aggressionSystem.ToggleTriggerCheckState(isEnabled);
-        }
-
+        
         private void EnableAgent()
         {
-            NavMeshAgent agent = _beetleEntity.GetAgent();
+            NavMeshAgent agent = _evilClownEntity.GetAgent();
             _cachedStoppingDistance = agent.stoppingDistance;
             
             agent.enabled = true;
-            agent.speed = _beetleAIConfig.ChaseSpeed;
-            agent.stoppingDistance = _beetleAIConfig.ChaseStoppingDistance;
+            agent.speed = _evilClownAIConfig.ChaseSpeed;
+            agent.stoppingDistance = _evilClownAIConfig.ChaseStoppingDistance;
         }
 
         private void ResetAgent()
         {
-            NavMeshAgent agent = _beetleEntity.GetAgent();
+            NavMeshAgent agent = _evilClownEntity.GetAgent();
             agent.stoppingDistance = _cachedStoppingDistance;
         }
-
+        
         private void SetDestination()
         {
-            PlayerEntity targetPlayer = _beetleEntity.GetTargetPlayer();
+            PlayerEntity targetPlayer = _evilClownEntity.GetTargetPlayer();
             bool isTargetExists = targetPlayer != null;
 
             if (!isTargetExists)
             {
-                EnterTriggerState();
+                EnterWanderingState();
                 return;
             }
 
@@ -90,20 +82,20 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         private void CheckDistance()
         {
-            PlayerEntity targetPlayer = _beetleEntity.GetTargetPlayer();
+            PlayerEntity targetPlayer = _evilClownEntity.GetTargetPlayer();
             bool isTargetExists = targetPlayer != null;
 
             if (!isTargetExists)
             {
-                EnterTriggerState();
+                EnterWanderingState();
                 return;
             }
 
             Vector3 targetPosition = targetPlayer.transform.position;
             Vector3 beetlePosition = _transform.position;
             float distance = Vector3.Distance(a: beetlePosition, b: targetPosition);
-            bool isTooFar = distance > _beetleAIConfig.MaxChaseDistance;
-            bool canAttack = distance <= _beetleAIConfig.AttackDistance;
+            bool isTooFar = distance > _evilClownAIConfig.MaxChaseDistance;
+            bool canAttack = distance <= _evilClownAIConfig.AttackDistance;
 
             if (canAttack)
             {
@@ -120,7 +112,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         private void StartChasing()
         {
             IEnumerator routine = ChaseCO();
-            _chaseCO = _beetleEntity.StartCoroutine(routine);
+            _chaseCO = _evilClownEntity.StartCoroutine(routine);
         }
 
         private void StopChasing()
@@ -128,13 +120,13 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             if (_chaseCO == null)
                 return;
             
-            _beetleEntity.StopCoroutine(_chaseCO);
+            _evilClownEntity.StopCoroutine(_chaseCO);
         }
 
         private void StartDistanceCheck()
         {
             IEnumerator routine = DistanceCheckCO();
-            _distanceCheckCO = _beetleEntity.StartCoroutine(routine);
+            _distanceCheckCO = _evilClownEntity.StartCoroutine(routine);
         }
 
         private void StopDistanceCheck()
@@ -142,7 +134,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             if (_distanceCheckCO == null)
                 return;
             
-            _beetleEntity.StopCoroutine(_distanceCheckCO);
+            _evilClownEntity.StopCoroutine(_distanceCheckCO);
         }
 
         private void StartChasingEndTimer()
@@ -151,7 +143,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
                 return;
 
             IEnumerator routine = ChasingEndTimerCO();
-            _chasingEndTimerCO = _beetleEntity.StartCoroutine(routine);
+            _chasingEndTimerCO = _evilClownEntity.StartCoroutine(routine);
             _isStopChasingTimerEnabled = true;
         }
 
@@ -163,15 +155,16 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             if (_chasingEndTimerCO == null)
                 return;
 
-            _beetleEntity.StopCoroutine(_chasingEndTimerCO);
+            _evilClownEntity.StopCoroutine(_chasingEndTimerCO);
             _isStopChasingTimerEnabled = false;
         }
+        
         
         private IEnumerator ChaseCO()
         {
             while (true)
             {
-                float checkInterval = _beetleAIConfig.ChasePositionCheckInterval;
+                float checkInterval = _evilClownAIConfig.ChasePositionCheckInterval;
                 yield return new WaitForSeconds(checkInterval);
                 
                 SetDestination();
@@ -182,7 +175,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         {
             while (true)
             {
-                float checkInterval = _beetleAIConfig.ChaseDistanceCheckInterval;
+                float checkInterval = _evilClownAIConfig.ChaseDistanceCheckInterval;
                 yield return new WaitForSeconds(checkInterval);
                 
                 CheckDistance();
@@ -191,16 +184,16 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         
         private IEnumerator ChasingEndTimerCO()
         {
-            float delay = _beetleAIConfig.ChaseEndDelay;
+            float delay = _evilClownAIConfig.ChaseEndDelay;
             yield return new WaitForSeconds(delay);
                 
-            EnterTriggerState();
+            EnterWanderingState();
         }
-        
-        private void EnterTriggerState() =>
-            _beetleEntity.EnterTriggerState();
 
         private void EnterAttackState() =>
-            _beetleEntity.EnterAttackState();
+            _evilClownEntity.EnterAttackState();
+
+        private void EnterWanderingState() =>
+            _evilClownEntity.EnterWanderingState();
     }
 }

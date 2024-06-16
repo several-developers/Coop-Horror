@@ -332,19 +332,19 @@ namespace GameCore.Gameplay.Entities.Player
         private void SetFloat(int id, float value)
         {
             _animator.SetFloat(id, value);
-            _armsAnimator.SetFloat(id, value);
+            //_armsAnimator.SetFloat(id, value);
         }
 
         private void SetInteger(int id, int value)
         {
             _animator.SetInteger(id, value);
-            _armsAnimator.SetInteger(id, value);
+            //_armsAnimator.SetInteger(id, value);
         }
 
         private void SetBool(int id, bool value)
         {
             _animator.SetBool(id, value);
-            _armsAnimator.SetBool(id, value);
+            //_armsAnimator.SetBool(id, value);
         }
 
         /// <summary>

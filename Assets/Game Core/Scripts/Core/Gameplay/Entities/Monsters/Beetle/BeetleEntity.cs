@@ -51,8 +51,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         private static readonly List<BeetleEntity> AllBeetles = new();
 
         private ILevelProvider _levelProvider;
-
         private BeetleAIConfigMeta _beetleAIConfig;
+
         private StateMachine _beetleStateMachine;
         private AggressionSystem _aggressionSystem;
         private PlayerEntity _targetPlayer;

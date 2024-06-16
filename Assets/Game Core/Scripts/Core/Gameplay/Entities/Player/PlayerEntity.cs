@@ -31,11 +31,13 @@ namespace GameCore.Gameplay.Entities.Player
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsPreviewFactory itemsPreviewFactory,
+        private void Construct(
+            IItemsPreviewFactory itemsPreviewFactory,
             IPlayerInteractionObserver playerInteractionObserver,
             ICamerasManager camerasManager,
             IGameplayConfigsProvider gameplayConfigsProvider,
-            IConfigsProvider configsProvider)
+            IConfigsProvider configsProvider
+        )
         {
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInteractionObserver = playerInteractionObserver;
@@ -72,10 +74,10 @@ namespace GameCore.Gameplay.Entities.Player
         public static event Action<PlayerEntity> OnPlayerDespawnedEvent = delegate { };
 
         public event Action<EntityLocation> OnPlayerLocationChangedEvent = delegate { };
-        public event Action<float> OnSanityChangedEvent = delegate { }; 
+        public event Action<float> OnSanityChangedEvent = delegate { };
         public event Action OnDiedEvent = delegate { };
         public event Action OnRevivedEvent = delegate { };
-        
+
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
         private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: Constants.OwnerPermission);
@@ -120,7 +122,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (IsDead())
                 return;
-            
+
             _inventory.DropItem(destroy);
         }
 
@@ -128,7 +130,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!IsOwner)
                 return;
-            
+
             EnterDeathState();
         }
 
@@ -136,7 +138,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (_isDead.Value == isDead)
                 return;
-            
+
             _isDead.Value = isDead;
         }
 
@@ -150,7 +152,7 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform GetTransform() => transform;
 
         public PlayerInventory GetInventory() => _inventory;
-        
+
         public EntityLocation GeEntityLocation() =>
             _entityLocation.Value;
 
@@ -182,7 +184,7 @@ namespace GameCore.Gameplay.Entities.Player
             PlayerCamera playerCamera = _camerasManager.GetPlayerCamera();
             CameraReferences cameraReferences = playerCamera.CameraReferences;
             Camera mainCamera = cameraReferences.MainCamera;
-            
+
             Other();
             InitSystems();
             InitPlayerMovement();
@@ -287,7 +289,7 @@ namespace GameCore.Gameplay.Entities.Player
             }
 
             AllPlayers.Remove(OwnerClientId);
-            
+
             _sanity.OnValueChanged -= OnSanityChanged;
             _isDead.OnValueChanged -= OnDead;
         }
@@ -299,7 +301,7 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnScrollEvent -= OnScrollInventory;
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
-            
+
             _entityLocation.OnValueChanged -= OnOwnerPlayerLocationChanged;
 
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
@@ -328,12 +330,12 @@ namespace GameCore.Gameplay.Entities.Player
 
             if (!isStateValid)
                 return;
-            
+
             EnterDeathState();
         }
 
         private void EnterDeathState() => ChangeState<DeathState>();
-        
+
         private void ChangeState<TState>() where TState : IState =>
             _playerStateMachine.ChangeState<TState>();
 
@@ -391,7 +393,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             CapsuleCollider capsuleCollider = _references.Collider;
             capsuleCollider.isTrigger = enable;
-            
+
             RagdollController ragdollController = _references.RagdollController;
             ragdollController.ToggleRagdoll(enable);
         }
@@ -426,7 +428,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (IsDead())
                 return;
-            
+
             bool switchToNextSlot = scrollValue <= 0;
 
             if (switchToNextSlot)
@@ -439,7 +441,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (IsDead())
                 return;
-            
+
             _interactionHandler.Interact();
         }
 
@@ -482,13 +484,13 @@ namespace GameCore.Gameplay.Entities.Player
         [Title(Constants.DebugButtons)]
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugKill() => Kill(PlayerDeathReason._);
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterAliveState() => EnterAliveState();
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterDeathState() => EnterDeathState();
-        
+
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterReviveState() => EnterReviveState();
 
