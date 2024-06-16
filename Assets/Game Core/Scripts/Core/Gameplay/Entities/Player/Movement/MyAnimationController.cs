@@ -1,5 +1,4 @@
-﻿using System;
-using ECM2;
+﻿using ECM2;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.InputManagement;
 using Sirenix.OdinInspector;
@@ -7,10 +6,6 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player
 {
-    /// <summary>
-    /// This example shows how to animate a Character,
-    /// using the Character data (movement direction, velocity, is jumping, etc) to feed your Animator.
-    /// </summary>
     public class MyAnimationController : MonoBehaviour
     {
         private enum AnimationState
@@ -67,10 +62,6 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField]
         private LayerMask _groundLayerMask;
 
-        [Tooltip("Useful for rough ground")]
-        [SerializeField]
-        private float _groundedOffset = -0.14f;
-
         [Header("Player Lean")]
         [Tooltip("Flag indicating if leaning is enabled.")]
         [SerializeField]
@@ -88,44 +79,44 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField]
         private AnimationCurve _leanCurve;
 
-        [Tooltip("Delay for head leaning looks.")]
-        [SerializeField]
-        private float _leansHeadLooksDelay;
-
-        [Tooltip("Flag indicating if an animation clip has ended.")]
-        [SerializeField]
-        private bool _animationClipEnd;
-
         [Header("Player Head Look")]
         [Tooltip("Flag indicating if head turning is enabled.")]
         [SerializeField]
         private bool _enableHeadTurn = true;
+
         [Tooltip("Delay for head turning.")]
         [SerializeField]
         private float _headLookDelay;
+
         [Tooltip("X-axis value for head turning.")]
         [SerializeField]
         private float _headLookX;
+
         [Tooltip("Y-axis value for head turning.")]
         [SerializeField]
         private float _headLookY;
+
         [Tooltip("Curve for X-axis head turning.")]
         [SerializeField]
         private AnimationCurve _headLookXCurve;
-        
+
         [Header("Player Body Look")]
         [Tooltip("Flag indicating if body turning is enabled.")]
         [SerializeField]
         private bool _enableBodyTurn = true;
+
         [Tooltip("Delay for body turning.")]
         [SerializeField]
         private float _bodyLookDelay;
+
         [Tooltip("X-axis value for body turning.")]
         [SerializeField]
         private float _bodyLookX;
+
         [Tooltip("Y-axis value for body turning.")]
         [SerializeField]
         private float _bodyLookY;
+
         [Tooltip("Curve for X-axis body turning.")]
         [SerializeField]
         private AnimationCurve _bodyLookXCurve;
@@ -136,7 +127,6 @@ namespace GameCore.Gameplay.Entities.Player
         private float WalkSpeed => _character.minAnalogWalkSpeed;
         private float RunSpeed => _character.maxWalkSpeed;
         private float SprintSpeed => _sprintAbility.MaxSprintSpeed;
-        private float SpeedChangeDamping => _character.maxAcceleration;
         private bool IsGrounded => _character.IsGrounded();
         private bool IsCrouching => _character.IsCrouched();
         private bool IsWalking => _character.IsWalking();
@@ -188,7 +178,6 @@ namespace GameCore.Gameplay.Entities.Player
         #endregion
 
         private Character _character;
-        private PlayerMovementController _playerMovementController;
         private MySprintAbility _sprintAbility;
         private InputReader _inputReader;
         private Animator _animator;
@@ -234,7 +223,6 @@ namespace GameCore.Gameplay.Entities.Player
         private const float AnimationDampTime = 5f;
         private const float StrafeDirectionDampTime = 20f;
 
-        private Vector3 _targetVelocity;
         private Vector3 _cameraForward;
         private float _targetMaxSpeed;
         private float _fallStartTime;
@@ -272,75 +260,11 @@ namespace GameCore.Gameplay.Entities.Player
             }
         }
 
-        private void OldUpdate()
-        {
-            float deltaTime = Time.deltaTime;
-
-            // Compute input move vector in local space
-
-            Vector3 move = transform.InverseTransformDirection(_character.GetMovementDirection());
-
-            // Update the animator parameters
-
-            float forwardAmount = _character.useRootMotion && _character.GetRootMotionController()
-                ? move.z
-                : Mathf.InverseLerp(a: 0.0f, b: _character.GetMaxSpeed(), value: _character.GetSpeed());
-
-            bool isMovingBackwards = move.z < 0f;
-
-            if (!isMovingBackwards)
-            {
-#warning НЕПРАВИЛЬНО РАБОТАЕТ, в правую сторону -1 даёт
-                float turnAmount = Mathf.Atan2(y: move.x, x: move.z);
-
-                _animator.SetFloat(id: AnimatorHashes.Turn, value: turnAmount, dampTime: 0.15f, deltaTime);
-                _armsAnimator.SetFloat(id: AnimatorHashes.Turn, value: turnAmount, dampTime: 0.15f, deltaTime);
-            }
-            else
-                forwardAmount *= -1f;
-
-            float sprintAmount = _sprintAbility.IsSprinting() ? forwardAmount : 0.0f;
-            bool isGrounded = _character.IsGrounded();
-            bool isCrouched = _character.IsCrouched();
-
-            _animator.SetFloat(id: AnimatorHashes.Forward, value: forwardAmount, dampTime: 0.15f, deltaTime);
-            _animator.SetFloat(id: AnimatorHashes.Sprint, value: sprintAmount, dampTime: 0.3f, deltaTime);
-
-            _armsAnimator.SetFloat(id: AnimatorHashes.Forward, value: forwardAmount, dampTime: 0.15f, deltaTime);
-            _armsAnimator.SetFloat(id: AnimatorHashes.Sprint, value: sprintAmount, dampTime: 0.3f, deltaTime);
-
-            _animator.SetBool(id: AnimatorHashes.Ground, value: isGrounded);
-            _animator.SetBool(id: AnimatorHashes.Crouch, value: isCrouched);
-
-            _armsAnimator.SetBool(id: AnimatorHashes.Ground, value: isGrounded);
-            _armsAnimator.SetBool(id: AnimatorHashes.Crouch, value: isCrouched);
-
-            if (_character.IsFalling())
-            {
-                float yVelocity = _character.GetVelocity().y;
-
-                _animator.SetFloat(id: AnimatorHashes.Jump, value: yVelocity, dampTime: 0.1f, deltaTime);
-                _armsAnimator.SetFloat(id: AnimatorHashes.Jump, value: yVelocity, dampTime: 0.1f, deltaTime);
-            }
-
-            // Calculate which leg is behind, so as to leave that leg trailing in the jump animation
-            // (This code is reliant on the specific run cycle offset in our animations,
-            // and assumes one leg passes the other at the normalized clip times of 0.0 and 0.5)
-
-            //float runCycle = Mathf.Repeat(animator.GetCurrentAnimatorStateInfo(0).normalizedTime + 0.2f, 1.0f);
-            //float jumpLeg = (runCycle < 0.5f ? 1.0f : -1.0f) * forwardAmount;
-
-            // if (_character.IsGrounded())
-            //     animator.SetFloat(JumpLeg, jumpLeg);
-        }
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Setup(Character character, PlayerMovementController playerMovementController,
-            InputReader inputReader, CameraReferences cameraReferences)
+        public void Setup(Character character, InputReader inputReader, CameraReferences cameraReferences)
         {
             _character = character;
-            _playerMovementController = playerMovementController;
             _inputReader = inputReader;
             _mainCamera = cameraReferences.MainCamera;
             _animator = character.GetAnimator();
@@ -351,46 +275,76 @@ namespace GameCore.Gameplay.Entities.Player
             SwitchState(AnimationState.Locomotion);
         }
 
+        // Using in animation.
+        // ReSharper disable once UnusedMember.Global
+        public void ActivateSliding()
+        {
+        }
+
+        // Using in animation.
+        // ReSharper disable once UnusedMember.Global
+        public void DeactivateSliding()
+        {
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         #region Other
 
         private void UpdateAnimatorController()
         {
-            //_animator.SetFloat(_leanValueHash, _leanValue);
-            _animator.SetFloat(_headLookXHash, _headLookX);
-            _animator.SetFloat(_headLookYHash, _headLookY);
-            //_animator.SetFloat(_bodyLookXHash, _bodyLookX);
-            //_animator.SetFloat(_bodyLookYHash, _bodyLookY);
+            SetFloat(_leanValueHash, _leanValue);
+            SetFloat(_headLookXHash, _headLookX);
+            SetFloat(_headLookYHash, _headLookY);
+            SetFloat(_bodyLookXHash, _bodyLookX);
+            SetFloat(_bodyLookYHash, _bodyLookY);
 
-            _animator.SetFloat(_isStrafingHash, _isStrafing ? 1.0f : 0.0f);
+            SetFloat(_isStrafingHash, _isStrafing ? 1.0f : 0.0f);
 
-            _animator.SetFloat(_inclineAngleHash, _inclineAngle);
+            SetFloat(_inclineAngleHash, _inclineAngle);
 
-            _animator.SetFloat(_moveSpeedHash, _speed2D);
-            _animator.SetInteger(id: _currentGaitHash, value: (int)_currentGait);
+            SetFloat(_moveSpeedHash, _speed2D);
+            SetInteger(id: _currentGaitHash, value: (int)_currentGait);
 
-            _animator.SetFloat(_strafeDirectionXHash, _strafeDirectionX);
-            _animator.SetFloat(_strafeDirectionZHash, _strafeDirectionZ);
-            _animator.SetFloat(_forwardStrafeHash, _forwardStrafe);
-            //_animator.SetFloat(_cameraRotationOffsetHash, _cameraRotationOffset);
+            SetFloat(_strafeDirectionXHash, _strafeDirectionX);
+            SetFloat(_strafeDirectionZHash, _strafeDirectionZ);
+            SetFloat(_forwardStrafeHash, _forwardStrafe);
+            SetFloat(_cameraRotationOffsetHash, _cameraRotationOffset);
 
-            _animator.SetBool(_movementInputHeldHash, _movementInputHeld);
-            _animator.SetBool(_movementInputPressedHash, _movementInputPressed);
-            _animator.SetBool(_movementInputTappedHash, _movementInputTapped);
-            _animator.SetFloat(_shuffleDirectionXHash, _shuffleDirectionX);
-            _animator.SetFloat(_shuffleDirectionZHash, _shuffleDirectionZ);
+            SetBool(_movementInputHeldHash, _movementInputHeld);
+            SetBool(_movementInputPressedHash, _movementInputPressed);
+            SetBool(_movementInputTappedHash, _movementInputTapped);
+            SetFloat(_shuffleDirectionXHash, _shuffleDirectionX);
+            SetFloat(_shuffleDirectionZHash, _shuffleDirectionZ);
 
-            _animator.SetBool(_isTurningInPlaceHash, _isTurningInPlace);
-            _animator.SetBool(_isCrouchingHash, IsCrouching);
+            SetBool(_isTurningInPlaceHash, _isTurningInPlace);
+            SetBool(_isCrouchingHash, IsCrouching);
 
-            _animator.SetFloat(_fallingDurationHash, _fallingDuration);
-            _animator.SetBool(_isGroundedHash, IsGrounded);
+            SetFloat(_fallingDurationHash, _fallingDuration);
+            SetBool(_isGroundedHash, IsGrounded);
 
-            _animator.SetBool(_isWalkingHash, IsWalking);
-            _animator.SetBool(_isStoppedHash, _isStopped);
+            SetBool(_isWalkingHash, IsWalking);
+            SetBool(_isStoppedHash, _isStopped);
 
-            _animator.SetFloat(_locomotionStartDirectionHash, _locomotionStartDirection);
+            SetFloat(_locomotionStartDirectionHash, _locomotionStartDirection);
+        }
+
+        private void SetFloat(int id, float value)
+        {
+            _animator.SetFloat(id, value);
+            _armsAnimator.SetFloat(id, value);
+        }
+
+        private void SetInteger(int id, int value)
+        {
+            _animator.SetInteger(id, value);
+            _armsAnimator.SetInteger(id, value);
+        }
+
+        private void SetBool(int id, bool value)
+        {
+            _animator.SetBool(id, value);
+            _armsAnimator.SetBool(id, value);
         }
 
         /// <summary>
@@ -444,7 +398,7 @@ namespace GameCore.Gameplay.Entities.Player
             switch (_currentState)
             {
                 case AnimationState.Base:
-                    //EnterBaseState();
+                    EnterBaseState();
                     break;
 
                 case AnimationState.Locomotion:
@@ -483,6 +437,9 @@ namespace GameCore.Gameplay.Entities.Player
             }
         }
 
+        private void EnterBaseState() =>
+            _previousRotation = transform.forward;
+
         #endregion
 
         #region Movement
@@ -508,8 +465,8 @@ namespace GameCore.Gameplay.Entities.Player
                 t: AnimationDampTime * Time.deltaTime
             );
 
-            _targetVelocity.x = _moveDirection.x * _currentMaxSpeed;
-            _targetVelocity.z = _moveDirection.z * _currentMaxSpeed;
+            // _targetVelocity.x = _moveDirection.x * _currentMaxSpeed;
+            // _targetVelocity.z = _moveDirection.z * _currentMaxSpeed;
 
             _speed2D = new Vector3(Velocity.x, y: 0f, Velocity.z).magnitude;
             _speed2D = Mathf.Round(f: _speed2D * 1000f) / 1000f;
@@ -597,10 +554,10 @@ namespace GameCore.Gameplay.Entities.Player
                         _animator.SetFloat(_locomotionStartDirectionHash, _locomotionStartDirection);
                     }
 
-                    float delayTime = 0.2f;
-                    //_leanDelay = delayTime;
-                    //_headLookDelay = delayTime;
-                    //_bodyLookDelay = delayTime;
+                    const float delayTime = 0.2f;
+                    _leanDelay = delayTime;
+                    _headLookDelay = delayTime;
+                    _bodyLookDelay = delayTime;
 
                     _locomotionStartTimer = delayTime;
                 }
@@ -785,13 +742,13 @@ namespace GameCore.Gameplay.Entities.Player
             _bodyLookDelay = VariableOverrideDelayTimer(_bodyLookDelay);
             _enableBodyTurn = _bodyLookDelay == 0.0f && !(_isStarting || _isTurningInPlace);
         }
-        
+
         private void CheckEnableLean()
         {
             _leanDelay = VariableOverrideDelayTimer(_leanDelay);
             _enableLean = _leanDelay == 0.0f && !(_isStarting || _isTurningInPlace);
         }
-        
+
         private void CalculateRotationalAdditives(bool leansActivated, bool headLookActivated, bool bodyLookActivated)
         {
             if (headLookActivated || leansActivated || bodyLookActivated)
@@ -921,7 +878,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             if (IsCrouching)
                 SwitchState(AnimationState.Crouch);
-            
+
             CheckEnableTurns();
             CheckEnableLean();
             CalculateRotationalAdditives(_enableLean, _enableHeadTurn, _enableBodyTurn);
@@ -1004,7 +961,7 @@ namespace GameCore.Gameplay.Entities.Player
         #region Crouch State
 
         private void EnterCrouchState() =>
-            _character.UnCrouched += CrouchToJumpState;
+            _character.Jumped += CrouchToJumpState;
 
         private void UpdateCrouchState()
         {
@@ -1015,7 +972,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             if (!IsCrouching)
                 SwitchState(AnimationState.Locomotion);
-            
+
             CheckEnableTurns();
             CheckEnableLean();
             CalculateRotationalAdditives(false, _enableHeadTurn, false);
@@ -1029,7 +986,7 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         private void ExitCrouchState() =>
-            _character.UnCrouched -= CrouchToJumpState;
+            _character.Jumped -= CrouchToJumpState;
 
         private void CrouchToJumpState() => SwitchState(AnimationState.Jump);
 

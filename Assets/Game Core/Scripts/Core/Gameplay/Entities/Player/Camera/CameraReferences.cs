@@ -23,9 +23,6 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         private Transform _rightHandItemsHolder;
         
         [SerializeField, Required]
-        private Transform _lookAtObject;
-
-        [SerializeField, Required]
         private Animator _playerArmsAnimator;
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -34,7 +31,6 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         public CinemachineBrain CinemachineBrain => _cinemachineBrain;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
-        public Transform LookAtObject => _lookAtObject;
         public Animator PlayerArmsAnimator => _playerArmsAnimator;
     }
 }

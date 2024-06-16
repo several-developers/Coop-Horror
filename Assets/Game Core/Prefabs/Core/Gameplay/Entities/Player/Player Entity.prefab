@@ -1793,11 +1793,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8002823085884072930, guid: 488b74f8770b1e643b27b3be5c19a5a5,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: a96dde629b81ef64aa43668070fe0b65, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 488b74f8770b1e643b27b3be5c19a5a5, type: 3}
 --- !u!114 &137842141037906286 stripped
@@ -2065,7 +2060,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4251873558
+  GlobalObjectIdHash: 2175522384
   InScenePlacedSourceGlobalObjectIdHash: 4251873558
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

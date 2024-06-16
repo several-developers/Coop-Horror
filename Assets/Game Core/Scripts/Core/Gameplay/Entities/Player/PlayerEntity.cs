@@ -78,7 +78,6 @@ namespace GameCore.Gameplay.Entities.Player
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
         private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: Constants.OwnerPermission);
-        private readonly NetworkVariable<Vector3> _lookAtPosition = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<bool> _isDead = new(writePerm: Constants.OwnerPermission);
 
@@ -95,8 +94,6 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
         private HealthSystem _healthSystem;
-
-        private Transform _cameraLookAtObject;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -183,16 +180,13 @@ namespace GameCore.Gameplay.Entities.Player
             Other();
             InitSystems();
             InitPlayerMovement();
-            //DeactivatePlayerMesh();
+            DeactivatePlayerMesh();
             SetupStates();
             EnterAliveState();
 
             InputReader.OnScrollEvent += OnScrollInventory;
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
-
-            _references.Character.Crouched += OnCrouched;
-            _references.Character.UnCrouched += OnUnCrouched;
 
             _entityLocation.OnValueChanged += OnOwnerPlayerLocationChanged;
 
@@ -205,7 +199,6 @@ namespace GameCore.Gameplay.Entities.Player
             void Other()
             {
                 _localPlayer = this;
-                _cameraLookAtObject = cameraReferences.LookAtObject;
             }
 
             void InitSystems()
@@ -232,7 +225,7 @@ namespace GameCore.Gameplay.Entities.Player
                 playerMovementController.Setup(playerEntity: this);
 
                 MyAnimationController animationController = _references.AnimationController;
-                animationController.Setup(character, playerMovementController, InputReader, cameraReferences);
+                animationController.Setup(character, InputReader, cameraReferences);
             }
 
             void DeactivatePlayerMesh()
@@ -276,14 +269,8 @@ namespace GameCore.Gameplay.Entities.Player
             }
         }
 
-        protected override void TickOwner()
-        {
-            _lookAtPosition.Value = _cameraLookAtObject.position;
+        protected override void TickOwner() =>
             _interactionChecker.Check();
-        }
-
-        protected override void TickNotOwner() =>
-            _references.HeadLookAtObject.position = _lookAtPosition.Value;
 
         protected override void DespawnAll()
         {
@@ -306,9 +293,6 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
             
-            _references.Character.Crouched -= OnCrouched;
-            _references.Character.UnCrouched -= OnUnCrouched;
-
             _entityLocation.OnValueChanged -= OnOwnerPlayerLocationChanged;
 
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
@@ -453,22 +437,6 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         private void OnDropItem() => DropItem();
-
-        private void OnCrouched()
-        {
-            Transform headLookTransform = _references.HeadLookAtObject.transform;
-            Vector3 position = headLookTransform.localPosition;
-            position.y = 4.467f * 0.5f;
-            headLookTransform.localPosition = position;
-        }
-
-        private void OnUnCrouched()
-        {
-            Transform headLookTransform = _references.HeadLookAtObject.transform;
-            Vector3 position = headLookTransform.localPosition;
-            position.y = 4.467f;
-            headLookTransform.localPosition = position;
-        }
 
         private void OnOwnerSelectedSlotChanged(ChangedSlotStaticData data)
         {

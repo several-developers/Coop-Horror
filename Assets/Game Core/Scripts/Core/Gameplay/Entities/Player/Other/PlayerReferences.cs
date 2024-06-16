@@ -1,11 +1,9 @@
 ﻿using System;
 using ECM2;
-using GameCore.Configs.Gameplay.Player;
 using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.EntitiesSystems.Ragdoll;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player
@@ -29,9 +27,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         [SerializeField, Required]
         private CapsuleCollider _collider;
-
-        [SerializeField, Required]
-        private Transform _headLookAtObject;
 
         [SerializeField, Required]
         private Transform _spectatorCameraTarget;
@@ -73,7 +68,6 @@ namespace GameCore.Gameplay.Entities.Player
         public Animator Animator => _animator;
         public Rigidbody Rigidbody => _rigidbody;
         public CapsuleCollider Collider => _collider;
-        public Transform HeadLookAtObject => _headLookAtObject;
         public Transform SpectatorCameraTarget => _spectatorCameraTarget;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;

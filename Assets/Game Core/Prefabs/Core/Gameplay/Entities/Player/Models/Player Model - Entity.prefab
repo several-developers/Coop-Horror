@@ -71,6 +71,11 @@ PrefabInstance:
       propertyPath: m_UpdateWhenOffscreen
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5952414648362140603, guid: c20d85aa9eadab443814b2e67f627674,
+        type: 3}
+      propertyPath: m_Weight
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6268746994261546514, guid: c20d85aa9eadab443814b2e67f627674,
         type: 3}
       propertyPath: m_RootOrder
@@ -171,6 +176,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 640379f3f26346a6a561ca1d2f9dc3d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _alwaysStrafe: 1
+  _rotationSmoothing: 10
+  _buttonHoldThreshold: 0.15
+  _forwardStrafeMinThreshold: -55
+  _forwardStrafeMaxThreshold: 125
+  _rearRayPos: {fileID: 0}
+  _frontRayPos: {fileID: 0}
+  _groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  _enableLean: 1
+  _leanDelay: 0
+  _leanValue: 0
+  _leanCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _leansHeadLooksDelay: 0
+  _animationClipEnd: 0
+  _enableHeadTurn: 1
+  _headLookDelay: 0
+  _headLookX: 0
+  _headLookY: 0
+  _headLookXCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _enableBodyTurn: 1
+  _bodyLookDelay: 0
+  _bodyLookX: 0
+  _bodyLookY: 0
+  _bodyLookXCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &2321195118744166981
 MonoBehaviour:
   m_ObjectHideFlags: 0
