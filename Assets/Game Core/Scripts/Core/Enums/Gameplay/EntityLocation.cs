@@ -5,6 +5,7 @@
         Road = 0,
         LocationSurface = 1,
         Stairs = 2,
-        Dungeon = 3
+        Dungeon = 3,
+        Elevator = 4
     }
 }

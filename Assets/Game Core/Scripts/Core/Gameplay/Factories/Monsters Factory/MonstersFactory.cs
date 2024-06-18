@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Monsters.Beetle;
+using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Unity.Netcode;

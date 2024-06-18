@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using GameCore.Configs.Gameplay.Enemies;
+﻿using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.EntitiesSystems.MovementLogics;
 using GameCore.Gameplay.Level;
-using UnityEngine;
 using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
@@ -16,39 +15,42 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         {
             _beetleEntity = beetleEntity;
             _beetleAIConfig = beetleAIConfig;
-            _transform = beetleEntity.transform;
             _agent = beetleEntity.GetAgent();
-            
-            _levelProvider = levelProvider;
+            _movementLogic = new MoveFromStairsToDungeonLogic(beetleEntity, _agent, levelProvider);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly BeetleEntity _beetleEntity;
         private readonly BeetleAIConfigMeta _beetleAIConfig;
-        private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
-
-        private readonly ILevelProvider _levelProvider;
-
-        private FireExit _fireExit;
-        private Coroutine _distanceCheckCO;
-        private Vector3 _destinationPoint;
+        private readonly MoveFromStairsToDungeonLogic _movementLogic;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
+            _movementLogic.OnFireExitNotFoundEvent += OnFireExitNotFound;
+            _movementLogic.OnInteractWithFireExitEvent += OnInteractWithFireExit;
+            _movementLogic.GetDungeonFloorEvent += GetDungeonFloor;
+            _movementLogic.GetFireExitDistanceCheckIntervalEvent += GetFireExitDistanceCheckInterval;
+            _movementLogic.GetFireExitInteractionDistanceEvent += GetFireExitInteractionDistance;
+            
             EnableAgent();
-            StartDistanceCheck();
-            SetDestinationPoint();
+            _movementLogic.Start();
             
             _beetleEntity.OnEntityTeleportedEvent += OnEntityTeleported;
         }
 
         public void Exit()
         {
-            StopDistanceCheck();
+            _movementLogic.OnFireExitNotFoundEvent -= OnFireExitNotFound;
+            _movementLogic.OnInteractWithFireExitEvent -= OnInteractWithFireExit;
+            _movementLogic.GetDungeonFloorEvent -= GetDungeonFloor;
+            _movementLogic.GetFireExitDistanceCheckIntervalEvent -= GetFireExitDistanceCheckInterval;
+            _movementLogic.GetFireExitInteractionDistanceEvent -= GetFireExitInteractionDistance;
+            
+            _movementLogic.Stop();
             
             _beetleEntity.OnEntityTeleportedEvent -= OnEntityTeleported;
         }
@@ -61,66 +63,27 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             _agent.speed = _beetleAIConfig.MoveToDungeonSpeed;
         }
 
-        private void SetDestinationPoint()
-        {
-            Floor dungeonFloor = _beetleEntity.GetDungeonFloor();
-            bool isFireExitFound = _levelProvider.TryGetStairsFireExit(dungeonFloor, out _fireExit);
-
-            if (!isFireExitFound)
-            {
-                EnterIdleState();
-                return;
-            }
-
-            Transform teleportPoint = _fireExit.GetTeleportPoint();
-            _destinationPoint = teleportPoint.position;
-            _agent.destination = _destinationPoint;
-        }
-        
-        private void CheckDistanceToFireExit()
-        {
-            Vector3 beetlePosition = _transform.position;
-            float distance = Vector3.Distance(a: beetlePosition, b: _destinationPoint);
-            bool canInteract = distance <= _beetleAIConfig.FireExitInteractionDistance;
-
-            if (!canInteract)
-                return;
-            
-            _fireExit.Interact(_beetleEntity);
-        }
-
-        private void StartDistanceCheck()
-        {
-            IEnumerator routine = DistanceCheckCO();
-            _distanceCheckCO = _beetleEntity.StartCoroutine(routine);
-        }
-
-        private void StopDistanceCheck()
-        {
-            if (_distanceCheckCO == null)
-                return;
-            
-            _beetleEntity.StopCoroutine(_distanceCheckCO);
-        }
-
-        private IEnumerator DistanceCheckCO()
-        {
-            while (true)
-            {
-                float checkInterval = _beetleAIConfig.FireExitDistanceCheckInterval;
-                yield return new WaitForSeconds(checkInterval);
-                
-                CheckDistanceToFireExit();
-            }
-        }
-
         private void DecideStateByLocation() =>
             _beetleEntity.DecideStateByLocation();
 
         private void EnterIdleState() =>
             _beetleEntity.EnterIdleState();
-        
+
+        private Floor GetDungeonFloor() =>
+            _beetleEntity.GetDungeonFloor();
+
+        private float GetFireExitDistanceCheckInterval() =>
+            _beetleAIConfig.FireExitDistanceCheckInterval;
+
+        private float GetFireExitInteractionDistance() =>
+            _beetleAIConfig.FireExitInteractionDistance;
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnFireExitNotFound() => EnterIdleState();
+
+        private void OnInteractWithFireExit(FireExit fireExit) =>
+            fireExit.Interact(_beetleEntity);
 
         private void OnEntityTeleported()
         {

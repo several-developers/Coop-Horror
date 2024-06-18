@@ -1,10 +1,11 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Gameplay.EntitiesSystems.MovementLogics;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 {
-    public class WanderingState : IEnterState, ITickableState
+    public class WanderingState : IEnterState, ITickableState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -12,18 +13,16 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         {
             _beetleEntity = beetleEntity;
             _beetleAIConfig = beetleAIConfig;
-            _transform = beetleEntity.transform;
             _agent = beetleEntity.GetAgent();
+            _wanderingMovementLogic = new WanderingMovementLogic(beetleEntity.transform, _agent);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const float MinDistance = 0.5f;
-        
         private readonly BeetleEntity _beetleEntity;
         private readonly BeetleAIConfigMeta _beetleAIConfig;
-        private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
+        private readonly WanderingMovementLogic _wanderingMovementLogic;
 
         private Vector3 _targetPoint;
 
@@ -31,35 +30,29 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         public void Enter()
         {
+            _wanderingMovementLogic.OnStuckEvent += OnStuck;
+            _wanderingMovementLogic.OnArrivedEvent += OnArrived;
+            _wanderingMovementLogic.OnGetWanderingMinDistanceInnerEvent += GetWanderingMinDistance;
+            _wanderingMovementLogic.OnGetWanderingMaxDistanceInnerEvent += GetWanderingMaxDistance;
+            
             EnableAgent();
 
-            if (IsOnNavMesh())
-                SetDestinationPoint();
-            else
+            if (!_wanderingMovementLogic.TrySetDestinationPoint())
                 EnterIdleState();
         }
 
-        public void Tick()
-        {
-            if (IsStuck())
-            {
-                EnterIdleState();
-                return;
-            }
+        public void Tick() =>
+            _wanderingMovementLogic.Tick();
 
-            if (!IsArrivedToTargetPoint())
-                return;
-            
-            EnterIdleState();
+        public void Exit()
+        {
+            _wanderingMovementLogic.OnStuckEvent -= OnStuck;
+            _wanderingMovementLogic.OnArrivedEvent -= OnArrived;
+            _wanderingMovementLogic.OnGetWanderingMinDistanceInnerEvent -= GetWanderingMinDistance;
+            _wanderingMovementLogic.OnGetWanderingMaxDistanceInnerEvent -= GetWanderingMaxDistance;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void SetDestinationPoint()
-        {
-            _targetPoint = GetRandomPosition();
-            _agent.destination = _targetPoint;
-        }
 
         private void EnableAgent()
         {
@@ -67,22 +60,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             _agent.speed = GetWanderingSpeed();
         }
 
-        private Vector3 GetRandomPosition()
-        {
-            float minDistance = _beetleAIConfig.WanderingMinDistance;
-            float maxDistance = _beetleAIConfig.WanderingMaxDistance;
-            float distance = Random.Range(minDistance, maxDistance);
-            
-            Vector2 circle = Random.insideUnitCircle;
-            circle *= distance;
-
-            Vector3 circlePosition = new(x: circle.x, y: 0f, z: circle.y);
-            Vector3 beetlePosition = _transform.position;
-            Vector3 newBeetlePosition = circlePosition + beetlePosition;
-
-            return newBeetlePosition;
-        }
-
+        private void EnterIdleState() =>
+            _beetleEntity.EnterIdleState();
+        
         private float GetWanderingSpeed()
         {
             float minSpeed = _beetleAIConfig.WanderingMinSpeed;
@@ -91,28 +71,16 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             return speed;
         }
 
-        private bool IsArrivedToTargetPoint()
-        {
-            Vector3 position = _transform.position;
-            float distance = Vector3.Distance(a: position, b: _targetPoint);
-            bool isArrived = distance < MinDistance;
-            
-            return isArrived;
-        }
+        private float GetWanderingMinDistance() =>
+            _beetleAIConfig.WanderingMinDistance;
+        
+        private float GetWanderingMaxDistance() =>
+            _beetleAIConfig.WanderingMaxDistance;
 
-        private bool IsStuck()
-        {
-            NavMeshPathStatus pathStatus = _agent.pathStatus;
-            bool isStatusValid = pathStatus == NavMeshPathStatus.PathComplete && _agent.hasPath;
-            float velocity = _agent.velocity.magnitude;
-            bool isStuck = !isStatusValid && velocity < 0.1f;
-            return isStuck;
-        }
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private bool IsOnNavMesh() =>
-            _agent.isOnNavMesh;
+        private void OnStuck() => EnterIdleState();
 
-        private void EnterIdleState() =>
-            _beetleEntity.EnterIdleState();
+        private void OnArrived() => EnterIdleState();
     }
 }

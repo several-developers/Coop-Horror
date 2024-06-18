@@ -238,10 +238,7 @@ namespace GameCore.Gameplay.Items.Rigging
             float duration = rigPresetMeta.AnimatorLayerWeightChangeTime;
 
             FloatAnimation(from, to: targetWeight, duration,
-                onVirtualUpdate: weight =>
-                {
-                    //_playersArmsAnimator.SetLayerWeight(layerIndex, weight);
-                });
+                onVirtualUpdate: weight => _playersArmsAnimator.SetLayerWeight(layerIndex, weight));
         }
 
         private void FloatAnimation(float from, float to, float duration, TweenCallback<float> onVirtualUpdate) =>

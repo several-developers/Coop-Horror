@@ -1,5 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Monsters.Beetle;
+using GameCore.Gameplay.Entities.Monsters;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Factories.Monsters

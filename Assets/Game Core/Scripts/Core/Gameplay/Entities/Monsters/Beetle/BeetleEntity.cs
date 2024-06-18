@@ -143,9 +143,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             {
                 string stateName = state.GetType().Name.GetNiceName();
                 _stateTMP.text = $"State: {stateName}";
-
-                // string log = Log.HandleLog($"New state = <gb>{stateName}</gb>");
-                // Debug.Log(log);
             };
 
             // LOCAL METHODS: -----------------------------

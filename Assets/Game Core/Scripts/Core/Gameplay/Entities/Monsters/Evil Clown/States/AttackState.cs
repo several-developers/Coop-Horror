@@ -1,90 +1,76 @@
-﻿using System.Collections;
-using GameCore.Configs.Gameplay.Enemies;
+﻿using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using UnityEngine;
+using GameCore.Gameplay.EntitiesSystems.CombatLogics;
 
 namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 {
-    public class AttackState : IEnterState
+    public class AttackState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public AttackState(EvilClownEntity evilClownEntity, EvilClownAIConfigMeta evilClownAIConfig)
+        public AttackState(EvilClownEntity evilClownEntity)
         {
             _evilClownEntity = evilClownEntity;
-            _evilClownAIConfig = evilClownAIConfig;
+            _evilClownAIConfig = evilClownEntity.GetEvilClownAIConfig();
+            _attackLogic = new AttackLogic(evilClownEntity);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly EvilClownEntity _evilClownEntity;
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
-        
-        private bool _canAttack = true;
-        
+        private readonly AttackLogic _attackLogic;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
-            if (_canAttack)
-                TryAttack();
-            else
+            _attackLogic.OnTargetNotFoundEvent += OnTargetNotFound;
+            _attackLogic.OnAttackEvent += OnAttack;
+            _attackLogic.OnAttackEndedEvent += OnAttackEnded;
+            _attackLogic.GetTargetPlayerEvent += GetTargetPlayer;
+            _attackLogic.GetAttackDistanceEvent += GetAttackDistance;
+            _attackLogic.GetAttackCooldownEvent += GetAttackCooldown;
+            
+            if (!_attackLogic.TryAttack())
                 EnterChaseState();
+        }
+
+        public void Exit()
+        {
+            _attackLogic.OnTargetNotFoundEvent -= OnTargetNotFound;
+            _attackLogic.OnAttackEvent -= OnAttack;
+            _attackLogic.OnAttackEndedEvent -= OnAttackEnded;
+            _attackLogic.GetTargetPlayerEvent -= GetTargetPlayer;
+            _attackLogic.GetAttackDistanceEvent -= GetAttackDistance;
+            _attackLogic.GetAttackCooldownEvent -= GetAttackCooldown;
         }
         
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void TryAttack()
-        {
-            PlayerEntity targetPlayer = _evilClownEntity.GetTargetPlayer();
+        private PlayerEntity GetTargetPlayer() =>
+            _evilClownEntity.GetTargetPlayer();
 
-            if (targetPlayer == null)
-            {
-                DecideStateByLocation();
-                return;
-            }
-
-            Vector3 beetlePosition = _evilClownEntity.transform.position;
-            Vector3 playerPosition = targetPlayer.transform.position;
-            float distance = Vector3.Distance(a: beetlePosition, b: playerPosition);
-            bool canAttack = distance <= _evilClownAIConfig.AttackDistance;
-
-            if (canAttack)
-            {
-                KillTargetPlayer();
-                StartCooldownTimer();
-            }
-
-            EnterChaseState();
-        }
-
-        private void KillTargetPlayer()
-        {
-            PlayerEntity targetPlayer = _evilClownEntity.GetTargetPlayer();
-            targetPlayer.Kill(PlayerDeathReason._);
-        }
+        private float GetAttackDistance() =>
+            _evilClownAIConfig.AttackDistance;
         
-        private void StartCooldownTimer()
-        {
-            IEnumerator routine = CooldownTimerCO();
-            _evilClownEntity.StartCoroutine(routine);
-        }
+        private float GetAttackCooldown() =>
+            _evilClownAIConfig.AttackCooldown;
 
-        private IEnumerator CooldownTimerCO()
-        {
-            _canAttack = false;
-            
-            float delay = _evilClownAIConfig.AttackCooldown;
-            yield return new WaitForSeconds(delay);
-
-            _canAttack = true;
-        }
-        
         private void DecideStateByLocation() =>
             _evilClownEntity.DecideStateByLocation();
 
         private void EnterChaseState() =>
             _evilClownEntity.EnterChaseState();
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnTargetNotFound() => DecideStateByLocation();
+
+        private static void OnAttack(PlayerEntity targetPlayer) =>
+            targetPlayer.Kill(PlayerDeathReason._);
+
+        private void OnAttackEnded() => EnterChaseState();
     }
 }

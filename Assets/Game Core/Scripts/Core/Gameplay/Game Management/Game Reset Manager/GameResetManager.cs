@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
-using GameCore.Gameplay.Entities.Monsters.Beetle;
+using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;

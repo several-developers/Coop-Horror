@@ -1,6 +1,6 @@
 ﻿namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 {
-    public class RunAwayAtSurfaceState : IState
+    public class RunAwayInSurfaceState : IState
     {
         
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Monsters.Beetle;
+using GameCore.Gameplay.Entities.Monsters;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.EntitiesSystems.CombatLogics;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -16,6 +17,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             _beetleAIConfig = beetleAIConfig;
             _transform = beetleEntity.transform;
             _agent = beetleEntity.GetAgent();
+            _chaseLogic = new ChaseLogic(beetleEntity, _agent);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -24,6 +26,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         private readonly BeetleAIConfigMeta _beetleAIConfig;
         private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
+        private readonly ChaseLogic _chaseLogic;
 
         private Coroutine _chaseCO;
         private Coroutine _distanceCheckCO;
@@ -35,18 +38,36 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         public void Enter()
         {
+            _chaseLogic.OnTargetNotFoundEvent += OnTargetNotFound;
+            _chaseLogic.OnTargetReachedEvent += OnTargetReached;
+            _chaseLogic.OnChaseEndedEvent += OnChaseEnded;
+            _chaseLogic.GetTargetPlayerEvent += GetTargetPlayer;
+            _chaseLogic.GetChasePositionCheckIntervalEvent += GetChasePositionCheckInterval;
+            _chaseLogic.GetChaseDistanceCheckIntervalEvent += GetChaseDistanceCheckInterval;
+            _chaseLogic.GetChaseEndDelayEvent += GetChaseEndDelay;
+            _chaseLogic.GetMaxChaseDistanceEvent += GetMaxChaseDistance;
+            _chaseLogic.GetTargetReachDistanceEvent += GetTargetReachDistance;
+            
             ToggleTriggerCheckState(isEnabled: false);
             EnableAgent();
-            StartChasing();
-            StartDistanceCheck();
+            _chaseLogic.Start();
         }
 
         public void Exit()
         {
+            _chaseLogic.OnTargetNotFoundEvent -= OnTargetNotFound;
+            _chaseLogic.OnTargetReachedEvent -= OnTargetReached;
+            _chaseLogic.OnChaseEndedEvent -= OnChaseEnded;
+            _chaseLogic.GetTargetPlayerEvent -= GetTargetPlayer;
+            _chaseLogic.GetChasePositionCheckIntervalEvent -= GetChasePositionCheckInterval;
+            _chaseLogic.GetChaseDistanceCheckIntervalEvent -= GetChaseDistanceCheckInterval;
+            _chaseLogic.GetChaseEndDelayEvent -= GetChaseEndDelay;
+            _chaseLogic.GetMaxChaseDistanceEvent -= GetMaxChaseDistance;
+            _chaseLogic.GetTargetReachDistanceEvent -= GetTargetReachDistance;
+            
             ToggleTriggerCheckState(isEnabled: true);
             ResetAgent();
-            StopChasing();
-            StopDistanceCheck();
+            _chaseLogic.Stop();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -73,134 +94,36 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             agent.stoppingDistance = _cachedStoppingDistance;
         }
 
-        private void SetDestination()
-        {
-            PlayerEntity targetPlayer = _beetleEntity.GetTargetPlayer();
-            bool isTargetExists = targetPlayer != null;
-
-            if (!isTargetExists)
-            {
-                EnterTriggerState();
-                return;
-            }
-
-            Vector3 targetPosition = targetPlayer.transform.position;
-            _agent.destination = targetPosition;
-        }
-
-        private void CheckDistance()
-        {
-            PlayerEntity targetPlayer = _beetleEntity.GetTargetPlayer();
-            bool isTargetExists = targetPlayer != null;
-
-            if (!isTargetExists)
-            {
-                EnterTriggerState();
-                return;
-            }
-
-            Vector3 targetPosition = targetPlayer.transform.position;
-            Vector3 beetlePosition = _transform.position;
-            float distance = Vector3.Distance(a: beetlePosition, b: targetPosition);
-            bool isTooFar = distance > _beetleAIConfig.MaxChaseDistance;
-            bool canAttack = distance <= _beetleAIConfig.AttackDistance;
-
-            if (canAttack)
-            {
-                EnterAttackState();
-                return;
-            }
-            
-            if (isTooFar)
-                StartChasingEndTimer();
-            else
-                StopChasingEndTimer();
-        }
-        
-        private void StartChasing()
-        {
-            IEnumerator routine = ChaseCO();
-            _chaseCO = _beetleEntity.StartCoroutine(routine);
-        }
-
-        private void StopChasing()
-        {
-            if (_chaseCO == null)
-                return;
-            
-            _beetleEntity.StopCoroutine(_chaseCO);
-        }
-
-        private void StartDistanceCheck()
-        {
-            IEnumerator routine = DistanceCheckCO();
-            _distanceCheckCO = _beetleEntity.StartCoroutine(routine);
-        }
-
-        private void StopDistanceCheck()
-        {
-            if (_distanceCheckCO == null)
-                return;
-            
-            _beetleEntity.StopCoroutine(_distanceCheckCO);
-        }
-
-        private void StartChasingEndTimer()
-        {
-            if (_isStopChasingTimerEnabled)
-                return;
-
-            IEnumerator routine = ChasingEndTimerCO();
-            _chasingEndTimerCO = _beetleEntity.StartCoroutine(routine);
-            _isStopChasingTimerEnabled = true;
-        }
-
-        private void StopChasingEndTimer()
-        {
-            if (!_isStopChasingTimerEnabled)
-                return;
-
-            if (_chasingEndTimerCO == null)
-                return;
-
-            _beetleEntity.StopCoroutine(_chasingEndTimerCO);
-            _isStopChasingTimerEnabled = false;
-        }
-        
-        private IEnumerator ChaseCO()
-        {
-            while (true)
-            {
-                float checkInterval = _beetleAIConfig.ChasePositionCheckInterval;
-                yield return new WaitForSeconds(checkInterval);
-                
-                SetDestination();
-            }
-        }
-
-        private IEnumerator DistanceCheckCO()
-        {
-            while (true)
-            {
-                float checkInterval = _beetleAIConfig.ChaseDistanceCheckInterval;
-                yield return new WaitForSeconds(checkInterval);
-                
-                CheckDistance();
-            }
-        }
-        
-        private IEnumerator ChasingEndTimerCO()
-        {
-            float delay = _beetleAIConfig.ChaseEndDelay;
-            yield return new WaitForSeconds(delay);
-                
-            EnterTriggerState();
-        }
-        
         private void EnterTriggerState() =>
             _beetleEntity.EnterTriggerState();
 
         private void EnterAttackState() =>
             _beetleEntity.EnterAttackState();
+
+        private PlayerEntity GetTargetPlayer() =>
+            _beetleEntity.GetTargetPlayer();
+
+        private float GetChasePositionCheckInterval() =>
+            _beetleAIConfig.ChasePositionCheckInterval;
+
+        private float GetChaseDistanceCheckInterval() =>
+            _beetleAIConfig.ChaseDistanceCheckInterval;
+
+        private float GetChaseEndDelay() =>
+            _beetleAIConfig.ChaseEndDelay;
+
+        private float GetMaxChaseDistance() =>
+            _beetleAIConfig.MaxChaseDistance;
+
+        private float GetTargetReachDistance() =>
+            _beetleAIConfig.AttackDistance;
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnTargetNotFound() => EnterTriggerState();
+
+        private void OnTargetReached(PlayerEntity targetPlayer) => EnterAttackState();
+
+        private void OnChaseEnded() => EnterTriggerState();
     }
 }

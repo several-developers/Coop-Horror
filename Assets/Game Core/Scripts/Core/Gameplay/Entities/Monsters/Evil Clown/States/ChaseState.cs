@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using GameCore.Configs.Gameplay.Enemies;
+﻿using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.EntitiesSystems.CombatLogics;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,190 +10,108 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ChaseState(EvilClownEntity evilClownEntity, EvilClownAIConfigMeta evilClownAIConfig)
+        public ChaseState(EvilClownEntity evilClownEntity)
         {
             _evilClownEntity = evilClownEntity;
-            _evilClownAIConfig = evilClownAIConfig;
-            _transform = evilClownEntity.transform;
+            _evilClownAIConfig = evilClownEntity.GetEvilClownAIConfig();
             _agent = evilClownEntity.GetAgent();
+            _wanderingTimer = evilClownEntity.GetWanderingTimer();
+            _chaseLogic = new ChaseLogic(_evilClownEntity, _agent);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly EvilClownEntity _evilClownEntity;
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
-        private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
+        private readonly WanderingTimer _wanderingTimer;
+        private readonly ChaseLogic _chaseLogic;
 
         private Coroutine _chaseCO;
         private Coroutine _distanceCheckCO;
         private Coroutine _chasingEndTimerCO;
-        private float _cachedStoppingDistance;
+        private float _cachedAgentStoppingDistance;
         private bool _isStopChasingTimerEnabled;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
+            _chaseLogic.OnTargetNotFoundEvent += OnTargetNotFound;
+            _chaseLogic.OnTargetReachedEvent += OnTargetReached;
+            _chaseLogic.OnChaseEndedEvent += OnChaseEnded;
+            _chaseLogic.GetTargetPlayerEvent += GetTargetPlayer;
+            _chaseLogic.GetChasePositionCheckIntervalEvent += GetChasePositionCheckInterval;
+            _chaseLogic.GetChaseDistanceCheckIntervalEvent += GetChaseDistanceCheckInterval;
+            _chaseLogic.GetChaseEndDelayEvent += GetChaseEndDelay;
+            _chaseLogic.GetMaxChaseDistanceEvent += GetMaxChaseDistance;
+            _chaseLogic.GetTargetReachDistanceEvent += GetTargetReachDistance;
+            
             EnableAgent();
-            StartChasing();
-            StartDistanceCheck();
+            _wanderingTimer.StopTimer();
+            _chaseLogic.Start();
         }
 
         public void Exit()
         {
+            _chaseLogic.OnTargetNotFoundEvent -= OnTargetNotFound;
+            _chaseLogic.OnTargetReachedEvent -= OnTargetReached;
+            _chaseLogic.OnChaseEndedEvent -= OnChaseEnded;
+            _chaseLogic.GetTargetPlayerEvent -= GetTargetPlayer;
+            _chaseLogic.GetChasePositionCheckIntervalEvent -= GetChasePositionCheckInterval;
+            _chaseLogic.GetChaseDistanceCheckIntervalEvent -= GetChaseDistanceCheckInterval;
+            _chaseLogic.GetChaseEndDelayEvent -= GetChaseEndDelay;
+            _chaseLogic.GetMaxChaseDistanceEvent -= GetMaxChaseDistance;
+            _chaseLogic.GetTargetReachDistanceEvent -= GetTargetReachDistance;
+            
             ResetAgent();
-            StopChasing();
-            StopDistanceCheck();
+            _chaseLogic.Stop();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
         private void EnableAgent()
         {
-            NavMeshAgent agent = _evilClownEntity.GetAgent();
-            _cachedStoppingDistance = agent.stoppingDistance;
+            _cachedAgentStoppingDistance = _agent.stoppingDistance;
             
-            agent.enabled = true;
-            agent.speed = _evilClownAIConfig.ChaseSpeed;
-            agent.stoppingDistance = _evilClownAIConfig.ChaseStoppingDistance;
+            _agent.enabled = true;
+            _agent.speed = _evilClownAIConfig.ChaseSpeed;
+            _agent.stoppingDistance = _evilClownAIConfig.ChaseStoppingDistance;
         }
 
-        private void ResetAgent()
-        {
-            NavMeshAgent agent = _evilClownEntity.GetAgent();
-            agent.stoppingDistance = _cachedStoppingDistance;
-        }
-        
-        private void SetDestination()
-        {
-            PlayerEntity targetPlayer = _evilClownEntity.GetTargetPlayer();
-            bool isTargetExists = targetPlayer != null;
-
-            if (!isTargetExists)
-            {
-                EnterWanderingState();
-                return;
-            }
-
-            Vector3 targetPosition = targetPlayer.transform.position;
-            _agent.destination = targetPosition;
-        }
-
-        private void CheckDistance()
-        {
-            PlayerEntity targetPlayer = _evilClownEntity.GetTargetPlayer();
-            bool isTargetExists = targetPlayer != null;
-
-            if (!isTargetExists)
-            {
-                EnterWanderingState();
-                return;
-            }
-
-            Vector3 targetPosition = targetPlayer.transform.position;
-            Vector3 beetlePosition = _transform.position;
-            float distance = Vector3.Distance(a: beetlePosition, b: targetPosition);
-            bool isTooFar = distance > _evilClownAIConfig.MaxChaseDistance;
-            bool canAttack = distance <= _evilClownAIConfig.AttackDistance;
-
-            if (canAttack)
-            {
-                EnterAttackState();
-                return;
-            }
-            
-            if (isTooFar)
-                StartChasingEndTimer();
-            else
-                StopChasingEndTimer();
-        }
-        
-        private void StartChasing()
-        {
-            IEnumerator routine = ChaseCO();
-            _chaseCO = _evilClownEntity.StartCoroutine(routine);
-        }
-
-        private void StopChasing()
-        {
-            if (_chaseCO == null)
-                return;
-            
-            _evilClownEntity.StopCoroutine(_chaseCO);
-        }
-
-        private void StartDistanceCheck()
-        {
-            IEnumerator routine = DistanceCheckCO();
-            _distanceCheckCO = _evilClownEntity.StartCoroutine(routine);
-        }
-
-        private void StopDistanceCheck()
-        {
-            if (_distanceCheckCO == null)
-                return;
-            
-            _evilClownEntity.StopCoroutine(_distanceCheckCO);
-        }
-
-        private void StartChasingEndTimer()
-        {
-            if (_isStopChasingTimerEnabled)
-                return;
-
-            IEnumerator routine = ChasingEndTimerCO();
-            _chasingEndTimerCO = _evilClownEntity.StartCoroutine(routine);
-            _isStopChasingTimerEnabled = true;
-        }
-
-        private void StopChasingEndTimer()
-        {
-            if (!_isStopChasingTimerEnabled)
-                return;
-
-            if (_chasingEndTimerCO == null)
-                return;
-
-            _evilClownEntity.StopCoroutine(_chasingEndTimerCO);
-            _isStopChasingTimerEnabled = false;
-        }
-        
-        
-        private IEnumerator ChaseCO()
-        {
-            while (true)
-            {
-                float checkInterval = _evilClownAIConfig.ChasePositionCheckInterval;
-                yield return new WaitForSeconds(checkInterval);
-                
-                SetDestination();
-            }
-        }
-
-        private IEnumerator DistanceCheckCO()
-        {
-            while (true)
-            {
-                float checkInterval = _evilClownAIConfig.ChaseDistanceCheckInterval;
-                yield return new WaitForSeconds(checkInterval);
-                
-                CheckDistance();
-            }
-        }
-        
-        private IEnumerator ChasingEndTimerCO()
-        {
-            float delay = _evilClownAIConfig.ChaseEndDelay;
-            yield return new WaitForSeconds(delay);
-                
-            EnterWanderingState();
-        }
+        private void ResetAgent() =>
+            _agent.stoppingDistance = _cachedAgentStoppingDistance;
 
         private void EnterAttackState() =>
             _evilClownEntity.EnterAttackState();
-
+        
         private void EnterWanderingState() =>
             _evilClownEntity.EnterWanderingState();
+
+        private PlayerEntity GetTargetPlayer() =>
+            _evilClownEntity.GetTargetPlayer();
+
+        private float GetChasePositionCheckInterval() =>
+            _evilClownAIConfig.ChasePositionCheckInterval;
+
+        private float GetChaseDistanceCheckInterval() =>
+            _evilClownAIConfig.ChaseDistanceCheckInterval;
+
+        private float GetChaseEndDelay() =>
+            _evilClownAIConfig.ChaseEndDelay;
+
+        private float GetMaxChaseDistance() =>
+            _evilClownAIConfig.MaxChaseDistance;
+
+        private float GetTargetReachDistance() =>
+            _evilClownAIConfig.AttackDistance;
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        
+        private void OnTargetNotFound() => EnterWanderingState();
+
+        private void OnTargetReached(PlayerEntity targetPlayer) => EnterAttackState();
+
+        private void OnChaseEnded() => EnterWanderingState();
     }
 }

@@ -6,7 +6,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.Entities.Monsters.Beetle
+namespace GameCore.Gameplay.Entities.Monsters
 {
     public abstract class MonsterEntityBase : NetcodeBehaviour, ITeleportableEntity
     {
