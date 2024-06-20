@@ -32,8 +32,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         {
             _wanderingMovementLogic.OnStuckEvent += OnStuck;
             _wanderingMovementLogic.OnArrivedEvent += OnArrived;
-            _wanderingMovementLogic.OnGetWanderingMinDistanceInnerEvent += GetWanderingMinDistance;
-            _wanderingMovementLogic.OnGetWanderingMaxDistanceInnerEvent += GetWanderingMaxDistance;
+            _wanderingMovementLogic.GetWanderingMinDistanceEvent += GetWanderingMinDistance;
+            _wanderingMovementLogic.GetWanderingMaxDistanceEvent += GetWanderingMaxDistance;
             
             EnableAgent();
 
@@ -48,8 +48,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         {
             _wanderingMovementLogic.OnStuckEvent -= OnStuck;
             _wanderingMovementLogic.OnArrivedEvent -= OnArrived;
-            _wanderingMovementLogic.OnGetWanderingMinDistanceInnerEvent -= GetWanderingMinDistance;
-            _wanderingMovementLogic.OnGetWanderingMaxDistanceInnerEvent -= GetWanderingMaxDistance;
+            _wanderingMovementLogic.GetWanderingMinDistanceEvent -= GetWanderingMinDistance;
+            _wanderingMovementLogic.GetWanderingMaxDistanceEvent -= GetWanderingMaxDistance;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

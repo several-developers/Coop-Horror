@@ -1,9 +1,7 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
-using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Interactable;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -16,12 +14,8 @@ namespace GameCore.Gameplay.Level.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator,
-            IRpcHandlerDecorator rpcHandlerDecorator)
-        {
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
-            _rpcHandlerDecorator = rpcHandlerDecorator;
-        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -43,7 +37,6 @@ namespace GameCore.Gameplay.Level.Elevator
         public event Action OnInteractionStateChangedEvent;
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
-        private IRpcHandlerDecorator _rpcHandlerDecorator;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -113,7 +106,7 @@ namespace GameCore.Gameplay.Level.Elevator
         }
 
         private void OpenElevator(Floor floor) =>
-            _rpcHandlerDecorator.OpenElevator(floor);
+            _elevatorsManagerDecorator.OpenElevator(floor);
 
         private void StartElevator(Floor floor) =>
             _controlPanel.StartElevator(floor);

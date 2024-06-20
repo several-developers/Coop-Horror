@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Monsters List Config
   _references:
+  - _monsterType: 1
+    _monsterPrefab: {fileID: 4870548347698269539, guid: 0fb27fc3f913e2d4aac7d5ac1fa23e46,
+      type: 3}
   - _monsterType: 2
     _monsterPrefab: {fileID: 9060489894689602524, guid: 3d7c090ddb94c48489036f7ab94708d5,
       type: 3}

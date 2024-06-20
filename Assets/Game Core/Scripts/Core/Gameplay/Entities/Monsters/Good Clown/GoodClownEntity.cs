@@ -21,10 +21,14 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         {
             _levelProvider = levelProvider;
             _goodClownAIConfig = monstersAIConfigsProvider.GetGoodClownAIConfig();
+            _clownUtilities = new GoodClownUtilities(this, _animator);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [SerializeField, Required]
+        private Animator _animator;
+        
         [SerializeField, Required]
         private GameObject _balloonObject;
         
@@ -40,15 +44,29 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 
         private StateMachine _goodClownStateMachine;
         private PlayerEntity _targetPlayer;
+        private GoodClownUtilities _clownUtilities;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void SetTargetPlayer(PlayerEntity playerEntity) =>
             _targetPlayer = playerEntity;
+
+        [Button]
+        public void EnterSearchForTargetState() => ChangeState<SearchForTargetState>();
+        
+        [Button]
+        public void EnterMoveToTargetState() => ChangeState<MoveToTargetState>();
+
+        [Button]
+        public void EnterWanderingAroundTargetState() => ChangeState<WanderingAroundTargetState>();
         
         public static IReadOnlyList<GoodClownEntity> GetAllGoodClowns() => AllGoodClowns;
 
+        public GoodClownAIConfigMeta GetGoodClownAIConfig() => _goodClownAIConfig;
+        
         public PlayerEntity GetTargetPlayer() => _targetPlayer;
+
+        public GoodClownUtilities GetClownUtilities() => _clownUtilities;
         
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -61,8 +79,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
             InitSystems();
             SetupStates();
             //DecideStateByLocation();
-            //EnterPrepareToChaseState();
-
+            EnterSearchForTargetState();
+            
             // LOCAL METHODS: -----------------------------
 
             void InitSystems()
@@ -73,14 +91,23 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
                 {
                     string stateName = state.GetType().Name.GetNiceName();
                     _stateTMP.text = $"State: {stateName}";
+
+                    string log = Log.HandleLog($"Good Clown new state = <gb>{stateName}</gb>");
+                    Debug.Log(log);
                 };
             }
 
             void SetupStates()
             {
-                IdleState idleState = new();
+                IdleState idleState = new(goodClownEntity: this);
+                SearchForTargetState searchForTargetState = new(goodClownEntity: this);
+                MoveToTargetState moveToTargetState = new(goodClownEntity: this);
+                WanderingAroundTargetState wanderingAroundTargetState = new(goodClownEntity: this);
 
                 _goodClownStateMachine.AddState(idleState);
+                _goodClownStateMachine.AddState(searchForTargetState);
+                _goodClownStateMachine.AddState(moveToTargetState);
+                _goodClownStateMachine.AddState(wanderingAroundTargetState);
             }
         }
 

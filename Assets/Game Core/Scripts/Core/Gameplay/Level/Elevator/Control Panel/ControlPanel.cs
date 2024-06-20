@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -12,8 +11,8 @@ namespace GameCore.Gameplay.Level.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IRpcHandlerDecorator rpcHandlerDecorator) =>
-            _rpcHandlerDecorator = rpcHandlerDecorator;
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
+            _elevatorsManagerDecorator = elevatorsManagerDecorator;
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -23,7 +22,7 @@ namespace GameCore.Gameplay.Level.Elevator
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private IRpcHandlerDecorator _rpcHandlerDecorator;
+        private IElevatorsManagerDecorator _elevatorsManagerDecorator;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -32,7 +31,7 @@ namespace GameCore.Gameplay.Level.Elevator
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void StartElevator(Floor floor) =>
-            _rpcHandlerDecorator.StartElevator(floor);
+            _elevatorsManagerDecorator.StartElevator(floor);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

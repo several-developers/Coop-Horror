@@ -12,7 +12,7 @@ namespace GameCore.Gameplay.Items.SpawnSystem
         [Title(Constants.Settings)]
         [SerializeField]
         [ListDrawerSettings(ListElementLabelName = "Label")]
-        private List<ItemSpawnConfig> _configs;
+        private List<ItemSpawnConfig> _configs = new();
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 

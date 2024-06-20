@@ -1,6 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Network;
-using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -12,11 +11,8 @@ namespace GameCore.Gameplay.Level.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator, IRpcObserver rpcObserver)
-        {
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
-            _rpcObserver = rpcObserver;
-        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -31,7 +27,6 @@ namespace GameCore.Gameplay.Level.Elevator
         // FIELDS: --------------------------------------------------------------------------------
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
-        private IRpcObserver _rpcObserver;
         private bool _isOpen;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -40,8 +35,7 @@ namespace GameCore.Gameplay.Level.Elevator
         {
             _elevatorsManagerDecorator.OnElevatorStartedEvent += OnElevatorsStarted;
             _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
-            
-            _rpcObserver.OnOpenElevatorEvent += OnOpenElevator;
+            _elevatorsManagerDecorator.OnElevatorOpenedEvent += OnElevatorOpened;
         }
 
         public override void OnDestroy()
@@ -50,8 +44,7 @@ namespace GameCore.Gameplay.Level.Elevator
             
             _elevatorsManagerDecorator.OnElevatorStartedEvent -= OnElevatorsStarted;
             _elevatorsManagerDecorator.OnFloorChangedEvent -= OnFloorChanged;
-
-            _rpcObserver.OnOpenElevatorEvent -= OnOpenElevator;
+            _elevatorsManagerDecorator.OnElevatorOpenedEvent -= OnElevatorOpened;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -114,7 +107,7 @@ namespace GameCore.Gameplay.Level.Elevator
             OpenElevator();
         }
 
-        private void OnOpenElevator(Floor floor)
+        private void OnElevatorOpened(Floor floor)
         {
             bool isSameFloor = floor == _floor;
 

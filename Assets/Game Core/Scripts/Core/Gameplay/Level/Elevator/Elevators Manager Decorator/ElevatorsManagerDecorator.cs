@@ -10,9 +10,12 @@ namespace GameCore.Gameplay.Level.Elevator
         public event Action<ElevatorStaticData> OnElevatorStartedEvent = delegate {  };
         public event Action<ElevatorStaticData> OnFloorChangedEvent = delegate {  };
         public event Action<Floor> OnElevatorStoppedEvent = delegate {  };
-        
-        public event Func<Floor> OnGetCurrentFloorEvent; // Проверить как выше
-        public event Func<bool> OnIsElevatorMovingEvent;
+        public event Action<Floor> OnElevatorOpenedEvent = delegate { };
+
+        public event Action<Floor> OnStartElevatorInnerEvent = delegate { };
+        public event Action<Floor> OnOpenElevatorInnerEvent = delegate { };
+        public event Func<Floor> GetCurrentFloorInnerEvent;
+        public event Func<bool> IsElevatorMovingInnerEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -25,20 +28,19 @@ namespace GameCore.Gameplay.Level.Elevator
         public void ElevatorStopped(Floor floor) =>
             OnElevatorStoppedEvent.Invoke(floor);
 
-        public Floor GetCurrentFloor()
-        {
-            if (OnGetCurrentFloorEvent == null)
-                return Floor.Surface;
-            
-            return OnGetCurrentFloorEvent();
-        }
+        public void ElevatorOpened(Floor floor) =>
+            OnElevatorOpenedEvent.Invoke(floor);
 
-        public bool IsElevatorMoving()
-        {
-            if (OnIsElevatorMovingEvent == null)
-                return false;
-            
-            return OnIsElevatorMovingEvent();
-        }
+        public void StartElevator(Floor floor) =>
+            OnStartElevatorInnerEvent.Invoke(floor);
+
+        public void OpenElevator(Floor floor) =>
+            OnOpenElevatorInnerEvent.Invoke(floor);
+
+        public Floor GetCurrentFloor() =>
+            GetCurrentFloorInnerEvent?.Invoke() ?? Floor.Surface;
+
+        public bool IsElevatorMoving() =>
+            IsElevatorMovingInnerEvent?.Invoke() ?? false;
     }
 }

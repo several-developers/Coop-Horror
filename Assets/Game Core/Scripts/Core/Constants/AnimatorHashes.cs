@@ -7,6 +7,7 @@ namespace GameCore
         // FIELDS: --------------------------------------------------------------------------------
         
         public static readonly int Speed = Animator.StringToHash(name: "Speed");
+        public static readonly int MoveSpeed = Animator.StringToHash(name: "MoveSpeed");
         public static readonly int MotionSpeed = Animator.StringToHash(name: "MotionSpeed");
         public static readonly int CanMove = Animator.StringToHash(name: "CanMove");
         public static readonly int HitReaction = Animator.StringToHash(name: "HitReaction");
@@ -17,7 +18,9 @@ namespace GameCore
         public static readonly int Open = Animator.StringToHash(name: "Open");
         public static readonly int Close = Animator.StringToHash(name: "Close");
         public static readonly int Trigger = Animator.StringToHash(name: "Trigger");
+        public static readonly int Aggression = Animator.StringToHash(name: "Aggression");
         
+        public static readonly int IsWalking = Animator.StringToHash(name: "IsWalking");
         public static readonly int IsSprinting = Animator.StringToHash(name: "IsSprinting");
         public static readonly int IsCrawling = Animator.StringToHash(name: "IsCrawling");
         public static readonly int IsOn = Animator.StringToHash(name: "IsOn");
