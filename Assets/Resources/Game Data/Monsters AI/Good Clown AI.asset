@@ -15,17 +15,40 @@ MonoBehaviour:
   _metaName: Good Clown AI
   _isDamageable: 1
   _health: 100
-  _playersAroundToHunt: 1
-  _chasePositionCheckInterval: 0.25
-  _chaseSpeed: 3
-  _chaseDistanceCheckInterval: 0.25
-  _chaseStoppingDistance: 2
-  _chaseReachDistance: 4
-  _maxChaseDistance: 10
-  _chaseEndDelay: 3
-  _wanderingMinSpeed: 1
-  _wanderingMaxSpeed: 2
-  _wanderingMinDistance: 2
-  _wanderingMaxDistance: 10
-  _wanderingMinDelay: 1
-  _wanderingMaxDelay: 5
+  _hunterSystemConfig:
+    _disableHunting: 0
+    _huntingCheckInterval: 0.5
+    _targetDistanceForHunt: 20
+    _distanceToOtherPlayersForHunt: 40
+  _transformationConfig:
+    _transformationCheckInterval: 0.25
+    _canTransformAtDistance: 20
+    _transformationDelay: 5
+  _followTargetConfig:
+    _positionCheckInterval: 0.15
+    _moveSpeed: 3
+    _distanceCheckInterval: 0.25
+    _stoppingDistance: 2
+    _reachDistance: 4
+    _maxFollowDistance: 10
+    _followEndDelay: 5
+  _wanderingConfig:
+    _minSpeed: 1
+    _maxSpeed: 2
+    _minDistance: 3
+    _maxDistance: 11
+    _minDelay: 1.5
+    _maxDelay: 5
+    _distanceToBreakWandering: 10
+    _wanderingDistanceBreakCheckInterval: 0.25
+  _huntingIdleConfig:
+    _minDistanceToChase: 10
+    _distanceCheckInterval: 0.2
+  _huntingChaseConfig:
+    _positionCheckInterval: 0.1
+    _moveSpeed: 3
+    _distanceCheckInterval: 0.15
+    _stoppingDistance: 5
+    _reachDistance: 6
+    _maxChaseDistance: 20
+    _chaseEndDelay: 2.5

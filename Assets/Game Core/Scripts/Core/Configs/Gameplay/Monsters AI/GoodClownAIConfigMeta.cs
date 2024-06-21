@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Enemies
@@ -6,83 +7,258 @@ namespace GameCore.Configs.Gameplay.Enemies
     public class GoodClownAIConfigMeta : MonsterAIConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
+        
+        [TitleGroup(title: HunterSystemSettingsTitle)]
+        [BoxGroup(HunterSystemGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
+        private HunterSystemSettings _hunterSystemConfig;
 
-        [TitleGroup(title: CommonSettings)]
-        [BoxGroup(CommonGroup, showLabel: false), SerializeField, Min(0)]
-        private int _playersAroundToHunt = 1;
-        
-        [TitleGroup(title: ChaseStateSettings)]
-        [BoxGroup(ChaseStateGroup, showLabel: false), SerializeField, Min(0f)]
-        private float _chasePositionCheckInterval = 0.1f;
-        
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseSpeed = 5f;
+        [TitleGroup(TransformationSettingsTitle)]
+        [BoxGroup(TransformationGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
+        private TransformationSettings _transformationConfig;
 
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseDistanceCheckInterval = 0.1f;
-        
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseStoppingDistance = 0.5f;
+        [TitleGroup(title: FollowTargetSettingsTitle)]
+        [BoxGroup(FollowTargetGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
+        private FollowTargetSettings _followTargetConfig;
 
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseReachDistance = 4f;
-        
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _maxChaseDistance = 10f;
+        [TitleGroup(title: WanderingSettingsTitle)]
+        [BoxGroup(WanderingGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
+        private WanderingSettings _wanderingConfig;
 
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseEndDelay = 5f;
-        
-        [TitleGroup(title: WanderingStateSettings)]
-        [BoxGroup(WanderingStateGroup, showLabel: false), SerializeField, Min(0f)]
-        private float _wanderingMinSpeed = 1f;
-        
-        [BoxGroup(WanderingStateGroup), SerializeField, Min(0f)]
-        private float _wanderingMaxSpeed = 2.5f;
-        
-        [BoxGroup(WanderingStateGroup), SerializeField, Min(0f)]
-        private float _wanderingMinDistance = 1f;
-        
-        [BoxGroup(WanderingStateGroup), SerializeField, Min(0f)]
-        private float _wanderingMaxDistance = 15f;
-        
-        [BoxGroup(WanderingStateGroup), SerializeField, Min(0f)]
-        private float _wanderingMinDelay = 0.5f;
-        
-        [BoxGroup(WanderingStateGroup), SerializeField, Min(0f)]
-        private float _wanderingMaxDelay = 5f;
+        [TitleGroup(title: HuntingIdleSettingsTitle)]
+        [BoxGroup(HuntingIdleGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
+        private HuntingIdleSettings _huntingIdleConfig;
+
+        [TitleGroup(title: HuntingChaseSettingsTitle)]
+        [BoxGroup(HuntingChaseGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
+        private HuntingChaseSettings _huntingChaseConfig;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public int PlayersAroundToHunt => _playersAroundToHunt;
-        
-        public float ChasePositionCheckInterval => _chasePositionCheckInterval;
-        public float ChaseSpeed => _chaseSpeed;
-        public float ChaseDistanceCheckInterval => _chaseDistanceCheckInterval;
-        public float ChaseStoppingDistance => _chaseStoppingDistance;
-        public float ChaseReachDistance => _chaseReachDistance;
-        public float MaxChaseDistance => _maxChaseDistance;
-        public float ChaseEndDelay => _chaseEndDelay;
-        
-        public float WanderingMinSpeed => _wanderingMinSpeed;
-        public float WanderingMaxSpeed => _wanderingMaxSpeed;
-        public float WanderingMinDistance => _wanderingMinDistance;
-        public float WanderingMaxDistance => _wanderingMaxDistance;
-        public float WanderingMinDelay => _wanderingMinDelay;
-        public float WanderingMaxDelay => _wanderingMaxDelay;
-        
+        public TransformationSettings TransformationConfig => _transformationConfig;
+        public FollowTargetSettings FollowTargetConfig => _followTargetConfig;
+        public WanderingSettings WanderingConfig => _wanderingConfig;
+        public HunterSystemSettings HunterSystemConfig => _hunterSystemConfig;
+        public HuntingIdleSettings HuntingIdleConfig => _huntingIdleConfig;
+        public HuntingChaseSettings HuntingChaseConfig => _huntingChaseConfig;
+
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private const string CommonSettings = "Common Settings";
-        private const string IdleStateSettings = "Idle State Settings";
-        private const string WanderingStateSettings = "Wandering Around Target State Settings";
-        private const string ChaseStateSettings = "Chase State Settings";
-        private const string AttackStateSettings = "Attack State Settings";
-        
+        private const string HunterSystemSettingsTitle = "Hunter System Settings";
+        private const string TransformationSettingsTitle = "Transformation Settings";
+        private const string FollowTargetSettingsTitle = "Follow Target State Settings";
+        private const string WanderingSettingsTitle = "Wandering State Settings";
+        private const string HuntingIdleSettingsTitle = "Hunting Idle State Settings";
+        private const string HuntingChaseSettingsTitle = "Hunting Chase State Settings";
+        private const string SleepingSettingsTitle = "Sleeping State Settings";
+
         private const string CommonGroup = CommonSettings + "/Group";
-        private const string IdleStateGroup = IdleStateSettings + "/Group";
-        private const string WanderingStateGroup = WanderingStateSettings + "/Group";
-        private const string ChaseStateGroup = ChaseStateSettings + "/Group";
-        private const string AttackStateGroup = AttackStateSettings + "/Group";
+        private const string HunterSystemGroup = HunterSystemSettingsTitle + "/Group";
+        private const string TransformationGroup = TransformationSettingsTitle + "/Group";
+        private const string FollowTargetGroup = FollowTargetSettingsTitle + "/Group";
+        private const string WanderingGroup = WanderingSettingsTitle + "/Group";
+        private const string HuntingIdleGroup = HuntingIdleSettingsTitle + "/Group";
+        private const string HuntingChaseGroup = HuntingChaseSettingsTitle + "/Group";
+        private const string SleepingGroup = SleepingSettingsTitle + "/Group";
+
+        // INNER CLASSES: -------------------------------------------------------------------------
+
+        #region Inner Classes
+
+        [Serializable]
+        public class HunterSystemSettings
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField]
+            [InfoBox(message: WarningMessage, InfoMessageType.Error, visibleIfMemberName: nameof(_disableHunting))]
+            private bool _disableHunting;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Интервал проверки доступности охоты.")]
+            private float _huntingCheckInterval = 0.5f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Дистанция до цели при которой доступна охота.")]
+            private float _targetDistanceForHunt = 20f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Дистанция до других игроков, чтобы охота была доступна.")]
+            private float _distanceToOtherPlayersForHunt = 40f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public bool DisableHunting => _disableHunting;
+            public float HuntingCheckInterval => _huntingCheckInterval;
+            public float TargetDistanceForHunt => _targetDistanceForHunt;
+            public float DistanceToOtherPlayersForHunt => _distanceToOtherPlayersForHunt;
+
+            // FIELDS: --------------------------------------------------------------------------------
+
+            private const string WarningMessage = "Warning! This should be disabled!";
+        }
+
+        [Serializable]
+        public class TransformationSettings
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+            
+            [SerializeField, Min(0f)]
+            [Tooltip("Интервал проверки дистанции для трансформации.")]
+            private float _transformationCheckInterval = 0.25f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Дистанция при которой доступна трансформация.")]
+            private float _canTransformAtDistance = 20f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Задержка перед трансформацией.")]
+            private float _transformationDelay = 5f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float TransformationCheckInterval => _transformationCheckInterval;
+            public float CanTransformAtDistance => _canTransformAtDistance;
+        }
+
+        [Serializable]
+        public class FollowTargetSettings
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+            
+            [SerializeField, Min(0f)]
+            private float _positionCheckInterval = 0.1f;
+
+            [SerializeField, Min(0f)]
+            private float _moveSpeed = 5f;
+
+            [SerializeField, Min(0f)]
+            private float _distanceCheckInterval = 0.1f;
+
+            [SerializeField, Min(0f)]
+            private float _stoppingDistance = 0.5f;
+
+            [SerializeField, Min(0f)]
+            private float _reachDistance = 4f;
+
+            [SerializeField, Min(0f)]
+            private float _maxFollowDistance = 10f;
+
+            [SerializeField, Min(0f)]
+            private float _followEndDelay = 5f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+            
+            public float PositionCheckInterval => _positionCheckInterval;
+            public float MoveSpeed => _moveSpeed;
+            public float DistanceCheckInterval => _distanceCheckInterval;
+            public float StoppingDistance => _stoppingDistance;
+            public float ReachDistance => _reachDistance;
+            public float MaxFollowDistance => _maxFollowDistance;
+            public float FollowEndDelay => _followEndDelay;
+        }
+
+        [Serializable]
+        public class WanderingSettings
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+            
+            [SerializeField, Min(0f)]
+            [Tooltip("Минимальная скорость блуждания.")]
+            private float _minSpeed = 1f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Максимальная скорость блуждания.")]
+            private float _maxSpeed = 2.5f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Минимальная дистанция от цели.")]
+            private float _minDistance = 2f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Максимальная дистанция от цели.")]
+            private float _maxDistance = 10f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Минимальная задержка перед новой позицией блуждания.")]
+            private float _minDelay = 0.5f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Максимальная задержка перед новой позицией блуждания.")]
+            private float _maxDelay = 5f;
+
+            [SerializeField, Min(0f)]
+            private float _distanceToBreakWandering = 15f;
+
+            [SerializeField, Min(0f)]
+            private float _wanderingDistanceBreakCheckInterval = 0.25f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+            
+            public float MinSpeed => _minSpeed;
+            public float MaxSpeed => _maxSpeed;
+            public float MinDistance => _minDistance;
+            public float MaxDistance => _maxDistance;
+            public float MinDelay => _minDelay;
+            public float MaxDelay => _maxDelay;
+            public float DistanceToBreakWandering => _distanceToBreakWandering;
+            public float WanderingDistanceBreakCheckInterval => _wanderingDistanceBreakCheckInterval;
+        }
+
+        [Serializable]
+        public class HuntingIdleSettings
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, Min(0f)]
+            private float _minDistanceToChase = 10f;
+
+            [SerializeField, Min(0f)]
+            private float _distanceCheckInterval = 0.2f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float MinDistanceToChase => _minDistanceToChase;
+            public float DistanceCheckInterval => _distanceCheckInterval;
+        }
+        
+        [Serializable]
+        public class HuntingChaseSettings
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+            
+            [SerializeField, Min(0f)]
+            private float _positionCheckInterval = 0.1f;
+
+            [SerializeField, Min(0f)]
+            private float _moveSpeed = 5f;
+
+            [SerializeField, Min(0f)]
+            private float _distanceCheckInterval = 0.1f;
+
+            [SerializeField, Min(0f)]
+            private float _stoppingDistance = 0.5f;
+
+            [SerializeField, Min(0f)]
+            private float _reachDistance = 4f;
+
+            [SerializeField, Min(0f)]
+            private float _maxChaseDistance = 10f;
+
+            [SerializeField, Min(0f)]
+            private float _chaseEndDelay = 5f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+            
+            public float PositionCheckInterval => _positionCheckInterval;
+            public float MoveSpeed => _moveSpeed;
+            public float DistanceCheckInterval => _distanceCheckInterval;
+            public float StoppingDistance => _stoppingDistance;
+            public float ReachDistance => _reachDistance;
+            public float MaxChaseDistance => _maxChaseDistance;
+            public float ChaseEndDelay => _chaseEndDelay;
+        }
+
+        #endregion
     }
 }

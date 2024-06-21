@@ -93,8 +93,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         protected override void InitServerOnly()
         {
-            base.InitServerOnly();
-
             AllEvilClowns.Add(item: this);
 
             InitSystems();
@@ -112,7 +110,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
                 _evilClownStateMachine.OnStateChangedEvent += state =>
                 {
-                    string stateName = state.GetType().Name.GetNiceName();
+                    string stateName = state.GetType().Name.Replace(oldValue: "State", newValue: "").GetNiceName();
                     _stateTMP.text = $"State: {stateName}";
                 };
             }
@@ -142,12 +140,8 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         protected override void TickServerOnly() =>
             _evilClownStateMachine.Tick();
 
-        protected override void DespawnServerOnly()
-        {
-            base.DespawnServerOnly();
-
+        protected override void DespawnServerOnly() =>
             AllEvilClowns.Remove(item: this);
-        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

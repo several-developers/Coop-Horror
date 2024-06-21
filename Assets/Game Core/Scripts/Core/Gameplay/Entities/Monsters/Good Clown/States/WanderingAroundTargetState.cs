@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.EntitiesSystems.MovementLogics;
@@ -15,21 +16,25 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         public WanderingAroundTargetState(GoodClownEntity goodClownEntity)
         {
             _goodClownEntity = goodClownEntity;
-            _goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
             _transform = goodClownEntity.transform;
             _agent = goodClownEntity.GetAgent();
             _clownUtilities = goodClownEntity.GetClownUtilities();
             _wanderingMovementLogic = new WanderingMovementLogic(goodClownEntity.transform, _agent);
+            
+            GoodClownAIConfigMeta goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
+            _wanderingConfig = goodClownAIConfig.WanderingConfig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly GoodClownEntity _goodClownEntity;
-        private readonly GoodClownAIConfigMeta _goodClownAIConfig;
+        private readonly GoodClownAIConfigMeta.WanderingSettings _wanderingConfig;
         private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
         private readonly GoodClownUtilities _clownUtilities;
         private readonly WanderingMovementLogic _wanderingMovementLogic;
+
+        private Coroutine _wanderingDistanceBreakCheckCO;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -41,9 +46,10 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             
             EnableAgent();
             SetWalkingAnimation();
+            StartWanderingDistanceBreakCheck();
             
             if (!_wanderingMovementLogic.TrySetDestinationPoint())
-                EnterMoveToTargetState();
+                EnterFollowTargetState();
         }
 
         public void Tick()
@@ -57,6 +63,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _wanderingMovementLogic.OnStuckEvent -= OnStuck;
             _wanderingMovementLogic.OnArrivedEvent -= OnArrived;
             _wanderingMovementLogic.GetRandomPositionEvent -= GetRandomPosition;
+            
+            StopWanderingDistanceBreakCheck();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -75,8 +83,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         private async void SetNewDestinationPointWithDelay()
         {
-            float minDelay = _goodClownAIConfig.WanderingMinDelay;
-            float maxDelay = _goodClownAIConfig.WanderingMaxDelay;
+            float minDelay = _wanderingConfig.MinDelay;
+            float maxDelay = _wanderingConfig.MaxDelay;
             float delayInSeconds = Random.Range(minDelay, maxDelay);
             int delay = delayInSeconds.ConvertToMilliseconds();
 
@@ -90,13 +98,63 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _wanderingMovementLogic.TrySetDestinationPoint();
         }
 
-        private void EnterMoveToTargetState() =>
-            _goodClownEntity.EnterMoveToTargetState();
+        private void CheckWanderingBreakDistance()
+        {
+            PlayerEntity targetPlayer = _goodClownEntity.GetTargetPlayer();
+            bool isTargetFound = targetPlayer != null;
 
+            if (!isTargetFound)
+            {
+                EnterSearchForTargetState();
+                return;
+            }
+
+            Vector3 playerPosition = targetPlayer.transform.position;
+            Vector3 thisPosition = _transform.position;
+            float distance = Vector3.Distance(a: playerPosition, b: thisPosition);
+            bool breakWandering = distance >= _wanderingConfig.DistanceToBreakWandering;
+
+            if (!breakWandering)
+                return;
+
+            EnterFollowTargetState();
+        }
+        
+        private void StartWanderingDistanceBreakCheck()
+        {
+            IEnumerator routine = WanderingDistanceBreakCheckCO();
+            _wanderingDistanceBreakCheckCO = _goodClownEntity.StartCoroutine(routine);
+        }
+        
+        private void StopWanderingDistanceBreakCheck()
+        {
+            if (_wanderingDistanceBreakCheckCO == null)
+                return;
+            
+            _goodClownEntity.StopCoroutine(_wanderingDistanceBreakCheckCO);
+        }
+        
+        private void EnterSearchForTargetState() =>
+            _goodClownEntity.EnterSearchForTargetState();
+        
+        private void EnterFollowTargetState() =>
+            _goodClownEntity.EnterFollowTargetState();
+
+        private IEnumerator WanderingDistanceBreakCheckCO()
+        {
+            while (true)
+            {
+                float delay = _wanderingConfig.WanderingDistanceBreakCheckInterval;
+                yield return new WaitForSeconds(delay);
+
+                CheckWanderingBreakDistance();
+            }
+        }
+        
         private Vector3 GetRandomPosition()
         {
-            float minDistance = _goodClownAIConfig.WanderingMinDistance;
-            float maxDistance = _goodClownAIConfig.WanderingMaxDistance;
+            float minDistance = _wanderingConfig.MinDistance;
+            float maxDistance = _wanderingConfig.MaxDistance;
             float distance = Random.Range(minDistance, maxDistance);
 
             Vector2 circle = Random.insideUnitCircle;
@@ -114,8 +172,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         
         private float GetWanderingSpeed()
         {
-            float minSpeed = _goodClownAIConfig.WanderingMinSpeed;
-            float maxSpeed = _goodClownAIConfig.WanderingMaxSpeed;
+            float minSpeed = _wanderingConfig.MinSpeed;
+            float maxSpeed = _wanderingConfig.MaxSpeed;
             float speed = Random.Range(minSpeed, maxSpeed);
             return speed;
         }

@@ -129,8 +129,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         protected override void InitServerOnly()
         {
-            base.InitServerOnly();
-            
             AllBeetles.Add(item: this);
 
             InitSystems();
@@ -141,7 +139,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
             _beetleStateMachine.OnStateChangedEvent += state =>
             {
-                string stateName = state.GetType().Name.GetNiceName();
+                string stateName = state.GetType().Name.Replace(oldValue: "State", newValue: "").GetNiceName();
                 _stateTMP.text = $"State: {stateName}";
             };
 
@@ -192,8 +190,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         protected override void DespawnServerOnly()
         {
-            base.DespawnServerOnly();
-            
             AllBeetles.Remove(item: this);
             
             _healthSystem.OnHealthChangedEvent -= OnHealthChanged;

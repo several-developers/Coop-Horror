@@ -15,10 +15,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly GoodClownEntity _goodClownEntity;
         private readonly NavMeshAgent _agent;
         private readonly Animator _animator;
+
+        private Vector2 _smoothDeltaPosition;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -39,10 +41,10 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         private float GetCurrentClampedSpeed()
         {
             float targetSpeed = _agent.speed;
-            
+
             if (Mathf.Approximately(a: targetSpeed, b: 0f))
                 return 0f;
-            
+
             float agentSpeed = _agent.velocity.magnitude;
             return agentSpeed / targetSpeed;
         }

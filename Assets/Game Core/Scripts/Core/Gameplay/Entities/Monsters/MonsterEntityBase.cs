@@ -53,14 +53,6 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         public NavMeshAgent GetAgent() => _agent;
 
-        // PROTECTED METHODS: ---------------------------------------------------------------------
-
-        protected override void InitServerOnly() =>
-            AllMonsters.Add(item: this);
-
-        protected override void DespawnServerOnly() =>
-            AllMonsters.Remove(item: this);
-
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CheckAgentState()
@@ -69,6 +61,20 @@ namespace GameCore.Gameplay.Entities.Monsters
                 return;
 
             Log.PrintError(log: "Nav Mesh Agent enabled! Disable it in prefab!");
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            AllMonsters.Add(item: this);
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            AllMonsters.Remove(item: this);
         }
     }
 }

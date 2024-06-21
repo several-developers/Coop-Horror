@@ -4,32 +4,34 @@ using GameCore.Gameplay.EntitiesSystems.CombatLogics;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
+namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 {
-    public class ChaseState : IEnterState, IExitState
+    public class HuntingChaseState : IEnterState, ITickableState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public ChaseState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig)
+        public HuntingChaseState(GoodClownEntity goodClownEntity)
         {
-            _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleAIConfig;
-            _agent = beetleEntity.GetAgent();
-            _chaseLogic = new ChaseLogic(beetleEntity, _agent);
+            _goodClownEntity = goodClownEntity;
+            _clownUtilities = goodClownEntity.GetClownUtilities();
+            _agent = goodClownEntity.GetAgent();
+            _transform = goodClownEntity.transform;
+            _chaseLogic = new ChaseLogic(goodClownEntity, _agent);
+
+            GoodClownAIConfigMeta goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
+            _huntingChaseConfig = goodClownAIConfig.HuntingChaseConfig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        private readonly BeetleEntity _beetleEntity;
-        private readonly BeetleAIConfigMeta _beetleAIConfig;
+        private readonly GoodClownEntity _goodClownEntity;
+        private readonly GoodClownAIConfigMeta.HuntingChaseSettings _huntingChaseConfig;
+        private readonly GoodClownUtilities _clownUtilities;
         private readonly NavMeshAgent _agent;
+        private readonly Transform _transform;
         private readonly ChaseLogic _chaseLogic;
-
-        private Coroutine _chaseCO;
-        private Coroutine _distanceCheckCO;
-        private Coroutine _chasingEndTimerCO;
+        
         private float _cachedStoppingDistance;
-        private bool _isStopChasingTimerEnabled;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -45,10 +47,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             _chaseLogic.GetMaxChaseDistanceEvent += GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent += GetTargetReachDistance;
             
-            ToggleTriggerCheckState(isEnabled: false);
             EnableAgent();
             _chaseLogic.Start();
         }
+
+        public void Tick() =>
+            _clownUtilities.UpdateAnimationMoveSpeed();
 
         public void Exit()
         {
@@ -62,64 +66,54 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             _chaseLogic.GetMaxChaseDistanceEvent -= GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent -= GetTargetReachDistance;
             
-            ToggleTriggerCheckState(isEnabled: true);
             ResetAgent();
             _chaseLogic.Stop();
         }
-
+        
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void ToggleTriggerCheckState(bool isEnabled)
-        {
-            AggressionSystem aggressionSystem = _beetleEntity.GetAggressionSystem();
-            aggressionSystem.ToggleTriggerCheckState(isEnabled);
-        }
 
         private void EnableAgent()
         {
             _cachedStoppingDistance = _agent.stoppingDistance;
             
             _agent.enabled = true;
-            _agent.speed = _beetleAIConfig.ChaseSpeed;
-            _agent.stoppingDistance = _beetleAIConfig.ChaseStoppingDistance;
+            _agent.speed = _huntingChaseConfig.MoveSpeed;
+            _agent.stoppingDistance = _huntingChaseConfig.StoppingDistance;
         }
 
-        private void ResetAgent()
-        {
-            NavMeshAgent agent = _beetleEntity.GetAgent();
-            agent.stoppingDistance = _cachedStoppingDistance;
-        }
+        private void ResetAgent() =>
+            _agent.stoppingDistance = _cachedStoppingDistance;
 
-        private void EnterTriggerState() =>
-            _beetleEntity.EnterTriggerState();
+        private void EnterSearchForTargetState() =>
+            _goodClownEntity.EnterSearchForTargetState();
 
-        private void EnterAttackState() =>
-            _beetleEntity.EnterAttackState();
+        private void EnterHuntingIdleState() =>
+            _goodClownEntity.EnterHuntingIdleState();
 
         private PlayerEntity GetTargetPlayer() =>
-            _beetleEntity.GetTargetPlayer();
+            _goodClownEntity.GetTargetPlayer();
 
         private float GetChasePositionCheckInterval() =>
-            _beetleAIConfig.ChasePositionCheckInterval;
+            _huntingChaseConfig.PositionCheckInterval;
 
         private float GetChaseDistanceCheckInterval() =>
-            _beetleAIConfig.ChaseDistanceCheckInterval;
+            _huntingChaseConfig.DistanceCheckInterval;
 
         private float GetChaseEndDelay() =>
-            _beetleAIConfig.ChaseEndDelay;
+            _huntingChaseConfig.ChaseEndDelay;
 
         private float GetMaxChaseDistance() =>
-            _beetleAIConfig.MaxChaseDistance;
+            _huntingChaseConfig.MaxChaseDistance;
 
         private float GetTargetReachDistance() =>
-            _beetleAIConfig.AttackDistance;
+            _huntingChaseConfig.ReachDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnTargetNotFound() => EnterTriggerState();
+        private void OnTargetNotFound() => EnterSearchForTargetState();
 
-        private void OnTargetReached(PlayerEntity targetPlayer) => EnterAttackState();
+        private void OnTargetReached(PlayerEntity targetPlayer) => EnterHuntingIdleState();
 
-        private void OnChaseEnded() => EnterTriggerState();
+        private void OnChaseEnded() => EnterSearchForTargetState();
     }
 }

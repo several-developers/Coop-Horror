@@ -1,5 +1,6 @@
 using System;
 using GameCore.Enums.Gameplay;
+using UnityEngine;
 
 namespace GameCore.Gameplay.Level.Elevator
 {
@@ -12,6 +13,7 @@ namespace GameCore.Gameplay.Level.Elevator
 
         event Action<Floor> OnStartElevatorInnerEvent;
         event Action<Floor> OnOpenElevatorInnerEvent;
+        event Action<Transform> OnTeleportLocalPlayerInnerEvent;
         event Func<Floor> GetCurrentFloorInnerEvent;
         event Func<bool> IsElevatorMovingInnerEvent;
 
@@ -22,6 +24,7 @@ namespace GameCore.Gameplay.Level.Elevator
 
         void StartElevator(Floor floor);
         void OpenElevator(Floor floor);
+        void TeleportLocalPlayer(Transform elevatorTransform);
         Floor GetCurrentFloor();
         bool IsElevatorMoving();
     }

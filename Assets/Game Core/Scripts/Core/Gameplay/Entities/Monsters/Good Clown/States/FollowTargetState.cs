@@ -5,23 +5,25 @@ using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 {
-    public class MoveToTargetState : IEnterState, ITickableState, IExitState
+    public class FollowTargetState : IEnterState, ITickableState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MoveToTargetState(GoodClownEntity goodClownEntity)
+        public FollowTargetState(GoodClownEntity goodClownEntity)
         {
             _goodClownEntity = goodClownEntity;
-            _goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
             _agent = goodClownEntity.GetAgent();
             _clownUtilities = goodClownEntity.GetClownUtilities();
             _chaseLogic = new ChaseLogic(goodClownEntity, _agent);
+
+            GoodClownAIConfigMeta goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
+            _followTargetConfig = goodClownAIConfig.FollowTargetConfig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly GoodClownEntity _goodClownEntity;
-        private readonly GoodClownAIConfigMeta _goodClownAIConfig;
+        private readonly GoodClownAIConfigMeta.FollowTargetSettings _followTargetConfig;
         private readonly NavMeshAgent _agent;
         private readonly GoodClownUtilities _clownUtilities;
         private readonly ChaseLogic _chaseLogic;
@@ -73,8 +75,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _cachedAgentStoppingDistance = _agent.stoppingDistance;
             
             _agent.enabled = true;
-            _agent.speed = _goodClownAIConfig.ChaseSpeed;
-            _agent.stoppingDistance = _goodClownAIConfig.ChaseStoppingDistance;
+            _agent.speed = _followTargetConfig.MoveSpeed;
+            _agent.stoppingDistance = _followTargetConfig.StoppingDistance;
         }
 
         private void ResetAgent() =>
@@ -93,19 +95,19 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _goodClownEntity.GetTargetPlayer();
 
         private float GetChasePositionCheckInterval() =>
-            _goodClownAIConfig.ChasePositionCheckInterval;
+            _followTargetConfig.PositionCheckInterval;
 
         private float GetChaseDistanceCheckInterval() =>
-            _goodClownAIConfig.ChaseDistanceCheckInterval;
+            _followTargetConfig.DistanceCheckInterval;
 
         private float GetChaseEndDelay() =>
-            _goodClownAIConfig.ChaseEndDelay;
+            _followTargetConfig.FollowEndDelay;
 
         private float GetMaxChaseDistance() =>
-            _goodClownAIConfig.MaxChaseDistance;
+            _followTargetConfig.MaxFollowDistance;
 
         private float GetTargetReachDistance() =>
-            _goodClownAIConfig.ChaseReachDistance;
+            _followTargetConfig.ReachDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

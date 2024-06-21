@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.VisualManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
@@ -15,11 +17,16 @@ namespace GameCore.Gameplay.Level.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator, IVisualManager visualManager,
-            IGameplayConfigsProvider gameplayConfigsProvider)
+        private void Construct(
+            IElevatorsManagerDecorator elevatorsManagerDecorator,
+            IVisualManager visualManager,
+            ILevelProvider levelProvider,
+            IGameplayConfigsProvider gameplayConfigsProvider
+        )
         {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
             _visualManager = visualManager;
+            _levelProvider = levelProvider;
             _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
         }
 
@@ -31,6 +38,7 @@ namespace GameCore.Gameplay.Level.Elevator
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private IVisualManager _visualManager;
+        private ILevelProvider _levelProvider;
         private ElevatorConfigMeta _elevatorConfig;
         private Coroutine _movementCO;
 
@@ -40,6 +48,7 @@ namespace GameCore.Gameplay.Level.Elevator
         {
             _elevatorsManagerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
             _elevatorsManagerDecorator.OnOpenElevatorInnerEvent += OpenElevatorServerRpc;
+            _elevatorsManagerDecorator.OnTeleportLocalPlayerInnerEvent += OnTeleportLocalPlayer;
             _elevatorsManagerDecorator.GetCurrentFloorInnerEvent += GetCurrentFloor;
             _elevatorsManagerDecorator.IsElevatorMovingInnerEvent += IsElevatorMoving;
         }
@@ -49,7 +58,8 @@ namespace GameCore.Gameplay.Level.Elevator
             base.OnDestroy();
 
             _elevatorsManagerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
-            _elevatorsManagerDecorator.OnOpenElevatorInnerEvent += OpenElevatorServerRpc;
+            _elevatorsManagerDecorator.OnOpenElevatorInnerEvent -= OpenElevatorServerRpc;
+            _elevatorsManagerDecorator.OnTeleportLocalPlayerInnerEvent -= OnTeleportLocalPlayer;
             _elevatorsManagerDecorator.GetCurrentFloorInnerEvent -= GetCurrentFloor;
             _elevatorsManagerDecorator.IsElevatorMovingInnerEvent -= IsElevatorMoving;
         }
@@ -193,6 +203,29 @@ namespace GameCore.Gameplay.Level.Elevator
             _elevatorsManagerDecorator.ElevatorOpened(floor);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnTeleportLocalPlayer(Transform elevatorTransform)
+        {
+            Floor currentFloor = GetCurrentFloor();
+            bool isElevatorFound = _levelProvider.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
+
+            if (!isElevatorFound)
+                return;
+
+            PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
+            Transform target = playerEntity.transform;
+            Transform parentFrom = elevatorTransform;
+            Transform parentTo = targetElevator.transform;
+
+            GameUtilities.Teleport(target, parentFrom, parentTo, out Vector3 position, out Quaternion rotation);
+            playerEntity.Teleport(position, rotation);
+
+            VisualPresetType presetType = currentFloor == Floor.Surface
+                ? VisualPresetType.DefaultLocation
+                : VisualPresetType.Dungeon;
+            
+            _visualManager.ChangePreset(presetType);
+        }
 
         private void OnCurrentFloorChanged(Floor previousValue, Floor newValue)
         {

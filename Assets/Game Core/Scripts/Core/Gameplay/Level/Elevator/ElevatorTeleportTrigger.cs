@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -13,11 +11,8 @@ namespace GameCore.Gameplay.Level.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator, ILevelProvider levelProvider)
-        {
+        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
-            _levelProvider = levelProvider;
-        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -38,7 +33,6 @@ namespace GameCore.Gameplay.Level.Elevator
         private readonly List<PlayerEntity> _playersList = new();
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
-        private ILevelProvider _levelProvider;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -67,24 +61,8 @@ namespace GameCore.Gameplay.Level.Elevator
             if (!IsLocalPlayerInTheElevator())
                 return;
 
-            TeleportLocalPlayer();
-        }
-
-        private void TeleportLocalPlayer()
-        {
-            Floor currentFloor = _elevatorsManagerDecorator.GetCurrentFloor();
-            bool isElevatorFound = _levelProvider.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
-
-            if (!isElevatorFound)
-                return;
-
-            PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
-            Transform target = playerEntity.transform;
-            Transform parent1 = _elevator.transform;
-            Transform parent2 = targetElevator.transform;
-
-            GameUtilities.Teleport(target, parent1, parent2, out Vector3 position, out Quaternion rotation);
-            playerEntity.Teleport(position, rotation);
+            Transform elevatorTransform = _elevator.transform;
+            _elevatorsManagerDecorator.TeleportLocalPlayer(elevatorTransform);
         }
 
         private bool IsLocalPlayerInTheElevator()

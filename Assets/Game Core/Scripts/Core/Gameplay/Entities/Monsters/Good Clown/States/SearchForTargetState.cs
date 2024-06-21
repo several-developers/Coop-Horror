@@ -32,6 +32,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         {
             DisableAgent();
             SetIdleAnimation();
+            StartHunterSystem();
             SearchLogic();
         }
 
@@ -46,6 +47,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private void SetIdleAnimation() =>
             _clownUtilities.SetIdleAnimation();
 
+        private void StartHunterSystem()
+        {
+            HunterSystem hunterSystem = _goodClownEntity.GetHunterSystem();
+            hunterSystem.Start();
+        }
+        
         private async void SearchLogic()
         {
             while (true)
@@ -71,12 +78,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
                     continue;
 
                 _goodClownEntity.SetTargetPlayer(targetPlayer);
-                EnterMoveToTargetState();
+                EnterFollowTargetState();
                 break;
             }
         }
 
-        private void EnterMoveToTargetState() =>
-            _goodClownEntity.EnterMoveToTargetState();
+        private void EnterFollowTargetState() =>
+            _goodClownEntity.EnterFollowTargetState();
     }
 }
