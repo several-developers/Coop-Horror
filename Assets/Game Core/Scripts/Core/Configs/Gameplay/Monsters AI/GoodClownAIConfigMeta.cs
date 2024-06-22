@@ -75,8 +75,16 @@ namespace GameCore.Configs.Gameplay.Enemies
             private bool _disableHunting;
 
             [SerializeField, Min(0f)]
+            [Tooltip("Длительность охоты, после окончания которой клоун становится злым.")]
+            private float _huntingDuration = 15f;
+            
+            [SerializeField, Min(0f)]
             [Tooltip("Интервал проверки доступности охоты.")]
             private float _huntingCheckInterval = 0.5f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Интервал проверки возможности трансформации в злую версию.")]
+            private float _transformationCheckInterval = 0.1f;
 
             [SerializeField, Min(0f)]
             [Tooltip("Дистанция до цели при которой доступна охота.")]
@@ -89,7 +97,9 @@ namespace GameCore.Configs.Gameplay.Enemies
             // PROPERTIES: ----------------------------------------------------------------------------
 
             public bool DisableHunting => _disableHunting;
+            public float HuntingDuration => _huntingDuration;
             public float HuntingCheckInterval => _huntingCheckInterval;
+            public float TransformationCheckInterval => _transformationCheckInterval;
             public float TargetDistanceForHunt => _targetDistanceForHunt;
             public float DistanceToOtherPlayersForHunt => _distanceToOtherPlayersForHunt;
 
@@ -104,21 +114,12 @@ namespace GameCore.Configs.Gameplay.Enemies
             // MEMBERS: -------------------------------------------------------------------------------
             
             [SerializeField, Min(0f)]
-            [Tooltip("Интервал проверки дистанции для трансформации.")]
-            private float _transformationCheckInterval = 0.25f;
-
-            [SerializeField, Min(0f)]
-            [Tooltip("Дистанция при которой доступна трансформация.")]
-            private float _canTransformAtDistance = 20f;
-
-            [SerializeField, Min(0f)]
             [Tooltip("Задержка перед трансформацией.")]
             private float _transformationDelay = 5f;
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
-            public float TransformationCheckInterval => _transformationCheckInterval;
-            public float CanTransformAtDistance => _canTransformAtDistance;
+            public float TransformationDelay => _transformationDelay;
         }
 
         [Serializable]
@@ -216,10 +217,14 @@ namespace GameCore.Configs.Gameplay.Enemies
             [SerializeField, Min(0f)]
             private float _distanceCheckInterval = 0.2f;
 
+            [SerializeField, Min(0f)]
+            private float _rotationSpeed = 5f;
+
             // PROPERTIES: ----------------------------------------------------------------------------
 
             public float MinDistanceToChase => _minDistanceToChase;
             public float DistanceCheckInterval => _distanceCheckInterval;
+            public float RotationSpeed => _rotationSpeed;
         }
         
         [Serializable]

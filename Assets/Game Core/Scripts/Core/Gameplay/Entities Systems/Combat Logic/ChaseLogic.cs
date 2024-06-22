@@ -56,6 +56,9 @@ namespace GameCore.Gameplay.EntitiesSystems.CombatLogics
         
         private void SetDestination()
         {
+            if (!_agent.enabled)
+                return;
+            
             PlayerEntity targetPlayer = GetTargetPlayer();
             bool isTargetExists = targetPlayer != null;
 

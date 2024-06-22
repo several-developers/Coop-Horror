@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.EntitiesSystems.MovementLogics;
+using GameCore.Gameplay.EntitiesSystems.Utilities;
 using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
@@ -19,6 +20,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _transform = goodClownEntity.transform;
             _agent = goodClownEntity.GetAgent();
             _clownUtilities = goodClownEntity.GetClownUtilities();
+            _wanderingDistanceBreakCheckRoutine = new CoroutineHelper(goodClownEntity);
             _wanderingMovementLogic = new WanderingMovementLogic(goodClownEntity.transform, _agent);
             
             GoodClownAIConfigMeta goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
@@ -32,21 +34,22 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
         private readonly GoodClownUtilities _clownUtilities;
+        private readonly CoroutineHelper _wanderingDistanceBreakCheckRoutine;
         private readonly WanderingMovementLogic _wanderingMovementLogic;
-
-        private Coroutine _wanderingDistanceBreakCheckCO;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
+            _wanderingDistanceBreakCheckRoutine.GetRoutineEvent += WanderingDistanceBreakCheckCO;
+            
             _wanderingMovementLogic.OnStuckEvent += OnStuck;
             _wanderingMovementLogic.OnArrivedEvent += OnArrived;
             _wanderingMovementLogic.GetRandomPositionEvent += GetRandomPosition;
             
             EnableAgent();
             SetWalkingAnimation();
-            StartWanderingDistanceBreakCheck();
+            _wanderingDistanceBreakCheckRoutine.Start();
             
             if (!_wanderingMovementLogic.TrySetDestinationPoint())
                 EnterFollowTargetState();
@@ -60,11 +63,13 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         public void Exit()
         {
+            _wanderingDistanceBreakCheckRoutine.GetRoutineEvent -= WanderingDistanceBreakCheckCO;
+            
             _wanderingMovementLogic.OnStuckEvent -= OnStuck;
             _wanderingMovementLogic.OnArrivedEvent -= OnArrived;
             _wanderingMovementLogic.GetRandomPositionEvent -= GetRandomPosition;
             
-            StopWanderingDistanceBreakCheck();
+            _wanderingDistanceBreakCheckRoutine.Stop();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -119,21 +124,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
             EnterFollowTargetState();
         }
-        
-        private void StartWanderingDistanceBreakCheck()
-        {
-            IEnumerator routine = WanderingDistanceBreakCheckCO();
-            _wanderingDistanceBreakCheckCO = _goodClownEntity.StartCoroutine(routine);
-        }
-        
-        private void StopWanderingDistanceBreakCheck()
-        {
-            if (_wanderingDistanceBreakCheckCO == null)
-                return;
-            
-            _goodClownEntity.StopCoroutine(_wanderingDistanceBreakCheckCO);
-        }
-        
+
         private void EnterSearchForTargetState() =>
             _goodClownEntity.EnterSearchForTargetState();
         

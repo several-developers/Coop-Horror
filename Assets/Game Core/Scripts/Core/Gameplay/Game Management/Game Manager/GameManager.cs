@@ -153,11 +153,11 @@ namespace GameCore.Gameplay.GameManagement
                     break;
                 
                 case GameState.HeadingToTheRoad:
-                    localPlayer.ChangePlayerLocation(EntityLocation.Road);
+                    localPlayer.SetEntityLocation(EntityLocation.Road);
                     break;
                 
                 case GameState.HeadingToTheLocation:
-                    localPlayer.ChangePlayerLocation(EntityLocation.LocationSurface);
+                    localPlayer.SetEntityLocation(EntityLocation.LocationSurface);
                     break;
 
                 case GameState.ArrivedAtTheRoad:

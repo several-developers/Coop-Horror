@@ -1,4 +1,12 @@
-﻿using UnityEngine.AI;
+﻿using Cysharp.Threading.Tasks;
+using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Monsters.EvilClown;
+using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Factories.Monsters;
+using GameCore.Utilities;
+using UnityEngine;
+using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 {
@@ -6,19 +14,24 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public RespawnAsEvilClownState(GoodClownEntity goodClownEntity) =>
+        public RespawnAsEvilClownState(GoodClownEntity goodClownEntity, IMonstersFactory monstersFactory)
+        {
             _goodClownEntity = goodClownEntity;
+            _monstersFactory = monstersFactory;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly GoodClownEntity _goodClownEntity;
+        private readonly IMonstersFactory _monstersFactory;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
         {
             DisableAgent();
-            DisableHunterSystem();
+            SetAgonizeAnimation();
+            DelayedLogic();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -26,13 +39,58 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private void DisableAgent()
         {
             NavMeshAgent agent = _goodClownEntity.GetAgent();
-            agent.enabled = false;
+            agent.speed = 0f;
         }
         
-        private void DisableHunterSystem()
+        private void SetAgonizeAnimation()
         {
-            HunterSystem hunterSystem = _goodClownEntity.GetHunterSystem();
-            hunterSystem.Stop();
+            GoodClownUtilities clownUtilities = _goodClownEntity.GetClownUtilities();
+            clownUtilities.SetAgonizeAnimation();
         }
+
+        private async void DelayedLogic()
+        {
+            GoodClownAIConfigMeta goodClownAIConfig = _goodClownEntity.GetGoodClownAIConfig();
+            GoodClownAIConfigMeta.TransformationSettings transformationConfig = goodClownAIConfig.TransformationConfig;
+            float delayInSeconds = transformationConfig.TransformationDelay;
+            int delay = delayInSeconds.ConvertToMilliseconds();
+
+            bool isCanceled = await UniTask
+                .Delay(delay, cancellationToken: _goodClownEntity.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+            
+            SpawnEvilClown();
+            EnterDeathState();
+        }
+        
+        private void SpawnEvilClown()
+        {
+            Transform transform = _goodClownEntity.transform;
+            Vector3 position = transform.position;
+            Quaternion rotation = transform.rotation;
+
+            bool isSpawned = _monstersFactory
+                .SpawnMonster(MonsterType.EvilClown, position, rotation, out MonsterEntityBase monsterEntity);
+
+            if (!isSpawned)
+                return;
+
+            PlayerEntity targetPlayer = _goodClownEntity.GetTargetPlayer();
+            bool isTargetFound = targetPlayer != null;
+
+            if (!isTargetFound)
+                return;
+
+            if (monsterEntity is not EvilClownEntity evilClownEntity)
+                return;
+            
+            evilClownEntity.SetTargetPlayer(targetPlayer);
+        }
+
+        private void EnterDeathState() =>
+            _goodClownEntity.EnterDeathState();
     }
 }

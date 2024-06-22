@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.EntitiesSystems.Utilities;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown
@@ -14,28 +15,66 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         {
             _goodClownEntity = goodClownEntity;
             _transform = goodClownEntity.transform;
+            _checkForHuntingRoutine = new CoroutineHelper(goodClownEntity);
+            _checkForTransformationRoutine = new CoroutineHelper(goodClownEntity);
 
             GoodClownAIConfigMeta goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
             _hunterSystemConfig = goodClownAIConfig.HunterSystemConfig;
+
+            _checkForHuntingRoutine.GetRoutineEvent += CheckForHuntingCO;
+            _checkForTransformationRoutine.GetRoutineEvent += CheckForTransformationCO;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly GoodClownEntity _goodClownEntity;
         private readonly GoodClownAIConfigMeta.HunterSystemSettings _hunterSystemConfig;
         private readonly Transform _transform;
+        private readonly CoroutineHelper _checkForHuntingRoutine;
+        private readonly CoroutineHelper _checkForTransformationRoutine;
 
         private Coroutine _checkForHuntingCO;
+        private float _currentHuntingTime;
+        private bool _isHuntingStarted;
+        private bool _isHuntingOver;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Start()
         {
             Stop();
-            StartCheckForHunting();
+            _checkForHuntingRoutine.Start();
         }
 
-        public void Stop() => StopCheckForHunting();
+        public void Tick()
+        {
+            if (!_isHuntingStarted || _isHuntingOver)
+                return;
+            
+            _currentHuntingTime += Time.deltaTime;
+            _isHuntingOver = _currentHuntingTime >= _hunterSystemConfig.HuntingDuration;
+
+            if (!_isHuntingOver)
+                return;
+            
+            _checkForTransformationRoutine.Start();
+        }
+        
+        public void Stop() =>
+            _checkForHuntingRoutine.Stop();
+
+        public void StopHuntingTimer()
+        {
+            _isHuntingStarted = false;
+            _isHuntingOver = false;
+            _currentHuntingTime = 0f;
+        }
+
+        public void Destroy()
+        {
+            _checkForHuntingRoutine.GetRoutineEvent -= CheckForHuntingCO;
+            _checkForTransformationRoutine.GetRoutineEvent -= CheckForTransformationCO;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -61,25 +100,44 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
                 return;
 
             Stop();
+            StartHuntingTimer();
             EnterHuntingIdleState();
         }
 
-        private void StartCheckForHunting()
+        private void CheckForTransformation()
         {
-            IEnumerator routine = CheckForHuntingCO();
-            _checkForHuntingCO = _goodClownEntity.StartCoroutine(routine);
-        }
+            PlayerEntity targetPlayer = _goodClownEntity.GetTargetPlayer();
+            bool isTargetFound = targetPlayer != null;
 
-        private void StopCheckForHunting()
-        {
-            if (_checkForHuntingCO == null)
+            if (!isTargetFound)
+                return;
+
+            Transform target = targetPlayer.transform;
+            float lookDirectionDot = EntitiesUtilities.GetLookDirectionDot(owner: _transform, target);
+            bool canTransform = lookDirectionDot < 0.3f;
+
+            // string log = Log.HandleLog($"Look Value: <gb>{lookDirectionDot}</gb>");
+            // Debug.Log(log);
+
+            if (!canTransform)
                 return;
             
-            _goodClownEntity.StopCoroutine(_checkForHuntingCO);
+            _checkForTransformationRoutine.Stop();
+            EnterRespawnAsEvilClownState();
+        }
+        
+        private void StartHuntingTimer()
+        {
+            _isHuntingStarted = true;
+            _isHuntingOver = false;
+            _currentHuntingTime = 0f;
         }
 
         private void EnterHuntingIdleState() =>
             _goodClownEntity.EnterHuntingIdleState();
+
+        private void EnterRespawnAsEvilClownState() =>
+            _goodClownEntity.EnterRespawnAsEvilClownState();
 
         private IEnumerator CheckForHuntingCO()
         {
@@ -89,6 +147,17 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
                 yield return new WaitForSeconds(checkInterval);
                 
                 CheckForHunting();
+            }
+        }
+
+        private IEnumerator CheckForTransformationCO()
+        {
+            while (true)
+            {
+                float checkInterval = _hunterSystemConfig.TransformationCheckInterval;
+                yield return new WaitForSeconds(checkInterval);
+
+                CheckForTransformation();
             }
         }
 

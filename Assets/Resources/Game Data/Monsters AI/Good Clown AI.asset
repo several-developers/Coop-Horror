@@ -17,20 +17,20 @@ MonoBehaviour:
   _health: 100
   _hunterSystemConfig:
     _disableHunting: 0
+    _huntingDuration: 10
     _huntingCheckInterval: 0.5
+    _transformationCheckInterval: 0.1
     _targetDistanceForHunt: 20
     _distanceToOtherPlayersForHunt: 40
   _transformationConfig:
-    _transformationCheckInterval: 0.25
-    _canTransformAtDistance: 20
-    _transformationDelay: 5
+    _transformationDelay: 6.5
   _followTargetConfig:
     _positionCheckInterval: 0.15
     _moveSpeed: 3
     _distanceCheckInterval: 0.25
     _stoppingDistance: 2
     _reachDistance: 4
-    _maxFollowDistance: 10
+    _maxFollowDistance: 30
     _followEndDelay: 5
   _wanderingConfig:
     _minSpeed: 1
@@ -44,6 +44,7 @@ MonoBehaviour:
   _huntingIdleConfig:
     _minDistanceToChase: 10
     _distanceCheckInterval: 0.2
+    _rotationSpeed: 1
   _huntingChaseConfig:
     _positionCheckInterval: 0.1
     _moveSpeed: 3

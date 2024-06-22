@@ -19,7 +19,7 @@ MonoBehaviour:
   _test2: 0
   _chaseDelay: 3
   _chasePositionCheckInterval: 0.1
-  _chaseSpeed: 5
+  _chaseSpeed: 7
   _chaseDistanceCheckInterval: 0.1
   _chaseStoppingDistance: 0.5
   _maxChaseDistance: 50

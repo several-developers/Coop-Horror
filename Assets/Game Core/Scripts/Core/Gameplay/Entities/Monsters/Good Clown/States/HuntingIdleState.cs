@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.EntitiesSystems.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -15,22 +16,25 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _goodClownEntity = goodClownEntity;
             _clownUtilities = goodClownEntity.GetClownUtilities();
             _transform = goodClownEntity.transform;
+            _agent = goodClownEntity.GetAgent();
 
             GoodClownAIConfigMeta goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
             _huntingIdleConfig = goodClownAIConfig.HuntingIdleConfig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly GoodClownEntity _goodClownEntity;
         private readonly GoodClownAIConfigMeta.HuntingIdleSettings _huntingIdleConfig;
         private readonly GoodClownUtilities _clownUtilities;
+        private readonly NavMeshAgent _agent;
         private readonly Transform _transform;
 
         private Coroutine _distanceCheckCO;
+        private float _cachedAgentSpeed;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void Enter()
         {
             DisableAgent();
@@ -45,22 +49,29 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             RotateToTarget();
         }
 
-        public void Exit() => StopDistanceCheck();
+        public void Exit()
+        {
+            ResetAgent();
+            StopDistanceCheck();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void DisableAgent()
         {
-            NavMeshAgent agent = _goodClownEntity.GetAgent();
-            agent.enabled = false;
+            _cachedAgentSpeed = _agent.speed;
+            _agent.speed = 0f;
         }
-        
+
+        private void ResetAgent() =>
+            _agent.speed = _cachedAgentSpeed;
+
         private void SetIdleAnimation() =>
             _clownUtilities.SetIdleAnimation();
 
         private void ReleaseBalloon() =>
             _goodClownEntity.ReleaseBalloonServerRpc();
-        
+
         private void RotateToTarget()
         {
             PlayerEntity targetPlayer = _goodClownEntity.GetTargetPlayer();
@@ -71,8 +82,11 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
                 EnterSearchForTargetState();
                 return;
             }
+
+            Transform target = targetPlayer.transform;
+            float rotationSpeed = _huntingIdleConfig.RotationSpeed;
             
-            _transform.LookAt(targetPlayer.transform);
+            EntitiesUtilities.RotateToTarget(owner: _transform, target, rotationSpeed);
         }
 
         private void CheckDistance()
@@ -107,10 +121,10 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         {
             if (_distanceCheckCO == null)
                 return;
-            
+
             _goodClownEntity.StopCoroutine(_distanceCheckCO);
         }
-        
+
         private void EnterSearchForTargetState() =>
             _goodClownEntity.EnterSearchForTargetState();
 

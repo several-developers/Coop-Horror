@@ -70,6 +70,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         private void Start()
         {
+            // TEMP
             if (!IsSpawned && NetworkHorror.IsTrueServer)
                 NetworkObject.Spawn();
         }

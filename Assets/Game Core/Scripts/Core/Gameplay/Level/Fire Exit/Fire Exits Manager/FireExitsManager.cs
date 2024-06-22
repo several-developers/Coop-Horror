@@ -81,7 +81,7 @@ namespace GameCore.Gameplay.Level
                     : EntityLocation.Dungeon;
             }
 
-            playerEntity.ChangePlayerLocation(entityLocation);
+            playerEntity.SetEntityLocation(entityLocation);
         }
 
         private void ChangeVisualPreset(EntityLocation entityLocation)

@@ -110,7 +110,7 @@ namespace GameCore.Gameplay.Entities.Player
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
         }
 
-        public void ChangePlayerLocation(EntityLocation entityLocation)
+        public void SetEntityLocation(EntityLocation entityLocation)
         {
             if (IsOwner)
                 _entityLocation.Value = entityLocation;
@@ -463,8 +463,12 @@ namespace GameCore.Gameplay.Entities.Player
             _inventoryManager.ToggleItemsState();
         }
 
-        private void OnOwnerPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue) =>
+        private void OnOwnerPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue)
+        {
+            string log = Log.HandleLog($"New Location: <gb>{newValue}</gb>");
+            Debug.Log(log);
             OnPlayerLocationChangedEvent.Invoke(newValue);
+        }
 
         private void OnSanityChanged(float previousValue, float newValue) =>
             OnSanityChangedEvent.Invoke(newValue);

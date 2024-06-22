@@ -220,10 +220,15 @@ namespace GameCore.Gameplay.Level.Elevator
             GameUtilities.Teleport(target, parentFrom, parentTo, out Vector3 position, out Quaternion rotation);
             playerEntity.Teleport(position, rotation);
 
+            EntityLocation playerLocation = currentFloor == Floor.Surface
+                ? EntityLocation.LocationSurface
+                : EntityLocation.Dungeon;
+            
             VisualPresetType presetType = currentFloor == Floor.Surface
                 ? VisualPresetType.DefaultLocation
                 : VisualPresetType.Dungeon;
             
+            playerEntity.SetEntityLocation(playerLocation);
             _visualManager.ChangePreset(presetType);
         }
 

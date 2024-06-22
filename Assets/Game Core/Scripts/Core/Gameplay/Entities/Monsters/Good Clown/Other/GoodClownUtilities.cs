@@ -30,6 +30,9 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         public void SetWalkingAnimation() =>
             _animator.SetBool(id: AnimatorHashes.IsWalking, value: true);
 
+        public void SetAgonizeAnimation() =>
+            _animator.SetBool(id: AnimatorHashes.IsAgonizing, value: true);
+
         public void UpdateAnimationMoveSpeed()
         {
             float value = GetCurrentClampedSpeed();
