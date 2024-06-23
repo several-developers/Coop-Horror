@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using GameCore.Gameplay.EntitiesSystems.Utilities;
+using UnityEngine;
 using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown
@@ -23,33 +24,14 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         private Vector2 _smoothDeltaPosition;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void SetIdleAnimation() =>
-            _animator.SetBool(id: AnimatorHashes.IsWalking, value: false);
-
-        public void SetWalkingAnimation() =>
-            _animator.SetBool(id: AnimatorHashes.IsWalking, value: true);
-
+        
         public void SetAgonizeAnimation() =>
             _animator.SetBool(id: AnimatorHashes.IsAgonizing, value: true);
 
         public void UpdateAnimationMoveSpeed()
         {
-            float value = GetCurrentClampedSpeed();
+            float value = MonstersUtilities.GetAgentClampedSpeed(_agent);
             _animator.SetFloat(id: AnimatorHashes.MoveSpeed, value);
-        }
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private float GetCurrentClampedSpeed()
-        {
-            float targetSpeed = _agent.speed;
-
-            if (Mathf.Approximately(a: targetSpeed, b: 0f))
-                return 0f;
-
-            float agentSpeed = _agent.velocity.magnitude;
-            return agentSpeed / targetSpeed;
         }
     }
 }

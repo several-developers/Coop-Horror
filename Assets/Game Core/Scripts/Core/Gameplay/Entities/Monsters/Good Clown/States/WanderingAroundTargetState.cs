@@ -48,7 +48,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _wanderingMovementLogic.GetRandomPositionEvent += GetRandomPosition;
             
             EnableAgent();
-            SetWalkingAnimation();
             _wanderingDistanceBreakCheckRoutine.Start();
             
             if (!_wanderingMovementLogic.TrySetDestinationPoint())
@@ -79,9 +78,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _agent.enabled = true;
             _agent.speed = GetWanderingSpeed();
         }
-
-        private void SetWalkingAnimation() =>
-            _clownUtilities.SetWalkingAnimation();
 
         private void UpdateAnimationMoveSpeed() =>
             _clownUtilities.UpdateAnimationMoveSpeed();

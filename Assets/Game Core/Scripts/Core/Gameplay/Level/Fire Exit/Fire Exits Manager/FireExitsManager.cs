@@ -62,10 +62,20 @@ namespace GameCore.Gameplay.Level
             Transform teleportPoint = fireExit.GetTeleportPoint();
             Vector3 position = teleportPoint.position;
             Quaternion rotation = teleportPoint.rotation;
+            
+            var entityLocation = EntityLocation.Stairs;
+
+            if (isInStairsLocation)
+            {
+                entityLocation = floor == Floor.Surface
+                    ? EntityLocation.LocationSurface
+                    : EntityLocation.Dungeon;
+            }
 
             //entity.Rigidbody.velocity = Vector3.zero;
-            entity.Teleport(position, rotation);
+            entity.SetEntityLocation(entityLocation);
             entity.SetFloor(floor);
+            entity.Teleport(position, rotation);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

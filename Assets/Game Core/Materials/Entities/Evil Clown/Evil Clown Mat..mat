@@ -14,7 +14,6 @@ Material:
   - _MK_DETAIL_BLEND_MIX
   - _MK_ENVIRONMENT_REFLECTIONS_ADVANCED
   - _MK_LIGHT_CEL
-  - _MK_OUTLINE_NOISE
   - _MK_RECEIVE_SHADOWS
   - _MK_SPECULAR_ISOTROPIC
   - _MK_WRAPPED_DIFFUSE
@@ -264,8 +263,8 @@ Material:
     - _OutlineData: 0
     - _OutlineFadeMax: 2
     - _OutlineFadeMin: 0.25
-    - _OutlineNoise: -1
-    - _OutlineSize: 15
+    - _OutlineNoise: 0
+    - _OutlineSize: 10
     - _OutlineTab: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
@@ -307,9 +306,9 @@ Material:
     - _ZTest: 4
     - _ZWrite: 1
     m_Colors:
-    - _AlbedoColor: {r: 1, g: 0.18396229, b: 0.18396229, a: 1}
+    - _AlbedoColor: {r: 0.9528302, g: 0.9528302, b: 0.9528302, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 0.18396226, b: 0.18396226, a: 1}
+    - _Color: {r: 0.95283014, g: 0.95283014, b: 0.95283014, a: 1}
     - _DetailColor: {r: 1, g: 1, b: 1, a: 1}
     - _DissolveBorderColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

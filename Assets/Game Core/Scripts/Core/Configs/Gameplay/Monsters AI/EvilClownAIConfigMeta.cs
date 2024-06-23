@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Enemies
@@ -56,6 +57,10 @@ namespace GameCore.Configs.Gameplay.Enemies
         [BoxGroup(WanderingStateGroup), SerializeField, Min(0f)]
         private float _wanderingMaxDistance = 15f;
 
+        [TitleGroup(AnimationSettingsTitle)]
+        [BoxGroup(AnimationGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
+        private AnimationSettings _animationConfig;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float FireExitInteractionDistance => _fireExitInteractionDistance;
@@ -76,6 +81,8 @@ namespace GameCore.Configs.Gameplay.Enemies
         public float WanderingMaxSpeed => _wanderingMaxSpeed;
         public float WanderingMinDistance => _wanderingMinDistance;
         public float WanderingMaxDistance => _wanderingMaxDistance;
+
+        public AnimationSettings AnimationConfig => _animationConfig;
         
         // FIELDS: --------------------------------------------------------------------------------
         
@@ -84,11 +91,44 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string WanderingStateSettings = "Wandering State Settings";
         private const string ChaseStateSettings = "Chase State Settings";
         private const string AttackStateSettings = "Attack State Settings";
+        private const string AnimationSettingsTitle = "Animation Settings";
         
         private const string CommonGroup = CommonSettings + "/Group";
         private const string IdleStateGroup = IdleStateSettings + "/Group";
         private const string WanderingStateGroup = WanderingStateSettings + "/Group";
         private const string ChaseStateGroup = ChaseStateSettings + "/Group";
         private const string AttackStateGroup = AttackStateSettings + "/Group";
+        private const string AnimationGroup = AnimationSettingsTitle + "/Group";
+
+        // INNER CLASSES: -------------------------------------------------------------------------
+
+        #region Inner Classes
+
+        [Serializable]
+        public class AnimationSettings
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, Min(0f)]
+            private float _distanceCheckInterval = 0.2f;
+
+            [SerializeField, Min(0f)]
+            private float _typeChangeDuration = 0.15f;
+            
+            [SerializeField, Min(0f)]
+            private float _runningFirstTypeDistance = 25f;
+
+            [SerializeField, Min(0f)]
+            private float _runningSecondTypeDistance = 15f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float DistanceCheckInterval => _distanceCheckInterval;
+            public float TypeChangeDuration => _typeChangeDuration;
+            public float RunningFirstTypeDistance => _runningFirstTypeDistance;
+            public float RunningSecondTypeDistance => _runningSecondTypeDistance;
+        }
+
+        #endregion
     }
 }

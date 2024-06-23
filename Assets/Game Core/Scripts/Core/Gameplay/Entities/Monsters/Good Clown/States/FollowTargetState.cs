@@ -54,7 +54,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _chaseLogic.GetStoppingDistanceEvent += GetStoppingDistance;
 
             EnableAgent();
-            SetWalkingAnimation();
             _chaseLogic.Start();
         }
 
@@ -94,9 +93,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         private void ResetAgent() =>
             _agent.stoppingDistance = _cachedAgentStoppingDistance;
-
-        private void SetWalkingAnimation() =>
-            _clownUtilities.SetWalkingAnimation();
 
         private void EnterSearchForTargetState() =>
             _goodClownEntity.EnterSearchForTargetState();

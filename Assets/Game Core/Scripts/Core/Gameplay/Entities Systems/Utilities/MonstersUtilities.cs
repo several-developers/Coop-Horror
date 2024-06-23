@@ -2,6 +2,7 @@
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace GameCore.Gameplay.EntitiesSystems.Utilities
 {
@@ -9,6 +10,17 @@ namespace GameCore.Gameplay.EntitiesSystems.Utilities
     {
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public static float GetAgentClampedSpeed(NavMeshAgent agent)
+        {
+            float targetSpeed = agent.speed;
+
+            if (Mathf.Approximately(a: targetSpeed, b: 0f))
+                return 0f;
+
+            float agentSpeed = agent.velocity.magnitude;
+            return agentSpeed / targetSpeed;
+        }
+        
         public static bool TryGetClosestAlivePlayer(
             Vector3 worldPosition,
             EntityLocation location,

@@ -15,7 +15,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         public SearchForTargetState(GoodClownEntity goodClownEntity)
         {
             _goodClownEntity = goodClownEntity;
-            _clownUtilities = goodClownEntity.GetClownUtilities();
             _agent = goodClownEntity.GetAgent();
             _transform = goodClownEntity.transform;
             _searchTargetRoutine = new CoroutineHelper(goodClownEntity);
@@ -26,7 +25,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private const float SearchInterval = 1f;
 
         private readonly GoodClownEntity _goodClownEntity;
-        private readonly GoodClownUtilities _clownUtilities;
         private readonly NavMeshAgent _agent;
         private readonly Transform _transform;
         private readonly CoroutineHelper _searchTargetRoutine;
@@ -40,7 +38,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _searchTargetRoutine.GetRoutineEvent += SearchTargetCO;
 
             DisableAgent();
-            SetIdleAnimation();
             StartHunterSystem();
             _searchTargetRoutine.Start();
         }
@@ -64,9 +61,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private void ResetAgent() =>
             _agent.speed = _cachedAgentSpeed;
 
-        private void SetIdleAnimation() =>
-            _clownUtilities.SetIdleAnimation();
-
         private void StartHunterSystem()
         {
             HunterSystem hunterSystem = _goodClownEntity.GetHunterSystem();
@@ -84,8 +78,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
                 
                 bool isTargetFound = TryFoundTarget(out PlayerEntity targetPlayer);
 
-                string log = Log.HandleLog($"Is Target Found: <gb>{isTargetFound}</gb>");
-                Debug.Log(log);
+                // string log = Log.HandleLog($"Is Target Found: <gb>{isTargetFound}</gb>");
+                // Debug.Log(log);
 
                 if (!isTargetFound)
                     continue;

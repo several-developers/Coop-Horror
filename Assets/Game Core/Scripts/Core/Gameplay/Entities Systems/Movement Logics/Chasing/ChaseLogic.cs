@@ -87,7 +87,7 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
             if (!Agent.enabled)
                 return;
 
-            bool isTargetPointFound = TryGetDestinationPoint(out Vector3 targetPoint);
+            bool isTargetPointFound = TryGetDestinationPoint(out _targetPoint);
 
             if (!isTargetPointFound)
             {
@@ -95,7 +95,7 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
                 return;
             }
 
-            Agent.destination = targetPoint;
+            Agent.destination = _targetPoint;
         }
 
         private void CheckDistance()

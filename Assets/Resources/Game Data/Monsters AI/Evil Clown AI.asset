@@ -15,18 +15,23 @@ MonoBehaviour:
   _metaName: Evil Clown AI
   _isDamageable: 0
   _health: 100
-  _test: 0
-  _test2: 0
+  _fireExitInteractionDistance: 0.5
+  _fireExitInteractionDuration: 0.5
   _chaseDelay: 3
   _chasePositionCheckInterval: 0.1
   _chaseSpeed: 7
   _chaseDistanceCheckInterval: 0.1
   _chaseStoppingDistance: 0.5
-  _maxChaseDistance: 50
-  _chaseEndDelay: 5
+  _maxChaseDistance: 10000
+  _chaseEndDelay: 10
   _attackDistance: 1.25
   _attackCooldown: 2
   _wanderingMinSpeed: 1
   _wanderingMaxSpeed: 2.5
   _wanderingMinDistance: 1
   _wanderingMaxDistance: 15
+  _animationConfig:
+    _distanceCheckInterval: 0.2
+    _typeChangeDuration: 0.03
+    _runningFirstTypeDistance: 20
+    _runningSecondTypeDistance: 10

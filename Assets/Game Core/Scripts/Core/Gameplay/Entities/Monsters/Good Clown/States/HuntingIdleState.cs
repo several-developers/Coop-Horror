@@ -38,7 +38,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         public void Enter()
         {
             DisableAgent();
-            SetIdleAnimation();
             ReleaseBalloon();
             StartDistanceCheck();
         }
@@ -65,9 +64,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         private void ResetAgent() =>
             _agent.speed = _cachedAgentSpeed;
-
-        private void SetIdleAnimation() =>
-            _clownUtilities.SetIdleAnimation();
 
         private void ReleaseBalloon() =>
             _goodClownEntity.ReleaseBalloonServerRpc();

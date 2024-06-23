@@ -8,7 +8,7 @@ using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 {
-    public class ChaseState : IEnterState, IExitState
+    public class ChaseState : IEnterState, ITickableState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -17,6 +17,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _evilClownEntity = evilClownEntity;
             _evilClownAIConfig = evilClownEntity.GetEvilClownAIConfig();
             _agent = evilClownEntity.GetAgent();
+            _animationController = evilClownEntity.GetAnimationController();
             _wanderingTimer = evilClownEntity.GetWanderingTimer();
             _chaseLogic = new ClownChaseLogic(_evilClownEntity, _agent, levelProvider);
         }
@@ -26,6 +27,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         private readonly EvilClownEntity _evilClownEntity;
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly NavMeshAgent _agent;
+        private readonly AnimationController _animationController;
         private readonly WanderingTimer _wanderingTimer;
         private readonly ClownChaseLogic _chaseLogic;
 
@@ -59,6 +61,9 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _chaseLogic.Start();
         }
 
+        public void Tick() =>
+            _animationController.UpdateAnimationMoveSpeed();
+
         public void Exit()
         {
             _chaseLogic.OnTargetNotFoundEvent -= OnTargetNotFound;
@@ -86,7 +91,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         {
             _cachedAgentStoppingDistance = _agent.stoppingDistance;
             
-            _agent.enabled = true;
             _agent.speed = _evilClownAIConfig.ChaseSpeed;
             _agent.stoppingDistance = _evilClownAIConfig.ChaseStoppingDistance;
         }

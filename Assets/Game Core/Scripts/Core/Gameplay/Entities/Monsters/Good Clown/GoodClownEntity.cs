@@ -30,8 +30,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
             _levelProvider = levelProvider;
             _monstersFactory = monstersFactory;
             _goodClownAIConfig = monstersAIConfigsProvider.GetGoodClownAIConfig();
-            _hunterSystem = new HunterSystem(goodClownEntity: this);
-            _clownUtilities = new GoodClownUtilities(goodClownEntity: this, _animator);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -144,6 +142,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
             void InitSystems()
             {
                 _goodClownStateMachine = new StateMachine();
+                _hunterSystem = new HunterSystem(goodClownEntity: this);
+                _clownUtilities = new GoodClownUtilities(goodClownEntity: this, _animator);
 
                 _goodClownStateMachine.OnStateChangedEvent += state =>
                 {

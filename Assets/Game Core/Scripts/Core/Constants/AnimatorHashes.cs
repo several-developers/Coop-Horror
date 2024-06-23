@@ -19,6 +19,8 @@ namespace GameCore
         public static readonly int Close = Animator.StringToHash(name: "Close");
         public static readonly int Trigger = Animator.StringToHash(name: "Trigger");
         public static readonly int Aggression = Animator.StringToHash(name: "Aggression");
+        public static readonly int IdleType = Animator.StringToHash(name: "IdleType");
+        public static readonly int RunningType = Animator.StringToHash(name: "RunningType");
         
         public static readonly int IsWalking = Animator.StringToHash(name: "IsWalking");
         public static readonly int IsSprinting = Animator.StringToHash(name: "IsSprinting");

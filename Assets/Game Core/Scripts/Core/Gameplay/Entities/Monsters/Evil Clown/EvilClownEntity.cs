@@ -27,6 +27,9 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField, Required]
+        private Animator _animator;
+
+        [SerializeField, Required]
         private TextMeshPro _stateTMP;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -37,6 +40,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private EvilClownAIConfigMeta _evilClownAIConfig;
 
         private StateMachine _evilClownStateMachine;
+        private AnimationController _animationController;
         private WanderingTimer _wanderingTimer;
         private PlayerEntity _targetPlayer;
 
@@ -87,6 +91,8 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         public EvilClownAIConfigMeta GetEvilClownAIConfig() => _evilClownAIConfig;
 
+        public AnimationController GetAnimationController() => _animationController;
+        
         public WanderingTimer GetWanderingTimer() => _wanderingTimer;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
@@ -105,8 +111,13 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             void InitSystems()
             {
                 _evilClownStateMachine = new StateMachine();
+                _animationController = new AnimationController(evilClownEntity: this, _animator);
                 _wanderingTimer = new WanderingTimer(evilClownEntity: this);
-                _targetPlayer = PlayerEntity.GetLocalPlayer(); // TEMP!!!!!!!!!!!!!!!!!!
+                
+                if (_targetPlayer == null)
+                    _targetPlayer = PlayerEntity.GetLocalPlayer(); // TEMP!!!!!!!!!!!!!!!!!!
+                
+                _animationController.StartAnimationCheck();
 
                 _evilClownStateMachine.OnStateChangedEvent += state =>
                 {
@@ -140,8 +151,11 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         protected override void TickServerOnly() =>
             _evilClownStateMachine.Tick();
 
-        protected override void DespawnServerOnly() =>
+        protected override void DespawnServerOnly()
+        {
             AllEvilClowns.Remove(item: this);
+            _animationController.StopAnimationCheck();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public EntityLocation EntityLocation { get; private set; } = EntityLocation.Dungeon;
+        public EntityLocation EntityLocation { get; private set; } = EntityLocation.LocationSurface;
         public Floor CurrentFloor { get; private set; }
         
         // FIELDS: --------------------------------------------------------------------------------
@@ -70,7 +70,10 @@ namespace GameCore.Gameplay.Entities.Monsters
         private void CheckAgentState()
         {
             if (!_agent.enabled)
+            {
+                _agent.enabled = true;
                 return;
+            }
 
             Log.PrintError(log: "Nav Mesh Agent enabled! Disable it in prefab!");
         }
