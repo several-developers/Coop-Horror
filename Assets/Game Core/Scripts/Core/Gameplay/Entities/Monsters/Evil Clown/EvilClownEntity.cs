@@ -148,8 +148,11 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             }
         }
 
-        protected override void TickServerOnly() =>
+        protected override void TickServerOnly()
+        {
+            _animationController.Tick();
             _evilClownStateMachine.Tick();
+        }
 
         protected override void DespawnServerOnly()
         {

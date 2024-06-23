@@ -177,6 +177,8 @@ namespace GameCore.Gameplay.GameManagement
                     break;
 
                 case GameState.ArrivedAtTheLocation:
+                    localPlayer.EnterAliveState();
+
                     if (!IsServerOnly)
                         return;
 

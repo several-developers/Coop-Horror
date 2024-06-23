@@ -25,7 +25,7 @@ namespace GameCore.Gameplay.Entities.Player.States
             EnableMovement();
             DisableRagdoll();
             ToggleNotDead();
-            EnterAliveState();
+            EnterSittingState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.Entities.Player.States
         private void EnableMovement()
         {
             PlayerMovementController movementController = _playerReferences.PlayerMovementController;
-            movementController.ToggleMovementState(isEnabled: true);
+            movementController.ToggleActiveState(isEnabled: true);
         }
 
         private void DisableRagdoll() =>
@@ -48,7 +48,7 @@ namespace GameCore.Gameplay.Entities.Player.States
         private void ToggleNotDead() =>
             _playerEntity.ToggleDead(isDead: false);
 
-        private void EnterAliveState() =>
-            _playerEntity.EnterAliveState();
+        private void EnterSittingState() =>
+            _playerEntity.EnterSittingState();
     }
 }

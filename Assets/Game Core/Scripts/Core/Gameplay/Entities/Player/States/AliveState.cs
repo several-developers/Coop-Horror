@@ -7,15 +7,11 @@ namespace GameCore.Gameplay.Entities.Player.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public AliveState(PlayerEntity playerEntity, ICamerasManager camerasManager)
-        {
-            _playerEntity = playerEntity;
+        public AliveState(ICamerasManager camerasManager) =>
             _camerasManager = camerasManager;
-        }
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        private readonly PlayerEntity _playerEntity;
         private readonly ICamerasManager _camerasManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

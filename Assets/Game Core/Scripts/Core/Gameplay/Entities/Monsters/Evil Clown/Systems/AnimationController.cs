@@ -32,7 +32,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private readonly Animator _animator;
         private readonly CoroutineHelper _checkAnimationRoutine;
 
-        private float _previousRunningType = -1f;
+        private float _runningType;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -41,6 +41,14 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             _checkAnimationRoutine.GetRoutineEvent += CheckAnimationCO;
             
             _checkAnimationRoutine.Start();
+        }
+
+        public void Tick()
+        {
+            float dampTime = _animationConfig.TypeChangeDuration;
+            float deltaTime = Time.deltaTime;
+            
+            _animator.SetFloat(id: AnimatorHashes.RunningType, value: _runningType, dampTime, deltaTime);
         }
 
         public void StopAnimationCheck()
@@ -79,16 +87,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             else if (distance < typeTwoDistance)
                 runningType = 2f;
 
-            bool isSameRunningType = Mathf.Approximately(a: runningType, b: _previousRunningType);
-            _previousRunningType = runningType;
-
-            if (!isSameRunningType)
-                return;
-            
-            float dampTime = _animationConfig.TypeChangeDuration;
-            float deltaTime = Time.deltaTime;
-            
-            _animator.SetFloat(id: AnimatorHashes.RunningType, value: runningType, dampTime, deltaTime);
+            _runningType = runningType;
         }
 
         private IEnumerator CheckAnimationCO()

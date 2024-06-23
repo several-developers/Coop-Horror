@@ -26,6 +26,7 @@ namespace GameCore
         public static readonly int IsSprinting = Animator.StringToHash(name: "IsSprinting");
         public static readonly int IsCrawling = Animator.StringToHash(name: "IsCrawling");
         public static readonly int IsAgonizing = Animator.StringToHash(name: "IsAgonizing");
+        public static readonly int IsSitting = Animator.StringToHash(name: "IsSitting");
         public static readonly int IsOn = Animator.StringToHash(name: "IsOn");
         public static readonly int IsOpen = Animator.StringToHash(name: "IsOpen");
         

@@ -51,7 +51,7 @@ namespace GameCore.Gameplay.Entities.Player.States
         private void DisableMovement()
         {
             PlayerMovementController movementController = _playerReferences.PlayerMovementController;
-            movementController.ToggleMovementState(isEnabled: false);
+            movementController.ToggleActiveState(isEnabled: false);
         }
 
         private void EnableRagdoll() =>

@@ -1,18 +1,14 @@
 ﻿using System.Collections.Generic;
-using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Network.Other
+namespace GameCore.Gameplay.Entities.MobileHeadquarters
 {
-    public class PlayerSpawnPoint : MonoBehaviour
+    public class VehicleSeatSpawnPoint : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
-        [SerializeField, Min(0f)]
-        private float _radius = 0.5f;
-
         [SerializeField, Min(0f)]
         private float _yOffset = 1.1f;
 
@@ -21,45 +17,41 @@ namespace GameCore.Gameplay.Network.Other
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public float Radius => _radius;
         public bool DrawGizmos => _drawGizmos;
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private static readonly List<PlayerSpawnPoint> SpawnPointsList = new();
+        private static readonly List<VehicleSeatSpawnPoint> AllSpawnPoints = new();
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() =>
-            SpawnPointsList.Add(item: this);
+            AllSpawnPoints.Add(item: this);
 
         private void OnDestroy() =>
-            SpawnPointsList.Remove(item: this);
+            AllSpawnPoints.Remove(item: this);
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public Vector3 GetRandomPosition(bool localPosition = false)
+        public Vector3 GetSpawnPosition()
         {
-            Vector3 spawnPosition = localPosition
-                ? transform.GetRandomLocalPosition(_radius)
-                : transform.GetRandomPosition(_radius);
-            
+            Vector3 spawnPosition = transform.localPosition;
             spawnPosition.y += _yOffset;
             return spawnPosition;
         }
 
-        public static bool GetRandomSpawnPoint(out PlayerSpawnPoint spawnPoint)
+        public static bool GetRandomSpawnPoint(out VehicleSeatSpawnPoint result)
         {
-            int spawnPointsAmount = SpawnPointsList.Count;
+            int spawnPointsAmount = AllSpawnPoints.Count;
 
             if (spawnPointsAmount == 0)
             {
-                spawnPoint = null;
+                result = null;
                 return false;
             }
-
+            
             int randomIndex = Random.Range(0, spawnPointsAmount);
-            spawnPoint = SpawnPointsList[randomIndex];
+            result = AllSpawnPoints[randomIndex];
             return true;
         }
     }

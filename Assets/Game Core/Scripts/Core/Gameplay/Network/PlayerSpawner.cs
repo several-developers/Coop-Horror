@@ -6,7 +6,6 @@ using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.ConnectionManagement;
-using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.Session_Manager;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Utilities;
@@ -110,8 +109,8 @@ namespace GameCore.Gameplay.Network
 
         private Vector3 GetSpawnPosition()
         {
-            bool isSpawnPointFound = PlayerSpawnPoint.GetRandomSpawnPoint(out PlayerSpawnPoint spawnPoint);
-            return isSpawnPointFound ? spawnPoint.GetRandomPosition(SpawnAsChild) : transform.GetRandomPosition();
+            bool isSpawnPointFound = VehicleSeatSpawnPoint.GetRandomSpawnPoint(out VehicleSeatSpawnPoint spawnPoint);
+            return isSpawnPointFound ? spawnPoint.GetSpawnPosition() : transform.GetRandomPosition();
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

@@ -61,6 +61,7 @@ namespace GameCore.Gameplay.Entities.Player
         private bool _cancelCrouch;
 
         private bool _isEnabled;
+        private bool _canMove;
         private bool _isCameraEnabled;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -93,7 +94,8 @@ namespace GameCore.Gameplay.Entities.Player
 
             // Set Character movement direction
 
-            _character.SetMovementDirection(movementDirection);
+            if (_canMove)
+                _character.SetMovementDirection(movementDirection);
 
             if (_isCameraEnabled)
             {
@@ -109,6 +111,9 @@ namespace GameCore.Gameplay.Entities.Player
 
                 AddControlPitchInput(_lookVector.y * _lookSensitivity.y, _minPitch, _maxPitch);
             }
+
+            if (!_canMove)
+                return;
 
             // Crouch input
 
@@ -175,10 +180,11 @@ namespace GameCore.Gameplay.Entities.Player
             _isInitialized = true;
             _isEnabled = true;
             _isCameraEnabled = true;
+            _canMove = true;
             _inputReader = playerEntity.InputReader;
 
-            _crouchedCamera.SetActive(false);
-            _unCrouchedCamera.SetActive(true);
+            EnableUnCrouchedCamera();
+            
             _crouchedCamera.transform.SetParent(null);
             _unCrouchedCamera.transform.SetParent(null);
 
@@ -192,11 +198,32 @@ namespace GameCore.Gameplay.Entities.Player
             _inputReader.OnSprintCanceledEvent += OnSprintCanceled;
         }
 
-        public void ToggleMovementState(bool isEnabled) =>
+        public void ToggleActiveState(bool isEnabled) =>
             _isEnabled = isEnabled;
+
+        public void ToggleMovement(bool canMove) =>
+            _canMove = canMove;
 
         public void ToggleCameraState(bool isEnabled) =>
             _isCameraEnabled = isEnabled;
+
+        public void DisableAllCameras()
+        {
+            _crouchedCamera.SetActive(false);
+            _unCrouchedCamera.SetActive(false);
+        }
+
+        public void EnableCrouchedCamera()
+        {
+            _crouchedCamera.SetActive(true);
+            _unCrouchedCamera.SetActive(false);
+        }
+
+        public void EnableUnCrouchedCamera()
+        {
+            _crouchedCamera.SetActive(false);
+            _unCrouchedCamera.SetActive(true);
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -245,7 +272,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnJump()
         {
-            if (!_isEnabled)
+            if (!_isEnabled || !_canMove)
                 return;
 
             _performJump = true;
@@ -253,7 +280,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnJumpCanceled()
         {
-            if (!_isEnabled)
+            if (!_isEnabled || !_canMove)
                 return;
 
             _cancelJump = true;
@@ -261,7 +288,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnCrouch()
         {
-            if (!_isEnabled)
+            if (!_isEnabled || !_canMove)
                 return;
 
             _performCrouch = true;
@@ -269,7 +296,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnCrouchCanceled()
         {
-            if (!_isEnabled)
+            if (!_isEnabled || !_canMove)
                 return;
 
             _cancelCrouch = true;
@@ -285,7 +312,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnSprint()
         {
-            if (!_isEnabled)
+            if (!_isEnabled || !_canMove)
                 return;
 
             _sprintAbility.Sprint();
@@ -293,7 +320,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnSprintCanceled()
         {
-            if (!_isEnabled)
+            if (!_isEnabled || !_canMove)
                 return;
 
             _sprintAbility.StopSprinting();

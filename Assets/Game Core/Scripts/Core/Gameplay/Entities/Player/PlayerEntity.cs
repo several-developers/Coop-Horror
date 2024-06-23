@@ -156,6 +156,8 @@ namespace GameCore.Gameplay.Entities.Player
         public void EnterAliveState() => ChangeState<AliveState>();
 
         public void EnterReviveState() => ChangeState<ReviveState>();
+        
+        public void EnterSittingState() => ChangeState<SittingState>();
 
         public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
 
@@ -201,7 +203,7 @@ namespace GameCore.Gameplay.Entities.Player
             InitPlayerMovement();
             DeactivatePlayerMesh();
             SetupStates();
-            EnterAliveState();
+            EnterSittingState();
 
             InputReader.OnScrollEvent += OnScrollInventory;
             InputReader.OnInteractEvent += OnInteract;
@@ -245,6 +247,9 @@ namespace GameCore.Gameplay.Entities.Player
 
                 MyAnimationController animationController = _references.AnimationController;
                 animationController.Setup(character, InputReader, cameraReferences);
+
+                SittingCameraController sittingCameraController = _references.SittingCameraController;
+                sittingCameraController.ToggleActiveState(isEnabled: false);
             }
 
             void DeactivatePlayerMesh()
@@ -261,13 +266,15 @@ namespace GameCore.Gameplay.Entities.Player
 
             void SetupStates()
             {
-                AliveState aliveState = new(playerEntity: this, _camerasManager);
+                AliveState aliveState = new(_camerasManager);
                 DeathState deathState = new(playerEntity: this, _camerasManager);
                 ReviveState reviveState = new(playerEntity: this);
+                SittingState sittingState = new(playerEntity: this, _camerasManager);
 
                 _playerStateMachine.AddState(aliveState);
                 _playerStateMachine.AddState(deathState);
                 _playerStateMachine.AddState(reviveState);
+                _playerStateMachine.AddState(sittingState);
             }
         }
 
@@ -512,6 +519,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugEnterReviveState() => EnterReviveState();
+
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugEnterSittingState() => EnterSittingState();
 
         [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugSetCameraStatus(CameraStatus cameraStatus) =>

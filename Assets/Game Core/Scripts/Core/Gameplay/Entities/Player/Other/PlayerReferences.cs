@@ -44,6 +44,9 @@ namespace GameCore.Gameplay.Entities.Player
         private Character _character;
 
         [SerializeField, Required]
+        private SittingCameraController _sittingCameraController;
+        
+        [SerializeField, Required]
         private PlayerMovementController _playerMovementController;
 
         [SerializeField, Required]
@@ -73,6 +76,7 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public RagdollController RagdollController => _ragdollController;
         public Character Character => _character;
+        public SittingCameraController SittingCameraController => _sittingCameraController;
         public PlayerMovementController PlayerMovementController => _playerMovementController;
         public MyAnimationController AnimationController => _animationController;
         public HealthSystem HealthSystem => _healthSystem;

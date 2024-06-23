@@ -6,7 +6,6 @@ using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.VisualManagement;
 using Unity.Netcode;
 using UnityEngine;
@@ -101,14 +100,17 @@ namespace GameCore.Gameplay.GameManagement
 
                 playerEntity.Teleport(spawnPosition, rotation);
                 playerEntity.NetworkObject.TrySetParent(parent, worldPositionStays: false);
+                playerEntity.EnterSittingState();
             }
 
             // LOCAL METHODS: -----------------------------
 
             Vector3 GetSpawnPosition()
             {
-                bool isSpawnPointFound = PlayerSpawnPoint.GetRandomSpawnPoint(out PlayerSpawnPoint spawnPoint);
-                return isSpawnPointFound ? spawnPoint.GetRandomPosition(localPosition: true) : Vector3.zero;
+                bool isSpawnPointFound =
+                    VehicleSeatSpawnPoint.GetRandomSpawnPoint(out VehicleSeatSpawnPoint spawnPoint);
+                
+                return isSpawnPointFound ? spawnPoint.GetSpawnPosition() : Vector3.zero;
             }
         }
 
@@ -125,7 +127,7 @@ namespace GameCore.Gameplay.GameManagement
             foreach (MonsterEntityBase monsterEntity in allMonsters)
                 Object.Destroy(monsterEntity.gameObject);
         }
-        
+
         private void ChangeVisualPreset() =>
             _visualManager.ChangePreset(VisualPresetType.RoadLocation, instant: true);
 
