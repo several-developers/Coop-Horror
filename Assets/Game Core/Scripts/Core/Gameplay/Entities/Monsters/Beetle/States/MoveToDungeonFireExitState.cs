@@ -70,7 +70,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             _beetleEntity.EnterIdleState();
 
         private Floor GetDungeonFloor() =>
-            _beetleEntity.GetDungeonFloor();
+            _beetleEntity.CurrentFloor;
 
         private float GetFireExitDistanceCheckInterval() =>
             _beetleAIConfig.FireExitDistanceCheckInterval;

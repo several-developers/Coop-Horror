@@ -118,7 +118,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             void SetupStates()
             {
                 PrepareToChaseState idleState = new(evilClownEntity: this);
-                ChaseState chaseState = new(evilClownEntity: this);
+                ChaseState chaseState = new(evilClownEntity: this, _levelProvider);
                 AttackState attackState = new(evilClownEntity: this);
                 WanderingState wanderingState = new(evilClownEntity: this);
                 DespawnState despawnState = new(evilClownEntity: this);

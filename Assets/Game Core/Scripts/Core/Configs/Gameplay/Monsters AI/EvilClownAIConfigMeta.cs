@@ -9,10 +9,10 @@ namespace GameCore.Configs.Gameplay.Enemies
         
         [TitleGroup(title: CommonSettings)]
         [BoxGroup(CommonGroup, showLabel: false), SerializeField, Min(0f)]
-        private float _test;
+        private float _fireExitInteractionDistance = 0.5f;
         
         [BoxGroup(CommonGroup), SerializeField, Min(0f)]
-        private float _test2;
+        private float _fireExitInteractionDuration = 0.5f;
         
         [TitleGroup(title: ChaseStateSettings)]
         [BoxGroup(ChaseStateGroup, showLabel: false), SerializeField, Min(0f)]
@@ -58,6 +58,9 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public float FireExitInteractionDistance => _fireExitInteractionDistance;
+        public float FireExitInteractionDuration => _fireExitInteractionDuration;
+        
         public float ChaseDelay => _chaseDelay;
         public float ChasePositionCheckInterval => _chasePositionCheckInterval;
         public float ChaseSpeed => _chaseSpeed;

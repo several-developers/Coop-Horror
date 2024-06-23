@@ -7,34 +7,34 @@ namespace GameCore.Configs.Gameplay.Enemies
     public class GoodClownAIConfigMeta : MonsterAIConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
-        
-        [TitleGroup(title: HunterSystemSettingsTitle)]
+
+        [TitleGroup(CommonSettingsTitle)]
+        [BoxGroup(CommonGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
+        private CommonSettings _commonConfig;
+
+        [TitleGroup(HunterSystemSettingsTitle)]
         [BoxGroup(HunterSystemGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
         private HunterSystemSettings _hunterSystemConfig;
 
-        [TitleGroup(TransformationSettingsTitle)]
-        [BoxGroup(TransformationGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
-        private TransformationSettings _transformationConfig;
-
-        [TitleGroup(title: FollowTargetSettingsTitle)]
+        [TitleGroup(FollowTargetSettingsTitle)]
         [BoxGroup(FollowTargetGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
         private FollowTargetSettings _followTargetConfig;
 
-        [TitleGroup(title: WanderingSettingsTitle)]
+        [TitleGroup(WanderingSettingsTitle)]
         [BoxGroup(WanderingGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
         private WanderingSettings _wanderingConfig;
 
-        [TitleGroup(title: HuntingIdleSettingsTitle)]
+        [TitleGroup(HuntingIdleSettingsTitle)]
         [BoxGroup(HuntingIdleGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
         private HuntingIdleSettings _huntingIdleConfig;
 
-        [TitleGroup(title: HuntingChaseSettingsTitle)]
+        [TitleGroup(HuntingChaseSettingsTitle)]
         [BoxGroup(HuntingChaseGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
         private HuntingChaseSettings _huntingChaseConfig;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public TransformationSettings TransformationConfig => _transformationConfig;
+        public CommonSettings CommonConfig => _commonConfig;
         public FollowTargetSettings FollowTargetConfig => _followTargetConfig;
         public WanderingSettings WanderingConfig => _wanderingConfig;
         public HunterSystemSettings HunterSystemConfig => _hunterSystemConfig;
@@ -43,18 +43,16 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const string CommonSettings = "Common Settings";
+        private const string CommonSettingsTitle = "Common Settings";
         private const string HunterSystemSettingsTitle = "Hunter System Settings";
-        private const string TransformationSettingsTitle = "Transformation Settings";
         private const string FollowTargetSettingsTitle = "Follow Target State Settings";
         private const string WanderingSettingsTitle = "Wandering State Settings";
         private const string HuntingIdleSettingsTitle = "Hunting Idle State Settings";
         private const string HuntingChaseSettingsTitle = "Hunting Chase State Settings";
         private const string SleepingSettingsTitle = "Sleeping State Settings";
 
-        private const string CommonGroup = CommonSettings + "/Group";
+        private const string CommonGroup = CommonSettingsTitle + "/Group";
         private const string HunterSystemGroup = HunterSystemSettingsTitle + "/Group";
-        private const string TransformationGroup = TransformationSettingsTitle + "/Group";
         private const string FollowTargetGroup = FollowTargetSettingsTitle + "/Group";
         private const string WanderingGroup = WanderingSettingsTitle + "/Group";
         private const string HuntingIdleGroup = HuntingIdleSettingsTitle + "/Group";
@@ -65,6 +63,28 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         #region Inner Classes
 
+        [Serializable]
+        public class CommonSettings
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, Min(0f)]
+            private float _fireExitInteractionDistance = 0.5f;
+
+            [SerializeField, Min(0f)]
+            private float _fireExitInteractionDuration = 0.5f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Задержка перед трансформацией.")]
+            private float _transformationDelay = 5f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float FireExitInteractionDistance => _fireExitInteractionDistance;
+            public float FireExitInteractionDuration => _fireExitInteractionDuration;
+            public float TransformationDelay => _transformationDelay;
+        }
+        
         [Serializable]
         public class HunterSystemSettings
         {
@@ -106,20 +126,6 @@ namespace GameCore.Configs.Gameplay.Enemies
             // FIELDS: --------------------------------------------------------------------------------
 
             private const string WarningMessage = "Warning! This should be disabled!";
-        }
-
-        [Serializable]
-        public class TransformationSettings
-        {
-            // MEMBERS: -------------------------------------------------------------------------------
-            
-            [SerializeField, Min(0f)]
-            [Tooltip("Задержка перед трансформацией.")]
-            private float _transformationDelay = 5f;
-
-            // PROPERTIES: ----------------------------------------------------------------------------
-
-            public float TransformationDelay => _transformationDelay;
         }
 
         [Serializable]

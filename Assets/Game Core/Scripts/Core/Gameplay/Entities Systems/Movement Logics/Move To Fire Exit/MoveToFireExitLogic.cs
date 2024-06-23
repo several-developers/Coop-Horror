@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using GameCore.Gameplay.EntitiesSystems.Utilities;
 using GameCore.Gameplay.Level;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,9 +13,9 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
 
         protected MoveToFireExitLogic(MonoBehaviour coroutineRunner, NavMeshAgent agent, ILevelProvider levelProvider)
         {
-            _coroutineRunner = coroutineRunner;
             _agent = agent;
             _transform = coroutineRunner.transform;
+            _distanceCheckRoutine = new CoroutineHelper(coroutineRunner);
             LevelProvider = levelProvider;
         }
 
@@ -27,23 +28,29 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
 
         protected readonly ILevelProvider LevelProvider;
 
-        private readonly MonoBehaviour _coroutineRunner;
-        private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
+        private readonly Transform _transform;
+        private readonly CoroutineHelper _distanceCheckRoutine;
         
         private FireExit _fireExit;
-        private Coroutine _distanceCheckCO;
         private Vector3 _destinationPoint;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Start()
         {
-            StartDistanceCheck();
+            _distanceCheckRoutine.GetRoutineEvent += DistanceCheckCO;
+            
+            _distanceCheckRoutine.Start();
             SetDestinationPoint();
         }
 
-        public void Stop() => StopDistanceCheck();
+        public void Stop()
+        {
+            _distanceCheckRoutine.GetRoutineEvent -= DistanceCheckCO;
+            
+            _distanceCheckRoutine.Stop();
+        }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -76,20 +83,6 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
                 return;
 
             OnInteractWithFireExitEvent.Invoke(_fireExit);
-        }
-
-        private void StartDistanceCheck()
-        {
-            IEnumerator routine = DistanceCheckCO();
-            _distanceCheckCO = _coroutineRunner.StartCoroutine(routine);
-        }
-
-        private void StopDistanceCheck()
-        {
-            if (_distanceCheckCO == null)
-                return;
-
-            _coroutineRunner.StopCoroutine(_distanceCheckCO);
         }
 
         private IEnumerator DistanceCheckCO()

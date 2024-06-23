@@ -51,8 +51,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private async void DelayedLogic()
         {
             GoodClownAIConfigMeta goodClownAIConfig = _goodClownEntity.GetGoodClownAIConfig();
-            GoodClownAIConfigMeta.TransformationSettings transformationConfig = goodClownAIConfig.TransformationConfig;
-            float delayInSeconds = transformationConfig.TransformationDelay;
+            GoodClownAIConfigMeta.CommonSettings commonConfig = goodClownAIConfig.CommonConfig;
+            float delayInSeconds = commonConfig.TransformationDelay;
             int delay = delayInSeconds.ConvertToMilliseconds();
 
             bool isCanceled = await UniTask

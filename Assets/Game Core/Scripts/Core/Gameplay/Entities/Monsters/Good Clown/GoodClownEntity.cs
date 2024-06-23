@@ -48,6 +48,10 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         [SerializeField, Required]
         private TextMeshPro _stateTMP;
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public bool IsInnocent { get; private set; } = true;
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private static readonly List<GoodClownEntity> AllGoodClowns = new();
@@ -61,7 +65,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         private HunterSystem _hunterSystem;
         private GoodClownUtilities _clownUtilities;
 
-        private bool _isReleasedBalloon;
+        private bool _isBalloonReleased;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -76,6 +80,9 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 
         public void SetTargetPlayer(PlayerEntity playerEntity) =>
             _targetPlayer = playerEntity;
+
+        public void ToggleInnocent(bool isInnocent) =>
+            IsInnocent = isInnocent;
 
         [Button]
         public void EnterSearchForTargetState() => ChangeState<SearchForTargetState>();
@@ -148,10 +155,10 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
             void SetupStates()
             {
                 SearchForTargetState searchForTargetState = new(goodClownEntity: this);
-                FollowTargetState followTargetState = new(goodClownEntity: this);
+                FollowTargetState followTargetState = new(goodClownEntity: this, _levelProvider);
                 WanderingAroundTargetState wanderingAroundTargetState = new(goodClownEntity: this);
                 HuntingIdleState huntingIdleState = new(goodClownEntity: this);
-                HuntingChaseState huntingChaseState = new(goodClownEntity: this);
+                HuntingChaseState huntingChaseState = new(goodClownEntity: this, _levelProvider);
                 RespawnAsEvilClownState respawnAsEvilClownState = new(goodClownEntity: this, _monstersFactory);
                 DeathState deathState = new(goodClownEntity: this, _balloon);
 
@@ -175,6 +182,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         {
             AllGoodClowns.Remove(item: this);
             _hunterSystem.Destroy();
+            _balloon.Reset();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -187,10 +195,10 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         [ServerRpc(RequireOwnership = false)]
         public void ReleaseBalloonServerRpc()
         {
-            if (_isReleasedBalloon)
+            if (_isBalloonReleased)
                 return;
 
-            _isReleasedBalloon = true;
+            _isBalloonReleased = true;
             ReleaseBalloonClientRpc();
         }
 

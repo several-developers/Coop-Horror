@@ -142,6 +142,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public void SendCallDeliveryDrone() =>
             OnCallDeliveryDroneEvent.Invoke();
 
+        public MonoBehaviour GetMonoBehaviour() => this;
+        
         public Transform GetTransform() => transform;
 
         public NetworkObject GetNetworkObject() => NetworkObject;

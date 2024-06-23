@@ -1,6 +1,8 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.CombatLogics;
+using GameCore.Gameplay.EntitiesSystems.MovementLogics;
+using GameCore.Gameplay.Level;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,26 +12,26 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public HuntingChaseState(GoodClownEntity goodClownEntity)
+        public HuntingChaseState(GoodClownEntity goodClownEntity, ILevelProvider levelProvider)
         {
             _goodClownEntity = goodClownEntity;
             _clownUtilities = goodClownEntity.GetClownUtilities();
             _agent = goodClownEntity.GetAgent();
-            _transform = goodClownEntity.transform;
-            _chaseLogic = new ChaseLogic(goodClownEntity, _agent);
+            _chaseLogic = new ClownChaseLogic(goodClownEntity, _agent, levelProvider);
 
             GoodClownAIConfigMeta goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
             _huntingChaseConfig = goodClownAIConfig.HuntingChaseConfig;
+            _commonConfig = goodClownAIConfig.CommonConfig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly GoodClownEntity _goodClownEntity;
         private readonly GoodClownAIConfigMeta.HuntingChaseSettings _huntingChaseConfig;
+        private readonly GoodClownAIConfigMeta.CommonSettings _commonConfig;
         private readonly GoodClownUtilities _clownUtilities;
         private readonly NavMeshAgent _agent;
-        private readonly Transform _transform;
-        private readonly ChaseLogic _chaseLogic;
+        private readonly ClownChaseLogic _chaseLogic;
         
         private float _cachedStoppingDistance;
 
@@ -46,6 +48,11 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _chaseLogic.GetChaseEndDelayEvent += GetChaseEndDelay;
             _chaseLogic.GetMaxChaseDistanceEvent += GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent += GetTargetReachDistance;
+            
+            _chaseLogic.GetClownLocationEvent += GetClownLocation;
+            _chaseLogic.GetClownFloorEvent += GetClownFloor;
+            _chaseLogic.GetFireExitInteractionDistanceEvent += GetFireExitInteractionDistance;
+            _chaseLogic.GetStoppingDistanceEvent += GetStoppingDistance;
             
             EnableAgent();
             _chaseLogic.Start();
@@ -66,8 +73,13 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _chaseLogic.GetMaxChaseDistanceEvent -= GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent -= GetTargetReachDistance;
             
-            ResetAgent();
+            _chaseLogic.GetClownLocationEvent -= GetClownLocation;
+            _chaseLogic.GetClownFloorEvent -= GetClownFloor;
+            _chaseLogic.GetFireExitInteractionDistanceEvent -= GetFireExitInteractionDistance;
+            _chaseLogic.GetStoppingDistanceEvent -= GetStoppingDistance;
+            
             _chaseLogic.Stop();
+            ResetAgent();
         }
         
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -92,6 +104,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         private PlayerEntity GetTargetPlayer() =>
             _goodClownEntity.GetTargetPlayer();
+        
+        private EntityLocation GetClownLocation() =>
+            _goodClownEntity.EntityLocation;
+
+        private Floor GetClownFloor() =>
+            _goodClownEntity.CurrentFloor;
 
         private float GetChasePositionCheckInterval() =>
             _huntingChaseConfig.PositionCheckInterval;
@@ -107,6 +125,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         private float GetTargetReachDistance() =>
             _huntingChaseConfig.ReachDistance;
+        
+        private float GetFireExitInteractionDistance() =>
+            _commonConfig.FireExitInteractionDistance;
+
+        private float GetStoppingDistance() =>
+            _huntingChaseConfig.StoppingDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

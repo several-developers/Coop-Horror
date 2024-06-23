@@ -1,6 +1,8 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.CombatLogics;
+using GameCore.Gameplay.EntitiesSystems.MovementLogics;
+using GameCore.Gameplay.Level;
 using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
@@ -9,24 +11,26 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public FollowTargetState(GoodClownEntity goodClownEntity)
+        public FollowTargetState(GoodClownEntity goodClownEntity, ILevelProvider levelProvider)
         {
             _goodClownEntity = goodClownEntity;
             _agent = goodClownEntity.GetAgent();
             _clownUtilities = goodClownEntity.GetClownUtilities();
-            _chaseLogic = new ChaseLogic(goodClownEntity, _agent);
+            _chaseLogic = new ClownChaseLogic(goodClownEntity, _agent, levelProvider);
 
             GoodClownAIConfigMeta goodClownAIConfig = goodClownEntity.GetGoodClownAIConfig();
             _followTargetConfig = goodClownAIConfig.FollowTargetConfig;
+            _commonConfig = goodClownAIConfig.CommonConfig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly GoodClownEntity _goodClownEntity;
         private readonly GoodClownAIConfigMeta.FollowTargetSettings _followTargetConfig;
+        private readonly GoodClownAIConfigMeta.CommonSettings _commonConfig;
         private readonly NavMeshAgent _agent;
         private readonly GoodClownUtilities _clownUtilities;
-        private readonly ChaseLogic _chaseLogic;
+        private readonly ClownChaseLogic _chaseLogic;
 
         private float _cachedAgentStoppingDistance;
 
@@ -44,6 +48,11 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _chaseLogic.GetMaxChaseDistanceEvent += GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent += GetTargetReachDistance;
             
+            _chaseLogic.GetClownLocationEvent += GetClownLocation;
+            _chaseLogic.GetClownFloorEvent += GetClownFloor;
+            _chaseLogic.GetFireExitInteractionDistanceEvent += GetFireExitInteractionDistance;
+            _chaseLogic.GetStoppingDistanceEvent += GetStoppingDistance;
+
             EnableAgent();
             SetWalkingAnimation();
             _chaseLogic.Start();
@@ -64,8 +73,13 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _chaseLogic.GetMaxChaseDistanceEvent -= GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent -= GetTargetReachDistance;
             
-            ResetAgent();
+            _chaseLogic.GetClownLocationEvent -= GetClownLocation;
+            _chaseLogic.GetClownFloorEvent -= GetClownFloor;
+            _chaseLogic.GetFireExitInteractionDistanceEvent -= GetFireExitInteractionDistance;
+            _chaseLogic.GetStoppingDistanceEvent -= GetStoppingDistance;
+
             _chaseLogic.Stop();
+            ResetAgent();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -73,10 +87,9 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private void EnableAgent()
         {
             _cachedAgentStoppingDistance = _agent.stoppingDistance;
-            
+
             _agent.enabled = true;
             _agent.speed = _followTargetConfig.MoveSpeed;
-            _agent.stoppingDistance = _followTargetConfig.StoppingDistance;
         }
 
         private void ResetAgent() =>
@@ -85,7 +98,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private void SetWalkingAnimation() =>
             _clownUtilities.SetWalkingAnimation();
 
-        private void EnterSearchForTargetState() => 
+        private void EnterSearchForTargetState() =>
             _goodClownEntity.EnterSearchForTargetState();
 
         private void EnterWanderingAroundTargetState() =>
@@ -94,6 +107,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private PlayerEntity GetTargetPlayer() =>
             _goodClownEntity.GetTargetPlayer();
 
+        private EntityLocation GetClownLocation() =>
+            _goodClownEntity.EntityLocation;
+
+        private Floor GetClownFloor() =>
+            _goodClownEntity.CurrentFloor;
+        
         private float GetChasePositionCheckInterval() =>
             _followTargetConfig.PositionCheckInterval;
 
@@ -108,6 +127,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         private float GetTargetReachDistance() =>
             _followTargetConfig.ReachDistance;
+
+        private float GetFireExitInteractionDistance() =>
+            _commonConfig.FireExitInteractionDistance;
+
+        private float GetStoppingDistance() =>
+            _followTargetConfig.StoppingDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

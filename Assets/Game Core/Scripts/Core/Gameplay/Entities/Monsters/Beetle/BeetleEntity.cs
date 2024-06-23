@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Monsters.Beetle.States;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.EntitiesSystems.Health;
@@ -57,16 +56,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         private AggressionSystem _aggressionSystem;
         private PlayerEntity _targetPlayer;
 
-        private Floor _dungeonFloor;
         private bool _isDead;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
-
-        protected override void Awake()
-        {
-            base.Awake();
-            CheckEntityLocation();
-        }
 
         private void Start()
         {
@@ -118,8 +110,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         public AggressionSystem GetAggressionSystem() => _aggressionSystem;
 
         public PlayerEntity GetTargetPlayer() => _targetPlayer;
-
-        public Floor GetDungeonFloor() => _dungeonFloor;
 
         public bool TryGetCurrentState(out IState state) =>
             _beetleStateMachine.TryGetCurrentState(out state);
@@ -197,35 +187,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void CheckEntityLocation()
-        {
-            Transform parent = transform.parent;
-            bool inDungeon = false;
-
-            while (parent != null)
-            {
-                bool isDungeonRootFound = parent.TryGetComponent(out DungeonRoot dungeonRoot);
-
-                parent = parent.parent;
-
-                if (!isDungeonRootFound)
-                    continue;
-
-                _dungeonFloor = dungeonRoot.Floor;
-                inDungeon = true;
-                break;
-            }
-
-            if (inDungeon)
-            {
-                SetEntityLocation(EntityLocation.Dungeon);
-                return;
-            }
-            
-            int randomFloor = Random.Range(1, 4);
-            _dungeonFloor = (Floor)randomFloor;
-        }
 
         private void EnterDeathState() => ChangeState<DeathState>();
         

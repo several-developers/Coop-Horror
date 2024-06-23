@@ -67,6 +67,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         public PlayerReferences References => _references;
         public InputReader InputReader { get; private set; }
+        public EntityLocation EntityLocation => _entityLocation.Value;
+        public Floor CurrentFloor => _currentFloor.Value;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -81,6 +83,7 @@ namespace GameCore.Gameplay.Entities.Player
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
         private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: Constants.OwnerPermission);
+        private readonly NetworkVariable<Floor> _currentFloor = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<float> _sanity = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<bool> _isDead = new(writePerm: Constants.OwnerPermission);
@@ -115,7 +118,15 @@ namespace GameCore.Gameplay.Entities.Player
             if (IsOwner)
                 _entityLocation.Value = entityLocation;
             else
-                ChangePlayerLocationServerRpc(entityLocation);
+                SetPlayerLocationServerRpc(entityLocation);
+        }
+
+        public void SetFloor(Floor floor)
+        {
+            if (IsOwner)
+                _currentFloor.Value = floor;
+            else
+                SetFloorServerRpc(floor);
         }
 
         public void DropItem(bool destroy = false)
@@ -149,12 +160,12 @@ namespace GameCore.Gameplay.Entities.Player
         public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
 
         public static PlayerEntity GetLocalPlayer() => _localPlayer;
+
+        public MonoBehaviour GetMonoBehaviour() => this;
+        
         public Transform GetTransform() => transform;
 
         public PlayerInventory GetInventory() => _inventory;
-
-        public EntityLocation GeEntityLocation() =>
-            _entityLocation.Value;
 
         public float GetSanity() =>
             _sanity.Value;
@@ -363,8 +374,12 @@ namespace GameCore.Gameplay.Entities.Player
         public void ToggleRagdollServerRpc(bool enable) => ToggleRagdollClientRpc(enable);
 
         [ServerRpc(RequireOwnership = false)]
-        private void ChangePlayerLocationServerRpc(EntityLocation entityLocation) =>
+        private void SetPlayerLocationServerRpc(EntityLocation entityLocation) =>
             _entityLocation.Value = entityLocation;
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetFloorServerRpc(Floor floor) =>
+            _currentFloor.Value = floor;
 
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)

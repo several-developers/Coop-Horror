@@ -45,8 +45,9 @@ namespace GameCore.Gameplay.EntitiesSystems.CombatLogics
         private void Attack()
         {
             PlayerEntity targetPlayer = GetTargetPlayerEvent.Invoke();
+            bool isTargetValid = targetPlayer != null && !targetPlayer.IsDead();
 
-            if (targetPlayer == null)
+            if (!isTargetValid)
             {
                 OnTargetNotFoundEvent.Invoke();
                 return;

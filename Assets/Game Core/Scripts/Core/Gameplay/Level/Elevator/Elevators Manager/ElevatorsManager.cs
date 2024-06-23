@@ -229,6 +229,7 @@ namespace GameCore.Gameplay.Level.Elevator
                 : VisualPresetType.Dungeon;
             
             playerEntity.SetEntityLocation(playerLocation);
+            playerEntity.SetFloor(currentFloor);
             _visualManager.ChangePreset(presetType);
         }
 

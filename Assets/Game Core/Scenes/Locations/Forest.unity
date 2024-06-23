@@ -2511,6 +2511,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Good Clown
       objectReference: {fileID: 0}
+    - target: {fileID: 1521519558286138969, guid: 0fb27fc3f913e2d4aac7d5ac1fa23e46,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1797241303294243819, guid: 0fb27fc3f913e2d4aac7d5ac1fa23e46,
         type: 3}
       propertyPath: GlobalObjectIdHash

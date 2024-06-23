@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Entities.Monsters
 {
@@ -21,7 +23,8 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        protected EntityLocation EntityLocation { get; private set; } = EntityLocation.LocationSurface;
+        public EntityLocation EntityLocation { get; private set; } = EntityLocation.Dungeon;
+        public Floor CurrentFloor { get; private set; }
         
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -31,7 +34,11 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        protected virtual void Awake() => CheckAgentState();
+        protected virtual void Awake()
+        {
+            CheckAgentState();
+            FindEntityLocation();
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -47,7 +54,12 @@ namespace GameCore.Gameplay.Entities.Monsters
         public void SetEntityLocation(EntityLocation entityLocation) =>
             EntityLocation = entityLocation;
 
+        public void SetFloor(Floor floor) =>
+            CurrentFloor = floor;
+
         public static IReadOnlyList<MonsterEntityBase> GetAllMonsters() => AllMonsters;
+
+        public MonoBehaviour GetMonoBehaviour() => this;
         
         public Transform GetTransform() => transform;
 
@@ -61,6 +73,35 @@ namespace GameCore.Gameplay.Entities.Monsters
                 return;
 
             Log.PrintError(log: "Nav Mesh Agent enabled! Disable it in prefab!");
+        }
+
+        private void FindEntityLocation()
+        {
+            Transform parent = transform.parent;
+            bool inDungeon = false;
+
+            while (parent != null)
+            {
+                bool isDungeonRootFound = parent.TryGetComponent(out DungeonRoot dungeonRoot);
+
+                parent = parent.parent;
+
+                if (!isDungeonRootFound)
+                    continue;
+
+                CurrentFloor = dungeonRoot.Floor;
+                inDungeon = true;
+                break;
+            }
+
+            if (inDungeon)
+            {
+                SetEntityLocation(EntityLocation.Dungeon);
+                return;
+            }
+            
+            int randomFloor = Random.Range(1, 4);
+            CurrentFloor = (Floor)randomFloor;
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

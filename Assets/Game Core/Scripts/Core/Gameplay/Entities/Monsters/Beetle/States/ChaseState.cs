@@ -1,6 +1,6 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.CombatLogics;
+using GameCore.Gameplay.EntitiesSystems.MovementLogics;
 using UnityEngine;
 using UnityEngine.AI;
 

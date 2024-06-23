@@ -32,6 +32,8 @@ MonoBehaviour:
     _reachDistance: 4
     _maxFollowDistance: 30
     _followEndDelay: 5
+    _fireExitInteractionDistance: 0.5
+    _fireExitInteractionDuration: 0.5
   _wanderingConfig:
     _minSpeed: 1
     _maxSpeed: 2

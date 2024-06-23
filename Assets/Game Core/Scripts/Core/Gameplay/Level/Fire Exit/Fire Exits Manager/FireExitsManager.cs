@@ -65,6 +65,7 @@ namespace GameCore.Gameplay.Level
 
             //entity.Rigidbody.velocity = Vector3.zero;
             entity.Teleport(position, rotation);
+            entity.SetFloor(floor);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -82,6 +83,7 @@ namespace GameCore.Gameplay.Level
             }
 
             playerEntity.SetEntityLocation(entityLocation);
+            playerEntity.SetFloor(floor);
         }
 
         private void ChangeVisualPreset(EntityLocation entityLocation)

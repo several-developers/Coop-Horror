@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.EntitiesSystems.Utilities;
 using UnityEngine;
@@ -16,7 +18,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _clownUtilities = goodClownEntity.GetClownUtilities();
             _agent = goodClownEntity.GetAgent();
             _transform = goodClownEntity.transform;
-            _searchLogicRoutine = new CoroutineHelper(goodClownEntity);
+            _searchTargetRoutine = new CoroutineHelper(goodClownEntity);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -27,7 +29,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private readonly GoodClownUtilities _clownUtilities;
         private readonly NavMeshAgent _agent;
         private readonly Transform _transform;
-        private readonly CoroutineHelper _searchLogicRoutine;
+        private readonly CoroutineHelper _searchTargetRoutine;
 
         private float _cachedAgentSpeed;
 
@@ -35,20 +37,20 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         public void Enter()
         {
-            _searchLogicRoutine.GetRoutineEvent += SearchLogicCO;
-            
+            _searchTargetRoutine.GetRoutineEvent += SearchTargetCO;
+
             DisableAgent();
             SetIdleAnimation();
             StartHunterSystem();
-            _searchLogicRoutine.Start();
+            _searchTargetRoutine.Start();
         }
 
         public void Exit()
         {
-            _searchLogicRoutine.GetRoutineEvent -= SearchLogicCO;
-            
+            _searchTargetRoutine.GetRoutineEvent -= SearchTargetCO;
+
             ResetAgent();
-            _searchLogicRoutine.Stop();
+            _searchTargetRoutine.Stop();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -74,27 +76,84 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private void EnterFollowTargetState() =>
             _goodClownEntity.EnterFollowTargetState();
 
-        private IEnumerator SearchLogicCO()
+        private IEnumerator SearchTargetCO()
         {
             while (true)
             {
                 yield return new WaitForSeconds(SearchInterval);
+                
+                bool isTargetFound = TryFoundTarget(out PlayerEntity targetPlayer);
 
-                Vector3 position = _transform.position;
-
-                //bool isTargetFound = MonstersUtilities.TryGetClosestAlivePlayer(position, EntityLocation.Dungeon,
-                //out PlayerEntity targetPlayer);
-
-                bool isTargetFound =
-                    MonstersUtilities.TryGetClosestAlivePlayer(position, out PlayerEntity targetPlayer);
+                string log = Log.HandleLog($"Is Target Found: <gb>{isTargetFound}</gb>");
+                Debug.Log(log);
 
                 if (!isTargetFound)
                     continue;
 
+                _goodClownEntity.ToggleInnocent(false);
                 _goodClownEntity.SetTargetPlayer(targetPlayer);
                 EnterFollowTargetState();
                 break;
             }
+        }
+
+        private bool TryFoundTarget(out PlayerEntity result)
+        {
+            Vector3 clownPosition = _transform.position;
+            EntityLocation clownLocation = _goodClownEntity.EntityLocation;
+            Floor clownFloor = _goodClownEntity.CurrentFloor;
+            bool isInnocent = _goodClownEntity.IsInnocent;
+
+            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
+            PlayerEntity closestPlayer = null;
+            float minDistance = float.MaxValue;
+            bool isPlayerFound = false;
+
+            foreach (PlayerEntity playerEntity in allPlayers.Values)
+            {
+                bool isDead = playerEntity.IsDead();
+
+                if (isDead)
+                    continue;
+
+                EntityLocation playerLocation = playerEntity.EntityLocation;
+                Floor playerFloor = playerEntity.CurrentFloor;
+                bool isPlayerPositionValid = true;
+
+                if (isInnocent)
+                {
+                    if (clownLocation == EntityLocation.Dungeon)
+                    {
+                        isPlayerPositionValid = playerLocation == EntityLocation.Dungeon &&
+                                                playerFloor == clownFloor;
+                    }
+                }
+                else
+                {
+                    if (clownLocation == EntityLocation.Dungeon)
+                    {
+                        isPlayerPositionValid = playerLocation
+                            is EntityLocation.Dungeon
+                            or EntityLocation.Stairs;
+                    }
+                }
+                
+                if (!isPlayerPositionValid)
+                    continue;
+
+                Vector3 playerPosition = playerEntity.transform.position;
+                float distance = Vector3.Distance(a: clownPosition, b: playerPosition);
+                
+                if (distance >= minDistance)
+                    continue;
+
+                minDistance = distance;
+                closestPlayer = playerEntity;
+                isPlayerFound = true;
+            }
+
+            result = closestPlayer;
+            return isPlayerFound;
         }
     }
 }

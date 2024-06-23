@@ -1,6 +1,8 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.CombatLogics;
+using GameCore.Gameplay.EntitiesSystems.MovementLogics;
+using GameCore.Gameplay.Level;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,13 +12,13 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ChaseState(EvilClownEntity evilClownEntity)
+        public ChaseState(EvilClownEntity evilClownEntity, ILevelProvider levelProvider)
         {
             _evilClownEntity = evilClownEntity;
             _evilClownAIConfig = evilClownEntity.GetEvilClownAIConfig();
             _agent = evilClownEntity.GetAgent();
             _wanderingTimer = evilClownEntity.GetWanderingTimer();
-            _chaseLogic = new ChaseLogic(_evilClownEntity, _agent);
+            _chaseLogic = new ClownChaseLogic(_evilClownEntity, _agent, levelProvider);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -25,7 +27,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly NavMeshAgent _agent;
         private readonly WanderingTimer _wanderingTimer;
-        private readonly ChaseLogic _chaseLogic;
+        private readonly ClownChaseLogic _chaseLogic;
 
         private Coroutine _chaseCO;
         private Coroutine _distanceCheckCO;
@@ -47,6 +49,11 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _chaseLogic.GetMaxChaseDistanceEvent += GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent += GetTargetReachDistance;
             
+            _chaseLogic.GetClownLocationEvent += GetClownLocation;
+            _chaseLogic.GetClownFloorEvent += GetClownFloor;
+            _chaseLogic.GetFireExitInteractionDistanceEvent += GetFireExitInteractionDistance;
+            _chaseLogic.GetStoppingDistanceEvent += GetStoppingDistance;
+            
             EnableAgent();
             _wanderingTimer.StopTimer();
             _chaseLogic.Start();
@@ -64,8 +71,13 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _chaseLogic.GetMaxChaseDistanceEvent -= GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent -= GetTargetReachDistance;
             
-            ResetAgent();
+            _chaseLogic.GetClownLocationEvent -= GetClownLocation;
+            _chaseLogic.GetClownFloorEvent -= GetClownFloor;
+            _chaseLogic.GetFireExitInteractionDistanceEvent -= GetFireExitInteractionDistance;
+            _chaseLogic.GetStoppingDistanceEvent -= GetStoppingDistance;
+            
             _chaseLogic.Stop();
+            ResetAgent();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -90,6 +102,12 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         private PlayerEntity GetTargetPlayer() =>
             _evilClownEntity.GetTargetPlayer();
+        
+        private EntityLocation GetClownLocation() =>
+            _evilClownEntity.EntityLocation;
+
+        private Floor GetClownFloor() =>
+            _evilClownEntity.CurrentFloor;
 
         private float GetChasePositionCheckInterval() =>
             _evilClownAIConfig.ChasePositionCheckInterval;
@@ -105,6 +123,12 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         private float GetTargetReachDistance() =>
             _evilClownAIConfig.AttackDistance;
+        
+        private float GetFireExitInteractionDistance() =>
+            _evilClownAIConfig.FireExitInteractionDistance;
+
+        private float GetStoppingDistance() =>
+            _evilClownAIConfig.ChaseStoppingDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
         

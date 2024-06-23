@@ -55,6 +55,8 @@ namespace GameCore.Gameplay.Entities.DeliveryDrone
         public void Teleport(Vector3 position, Quaternion rotation)
         {
         }
+
+        public MonoBehaviour GetMonoBehaviour() => this;
         
         public Transform GetTransform() => transform;
 
