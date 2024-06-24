@@ -33,7 +33,7 @@ namespace GameCore.Gameplay.Entities.Player
         [Title(Constants.References)]
         [SerializeField, Required]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow.")]
-        private GameObject _cameraTarget;
+        private Transform _cameraTarget;
 
         [SerializeField, Required]
         [Tooltip("Cinemachine Virtual Camera positioned at desired crouched height.")]
@@ -100,16 +100,16 @@ namespace GameCore.Gameplay.Entities.Player
             if (_isCameraEnabled)
             {
                 // Look input
-
+            
                 _lookVector = _inputReader.GameInput.Gameplay.Look.ReadValue<Vector2>();
-
+                
                 // Add yaw input, this update character's yaw rotation
 
                 AddControlYawInput(_lookVector.x * _lookSensitivity.x);
-
+                
                 // Add pitch input (look up / look down), this update cameraTarget's local rotation
 
-                AddControlPitchInput(_lookVector.y * _lookSensitivity.y, _minPitch, _maxPitch);
+                AddControlPitchInput(value: _lookVector.y * _lookSensitivity.y, _minPitch, _maxPitch);
             }
 
             if (!_canMove)
@@ -152,7 +152,6 @@ namespace GameCore.Gameplay.Entities.Player
             _inputReader.OnJumpCanceledEvent -= OnJumpCanceled;
             _inputReader.OnCrouchEvent -= OnCrouch;
             _inputReader.OnCrouchCanceledEvent -= OnCrouchCanceled;
-            _inputReader.OnLookEvent -= OnLook;
             _inputReader.OnSprintEvent -= OnSprint;
             _inputReader.OnSprintCanceledEvent -= OnSprintCanceled;
         }
@@ -183,7 +182,7 @@ namespace GameCore.Gameplay.Entities.Player
             _canMove = true;
             _inputReader = playerEntity.InputReader;
 
-            EnableUnCrouchedCamera();
+            EnableCamera();
             
             _crouchedCamera.transform.SetParent(null);
             _unCrouchedCamera.transform.SetParent(null);
@@ -193,7 +192,6 @@ namespace GameCore.Gameplay.Entities.Player
             _inputReader.OnJumpCanceledEvent += OnJumpCanceled;
             _inputReader.OnCrouchEvent += OnCrouch;
             _inputReader.OnCrouchCanceledEvent += OnCrouchCanceled;
-            _inputReader.OnLookEvent += OnLook;
             _inputReader.OnSprintEvent += OnSprint;
             _inputReader.OnSprintCanceledEvent += OnSprintCanceled;
         }
@@ -201,7 +199,7 @@ namespace GameCore.Gameplay.Entities.Player
         public void ToggleActiveState(bool isEnabled) =>
             _isEnabled = isEnabled;
 
-        public void ToggleMovement(bool canMove) =>
+        public void ToggleMovementState(bool canMove) =>
             _canMove = canMove;
 
         public void ToggleCameraState(bool isEnabled) =>
@@ -213,16 +211,17 @@ namespace GameCore.Gameplay.Entities.Player
             _unCrouchedCamera.SetActive(false);
         }
 
-        public void EnableCrouchedCamera()
+        public void EnableCamera()
         {
-            _crouchedCamera.SetActive(true);
-            _unCrouchedCamera.SetActive(false);
+            bool isCrouched = _character.IsCrouched();
+            _crouchedCamera.SetActive(isCrouched);
+            _unCrouchedCamera.SetActive(!isCrouched);
         }
 
-        public void EnableUnCrouchedCamera()
+        public void ResetCameraTarget()
         {
-            _crouchedCamera.SetActive(false);
-            _unCrouchedCamera.SetActive(true);
+            _cameraTargetPitch = 0f;
+            _cameraTarget.localRotation = Quaternion.Euler(Vector3.zero);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -244,7 +243,7 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             _cameraTargetPitch = MathLib.ClampAngle(_cameraTargetPitch + value, minValue, maxValue);
-            _cameraTarget.transform.localRotation = Quaternion.Euler(-_cameraTargetPitch, 0.0f, 0.0f);
+            _cameraTarget.localRotation = Quaternion.Euler(-_cameraTargetPitch, 0.0f, 0.0f);
         }
 
         /// <summary>
@@ -300,14 +299,6 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             _cancelCrouch = true;
-        }
-
-        private void OnLook(Vector2 lookVector)
-        {
-            if (!_isEnabled)
-                return;
-
-            _lookVector = lookVector;
         }
 
         private void OnSprint()

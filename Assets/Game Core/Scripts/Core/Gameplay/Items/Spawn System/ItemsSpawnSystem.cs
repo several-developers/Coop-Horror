@@ -202,7 +202,7 @@ namespace GameCore.Gameplay.Items.SpawnSystem
             Vector3 worldPosition = itemsSpawner.GetRandomSpawnWorldPosition();
             worldPosition.y += 1f;
             
-            _itemsFactory.CreateItem(itemID, worldPosition, out _);
+            _itemsFactory.CreateItem(itemID, worldPosition, out ItemObjectBase itemObject);
         }
 
         private void ClearItemsSpawners()

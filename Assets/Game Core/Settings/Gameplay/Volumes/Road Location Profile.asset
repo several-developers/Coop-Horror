@@ -151,7 +151,7 @@ MonoBehaviour:
   active: 1
   postExposure:
     m_OverrideState: 1
-    m_Value: -0.6
+    m_Value: -0.7
   contrast:
     m_OverrideState: 1
     m_Value: 7
@@ -163,7 +163,7 @@ MonoBehaviour:
     m_Value: 0
   saturation:
     m_OverrideState: 1
-    m_Value: 15
+    m_Value: 5
 --- !u!114 &7787568825093967825
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -204,7 +204,7 @@ MonoBehaviour:
     m_Value: 0
   _FogColor:
     m_OverrideState: 1
-    m_Value: {r: 0.23529412, g: 0.2627451, b: 0.48235294, a: 1}
+    m_Value: {r: 0.18792278, g: 0.21001941, b: 0.38679248, a: 1}
   _GradientStart:
     m_OverrideState: 1
     m_Value: 0

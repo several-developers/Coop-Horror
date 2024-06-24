@@ -1137,7 +1137,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3899032711484485059}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.55, z: 0.14990234}
+  m_LocalPosition: {x: 0, y: 1.5499998, z: 0.14990234}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1330,8 +1330,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NoiseProfile: {fileID: 11400000, guid: 46965f9cbaf525742a6da4c2172a99cd, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 0.6
-  m_FrequencyGain: 0.6
+  m_AmplitudeGain: 0.65
+  m_FrequencyGain: 0.65
   mNoiseOffsets: {x: 269.55075, y: 795.18054, z: 747.5836}
 --- !u!1 &5233563664008430099
 GameObject:
@@ -1557,6 +1557,7 @@ GameObject:
   - component: {fileID: 38454851627222461}
   - component: {fileID: 3191657970526933107}
   - component: {fileID: 6733583444764857353}
+  - component: {fileID: 7213396046044653887}
   m_Layer: 0
   m_Name: cm
   m_TagString: Untagged
@@ -1615,6 +1616,23 @@ MonoBehaviour:
   CameraRadius: 0.2
   DampingIntoCollision: 0
   DampingFromCollision: 2
+--- !u!114 &7213396046044653887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7684169924820333203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NoiseProfile: {fileID: 11400000, guid: 46965f9cbaf525742a6da4c2172a99cd, type: 2}
+  m_PivotOffset: {x: 0, y: 0, z: 0}
+  m_AmplitudeGain: 0.35
+  m_FrequencyGain: 0.35
+  mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1 &8193727296458710633
 GameObject:
   m_ObjectHideFlags: 0
@@ -2197,10 +2215,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
+  m_Radius: 0.35
+  m_Height: 1.7
   m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: 0, y: 0.85, z: 0}
 --- !u!114 &-4117527861951101490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2213,7 +2231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4251873558
+  GlobalObjectIdHash: 2175522384
   InScenePlacedSourceGlobalObjectIdHash: 4251873558
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2234,7 +2252,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 424f918484f348cfa39826a0a5b34d6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSprintSpeed: 10
+  _maxSprintSpeed: 7
 --- !u!114 &2451543691127853220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2264,11 +2282,11 @@ MonoBehaviour:
   _planeConstraint: 0
   _rootTransform: {fileID: 0}
   _rootTransformOffset: {x: 0, y: 0, z: 0}
-  _radius: 0.5
-  _height: 2
+  _radius: 0.35
+  _height: 1.7
   _slopeLimit: 45
   _stepOffset: 0.45
-  _perchOffset: 0.5
+  _perchOffset: 0.3
   _perchAdditionalHeight: 0.4
   _slopeLimitOverride: 0
   _useFlatTop: 0
@@ -2309,8 +2327,8 @@ MonoBehaviour:
   _groundFriction: 8
   _canEverCrouch: 1
   _crouchedHeight: 1.25
-  _unCrouchedHeight: 2
-  _maxWalkSpeedCrouched: 3
+  _unCrouchedHeight: 1.7
+  _maxWalkSpeedCrouched: 2
   _maxFallSpeed: 40
   _brakingDecelerationFalling: 0
   _fallingLateralFriction: 0.3
@@ -2518,7 +2536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9809f304c734464923bc826a4c1f390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camera: {fileID: 3816139666241093136}
+  _camera: {fileID: 1455346093898162791}
 --- !u!114 &7014763259676313825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2534,7 +2552,7 @@ MonoBehaviour:
   _maxPitch: 70
   _minPitch: -60
   _lookSensitivity: {x: 0.65, y: 0.55}
-  _cameraTarget: {fileID: 2470589372477707289}
+  _cameraTarget: {fileID: 2013587981637269708}
   _crouchedCamera: {fileID: 8193727296458710633}
   _unCrouchedCamera: {fileID: 3899032711484485059}
 --- !u!4 &8684867425259486934 stripped

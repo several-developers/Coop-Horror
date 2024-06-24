@@ -14,5 +14,6 @@
         FireExitDoor = 9,
         SimpleButton = 10,
         Heliport = 11,
+        MobileHQSeat = 12,
     }
 }

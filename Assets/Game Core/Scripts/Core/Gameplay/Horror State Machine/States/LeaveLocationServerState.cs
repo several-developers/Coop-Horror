@@ -54,6 +54,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 return;
             
             DestroyAllItems();
+            KillAllMonsters();
             ClearDungeonElevators();
             UnloadLastLocation();
             EnterLeaveLocationClientState();
@@ -78,6 +79,11 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
             foreach (int uniqueItemID in allKeys)
                 _itemsProvider.RemoveItem(uniqueItemID);
+        }
+
+        private void KillAllMonsters()
+        {
+            
         }
 
         private void ClearDungeonElevators()

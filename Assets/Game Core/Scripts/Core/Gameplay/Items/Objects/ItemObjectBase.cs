@@ -43,9 +43,9 @@ namespace GameCore.Gameplay.Items
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public int ItemID => _itemID;
-        public int UniqueItemID => _uniqueItemID;
-        public bool DestroyOnSceneUnload => _destroyOnSceneUnload;
+        public int ItemID { get; private set; }
+        public int UniqueItemID { get; private set; }
+        public bool DestroyOnSceneUnload { get; private set; } = true;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -61,11 +61,8 @@ namespace GameCore.Gameplay.Items
         private Rigidbody _rigidbody;
         private Collider _collider;
         private GameObject _child; // Model container
-        
-        private int _itemID;
-        private int _uniqueItemID;
+
         private bool _isPickedUpLocal;
-        private bool _destroyOnSceneUnload;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -79,7 +76,7 @@ namespace GameCore.Gameplay.Items
 
             if (_changeItemIDAtAwake)
             {
-                _itemID = _startItemID;
+                ItemID = _startItemID;
                 _itemIDDebug = _startItemID;
             }
 
@@ -92,7 +89,7 @@ namespace GameCore.Gameplay.Items
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Setup(int itemID) =>
-            _itemID = itemID;
+            ItemID = itemID;
         
         public virtual void InteractionStarted()
         {
@@ -112,7 +109,7 @@ namespace GameCore.Gameplay.Items
         }
 
         public void ToggleDestroyOnSceneUnload(bool destroy) =>
-            _destroyOnSceneUnload = destroy;
+            DestroyOnSceneUnload = destroy;
 
         public void PickUp()
         {
@@ -202,7 +199,7 @@ namespace GameCore.Gameplay.Items
         private void SetupItemUniqueID()
         {
             maxUniqueItemID++;
-            _uniqueItemID = maxUniqueItemID;
+            UniqueItemID = maxUniqueItemID;
             _uniqueItemIDInfo = maxUniqueItemID;
         }
 
@@ -236,7 +233,7 @@ namespace GameCore.Gameplay.Items
         {
             if (destroy)
             {
-                _itemsProvider.RemoveItem(_uniqueItemID);
+                _itemsProvider.RemoveItem(UniqueItemID);
                 Destroy(gameObject);
                 return;
             }

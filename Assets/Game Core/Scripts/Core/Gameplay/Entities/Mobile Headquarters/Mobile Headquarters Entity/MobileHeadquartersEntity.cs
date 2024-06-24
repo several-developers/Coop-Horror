@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cinemachine;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
@@ -21,9 +23,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator,
-            ILocationManagerDecorator locationManagerDecorator, IQuestsManagerDecorator questsManagerDecorator,
-            ILevelObserver levelObserver)
+        private void Construct(
+            IGameManagerDecorator gameManagerDecorator,
+            ILocationManagerDecorator locationManagerDecorator,
+            IQuestsManagerDecorator questsManagerDecorator,
+            ILevelObserver levelObserver
+        )
         {
             GameManagerDecorator = gameManagerDecorator;
             QuestsManagerDecorator = questsManagerDecorator;
@@ -50,13 +55,18 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public GameState GameState => GameManagerDecorator.GetGameState();
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         public static int LastPathID = -1;
 
         public event Action OnOpenQuestsSelectionMenuEvent = delegate { };
         public event Action OnOpenLocationsSelectionMenuEvent = delegate { };
         public event Action OnOpenGameOverWarningMenuEvent = delegate { };
         public event Action OnCallDeliveryDroneEvent = delegate { };
+
+        private readonly NetworkVariable<SeatsRuntimeDataContainer> _seatsData =
+            new(writePerm: Constants.OwnerPermission);
+
+        private readonly NetworkVariable<bool> _doorState = new(writePerm: Constants.OwnerPermission);
 
         private ILocationManagerDecorator _locationManagerDecorator;
         private ILevelObserver _levelObserver;
@@ -73,8 +83,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersController = new MobileHeadquartersController(mobileHeadquartersEntity: this);
             _moveSpeedController = _references.MoveSpeedController;
             LastPathID = -1;
-            
+
             _moveSpeedController.Init(_mobileHeadquartersConfig, GameManagerDecorator);
+            InitMobileHQSeats();
         }
 
         public override void OnDestroy()
@@ -95,7 +106,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _pathMovement.ChangePath(path, startDistancePercent, stayAtSamePosition);
             HandlePathChange();
         }
-        
+
         public void ChangeToTheRoadPath()
         {
             RoadLocationManager roadLocationManager = RoadLocationManager.Get();
@@ -143,11 +154,11 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             OnCallDeliveryDroneEvent.Invoke();
 
         public MonoBehaviour GetMonoBehaviour() => this;
-        
+
         public Transform GetTransform() => transform;
 
         public NetworkObject GetNetworkObject() => NetworkObject;
-        
+
         public Camera GetOutsideCamera() => _references.OutsideCamera;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
@@ -158,10 +169,18 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             ChangeToTheRoadPath();
 
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
+
+            _doorState.OnValueChanged += OnDoorStateChanged;
         }
 
-        protected override void InitServerOnly() =>
+        protected override void InitServerOnly()
+        {
+            IReadOnlyList<MobileHQSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
+            int mobileHQSeatsAmount = allMobileHQSeats.Count;
+            _seatsData.Value = new SeatsRuntimeDataContainer(mobileHQSeatsAmount);
+            
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
+        }
 
         protected override void TickServerOnly()
         {
@@ -174,6 +193,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _mobileHeadquartersController.DespawnAll();
 
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
+            
+            _doorState.OnValueChanged -= OnDoorStateChanged;
         }
 
         protected override void DespawnServerOnly() =>
@@ -181,11 +202,61 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void InitMobileHQSeats()
+        {
+            IReadOnlyList<MobileHQSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
+            int seatsAmount = allMobileHQSeats.Count;
+
+            for (int i = 0; i < seatsAmount; i++)
+            {
+                MobileHQSeat mobileHQSeat = allMobileHQSeats[i];
+                mobileHQSeat.SetSeatIndex(i);
+                
+                mobileHQSeat.OnTakeSeatEvent += OnTakeSeat;
+                mobileHQSeat.OnLeftSeatEvent += OnLeftSeat;
+                mobileHQSeat.IsSeatBusyEvent += IsSeatBusy;
+                mobileHQSeat.ShouldRemovePlayerParentEvent += ShouldRemovePlayerParent;
+            }
+        }
+
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
 
         private void ToggleDoorState(bool isOpen) =>
             _mobileHeadquartersController.ToggleDoorState(isOpen);
+        
+        private void TeleportLocalPlayerToRandomSeat()
+        {
+            PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
+            bool hasParent = playerEntity.transform.parent != null;
+
+            if (hasParent)
+                return;
+
+            SeatsRuntimeDataContainer seatsRuntimeDataContainer = _seatsData.Value;
+            int seatIndex = seatsRuntimeDataContainer.GetRandomFreeSeatIndex();
+
+            IReadOnlyList<MobileHQSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
+
+            foreach (MobileHQSeat mobileHQSeat in allMobileHQSeats)
+            {
+                bool isMatches = mobileHQSeat.SeatIndex == seatIndex;
+
+                if (!isMatches)
+                    continue;
+
+                mobileHQSeat.Interact(playerEntity);
+                break;
+            }
+        }
+
+        private void ToggleSeatsColliders(bool isEnabled)
+        {
+            IReadOnlyList<MobileHQSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
+
+            foreach (MobileHQSeat mobileHQSeat in allMobileHQSeats)
+                mobileHQSeat.ToggleCollider(isEnabled);
+        }
 
         private void HandlePathChange()
         {
@@ -200,6 +271,39 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         private static bool IsCurrentPlayer(ulong senderClientID) =>
             NetworkHorror.ClientID == senderClientID;
+        
+        private bool IsSeatBusy(int seatIndex)
+        {
+            SeatsRuntimeDataContainer seatsRuntimeDataContainer = _seatsData.Value;
+            int freeSeatsAmount = seatsRuntimeDataContainer.GetFreeSeatsAmount();
+
+            if (freeSeatsAmount == 0)
+                return true;
+
+            IEnumerable<SeatRuntimeData> allSeatsData = seatsRuntimeDataContainer.GetAllSeatsData();
+            bool isSeatBusy = true;
+
+            foreach (SeatRuntimeData seatRuntimeData in allSeatsData)
+            {
+                bool isMatches = seatRuntimeData.SeatIndex == seatIndex;
+                
+                if (!isMatches)
+                    continue;
+                
+                isSeatBusy = seatRuntimeData.IsBusy;
+                break;
+            }
+
+            return isSeatBusy;
+        }
+
+        // TEMP
+        private bool ShouldRemovePlayerParent()
+        {
+            GameState gameState = GameManagerDecorator.GetGameState();
+            bool isGameStateValid = gameState == GameState.ReadyToLeaveTheLocation;
+            return isGameStateValid;
+        }
 
         // RPC: -----------------------------------------------------------------------------------
 
@@ -209,6 +313,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             CinemachinePath path = _locationManagerDecorator.GetExitPath();
 
+            TeleportLocalPlayerToRandomSeat();
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
             StartLeavingLocationClientRpc();
@@ -251,6 +356,18 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             ulong senderClientId = serverRpcParams.Receive.SenderClientId;
             PlayCompleteQuestsButtonAnimationClientRpc(senderClientId);
         }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void TakeSeatServerRpc(int seatIndex) =>
+            _seatsData.Value.TakeSeat(seatIndex);
+        
+        [ServerRpc(RequireOwnership = false)]
+        private void LeftSeatServerRpc(int seatIndex) =>
+            _seatsData.Value.LeftSeat(seatIndex);
+
+        [ServerRpc(RequireOwnership = false)]
+        public void ToggleDoorServerRpc(bool isOpen) =>
+            _doorState.Value = isOpen;
 
         [ClientRpc]
         private void StartLeavingLocationClientRpc() => ToggleMovement(canMove: true);
@@ -324,6 +441,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case GameState.LeavingMainRoad:
+                    if (LastPathID == -1)
+                    {
+                        _pathMovement.ToggleArrived(isArrived: false);
+                        break;
+                    }
+                    
                     GameManagerDecorator.LoadSelectedLocation();
                     break;
 
@@ -342,5 +465,20 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             ChangePath(path);
             ToggleMovement(canMove: true);
         }
+
+        private void OnTakeSeat(int seatIndex)
+        {
+            ToggleSeatsColliders(isEnabled: false);
+            TakeSeatServerRpc(seatIndex);
+        }
+        
+        private void OnLeftSeat(int seatIndex)
+        {
+            ToggleSeatsColliders(isEnabled: true);
+            LeftSeatServerRpc(seatIndex);
+        }
+
+        private void OnDoorStateChanged(bool previousValue, bool newValue) =>
+            _references.Doors.SetActive(!newValue);
     }
 }

@@ -12,6 +12,18 @@ namespace GameCore.Configs.Gameplay.Player
         [Title(Constants.Settings)]
         [SerializeField, Min(0f)]
         private float _health = 100f;
+
+        [SerializeField, Min(0f)]
+        private float _defaultHeight = 1.7f;
+        
+        [SerializeField, Min(0f)]
+        private float _defaultRadius = 0.35f;
+        
+        [SerializeField, Min(0f)]
+        private float _sittingHeight = 1f;
+        
+        [SerializeField, Min(0f)]
+        private float _sittingRadius = 0.25f;
         
         [Title(Constants.References)]
         [SerializeField, Required]

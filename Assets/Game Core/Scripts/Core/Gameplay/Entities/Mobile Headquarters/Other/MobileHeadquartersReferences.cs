@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
 using GameCore.Gameplay.Other;
@@ -22,6 +23,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private AnimationObserver _animationObserver;
 
         [SerializeField, Required]
+        private GameObject _doors;
+        
+        [SerializeField, Required]
         private Camera _outsideCamera;
         
         [SerializeField, Required]
@@ -39,16 +43,24 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         [SerializeField, Required]
         private SimpleButton _completeQuestsButton;
 
+        [SerializeField, Required, Space(height: 5)]
+        private List<MobileHQSeat> _allMobileHQSeats;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public MoveSpeedController MoveSpeedController => _moveSpeedController;
         public Animator Animator => _animator;
         public AnimationObserver AnimationObserver => _animationObserver;
+        public GameObject Doors => _doors;
         public Camera OutsideCamera => _outsideCamera;
         public MobileHQMainLever MainLever => _mainLever;
         public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
         public SimpleButton OpenLocationsSelectionMenuButton => _openLocationsSelectionMenuButton;
         public SimpleButton CallDeliveryDroneButton => _callDeliveryDroneButton;
         public SimpleButton CompleteQuestsButton => _completeQuestsButton;
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public IReadOnlyList<MobileHQSeat> GetAllMobileHQSeats() => _allMobileHQSeats;
     }
 }

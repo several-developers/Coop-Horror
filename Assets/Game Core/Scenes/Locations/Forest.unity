@@ -396,6 +396,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Evil Clown Entity
       objectReference: {fileID: 0}
+    - target: {fileID: 1521519558286138969, guid: 3d7c090ddb94c48489036f7ab94708d5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1797241303294243819, guid: 3d7c090ddb94c48489036f7ab94708d5,
         type: 3}
       propertyPath: GlobalObjectIdHash

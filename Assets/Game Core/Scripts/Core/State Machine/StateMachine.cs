@@ -66,6 +66,7 @@ namespace GameCore
                 case IExitState exitState:
                     exitState.Exit();
                     break;
+                
                 case IExitStateAsync exitStateAsync:
                     exitStateAsync.Exit();
                     break;
@@ -79,6 +80,7 @@ namespace GameCore
                 case IEnterState enterState:
                     enterState.Enter();
                     break;
+                
                 case IEnterStateAsync enterStateAsync:
                     enterStateAsync.Enter();
                     break;
@@ -97,6 +99,7 @@ namespace GameCore
                 case IExitState exitState:
                     exitState.Exit();
                     break;
+                
                 case IExitStateAsync exitStateAsync:
                     exitStateAsync.Exit();
                     break;

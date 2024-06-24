@@ -53,9 +53,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hiddenByAwake: 0
-  _ignoreScaleTime: 0
   _changeInteractableState: 0
   _changeCanvasState: 0
+  _ignoreScaleTime: 0
+  _ignoreCanvasGroupFade: 0
   _canvas: {fileID: 0}
   _fadeTime: 0.25
   _targetCG: {fileID: 3786323513249775983}
@@ -76,6 +77,8 @@ MonoBehaviour:
       _text: Press 'E' to interact
     - _interactionType: 11
       _text: Press 'E' to interact
+    - _interactionType: 12
+      _text: Press 'E' to sit down
     _interactionDisabledTextSettings:
     - _interactionType: 1
       _text: Can't pick up item now

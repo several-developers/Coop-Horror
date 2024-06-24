@@ -9,6 +9,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
+        [SerializeField, Min(0)]
+        private int _seatIndex;
+        
         [SerializeField, Min(0f)]
         private float _yOffset = 1.1f;
 
@@ -17,6 +20,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public int SeatIndex => _seatIndex;
         public bool DrawGizmos => _drawGizmos;
 
         // FIELDS: --------------------------------------------------------------------------------

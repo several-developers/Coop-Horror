@@ -2,6 +2,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
+using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
 using UnityEngine;
 
@@ -98,8 +99,19 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     break;
 
                 case GameState.ReadyToLeaveTheRoad:
+                    EnableMainLever();
+                    break;
+
                 case GameState.ReadyToLeaveTheLocation:
                     EnableMainLever();
+
+                    if (NetworkHorror.IsTrueServer)
+                        _mobileHeadquartersEntity.ToggleDoorServerRpc(isOpen: true);
+                    break;
+
+                case GameState.HeadingToTheRoad:
+                    if (NetworkHorror.IsTrueServer)
+                        _mobileHeadquartersEntity.ToggleDoorServerRpc(isOpen: false);
                     break;
 
                 case GameState.ArrivedAtTheLocation:
@@ -138,7 +150,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
                 case GameState.ReadyToLeaveTheLocation:
                     _mobileHeadquartersEntity.StartLeavingLocationServerRpc();
-                    
+
                     _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.HeadingToTheRoad,
                         previousState: GameState.ReadyToLeaveTheLocation);
                     break;

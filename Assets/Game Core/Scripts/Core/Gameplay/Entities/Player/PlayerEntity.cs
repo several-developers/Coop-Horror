@@ -4,6 +4,7 @@ using ECM2;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
+using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
@@ -11,6 +12,7 @@ using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.EntitiesSystems.Inventory;
 using GameCore.Gameplay.EntitiesSystems.Ragdoll;
 using GameCore.Gameplay.Factories.ItemsPreview;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -34,14 +36,18 @@ namespace GameCore.Gameplay.Entities.Player
         private void Construct(
             IItemsPreviewFactory itemsPreviewFactory,
             IPlayerInteractionObserver playerInteractionObserver,
+            IGameManagerDecorator gameManagerDecorator,
             ICamerasManager camerasManager,
+            IMobileHeadquartersEntity mobileHeadquartersEntity,
             IGameplayConfigsProvider gameplayConfigsProvider,
             IConfigsProvider configsProvider
         )
         {
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInteractionObserver = playerInteractionObserver;
+            _gameManagerDecorator = gameManagerDecorator;
             _camerasManager = camerasManager;
+            _mobileHeadquartersEntity = mobileHeadquartersEntity;
 
             _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
             InputReader = configsProvider.GetInputReader();
@@ -77,6 +83,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         public event Action<EntityLocation> OnPlayerLocationChangedEvent = delegate { };
         public event Action<float> OnSanityChangedEvent = delegate { };
+        public event Action OnLeftMobileHQSeat = delegate { };
         public event Action OnDiedEvent = delegate { };
         public event Action OnRevivedEvent = delegate { };
 
@@ -92,7 +99,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         private IItemsPreviewFactory _itemsPreviewFactory;
         private IPlayerInteractionObserver _playerInteractionObserver;
+        private IGameManagerDecorator _gameManagerDecorator;
         private ICamerasManager _camerasManager;
+        private IMobileHeadquartersEntity _mobileHeadquartersEntity;
 
         private PlayerConfigMeta _playerConfig;
         private StateMachine _playerStateMachine;
@@ -153,6 +162,9 @@ namespace GameCore.Gameplay.Entities.Player
             _isDead.Value = isDead;
         }
 
+        public void SendLeftMobileHQSeat() =>
+            OnLeftMobileHQSeat.Invoke();
+
         public void EnterAliveState() => ChangeState<AliveState>();
 
         public void EnterReviveState() => ChangeState<ReviveState>();
@@ -174,6 +186,21 @@ namespace GameCore.Gameplay.Entities.Player
 
         public static bool TryGetPlayer(ulong clientID, out PlayerEntity playerEntity) =>
             AllPlayers.TryGetValue(clientID, out playerEntity);
+
+        public bool TrySetMobileHQAsParent()
+        {
+            Transform newParent = _mobileHeadquartersEntity.GetTransform();
+            Transform parent = transform.parent;
+            bool alreadyParented = parent != null && parent == newParent;
+
+            if (alreadyParented)
+                return true;
+            
+            return NetworkObject.TrySetParent(newParent);
+        }
+
+        public bool TryRemoveParent() =>
+            NetworkObject.TryRemoveParent();
 
         public bool IsDead() =>
             _isDead.Value;
@@ -269,7 +296,7 @@ namespace GameCore.Gameplay.Entities.Player
                 AliveState aliveState = new(_camerasManager);
                 DeathState deathState = new(playerEntity: this, _camerasManager);
                 ReviveState reviveState = new(playerEntity: this);
-                SittingState sittingState = new(playerEntity: this, _camerasManager);
+                SittingState sittingState = new(playerEntity: this, _gameManagerDecorator, _camerasManager);
 
                 _playerStateMachine.AddState(aliveState);
                 _playerStateMachine.AddState(deathState);

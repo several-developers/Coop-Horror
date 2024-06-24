@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using Cinemachine;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player
@@ -6,14 +7,23 @@ namespace GameCore.Gameplay.Entities.Player
     public class SittingCameraController : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
-        
+
         [Title(Constants.References)]
         [SerializeField, Required]
-        private GameObject _camera;
+        private CinemachineVirtualCamera  _camera;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void ToggleActiveState(bool isEnabled) =>
-            _camera.SetActive(isEnabled);
+        public void ToggleActiveState(bool isEnabled)
+        {
+            _camera.gameObject.SetActive(isEnabled);
+
+            if (!isEnabled)
+                return;
+
+            var cinemachinePov = _camera.GetCinemachineComponent<CinemachinePOV>();
+            cinemachinePov.m_VerticalAxis.Value = 0f;
+            cinemachinePov.m_HorizontalAxis.Value = 0f;
+        }
     }
 }

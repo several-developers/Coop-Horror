@@ -10,7 +10,10 @@ namespace GameCore.Configs.Gameplay.MobileHeadquarters
 
         [Title(Constants.Settings)]
         [SerializeField, Min(0f)]
-        private float _movementSpeed = 2f;
+        private float _roadLocationMoveSpeed = 40f;
+        
+        [SerializeField, Min(0f)]
+        private float _gameplayLocationMoveSpeed = 10f;
         
         [SerializeField, Min(0f)]
         private float _speedChangeRate = 1f;
@@ -23,7 +26,9 @@ namespace GameCore.Configs.Gameplay.MobileHeadquarters
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public float MovementSpeed => _movementSpeed;
+        public float MovementSpeed => _roadLocationMoveSpeed;
+        public float RoadLocationMoveSpeed => _roadLocationMoveSpeed;
+        public float GameplayLocationMoveSpeed => _gameplayLocationMoveSpeed;
         public float SpeedChangeRate => _speedChangeRate;
         public float LeavingMainRoadSpeedMultiplier => _leavingMainRoadSpeedMultiplier;
         public float StartPositionAtRoadLocation => _startPositionAtRoadLocation;

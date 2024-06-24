@@ -32,6 +32,6 @@ MonoBehaviour:
   _wanderingMaxDistance: 15
   _animationConfig:
     _distanceCheckInterval: 0.2
-    _typeChangeDuration: 0.03
+    _typeChangeDuration: 0.15
     _runningFirstTypeDistance: 20
     _runningSecondTypeDistance: 10

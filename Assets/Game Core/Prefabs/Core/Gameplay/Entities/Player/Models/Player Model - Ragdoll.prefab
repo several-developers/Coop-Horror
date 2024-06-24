@@ -267,6 +267,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player Model - Ragdoll
       objectReference: {fileID: 0}
+    - target: {fileID: 4398730502183453927, guid: ccf3348006d206643bf18a15cc192663,
+        type: 3}
+      propertyPath: m_Effectors.Array.data[15].m_Visible
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7405728984279784863, guid: ccf3348006d206643bf18a15cc192663,
         type: 3}
       propertyPath: m_Controller
