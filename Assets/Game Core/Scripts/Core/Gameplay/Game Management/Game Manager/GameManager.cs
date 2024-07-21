@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.GameManagement
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const SceneName DefaultLocation = SceneName.Forest;
+        private const SceneName DefaultLocation = SceneName.Scrapyard;
         private const GameState DefaultGameState = GameState.ReadyToLeaveTheRoad;
 
         private readonly NetworkVariable<SceneName> _selectedLocation = new(DefaultLocation);

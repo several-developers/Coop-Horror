@@ -2,7 +2,6 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
-using GameCore.Gameplay.Entities.Player;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;

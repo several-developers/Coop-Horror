@@ -7,6 +7,7 @@
         Gameplay = 2,
         
         Desert = 10,
-        Forest = 11
+        Forest = 11,
+        Scrapyard = 12
     }
 }

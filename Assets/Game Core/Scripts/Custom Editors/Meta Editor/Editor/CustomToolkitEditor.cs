@@ -15,6 +15,7 @@ namespace CustomEditors
         private const string ScenesPath = "Assets/Game Core/Scenes/";
         private const string LocationsScenesPath = ScenesPath + "Locations/";
 
+        private const string ScrapyardLocationSceneMenuItem = LocationsScenesMenuItem + "🗑️ Scrapyard";
         private const string DesertLocationSceneMenuItem = LocationsScenesMenuItem + "🌵 Desert";
         private const string ForestLocationSceneMenuItem = LocationsScenesMenuItem + "🌲 Forest";
 
@@ -35,6 +36,7 @@ namespace CustomEditors
         private const string MainMenuScenePath = ScenesPath + "MainMenu.unity";
         private const string GameplayScenePath = ScenesPath + "Gameplay.unity";
 
+        private const string ScrapyardLocationScenePath = LocationsScenesPath + "Scrapyard.unity";
         private const string DesertLocationScenePath = LocationsScenesPath + "Desert.unity";
         private const string ForestLocationScenePath = LocationsScenesPath + "Forest.unity";
 
@@ -46,6 +48,10 @@ namespace CustomEditors
         [InitializeOnEnterPlayMode]
         private static void Init() =>
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+
+        [MenuItem(ScrapyardLocationSceneMenuItem)]
+        private static void LoadScrapyardLocationScene() =>
+            OpenScene(ScrapyardLocationScenePath);
 
         [MenuItem(DesertLocationSceneMenuItem)]
         private static void LoadDesertLocationScene() =>
