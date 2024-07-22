@@ -2229,7 +2229,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &410087040
 Light:
   m_ObjectHideFlags: 0
@@ -5457,6 +5457,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player Model - Entity
       objectReference: {fileID: 0}
+    - target: {fileID: 4282240716220013919, guid: ccf3348006d206643bf18a15cc192663,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ccf3348006d206643bf18a15cc192663, type: 3}
 --- !u!1 &1062809460
@@ -7109,6 +7114,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mobile Headquarters
       objectReference: {fileID: 0}
+    - target: {fileID: 6195987239533786563, guid: b573e9cfef954b44eb72d3d379112c48,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b573e9cfef954b44eb72d3d379112c48, type: 3}
 --- !u!1 &1254037716
@@ -7974,11 +7984,6 @@ PrefabInstance:
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3903017099
-      objectReference: {fileID: 0}
-    - target: {fileID: 6153614387115906804, guid: 146bb27d76687894f8f545ff9ac84bc7,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6552383511017437958, guid: 146bb27d76687894f8f545ff9ac84bc7,
         type: 3}

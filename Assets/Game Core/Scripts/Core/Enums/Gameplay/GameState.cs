@@ -13,7 +13,7 @@
         WaitingForPlayers = 8,
         QuestsRewarding = 9,
         RestartGame = 10,
-        LeavingMainRoad = 11,
+        //LeavingMainRoad = 11,
         EnteringMainRoad = 12,
         RestartGameCompleted = 13,
     }

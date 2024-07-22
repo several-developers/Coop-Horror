@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mobile Headquarters Config
   m_EditorClassIdentifier: 
   _metaName: Mobile Headquarters Config
-  _roadLocationMoveSpeed: 40
+  _roadLocationMoveSpeed: 25
   _gameplayLocationMoveSpeed: 10
   _speedChangeRate: 0.65
   _leavingMainRoadSpeedMultiplier: 0.7

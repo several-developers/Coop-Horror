@@ -84,14 +84,8 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _moveSpeedController = _references.MoveSpeedController;
             LastPathID = -1;
 
-            _moveSpeedController.Init(_mobileHeadquartersConfig, GameManagerDecorator);
+            _moveSpeedController.Init(_mobileHeadquartersConfig);
             InitMobileHQSeats();
-        }
-
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-            _moveSpeedController.Dispose();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -438,16 +432,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
                 case GameState.HeadingToTheRoad:
                     _levelObserver.LocationLeft();
-                    break;
-
-                case GameState.LeavingMainRoad:
-                    if (LastPathID == -1)
-                    {
-                        _pathMovement.ToggleArrived(isArrived: false);
-                        break;
-                    }
-                    
-                    GameManagerDecorator.LoadSelectedLocation();
                     break;
 
                 default:

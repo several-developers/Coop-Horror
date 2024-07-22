@@ -81,21 +81,21 @@ namespace GameCore.Gameplay.Level.Locations
             _doorTN.Complete();
             _doorTN.Kill();
 
-            float leftDoorStartX = _leftDoor.localPosition.x;
-            float rightDoorStartX = _rightDoor.localPosition.x;
-            float leftDoorTargetX = leftDoorStartX + (open ? _moveAmount : -_moveAmount); 
-            float rightDoorTargetX = rightDoorStartX + (open ? -_moveAmount : _moveAmount); 
+            float leftDoorStartZ = _leftDoor.localPosition.z;
+            float rightDoorStartZ = _rightDoor.localPosition.z;
+            float leftDoorTargetZ = leftDoorStartZ + (open ? _moveAmount : -_moveAmount); 
+            float rightDoorTargetZ = rightDoorStartZ + (open ? -_moveAmount : _moveAmount); 
 
             _doorTN = DOVirtual.Float(from: 0f, to: 1f, _animationDuration, onVirtualUpdate: (t) =>
             {
-                float leftDoorX = Mathf.Lerp(a: leftDoorStartX, b: leftDoorTargetX, t);
-                float rightDoorX = Mathf.Lerp(a: rightDoorStartX, b: rightDoorTargetX, t);
+                float leftDoorZ = Mathf.Lerp(a: leftDoorStartZ, b: leftDoorTargetZ, t);
+                float rightDoorZ = Mathf.Lerp(a: rightDoorStartZ, b: rightDoorTargetZ, t);
 
                 Vector3 leftDoorPosition = _leftDoor.localPosition;
                 Vector3 rightDoorPosition = _rightDoor.localPosition;
 
-                leftDoorPosition.x = leftDoorX;
-                rightDoorPosition.x = rightDoorX;
+                leftDoorPosition.z = leftDoorZ;
+                rightDoorPosition.z = rightDoorZ;
 
                 _leftDoor.localPosition = leftDoorPosition;
                 _rightDoor.localPosition = rightDoorPosition;

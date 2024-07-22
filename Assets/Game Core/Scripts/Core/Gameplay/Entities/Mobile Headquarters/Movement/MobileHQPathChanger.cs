@@ -21,7 +21,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         [Title(Constants.Settings)]
         [SerializeField]
-        private GameState _targetGameState = GameState.LeavingMainRoad;
+        private GameState _targetGameState; // = GameState.LeavingMainRoad
         
         [SerializeField]
         private bool _drawSphere = true;

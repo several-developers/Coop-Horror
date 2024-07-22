@@ -142,10 +142,14 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     bool containsExpiredQuests = _questsManagerDecorator.ContainsExpiredQuests();
 
                     if (containsExpiredQuests)
+                    {
                         _mobileHeadquartersEntity.SendOpenGameOverWarningMenu();
+                    }
                     else
-                        _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.LeavingMainRoad,
-                            previousState: GameState.ReadyToLeaveTheRoad);
+                    {
+                        _gameManagerDecorator.LoadSelectedLocation();
+                    }
+
                     break;
 
                 case GameState.ReadyToLeaveTheLocation:

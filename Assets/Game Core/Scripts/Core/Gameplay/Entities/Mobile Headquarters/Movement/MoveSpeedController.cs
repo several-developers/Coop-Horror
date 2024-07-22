@@ -1,7 +1,5 @@
 ﻿using System;
 using GameCore.Configs.Gameplay.MobileHeadquarters;
-using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.GameManagement;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -35,7 +33,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public event Action<float> OnDistanceChangedEvent = delegate { };
 
         private MobileHeadquartersConfigMeta _mobileHeadquartersConfig;
-        private IGameManagerDecorator _gameManagerDecorator;
         private float _speedMultiplier;
         private float _leavingMainRoadSpeedMultiplier;
         private float _currentSpeed;
@@ -54,19 +51,12 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _targetSpeedDebug = finalTargetSpeed;
         }
 
-        public void Init(MobileHeadquartersConfigMeta mobileHeadquartersConfig,
-            IGameManagerDecorator gameManagerDecorator)
+        public void Init(MobileHeadquartersConfigMeta mobileHeadquartersConfig)
         {
             _mobileHeadquartersConfig = mobileHeadquartersConfig;
-            _gameManagerDecorator = gameManagerDecorator;
             _targetSpeed = mobileHeadquartersConfig.MovementSpeed;
             _currentSpeed = _targetSpeed;
-
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
-
-        public void Dispose() =>
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
 
         public void IncreaseSpeedMultiplier(float amount) =>
             _speedMultiplier = Mathf.Clamp(_speedMultiplier + amount, min: -1f, max: 1f);
@@ -77,13 +67,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public float GetCurrentSpeed() => _currentSpeed;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnGameStateChanged(GameState gameState)
-        {
-            _leavingMainRoadSpeedMultiplier = gameState == GameState.LeavingMainRoad
-                ? _mobileHeadquartersConfig.LeavingMainRoadSpeedMultiplier
-                : 0f;
-        }
 
         private void OnDistanceChanged(float distance) =>
             OnDistanceChangedEvent.Invoke(distance);

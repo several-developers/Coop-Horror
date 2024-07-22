@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7501953251711089916}
+  - component: {fileID: 1416197603149918175}
   - component: {fileID: 7501953251711089907}
   m_Layer: 0
   m_Name: Location Door
@@ -36,6 +37,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1416197603149918175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7501953251711089917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 338903123
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
 --- !u!114 &7501953251711089907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -303,7 +325,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 1909
+  m_VersionIndex: 1912
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -648,7 +670,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 2303
+  m_VersionIndex: 2306
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -765,7 +787,7 @@ PrefabInstance:
     - target: {fileID: 6344306612812362201, guid: c6f2a1d419a7d4940a45d0b5baafef1a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 1.385
       objectReference: {fileID: 0}
     - target: {fileID: 6344306612812362201, guid: c6f2a1d419a7d4940a45d0b5baafef1a,
         type: 3}
@@ -852,7 +874,7 @@ PrefabInstance:
     - target: {fileID: 6344306612812362201, guid: c6f2a1d419a7d4940a45d0b5baafef1a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 1.385
       objectReference: {fileID: 0}
     - target: {fileID: 6344306612812362201, guid: c6f2a1d419a7d4940a45d0b5baafef1a,
         type: 3}

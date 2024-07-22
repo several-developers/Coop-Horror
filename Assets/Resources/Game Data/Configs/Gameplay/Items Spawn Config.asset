@@ -53,3 +53,5 @@ MonoBehaviour:
     _config: {fileID: 11400000, guid: 79917301b0535864a92ce6ee9adf1522, type: 2}
   - _locationName: 11
     _config: {fileID: 11400000, guid: 79917301b0535864a92ce6ee9adf1522, type: 2}
+  - _locationName: 12
+    _config: {fileID: 11400000, guid: 79917301b0535864a92ce6ee9adf1522, type: 2}
