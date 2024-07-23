@@ -1,8 +1,7 @@
 ﻿using CustomEditors;
 using GameCore.Gameplay.ChatManagement;
-using GameCore.Gameplay.GameTimeManagement;
-using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
@@ -32,9 +31,6 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         private QuestsManager _questsManager;
         
         [SerializeField, Required]
-        private DeliveryManager _deliveryManager;
-        
-        [SerializeField, Required]
         private GameManager _gameManager;
         
         [SerializeField, Required]
@@ -47,7 +43,6 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         public RpcHandler RpcHandler => _rpcHandler;
         public GameTimeManager GameTimeManager => _gameTimeManager;
         public QuestsManager QuestsManager => _questsManager;
-        public DeliveryManager DeliveryManager => _deliveryManager;
         public GameManager GameManager => _gameManager;
         public ChatManager ChatManager => _chatManager;
 

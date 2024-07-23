@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3607979043729401691}
   - component: {fileID: 3607979043729401690}
   - component: {fileID: 1687473071169679351}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Gold Counter UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,9 +52,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hiddenByAwake: 0
-  _ignoreScaleTime: 0
   _changeInteractableState: 0
   _changeCanvasState: 0
+  _ignoreScaleTime: 0
+  _ignoreCanvasGroupFade: 0
   _canvas: {fileID: 0}
   _fadeTime: 0.25
   _targetCG: {fileID: 1687473071169679351}
@@ -82,7 +83,7 @@ GameObject:
   - component: {fileID: 3607979044365779774}
   - component: {fileID: 3607979044365779772}
   - component: {fileID: 3607979044365779773}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,7 +159,7 @@ GameObject:
   - component: {fileID: 3607979044426759459}
   - component: {fileID: 3607979044426759457}
   - component: {fileID: 3607979044426759458}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Gold (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -291,7 +292,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9196448505289602043}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}

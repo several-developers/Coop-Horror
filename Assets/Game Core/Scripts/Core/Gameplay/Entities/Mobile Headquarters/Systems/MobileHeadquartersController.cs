@@ -41,9 +41,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
             openLocationsSelectionMenuButton.OnTriggerEvent += OnOpenLocationsSelectionMenu;
 
-            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
-            callDeliveryDroneButton.OnTriggerEvent += OnCallDeliveryDrone;
-
             SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
             completeQuestsButton.OnTriggerEvent += OnCompleteQuests;
 
@@ -61,9 +58,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
             openLocationsSelectionMenuButton.OnTriggerEvent -= OnOpenLocationsSelectionMenu;
-
-            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
-            callDeliveryDroneButton.OnTriggerEvent -= OnCallDeliveryDrone;
 
             SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
             completeQuestsButton.OnTriggerEvent -= OnCompleteQuests;
@@ -98,7 +92,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
                     _mobileHeadquartersEntity.ChangeToTheRoadPath();
                     break;
 
-                case GameState.ReadyToLeaveTheRoad:
+                case GameState.CycleMovement:
                     EnableMainLever();
                     break;
 
@@ -134,11 +128,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             switch (gameState)
             {
-                case GameState.WaitingForPlayers:
-                    //_gameManagerDecorator.ChangeGameState(GameState.ReadyToLeaveTheRoad);
-                    break;
-
-                case GameState.ReadyToLeaveTheRoad:
+                case GameState.CycleMovement:
                     bool containsExpiredQuests = _questsManagerDecorator.ContainsExpiredQuests();
 
                     if (containsExpiredQuests)
@@ -175,12 +165,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         {
             _mobileHeadquartersEntity.SendOpenLocationsSelectionMenu();
             _mobileHeadquartersEntity.PlayLocationsButtonAnimationServerRpc();
-        }
-
-        private void OnCallDeliveryDrone()
-        {
-            _mobileHeadquartersEntity.SendCallDeliveryDrone();
-            _mobileHeadquartersEntity.PlayDeliveryDroneButtonAnimationServerRpc();
         }
 
         private void OnCompleteQuests()

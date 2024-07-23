@@ -218,7 +218,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void OnOpenQuestsSelectionMenu()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
-            bool canOpenMenu = gameState == GameState.ReadyToLeaveTheRoad;
+            bool canOpenMenu = gameState == GameState.CycleMovement;
             
             if (!canOpenMenu)
                 return;
@@ -232,7 +232,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void OnOpenLocationsSelectionMenu()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
-            bool canOpenMenu = gameState == GameState.ReadyToLeaveTheRoad;
+            bool canOpenMenu = gameState == GameState.CycleMovement;
             
             if (!canOpenMenu)
                 return;

@@ -9,7 +9,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         event Action OnOpenQuestsSelectionMenuEvent;
         event Action OnOpenLocationsSelectionMenuEvent;
         event Action OnOpenGameOverWarningMenuEvent;
-        event Action OnCallDeliveryDroneEvent;
         void OpenDoor();
         void EnableMainLever();
         void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false);

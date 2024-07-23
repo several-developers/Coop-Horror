@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 
 namespace GameCore.Gameplay.GameManagement
 {
@@ -6,8 +7,12 @@ namespace GameCore.Gameplay.GameManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameStatesHandler(IGameManagerDecorator gameManagerDecorator) =>
+        public GameStatesHandler(IGameManagerDecorator gameManagerDecorator)
+        {
             _gameManagerDecorator = gameManagerDecorator;
+
+            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -16,6 +21,23 @@ namespace GameCore.Gameplay.GameManagement
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Dispose()
+        {
+            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void HandleState(GameState gameState)
+        {
+            switch (gameState)
+            {
+                
+            }
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnGameStateChanged(GameState gameState)
         {
             
         }

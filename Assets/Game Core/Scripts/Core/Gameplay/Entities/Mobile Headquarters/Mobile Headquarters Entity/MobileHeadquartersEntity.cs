@@ -61,7 +61,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public event Action OnOpenQuestsSelectionMenuEvent = delegate { };
         public event Action OnOpenLocationsSelectionMenuEvent = delegate { };
         public event Action OnOpenGameOverWarningMenuEvent = delegate { };
-        public event Action OnCallDeliveryDroneEvent = delegate { };
 
         private readonly NetworkVariable<SeatsRuntimeDataContainer> _seatsData =
             new(writePerm: Constants.OwnerPermission);
@@ -143,9 +142,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
         public void SendOpenGameOverWarningMenu() =>
             OnOpenGameOverWarningMenuEvent.Invoke();
-
-        public void SendCallDeliveryDrone() =>
-            OnCallDeliveryDroneEvent.Invoke();
 
         public MonoBehaviour GetMonoBehaviour() => this;
 
@@ -257,7 +253,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             switch (GameState)
             {
                 case GameState.EnteringMainRoad:
-                    GameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
+                    GameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.CycleMovement,
                         previousState: GameState.EnteringMainRoad);
                     break;
             }
@@ -338,13 +334,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void PlayDeliveryDroneButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
-            PlayDeliveryDroneButtonAnimationClientRpc(senderClientId);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
         public void PlayCompleteQuestsButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
         {
             ulong senderClientId = serverRpcParams.Receive.SenderClientId;
@@ -397,16 +386,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             SimpleButton openLocationsSelectionMenuButton = _references.OpenLocationsSelectionMenuButton;
             openLocationsSelectionMenuButton.PlayInteractAnimation();
-        }
-
-        [ClientRpc]
-        private void PlayDeliveryDroneButtonAnimationClientRpc(ulong senderClientID)
-        {
-            if (IsCurrentPlayer(senderClientID))
-                return;
-
-            SimpleButton callDeliveryDroneButton = _references.CallDeliveryDroneButton;
-            callDeliveryDroneButton.PlayInteractAnimation();
         }
 
         [ClientRpc]

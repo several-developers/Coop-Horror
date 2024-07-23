@@ -40,7 +40,7 @@ namespace GameCore.Gameplay.GameManagement
         // FIELDS: --------------------------------------------------------------------------------
 
         private const SceneName DefaultLocation = SceneName.Scrapyard;
-        private const GameState DefaultGameState = GameState.ReadyToLeaveTheRoad;
+        private const GameState DefaultGameState = GameState.CycleMovement;
 
         private readonly NetworkVariable<SceneName> _selectedLocation = new(DefaultLocation);
         private readonly NetworkVariable<GameState> _gameState = new(DefaultGameState);
@@ -172,7 +172,7 @@ namespace GameCore.Gameplay.GameManagement
                     if (!IsServerOnly)
                         return;
 
-                    ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
+                    ChangeGameStateWhenAllPlayersReady(newState: GameState.CycleMovement,
                         previousState: GameState.QuestsRewarding);
                     break;
 
@@ -197,7 +197,7 @@ namespace GameCore.Gameplay.GameManagement
                     break;
                 
                 case GameState.RestartGameCompleted:
-                    ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheRoad,
+                    ChangeGameStateWhenAllPlayersReady(newState: GameState.CycleMovement,
                         previousState: GameState.RestartGameCompleted);
                     break;
             }

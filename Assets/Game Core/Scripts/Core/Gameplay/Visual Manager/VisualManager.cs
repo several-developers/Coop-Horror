@@ -52,10 +52,11 @@ namespace GameCore.Gameplay.VisualManagement
         private void Awake() =>
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
+#warning ВЫНЕСТИ В GAME STATES HANDLER
         private void Start()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
-            bool isGameStateValid = gameState == GameState.ReadyToLeaveTheRoad;
+            bool isGameStateValid = gameState == GameState.CycleMovement;
 
             if (!isGameStateValid)
                 return;

@@ -38,9 +38,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         private SimpleButton _openLocationsSelectionMenuButton;
         
         [SerializeField, Required]
-        private SimpleButton _callDeliveryDroneButton;
-        
-        [SerializeField, Required]
         private SimpleButton _completeQuestsButton;
 
         [SerializeField, Required, Space(height: 5)]
@@ -56,7 +53,6 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public MobileHQMainLever MainLever => _mainLever;
         public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
         public SimpleButton OpenLocationsSelectionMenuButton => _openLocationsSelectionMenuButton;
-        public SimpleButton CallDeliveryDroneButton => _callDeliveryDroneButton;
         public SimpleButton CompleteQuestsButton => _completeQuestsButton;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

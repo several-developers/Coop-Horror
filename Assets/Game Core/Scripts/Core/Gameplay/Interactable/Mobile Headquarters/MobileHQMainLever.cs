@@ -57,7 +57,7 @@ namespace GameCore.Gameplay.Interactable.MobileHeadquarters
             switch (gameState)
             {
                 case GameState.WaitingForPlayers:
-                case GameState.ReadyToLeaveTheRoad:
+                case GameState.CycleMovement:
                 case GameState.ReadyToLeaveTheLocation:
                     isGameStateValid = true;
                     break;

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5672098283768960201}
   - component: {fileID: 5672098283768960200}
   - component: {fileID: 5672098283768960207}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Inventory HUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -53,9 +53,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hiddenByAwake: 1
-  _ignoreScaleTime: 0
   _changeInteractableState: 0
   _changeCanvasState: 0
+  _ignoreScaleTime: 0
+  _ignoreCanvasGroupFade: 0
   _canvas: {fileID: 0}
   _fadeTime: 0.25
   _targetCG: {fileID: 5672098283768960207}
@@ -106,7 +107,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5672098284465638335}
   - component: {fileID: 5672098284465638328}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Slots container
   m_TagString: Untagged
   m_Icon: {fileID: 0}

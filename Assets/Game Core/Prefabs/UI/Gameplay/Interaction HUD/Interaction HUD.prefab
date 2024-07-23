@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3322489204416818952}
   - component: {fileID: 1650463359775500567}
   - component: {fileID: 3786323513249775983}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Interaction HUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 1650463360097365806}
   - component: {fileID: 1650463360097365804}
   - component: {fileID: 1650463360097365807}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Title (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -1,5 +1,4 @@
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.MobileHeadquarters;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
@@ -25,9 +24,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private MobileHeadquartersEntity _mobileHeadquartersEntity;
 
         [SerializeField, Required]
-        private DeliveryPoint _deliveryPoint;
-
-        [SerializeField, Required]
         private PlayerCamera _playerCamera;
 
         [SerializeField, Required]
@@ -41,7 +37,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         public override void InstallBindings()
         {
             BindMobileHeadquartersEntity();
-            BindDeliveryPoint();
             BindTimeCycle();
             BindLocationsLoader();
             BindLevelProvider();
@@ -64,14 +59,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .Bind<IMobileHeadquartersEntity>()
                 .FromInstance(_mobileHeadquartersEntity)
-                .AsSingle();
-        }
-
-        private void BindDeliveryPoint()
-        {
-            Container
-                .Bind<IDeliveryPoint>()
-                .FromInstance(_deliveryPoint)
                 .AsSingle();
         }
 

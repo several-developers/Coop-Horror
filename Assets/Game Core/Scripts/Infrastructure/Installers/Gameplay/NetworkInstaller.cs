@@ -1,5 +1,4 @@
 using GameCore.Gameplay.ChatManagement;
-using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
@@ -20,7 +19,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindElevatorsManagerDecorator();
             BindQuestsManagerDecorator();
             BindGameTimeManagerDecorator();
-            BindDeliveryManagerDecorator();
             BindChatManagerDecorator();
         }
 
@@ -60,14 +58,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .BindInterfacesTo<GameTimeManagerDecorator>()
                 .AsSingle();
         }
-        
-        private void BindDeliveryManagerDecorator()
-        {
-            Container
-                .BindInterfacesTo<DeliveryManagerDecorator>()
-                .AsSingle();
-        }
-        
+
         private void BindChatManagerDecorator()
         {
             Container

@@ -1,8 +1,7 @@
 ﻿using GameCore.Configs.Gameplay.PrefabsList;
 using GameCore.Gameplay.ChatManagement;
-using GameCore.Gameplay.GameTimeManagement;
-using GameCore.Gameplay.Delivery;
 using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
@@ -57,7 +56,6 @@ namespace GameCore.Infrastructure.StateMachine
             CreatePlayerSpawner();
             CreateElevatorsManager();
             CreateQuestsManager();
-            CreateDeliveryManager();
             CreateGameTimeManager();
             CreateChatManager();
         }
@@ -90,12 +88,6 @@ namespace GameCore.Infrastructure.StateMachine
         {
             QuestsManager questsManagerPrefab = _prefabsListConfig.QuestsManager;
             CreateNetworkPrefab(questsManagerPrefab.gameObject);
-        }
-
-        private void CreateDeliveryManager()
-        {
-            DeliveryManager deliveryManagerPrefab = _prefabsListConfig.DeliveryManager;
-            CreateNetworkPrefab(deliveryManagerPrefab.gameObject);
         }
 
         private void CreateGameTimeManager()
