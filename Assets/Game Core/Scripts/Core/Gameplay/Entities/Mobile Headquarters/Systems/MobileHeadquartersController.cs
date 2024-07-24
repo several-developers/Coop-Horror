@@ -1,4 +1,5 @@
 using GameCore.Enums.Gameplay;
+using GameCore.Enums.Global;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.MobileHeadquarters;
@@ -44,6 +45,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
             completeQuestsButton.OnTriggerEvent += OnCompleteQuests;
 
+            SimpleButton loadMarketButton = _references.LoadMarketButton;
+            loadMarketButton.OnTriggerEvent += OnLoadMarket;
+
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent += OnInteractWithMainLever;
             loadLocationLever.OnEnabledEvent += OnMainLeverPulled;
@@ -61,6 +65,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
             completeQuestsButton.OnTriggerEvent -= OnCompleteQuests;
+            
+            SimpleButton loadMarketButton = _references.LoadMarketButton;
+            loadMarketButton.OnTriggerEvent -= OnLoadMarket;
 
             MobileHQMainLever loadLocationLever = _references.MainLever;
             loadLocationLever.OnInteractEvent -= OnInteractWithMainLever;
@@ -173,6 +180,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _questsManagerDecorator.CompleteQuests();
             _gameManagerDecorator.ChangeGameState(GameState.QuestsRewarding);
         }
+
+        private void OnLoadMarket() =>
+            _gameManagerDecorator.LoadLocation(SceneName.Market);
 
         private void OnInteractWithMainLever()
         {

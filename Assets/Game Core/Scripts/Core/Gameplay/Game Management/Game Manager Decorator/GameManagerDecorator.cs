@@ -16,6 +16,7 @@ namespace GameCore.Gameplay.GameManagement
         public event Action<GameState, GameState> OnChangeGameStateWhenAllPlayersReadyInnerEvent = delegate { };
         public event Action<SceneName> OnSelectLocationInnerEvent = delegate { };
         public event Action OnLoadSelectedLocationInnerEvent = delegate { };
+        public event Action<SceneName> OnLoadLocationInnerEvent = delegate { };
         public event Action<int> OnAddPlayersGoldInnerEvent = delegate { };
         public event Action<int> OnSpendPlayersGoldInnerEvent = delegate { };
         public event Action OnResetPlayersGoldInnerEvent = delegate { };
@@ -44,6 +45,9 @@ namespace GameCore.Gameplay.GameManagement
 
         public void LoadSelectedLocation() =>
             OnLoadSelectedLocationInnerEvent.Invoke();
+
+        public void LoadLocation(SceneName locationName) =>
+            OnLoadLocationInnerEvent.Invoke(locationName);
 
         public void AddPlayersGold(int amount) =>
             OnAddPlayersGoldInnerEvent.Invoke(amount);

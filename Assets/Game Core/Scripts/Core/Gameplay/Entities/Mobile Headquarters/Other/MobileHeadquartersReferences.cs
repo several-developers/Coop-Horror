@@ -39,6 +39,9 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         
         [SerializeField, Required]
         private SimpleButton _completeQuestsButton;
+        
+        [SerializeField, Required]
+        private SimpleButton _loadMarketButton;
 
         [SerializeField, Required, Space(height: 5)]
         private List<MobileHQSeat> _allMobileHQSeats;
@@ -54,6 +57,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
         public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
         public SimpleButton OpenLocationsSelectionMenuButton => _openLocationsSelectionMenuButton;
         public SimpleButton CompleteQuestsButton => _completeQuestsButton;
+        public SimpleButton LoadMarketButton => _loadMarketButton;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

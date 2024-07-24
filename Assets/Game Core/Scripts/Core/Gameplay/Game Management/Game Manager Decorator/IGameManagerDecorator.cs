@@ -17,6 +17,7 @@ namespace GameCore.Gameplay.GameManagement
         event Action<GameState, GameState> OnChangeGameStateWhenAllPlayersReadyInnerEvent;
         event Action<SceneName> OnSelectLocationInnerEvent;
         event Action OnLoadSelectedLocationInnerEvent;
+        event Action<SceneName> OnLoadLocationInnerEvent;
         event Action<int> OnAddPlayersGoldInnerEvent;
         event Action<int> OnSpendPlayersGoldInnerEvent;
         event Action OnResetPlayersGoldInnerEvent;
@@ -29,6 +30,7 @@ namespace GameCore.Gameplay.GameManagement
         void ChangeGameStateWhenAllPlayersReady(GameState newState, GameState previousState);
         void SelectLocation(SceneName locationName);
         void LoadSelectedLocation();
+        void LoadLocation(SceneName locationName);
         void AddPlayersGold(int amount);
         void SpendPlayersGold(int amount);
         void ResetPlayersGold();

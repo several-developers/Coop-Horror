@@ -63,6 +63,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent += ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnSelectLocationInnerEvent += SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent += LoadSelectedLocationServerRpc;
+            _gameManagerDecorator.OnLoadLocationInnerEvent += LoadLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent += AddPlayersGold;
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent += SpendPlayersGold;
             _gameManagerDecorator.OnResetPlayersGoldInnerEvent += ResetGold;
@@ -81,6 +82,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent -= ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnSelectLocationInnerEvent -= SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent -= LoadSelectedLocationServerRpc;
+            _gameManagerDecorator.OnLoadLocationInnerEvent -= LoadLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent -= AddPlayersGold;
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent -= SpendPlayersGold;
             _gameManagerDecorator.OnResetPlayersGoldInnerEvent -= ResetGold;
@@ -334,6 +336,10 @@ namespace GameCore.Gameplay.GameManagement
             SceneName selectedLocation = _selectedLocation.Value;
             _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(selectedLocation);
         }
+        
+        [ServerRpc(RequireOwnership = false)]
+        private void LoadLocationServerRpc(SceneName location) =>
+            _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(location);
 
         [ServerRpc(RequireOwnership = false)]
         private void AddPlayersGoldServerRpc(int amount) =>
