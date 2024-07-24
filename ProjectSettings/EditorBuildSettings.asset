@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Game Core/Scenes/Gameplay.unity
     guid: b2bf899e600d75e44bc1a8e1dd9f2c50
   - enabled: 1
+    path: Assets/Game Core/Scenes/Market.unity
+    guid: 5eeb4c2879517e14bbbe756e35a28386
+  - enabled: 1
     path: Assets/Game Core/Scenes/Locations/Scrapyard.unity
     guid: 6358488ffdf90fe4f8686a7e89ad9671
   - enabled: 1
