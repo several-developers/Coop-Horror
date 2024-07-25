@@ -60,6 +60,7 @@ namespace GameCore.Gameplay.Entities.Train
 
         public event Action OnOpenQuestsSelectionMenuEvent = delegate { };
         public event Action OnOpenGameOverWarningMenuEvent = delegate { };
+        public event Action OnOpenGameMapEvent = delegate { };
 
         private readonly NetworkVariable<SeatsRuntimeDataContainer> _seatsData =
             new(writePerm: Constants.OwnerPermission);
@@ -138,6 +139,9 @@ namespace GameCore.Gameplay.Entities.Train
 
         public void SendOpenGameOverWarningMenu() =>
             OnOpenGameOverWarningMenuEvent.Invoke();
+
+        public void SendOpenGameMapEvent() =>
+            OnOpenGameMapEvent.Invoke();
 
         public MonoBehaviour GetMonoBehaviour() => this;
 

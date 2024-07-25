@@ -18,5 +18,6 @@
         GameOver = 0,
         WaitingForPlayers = 8,
         CycleMovement = 14,
+        Gameplay = 15,
     }
 }

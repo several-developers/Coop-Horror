@@ -8,6 +8,7 @@ namespace GameCore.Gameplay.Entities.Train
     {
         event Action OnOpenQuestsSelectionMenuEvent;
         event Action OnOpenGameOverWarningMenuEvent;
+        event Action OnOpenGameMapEvent;
         void OpenDoor();
         void EnableMainLever();
         void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false);

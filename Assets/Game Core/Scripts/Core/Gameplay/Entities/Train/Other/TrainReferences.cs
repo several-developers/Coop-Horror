@@ -38,7 +38,7 @@ namespace GameCore.Gameplay.Entities.Train
         private SimpleButton _completeQuestsButton;
         
         [SerializeField, Required]
-        private SimpleButton _loadMarketButton;
+        private SimpleButton _openGameMapButton;
 
         [SerializeField, Required, Space(height: 5)]
         private List<TrainSeat> _allMobileHQSeats;
@@ -53,7 +53,7 @@ namespace GameCore.Gameplay.Entities.Train
         public TrainMainLever MainLever => _mainLever;
         public SimpleButton OpenQuestsSelectionMenuButton => _openQuestsSelectionMenuButton;
         public SimpleButton CompleteQuestsButton => _completeQuestsButton;
-        public SimpleButton LoadMarketButton => _loadMarketButton;
+        public SimpleButton OpenGameMapButton => _openGameMapButton;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

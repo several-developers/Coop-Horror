@@ -44,7 +44,7 @@ namespace GameCore.Gameplay.GameManagement
         // FIELDS: --------------------------------------------------------------------------------
 
         private const LocationName DefaultLocation = LocationName.Base;
-        private const GameState DefaultGameState = GameState.CycleMovement;
+        private const GameState DefaultGameState = GameState.Gameplay;
 
         private readonly NetworkVariable<LocationName> _currentLocation = new(DefaultLocation);
         private readonly NetworkVariable<LocationName> _selectedLocation = new(DefaultLocation);
@@ -412,6 +412,11 @@ namespace GameCore.Gameplay.GameManagement
 
         private void OnSceneUnloaded()
         {
+            if (!NetworkHorror.IsTrueServer)
+                return;
+
+            _currentLocation.Value = _selectedLocation.Value;
+            
             Debug.LogWarning("-----> Scene Unloaded!");
         }
 
