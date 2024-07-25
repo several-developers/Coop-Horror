@@ -2208,6 +2208,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7327629532673652306}
     m_Modifications:
+    - target: {fileID: 1882233667025307755, guid: fdb92a40875cba64185ed42b227882a3,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1301898711
+      objectReference: {fileID: 0}
     - target: {fileID: 1997201917055687385, guid: fdb92a40875cba64185ed42b227882a3,
         type: 3}
       propertyPath: m_Name
@@ -2341,7 +2346,7 @@ PrefabInstance:
     - target: {fileID: 5984327647736789881, guid: 8b6514c3d48a93f45af0236b52bb4d63,
         type: 3}
       propertyPath: m_Name
-      value: Mobile Headquarters - Enter Path
+      value: Train - Enter Path
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b6514c3d48a93f45af0236b52bb4d63, type: 3}
@@ -2422,7 +2427,7 @@ PrefabInstance:
     - target: {fileID: 5984327647736789881, guid: e70c5456866f88f46b5a7462b63bcbb7,
         type: 3}
       propertyPath: m_Name
-      value: Mobile Headquarters - Exit Path
+      value: Train - Exit Path
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e70c5456866f88f46b5a7462b63bcbb7, type: 3}

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameTimeManagement;
@@ -19,12 +19,12 @@ namespace GameCore.Gameplay.GameManagement
 
         public GameResetManager(IGameManagerDecorator gameManagerDecorator,
             IGameTimeManagerDecorator gameTimeManagerDecorator,
-            IMobileHeadquartersEntity mobileHeadquartersEntity,
+            ITrainEntity trainEntity,
             IVisualManager visualManager)
         {
             _gameManagerDecorator = gameManagerDecorator;
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _trainEntity = trainEntity;
             _visualManager = visualManager;
 
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
@@ -34,7 +34,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly IGameTimeManagerDecorator _gameTimeManagerDecorator;
-        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private readonly ITrainEntity _trainEntity;
         private readonly IVisualManager _visualManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -81,12 +81,12 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.ResetPlayersGold();
 
         private void TeleportMobileHQToTheRoad() =>
-            _mobileHeadquartersEntity.TeleportToTheRoad();
+            _trainEntity.TeleportToTheRoad();
 
         private void RespawnPlayersAtMobileHQ()
         {
             IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
-            NetworkObject parent = _mobileHeadquartersEntity.GetNetworkObject();
+            NetworkObject parent = _trainEntity.GetNetworkObject();
 
             foreach (PlayerEntity playerEntity in allPlayers.Values)
             {

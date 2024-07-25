@@ -1,5 +1,5 @@
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Factories;
 using GameCore.Gameplay.GameManagement;
@@ -10,7 +10,6 @@ using GameCore.UI.Gameplay.Chat;
 using GameCore.UI.Gameplay.GameMap;
 using GameCore.UI.Gameplay.GameOverMenu;
 using GameCore.UI.Gameplay.GameOverWarningMenu;
-using GameCore.UI.Gameplay.LocationsSelectionMenu;
 using GameCore.UI.Gameplay.PauseMenu;
 using GameCore.UI.Gameplay.Quests;
 using GameCore.UI.Gameplay.Quests.ActiveQuests;
@@ -25,12 +24,12 @@ namespace GameCore.Infrastructure.StateMachine
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public GameplaySceneState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
-            IMobileHeadquartersEntity mobileHeadquartersEntity, IConfigsProvider configsProvider,
+            ITrainEntity trainEntity, IConfigsProvider configsProvider,
             IGameManagerDecorator gameManagerDecorator, DiContainer diContainer)
         {
             _gameStateMachine = gameStateMachine;
             _horrorStateMachine = horrorStateMachine;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _trainEntity = trainEntity;
             _gameManagerDecorator = gameManagerDecorator;
             _diContainer = diContainer;
             _inputReader = configsProvider.GetInputReader();
@@ -42,7 +41,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IHorrorStateMachine _horrorStateMachine;
-        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private readonly ITrainEntity _trainEntity;
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly DiContainer _diContainer;
         private readonly InputReader _inputReader;
@@ -50,7 +49,6 @@ namespace GameCore.Infrastructure.StateMachine
         private PauseMenuView _pauseMenuView;
         private QuitConfirmMenuView _quitConfirmMenuView;
         private QuestsSelectionMenuView _questsSelectionMenuView;
-        private LocationsSelectionMenuView _locationsSelectionMenuView;
         private GameMapUI _gameMapUI;
         private GameOverMenuView _gameOverMenuView;
         private GameOverWarningMenuView _gameOverWarningMenuView;
@@ -66,7 +64,6 @@ namespace GameCore.Infrastructure.StateMachine
             CreateChatMenu();
             CreateActiveQuestsView(); // TEMP
             CreateQuestsSelectionMenuView(); // TEMP
-            CreateLocationsSelectionMenuView(); // TEMP
             CreateGameMapMenu(); // TEMP
             CreateGameOverMenu(); // TEMP
             CreateRewardMenu(); // TEMP
@@ -81,9 +78,8 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.OnSubmitEvent += OnSendChatMessage;
             _inputReader.OnOpenGameMapEvent += OnOpenGameMap;
 
-            _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
-            _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent += OnOpenLocationsSelectionMenu;
-            _mobileHeadquartersEntity.OnOpenGameOverWarningMenuEvent += OnOpenGameOverWarningMenu;
+            _trainEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
+            _trainEntity.OnOpenGameOverWarningMenuEvent += OnOpenGameOverWarningMenu;
             
             _pauseMenuView.OnContinueClickedEvent += OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent += OnQuitClicked;
@@ -103,9 +99,8 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.OnSubmitEvent -= OnSendChatMessage;
             _inputReader.OnOpenGameMapEvent -= OnOpenGameMap;
 
-            _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
-            _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent -= OnOpenLocationsSelectionMenu;
-            _mobileHeadquartersEntity.OnOpenGameOverWarningMenuEvent -= OnOpenGameOverWarningMenu;
+            _trainEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
+            _trainEntity.OnOpenGameOverWarningMenuEvent -= OnOpenGameOverWarningMenu;
 
             _pauseMenuView.OnContinueClickedEvent -= OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent -= OnQuitClicked;
@@ -137,9 +132,6 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void CreateQuestsSelectionMenuView() =>
             _questsSelectionMenuView = MenuFactory.Create<QuestsSelectionMenuView>(_diContainer);
-
-        private void CreateLocationsSelectionMenuView() =>
-            _locationsSelectionMenuView = MenuFactory.Create<LocationsSelectionMenuView>(_diContainer);
 
         private void CreateGameMapMenu() =>
             _gameMapUI = MenuFactory.Create<GameMapUI>(_diContainer);
@@ -189,9 +181,6 @@ namespace GameCore.Infrastructure.StateMachine
             
             if (_questsSelectionMenuView.IsShown)
                 _questsSelectionMenuView.Hide();
-            
-            if (_locationsSelectionMenuView.IsShown)
-                _locationsSelectionMenuView.Hide();
         }
 
         private void EnterQuitGameplayState() =>
@@ -246,20 +235,6 @@ namespace GameCore.Infrastructure.StateMachine
                 _questsSelectionMenuView.Show();
         }
 
-        private void OnOpenLocationsSelectionMenu()
-        {
-            GameState gameState = _gameManagerDecorator.GetGameState();
-            bool canOpenMenu = gameState == GameState.CycleMovement;
-            
-            if (!canOpenMenu)
-                return;
-            
-            if (_locationsSelectionMenuView.IsShown)
-                _locationsSelectionMenuView.Hide();
-            else
-                _locationsSelectionMenuView.Show();
-        }
-
         private void OnOpenGameOverWarningMenu()
         {
             if (_gameOverWarningMenuView.IsShown)
@@ -277,7 +252,7 @@ namespace GameCore.Infrastructure.StateMachine
             _gameManagerDecorator.ChangeGameState(GameState.KillPlayersOnTheRoad);
 
         private void OnGameOverWarningCancelClicked() =>
-            _mobileHeadquartersEntity.EnableMainLever();
+            _trainEntity.EnableMainLever();
 
         private void OnQuitConfirmClicked() => EnterQuitGameplayState();
 

@@ -1,6 +1,6 @@
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Dungeons;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
@@ -21,7 +21,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         [Title(Constants.References)]
         [SerializeField, Required]
-        private MobileHeadquartersEntity _mobileHeadquartersEntity;
+        private TrainEntity _trainEntity;
 
         [SerializeField, Required]
         private PlayerCamera _playerCamera;
@@ -57,8 +57,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private void BindMobileHeadquartersEntity()
         {
             Container
-                .Bind<IMobileHeadquartersEntity>()
-                .FromInstance(_mobileHeadquartersEntity)
+                .Bind<ITrainEntity>()
+                .FromInstance(_trainEntity)
                 .AsSingle();
         }
 

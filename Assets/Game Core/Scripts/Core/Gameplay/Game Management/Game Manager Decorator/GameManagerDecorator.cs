@@ -18,6 +18,7 @@ namespace GameCore.Gameplay.GameManagement
         public event Action<int> OnAddPlayersGoldInnerEvent = delegate { };
         public event Action<int> OnSpendPlayersGoldInnerEvent = delegate { };
         public event Action OnResetPlayersGoldInnerEvent = delegate { };
+        public event Func<LocationName> OnGetCurrentLocationInnerEvent;
         public event Func<LocationName> OnGetSelectedLocationInnerEvent;
         public event Func<GameState> OnGetGameStateInnerEvent;
 
@@ -52,6 +53,9 @@ namespace GameCore.Gameplay.GameManagement
 
         public void ResetPlayersGold() =>
             OnResetPlayersGoldInnerEvent.Invoke();
+
+        public LocationName GetCurrentLocation() =>
+            OnGetCurrentLocationInnerEvent?.Invoke() ?? LocationName.Base;
 
         public LocationName GetSelectedLocation() =>
             OnGetSelectedLocationInnerEvent?.Invoke() ?? LocationName.Base;

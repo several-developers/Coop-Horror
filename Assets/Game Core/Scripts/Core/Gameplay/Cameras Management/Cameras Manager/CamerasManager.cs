@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using UnityEngine;
@@ -11,17 +11,17 @@ namespace GameCore.Gameplay.CamerasManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CamerasManager(IMobileHeadquartersEntity mobileHeadquartersEntity, PlayerCamera playerCamera,
+        public CamerasManager(ITrainEntity trainEntity, PlayerCamera playerCamera,
             SpectatorCamera spectatorCamera)
         {
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _trainEntity = trainEntity;
             _playerCamera = playerCamera;
             _spectatorCamera = spectatorCamera;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private readonly ITrainEntity _trainEntity;
         private readonly PlayerCamera _playerCamera;
         private readonly SpectatorCamera _spectatorCamera;
 
@@ -107,7 +107,7 @@ namespace GameCore.Gameplay.CamerasManagement
         private void CheckMobileHQCamera(CameraStatus cameraStatus)
         {
             bool isEnabled = cameraStatus == CameraStatus.OutsideMobileHQ;
-            Camera camera = _mobileHeadquartersEntity.GetOutsideCamera();
+            Camera camera = _trainEntity.GetOutsideCamera();
             camera.enabled = isEnabled;
         }
 

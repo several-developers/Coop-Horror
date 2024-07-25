@@ -4,7 +4,7 @@ using ECM2;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
@@ -38,7 +38,7 @@ namespace GameCore.Gameplay.Entities.Player
             IPlayerInteractionObserver playerInteractionObserver,
             IGameManagerDecorator gameManagerDecorator,
             ICamerasManager camerasManager,
-            IMobileHeadquartersEntity mobileHeadquartersEntity,
+            ITrainEntity trainEntity,
             IGameplayConfigsProvider gameplayConfigsProvider,
             IConfigsProvider configsProvider
         )
@@ -47,7 +47,7 @@ namespace GameCore.Gameplay.Entities.Player
             _playerInteractionObserver = playerInteractionObserver;
             _gameManagerDecorator = gameManagerDecorator;
             _camerasManager = camerasManager;
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _trainEntity = trainEntity;
 
             _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
             InputReader = configsProvider.GetInputReader();
@@ -101,7 +101,7 @@ namespace GameCore.Gameplay.Entities.Player
         private IPlayerInteractionObserver _playerInteractionObserver;
         private IGameManagerDecorator _gameManagerDecorator;
         private ICamerasManager _camerasManager;
-        private IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private ITrainEntity _trainEntity;
 
         private PlayerConfigMeta _playerConfig;
         private StateMachine _playerStateMachine;
@@ -189,7 +189,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         public bool TrySetMobileHQAsParent()
         {
-            Transform newParent = _mobileHeadquartersEntity.GetTransform();
+            Transform newParent = _trainEntity.GetTransform();
             Transform parent = transform.parent;
             bool alreadyParented = parent != null && parent == newParent;
 

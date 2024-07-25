@@ -8,6 +8,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Services.Global;
 using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -21,16 +22,20 @@ namespace GameCore.Gameplay.GameManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator,
+        private void Construct(
+            IGameManagerDecorator gameManagerDecorator,
             IHorrorStateMachine horrorStateMachine,
             INetworkHorror networkHorror,
+            IScenesLoaderService scenesLoaderService,
             ILevelObserver levelObserver,
             ICamerasManager camerasManager,
-            IGameplayConfigsProvider gameplayConfigsProvider)
+            IGameplayConfigsProvider gameplayConfigsProvider
+        )
         {
             _gameManagerDecorator = gameManagerDecorator;
             _horrorStateMachine = horrorStateMachine;
             _networkHorror = networkHorror;
+            _scenesLoaderService = scenesLoaderService;
             _levelObserver = levelObserver;
             _camerasManager = camerasManager;
             _balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
@@ -41,15 +46,18 @@ namespace GameCore.Gameplay.GameManagement
         private const LocationName DefaultLocation = LocationName.Base;
         private const GameState DefaultGameState = GameState.CycleMovement;
 
+        private readonly NetworkVariable<LocationName> _currentLocation = new(DefaultLocation);
         private readonly NetworkVariable<LocationName> _selectedLocation = new(DefaultLocation);
         private readonly NetworkVariable<GameState> _gameState = new(DefaultGameState);
         private readonly NetworkVariable<int> _playersGold = new();
+        private readonly NetworkVariable<bool> _locationLoadingInProgress = new();
 
         private readonly Dictionary<ulong, GameState> _playersStates = new(capacity: 8); // Server only.
 
         private IGameManagerDecorator _gameManagerDecorator;
         private IHorrorStateMachine _horrorStateMachine;
         private INetworkHorror _networkHorror;
+        private IScenesLoaderService _scenesLoaderService;
         private ILevelObserver _levelObserver;
         private ICamerasManager _camerasManager;
         private BalanceConfigMeta _balanceConfig;
@@ -65,8 +73,11 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent += AddPlayersGold;
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent += SpendPlayersGold;
             _gameManagerDecorator.OnResetPlayersGoldInnerEvent += ResetGold;
+            _gameManagerDecorator.OnGetCurrentLocationInnerEvent += GetCurrentLocation;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent += GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent += GetGameState;
+
+            _scenesLoaderService.OnSceneUnloadedEvent += OnSceneUnloaded;
 
             PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
             PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
@@ -83,9 +94,12 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent -= AddPlayersGold;
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent -= SpendPlayersGold;
             _gameManagerDecorator.OnResetPlayersGoldInnerEvent -= ResetGold;
+            _gameManagerDecorator.OnGetCurrentLocationInnerEvent -= GetCurrentLocation;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent -= GetSelectedLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent -= GetGameState;
-            
+
+            _scenesLoaderService.OnSceneUnloadedEvent -= OnSceneUnloaded;
+
             PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
             PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
         }
@@ -103,7 +117,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             _networkHorror.OnPlayerConnectedEvent += OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent += OnPlayerDisconnected;
-            
+
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
             _levelObserver.OnLocationLeftEvent += OnLocationLeft;
         }
@@ -119,7 +133,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             _networkHorror.OnPlayerConnectedEvent -= OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent -= OnPlayerDisconnected;
-            
+
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
             _levelObserver.OnLocationLeftEvent -= OnLocationLeft;
         }
@@ -129,7 +143,7 @@ namespace GameCore.Gameplay.GameManagement
         private void ChangeGameState(GameState gameState)
         {
             // Debug.LogWarning("----> GAME STATE changed!!! " + gameState);
-            
+
             if (IsServerOnly)
                 _gameState.Value = gameState;
             else
@@ -144,17 +158,17 @@ namespace GameCore.Gameplay.GameManagement
             {
                 case GameState.GameOver:
                     _camerasManager.SetCameraStatus(CameraStatus.OutsideMobileHQ);
-                    
+
                     if (!IsServerOnly)
                         return;
-                    
+
                     StartCoroutine(routine: RestartGameTimerCO());
                     break;
-                
+
                 case GameState.HeadingToTheRoad:
                     localPlayer.SetEntityLocation(EntityLocation.Road);
                     break;
-                
+
                 case GameState.HeadingToTheLocation:
                     localPlayer.SetEntityLocation(EntityLocation.LocationSurface);
                     break;
@@ -166,7 +180,7 @@ namespace GameCore.Gameplay.GameManagement
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.EnteringMainRoad,
                         previousState: GameState.ArrivedAtTheRoad);
                     break;
-                
+
                 case GameState.QuestsRewarding:
                     if (!IsServerOnly)
                         return;
@@ -194,7 +208,7 @@ namespace GameCore.Gameplay.GameManagement
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.RestartGameCompleted,
                         previousState: GameState.RestartGame);
                     break;
-                
+
                 case GameState.RestartGameCompleted:
                     ChangeGameStateWhenAllPlayersReady(newState: GameState.CycleMovement,
                         previousState: GameState.RestartGameCompleted);
@@ -251,7 +265,7 @@ namespace GameCore.Gameplay.GameManagement
 
             int totalPlayersAmount = allPlayers.Count;
             bool isGameOver = totalPlayersAmount == deadPlayersAmount;
-            
+
             string log = Log.HandleLog($"Is Game Over: <gb>{isGameOver}</gb>.");
             Debug.Log(log);
 
@@ -260,7 +274,7 @@ namespace GameCore.Gameplay.GameManagement
 
             ChangeGameState(GameState.GameOver);
         }
-        
+
         private async void ChangeGameStateWhenAllPlayersReady(GameState newState, GameState previousState)
         {
             const int checkDelay = 100;
@@ -310,6 +324,9 @@ namespace GameCore.Gameplay.GameManagement
             GameState previousState = _gameState.Value;
             ChangeGameStateWhenAllPlayersReady(newState: GameState.RestartGame, previousState);
         }
+
+        private LocationName GetCurrentLocation() =>
+            _currentLocation.Value;
 
         private LocationName GetSelectedLocation() =>
             _selectedLocation.Value;
@@ -393,6 +410,11 @@ namespace GameCore.Gameplay.GameManagement
 
         private void OnLocationLeft() => ChangeGameState(GameState.ArrivedAtTheRoad);
 
+        private void OnSceneUnloaded()
+        {
+            Debug.LogWarning("-----> Scene Unloaded!");
+        }
+
         private void OnPlayerSpawned(PlayerEntity playerEntity) =>
             playerEntity.OnDiedEvent += OnPlayerDied;
 
@@ -400,7 +422,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             if (!playerEntity.IsServerOnly)
                 CheckGameOverOnServer();
-            
+
             playerEntity.OnDiedEvent -= OnPlayerDied;
         }
 

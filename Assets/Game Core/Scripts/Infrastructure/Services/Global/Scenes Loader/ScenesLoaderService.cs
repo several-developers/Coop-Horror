@@ -11,9 +11,10 @@ namespace GameCore.Infrastructure.Services.Global
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnSceneLoadEvent;
-        public event Action OnSceneLoadedEvent;
-        public event Action<bool> OnLoadingScreenStateChangedEvent;
+        public event Action OnSceneLoadEvent = delegate { };
+        public event Action OnSceneLoadedEvent = delegate { };
+        public event Action OnSceneUnloadedEvent = delegate { };
+        public event Action<bool> OnLoadingScreenStateChangedEvent = delegate { };
         
         private bool IsNetworkSceneManagementEnabled => NetworkManager != null
                                                         && NetworkManager.SceneManager != null
@@ -23,14 +24,18 @@ namespace GameCore.Infrastructure.Services.Global
 
         private void Awake() => DontDestroyOnLoad(gameObject);
 
-        private void Start() =>
+        private void Start()
+        {
             SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+        }
 
         public override void OnDestroy()
         {
             base.OnDestroy();
             
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -64,7 +69,7 @@ namespace GameCore.Infrastructure.Services.Global
                         // If is active server and NetworkManager uses scene management, load scene using NetworkManager's SceneManager
                         NetworkManager.SceneManager.LoadScene(sceneName.ToString(), loadSceneMode);
                         
-                        OnSceneLoadEvent?.Invoke();
+                        OnSceneLoadEvent.Invoke();
                     }
                 }
             }
@@ -121,7 +126,7 @@ namespace GameCore.Infrastructure.Services.Global
 
             if (loadSceneMode == LoadSceneMode.Single)
             {
-                OnSceneLoadEvent?.Invoke();
+                OnSceneLoadEvent.Invoke();
                 
                 ShowLoadingScreen();
                 //m_ClientLoadingScreen.StartLoadingScreen(sceneName);
@@ -133,7 +138,7 @@ namespace GameCore.Infrastructure.Services.Global
                 yield return null;
 
             callback?.Invoke();
-            OnSceneLoadedEvent?.Invoke();
+            OnSceneLoadedEvent.Invoke();
         }
 
         // RPC: -----------------------------------------------------------------------------------
@@ -161,9 +166,12 @@ namespace GameCore.Infrastructure.Services.Global
                 
                 //m_ClientLoadingScreen.StopLoadingScreen();
                 
-                OnSceneLoadedEvent?.Invoke();
+                OnSceneLoadedEvent.Invoke();
             }
         }
+
+        private void OnSceneUnloaded(Scene scene) =>
+            OnSceneUnloadedEvent.Invoke();
 
         private void OnSceneEvent(SceneEvent sceneEvent)
         {
@@ -199,7 +207,7 @@ namespace GameCore.Infrastructure.Services.Global
                         //m_ClientLoadingScreen.StopLoadingScreen();
                         //m_LoadingProgressManager.ResetLocalProgress();
                         
-                        OnSceneLoadedEvent?.Invoke();
+                        OnSceneLoadedEvent.Invoke();
                     }
 
                     break;
@@ -231,7 +239,7 @@ namespace GameCore.Infrastructure.Services.Global
                     }
                     
                     if (NetworkManager.IsClient && !NetworkManager.IsHost)
-                        OnSceneLoadedEvent?.Invoke();
+                        OnSceneLoadedEvent.Invoke();
 
                     break;
             }

@@ -8,6 +8,7 @@ namespace GameCore.Infrastructure.Services.Global
     {
         event Action OnSceneLoadEvent;
         event Action OnSceneLoadedEvent;
+        event Action OnSceneUnloadedEvent;
         event Action<bool> OnLoadingScreenStateChangedEvent; 
         void AddOnSceneEventCallback();
         void LoadScene(SceneName sceneName, bool isNetwork, LoadSceneMode loadSceneMode = LoadSceneMode.Single);

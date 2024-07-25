@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.Entities.MobileHeadquarters;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.Session_Manager;
@@ -22,10 +22,10 @@ namespace GameCore.Gameplay.Network
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IMobileHeadquartersEntity mobileHeadquartersEntity, ICamerasManager camerasManager,
+        private void Construct(ITrainEntity trainEntity, ICamerasManager camerasManager,
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            _mobileHeadquartersEntity = mobileHeadquartersEntity;
+            _trainEntity = trainEntity;
             _camerasManager = camerasManager;
             _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
         }
@@ -34,7 +34,7 @@ namespace GameCore.Gameplay.Network
 
         private const bool SpawnAsChild = true;
 
-        private IMobileHeadquartersEntity _mobileHeadquartersEntity;
+        private ITrainEntity _trainEntity;
         private ICamerasManager _camerasManager;
         private PlayerConfigMeta _playerConfig;
         private NetworkManager _networkManager;
@@ -96,7 +96,7 @@ namespace GameCore.Gameplay.Network
 
             if (SpawnAsChild)
             {
-                NetworkObject parent = _mobileHeadquartersEntity.GetNetworkObject();
+                NetworkObject parent = _trainEntity.GetNetworkObject();
                 playerInstance.NetworkObject.TrySetParent(parent, worldPositionStays: false);
             }
 
