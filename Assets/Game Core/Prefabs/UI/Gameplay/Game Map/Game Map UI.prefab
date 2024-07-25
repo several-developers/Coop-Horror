@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 8801540121399844497}
   - component: {fileID: 413065418497333429}
   - component: {fileID: 8801540121399844500}
+  - component: {fileID: 355919687947919196}
   - component: {fileID: 8801540121399844502}
   m_Layer: 5
   m_Name: Game Map UI
@@ -131,7 +132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hiddenByAwake: 1
-  _changeInteractableState: 0
+  _changeInteractableState: 1
   _changeCanvasState: 1
   _ignoreScaleTime: 0
   _ignoreCanvasGroupFade: 0
@@ -160,6 +161,23 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &355919687947919196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8801540121399844496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 34807
 --- !u!225 &8801540121399844502
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -548,8 +566,8 @@ RectTransform:
   - {fileID: 3451651793808537355}
   - {fileID: 3451651793976924108}
   - {fileID: 3451651793649668351}
-  - {fileID: 716926104768030855}
   - {fileID: 6113510942244612386}
+  - {fileID: 716926104768030855}
   - {fileID: 2525938360426402982}
   - {fileID: 2525938360191991932}
   - {fileID: 2525938361256513037}
@@ -16366,7 +16384,7 @@ PrefabInstance:
     - target: {fileID: 8346949555975352580, guid: cb58c711c4974004f81651661229f8fa,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8346949555975352580, guid: cb58c711c4974004f81651661229f8fa,
         type: 3}
@@ -19616,7 +19634,7 @@ PrefabInstance:
     - target: {fileID: 3383003577662051629, guid: 5d301680287132e478fcabdeda6faa47,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3383003577662051629, guid: 5d301680287132e478fcabdeda6faa47,
         type: 3}

@@ -40,7 +40,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         public override void OnDestroy()
         {
             base.OnDestroy();
-            
+
             _gameTimeManagerDecorator.OnResetDayInnerEvent -= ResetDay;
             _gameTimeManagerDecorator.OnSetMidnightInnerEvent -= SetMidnight;
         }
@@ -84,19 +84,20 @@ namespace GameCore.Gameplay.GameTimeManagement
             UpdateGameTimer();
         }
 
+#warning СЛОМАНО, СРОЧНО ЧИНИТЬ
         private void HandleGameState(GameState gameState)
         {
-            switch (gameState)
-            {
-                case GameState.HeadingToTheLocation:
-                    _timeCycle.SetSunrise();
-                    IncreaseDay();
-                    break;
-
-                case GameState.ArrivedAtTheRoad:
-                    SetMidnight();
-                    break;
-            }
+            // switch (gameState)
+            // {
+            //     case GameState.HeadingToTheLocation:
+            //         _timeCycle.SetSunrise();
+            //         IncreaseDay();
+            //         break;
+            //
+            //     case GameState.ArrivedAtTheRoad:
+            //         SetMidnight();
+            //         break;
+            // }
         }
 
         private void ResetDay()

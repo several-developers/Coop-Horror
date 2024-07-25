@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Train Config
   m_EditorClassIdentifier: 
   _metaName: Train Config
-  _roadLocationMoveSpeed: 25
+  _roadLocationMoveSpeed: 15
   _gameplayLocationMoveSpeed: 10
   _speedChangeRate: 0.65
   _leavingMainRoadSpeedMultiplier: 0.7

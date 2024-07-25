@@ -159,7 +159,7 @@ namespace GameCore.Gameplay.Items.SpawnSystem
 
         private void SpawnLocationItems()
         {
-            LocationName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
+            LocationName selectedLocation = _gameManagerDecorator.GetCurrentLocation();
 
             bool isConfigFound = _itemsSpawnConfig.TryGetItemsSpawnConfig(selectedLocation,
                 out LocationItemsSpawnConfigMeta itemsSpawnConfig);

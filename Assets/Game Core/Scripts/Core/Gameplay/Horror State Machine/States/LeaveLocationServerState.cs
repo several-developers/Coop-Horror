@@ -97,7 +97,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 if (!isElevatorFound)
                     continue;
                 
-                UnityEngine.Object.Destroy(elevatorBase.gameObject);
+                Object.Destroy(elevatorBase.gameObject);
             }
 
             // LOCAL METHODS: -----------------------------

@@ -11,6 +11,7 @@ using GameCore.Configs.Gameplay.Quests;
 using GameCore.Configs.Gameplay.QuestsItems;
 using GameCore.Configs.Gameplay.RigPresets;
 using GameCore.Configs.Gameplay.Time;
+using GameCore.Configs.Gameplay.Train;
 using GameCore.Configs.Gameplay.Visual;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
@@ -22,6 +23,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         ItemsListConfigMeta GetItemsListConfig();
         LocationsListConfigMeta GetLocationsListConfig();
         TimeConfigMeta GetTimeConfig();
+        TrainConfigMeta GetTrainConfig();
         DungeonGeneratorConfigMeta GetDungeonGeneratorConfig();
         ElevatorConfigMeta GetElevatorConfig();
         PrefabsListConfigMeta GetPrefabsListConfig();

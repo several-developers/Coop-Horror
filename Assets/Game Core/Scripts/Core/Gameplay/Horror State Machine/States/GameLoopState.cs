@@ -1,4 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network;
 
@@ -8,10 +9,15 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameLoopState(IHorrorStateMachine horrorStateMachine, IGameManagerDecorator gameManagerDecorator)
+        public GameLoopState(
+            IHorrorStateMachine horrorStateMachine,
+            IGameManagerDecorator gameManagerDecorator,
+            ITrainEntity trainEntity
+        )
         {
             _horrorStateMachine = horrorStateMachine;
             _gameManagerDecorator = gameManagerDecorator;
+            _trainEntity = trainEntity;
 
             horrorStateMachine.AddState(this);
         }
@@ -20,29 +26,40 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly IGameManagerDecorator _gameManagerDecorator;
+        private readonly ITrainEntity _trainEntity;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter() =>
+        public void Enter()
+        {
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
-        public void Exit() =>
+            _trainEntity.OnLeaveLocationEvent += LeaveLocation;
+        }
+
+        public void Exit()
+        {
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
+            
+            _trainEntity.OnLeaveLocationEvent -= LeaveLocation;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void HandleGameState(GameState gameState)
         {
-            switch (gameState)
-            {
-                case GameState.ArrivedAtTheRoad:
-                case GameState.RestartGame:
-                    if (NetworkHorror.IsTrueServer)
-                        EnterLeaveLocationServerState();
-                    else
-                        EnterLeaveLocationClientState();
-                    break;
-            }
+            if (gameState != GameState.RestartGame)
+                return;
+            
+            LeaveLocation();
+        }
+
+        private void LeaveLocation()
+        {
+            if (NetworkHorror.IsTrueServer)
+                EnterLeaveLocationServerState();
+            else
+                EnterLeaveLocationClientState();
         }
 
         private void EnterLeaveLocationServerState() =>

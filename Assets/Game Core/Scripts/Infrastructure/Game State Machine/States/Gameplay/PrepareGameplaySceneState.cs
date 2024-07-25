@@ -6,6 +6,7 @@ using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Observers.Gameplay.Game;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -58,6 +59,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreateQuestsManager();
             CreateGameTimeManager();
             CreateChatManager();
+            //CreateGameObserver();
         }
 
         private void CreateGameManager()
@@ -101,6 +103,12 @@ namespace GameCore.Infrastructure.StateMachine
             ChatManager chatManagerPrefab = _prefabsListConfig.ChatManager;
             CreateNetworkPrefab(chatManagerPrefab.gameObject);
         }
+
+        // private void CreateGameObserver()
+        // {
+        //     GameObserver gameObserverPrefab = _prefabsListConfig.GameObserver;
+        //     CreateNetworkPrefab(gameObserverPrefab.gameObject);
+        // }
 
         private void CreateNetworkPrefab(GameObject gameObject)
         {

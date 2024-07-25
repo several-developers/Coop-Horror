@@ -43,6 +43,8 @@ namespace GameCore.Gameplay.Level.Locations
 
         private void OnDestroy()
         {
+            SendLocationUnloaded();
+            
             _locationManagerDecorator.OnGetEnterPathInnerEvent -= GetEnterPath;
             _locationManagerDecorator.OnGetExitPathInnerEvent -= GetExitPath;
         }
@@ -51,6 +53,9 @@ namespace GameCore.Gameplay.Level.Locations
 
         private void SendLocationLoaded() =>
             _levelObserver.LocationLoaded();
+
+        private void SendLocationUnloaded() =>
+            _levelObserver.LocationLeft();
         
         private CinemachinePath GetEnterPath() => _enterPath;
         

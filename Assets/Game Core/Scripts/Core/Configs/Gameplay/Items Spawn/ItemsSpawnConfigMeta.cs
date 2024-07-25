@@ -58,7 +58,8 @@ namespace GameCore.Configs.Gameplay.ItemsSpawn
                 return true;
             }
 
-            Log.PrintError(log: $"Items Spawn Config for location <gb>{locationName}</gb> <rb>not found</rb>!");
+            string log = Log.HandleLog($"Items Spawn Config for location <gb>{locationName}</gb> <rb>not found</rb>!");
+            Debug.LogWarning(log);
 
             result = null;
             return false;

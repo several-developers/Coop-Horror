@@ -37,7 +37,7 @@ namespace GameCore.Gameplay.Interactable.Train
         public event Action<int> OnTakeSeatEvent = delegate { };
         public event Action<int> OnLeftSeatEvent = delegate { };
         public event Func<int, bool> IsSeatBusyEvent = _ => true;
-        public event Func<bool> ShouldRemovePlayerParentEvent = () => true; 
+        public event Func<bool> ShouldRemovePlayerParentEvent = () => false; 
 
         private PlayerEntity _lastPlayerEntity;
         private Tweener _playerPositionTN;

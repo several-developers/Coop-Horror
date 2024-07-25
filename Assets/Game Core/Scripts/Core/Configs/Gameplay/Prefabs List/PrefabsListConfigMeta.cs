@@ -5,6 +5,7 @@ using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
+using GameCore.Observers.Gameplay.Game;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -36,6 +37,9 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         [SerializeField, Required]
         private ChatManager _chatManager;
 
+        [SerializeField, Required]
+        private GameObserverNetwork _gameObserver;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public ElevatorsManager ElevatorsManager => _elevatorsManager;
@@ -45,6 +49,7 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         public QuestsManager QuestsManager => _questsManager;
         public GameManager GameManager => _gameManager;
         public ChatManager ChatManager => _chatManager;
+        public GameObserverNetwork GameObserver => _gameObserver;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

@@ -27,16 +27,26 @@ namespace GameCore.Gameplay.Interactable.Train
         public override bool CanInteract()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
-            bool isGameStateValid = true;
+            bool isGameStateValid = false;
 
             switch (gameState)
             {
-                case GameState.CycleMovement:
+                case GameState.WaitingForPlayers:
+                case GameState.Gameplay:
                     isGameStateValid = true;
                     break;
             }
 
-            return isGameStateValid && IsInteractionEnabled;
+            if (!isGameStateValid)
+                return false;
+
+            LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
+            bool inBaseLocation = currentLocation == LocationName.Base;
+
+            if (!inBaseLocation)
+                return false;
+
+            return IsInteractionEnabled;
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

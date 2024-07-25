@@ -104,9 +104,10 @@ namespace GameCore.Gameplay.Quests
                 _gameManagerDecorator.AddPlayersGold(reward);
         }
 
+#warning СЛОМАНО, СРОЧНО ЧИНИТЬ
         private void HandleGameState(GameState gameState)
         {
-            switch (gameState)
+            /*switch (gameState)
             {
                 case GameState.ArrivedAtTheRoad:
                     if (!IsServerOnly)
@@ -125,7 +126,7 @@ namespace GameCore.Gameplay.Quests
                     _questsManagerDecorator.ActiveQuestsDataReceived();
                     CreateQuests();
                     break;
-            }
+            }*/
         }
 
         private QuestsStorage GetQuestsStorage() => _questsStorage;

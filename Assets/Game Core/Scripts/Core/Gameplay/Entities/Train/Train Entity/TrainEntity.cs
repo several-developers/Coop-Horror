@@ -10,6 +10,7 @@ using GameCore.Gameplay.Interactable.Train;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -20,6 +21,13 @@ namespace GameCore.Gameplay.Entities.Train
 {
     public class TrainEntity : NetcodeBehaviour, ITrainEntity
     {
+        public enum MovementBehaviour
+        {
+            InfiniteMovement = 0,
+            StopAtPathEnd = 1,
+            LeaveAtPathEnd = 2
+        }
+        
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
@@ -27,20 +35,18 @@ namespace GameCore.Gameplay.Entities.Train
             IGameManagerDecorator gameManagerDecorator,
             ILocationManagerDecorator locationManagerDecorator,
             IQuestsManagerDecorator questsManagerDecorator,
-            ILevelObserver levelObserver
+            ILevelObserver levelObserver,
+            IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
             GameManagerDecorator = gameManagerDecorator;
             QuestsManagerDecorator = questsManagerDecorator;
             _locationManagerDecorator = locationManagerDecorator;
             _levelObserver = levelObserver;
+            _trainConfig = gameplayConfigsProvider.GetTrainConfig();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title(Constants.Settings)]
-        [SerializeField, Required]
-        private TrainConfigMeta _trainConfig;
 
         [Title(Constants.References)]
         [SerializeField]
@@ -51,28 +57,33 @@ namespace GameCore.Gameplay.Entities.Train
         public TrainReferences References => _references;
         public IGameManagerDecorator GameManagerDecorator { get; private set; }
         public IQuestsManagerDecorator QuestsManagerDecorator { get; private set; }
-        public PathMovement PathMovement => _pathMovement;
-        public GameState GameState => GameManagerDecorator.GetGameState();
 
         // FIELDS: --------------------------------------------------------------------------------
 
         public static int LastPathID = -1;
 
+        public event Action OnMovementStoppedEvent = delegate { };
+        public event Action OnMovementStartedEvent = delegate { };
+        public event Action OnLeaveLocationEvent = delegate { };
         public event Action OnOpenQuestsSelectionMenuEvent = delegate { };
         public event Action OnOpenGameOverWarningMenuEvent = delegate { };
         public event Action OnOpenGameMapEvent = delegate { };
 
-        private readonly NetworkVariable<SeatsRuntimeDataContainer> _seatsData =
-            new(writePerm: Constants.OwnerPermission);
-
-        private readonly NetworkVariable<bool> _doorState = new(writePerm: Constants.OwnerPermission);
+        private const NetworkVariableWritePermission OwnerPermission = Constants.OwnerPermission;
+        
+        private readonly NetworkVariable<SeatsRuntimeDataContainer> _seatsData = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<bool> _isMainLeverEnabled = new(value: true, writePerm: OwnerPermission);
+        private readonly NetworkVariable<bool> _isDoorOpened = new(writePerm: OwnerPermission);
 
         private ILocationManagerDecorator _locationManagerDecorator;
         private ILevelObserver _levelObserver;
 
+        private TrainConfigMeta _trainConfig;
         private TrainController _trainController;
         private MoveSpeedController _moveSpeedController;
         private PathMovement _pathMovement;
+
+        private MovementBehaviour _movementBehaviour;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -89,16 +100,11 @@ namespace GameCore.Gameplay.Entities.Train
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void OpenDoor() => OpenDoorServerRpc();
-
-        public void EnableMainLever() =>
-            _trainController.EnableMainLever();
-
-        public void ChangePath(CinemachinePath path, float startDistancePercent = 0, bool stayAtSamePosition = false)
-        {
+        public void ChangePath(CinemachinePath path, float startDistancePercent = 0, bool stayAtSamePosition = false) =>
             _pathMovement.ChangePath(path, startDistancePercent, stayAtSamePosition);
-            HandlePathChange();
-        }
+
+        public void SetMovementBehaviour(MovementBehaviour movementBehaviour) =>
+            _movementBehaviour = movementBehaviour;
 
         public void ChangeToTheRoadPath()
         {
@@ -130,8 +136,24 @@ namespace GameCore.Gameplay.Entities.Train
             LastPathID = -1;
             _pathMovement.ResetDistance();
             _pathMovement.ToggleArrived(isArrived: false);
-            _trainController.EnableMainLever();
             ChangeToTheRoadPath();
+        }
+
+        [Button(ButtonStyle.FoldoutButton)]
+        public void ToggleMainLeverState(bool isEnabled)
+        {
+            if (IsServerOnly)
+                _isMainLeverEnabled.Value = isEnabled;
+            else
+                ToggleMainLeverStateServerRpc(isEnabled);
+        }
+
+        public void ToggleDoorState(bool isOpened)
+        {
+            if (IsServerOnly)
+                _isDoorOpened.Value = isOpened;
+            else
+                ToggleDoorStateServerRpc(isOpened);
         }
 
         public void SendOpenQuestsSelectionMenu() =>
@@ -160,7 +182,9 @@ namespace GameCore.Gameplay.Entities.Train
 
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
 
-            _doorState.OnValueChanged += OnDoorStateChanged;
+            _isMainLeverEnabled.OnValueChanged += OnMainLeverStateChanged;
+
+            _isDoorOpened.OnValueChanged += OnDoorStateChanged;
         }
 
         protected override void InitServerOnly()
@@ -168,7 +192,7 @@ namespace GameCore.Gameplay.Entities.Train
             IReadOnlyList<TrainSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
             int mobileHQSeatsAmount = allMobileHQSeats.Count;
             _seatsData.Value = new SeatsRuntimeDataContainer(mobileHQSeatsAmount);
-            
+
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
         }
 
@@ -183,8 +207,10 @@ namespace GameCore.Gameplay.Entities.Train
             _trainController.DespawnAll();
 
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
-            
-            _doorState.OnValueChanged -= OnDoorStateChanged;
+
+            _isMainLeverEnabled.OnValueChanged -= OnMainLeverStateChanged;
+
+            _isDoorOpened.OnValueChanged -= OnDoorStateChanged;
         }
 
         protected override void DespawnServerOnly() =>
@@ -201,7 +227,7 @@ namespace GameCore.Gameplay.Entities.Train
             {
                 TrainSeat trainSeat = allMobileHQSeats[i];
                 trainSeat.SetSeatIndex(i);
-                
+
                 trainSeat.OnTakeSeatEvent += OnTakeSeat;
                 trainSeat.OnLeftSeatEvent += OnLeftSeat;
                 trainSeat.IsSeatBusyEvent += IsSeatBusy;
@@ -212,9 +238,6 @@ namespace GameCore.Gameplay.Entities.Train
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
 
-        private void ToggleDoorState(bool isOpen) =>
-            _trainController.ToggleDoorState(isOpen);
-        
         private void TeleportLocalPlayerToRandomSeat()
         {
             PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
@@ -248,20 +271,9 @@ namespace GameCore.Gameplay.Entities.Train
                 mobileHQSeat.ToggleCollider(isEnabled);
         }
 
-        private void HandlePathChange()
-        {
-            switch (GameState)
-            {
-                case GameState.EnteringMainRoad:
-                    GameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.CycleMovement,
-                        previousState: GameState.EnteringMainRoad);
-                    break;
-            }
-        }
-
         private static bool IsCurrentPlayer(ulong senderClientID) =>
             NetworkHorror.ClientID == senderClientID;
-        
+
         private bool IsSeatBusy(int seatIndex)
         {
             SeatsRuntimeDataContainer seatsRuntimeDataContainer = _seatsData.Value;
@@ -276,10 +288,10 @@ namespace GameCore.Gameplay.Entities.Train
             foreach (SeatRuntimeData seatRuntimeData in allSeatsData)
             {
                 bool isMatches = seatRuntimeData.SeatIndex == seatIndex;
-                
+
                 if (!isMatches)
                     continue;
-                
+
                 isSeatBusy = seatRuntimeData.IsBusy;
                 break;
             }
@@ -287,12 +299,14 @@ namespace GameCore.Gameplay.Entities.Train
             return isSeatBusy;
         }
 
+#warning СЛОМАНО, СРОЧНО ЧИНИТЬ
         // TEMP
         private bool ShouldRemovePlayerParent()
         {
             GameState gameState = GameManagerDecorator.GetGameState();
-            bool isGameStateValid = gameState == GameState.ReadyToLeaveTheLocation;
-            return isGameStateValid;
+            //bool isGameStateValid = gameState == GameState.ReadyToLeaveTheLocation;
+            //return isGameStateValid;
+            return false;
         }
 
         // RPC: -----------------------------------------------------------------------------------
@@ -301,16 +315,16 @@ namespace GameCore.Gameplay.Entities.Train
         [ServerRpc(RequireOwnership = false)]
         public void StartLeavingLocationServerRpc()
         {
-            CinemachinePath path = _locationManagerDecorator.GetExitPath();
+            OnMovementStartedEvent.Invoke();
 
             TeleportLocalPlayerToRandomSeat();
             _pathMovement.ToggleArrived(isArrived: false);
-            ChangePath(path);
+            
+            CinemachinePath exitPath = _locationManagerDecorator.GetExitPath();
+            ChangePath(exitPath);
+            
             StartLeavingLocationClientRpc();
         }
-
-        [ServerRpc]
-        private void OpenDoorServerRpc() => OpenDoorClientRpc();
 
         [ServerRpc(RequireOwnership = false)]
         public void MainLeverAnimationServerRpc(ServerRpcParams serverRpcParams = default)
@@ -336,20 +350,21 @@ namespace GameCore.Gameplay.Entities.Train
         [ServerRpc(RequireOwnership = false)]
         private void TakeSeatServerRpc(int seatIndex) =>
             _seatsData.Value.TakeSeat(seatIndex);
-        
+
         [ServerRpc(RequireOwnership = false)]
         private void LeftSeatServerRpc(int seatIndex) =>
             _seatsData.Value.LeftSeat(seatIndex);
 
         [ServerRpc(RequireOwnership = false)]
-        public void ToggleDoorServerRpc(bool isOpen) =>
-            _doorState.Value = isOpen;
+        private void ToggleMainLeverStateServerRpc(bool isEnabled) =>
+            _isMainLeverEnabled.Value = isEnabled;
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ToggleDoorStateServerRpc(bool isOpened) =>
+            _isDoorOpened.Value = isOpened;
 
         [ClientRpc]
         private void StartLeavingLocationClientRpc() => ToggleMovement(canMove: true);
-
-        [ClientRpc]
-        private void OpenDoorClientRpc() => ToggleDoorState(isOpen: true);
 
         [ClientRpc]
         private void MainLeverAnimationClientRpc(ulong senderClientID)
@@ -385,20 +400,19 @@ namespace GameCore.Gameplay.Entities.Train
 
         private void OnDestinationReached()
         {
-            switch (GameState)
+            switch (_movementBehaviour)
             {
-                case GameState.HeadingToTheLocation:
-                    GameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.ArrivedAtTheLocation,
-                        previousState: GameState.HeadingToTheLocation);
-                    break;
-
-                case GameState.HeadingToTheRoad:
-                    _levelObserver.LocationLeft();
-                    break;
-
-                default:
+                case MovementBehaviour.InfiniteMovement:
                     _pathMovement.ResetDistance();
                     _pathMovement.ToggleArrived(isArrived: false);
+                    break;
+                
+                case MovementBehaviour.StopAtPathEnd:
+                    OnMovementStoppedEvent.Invoke();
+                    break;
+                
+                case MovementBehaviour.LeaveAtPathEnd:
+                    OnLeaveLocationEvent.Invoke();
                     break;
             }
         }
@@ -417,12 +431,15 @@ namespace GameCore.Gameplay.Entities.Train
             ToggleSeatsColliders(isEnabled: false);
             TakeSeatServerRpc(seatIndex);
         }
-        
+
         private void OnLeftSeat(int seatIndex)
         {
             ToggleSeatsColliders(isEnabled: true);
             LeftSeatServerRpc(seatIndex);
         }
+
+        private void OnMainLeverStateChanged(bool previousValue, bool newValue) =>
+            _trainController.ToggleMainLeverState(newValue);
 
         private void OnDoorStateChanged(bool previousValue, bool newValue) =>
             _references.Doors.SetActive(!newValue);

@@ -76,10 +76,10 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.OnPauseEvent += OnOpenPauseMenu;
             _inputReader.OnOpenChatEvent += OnOpenChatMenu;
             _inputReader.OnSubmitEvent += OnSendChatMessage;
-            _inputReader.OnOpenGameMapEvent += OnOpenGameMap;
 
             _trainEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
             _trainEntity.OnOpenGameOverWarningMenuEvent += OnOpenGameOverWarningMenu;
+            _trainEntity.OnOpenGameMapEvent += OnOpenGameMap;
             
             _pauseMenuView.OnContinueClickedEvent += OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent += OnQuitClicked;
@@ -97,10 +97,10 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.OnPauseEvent -= OnOpenPauseMenu;
             _inputReader.OnOpenChatEvent -= OnOpenChatMenu;
             _inputReader.OnSubmitEvent -= OnSendChatMessage;
-            _inputReader.OnOpenGameMapEvent -= OnOpenGameMap;
 
             _trainEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
             _trainEntity.OnOpenGameOverWarningMenuEvent -= OnOpenGameOverWarningMenu;
+            _trainEntity.OnOpenGameMapEvent -= OnOpenGameMap;
 
             _pauseMenuView.OnContinueClickedEvent -= OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent -= OnQuitClicked;
@@ -157,6 +157,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void InitHorrorStateMachine() =>
             _horrorStateMachine.ChangeState<PrepareGameState>();
 
+        #warning СЛОМАНО, СРОЧНО ПОЧИНИТЬ
         private void HandleGameState(GameState gameState)
         {
             switch (gameState)
@@ -169,10 +170,10 @@ namespace GameCore.Infrastructure.StateMachine
                     // Open reward menu
                     break;
                 
-                case GameState.KillPlayersOnTheRoad:
-                    PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
-                    localPlayer.Kill(PlayerDeathReason.FailedQuests);
-                    break;
+                // case GameState.KillPlayersOnTheRoad:
+                //     PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+                //     localPlayer.Kill(PlayerDeathReason.FailedQuests);
+                //     break;
                 
                 case GameState.RestartGame:
                     _gameOverMenuView.Hide();
@@ -224,7 +225,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void OnOpenQuestsSelectionMenu()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
-            bool canOpenMenu = gameState == GameState.CycleMovement;
+            bool canOpenMenu = gameState == GameState.Gameplay;
             
             if (!canOpenMenu)
                 return;
@@ -251,8 +252,10 @@ namespace GameCore.Infrastructure.StateMachine
         private void OnGameOverWarningConfirmClicked() =>
             _gameManagerDecorator.ChangeGameState(GameState.KillPlayersOnTheRoad);
 
-        private void OnGameOverWarningCancelClicked() =>
-            _trainEntity.EnableMainLever();
+        private void OnGameOverWarningCancelClicked()
+        {
+            //_trainEntity.EnableMainLever();
+        }
 
         private void OnQuitConfirmClicked() => EnterQuitGameplayState();
 

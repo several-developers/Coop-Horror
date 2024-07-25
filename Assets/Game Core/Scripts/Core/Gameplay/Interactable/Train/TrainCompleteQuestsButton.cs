@@ -52,7 +52,7 @@ namespace GameCore.Gameplay.Interactable.Train
 
             switch (gameState)
             {
-                case GameState.CycleMovement:
+                case GameState.Gameplay:
                     isGameStateValid = true;
                     break;
             }

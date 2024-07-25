@@ -12,6 +12,7 @@
         public const string ItemsListConfig = GameplayConfigs + "Items List Config";
         public const string LocationsListConfig = GameplayConfigs + "Locations List Config";
         public const string TimeConfig = GameplayConfigs + "Time Config";
+        public const string TrainConfig = GameplayConfigs + "Train Config";
         public const string DungeonGeneratorConfig = GameplayConfigs + "Dungeon Generator Config";
         public const string ElevatorConfig = GameplayConfigs + "Elevator Config";
         public const string PrefabsListConfig = GameplayConfigs + "Prefabs List Config";

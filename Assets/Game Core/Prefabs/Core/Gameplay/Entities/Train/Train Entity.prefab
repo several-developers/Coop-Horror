@@ -2012,8 +2012,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43a4806faf6c4d239abe26fcfecb57fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mobileHeadquartersConfig: {fileID: 11400000, guid: 42fa32de715f30247b6994951dad2972,
-    type: 2}
   _references:
     _moveSpeedController: {fileID: 7222222120550699953}
     _animator: {fileID: 1830334093793617745}
@@ -2023,7 +2021,7 @@ MonoBehaviour:
     _mainLever: {fileID: 7287405237099232689}
     _openQuestsSelectionMenuButton: {fileID: 3434366812126167231}
     _completeQuestsButton: {fileID: 3230951295571640482}
-    _loadMarketButton: {fileID: 8463196859447597382}
+    _openGameMapButton: {fileID: 8463196859447597382}
     _allMobileHQSeats:
     - {fileID: 1121071700741122506}
     - {fileID: 4193860834753643447}

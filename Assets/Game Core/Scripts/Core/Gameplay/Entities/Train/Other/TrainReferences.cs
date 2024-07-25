@@ -47,7 +47,6 @@ namespace GameCore.Gameplay.Entities.Train
 
         public MoveSpeedController MoveSpeedController => _moveSpeedController;
         public Animator Animator => _animator;
-        public AnimationObserver AnimationObserver => _animationObserver;
         public GameObject Doors => _doors;
         public Camera OutsideCamera => _outsideCamera;
         public TrainMainLever MainLever => _mainLever;

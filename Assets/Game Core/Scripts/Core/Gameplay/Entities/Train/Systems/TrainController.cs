@@ -2,9 +2,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.Train;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
-using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Train
 {
@@ -31,8 +29,6 @@ namespace GameCore.Gameplay.Entities.Train
 
         public void InitAll()
         {
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
-
             SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
             openQuestsSelectionMenuButton.OnTriggerEvent += OnOpenQuestsSelectionMenu;
 
@@ -49,8 +45,6 @@ namespace GameCore.Gameplay.Entities.Train
 
         public void DespawnAll()
         {
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
-
             SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
             openQuestsSelectionMenuButton.OnTriggerEvent -= OnOpenQuestsSelectionMenu;
 
@@ -65,60 +59,14 @@ namespace GameCore.Gameplay.Entities.Train
             loadLocationLever.OnEnabledEvent -= OnMainLeverPulled;
         }
 
-        public void ToggleDoorState(bool isOpen)
-        {
-            Animator animator = _references.Animator;
-            animator.SetBool(id: AnimatorHashes.IsOpen, isOpen);
-        }
-
-        public void EnableMainLever()
+        public void ToggleMainLeverState(bool isEnabled)
         {
             TrainMainLever mainLever = _references.MainLever;
-            mainLever.InteractWithoutEvents(isLeverPulled: false);
-            mainLever.ToggleInteract(canInteract: true);
+            mainLever.InteractWithoutEvents(isLeverPulled: !isEnabled);
+            mainLever.ToggleInteract(canInteract: isEnabled);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void HandleGameState(GameState gameState)
-        {
-            switch (gameState)
-            {
-                // Под вопросом это
-                case GameState.ArrivedAtTheRoad:
-                    _trainEntity.PathMovement.ToggleArrived(isArrived: false);
-                    _trainEntity.ChangeToTheRoadPath();
-                    break;
-
-                case GameState.CycleMovement:
-                    EnableMainLever();
-                    break;
-
-                case GameState.ReadyToLeaveTheLocation:
-                    EnableMainLever();
-
-                    if (NetworkHorror.IsTrueServer)
-                        _trainEntity.ToggleDoorServerRpc(isOpen: true);
-                    break;
-
-                case GameState.HeadingToTheRoad:
-                    if (NetworkHorror.IsTrueServer)
-                        _trainEntity.ToggleDoorServerRpc(isOpen: false);
-                    break;
-
-                case GameState.ArrivedAtTheLocation:
-                    ToggleDoorState(isOpen: true);
-                    break;
-
-                case GameState.KillPlayersOnTheRoad:
-                    ToggleDoorState(isOpen: true);
-                    break;
-
-                case GameState.RestartGame:
-                    ToggleDoorState(isOpen: false);
-                    break;
-            }
-        }
 
         private void MainLeverLogic()
         {
@@ -127,7 +75,6 @@ namespace GameCore.Gameplay.Entities.Train
 
             if (leaveLocation)
             {
-                _gameManagerDecorator.SelectLocation(LocationName.Base);
                 _trainEntity.StartLeavingLocationServerRpc();
             }
             else
@@ -139,11 +86,11 @@ namespace GameCore.Gameplay.Entities.Train
                 else
                     _gameManagerDecorator.LoadSelectedLocation();
             }
+            
+            _trainEntity.ToggleMainLeverState(isEnabled: false);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
 
         private void OnOpenQuestsSelectionMenu()
         {

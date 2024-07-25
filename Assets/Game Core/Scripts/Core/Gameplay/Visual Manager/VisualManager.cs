@@ -56,7 +56,7 @@ namespace GameCore.Gameplay.VisualManagement
         private void Start()
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
-            bool isGameStateValid = gameState == GameState.CycleMovement;
+            bool isGameStateValid = gameState == GameState.Gameplay;
 
             if (!isGameStateValid)
                 return;
@@ -115,18 +115,19 @@ namespace GameCore.Gameplay.VisualManagement
             }
         }
 
+#warning СЛОМАНО, СРОЧНО ЧИНИТЬ
         private void HandleGameState(GameState gameState)
         {
-            switch (gameState)
-            {
-                case GameState.ArrivedAtTheRoad:
-                    ChangePreset(VisualPresetType.RoadLocation);
-                    break;
-
-                case GameState.HeadingToTheLocation:
-                    ChangePreset(VisualPresetType.DefaultLocation);
-                    break;
-            }
+            // switch (gameState)
+            // {
+            //     case GameState.ArrivedAtTheRoad:
+            //         ChangePreset(VisualPresetType.RoadLocation);
+            //         break;
+            //
+            //     case GameState.HeadingToTheLocation:
+            //         ChangePreset(VisualPresetType.DefaultLocation);
+            //         break;
+            // }
         }
 
         private void ApplyEffects(VisualPresetConfig presetConfig, bool instant = false)

@@ -11,6 +11,7 @@ using GameCore.Configs.Gameplay.Quests;
 using GameCore.Configs.Gameplay.QuestsItems;
 using GameCore.Configs.Gameplay.RigPresets;
 using GameCore.Configs.Gameplay.Time;
+using GameCore.Configs.Gameplay.Train;
 using GameCore.Configs.Gameplay.Visual;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
@@ -28,6 +29,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _itemsListConfig = Load<ItemsListConfigMeta>(path: ConfigsPaths.ItemsListConfig);
             _locationsListConfig = Load<LocationsListConfigMeta>(path: ConfigsPaths.LocationsListConfig);
             _timeConfig = Load<TimeConfigMeta>(path: ConfigsPaths.TimeConfig);
+            _trainConfig = Load<TrainConfigMeta>(path: ConfigsPaths.TrainConfig);
             _dungeonGeneratorConfig = Load<DungeonGeneratorConfigMeta>(path: ConfigsPaths.DungeonGeneratorConfig);
             _elevatorConfig = Load<ElevatorConfigMeta>(path: ConfigsPaths.ElevatorConfig);
             _prefabsListConfig = Load<PrefabsListConfigMeta>(path: ConfigsPaths.PrefabsListConfig);
@@ -46,6 +48,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly ItemsListConfigMeta _itemsListConfig;
         private readonly LocationsListConfigMeta _locationsListConfig;
         private readonly TimeConfigMeta _timeConfig;
+        private readonly TrainConfigMeta _trainConfig;
         private readonly DungeonGeneratorConfigMeta _dungeonGeneratorConfig;
         private readonly ElevatorConfigMeta _elevatorConfig;
         private readonly PrefabsListConfigMeta _prefabsListConfig;
@@ -63,6 +66,8 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public ItemsListConfigMeta GetItemsListConfig() => _itemsListConfig;
         public LocationsListConfigMeta GetLocationsListConfig() => _locationsListConfig;
         public TimeConfigMeta GetTimeConfig() => _timeConfig;
+        public TrainConfigMeta GetTrainConfig() => _trainConfig;
+
         public DungeonGeneratorConfigMeta GetDungeonGeneratorConfig() => _dungeonGeneratorConfig;
         public ElevatorConfigMeta GetElevatorConfig() => _elevatorConfig;
         public PrefabsListConfigMeta GetPrefabsListConfig() => _prefabsListConfig;

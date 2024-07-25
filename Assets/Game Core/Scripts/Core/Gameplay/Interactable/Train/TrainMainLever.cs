@@ -62,7 +62,17 @@ namespace GameCore.Gameplay.Interactable.Train
                     break;
             }
 
-            return isGameStateValid && IsInteractionEnabled;
+            if (!isGameStateValid)
+                return false;
+
+            LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
+            LocationName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
+            bool isLocationsMatches = currentLocation == selectedLocation;
+
+            if (isLocationsMatches)
+                return false;
+
+            return IsInteractionEnabled;
         }
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

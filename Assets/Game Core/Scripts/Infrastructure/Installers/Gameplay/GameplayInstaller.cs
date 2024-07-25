@@ -1,7 +1,7 @@
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Dungeons;
-using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Items.SpawnSystem;
@@ -50,6 +50,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindCamerasManager();
             BindGameResetManager();
             BindItemsSpawnSystem();
+            BindGameEventsHandler();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -159,6 +160,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<ItemsSpawnSystem>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindGameEventsHandler()
+        {
+            Container
+                .BindInterfacesTo<GameController>()
                 .AsSingle()
                 .NonLazy();
         }

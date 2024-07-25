@@ -55,9 +55,13 @@ namespace GameCore.UI.Gameplay.GameMap
         
         private void LocationChangedLogic()
         {
-            bool isLocationMatches = IsLocationMatches();
+            bool isCurrentLocationMatches = IsCurrentLocationMatches();
+            bool isSelectedLocationMatches = IsSelectedLocationMatches();
+            bool playAnimation = isCurrentLocationMatches || isSelectedLocationMatches;
             
-            if (isLocationMatches)
+            _buttonAnimation.ToggleUseGreenPing(isCurrentLocationMatches);
+            
+            if (playAnimation)
                 PlayButtonAnimation();
             else
                 StopButtonAnimation();
@@ -72,7 +76,13 @@ namespace GameCore.UI.Gameplay.GameMap
         private void StopButtonAnimation() =>
             _buttonAnimation.StopAnimation();
         
-        private bool IsLocationMatches()
+        private bool IsCurrentLocationMatches()
+        {
+            LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
+            return currentLocation == _locationName;
+        }
+        
+        private bool IsSelectedLocationMatches()
         {
             LocationName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
             return selectedLocation == _locationName;

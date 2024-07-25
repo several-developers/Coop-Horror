@@ -21,36 +21,57 @@ namespace GameCore.UI.Gameplay.GameMap
         
         [Title(Constants.References)]
         [SerializeField, Required]
-        private Image _pingImage;
+        private Image _greenPingImage;
+
+        [SerializeField, Required]
+        private Image _yellowPingImage;
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private Tweener _fadeTN;
+        private bool _useGreenPing;
+        private bool _isAnimationPlaying;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void PlayAnimation()
         {
+            if (_isAnimationPlaying)
+                return;
+            
             StopAnimation();
             Fade(fadeIn: true);
+            
+            _isAnimationPlaying = true;
         }
 
         public void StopAnimation()
         {
             _fadeTN.Kill();
 
-            Color color = _pingImage.color;
-            color.a = 0f;
-            _pingImage.color = color;
+            Color greenColor = _greenPingImage.color;
+            Color yellowColor = _yellowPingImage.color;
+            
+            greenColor.a = 0f;
+            yellowColor.a = 0f;
+            
+            _greenPingImage.color = greenColor;
+            _yellowPingImage.color = yellowColor;
+            
+            _isAnimationPlaying = false;
         }
+
+        public void ToggleUseGreenPing(bool useGreenPing) =>
+            _useGreenPing = useGreenPing;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void Fade(bool fadeIn)
         {
+            Image image = _useGreenPing ? _greenPingImage : _yellowPingImage;
             float endValue = fadeIn ? _maxAlpha : 0f;
 
-            _fadeTN = _pingImage
+            _fadeTN = image
                 .DOFade(endValue, _fadeDuration)
                 .SetEase(_fadeEase)
                 .SetLink(gameObject)

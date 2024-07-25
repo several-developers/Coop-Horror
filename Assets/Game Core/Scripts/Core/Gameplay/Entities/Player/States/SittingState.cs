@@ -90,11 +90,11 @@ namespace GameCore.Gameplay.Entities.Player.States
 
         private void TryLeftSeat()
         {
-            GameState gameState = _gameManagerDecorator.GetGameState();
-            bool isGameStateValid = gameState == GameState.ReadyToLeaveTheLocation;
-
-            if (!isGameStateValid)
-                return;
+            // GameState gameState = _gameManagerDecorator.GetGameState();
+            // bool isGameStateValid = gameState == GameState.ReadyToLeaveTheLocation;
+            //
+            // if (!isGameStateValid)
+            //     return;
             
             EnterAliveState();
         }
