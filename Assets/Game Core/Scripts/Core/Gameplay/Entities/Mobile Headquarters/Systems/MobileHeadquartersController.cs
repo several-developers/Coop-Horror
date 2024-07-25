@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.GameManagement;
@@ -65,7 +66,7 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
 
             SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
             completeQuestsButton.OnTriggerEvent -= OnCompleteQuests;
-            
+
             SimpleButton loadMarketButton = _references.LoadMarketButton;
             loadMarketButton.OnTriggerEvent -= OnLoadMarket;
 
@@ -181,8 +182,15 @@ namespace GameCore.Gameplay.Entities.MobileHeadquarters
             _gameManagerDecorator.ChangeGameState(GameState.QuestsRewarding);
         }
 
-        private void OnLoadMarket() =>
-            _gameManagerDecorator.LoadLocation(SceneName.Market);
+#warning ТУТ МОЖЕТ БЫТЬ БАГ НА КЛИЕНТЕ
+        private async void OnLoadMarket()
+        {
+            _gameManagerDecorator.SelectLocation(LocationName.Market);
+            
+            await UniTask.Delay(50); // TEMP
+            
+            _gameManagerDecorator.LoadSelectedLocation();
+        }
 
         private void OnInteractWithMainLever()
         {

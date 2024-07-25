@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Enums.Global;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Items.SpawnSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,14 +12,14 @@ namespace GameCore.Configs.Gameplay.ItemsSpawn
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField]
-        private SceneName _locationName = SceneName.Forest;
+        private LocationName _locationName;
 
         [SerializeField, Required]
         private LocationItemsSpawnConfigMeta _config;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public SceneName LocationName => _locationName;
+        public LocationName LocationName => _locationName;
         public LocationItemsSpawnConfigMeta Config => _config;
     }
 }

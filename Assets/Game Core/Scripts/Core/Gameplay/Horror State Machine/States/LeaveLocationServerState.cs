@@ -107,7 +107,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         }
 
         private void UnloadLastLocation() =>
-            _locationsLoader.UnloadLastLocation();
+            _locationsLoader.UnloadLastScene();
 
         private void EnterLeaveLocationClientState() =>
             _horrorStateMachine.ChangeState<LeaveLocationClientState>();

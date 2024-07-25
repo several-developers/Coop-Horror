@@ -1,6 +1,7 @@
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Infrastructure.Providers.Gameplay.RigPresets;
 using Zenject;
@@ -18,6 +19,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindItemsMetaProvider();
             BindItemsProvider();
             BindRigPresetsProvider();
+            BindLocationsMetaProvider();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -55,6 +57,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<RigPresetsProvider>()
+                .AsSingle();
+        }
+        
+        private void BindLocationsMetaProvider()
+        {
+            Container
+                .BindInterfacesTo<LocationsMetaProvider>()
                 .AsSingle();
         }
     }

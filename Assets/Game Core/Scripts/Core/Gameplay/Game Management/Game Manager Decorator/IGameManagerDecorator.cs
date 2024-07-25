@@ -1,40 +1,37 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
-using GameCore.Enums.Global;
 
 namespace GameCore.Gameplay.GameManagement
 {
     public interface IGameManagerDecorator
     {
         event Action<GameState> OnGameStateChangedEvent;
-        event Action<SceneName> OnSelectedLocationChangedEvent;
+        event Action<LocationName> OnSelectedLocationChangedEvent;
         event Action<int> OnPlayersGoldChangedEvent;
         void GameStateChanged(GameState gameState);
-        void SelectedLocationChanged(SceneName locationName);
+        void SelectedLocationChanged(LocationName locationName);
         void PlayersGoldChanged(int playersGold);
         
         event Action<GameState> OnChangeGameStateInnerEvent;
         event Action<GameState, GameState> OnChangeGameStateWhenAllPlayersReadyInnerEvent;
-        event Action<SceneName> OnSelectLocationInnerEvent;
+        event Action<LocationName> OnSelectLocationInnerEvent;
         event Action OnLoadSelectedLocationInnerEvent;
-        event Action<SceneName> OnLoadLocationInnerEvent;
         event Action<int> OnAddPlayersGoldInnerEvent;
         event Action<int> OnSpendPlayersGoldInnerEvent;
         event Action OnResetPlayersGoldInnerEvent;
-        event Func<SceneName> OnGetSelectedLocationInnerEvent;
+        event Func<LocationName> OnGetSelectedLocationInnerEvent;
         event Func<GameState> OnGetGameStateInnerEvent;
         /// <summary>
         /// State should be changed only once!
         /// </summary>
         void ChangeGameState(GameState gameState);
         void ChangeGameStateWhenAllPlayersReady(GameState newState, GameState previousState);
-        void SelectLocation(SceneName locationName);
+        void SelectLocation(LocationName locationName);
         void LoadSelectedLocation();
-        void LoadLocation(SceneName locationName);
         void AddPlayersGold(int amount);
         void SpendPlayersGold(int amount);
         void ResetPlayersGold();
-        SceneName GetSelectedLocation();
+        LocationName GetSelectedLocation();
         GameState GetGameState();
     }
 }

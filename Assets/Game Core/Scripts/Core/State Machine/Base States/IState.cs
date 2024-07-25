@@ -13,7 +13,7 @@ namespace GameCore
     
     public interface IEnterState<TEnterParams> : IState
     {
-        void Enter(TEnterParams sceneName);
+        void Enter(TEnterParams locationName);
     }
 
     public interface IExitState : IState

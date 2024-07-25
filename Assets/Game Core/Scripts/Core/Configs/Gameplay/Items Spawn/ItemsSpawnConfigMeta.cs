@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using CustomEditors;
-using GameCore.Enums.Global;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Items.SpawnSystem;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -45,7 +45,7 @@ namespace GameCore.Configs.Gameplay.ItemsSpawn
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public bool TryGetItemsSpawnConfig(SceneName locationName, out LocationItemsSpawnConfigMeta result)
+        public bool TryGetItemsSpawnConfig(LocationName locationName, out LocationItemsSpawnConfigMeta result)
         {
             foreach (LocationItemsSpawnConfigReference configReference in _itemsSpawnConfigs)
             {

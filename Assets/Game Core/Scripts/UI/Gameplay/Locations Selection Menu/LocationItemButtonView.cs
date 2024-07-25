@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Enums.Global;
+using GameCore.Enums.Gameplay;
 using GameCore.UI.Global.Buttons;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -24,18 +24,18 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public SceneName SceneName { get; private set; }
+        public LocationName LocationName { get; private set; }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<SceneName> OnLocationItemClickedEvent;
+        public event Action<LocationName> OnLocationItemClickedEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Setup(SceneName sceneName, string locationName)
+        public void Setup(LocationName locationName, string locationNameText)
         {
-            SceneName = sceneName;
-            _titleTMP.text = $"Location: {locationName}";
+            LocationName = locationName;
+            _titleTMP.text = $"Location: {locationNameText}";
         }
 
         public void ToggleSelected(bool isSelected)
@@ -47,6 +47,6 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
         // PROTECTED METHODS: ---------------------------------------------------------------------
         
         protected override void ClickLogic() =>
-            OnLocationItemClickedEvent?.Invoke(SceneName);
+            OnLocationItemClickedEvent?.Invoke(LocationName);
     }
 }

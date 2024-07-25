@@ -1,5 +1,4 @@
 ﻿using GameCore.Configs.Gameplay.Balance;
-using GameCore.Configs.Gameplay.Delivery;
 using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
@@ -34,7 +33,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _prefabsListConfig = Load<PrefabsListConfigMeta>(path: ConfigsPaths.PrefabsListConfig);
             _questsConfig = Load<QuestsConfigMeta>(path: ConfigsPaths.QuestsConfig);
             _questsItemsConfig = Load<QuestsItemsConfigMeta>(path: ConfigsPaths.QuestsItemsConfig);
-            _deliveryConfig = Load<DeliveryConfigMeta>(path: ConfigsPaths.DeliveryConfig);
             _rigPresetsConfig = Load<RigPresetsConfigMeta>(path: ConfigsPaths.RigPresetsConfig);
             _visualConfig = Load<VisualConfigMeta>(path: ConfigsPaths.VisualConfig);
             _itemsSpawnConfig = Load<ItemsSpawnConfigMeta>(path: ConfigsPaths.ItemsSpawnConfig);
@@ -53,7 +51,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly PrefabsListConfigMeta _prefabsListConfig;
         private readonly QuestsConfigMeta _questsConfig;
         private readonly QuestsItemsConfigMeta _questsItemsConfig;
-        private readonly DeliveryConfigMeta _deliveryConfig;
         private readonly RigPresetsConfigMeta _rigPresetsConfig;
         private readonly VisualConfigMeta _visualConfig;
         private readonly ItemsSpawnConfigMeta _itemsSpawnConfig;
@@ -71,7 +68,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public PrefabsListConfigMeta GetPrefabsListConfig() => _prefabsListConfig;
         public QuestsConfigMeta GetQuestsConfig() => _questsConfig;
         public QuestsItemsConfigMeta GetQuestsItemsConfig() => _questsItemsConfig;
-        public DeliveryConfigMeta GetDeliveryConfig() => _deliveryConfig;
         public RigPresetsConfigMeta GetRigPresetsConfig() => _rigPresetsConfig;
         public VisualConfigMeta GetVisualConfig() => _visualConfig;
         public ItemsSpawnConfigMeta GetItemsSpawnConfig() => _itemsSpawnConfig;

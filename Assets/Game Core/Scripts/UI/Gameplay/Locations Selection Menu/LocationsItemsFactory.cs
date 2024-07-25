@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using GameCore.Configs.Gameplay.LocationsList;
+using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using UnityEngine;
 
 namespace GameCore.UI.Gameplay.LocationsSelectionMenu
@@ -12,11 +14,15 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LocationsItemsFactory(IGameplayConfigsProvider gameplayConfigsProvider,
-            LocationsSelectionMenuView locationsSelectionMenuView, IGameManagerDecorator gameManagerDecorator,
-            Transform container, LocationItemButtonView prefab)
+        public LocationsItemsFactory(
+            ILocationsMetaProvider locationsMetaProvider,
+            LocationsSelectionMenuView locationsSelectionMenuView,
+            IGameManagerDecorator gameManagerDecorator,
+            Transform container,
+            LocationItemButtonView prefab
+        )
         {
-            _locationsListConfig = gameplayConfigsProvider.GetLocationsListConfig();
+            _locationsMetaProvider = locationsMetaProvider;
             _locationsSelectionMenuView = locationsSelectionMenuView;
             _gameManagerDecorator = gameManagerDecorator;
             _container = container;
@@ -26,7 +32,7 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly LocationsListConfigMeta _locationsListConfig;
+        private readonly ILocationsMetaProvider _locationsMetaProvider;
         private readonly LocationsSelectionMenuView _locationsSelectionMenuView;
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly Transform _container;
@@ -43,12 +49,12 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
 
         public void UpdateSelectionState()
         {
-            SceneName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
+            LocationName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
 
             foreach (LocationItemButtonView locationItemButtonView in _locationsItemsButtons)
             {
-                SceneName sceneName = locationItemButtonView.SceneName;
-                bool isSelected = sceneName == selectedLocation;
+                LocationName locationName = locationItemButtonView.LocationName;
+                bool isSelected = locationName == selectedLocation;
                 locationItemButtonView.ToggleSelected(isSelected);
             }
         }
@@ -57,13 +63,13 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
 
         private void CreationLogic()
         {
-            IEnumerable<LocationMeta> allLocationsMeta = _locationsListConfig.GetAllLocationsMeta();
-            SceneName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
+            IEnumerable<LocationMeta> allLocationsMeta = _locationsMetaProvider.GetAllLocationsMeta();
+            LocationName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
 
             foreach (LocationMeta locationMeta in allLocationsMeta)
             {
-                string locationName = locationMeta.LocationName;
-                SceneName sceneName = locationMeta.SceneName;
+                string locationName = locationMeta.LocationNameText;
+                LocationName sceneName = locationMeta.LocationName;
                 bool isSelected = sceneName == selectedLocation;
 
                 LocationItemButtonView locationItemButton = Object.Instantiate(_prefab, _container);
@@ -85,7 +91,7 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnLocationItemClicked(SceneName sceneName) =>
-            _locationsSelectionMenuView.SelectLocation(sceneName);
+        private void OnLocationItemClicked(LocationName locationName) =>
+            _locationsSelectionMenuView.SelectLocation(locationName);
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Enums.Gameplay;
-using GameCore.Enums.Global;
 using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items.Spawners;
@@ -160,7 +159,7 @@ namespace GameCore.Gameplay.Items.SpawnSystem
 
         private void SpawnLocationItems()
         {
-            SceneName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
+            LocationName selectedLocation = _gameManagerDecorator.GetSelectedLocation();
 
             bool isConfigFound = _itemsSpawnConfig.TryGetItemsSpawnConfig(selectedLocation,
                 out LocationItemsSpawnConfigMeta itemsSpawnConfig);

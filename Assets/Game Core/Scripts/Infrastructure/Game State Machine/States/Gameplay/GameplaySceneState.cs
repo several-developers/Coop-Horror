@@ -7,6 +7,7 @@ using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Gameplay.Chat;
+using GameCore.UI.Gameplay.GameMap;
 using GameCore.UI.Gameplay.GameOverMenu;
 using GameCore.UI.Gameplay.GameOverWarningMenu;
 using GameCore.UI.Gameplay.LocationsSelectionMenu;
@@ -50,6 +51,7 @@ namespace GameCore.Infrastructure.StateMachine
         private QuitConfirmMenuView _quitConfirmMenuView;
         private QuestsSelectionMenuView _questsSelectionMenuView;
         private LocationsSelectionMenuView _locationsSelectionMenuView;
+        private GameMapUI _gameMapUI;
         private GameOverMenuView _gameOverMenuView;
         private GameOverWarningMenuView _gameOverWarningMenuView;
         private ChatMenuUI _chatMenuUI;
@@ -65,6 +67,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreateActiveQuestsView(); // TEMP
             CreateQuestsSelectionMenuView(); // TEMP
             CreateLocationsSelectionMenuView(); // TEMP
+            CreateGameMapMenu(); // TEMP
             CreateGameOverMenu(); // TEMP
             CreateRewardMenu(); // TEMP
             CreateGameOverWarningMenuView(); // TEMP
@@ -76,6 +79,7 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.OnPauseEvent += OnOpenPauseMenu;
             _inputReader.OnOpenChatEvent += OnOpenChatMenu;
             _inputReader.OnSubmitEvent += OnSendChatMessage;
+            _inputReader.OnOpenGameMapEvent += OnOpenGameMap;
 
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent += OnOpenLocationsSelectionMenu;
@@ -96,6 +100,8 @@ namespace GameCore.Infrastructure.StateMachine
         {
             _inputReader.OnPauseEvent -= OnOpenPauseMenu;
             _inputReader.OnOpenChatEvent -= OnOpenChatMenu;
+            _inputReader.OnSubmitEvent -= OnSendChatMessage;
+            _inputReader.OnOpenGameMapEvent -= OnOpenGameMap;
 
             _mobileHeadquartersEntity.OnOpenQuestsSelectionMenuEvent -= OnOpenQuestsSelectionMenu;
             _mobileHeadquartersEntity.OnOpenLocationsSelectionMenuEvent -= OnOpenLocationsSelectionMenu;
@@ -134,6 +140,9 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void CreateLocationsSelectionMenuView() =>
             _locationsSelectionMenuView = MenuFactory.Create<LocationsSelectionMenuView>(_diContainer);
+
+        private void CreateGameMapMenu() =>
+            _gameMapUI = MenuFactory.Create<GameMapUI>(_diContainer);
 
         private void CreateGameOverMenu() =>
             _gameOverMenuView = MenuFactory.Create<GameOverMenuView>(_diContainer);
@@ -213,6 +222,14 @@ namespace GameCore.Infrastructure.StateMachine
                 return;
 
             _chatMenuUI.TrySendChatMessage();
+        }
+
+        private void OnOpenGameMap()
+        {
+            if (_chatMenuUI.IsShown)
+                return;
+            
+            _gameMapUI.Show();
         }
 
         private void OnOpenQuestsSelectionMenu()

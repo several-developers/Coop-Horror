@@ -17,7 +17,6 @@
         public const string PrefabsListConfig = GameplayConfigs + "Prefabs List Config";
         public const string QuestsConfig = GameplayConfigs + "Quests Config";
         public const string QuestsItemsConfig = GameplayConfigs + "Quests Items Config";
-        public const string DeliveryConfig = GameplayConfigs + "Delivery Config";
         public const string PlayerConfig = GameplayConfigs + "Player Config";
         public const string RigPresetsConfig = GameplayConfigs + "Rig Presets Config";
         public const string VisualConfig = GameplayConfigs + "Visual Config";

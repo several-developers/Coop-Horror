@@ -31,6 +31,7 @@ namespace GameCore.Gameplay.InputManagement
         public event Action OnPauseEvent = delegate { };
         public event Action OnInteractWithTabletEvent = delegate { };
         public event Action OnOpenChatEvent = delegate { };
+        public event Action OnOpenGameMapEvent = delegate { };
 
         // Menus
         public event Action OnResumeEvent = delegate { };
@@ -197,6 +198,14 @@ namespace GameCore.Gameplay.InputManagement
                 return;
             
             OnOpenChatEvent.Invoke();
+        }
+
+        public void OnOpenGameMap(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
+                return;
+            
+            OnOpenGameMapEvent.Invoke();
         }
 
         public void OnNavigate(InputAction.CallbackContext context)

@@ -1,5 +1,4 @@
 ﻿using GameCore.Configs.Gameplay.Balance;
-using GameCore.Configs.Gameplay.Delivery;
 using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
@@ -28,7 +27,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         PrefabsListConfigMeta GetPrefabsListConfig();
         QuestsConfigMeta GetQuestsConfig();
         QuestsItemsConfigMeta GetQuestsItemsConfig();
-        DeliveryConfigMeta GetDeliveryConfig();
         RigPresetsConfigMeta GetRigPresetsConfig();
         VisualConfigMeta GetVisualConfig();
         ItemsSpawnConfigMeta GetItemsSpawnConfig();

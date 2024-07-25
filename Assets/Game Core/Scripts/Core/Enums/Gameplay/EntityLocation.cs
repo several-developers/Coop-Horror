@@ -7,6 +7,6 @@
         Stairs = 2,
         Dungeon = 3,
         Market = 4,
-        MetroCycle = 5
+        CycleSection = 5
     }
 }

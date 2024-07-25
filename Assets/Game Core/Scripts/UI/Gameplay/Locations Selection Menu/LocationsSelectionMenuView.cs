@@ -1,6 +1,6 @@
-﻿using GameCore.Enums.Global;
+﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using GameCore.Observers.Gameplay.UIManager;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
@@ -16,15 +16,17 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator, IUIManagerObserver uiManagerObserver,
-            IGameplayConfigsProvider gameplayConfigsProvider)
+        private void Construct(
+            IGameManagerDecorator gameManagerDecorator,
+            IUIManagerObserver uiManagerObserver,
+            ILocationsMetaProvider locationsMetaProvider
+        )
         {
             _gameManagerDecorator = gameManagerDecorator;
             _uiManagerObserver = uiManagerObserver;
 
-            _locationsItemsFactory = new LocationsItemsFactory(gameplayConfigsProvider,
-                locationsSelectionMenuView: this, gameManagerDecorator, _locationsItemsContainer,
-                _locationItemButtonPrefab);
+            _locationsItemsFactory = new LocationsItemsFactory(locationsMetaProvider, locationsSelectionMenuView: this,
+                gameManagerDecorator, _locationsItemsContainer, _locationItemButtonPrefab);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -72,7 +74,7 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void SelectLocation(SceneName locationName) =>
+        public void SelectLocation(LocationName locationName) =>
             _gameManagerDecorator.SelectLocation(locationName);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -91,7 +93,7 @@ namespace GameCore.UI.Gameplay.LocationsSelectionMenu
         protected override void OnHideMenu() =>
             _uiManagerObserver.MenuHidden(menuView: this);
 
-        private void OnSelectedLocationChanged(SceneName locationName) =>
+        private void OnSelectedLocationChanged(LocationName locationName) =>
             _locationsItemsFactory.UpdateSelectionState();
     }
 }

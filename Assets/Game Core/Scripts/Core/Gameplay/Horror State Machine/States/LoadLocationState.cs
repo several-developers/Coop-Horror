@@ -1,15 +1,18 @@
-﻿using GameCore.Enums.Global;
+﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Observers.Gameplay.Level;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
-    public class LoadLocationState : IEnterState<SceneName>, IExitState
+    public class LoadLocationState : IEnterState<LocationName>, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LoadLocationState(IHorrorStateMachine horrorStateMachine, ILocationsLoader locationsLoader,
-            ILevelObserver levelObserver)
+        public LoadLocationState(
+            IHorrorStateMachine horrorStateMachine,
+            ILocationsLoader locationsLoader,
+            ILevelObserver levelObserver
+        )
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
@@ -26,11 +29,11 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter(SceneName sceneName)
+        public void Enter(LocationName locationName)
         {
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
 
-            LoadLocation(sceneName);
+            LoadLocation(locationName);
         }
 
         public void Exit() =>
@@ -38,8 +41,8 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void LoadLocation(SceneName sceneName) =>
-            _locationsLoader.LoadLocationNetwork(sceneName);
+        private void LoadLocation(LocationName locationName) =>
+            _locationsLoader.LoadLocationNetwork(locationName);
 
         private void EnterGenerateDungeonsState() =>
             _horrorStateMachine.ChangeState<GenerateDungeonsState>();

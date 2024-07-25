@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Forest
   m_EditorClassIdentifier: 
   _metaName: Forest
-  _locationName: Forest
+  _locationNameText: Forest
+  _locationName: 11
   _sceneName: 11

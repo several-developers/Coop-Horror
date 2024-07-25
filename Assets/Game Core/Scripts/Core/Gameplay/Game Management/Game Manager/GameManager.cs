@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Enums.Gameplay;
-using GameCore.Enums.Global;
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.HorrorStateMachineSpace;
@@ -39,10 +38,10 @@ namespace GameCore.Gameplay.GameManagement
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const SceneName DefaultLocation = SceneName.Scrapyard;
+        private const LocationName DefaultLocation = LocationName.Base;
         private const GameState DefaultGameState = GameState.CycleMovement;
 
-        private readonly NetworkVariable<SceneName> _selectedLocation = new(DefaultLocation);
+        private readonly NetworkVariable<LocationName> _selectedLocation = new(DefaultLocation);
         private readonly NetworkVariable<GameState> _gameState = new(DefaultGameState);
         private readonly NetworkVariable<int> _playersGold = new();
 
@@ -63,7 +62,6 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent += ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnSelectLocationInnerEvent += SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent += LoadSelectedLocationServerRpc;
-            _gameManagerDecorator.OnLoadLocationInnerEvent += LoadLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent += AddPlayersGold;
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent += SpendPlayersGold;
             _gameManagerDecorator.OnResetPlayersGoldInnerEvent += ResetGold;
@@ -82,7 +80,6 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent -= ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnSelectLocationInnerEvent -= SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent -= LoadSelectedLocationServerRpc;
-            _gameManagerDecorator.OnLoadLocationInnerEvent -= LoadLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent -= AddPlayersGold;
             _gameManagerDecorator.OnSpendPlayersGoldInnerEvent -= SpendPlayersGold;
             _gameManagerDecorator.OnResetPlayersGoldInnerEvent -= ResetGold;
@@ -205,12 +202,12 @@ namespace GameCore.Gameplay.GameManagement
             }
         }
 
-        private void SelectLocation(SceneName sceneName)
+        private void SelectLocation(LocationName locationName)
         {
             if (IsServerOnly)
-                _selectedLocation.Value = sceneName;
+                _selectedLocation.Value = locationName;
             else
-                SelectLocationServerRpc(sceneName);
+                SelectLocationServerRpc(locationName);
         }
 
         private void AddPlayersGold(int amount)
@@ -314,7 +311,7 @@ namespace GameCore.Gameplay.GameManagement
             ChangeGameStateWhenAllPlayersReady(newState: GameState.RestartGame, previousState);
         }
 
-        private SceneName GetSelectedLocation() =>
+        private LocationName GetSelectedLocation() =>
             _selectedLocation.Value;
 
         private GameState GetGameState() =>
@@ -327,19 +324,15 @@ namespace GameCore.Gameplay.GameManagement
             _gameState.Value = gameState;
 
         [ServerRpc(RequireOwnership = false)]
-        private void SelectLocationServerRpc(SceneName sceneName) =>
-            _selectedLocation.Value = sceneName;
+        private void SelectLocationServerRpc(LocationName locationName) =>
+            _selectedLocation.Value = locationName;
 
         [ServerRpc(RequireOwnership = false)]
         private void LoadSelectedLocationServerRpc()
         {
-            SceneName selectedLocation = _selectedLocation.Value;
-            _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(selectedLocation);
+            LocationName selectedLocation = _selectedLocation.Value;
+            _horrorStateMachine.ChangeState<LoadLocationState, LocationName>(selectedLocation);
         }
-        
-        [ServerRpc(RequireOwnership = false)]
-        private void LoadLocationServerRpc(SceneName location) =>
-            _horrorStateMachine.ChangeState<LoadLocationState, SceneName>(location);
 
         [ServerRpc(RequireOwnership = false)]
         private void AddPlayersGoldServerRpc(int amount) =>
@@ -376,7 +369,7 @@ namespace GameCore.Gameplay.GameManagement
         private void OnPlayerDisconnected(ulong clientID) =>
             _playersStates.Remove(clientID);
 
-        private void OnSelectedLocationChanged(SceneName previousValue, SceneName newValue) =>
+        private void OnSelectedLocationChanged(LocationName previousValue, LocationName newValue) =>
             _gameManagerDecorator.SelectedLocationChanged(newValue);
 
         private void OnAllGameStateChanged(GameState previousValue, GameState newValue)

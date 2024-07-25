@@ -112,6 +112,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "OpenGameMap",
+                    "type": "Button",
+                    "id": "614547b2-05a4-4a54-bc55-3c1facd70fdc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -475,6 +484,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "OpenChat",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9bf83405-eebe-4b53-9ca6-3cbd5645b2dd",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "OpenGameMap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

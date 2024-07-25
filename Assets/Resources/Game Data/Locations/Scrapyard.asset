@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Scrapyard
   m_EditorClassIdentifier: 
   _metaName: Scrapyard
-  _locationName: Scrapyard
+  _locationNameText: Scrapyard
+  _locationName: 10
   _sceneName: 12

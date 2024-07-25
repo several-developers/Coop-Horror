@@ -1,6 +1,5 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
-using GameCore.Enums.Global;
 
 namespace GameCore.Gameplay.GameManagement
 {
@@ -9,18 +8,17 @@ namespace GameCore.Gameplay.GameManagement
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<GameState> OnGameStateChangedEvent = delegate { };
-        public event Action<SceneName> OnSelectedLocationChangedEvent = delegate { };
+        public event Action<LocationName> OnSelectedLocationChangedEvent = delegate { };
         public event Action<int> OnPlayersGoldChangedEvent = delegate { };
 
         public event Action<GameState> OnChangeGameStateInnerEvent = delegate { };
         public event Action<GameState, GameState> OnChangeGameStateWhenAllPlayersReadyInnerEvent = delegate { };
-        public event Action<SceneName> OnSelectLocationInnerEvent = delegate { };
+        public event Action<LocationName> OnSelectLocationInnerEvent = delegate { };
         public event Action OnLoadSelectedLocationInnerEvent = delegate { };
-        public event Action<SceneName> OnLoadLocationInnerEvent = delegate { };
         public event Action<int> OnAddPlayersGoldInnerEvent = delegate { };
         public event Action<int> OnSpendPlayersGoldInnerEvent = delegate { };
         public event Action OnResetPlayersGoldInnerEvent = delegate { };
-        public event Func<SceneName> OnGetSelectedLocationInnerEvent;
+        public event Func<LocationName> OnGetSelectedLocationInnerEvent;
         public event Func<GameState> OnGetGameStateInnerEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -28,7 +26,7 @@ namespace GameCore.Gameplay.GameManagement
         public void GameStateChanged(GameState gameState) =>
             OnGameStateChangedEvent.Invoke(gameState);
 
-        public void SelectedLocationChanged(SceneName locationName) =>
+        public void SelectedLocationChanged(LocationName locationName) =>
             OnSelectedLocationChangedEvent.Invoke(locationName);
 
         public void PlayersGoldChanged(int playersGold) =>
@@ -40,14 +38,11 @@ namespace GameCore.Gameplay.GameManagement
         public void ChangeGameStateWhenAllPlayersReady(GameState newState, GameState previousState) =>
             OnChangeGameStateWhenAllPlayersReadyInnerEvent.Invoke(newState, previousState);
 
-        public void SelectLocation(SceneName locationName) =>
+        public void SelectLocation(LocationName locationName) =>
             OnSelectLocationInnerEvent.Invoke(locationName);
 
         public void LoadSelectedLocation() =>
             OnLoadSelectedLocationInnerEvent.Invoke();
-
-        public void LoadLocation(SceneName locationName) =>
-            OnLoadLocationInnerEvent.Invoke(locationName);
 
         public void AddPlayersGold(int amount) =>
             OnAddPlayersGoldInnerEvent.Invoke(amount);
@@ -58,8 +53,8 @@ namespace GameCore.Gameplay.GameManagement
         public void ResetPlayersGold() =>
             OnResetPlayersGoldInnerEvent.Invoke();
 
-        public SceneName GetSelectedLocation() =>
-            OnGetSelectedLocationInnerEvent?.Invoke() ?? SceneName.Desert;
+        public LocationName GetSelectedLocation() =>
+            OnGetSelectedLocationInnerEvent?.Invoke() ?? LocationName.Base;
 
         public GameState GetGameState() =>
             OnGetGameStateInnerEvent?.Invoke() ?? GameState.WaitingForPlayers;
