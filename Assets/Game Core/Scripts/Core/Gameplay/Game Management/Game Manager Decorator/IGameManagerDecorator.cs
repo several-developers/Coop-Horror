@@ -6,9 +6,11 @@ namespace GameCore.Gameplay.GameManagement
     public interface IGameManagerDecorator
     {
         event Action<GameState> OnGameStateChangedEvent;
+        event Action<LocationName> OnCurrentLocationChangedEvent;
         event Action<LocationName> OnSelectedLocationChangedEvent;
         event Action<int> OnPlayersGoldChangedEvent;
         void GameStateChanged(GameState gameState);
+        void CurrentLocationChanged(LocationName locationName);
         void SelectedLocationChanged(LocationName locationName);
         void PlayersGoldChanged(int playersGold);
         

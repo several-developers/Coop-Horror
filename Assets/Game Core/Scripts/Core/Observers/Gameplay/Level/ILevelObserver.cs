@@ -5,8 +5,8 @@ namespace GameCore.Observers.Gameplay.Level
     public interface ILevelObserver
     {
         event Action OnLocationLoadedEvent;
-        event Action OnLocationLeftEvent;
+        event Action OnLocationUnloadedEvent;
         void LocationLoaded();
-        void LocationLeft();
+        void LocationUnloaded();
     }
 }

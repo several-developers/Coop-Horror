@@ -55,7 +55,7 @@ namespace GameCore.Gameplay.Level.Locations
             _levelObserver.LocationLoaded();
 
         private void SendLocationUnloaded() =>
-            _levelObserver.LocationLeft();
+            _levelObserver.LocationUnloaded();
         
         private CinemachinePath GetEnterPath() => _enterPath;
         

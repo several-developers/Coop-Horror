@@ -30,19 +30,13 @@ namespace GameCore.UI.Gameplay.GameMap
 
         private Tweener _fadeTN;
         private bool _useGreenPing;
-        private bool _isAnimationPlaying;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void PlayAnimation()
         {
-            if (_isAnimationPlaying)
-                return;
-            
             StopAnimation();
             Fade(fadeIn: true);
-            
-            _isAnimationPlaying = true;
         }
 
         public void StopAnimation()
@@ -57,8 +51,6 @@ namespace GameCore.UI.Gameplay.GameMap
             
             _greenPingImage.color = greenColor;
             _yellowPingImage.color = yellowColor;
-            
-            _isAnimationPlaying = false;
         }
 
         public void ToggleUseGreenPing(bool useGreenPing) =>

@@ -1,4 +1,6 @@
-﻿using GameCore.Observers.Gameplay.UIManager;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Observers.Gameplay.UI;
+using GameCore.Observers.Gameplay.UIManager;
 using GameCore.UI.Global.MenuView;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,8 +14,11 @@ namespace GameCore.UI.Gameplay.GameMap
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
         [Inject]
-        private void Construct(IUIManagerObserver uiManagerObserver) =>
+        private void Construct(IUIManagerObserver uiManagerObserver, IUIObserver uiObserver)
+        {
             _uiManagerObserver = uiManagerObserver;
+            _uiObserver = uiObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -24,14 +29,24 @@ namespace GameCore.UI.Gameplay.GameMap
         // FIELDS: --------------------------------------------------------------------------------
 
         private IUIManagerObserver _uiManagerObserver;
+        private IUIObserver _uiObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         protected override void Awake()
         {
             base.Awake();
+
+            _uiObserver.OnTriggerUIEvent += OnTriggerUIEvent;
             
             _closeButton.onClick.AddListener(OnCloseClicked);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            
+            _uiObserver.OnTriggerUIEvent -= OnTriggerUIEvent;
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
@@ -42,6 +57,20 @@ namespace GameCore.UI.Gameplay.GameMap
         protected override void OnHideMenu() =>
             _uiManagerObserver.MenuHidden(menuView: this);
 
+        private void OnTriggerUIEvent(UIEventType eventType)
+        {
+            switch (eventType)
+            {
+                case UIEventType.ShowGameMap:
+                    Show();
+                    break;
+                
+                case UIEventType.HideGameMap:
+                    Hide();
+                    break;
+            }
+        }
+        
         private void OnCloseClicked() => Hide();
     }
 }

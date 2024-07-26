@@ -107,17 +107,17 @@ namespace GameCore.Gameplay.GameManagement
         {
             Debug.Log("--> Train Arrived At Base.");
 
+            _trainEntity.TeleportToTheRoad();
             ToggleTrainMainLever(isEnabled: true);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.InfiniteMovement);
             SetPlayersEntityLocation(EntityLocation.Base);
             PublishUIEvent(UIEventType.HideGameTimer);
+            PublishUIEvent(UIEventType.UpdateGameMap);
         }
 
         private void TrainLeavingBase()
         {
             Debug.Log("--> Train Leaving Base.");
-
-            ToggleTrainMainLever(isEnabled: false);
         }
 
         private void TrainArrivedAtSector()

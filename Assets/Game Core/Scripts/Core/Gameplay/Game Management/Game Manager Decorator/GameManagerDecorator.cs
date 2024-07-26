@@ -8,6 +8,7 @@ namespace GameCore.Gameplay.GameManagement
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<GameState> OnGameStateChangedEvent = delegate { };
+        public event Action<LocationName> OnCurrentLocationChangedEvent = delegate { };
         public event Action<LocationName> OnSelectedLocationChangedEvent = delegate { };
         public event Action<int> OnPlayersGoldChangedEvent = delegate { };
 
@@ -27,6 +28,9 @@ namespace GameCore.Gameplay.GameManagement
 
         public void GameStateChanged(GameState gameState) =>
             OnGameStateChangedEvent.Invoke(gameState);
+
+        public void CurrentLocationChanged(LocationName locationName) =>
+            OnCurrentLocationChangedEvent.Invoke(locationName);
 
         public void SelectedLocationChanged(LocationName locationName) =>
             OnSelectedLocationChangedEvent.Invoke(locationName);

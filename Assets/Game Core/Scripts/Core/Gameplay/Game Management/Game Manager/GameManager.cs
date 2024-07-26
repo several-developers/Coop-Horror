@@ -62,6 +62,8 @@ namespace GameCore.Gameplay.GameManagement
         private ITrainEntity _trainEntity;
         private BalanceConfigMeta _balanceConfig;
 
+        private LocationName _previousSelectedLocation = DefaultSelectedLocation;
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
@@ -80,6 +82,14 @@ namespace GameCore.Gameplay.GameManagement
 
             PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
             PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
+        }
+
+        private void Start()
+        {
+            if (!IsServerOnly)
+                return;
+            
+            _gameObserver.TrainArrivedAtBase();
         }
 
         public override void OnDestroy()
@@ -106,19 +116,22 @@ namespace GameCore.Gameplay.GameManagement
 
         protected override void InitAll()
         {
+            _currentLocation.OnValueChanged += OnCurrentLocationChanged;
+            
             _selectedLocation.OnValueChanged += OnSelectedLocationChanged;
+            
             _gameState.OnValueChanged += OnAllGameStateChanged;
+            
             _playersGold.OnValueChanged += OnPlayersGoldChanged;
         }
 
         protected override void InitServerOnly()
         {
-            _gameObserver.TrainArrivedAtBase();
-            
             _networkHorror.OnPlayerConnectedEvent += OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent += OnPlayerDisconnected;
 
             _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
+            _levelObserver.OnLocationUnloadedEvent += OnLocationUnloaded;
 
             _trainEntity.OnMovementStoppedEvent += OnTrainMovementStopped;
             _trainEntity.OnMovementStartedEvent += OnTrainMovementStarted;
@@ -126,8 +139,12 @@ namespace GameCore.Gameplay.GameManagement
 
         protected override void DespawnAll()
         {
+            _currentLocation.OnValueChanged -= OnCurrentLocationChanged;
+            
             _selectedLocation.OnValueChanged -= OnSelectedLocationChanged;
+            
             _gameState.OnValueChanged -= OnAllGameStateChanged;
+            
             _playersGold.OnValueChanged -= OnPlayersGoldChanged;
         }
 
@@ -137,6 +154,7 @@ namespace GameCore.Gameplay.GameManagement
             _networkHorror.OnPlayerDisconnectedEvent -= OnPlayerDisconnected;
 
             _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
+            _levelObserver.OnLocationUnloadedEvent -= OnLocationUnloaded;
             
             _trainEntity.OnMovementStoppedEvent -= OnTrainMovementStopped;
             _trainEntity.OnMovementStartedEvent -= OnTrainMovementStarted;
@@ -330,6 +348,9 @@ namespace GameCore.Gameplay.GameManagement
         private void OnPlayerDisconnected(ulong clientID) =>
             _playersStates.Remove(clientID);
 
+        private void OnCurrentLocationChanged(LocationName previousValue, LocationName newValue) =>
+            _gameManagerDecorator.CurrentLocationChanged(newValue);
+
         private void OnSelectedLocationChanged(LocationName previousValue, LocationName newValue) =>
             _gameManagerDecorator.SelectedLocationChanged(newValue);
 
@@ -351,17 +372,21 @@ namespace GameCore.Gameplay.GameManagement
 
         private void OnLocationLoaded()
         {
-            _currentLocation.Value = _selectedLocation.Value;
+            LocationName selectedLocation = GetSelectedLocation();
+            _currentLocation.Value = selectedLocation;
+            _previousSelectedLocation = selectedLocation;
             
-            LocationName currentLocation = GetCurrentLocation();
-            bool arrivedAtBase = currentLocation == LocationName.Base;
-
-            if (arrivedAtBase)
-                _gameObserver.TrainArrivedAtBase();
-            else
-                _gameObserver.TrainArrivedAtSector();
+            _gameObserver.TrainArrivedAtSector();
         }
 
+        private void OnLocationUnloaded()
+        {
+            _currentLocation.Value = _selectedLocation.Value;
+            _selectedLocation.Value = _previousSelectedLocation;
+            
+            _gameObserver.TrainArrivedAtBase();
+        }
+        
         private void OnTrainMovementStopped() =>
             _gameObserver.TrainStoppedAtSector();
 

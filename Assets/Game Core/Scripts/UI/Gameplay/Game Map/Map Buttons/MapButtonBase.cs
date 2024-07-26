@@ -1,5 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
+using GameCore.Observers.Gameplay.UI;
 using GameCore.UI.Global.Buttons;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,8 +13,11 @@ namespace GameCore.UI.Gameplay.GameMap
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator) =>
+        private void Construct(IGameManagerDecorator gameManagerDecorator, IUIObserver uiObserver)
+        {
             _gameManagerDecorator = gameManagerDecorator;
+            _uiObserver = uiObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -32,6 +36,7 @@ namespace GameCore.UI.Gameplay.GameMap
         // FIELDS: --------------------------------------------------------------------------------
         
         private IGameManagerDecorator _gameManagerDecorator;
+        private IUIObserver _uiObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -41,11 +46,19 @@ namespace GameCore.UI.Gameplay.GameMap
 
             LocationChangedLogic();
 
-            _gameManagerDecorator.OnSelectedLocationChangedEvent += OnSelectedLocationChanged;
+            _gameManagerDecorator.OnCurrentLocationChangedEvent += OnGameLocationChanged;
+            _gameManagerDecorator.OnSelectedLocationChangedEvent += OnGameLocationChanged;
+            
+            _uiObserver.OnTriggerUIEvent += OnTriggerUIEvent;
         }
 
-        private void OnDestroy() =>
-            _gameManagerDecorator.OnSelectedLocationChangedEvent -= OnSelectedLocationChanged;
+        private void OnDestroy()
+        {
+            _gameManagerDecorator.OnCurrentLocationChangedEvent -= OnGameLocationChanged;
+            _gameManagerDecorator.OnSelectedLocationChangedEvent -= OnGameLocationChanged;
+            
+            _uiObserver.OnTriggerUIEvent -= OnTriggerUIEvent;
+        }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -53,6 +66,7 @@ namespace GameCore.UI.Gameplay.GameMap
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
+        [Button]
         private void LocationChangedLogic()
         {
             bool isCurrentLocationMatches = IsCurrentLocationMatches();
@@ -90,6 +104,14 @@ namespace GameCore.UI.Gameplay.GameMap
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnSelectedLocationChanged(LocationName locationName) => LocationChangedLogic();
+        private void OnGameLocationChanged(LocationName locationName) => LocationChangedLogic();
+
+        private void OnTriggerUIEvent(UIEventType eventType)
+        {
+            if (eventType != UIEventType.UpdateGameMap)
+                return;
+            
+            LocationChangedLogic();
+        }
     }
 }

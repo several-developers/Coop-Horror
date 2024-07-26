@@ -97,6 +97,9 @@ namespace GameCore.Gameplay.Entities.Train
 
         public void ResetDistance()
         {
+            if (_path == null)
+                return;
+            
             float difference = _distance - _path.PathLength;
             _distance = difference;
         }

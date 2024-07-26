@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Cinemachine;
 using GameCore.Configs.Gameplay.Train;
-using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
@@ -178,7 +177,6 @@ namespace GameCore.Gameplay.Entities.Train
         protected override void InitAll()
         {
             _trainController.InitAll();
-            ChangeToTheRoadPath();
 
             _isMainLeverEnabled.OnValueChanged += OnMainLeverStateChanged;
 
