@@ -25,15 +25,11 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
-        {
+        public void Enter() =>
             _trainEntity.OnLeaveLocationEvent += LeaveLocation;
-        }
 
-        public void Exit()
-        {
+        public void Exit() =>
             _trainEntity.OnLeaveLocationEvent -= LeaveLocation;
-        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

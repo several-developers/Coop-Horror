@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.VisualManagement;
 using Unity.Netcode;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace GameCore.Gameplay.GameManagement
 {
-    public class GameResetManager : IDisposable
+    public class GameResetManager : IGameResetManager
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -26,8 +24,6 @@ namespace GameCore.Gameplay.GameManagement
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
             _trainEntity = trainEntity;
             _visualManager = visualManager;
-
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -38,35 +34,25 @@ namespace GameCore.Gameplay.GameManagement
         private readonly IVisualManager _visualManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void Dispose() =>
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void HandleGameState(GameState gameState)
+        
+        public void Reset()
         {
-            switch (gameState)
+            bool isServer = NetworkHorror.IsTrueServer;
+
+            // Common logic.
+            ChangeVisualPreset();
+
+            if (isServer)
             {
-                case GameState.RestartGame:
-                    bool isServer = NetworkHorror.IsTrueServer;
-
-                    // Common logic.
-                    ChangeVisualPreset();
-
-                    if (isServer)
-                    {
-                        DestroyAllMonsters();
-                        ResetGameTime();
-                        ResetGold();
-                        TeleportMobileHQToTheRoad();
-                        RespawnPlayersAtMobileHQ();
-                    }
-
-                    // Common logic.
-                    RevivePlayer();
-                    break;
+                DestroyAllMonsters();
+                ResetGameTime();
+                ResetGold();
+                TeleportMobileHQToTheRoad();
+                RespawnPlayersAtMobileHQ();
             }
+
+            // Common logic.
+            RevivePlayer();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -130,9 +116,5 @@ namespace GameCore.Gameplay.GameManagement
 
         private void ChangeVisualPreset() =>
             _visualManager.ChangePreset(VisualPresetType.RoadLocation, instant: true);
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Network;
+﻿using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Zenject;
@@ -13,11 +10,9 @@ namespace GameCore.Gameplay.GameTimeManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameTimeManagerDecorator gameTimeManagerDecorator,
-            IGameManagerDecorator gameManagerDecorator, ITimeCycle timeCycle)
+        private void Construct(IGameTimeManagerDecorator gameTimeManagerDecorator, ITimeCycle timeCycle)
         {
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
-            _gameManagerDecorator = gameManagerDecorator;
             _timeCycle = timeCycle;
         }
 
@@ -26,33 +21,32 @@ namespace GameCore.Gameplay.GameTimeManagement
         private readonly NetworkVariable<MyDateTime> _gameTimer = new();
 
         private IGameTimeManagerDecorator _gameTimeManagerDecorator;
-        private IGameManagerDecorator _gameManagerDecorator;
         private ITimeCycle _timeCycle;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
-            _gameTimeManagerDecorator.OnResetDayInnerEvent += ResetDay;
+            _gameTimeManagerDecorator.OnSetSunriseInnerEvent += SetSunrise;
             _gameTimeManagerDecorator.OnSetMidnightInnerEvent += SetMidnight;
+            _gameTimeManagerDecorator.OnIncreaseDayInnerEvent += IncreaseDay;
+            _gameTimeManagerDecorator.OnResetDayInnerEvent += ResetDay;
         }
 
         public override void OnDestroy()
         {
             base.OnDestroy();
 
-            _gameTimeManagerDecorator.OnResetDayInnerEvent -= ResetDay;
+            _gameTimeManagerDecorator.OnSetSunriseInnerEvent -= SetSunrise;
             _gameTimeManagerDecorator.OnSetMidnightInnerEvent -= SetMidnight;
+            _gameTimeManagerDecorator.OnIncreaseDayInnerEvent -= IncreaseDay;
+            _gameTimeManagerDecorator.OnResetDayInnerEvent -= ResetDay;
         }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitOwner()
-        {
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
-
+        protected override void InitOwner() =>
             _timeCycle.OnHourPassedEvent += OnHourPassed;
-        }
 
         protected override void InitNotOwner() =>
             _gameTimer.OnValueChanged += OnGameTimerUpdated;
@@ -60,12 +54,8 @@ namespace GameCore.Gameplay.GameTimeManagement
         protected override void TickAll() =>
             _timeCycle.Tick(); // Check for optimization
 
-        protected override void DespawnOwner()
-        {
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
-
+        protected override void DespawnOwner() =>
             _timeCycle.OnHourPassedEvent -= OnHourPassed;
-        }
 
         protected override void DespawnNotOwner() =>
             _gameTimer.OnValueChanged -= OnGameTimerUpdated;
@@ -84,21 +74,11 @@ namespace GameCore.Gameplay.GameTimeManagement
             UpdateGameTimer();
         }
 
-#warning СЛОМАНО, СРОЧНО ЧИНИТЬ
-        private void HandleGameState(GameState gameState)
-        {
-            // switch (gameState)
-            // {
-            //     case GameState.HeadingToTheLocation:
-            //         _timeCycle.SetSunrise();
-            //         IncreaseDay();
-            //         break;
-            //
-            //     case GameState.ArrivedAtTheRoad:
-            //         SetMidnight();
-            //         break;
-            // }
-        }
+        private void SetSunrise() =>
+            _timeCycle.SetSunrise();
+        
+        private void SetMidnight() =>
+            _timeCycle.SetMidnight();
 
         private void ResetDay()
         {
@@ -107,13 +87,8 @@ namespace GameCore.Gameplay.GameTimeManagement
             _timeCycle.SyncDateTime(dateTime);
         }
 
-        private void SetMidnight() =>
-            _timeCycle.SetMidnight();
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
-
+        
         private void OnHourPassed() => UpdateGameTimer();
 
         private void OnGameTimerUpdated(MyDateTime previousDate, MyDateTime newDate) =>

@@ -4,6 +4,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
@@ -18,14 +19,18 @@ namespace GameCore.Gameplay.GameManagement
 
         public GameController(
             IGameManagerDecorator gameManagerDecorator,
+            IGameTimeManagerDecorator gameTimeManagerDecorator,
             IGameObserver gameObserver,
             ICamerasManager camerasManager,
+            IGameResetManager gameResetManager,
             ITrainEntity trainEntity,
             IPublisher<UIEventMessage> uiEventMessagePublisher)
         {
             _gameManagerDecorator = gameManagerDecorator;
+            _gameTimeManagerDecorator = gameTimeManagerDecorator;
             _gameObserver = gameObserver;
             _camerasManager = camerasManager;
+            _gameResetManager = gameResetManager;
             _trainEntity = trainEntity;
             _uiEventMessagePublisher = uiEventMessagePublisher;
             
@@ -48,8 +53,10 @@ namespace GameCore.Gameplay.GameManagement
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameManagerDecorator _gameManagerDecorator;
+        private readonly IGameTimeManagerDecorator _gameTimeManagerDecorator;
         private readonly IGameObserver _gameObserver;
         private readonly ICamerasManager _camerasManager;
+        private readonly IGameResetManager _gameResetManager;
         private readonly ITrainEntity _trainEntity;
         private readonly IPublisher<UIEventMessage> _uiEventMessagePublisher;
 
@@ -87,6 +94,7 @@ namespace GameCore.Gameplay.GameManagement
 
                 case GameState.RestartGame:
                     PublishUIEvent(UIEventType.ShowGameplayHUD);
+                    _gameResetManager.Reset();
                     break;
 
                 case GameState.WaitingForPlayers:
@@ -107,6 +115,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             Debug.Log("--> Train Arrived At Base.");
 
+            _gameTimeManagerDecorator.SetMidnight();
             _trainEntity.TeleportToTheRoad();
             ToggleTrainMainLever(isEnabled: true);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.InfiniteMovement);
@@ -123,6 +132,14 @@ namespace GameCore.Gameplay.GameManagement
         private void TrainArrivedAtSector()
         {
             Debug.Log("--> Train Arrived At Sector.");
+
+            LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
+
+            if (currentLocation != LocationName.Market)
+            {
+                _gameTimeManagerDecorator.SetSunrise();
+                _gameTimeManagerDecorator.IncreaseDay();
+            }
 
             _gameManagerDecorator.SelectLocation(LocationName.Base);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.StopAtPathEnd);

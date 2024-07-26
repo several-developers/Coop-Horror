@@ -152,8 +152,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<GameResetManager>()
-                .AsSingle()
-                .NonLazy();
+                .AsSingle();
         }
 
         private void BindItemsSpawnSystem()

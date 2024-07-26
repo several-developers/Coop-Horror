@@ -105,31 +105,6 @@ namespace GameCore.Gameplay.Entities.Train
         public void SetMovementBehaviour(MovementBehaviour movementBehaviour) =>
             _movementBehaviour = movementBehaviour;
 
-        public void ChangeToTheRoadPath()
-        {
-            RoadLocationManager roadLocationManager = RoadLocationManager.Get();
-            CinemachinePath path;
-            float startPositionAtRoadLocation = 0f;
-
-            if (LastPathID == -1)
-            {
-                path = roadLocationManager.GetMainPath();
-                startPositionAtRoadLocation = _trainConfig.StartPositionAtRoadLocation;
-            }
-            else
-            {
-                bool isPathFound = roadLocationManager.TryGetEnterPathByID(LastPathID, out path);
-
-                if (!isPathFound)
-                {
-                    path = roadLocationManager.GetMainPath();
-                    Log.PrintError(log: $"Path with ID <gb>({LastPathID})</gb> <rb>not found</rb>!");
-                }
-            }
-
-            ChangePath(path, startPositionAtRoadLocation);
-        }
-
         public void TeleportToTheRoad()
         {
             LastPathID = -1;
@@ -234,6 +209,31 @@ namespace GameCore.Gameplay.Entities.Train
             }
         }
 
+        private void ChangeToTheRoadPath()
+        {
+            RoadLocationManager roadLocationManager = RoadLocationManager.Get();
+            CinemachinePath path;
+            float startPositionAtRoadLocation = 0f;
+
+            if (LastPathID == -1)
+            {
+                path = roadLocationManager.GetMainPath();
+                startPositionAtRoadLocation = _trainConfig.StartPositionAtRoadLocation;
+            }
+            else
+            {
+                bool isPathFound = roadLocationManager.TryGetEnterPathByID(LastPathID, out path);
+
+                if (!isPathFound)
+                {
+                    path = roadLocationManager.GetMainPath();
+                    Log.PrintError(log: $"Path with ID <gb>({LastPathID})</gb> <rb>not found</rb>!");
+                }
+            }
+
+            ChangePath(path, startPositionAtRoadLocation);
+        }
+        
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
 
