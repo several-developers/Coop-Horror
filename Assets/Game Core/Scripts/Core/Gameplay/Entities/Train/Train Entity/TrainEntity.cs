@@ -180,8 +180,6 @@ namespace GameCore.Gameplay.Entities.Train
             _trainController.InitAll();
             ChangeToTheRoadPath();
 
-            _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
-
             _isMainLeverEnabled.OnValueChanged += OnMainLeverStateChanged;
 
             _isDoorOpened.OnValueChanged += OnDoorStateChanged;
@@ -193,6 +191,8 @@ namespace GameCore.Gameplay.Entities.Train
             int mobileHQSeatsAmount = allMobileHQSeats.Count;
             _seatsData.Value = new SeatsRuntimeDataContainer(mobileHQSeatsAmount);
 
+            _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
+            
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
         }
 
@@ -205,16 +205,18 @@ namespace GameCore.Gameplay.Entities.Train
         protected override void DespawnAll()
         {
             _trainController.DespawnAll();
-
-            _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
-
+            
             _isMainLeverEnabled.OnValueChanged -= OnMainLeverStateChanged;
 
             _isDoorOpened.OnValueChanged -= OnDoorStateChanged;
         }
 
-        protected override void DespawnServerOnly() =>
+        protected override void DespawnServerOnly()
+        {
+            _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
+            
             _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -231,7 +233,6 @@ namespace GameCore.Gameplay.Entities.Train
                 trainSeat.OnTakeSeatEvent += OnTakeSeat;
                 trainSeat.OnLeftSeatEvent += OnLeftSeat;
                 trainSeat.IsSeatBusyEvent += IsSeatBusy;
-                trainSeat.ShouldRemovePlayerParentEvent += ShouldRemovePlayerParent;
             }
         }
 
@@ -299,16 +300,6 @@ namespace GameCore.Gameplay.Entities.Train
             return isSeatBusy;
         }
 
-#warning СЛОМАНО, СРОЧНО ЧИНИТЬ
-        // TEMP
-        private bool ShouldRemovePlayerParent()
-        {
-            GameState gameState = GameManagerDecorator.GetGameState();
-            //bool isGameStateValid = gameState == GameState.ReadyToLeaveTheLocation;
-            //return isGameStateValid;
-            return false;
-        }
-
         // RPC: -----------------------------------------------------------------------------------
 
 #warning TEMP
@@ -322,8 +313,6 @@ namespace GameCore.Gameplay.Entities.Train
             
             CinemachinePath exitPath = _locationManagerDecorator.GetExitPath();
             ChangePath(exitPath);
-            
-            StartLeavingLocationClientRpc();
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -362,10 +351,7 @@ namespace GameCore.Gameplay.Entities.Train
         [ServerRpc(RequireOwnership = false)]
         private void ToggleDoorStateServerRpc(bool isOpened) =>
             _isDoorOpened.Value = isOpened;
-
-        [ClientRpc]
-        private void StartLeavingLocationClientRpc() => ToggleMovement(canMove: true);
-
+        
         [ClientRpc]
         private void MainLeverAnimationClientRpc(ulong senderClientID)
         {

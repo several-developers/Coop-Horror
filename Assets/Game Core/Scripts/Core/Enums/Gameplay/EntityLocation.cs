@@ -2,11 +2,9 @@
 {
     public enum EntityLocation
     {
-        Road = 0,
-        LocationSurface = 1,
+        Base = 0, // Metro cycle section/Train
+        Sector = 1,
         Stairs = 2,
-        Dungeon = 3,
-        Market = 4,
-        CycleSection = 5
+        Dungeon = 3
     }
 }

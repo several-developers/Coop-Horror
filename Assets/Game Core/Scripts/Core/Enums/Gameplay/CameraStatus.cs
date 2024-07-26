@@ -4,7 +4,7 @@
     {
         _ = 0,
         PitchBlack = 1,
-        OutsideMobileHQ = 2,
+        OutsideTrain = 2,
         FirstPerson = 3,
         Spectator = 4
     }

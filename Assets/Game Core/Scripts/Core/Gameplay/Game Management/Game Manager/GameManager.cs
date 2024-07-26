@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.HorrorStateMachineSpace;
@@ -27,7 +26,6 @@ namespace GameCore.Gameplay.GameManagement
             IGameManagerDecorator gameManagerDecorator,
             IHorrorStateMachine horrorStateMachine,
             INetworkHorror networkHorror,
-            ICamerasManager camerasManager,
             IGameObserver gameObserver,
             ILevelObserver levelObserver,
             ITrainEntity trainEntity,
@@ -37,7 +35,6 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator = gameManagerDecorator;
             _horrorStateMachine = horrorStateMachine;
             _networkHorror = networkHorror;
-            _camerasManager = camerasManager;
             _gameObserver = gameObserver;
             _levelObserver = levelObserver;
             _trainEntity = trainEntity;
@@ -60,7 +57,6 @@ namespace GameCore.Gameplay.GameManagement
         private IGameManagerDecorator _gameManagerDecorator;
         private IHorrorStateMachine _horrorStateMachine;
         private INetworkHorror _networkHorror;
-        private ICamerasManager _camerasManager;
         private IGameObserver _gameObserver;
         private ILevelObserver _levelObserver;
         private ITrainEntity _trainEntity;
@@ -72,6 +68,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             _gameManagerDecorator.OnChangeGameStateInnerEvent += ChangeGameState;
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent += ChangeGameStateWhenAllPlayersReady;
+            _gameManagerDecorator.OnStartGameRestartTimerInnerEvent += StartGameRestartTimer;
             _gameManagerDecorator.OnSelectLocationInnerEvent += SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent += LoadSelectedLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent += AddPlayersGold;
@@ -91,6 +88,7 @@ namespace GameCore.Gameplay.GameManagement
 
             _gameManagerDecorator.OnChangeGameStateInnerEvent -= ChangeGameState;
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent -= ChangeGameStateWhenAllPlayersReady;
+            _gameManagerDecorator.OnStartGameRestartTimerInnerEvent -= StartGameRestartTimer;
             _gameManagerDecorator.OnSelectLocationInnerEvent -= SelectLocation;
             _gameManagerDecorator.OnLoadSelectedLocationInnerEvent -= LoadSelectedLocationServerRpc;
             _gameManagerDecorator.OnAddPlayersGoldInnerEvent -= AddPlayersGold;
@@ -115,6 +113,8 @@ namespace GameCore.Gameplay.GameManagement
 
         protected override void InitServerOnly()
         {
+            _gameObserver.TrainArrivedAtBase();
+            
             _networkHorror.OnPlayerConnectedEvent += OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent += OnPlayerDisconnected;
 
@@ -152,72 +152,6 @@ namespace GameCore.Gameplay.GameManagement
                 _gameState.Value = gameState;
             else
                 ChangeGameStateServerRpc(gameState);
-        }
-
-        private void HandleGameState(GameState gameState)
-        {
-            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
-
-            switch (gameState)
-            {
-                /*case GameState.GameOver:
-                    _camerasManager.SetCameraStatus(CameraStatus.OutsideMobileHQ);
-
-                    if (!IsServerOnly)
-                        return;
-
-                    StartCoroutine(routine: RestartGameTimerCO());
-                    break;
-
-                case GameState.HeadingToTheRoad:
-                    localPlayer.SetEntityLocation(EntityLocation.Road);
-                    break;
-
-                case GameState.HeadingToTheLocation:
-                    localPlayer.SetEntityLocation(EntityLocation.LocationSurface);
-                    break;
-
-                case GameState.ArrivedAtTheRoad:
-                    if (!IsServerOnly)
-                        return;
-
-                    ChangeGameStateWhenAllPlayersReady(newState: GameState.EnteringMainRoad,
-                        previousState: GameState.ArrivedAtTheRoad);
-                    break;
-
-                case GameState.QuestsRewarding:
-                    if (!IsServerOnly)
-                        return;
-
-                    ChangeGameStateWhenAllPlayersReady(newState: GameState.CycleMovement,
-                        previousState: GameState.QuestsRewarding);
-                    break;
-
-                case GameState.ArrivedAtTheLocation:
-                    localPlayer.EnterAliveState();
-
-                    if (!IsServerOnly)
-                        return;
-
-                    IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
-
-                    foreach (PlayerEntity playerEntity in allPlayers.Values)
-                        playerEntity.NetworkObject.TryRemoveParent();
-
-                    ChangeGameStateWhenAllPlayersReady(newState: GameState.ReadyToLeaveTheLocation,
-                        previousState: GameState.ArrivedAtTheLocation);
-                    break;
-
-                case GameState.RestartGame:
-                    ChangeGameStateWhenAllPlayersReady(newState: GameState.RestartGameCompleted,
-                        previousState: GameState.RestartGame);
-                    break;
-
-                case GameState.RestartGameCompleted:
-                    ChangeGameStateWhenAllPlayersReady(newState: GameState.CycleMovement,
-                        previousState: GameState.RestartGameCompleted);
-                    break;*/
-            }
         }
 
         private void SelectLocation(LocationName locationName)
@@ -320,6 +254,12 @@ namespace GameCore.Gameplay.GameManagement
             ChangeGameState(newState);
         }
 
+        private void StartGameRestartTimer()
+        {
+            IEnumerator routine = RestartGameTimerCO();
+            StartCoroutine(routine);
+        }
+        
         private IEnumerator RestartGameTimerCO()
         {
             float delay = _balanceConfig.GameRestartDelay;
@@ -395,7 +335,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private void OnAllGameStateChanged(GameState previousValue, GameState newValue)
         {
-            string log = Log.HandleLog("Game State", $"<gb>{previousValue}</gb> ---> <gb>{newValue}</gb>");
+            string log = Log.HandleLog(tag: "Game State", log: $"<gb>{previousValue}</gb> ---> <gb>{newValue}</gb>");
             Debug.Log(log);
 
             if (IsServerOnly)
@@ -404,7 +344,6 @@ namespace GameCore.Gameplay.GameManagement
                 SyncPlayerGameStateServerRpc(newValue);
 
             _gameManagerDecorator.GameStateChanged(gameState: newValue);
-            HandleGameState(gameState: newValue);
         }
 
         private void OnPlayersGoldChanged(int previousValue, int newValue) =>

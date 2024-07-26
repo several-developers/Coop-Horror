@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public EntityLocation EntityLocation { get; private set; } = EntityLocation.LocationSurface;
+        public EntityLocation EntityLocation { get; private set; } = EntityLocation.Sector;
         public Floor CurrentFloor { get; private set; }
         
         // FIELDS: --------------------------------------------------------------------------------

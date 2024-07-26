@@ -4,6 +4,7 @@ using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.UnityServices.Auth;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
+using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Infrastructure.Lifecycle;
 using Sirenix.OdinInspector;
 using UnityEngine;

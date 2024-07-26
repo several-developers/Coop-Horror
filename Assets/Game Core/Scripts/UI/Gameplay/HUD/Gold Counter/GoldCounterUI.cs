@@ -1,5 +1,4 @@
-﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Player;
+﻿using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameManagement;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
@@ -36,7 +35,6 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
             PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
             PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
             
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
             _gameManagerDecorator.OnPlayersGoldChangedEvent += OnPlayersGoldChanged;
         }
 
@@ -47,33 +45,16 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
             PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
             PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
             
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
             _gameManagerDecorator.OnPlayersGoldChangedEvent -= OnPlayersGoldChanged;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void HandleGameState(GameState gameState)
-        {
-            switch (gameState)
-            {
-                case GameState.KillPlayersOnTheRoad:
-                    Hide();
-                    break;
-                
-                case GameState.RestartGame:
-                    Show();
-                    break;
-            }
-        }
-
         private void UpdateGoldText(int playersGold) =>
             _goldTMP.text = $"Gold: {playersGold}";
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
-
+        
         private void OnPlayersGoldChanged(int playersGold) => UpdateGoldText(playersGold);
         
         private void OnPlayerSpawned(PlayerEntity playerEntity)

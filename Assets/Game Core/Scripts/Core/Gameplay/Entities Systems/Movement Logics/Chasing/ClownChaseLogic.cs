@@ -74,7 +74,7 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
 
             switch (clownLocation)
             {
-                case EntityLocation.LocationSurface:
+                case EntityLocation.Sector:
                     ClownAtSurfaceLogic();
                     break;
 
@@ -123,7 +123,7 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
 
                 bool isFireExitFound = playerLocation switch
                 {
-                    EntityLocation.LocationSurface => _levelProvider.TryGetStairsFireExit(Floor.Surface, out fireExit),
+                    EntityLocation.Sector => _levelProvider.TryGetStairsFireExit(Floor.Surface, out fireExit),
                     EntityLocation.Dungeon => _levelProvider.TryGetStairsFireExit(playerFloor, out fireExit),
                     _ => false
                 };
@@ -142,7 +142,7 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
             {
                 switch (playerLocation)
                 {
-                    case EntityLocation.LocationSurface:
+                    case EntityLocation.Sector:
                         useClownPosition = true;
                         break;
 

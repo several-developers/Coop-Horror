@@ -221,7 +221,7 @@ namespace GameCore.Gameplay.Level.Elevator
             playerEntity.Teleport(position, rotation);
 
             EntityLocation playerLocation = currentFloor == Floor.Surface
-                ? EntityLocation.LocationSurface
+                ? EntityLocation.Sector
                 : EntityLocation.Dungeon;
             
             VisualPresetType presetType = currentFloor == Floor.Surface

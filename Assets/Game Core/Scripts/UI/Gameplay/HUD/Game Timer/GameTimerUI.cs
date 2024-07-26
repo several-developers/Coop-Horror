@@ -1,6 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
+using GameCore.Observers.Gameplay.UI;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -14,10 +14,10 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator, ITimeCycle timeCycle)
+        private void Construct(ITimeCycle timeCycle, IUIObserver uiObserver)
         {
-            _gameManagerDecorator = gameManagerDecorator;
             _timeCycle = timeCycle;
+            _uiObserver = uiObserver;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -28,8 +28,8 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private IGameManagerDecorator _gameManagerDecorator;
         private ITimeCycle _timeCycle;
+        private IUIObserver _uiObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -37,41 +37,23 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         {
             base.Awake();
             
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
-
             _timeCycle.OnHourPassedEvent += OnHourPassed;
+
+            _uiObserver.OnTriggerUIEvent += OnTriggerUIEvent;
         }
 
-        private void Start()
-        {
-            UpdateTime();
-            Show();
-        }
+        private void Start() => UpdateTime();
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
             
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
-            
             _timeCycle.OnHourPassedEvent -= OnHourPassed;
+            
+            _uiObserver.OnTriggerUIEvent -= OnTriggerUIEvent;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void HandleGameState(GameState gameState)
-        {
-            switch (gameState)
-            {
-                case GameState.KillPlayersOnTheRoad:
-                    Hide();
-                    break;
-                
-                case GameState.RestartGame:
-                    Show();
-                    break;
-            }
-        }
 
         private void UpdateTime()
         {
@@ -86,9 +68,21 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
         
         private void OnHourPassed() => UpdateTime();
+
+        private void OnTriggerUIEvent(UIEventType eventType)
+        {
+            switch (eventType)
+            {
+                case UIEventType.ShowGameTimer:
+                    Show();
+                    break;
+                
+                case UIEventType.HideGameTimer:
+                    Hide();
+                    break;
+            }
+        }
     }
 }

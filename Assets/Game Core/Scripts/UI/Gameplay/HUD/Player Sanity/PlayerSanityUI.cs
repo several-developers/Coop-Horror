@@ -1,108 +1,75 @@
-﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.GameManagement;
+﻿using GameCore.Gameplay.Entities.Player;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
-using Zenject;
 
 namespace GameCore.UI.Gameplay.HUD.PlayerSanity
 {
     public class PlayerSanityUI : UIElement
     {
-        // CONSTRUCTORS: --------------------------------------------------------------------------
+        // MEMBERS: -------------------------------------------------------------------------------
 
-            [Inject]
-            private void Construct(IGameManagerDecorator gameManagerDecorator) =>
-                _gameManagerDecorator = gameManagerDecorator;
+        [Title(Constants.References)]
+        [SerializeField, Required]
+        private TextMeshProUGUI _sanityTMP;
 
-            // MEMBERS: -------------------------------------------------------------------------------
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-            [Title(Constants.References)]
-            [SerializeField, Required]
-            private TextMeshProUGUI _sanityTMP;
+        protected override void Awake()
+        {
+            base.Awake();
 
-            // FIELDS: --------------------------------------------------------------------------------
+            PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
+        }
 
-            private IGameManagerDecorator _gameManagerDecorator;
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
 
-            // GAME ENGINE METHODS: -------------------------------------------------------------------
+            PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
+        }
 
-            protected override void Awake()
-            {
-                base.Awake();
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
-                PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
-                PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
+        private void UpdateSanityText(float sanity) =>
+            _sanityTMP.text = $"Sanity: {sanity:F0}%";
 
-                _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
-            }
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-            protected override void OnDestroy()
-            {
-                base.OnDestroy();
+        private void OnPlayerSpawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
 
-                PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
-                PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
+            if (!isLocalPlayer)
+                return;
 
-                _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
-            }
+            float sanity = playerEntity.GetSanity();
+            UpdateSanityText(sanity);
 
-            // PRIVATE METHODS: -----------------------------------------------------------------------
+            playerEntity.OnSanityChangedEvent += OnSanityChanged;
+            playerEntity.OnDiedEvent += OnPlayerDied;
+            playerEntity.OnRevivedEvent += OnPlayerRevived;
+        }
 
-            private void HandleGameState(GameState gameState)
-            {
-                switch (gameState)
-                {
-                    case GameState.KillPlayersOnTheRoad:
-                        Hide();
-                        break;
+        private void OnPlayerDespawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
 
-                    case GameState.RestartGame:
-                        Show();
-                        break;
-                }
-            }
+            if (!isLocalPlayer)
+                return;
 
-            private void UpdateSanityText(float sanity) =>
-                _sanityTMP.text = $"Sanity: {sanity:F0}%";
+            playerEntity.OnSanityChangedEvent -= OnSanityChanged;
+            playerEntity.OnDiedEvent -= OnPlayerDied;
+            playerEntity.OnRevivedEvent -= OnPlayerRevived;
+        }
 
-            // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        private void OnSanityChanged(float sanity) => UpdateSanityText(sanity);
 
-            private void OnPlayerSpawned(PlayerEntity playerEntity)
-            {
-                bool isLocalPlayer = playerEntity.IsLocalPlayer();
+        private void OnPlayerDied() => Hide();
 
-                if (!isLocalPlayer)
-                    return;
-
-                float sanity = playerEntity.GetSanity();
-                UpdateSanityText(sanity);
-                
-                playerEntity.OnSanityChangedEvent += OnSanityChanged;
-                playerEntity.OnDiedEvent += OnPlayerDied;
-                playerEntity.OnRevivedEvent += OnPlayerRevived;
-            }
-
-            private void OnPlayerDespawned(PlayerEntity playerEntity)
-            {
-                bool isLocalPlayer = playerEntity.IsLocalPlayer();
-
-                if (!isLocalPlayer)
-                    return;
-
-                playerEntity.OnSanityChangedEvent -= OnSanityChanged;
-                playerEntity.OnDiedEvent -= OnPlayerDied;
-                playerEntity.OnRevivedEvent -= OnPlayerRevived;
-            }
-
-            private void OnSanityChanged(float sanity) => UpdateSanityText(sanity);
-
-            private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
-
-            private void OnPlayerDied() => Hide();
-
-            private void OnPlayerRevived() => Show();
+        private void OnPlayerRevived() => Show();
     }
 }

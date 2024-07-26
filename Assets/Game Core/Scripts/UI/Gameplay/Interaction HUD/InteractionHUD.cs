@@ -71,7 +71,7 @@ namespace GameCore.UI.Gameplay.Interaction
         {
             switch (gameState)
             {
-                case GameState.KillPlayersOnTheRoad:
+                case GameState.KillPlayersByMetroMonster:
                     Hide();
                     break;
                 

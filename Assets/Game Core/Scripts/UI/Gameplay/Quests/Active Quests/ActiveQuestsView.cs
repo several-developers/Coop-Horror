@@ -85,7 +85,7 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         {
             switch (gameState)
             {
-                case GameState.KillPlayersOnTheRoad:
+                case GameState.KillPlayersByMetroMonster:
                     Hide();
                     break;
                 

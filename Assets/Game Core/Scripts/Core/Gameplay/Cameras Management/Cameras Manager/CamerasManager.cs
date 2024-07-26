@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.CamerasManagement
                     if (IsAnyAlivePlayersLeft())
                         SwitchToNextPlayer();
                     else
-                        cameraStatus = CameraStatus.OutsideMobileHQ;
+                        cameraStatus = CameraStatus.OutsideTrain;
 
                     break;
                 }
@@ -106,7 +106,7 @@ namespace GameCore.Gameplay.CamerasManagement
 
         private void CheckMobileHQCamera(CameraStatus cameraStatus)
         {
-            bool isEnabled = cameraStatus == CameraStatus.OutsideMobileHQ;
+            bool isEnabled = cameraStatus == CameraStatus.OutsideTrain;
             Camera camera = _trainEntity.GetOutsideCamera();
             camera.enabled = isEnabled;
         }

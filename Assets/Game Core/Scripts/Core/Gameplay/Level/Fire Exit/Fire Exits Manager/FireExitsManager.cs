@@ -68,7 +68,7 @@ namespace GameCore.Gameplay.Level
             if (isInStairsLocation)
             {
                 entityLocation = floor == Floor.Surface
-                    ? EntityLocation.LocationSurface
+                    ? EntityLocation.Sector
                     : EntityLocation.Dungeon;
             }
 
@@ -88,7 +88,7 @@ namespace GameCore.Gameplay.Level
             if (isInStairsLocation)
             {
                 entityLocation = floor == Floor.Surface
-                    ? EntityLocation.LocationSurface
+                    ? EntityLocation.Sector
                     : EntityLocation.Dungeon;
             }
 

@@ -32,7 +32,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<UIObserver>()
-                .AsSingle();
+                .AsSingle()
+                .NonLazy();
         }
 
         private void BindPlayerInteractionObserver()

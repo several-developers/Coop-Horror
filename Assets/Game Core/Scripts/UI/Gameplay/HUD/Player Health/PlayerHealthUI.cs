@@ -1,32 +1,19 @@
-﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Player;
+﻿using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.EntitiesSystems.Health;
-using GameCore.Gameplay.GameManagement;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
-using Zenject;
 
 namespace GameCore.UI.Gameplay.HUD.PlayerHealth
 {
     public class PlayerHealthUI : UIElement
     {
-        // CONSTRUCTORS: --------------------------------------------------------------------------
-
-        [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator) =>
-            _gameManagerDecorator = gameManagerDecorator;
-        
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
         [SerializeField, Required]
         private TextMeshProUGUI _healthTMP;
-
-        // FIELDS: --------------------------------------------------------------------------------
-
-        private IGameManagerDecorator _gameManagerDecorator;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -36,8 +23,6 @@ namespace GameCore.UI.Gameplay.HUD.PlayerHealth
             
             PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
             PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
-            
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
 
         protected override void OnDestroy()
@@ -46,25 +31,9 @@ namespace GameCore.UI.Gameplay.HUD.PlayerHealth
             
             PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
             PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
-            
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void HandleGameState(GameState gameState)
-        {
-            switch (gameState)
-            {
-                case GameState.KillPlayersOnTheRoad:
-                    Hide();
-                    break;
-                
-                case GameState.RestartGame:
-                    Show();
-                    break;
-            }
-        }
 
         private void UpdateHealthText(HealthData healthData)
         {
@@ -107,9 +76,7 @@ namespace GameCore.UI.Gameplay.HUD.PlayerHealth
         }
 
         private void OnHealthChanged(HealthData healthData) => UpdateHealthText(healthData);
-
-        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
-
+        
         private void OnPlayerDied() => Hide();
 
         private void OnPlayerRevived() => Show();

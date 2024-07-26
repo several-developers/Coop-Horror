@@ -250,7 +250,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void OnQuitClicked() => ShowQuitConfirmMenu();
 
         private void OnGameOverWarningConfirmClicked() =>
-            _gameManagerDecorator.ChangeGameState(GameState.KillPlayersOnTheRoad);
+            _gameManagerDecorator.ChangeGameState(GameState.KillPlayersByMetroMonster);
 
         private void OnGameOverWarningCancelClicked()
         {

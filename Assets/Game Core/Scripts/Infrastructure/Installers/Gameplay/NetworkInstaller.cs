@@ -3,6 +3,8 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.PubSub;
+using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Quests;
 using Zenject;
 
@@ -20,6 +22,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindQuestsManagerDecorator();
             BindGameTimeManagerDecorator();
             BindChatManagerDecorator();
+            BindNetworkMessages();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -63,6 +66,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<ChatManagerDecorator>()
+                .AsSingle();
+        }
+
+        private void BindNetworkMessages()
+        {
+            Container
+                .BindInterfacesTo<NetworkedMessageChannel<UIEventMessage>>()
                 .AsSingle();
         }
     }
