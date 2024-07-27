@@ -133,7 +133,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             Debug.Log("--> Train Arrived At Sector.");
 
-            LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
+            LocationName currentLocation = GetCurrentLocation();
 
             if (currentLocation != LocationName.Market)
             {
@@ -149,11 +149,17 @@ namespace GameCore.Gameplay.GameManagement
         private void TrainStoppedAtSector()
         {
             Debug.Log("--> Train Stopped At Sector.");
+            
+            LocationName currentLocation = GetCurrentLocation();
+            
+            if (currentLocation != LocationName.Market)
+            {
+                PublishUIEvent(UIEventType.ShowGameTimer);
+            }
 
             ToggleTrainMainLever(isEnabled: true);
             ToggleTrainDoor(isOpened: true);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.LeaveAtPathEnd);
-            PublishUIEvent(UIEventType.ShowGameTimer);
             RemovePlayersParent();
         }
 
@@ -215,7 +221,10 @@ namespace GameCore.Gameplay.GameManagement
             // foreach (PlayerEntity playerEntity in allPlayers.Values)
             //     playerEntity.SetEntityLocation(entityLocation);
         }
-        
+
+        private LocationName GetCurrentLocation() =>
+            _gameManagerDecorator.GetCurrentLocation();
+
         #endregion
     }
 }

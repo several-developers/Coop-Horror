@@ -152,6 +152,8 @@ namespace GameCore.Gameplay.Items.SpawnSystem
 
                         DungeonItemsSpawner itemsSpawner = GetRandomItemsSpawner(floor);
                         SpawnItem(itemsSpawner, itemID);
+
+                        _itemsToSpawn = Mathf.Max(a: _itemsToSpawn - 1, b: 0);
                     }
                 }
             }
