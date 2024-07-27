@@ -21,7 +21,7 @@ MonoBehaviour:
       expandSettings: 0
       expandTriggerOnPlay: 0
       expandTriggerOnStop: 0
-      expandTriggerOnTail: 1
+      expandTriggerOnTail: 0
       expandAllSoundTag: 0
       timelineSoundContainerData:
       - delay: 0

@@ -1,5 +1,6 @@
 ﻿using System;
 using ECM2;
+using GameCore.Gameplay.EntitiesSystems.Footsteps;
 using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.EntitiesSystems.Ragdoll;
 using GameCore.Gameplay.Network;
@@ -44,10 +45,16 @@ namespace GameCore.Gameplay.Entities.Player
         private Character _character;
 
         [SerializeField, Required]
+        private PlayerFootstepsSystem _footstepsSystem;
+        
+        [SerializeField, Required]
         private SittingCameraController _sittingCameraController;
         
         [SerializeField, Required]
         private PlayerMovementController _playerMovementController;
+
+        [SerializeField, Required]
+        private MySprintAbility _sprintAbility;
 
         [SerializeField, Required]
         private MyAnimationController _animationController;
@@ -76,8 +83,10 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public RagdollController RagdollController => _ragdollController;
         public Character Character => _character;
+        public PlayerFootstepsSystem FootstepsSystem => _footstepsSystem;
         public SittingCameraController SittingCameraController => _sittingCameraController;
         public PlayerMovementController PlayerMovementController => _playerMovementController;
+        public MySprintAbility SprintAbility => _sprintAbility;
         public MyAnimationController AnimationController => _animationController;
         public HealthSystem HealthSystem => _healthSystem;
         public SkinnedMeshRenderer[] HiddenMeshes => _hiddenMeshes;

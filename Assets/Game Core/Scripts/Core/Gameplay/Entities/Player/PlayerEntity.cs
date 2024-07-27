@@ -8,6 +8,7 @@ using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
+using GameCore.Gameplay.EntitiesSystems.Footsteps;
 using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.EntitiesSystems.Inventory;
 using GameCore.Gameplay.EntitiesSystems.Ragdoll;
@@ -251,10 +252,13 @@ namespace GameCore.Gameplay.Entities.Player
 
             void InitSystems()
             {
-                _healthSystem = _references.HealthSystem;
                 float health = _playerConfig.Health;
+                _healthSystem = _references.HealthSystem;
                 _healthSystem.Setup(health);
 
+                PlayerFootstepsSystem footstepsSystem = _references.FootstepsSystem;
+                footstepsSystem.Setup(_references, InputReader);
+                
                 _playerStateMachine = new StateMachine();
 
                 _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform,

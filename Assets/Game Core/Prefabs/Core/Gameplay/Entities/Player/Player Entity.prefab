@@ -2231,7 +2231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2175522384
+  GlobalObjectIdHash: 4251873558
   InScenePlacedSourceGlobalObjectIdHash: 4251873558
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2253,6 +2253,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxSprintSpeed: 7
+--- !u!114 &1037070405942051512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4628898490251457778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c6a1f6d4e444ef9e2eb98566a667cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soundEvent: {fileID: 11400000, guid: f938e4af8586c564bb5481b3e2e15769, type: 2}
+  _baseStepSpeed: 0.55
+  _crouchSpeedMultiplier: 1.2
+  _sprintingSpeedMultiplier: 0.7
 --- !u!114 &2451543691127853220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2504,8 +2520,10 @@ MonoBehaviour:
     _rightHandItemsHolder: {fileID: 6401576952175673513}
     _ragdollController: {fileID: 728689328127067722}
     _character: {fileID: 4617892838296297533}
+    _footstepsSystem: {fileID: 1037070405942051512}
     _sittingCameraController: {fileID: 5821218146202177169}
     _playerMovementController: {fileID: 7014763259676313825}
+    _sprintAbility: {fileID: 128048721726418544}
     _animationController: {fileID: 137842141037906286}
     _healthSystem: {fileID: 2451543691127853220}
     _hiddenMeshes:

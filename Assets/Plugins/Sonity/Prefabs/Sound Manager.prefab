@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4796163816734636}
   - component: {fileID: -2683738262453034793}
   m_Layer: 0
-  m_Name: SoundManager
+  m_Name: Sound Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,8 +67,8 @@ MonoBehaviour:
       voiceStopTime: 5
       voiceEffectLimit: 32
       debugSoundEventsInSceneViewEnabled: 0
-      debugSoundEventsInGameViewEnabled: 0
-      debugSoundEventsFontSize: 16
+      debugSoundEventsInGameViewEnabled: 1
+      debugSoundEventsFontSize: 10
       debugSoundEventsVolumeToAlpha: 0.5
       debugSoundEventsLifetimeToAlpha: 0.75
       debugSoundEventsLifetimeColorLength: 1
