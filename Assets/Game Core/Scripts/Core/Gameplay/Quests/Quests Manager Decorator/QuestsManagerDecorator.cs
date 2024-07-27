@@ -13,6 +13,8 @@ namespace GameCore.Gameplay.Quests
         public event Action<int> OnSelectQuestInnerEvent = delegate { };
         public event Action<int> OnSubmitQuestItemInnerEvent = delegate { };
         public event Action OnCompleteQuestsInnerEvent = delegate { };
+        public event Action OnDecreaseQuestsDaysInnerEvent = delegate { };
+        public event Action OnResetQuestsInnerEvent = delegate { };
         public event Func<QuestsStorage> OnGetQuestsStorageInnerEvent;
         public event Func<int> OnGetActiveQuestsAmountInnerEvent;
         public event Func<int, bool> OnContainsItemInQuestsInnerEvent;
@@ -39,6 +41,12 @@ namespace GameCore.Gameplay.Quests
 
         public void CompleteQuests() =>
             OnCompleteQuestsInnerEvent.Invoke();
+
+        public void DecreaseQuestsDays() =>
+            OnDecreaseQuestsDaysInnerEvent.Invoke();
+
+        public void ResetQuests() =>
+            OnResetQuestsInnerEvent.Invoke();
 
         public QuestsStorage GetQuestsStorage() =>
             OnGetQuestsStorageInnerEvent?.Invoke();

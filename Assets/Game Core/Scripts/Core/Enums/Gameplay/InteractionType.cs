@@ -13,7 +13,7 @@
         ElevatorCallButton = 8,
         FireExitDoor = 9,
         SimpleButton = 10,
-        Heliport = 11,
+        MarketShop = 11,
         MobileHQSeat = 12,
     }
 }

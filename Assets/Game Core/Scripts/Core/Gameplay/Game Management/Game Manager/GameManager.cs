@@ -89,7 +89,7 @@ namespace GameCore.Gameplay.GameManagement
             if (!IsServerOnly)
                 return;
             
-            _gameObserver.TrainArrivedAtBase();
+            _gameObserver.TrainArrivedAtBase(LocationName.Base);
         }
 
         public override void OnDestroy()
@@ -384,7 +384,7 @@ namespace GameCore.Gameplay.GameManagement
             _currentLocation.Value = _selectedLocation.Value;
             _selectedLocation.Value = _previousSelectedLocation;
             
-            _gameObserver.TrainArrivedAtBase();
+            _gameObserver.TrainArrivedAtBase(_previousSelectedLocation);
         }
         
         private void OnTrainMovementStopped() =>

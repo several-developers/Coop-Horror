@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Network;
 using Unity.Netcode;
 
@@ -8,7 +9,7 @@ namespace GameCore.Observers.Gameplay.Game
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnTrainArrivedAtBaseEvent = delegate { };
+        public event Action<LocationName> OnTrainArrivedAtBaseEvent = delegate { };
         public event Action OnTrainLeavingBaseEvent = delegate { };
         public event Action OnTrainLeftBaseEvent = delegate { };
         public event Action OnTrainArrivedAtSectorEvent = delegate { };
@@ -18,7 +19,8 @@ namespace GameCore.Observers.Gameplay.Game
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void TrainArrivedAtBase() => TrainArrivedAtBaseServerRpc();
+        public void TrainArrivedAtBase(LocationName previousLocationName) =>
+            TrainArrivedAtBaseServerRpc(previousLocationName);
 
         public void TrainLeavingBase() => TrainLeavingBaseServerRpc();
 
@@ -35,7 +37,8 @@ namespace GameCore.Observers.Gameplay.Game
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
-        private void TrainArrivedAtBaseServerRpc() => TrainArrivedAtBaseClientRpc();
+        private void TrainArrivedAtBaseServerRpc(LocationName previousLocationName) =>
+            TrainArrivedAtBaseClientRpc(previousLocationName);
         
         [ServerRpc(RequireOwnership = false)]
         private void TrainLeavingBaseServerRpc() => TrainLeavingBaseClientRpc();
@@ -56,8 +59,8 @@ namespace GameCore.Observers.Gameplay.Game
         private void TrainLeftSectorServerRpc() => TrainLeftSectorClientRpc();
 
         [ClientRpc]
-        private void TrainArrivedAtBaseClientRpc() =>
-            OnTrainArrivedAtBaseEvent.Invoke();
+        private void TrainArrivedAtBaseClientRpc(LocationName previousLocationName) =>
+            OnTrainArrivedAtBaseEvent.Invoke(previousLocationName);
 
         [ClientRpc]
         private void TrainLeavingBaseClientRpc() =>

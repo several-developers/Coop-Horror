@@ -8,6 +8,7 @@ using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
+using GameCore.Gameplay.Quests;
 using GameCore.Observers.Gameplay.Game;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ namespace GameCore.Gameplay.GameManagement
         public GameController(
             IGameManagerDecorator gameManagerDecorator,
             IGameTimeManagerDecorator gameTimeManagerDecorator,
+            IQuestsManagerDecorator questsManagerDecorator,
             IGameObserver gameObserver,
             ICamerasManager camerasManager,
             IGameResetManager gameResetManager,
@@ -28,6 +30,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             _gameManagerDecorator = gameManagerDecorator;
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
+            _questsManagerDecorator = questsManagerDecorator;
             _gameObserver = gameObserver;
             _camerasManager = camerasManager;
             _gameResetManager = gameResetManager;
@@ -54,6 +57,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly IGameTimeManagerDecorator _gameTimeManagerDecorator;
+        private readonly IQuestsManagerDecorator _questsManagerDecorator;
         private readonly IGameObserver _gameObserver;
         private readonly ICamerasManager _camerasManager;
         private readonly IGameResetManager _gameResetManager;
@@ -111,10 +115,12 @@ namespace GameCore.Gameplay.GameManagement
             }
         }
 
-        private void TrainArrivedAtBase()
+        private void TrainArrivedAtBase(LocationName previousLocationName)
         {
             Debug.Log("--> Train Arrived At Base.");
 
+            bool arrivedFromMarket = previousLocationName == LocationName.Market;
+            
             _gameTimeManagerDecorator.SetMidnight();
             _trainEntity.TeleportToTheRoad();
             ToggleTrainMainLever(isEnabled: true);
@@ -122,6 +128,9 @@ namespace GameCore.Gameplay.GameManagement
             SetPlayersEntityLocation(EntityLocation.Base);
             PublishUIEvent(UIEventType.HideGameTimer);
             PublishUIEvent(UIEventType.UpdateGameMap);
+            
+            if (!arrivedFromMarket)
+                _questsManagerDecorator.DecreaseQuestsDays();
         }
 
         private void TrainLeavingBase()

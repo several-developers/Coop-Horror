@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 
 namespace GameCore.Observers.Gameplay.Game
 {
@@ -6,7 +7,7 @@ namespace GameCore.Observers.Gameplay.Game
     {
         // FIELDS: --------------------------------------------------------------------------------
         
-        public event Action OnTrainArrivedAtBaseEvent = delegate { };
+        public event Action<LocationName> OnTrainArrivedAtBaseEvent = delegate { };
         public event Action OnTrainLeavingBaseEvent = delegate { };
         public event Action OnTrainArrivedAtSectorEvent = delegate { };
         public event Action OnTrainStoppedAtSectorEvent = delegate { };
@@ -14,8 +15,8 @@ namespace GameCore.Observers.Gameplay.Game
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void TrainArrivedAtBase() =>
-            OnTrainArrivedAtBaseEvent.Invoke();
+        public void TrainArrivedAtBase(LocationName previousLocationName) =>
+            OnTrainArrivedAtBaseEvent.Invoke(previousLocationName);
 
         public void TrainLeavingBase() =>
             OnTrainLeavingBaseEvent.Invoke();

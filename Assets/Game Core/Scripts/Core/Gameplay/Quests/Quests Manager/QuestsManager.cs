@@ -48,6 +48,8 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.OnSelectQuestInnerEvent += OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent += SubmitQuestItem;
             _questsManagerDecorator.OnCompleteQuestsInnerEvent += CompleteQuestsServerRpc;
+            _questsManagerDecorator.OnDecreaseQuestsDaysInnerEvent += DecreaseQuestsDaysServerRpc;
+            _questsManagerDecorator.OnResetQuestsInnerEvent += ResetQuests;
             _questsManagerDecorator.OnGetQuestsStorageInnerEvent += GetQuestsStorage;
             _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent += GetActiveQuestsAmount;
             _questsManagerDecorator.OnContainsItemInQuestsInnerEvent += ContainsItemInQuests;
@@ -66,6 +68,8 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.OnSelectQuestInnerEvent -= OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent -= SubmitQuestItem;
             _questsManagerDecorator.OnCompleteQuestsInnerEvent -= CompleteQuestsServerRpc;
+            _questsManagerDecorator.OnDecreaseQuestsDaysInnerEvent -= DecreaseQuestsDaysServerRpc;
+            _questsManagerDecorator.OnResetQuestsInnerEvent -= ResetQuests;
             _questsManagerDecorator.OnGetQuestsStorageInnerEvent -= GetQuestsStorage;
             _questsManagerDecorator.OnGetActiveQuestsAmountInnerEvent -= GetActiveQuestsAmount;
             _questsManagerDecorator.OnContainsItemInQuestsInnerEvent -= ContainsItemInQuests;
@@ -104,6 +108,13 @@ namespace GameCore.Gameplay.Quests
                 _gameManagerDecorator.AddPlayersGold(reward);
         }
 
+        private void ResetQuests()
+        {
+            _questsStorage.ClearAll();
+            _questsManagerDecorator.ActiveQuestsDataReceived();
+            CreateQuests();
+        }
+
 #warning СЛОМАНО, СРОЧНО ЧИНИТЬ
         private void HandleGameState(GameState gameState)
         {
@@ -118,12 +129,6 @@ namespace GameCore.Gameplay.Quests
 
                 case GameState.QuestsRewarding:
                     CalculateReward();
-                    CreateQuests();
-                    break;
-
-                case GameState.RestartGame:
-                    _questsStorage.ClearAll();
-                    _questsManagerDecorator.ActiveQuestsDataReceived();
                     CreateQuests();
                     break;
             }*/

@@ -65,14 +65,19 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         private void DestroyAllItems()
         {
             IReadOnlyDictionary<int, ItemObjectBase> allItems = _itemsProvider.GetAllItems();
-            IEnumerable<int> allKeys = new List<int>(allItems.Keys);
+            var allKeys = new List<int>(allItems.Keys);
 
-            foreach (ItemObjectBase itemObject in allItems.Values)
+            foreach (KeyValuePair<int, ItemObjectBase> pair in allItems)
             {
-                bool isItemValid = itemObject.DestroyOnSceneUnload;
+                ItemObjectBase itemObject = pair.Value;
+                bool destroyOnSceneUnload = itemObject.DestroyOnSceneUnload;
 
-                if (!isItemValid)
+                if (!destroyOnSceneUnload)
+                {
+                    int key = pair.Key;
+                    allKeys.Remove(key);
                     continue;
+                }
                 
                 Object.Destroy(itemObject.gameObject);
             }

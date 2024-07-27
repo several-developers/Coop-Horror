@@ -218,6 +218,7 @@ namespace GameCore.Gameplay.Items
                 return;
             
             _isPickedUp.Value = true;
+            DestroyOnSceneUnload = false;
 
             ulong senderClientID = serverRpcParams.Receive.SenderClientId;
             bool changeOwnership = itemNetworkObject.OwnerClientId != senderClientID;

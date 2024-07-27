@@ -76,18 +76,23 @@ namespace GameCore.Gameplay.Entities.Train
             if (leaveLocation)
             {
                 _trainEntity.StartLeavingLocationServerRpc();
+                _trainEntity.ToggleMainLeverState(isEnabled: false);
             }
             else
             {
                 bool containsExpiredQuests = _questsManagerDecorator.ContainsExpiredQuests();
 
                 if (containsExpiredQuests)
+                {
                     _trainEntity.SendOpenGameOverWarningMenu();
+                }
                 else
+                {
                     _gameManagerDecorator.LoadSelectedLocation();
+                    _trainEntity.ToggleMainLeverState(isEnabled: false);
+                }
             }
             
-            _trainEntity.ToggleMainLeverState(isEnabled: false);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

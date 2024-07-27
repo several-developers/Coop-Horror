@@ -14,6 +14,8 @@ namespace GameCore.Gameplay.Quests
         event Action<int> OnSelectQuestInnerEvent;
         event Action<int> OnSubmitQuestItemInnerEvent;
         event Action OnCompleteQuestsInnerEvent;
+        event Action OnDecreaseQuestsDaysInnerEvent;
+        event Action OnResetQuestsInnerEvent;
         event Func<QuestsStorage> OnGetQuestsStorageInnerEvent;
         event Func<int> OnGetActiveQuestsAmountInnerEvent;
         event Func<int, bool> OnContainsItemInQuestsInnerEvent;
@@ -23,6 +25,8 @@ namespace GameCore.Gameplay.Quests
         void SelectQuest(int questID);
         void SubmitQuestItem(int itemID);
         void CompleteQuests();
+        void DecreaseQuestsDays();
+        void ResetQuests();
         QuestsStorage GetQuestsStorage();
         int GetActiveQuestsAmount();
         bool ContainsItemInQuests(int itemID);

@@ -5,6 +5,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Quests;
 using GameCore.Gameplay.VisualManagement;
 using Unity.Netcode;
 using UnityEngine;
@@ -15,13 +16,17 @@ namespace GameCore.Gameplay.GameManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameResetManager(IGameManagerDecorator gameManagerDecorator,
+        public GameResetManager(
+            IGameManagerDecorator gameManagerDecorator,
             IGameTimeManagerDecorator gameTimeManagerDecorator,
+            IQuestsManagerDecorator questsManagerDecorator,
             ITrainEntity trainEntity,
-            IVisualManager visualManager)
+            IVisualManager visualManager
+            )
         {
             _gameManagerDecorator = gameManagerDecorator;
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
+            _questsManagerDecorator = questsManagerDecorator;
             _trainEntity = trainEntity;
             _visualManager = visualManager;
         }
@@ -30,6 +35,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly IGameTimeManagerDecorator _gameTimeManagerDecorator;
+        private readonly IQuestsManagerDecorator _questsManagerDecorator;
         private readonly ITrainEntity _trainEntity;
         private readonly IVisualManager _visualManager;
 
@@ -49,6 +55,7 @@ namespace GameCore.Gameplay.GameManagement
                 ResetGold();
                 TeleportMobileHQToTheRoad();
                 RespawnPlayersAtMobileHQ();
+                ResetQuests();
             }
 
             // Common logic.
@@ -99,6 +106,9 @@ namespace GameCore.Gameplay.GameManagement
                 return isSpawnPointFound ? spawnPoint.GetSpawnPosition() : Vector3.zero;
             }
         }
+
+        private void ResetQuests() =>
+            _questsManagerDecorator.ResetQuests();
 
         private static void RevivePlayer()
         {
