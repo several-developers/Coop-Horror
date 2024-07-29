@@ -18,6 +18,8 @@ namespace GameCore.Gameplay.Entities.Train
         void TeleportToTheRoad();
         void ToggleMainLeverState(bool isEnabled);
         void ToggleDoorState(bool isOpened);
+        void PlaySound(TrainEntity.SFXType sfxType);
+        void StopSound(TrainEntity.SFXType sfxType);
         Camera GetOutsideCamera();
     }
 }

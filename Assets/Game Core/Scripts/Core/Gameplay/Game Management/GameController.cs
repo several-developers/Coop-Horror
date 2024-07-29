@@ -51,7 +51,7 @@ namespace GameCore.Gameplay.GameManagement
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        private bool IsServer => NetworkHorror.IsTrueServer;
+        private static bool IsServer => NetworkHorror.IsTrueServer;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -125,12 +125,14 @@ namespace GameCore.Gameplay.GameManagement
             
             _gameTimeManagerDecorator.SetMidnight();
             _trainEntity.TeleportToTheRoad();
+            _trainEntity.PlaySound(TrainEntity.SFXType.MovementLoop);
+            
             ToggleTrainMainLever(isEnabled: true);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.InfiniteMovement);
             SetPlayersEntityLocation(EntityLocation.Base);
             PublishUIEvent(UIEventType.HideGameTimer);
             PublishUIEvent(UIEventType.UpdateGameMap);
-            
+
             if (!arrivedFromMarket)
                 _questsManagerDecorator.DecreaseQuestsDays();
         }
@@ -155,6 +157,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.SelectLocation(LocationName.Base);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.StopAtPathEnd);
             SetPlayersEntityLocation(EntityLocation.Sector);
+            _trainEntity.PlaySound(TrainEntity.SFXType.Arrival);
         }
 
         private void TrainStoppedAtSector()
@@ -172,6 +175,8 @@ namespace GameCore.Gameplay.GameManagement
             ToggleTrainDoor(isOpened: true);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.LeaveAtPathEnd);
             RemovePlayersParent();
+            _trainEntity.StopSound(TrainEntity.SFXType.MovementLoop);
+            _trainEntity.StopSound(TrainEntity.SFXType.Arrival);
         }
 
         private void TrainLeavingSector()
@@ -180,6 +185,8 @@ namespace GameCore.Gameplay.GameManagement
 
             ToggleTrainMainLever(isEnabled: false);
             ToggleTrainDoor(isOpened: false);
+            _trainEntity.PlaySound(TrainEntity.SFXType.Departure);
+            _trainEntity.PlaySound(TrainEntity.SFXType.MovementLoop);
         }
 
         #endregion

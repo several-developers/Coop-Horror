@@ -18,5 +18,8 @@ namespace GameCore.Gameplay.EntitiesSystems.SoundReproducer
 
         protected void PlaySound(SoundEvent soundEvent) =>
             soundEvent.Play(_owner);
+        
+        protected void StopSound(SoundEvent soundEvent) =>
+            soundEvent.Stop(_owner);
     }
 }

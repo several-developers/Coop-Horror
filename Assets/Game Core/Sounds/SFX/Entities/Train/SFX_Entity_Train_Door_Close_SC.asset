@@ -26,7 +26,7 @@ MonoBehaviour:
       distanceScale: 100
       preventEndClicks: 1
       loopEnabled: 0
-      followPosition: 0
+      followPosition: 1
       stopIfTransformIsNull: 0
       randomStartPosition: 0
       randomStartPositionMin: 0

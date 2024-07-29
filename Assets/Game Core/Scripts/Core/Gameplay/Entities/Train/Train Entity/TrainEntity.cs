@@ -32,7 +32,10 @@ namespace GameCore.Gameplay.Entities.Train
         {
             //_ = 0,
             DoorOpen = 1,
-            DoorClose = 2
+            DoorClose = 2,
+            Departure = 3,
+            Arrival = 4,
+            MovementLoop = 5
         }
         
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -146,6 +149,12 @@ namespace GameCore.Gameplay.Entities.Train
         {
             PlaySoundLocal(sfxType);
             PlaySoundServerRPC(sfxType);
+        }
+        
+        public void StopSound(SFXType sfxType)
+        {
+            StopSoundLocal(sfxType);
+            StopSoundServerRPC(sfxType);
         }
         
         public void SendOpenQuestsSelectionMenu() =>
@@ -292,6 +301,9 @@ namespace GameCore.Gameplay.Entities.Train
 
         private void PlaySoundLocal(SFXType sfxType) =>
             _soundReproducer.PlaySound(sfxType);
+        
+        private void StopSoundLocal(SFXType sfxType) =>
+            _soundReproducer.StopSound(sfxType);
 
         private static bool IsCurrentPlayer(ulong senderClientID) =>
             NetworkHorror.ClientID == senderClientID;
@@ -381,6 +393,14 @@ namespace GameCore.Gameplay.Entities.Train
             PlaySoundClientRPC(sfxType, senderClientID);
         }
         
+        [ServerRpc(RequireOwnership = false)]
+        private void StopSoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+
+            StopSoundClientRPC(sfxType, senderClientID);
+        }
+        
         [ClientRpc]
         private void MainLeverAnimationClientRpc(ulong senderClientID)
         {
@@ -420,6 +440,17 @@ namespace GameCore.Gameplay.Entities.Train
                 return;
             
             PlaySoundLocal(sfxType);
+        }
+        
+        [ClientRpc]
+        private void StopSoundClientRPC(SFXType sfxType, ulong senderClientID)
+        {
+            bool isClientIDMatches = senderClientID == NetworkHorror.ClientID;
+
+            if (isClientIDMatches)
+                return;
+            
+            StopSoundLocal(sfxType);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

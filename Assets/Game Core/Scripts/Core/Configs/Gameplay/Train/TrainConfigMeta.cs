@@ -31,6 +31,15 @@ namespace GameCore.Configs.Gameplay.Train
         
         [SerializeField, Required]
         private SoundEvent _doorCloseSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _departureSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _arrivalSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _movementLoopSE;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -44,6 +53,9 @@ namespace GameCore.Configs.Gameplay.Train
         // SFX
         public SoundEvent DoorOpenSE => _doorOpenSE;
         public SoundEvent DoorCloseSE => _doorCloseSE;
+        public SoundEvent DepartureSE => _departureSE;
+        public SoundEvent ArrivalSE => _arrivalSE;
+        public SoundEvent MovementLoopSE => _movementLoopSE;
 
         // FIELDS: --------------------------------------------------------------------------------
         

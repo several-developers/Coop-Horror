@@ -20,23 +20,39 @@ namespace GameCore.Gameplay.EntitiesSystems.SoundReproducer
 
         public void PlaySound(TrainEntity.SFXType sfxType)
         {
-            SoundEvent soundEvent = null;
-            
-            switch (sfxType)
-            {
-                case TrainEntity.SFXType.DoorOpen:
-                    soundEvent = _trainConfig.DoorOpenSE;
-                    break;
-                
-                case TrainEntity.SFXType.DoorClose:
-                    soundEvent = _trainConfig.DoorCloseSE;
-                    break;
-            }
+            SoundEvent soundEvent = GetSoundEvent(sfxType);
 
             if (soundEvent == null)
                 return;
-
+            
             PlaySound(soundEvent);
+        }
+        
+        public void StopSound(TrainEntity.SFXType sfxType)
+        {
+            SoundEvent soundEvent = GetSoundEvent(sfxType);
+
+            if (soundEvent == null)
+                return;
+            
+            StopSound(soundEvent);
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private SoundEvent GetSoundEvent(TrainEntity.SFXType sfxType)
+        {
+            SoundEvent soundEvent = sfxType switch
+            {
+                TrainEntity.SFXType.DoorOpen => _trainConfig.DoorOpenSE,
+                TrainEntity.SFXType.DoorClose => _trainConfig.DoorCloseSE,
+                TrainEntity.SFXType.Departure => _trainConfig.DepartureSE,
+                TrainEntity.SFXType.Arrival => _trainConfig.ArrivalSE,
+                TrainEntity.SFXType.MovementLoop => _trainConfig.MovementLoopSE,
+                _ => null
+            };
+
+            return soundEvent;
         }
     }
 }
