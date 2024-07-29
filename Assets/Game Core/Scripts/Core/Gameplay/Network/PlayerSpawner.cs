@@ -60,6 +60,8 @@ namespace GameCore.Gameplay.Network
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
 
             Vector3 spawnPosition = GetSpawnPosition();
+            spawnPosition = Vector3.zero; // TEMP ?
+            
             PlayerEntity playerEntityPrefab = _playerConfig.PlayerPrefab;
             NetworkObject playerNetworkObjectPrefab = playerEntityPrefab.GetComponent<NetworkObject>();
 

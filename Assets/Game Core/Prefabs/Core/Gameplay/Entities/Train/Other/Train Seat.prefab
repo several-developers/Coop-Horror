@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfd7de32e53d4cbeb4ed467f38184280, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawnPositionY: 1.32614
+  _spawnPositionY: 1.219484
   _boxCollider: {fileID: 2223174844823835036}
   _teleportPoint: {fileID: 6306362532105636178}
 --- !u!65 &2223174844823835036

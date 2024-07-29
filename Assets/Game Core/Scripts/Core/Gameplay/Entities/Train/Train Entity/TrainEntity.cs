@@ -185,6 +185,8 @@ namespace GameCore.Gameplay.Entities.Train
             _isMainLeverEnabled.OnValueChanged += OnMainLeverStateChanged;
 
             _isDoorOpened.OnValueChanged += OnDoorStateChanged;
+
+            PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
         }
 
         protected override void InitServerOnly()
@@ -211,6 +213,8 @@ namespace GameCore.Gameplay.Entities.Train
             _isMainLeverEnabled.OnValueChanged -= OnMainLeverStateChanged;
 
             _isDoorOpened.OnValueChanged -= OnDoorStateChanged;
+            
+            PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
         }
 
         protected override void DespawnServerOnly()
@@ -500,5 +504,15 @@ namespace GameCore.Gameplay.Entities.Train
 
         private void OnDoorStateChanged(bool previousValue, bool newValue) =>
             _references.Doors.SetActive(!newValue);
+
+        private void OnPlayerSpawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+            
+            TeleportLocalPlayerToRandomSeat();
+        }
     }
 }

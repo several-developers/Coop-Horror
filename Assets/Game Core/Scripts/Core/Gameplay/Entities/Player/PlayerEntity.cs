@@ -247,7 +247,7 @@ namespace GameCore.Gameplay.Entities.Player
             InitPlayerMovement();
             DeactivatePlayerMesh();
             SetupStates();
-            EnterSittingState();
+            EnterAliveState();
 
             InputReader.OnScrollEvent += OnScrollInventory;
             InputReader.OnInteractEvent += OnInteract;
