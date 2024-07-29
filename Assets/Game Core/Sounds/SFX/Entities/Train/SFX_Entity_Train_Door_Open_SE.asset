@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b80e83c0feb1444db6d74f0748b6ec9, type: 3}
-  m_Name: SFX_Entity_Player_Landing_Temp_SE
+  m_Name: SFX_Entity_Train_Door_Open_SE
   m_EditorClassIdentifier: 
   internals:
     data:
@@ -18,7 +18,7 @@ MonoBehaviour:
       expandSoundContainers: 1
       expandTimeline: 1
       expandPreview: 0
-      expandSettings: 1
+      expandSettings: 0
       expandTriggerOnPlay: 0
       expandTriggerOnStop: 0
       expandTriggerOnTail: 0
@@ -44,7 +44,7 @@ MonoBehaviour:
         startPosition: 0
         reverse: 0
         stereoPan: 0
-        polyphony: 2
+        polyphony: 1
         distanceScale: 1
         distortionIncrease: 0
         fadeInLength: 0
@@ -232,4 +232,4 @@ MonoBehaviour:
         soundEvent:
         - {fileID: 0}
     soundContainers:
-    - {fileID: 11400000, guid: 3ec0949aab6daad4fb965f628939cba3, type: 2}
+    - {fileID: 11400000, guid: c1d5fb0d93a5c704aa2e43f2f5df5005, type: 2}

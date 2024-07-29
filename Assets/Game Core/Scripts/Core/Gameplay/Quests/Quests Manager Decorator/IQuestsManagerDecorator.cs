@@ -10,7 +10,8 @@ namespace GameCore.Gameplay.Quests
         void AwaitingQuestsDataReceived();
         void ActiveQuestsDataReceived();
         void UpdateQuestsProgress();
-        
+
+        event Action OnCalculateRewardInnerEvent;
         event Action<int> OnSelectQuestInnerEvent;
         event Action<int> OnSubmitQuestItemInnerEvent;
         event Action OnCompleteQuestsInnerEvent;
@@ -22,6 +23,7 @@ namespace GameCore.Gameplay.Quests
         event Func<bool> OnContainsCompletedQuestsInnerEvent;
         event Func<bool> OnContainsExpiredQuestsInnerEvent;
         event Func<bool> OnContainsExpiredAndUncompletedQuestsInnerEvent;
+        void CalculateReward();
         void SelectQuest(int questID);
         void SubmitQuestItem(int itemID);
         void CompleteQuests();

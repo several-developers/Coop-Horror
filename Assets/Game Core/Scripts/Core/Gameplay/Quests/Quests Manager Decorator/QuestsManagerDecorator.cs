@@ -10,6 +10,7 @@ namespace GameCore.Gameplay.Quests
         public event Action OnActiveQuestsDataReceivedEvent = delegate { };
         public event Action OnUpdateQuestsProgressEvent = delegate { };
         
+        public event Action OnCalculateRewardInnerEvent = delegate { };
         public event Action<int> OnSelectQuestInnerEvent = delegate { };
         public event Action<int> OnSubmitQuestItemInnerEvent = delegate { };
         public event Action OnCompleteQuestsInnerEvent = delegate { };
@@ -32,6 +33,10 @@ namespace GameCore.Gameplay.Quests
 
         public void UpdateQuestsProgress() =>
             OnUpdateQuestsProgressEvent.Invoke();
+
+
+        public void CalculateReward() =>
+            OnCalculateRewardInnerEvent.Invoke();
 
         public void SelectQuest(int questID) =>
             OnSelectQuestInnerEvent.Invoke(questID);

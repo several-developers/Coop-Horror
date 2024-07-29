@@ -18,3 +18,5 @@ MonoBehaviour:
   _speedChangeRate: 0.65
   _leavingMainRoadSpeedMultiplier: 0.7
   _startPositionAtRoadLocation: 0.9
+  _doorOpenSE: {fileID: 11400000, guid: 636bab7bd2954e64da787a0659397eb5, type: 2}
+  _doorCloseSE: {fileID: 11400000, guid: e3638c52a61454647a4485821f8b82a2, type: 2}

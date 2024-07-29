@@ -6,6 +6,7 @@ using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.SoundSystem;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -22,6 +23,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindQuestsManagerDecorator();
             BindGameTimeManagerDecorator();
             BindChatManagerDecorator();
+            BindSoundServiceDecorator();
             BindNetworkMessages();
         }
 
@@ -66,6 +68,13 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<ChatManagerDecorator>()
+                .AsSingle();
+        }
+
+        private void BindSoundServiceDecorator()
+        {
+            Container
+                .BindInterfacesTo<SoundServiceDecorator>()
                 .AsSingle();
         }
 

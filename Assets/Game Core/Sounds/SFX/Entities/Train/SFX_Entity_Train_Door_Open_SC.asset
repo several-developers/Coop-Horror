@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e444e5f947e2a7409a1eaa10f9fa16e, type: 3}
-  m_Name: SFX_Entity_Player_Footstep_Concrete_SC
+  m_Name: SFX_Entity_Train_Door_Open_SC
   m_EditorClassIdentifier: 
   internals:
     data:
@@ -18,7 +18,7 @@ MonoBehaviour:
       previewAudioMixerGroup: {fileID: 0}
       expandPreview: 0
       expandAudioClips: 1
-      expandSettings: 0
+      expandSettings: 1
       previewCurves: 1
       audioMixerGroup: {fileID: 0}
       priority: 0.5
@@ -31,7 +31,7 @@ MonoBehaviour:
       randomStartPosition: 0
       randomStartPositionMin: 0
       randomStartPositionMax: 1
-      startPosition: 0
+      startPosition: 0.1
       reverse: 0
       neverStealVoice: 0
       neverStealVoiceEffects: 0
@@ -43,7 +43,7 @@ MonoBehaviour:
       bypassReverbZones: 0
       bypassVoiceEffects: 0
       bypassListenerEffects: 0
-      volumeExpand: 1
+      volumeExpand: 0
       volumeDecibel: 0
       volumeRatio: 1
       volumeRandomEnable: 0
@@ -164,7 +164,7 @@ MonoBehaviour:
       pitchSemitone: 0
       pitchRatio: 1
       pitchRandomEnable: 1
-      pitchRandomRangeSemitoneBipolar: 0.35
+      pitchRandomRangeSemitoneBipolar: 0.25
       pitchIntensityEnable: 0
       pitchIntensityLowSemitone: -12
       pitchIntensityLowRatio: 0.5
@@ -432,7 +432,7 @@ MonoBehaviour:
       lowpassFrequencyEngine: 1
       lowpassAmountEditor: 6
       lowpassAmountEngine: 1
-      lowpassDistanceEnable: 1
+      lowpassDistanceEnable: 0
       lowpassDistanceFrequencyRolloff: -2
       lowpassDistanceFrequencyCurve:
         serializedVersion: 2
@@ -647,4 +647,4 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     audioClips:
-    - {fileID: 8300000, guid: ca716f6122119f74ca2b76d1fce24ae2, type: 3}
+    - {fileID: 8300000, guid: 4404c2b7c006f21479a303e2b8ba4a7a, type: 3}

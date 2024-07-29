@@ -18,7 +18,7 @@ MonoBehaviour:
       previewAudioMixerGroup: {fileID: 0}
       expandPreview: 0
       expandAudioClips: 1
-      expandSettings: 0
+      expandSettings: 1
       previewCurves: 1
       audioMixerGroup: {fileID: 0}
       priority: 0.5
@@ -31,7 +31,7 @@ MonoBehaviour:
       randomStartPosition: 0
       randomStartPositionMin: 0
       randomStartPositionMax: 1
-      startPosition: 0
+      startPosition: 0.135
       reverse: 0
       neverStealVoice: 0
       neverStealVoiceEffects: 0
@@ -43,9 +43,9 @@ MonoBehaviour:
       bypassReverbZones: 0
       bypassVoiceEffects: 0
       bypassListenerEffects: 0
-      volumeExpand: 1
-      volumeDecibel: 0
-      volumeRatio: 1
+      volumeExpand: 0
+      volumeDecibel: -8
+      volumeRatio: 0.39810717
       volumeRandomEnable: 0
       volumeRandomRangeDecibel: -3
       volumeDistanceRolloff: -2
@@ -370,7 +370,7 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      distortionExpand: 0
+      distortionExpand: 1
       distortionEnabled: 0
       distortionAmount: 0.25
       distortionDistanceEnable: 0

@@ -108,6 +108,8 @@ namespace GameCore.Gameplay.GameManagement
                     break;
 
                 case GameState.QuestsRewarding:
+                    _questsManagerDecorator.CalculateReward();
+                    // Create quests
                     break;
 
                 case GameState.KillPlayersByMetroMonster:

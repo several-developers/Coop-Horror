@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e444e5f947e2a7409a1eaa10f9fa16e, type: 3}
-  m_Name: SFX_Entity_Player_Footstep_Temp_SC
+  m_Name: SFX_Entity_Train_Door_Close_SC
   m_EditorClassIdentifier: 
   internals:
     data:
@@ -18,12 +18,12 @@ MonoBehaviour:
       previewAudioMixerGroup: {fileID: 0}
       expandPreview: 0
       expandAudioClips: 1
-      expandSettings: 0
+      expandSettings: 1
       previewCurves: 1
       audioMixerGroup: {fileID: 0}
       priority: 0.5
       distanceEnabled: 1
-      distanceScale: 50
+      distanceScale: 100
       preventEndClicks: 1
       loopEnabled: 0
       followPosition: 0
@@ -31,7 +31,7 @@ MonoBehaviour:
       randomStartPosition: 0
       randomStartPositionMin: 0
       randomStartPositionMax: 1
-      startPosition: 0
+      startPosition: 0.11
       reverse: 0
       neverStealVoice: 0
       neverStealVoiceEffects: 0
@@ -43,9 +43,9 @@ MonoBehaviour:
       bypassReverbZones: 0
       bypassVoiceEffects: 0
       bypassListenerEffects: 0
-      volumeExpand: 1
-      volumeDecibel: -8.5
-      volumeRatio: 0.3758374
+      volumeExpand: 0
+      volumeDecibel: 0
+      volumeRatio: 1
       volumeRandomEnable: 0
       volumeRandomRangeDecibel: -3
       volumeDistanceRolloff: -2
@@ -103,8 +103,8 @@ MonoBehaviour:
       volumeDistanceCrossfadeEnable: 0
       volumeDistanceCrossfadeTotalLayersOneBased: 2
       volumeDistanceCrossfadeTotalLayers: 1
-      volumeDistanceCrossfadeLayerOneBased: 2
-      volumeDistanceCrossfadeLayer: 1
+      volumeDistanceCrossfadeLayerOneBased: 1
+      volumeDistanceCrossfadeLayer: 0
       volumeDistanceCrossfadeRolloff: -2
       volumeDistanceCrossfadeCurve:
         serializedVersion: 2
@@ -647,8 +647,4 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     audioClips:
-    - {fileID: 8300000, guid: a2dd53fe7fc203341afb305e9e023c8a, type: 3}
-    - {fileID: 8300000, guid: 32fd52981c7679947999ea588bc47a0f, type: 3}
-    - {fileID: 8300000, guid: 221154bdca0d19b4988e8a0a91c63f80, type: 3}
-    - {fileID: 8300000, guid: c89f3df23de89fc4786be1765691a448, type: 3}
-    - {fileID: 8300000, guid: e76d38c8f623feb4cb565130b0258d19, type: 3}
+    - {fileID: 8300000, guid: 589737bcb86eca5419f60ab0491ded44, type: 3}

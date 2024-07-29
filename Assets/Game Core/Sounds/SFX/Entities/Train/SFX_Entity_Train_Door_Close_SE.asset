@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b80e83c0feb1444db6d74f0748b6ec9, type: 3}
-  m_Name: SFX_Entity_Player_Footstep_Concrete_SE
+  m_Name: SFX_Entity_Train_Door_Close_SE
   m_EditorClassIdentifier: 
   internals:
     data:
@@ -18,7 +18,7 @@ MonoBehaviour:
       expandSoundContainers: 1
       expandTimeline: 1
       expandPreview: 0
-      expandSettings: 0
+      expandSettings: 1
       expandTriggerOnPlay: 0
       expandTriggerOnStop: 0
       expandTriggerOnTail: 0
@@ -34,8 +34,8 @@ MonoBehaviour:
       soundEventModifier:
         volumeDecibel: 0
         volumeRatio: 1
-        pitchSemitone: -1.7
-        pitchRatio: 0.90647125
+        pitchSemitone: 0
+        pitchRatio: 1
         delay: 0
         increase2D: 0
         intensity: 1
@@ -44,7 +44,7 @@ MonoBehaviour:
         startPosition: 0
         reverse: 0
         stereoPan: 0
-        polyphony: 4
+        polyphony: 1
         distanceScale: 1
         distortionIncrease: 0
         fadeInLength: 0
@@ -232,4 +232,4 @@ MonoBehaviour:
         soundEvent:
         - {fileID: 0}
     soundContainers:
-    - {fileID: 11400000, guid: 09c165055f99d1e46a8a804a6f151a69, type: 2}
+    - {fileID: 11400000, guid: a0a349a3225ddf742846e96ff4caaa6a, type: 2}

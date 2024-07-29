@@ -8,11 +8,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
     public abstract class FootstepsSystemBase : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title(MainReferences)]
-        [SerializeField, Required]
-        private SoundEvent _soundEvent;
-
+        
         [Title(MainSettings)]
         [SerializeField, Min(0f)]
         private float _baseStepSpeed = 0.5f;
@@ -24,13 +20,38 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
         protected event Func<bool> GetGroundedEvent = () => true;
 
         private const string MainSettings = "Main Settings";
-        private const string MainReferences = "Main References";
         
+        private SoundEvent _soundEvent;
         private float _footstepTimer;
+        private bool _isActive;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Update() => HandleFootsteps();
+        private void Update()
+        {
+            if (!_isActive)
+                return;
+            
+            HandleFootsteps();
+        }
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void ToggleActiveState(bool isActive) =>
+            _isActive = isActive;
+
+        public void SetSoundEvent(SoundEvent soundEvent) =>
+            _soundEvent = soundEvent;
+
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected virtual void PlaySound()
+        {
+            if (_soundEvent == null)
+                return;
+            
+            _soundEvent.Play(transform);
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -85,8 +106,5 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
                     break;
             }
         }
-
-        private void PlaySound() =>
-            _soundEvent.Play(transform);
     }
 }

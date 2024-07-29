@@ -13,62 +13,13 @@ MonoBehaviour:
   m_Name: Player Config
   m_EditorClassIdentifier: 
   _metaName: Player Config
-  _movementConfig3: {fileID: 11400000, guid: a44a16049707311468d7a96025581cd9, type: 2}
-  _movementConfig4: {fileID: 11400000, guid: 0803470535038794f8e602f74525a640, type: 2}
-  _groundMask:
-    serializedVersion: 2
-    m_Bits: 1
-  _movementSpeed: 9
-  _crouchSpeedMultiplier: 0.248
-  _movementThreshold: 0.01
-  _dampSpeedUp: 0.2
-  _dampSpeedDown: 0.1
-  _jumpVelocity: 25
-  _fallMultiplier: 1.7
-  _holdJumpMultiplier: 5
-  _frictionAgainstFloor: 0.189
-  _frictionAgainstWall: 0.082
-  _canLongJump: 1
-  _groundCheckerThreshold: 0.1
-  _slopeCheckerThreshold: 0.51
-  stepCheckerThreshold: 0.6
-  _maxClimbableSlopeAngle: 53.6
-  _maxStepHeight: 0.74
-  _speedMultiplierOnAngle:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _canSlideMultiplierCurve: 0.061
-  _cantSlideMultiplierCurve: 0.039
-  _climbingStairsMultiplierCurve: 0.637
-  _gravityMultiplier: 3
-  _gravityMultiplierOnSlideChange: 3
-  _gravityMultiplierIfUnclimbableSlope: 30
-  _lockOnSlope: 1
-  _sprintSpeed: 20
-  _crouchHeightMultiplier: 0.5
-  _povNormalHeadHeight: {x: 0, y: 0.5, z: -0.1}
-  _povCrouchHeadHeight: {x: 0, y: -0.1, z: -0.1}
   _health: 100
+  _defaultHeight: 1.7
+  _defaultRadius: 0.35
+  _sittingHeight: 1
+  _sittingRadius: 0.25
   _playerPrefab: {fileID: 5746002443945451132, guid: a77369042e11ddd49be3f82d556be8a1,
     type: 3}
+  _footstepsSE: {fileID: 11400000, guid: f938e4af8586c564bb5481b3e2e15769, type: 2}
+  _jumpSE: {fileID: 11400000, guid: a7f57135654e8a14c84713594d442c20, type: 2}
+  _landSE: {fileID: 11400000, guid: 12687ca9a9a3d574389bfa8d6ab5b50c, type: 2}

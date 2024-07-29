@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cinemachine;
 using GameCore.Configs.Gameplay.Train;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.EntitiesSystems.SoundReproducer;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.Train;
@@ -25,6 +26,13 @@ namespace GameCore.Gameplay.Entities.Train
             InfiniteMovement = 0,
             StopAtPathEnd = 1,
             LeaveAtPathEnd = 2
+        }
+
+        public enum SFXType
+        {
+            //_ = 0,
+            DoorOpen = 1,
+            DoorClose = 2
         }
         
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -79,6 +87,7 @@ namespace GameCore.Gameplay.Entities.Train
 
         private TrainConfigMeta _trainConfig;
         private TrainController _trainController;
+        private TrainSoundReproducer _soundReproducer;
         private MoveSpeedController _moveSpeedController;
         private PathMovement _pathMovement;
 
@@ -128,8 +137,17 @@ namespace GameCore.Gameplay.Entities.Train
                 _isDoorOpened.Value = isOpened;
             else
                 ToggleDoorStateServerRpc(isOpened);
+            
+            SFXType sfxType = isOpened ? SFXType.DoorOpen : SFXType.DoorClose;
+            PlaySound(sfxType);
         }
 
+        public void PlaySound(SFXType sfxType)
+        {
+            PlaySoundLocal(sfxType);
+            PlaySoundServerRPC(sfxType);
+        }
+        
         public void SendOpenQuestsSelectionMenu() =>
             OnOpenQuestsSelectionMenuEvent.Invoke();
 
@@ -152,6 +170,8 @@ namespace GameCore.Gameplay.Entities.Train
         protected override void InitAll()
         {
             _trainController.InitAll();
+
+            _soundReproducer = new TrainSoundReproducer(transform, _trainConfig);
 
             _isMainLeverEnabled.OnValueChanged += OnMainLeverStateChanged;
 
@@ -270,6 +290,9 @@ namespace GameCore.Gameplay.Entities.Train
                 mobileHQSeat.ToggleCollider(isEnabled);
         }
 
+        private void PlaySoundLocal(SFXType sfxType) =>
+            _soundReproducer.PlaySound(sfxType);
+
         private static bool IsCurrentPlayer(ulong senderClientID) =>
             NetworkHorror.ClientID == senderClientID;
 
@@ -349,6 +372,14 @@ namespace GameCore.Gameplay.Entities.Train
         [ServerRpc(RequireOwnership = false)]
         private void ToggleDoorStateServerRpc(bool isOpened) =>
             _isDoorOpened.Value = isOpened;
+
+        [ServerRpc(RequireOwnership = false)]
+        private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+
+            PlaySoundClientRPC(sfxType, senderClientID);
+        }
         
         [ClientRpc]
         private void MainLeverAnimationClientRpc(ulong senderClientID)
@@ -378,6 +409,17 @@ namespace GameCore.Gameplay.Entities.Train
 
             SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
             completeQuestsButton.PlayInteractAnimation();
+        }
+
+        [ClientRpc]
+        private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
+        {
+            bool isClientIDMatches = senderClientID == NetworkHorror.ClientID;
+
+            if (isClientIDMatches)
+                return;
+            
+            PlaySoundLocal(sfxType);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

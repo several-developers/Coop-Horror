@@ -1,6 +1,5 @@
 ﻿using GameCore.Configs.Gameplay.Quests;
 using GameCore.Configs.Gameplay.QuestsItems;
-using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -45,6 +44,7 @@ namespace GameCore.Gameplay.Quests
 
         private void Awake()
         {
+            _questsManagerDecorator.OnCalculateRewardInnerEvent += CalculateReward;
             _questsManagerDecorator.OnSelectQuestInnerEvent += OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent += SubmitQuestItem;
             _questsManagerDecorator.OnCompleteQuestsInnerEvent += CompleteQuestsServerRpc;
@@ -57,14 +57,13 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.OnContainsExpiredQuestsInnerEvent += ContainsExpiredQuests;
             _questsManagerDecorator.OnContainsExpiredAndUncompletedQuestsInnerEvent +=
                 ContainsExpiredAndUncompletedQuests;
-
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
         }
 
         public override void OnDestroy()
         {
             base.OnDestroy();
 
+            _questsManagerDecorator.OnCalculateRewardInnerEvent -= CalculateReward;
             _questsManagerDecorator.OnSelectQuestInnerEvent -= OnSelectQuest;
             _questsManagerDecorator.OnSubmitQuestItemInnerEvent -= SubmitQuestItem;
             _questsManagerDecorator.OnCompleteQuestsInnerEvent -= CompleteQuestsServerRpc;
@@ -77,8 +76,6 @@ namespace GameCore.Gameplay.Quests
             _questsManagerDecorator.OnContainsExpiredQuestsInnerEvent -= ContainsExpiredQuests;
             _questsManagerDecorator.OnContainsExpiredAndUncompletedQuestsInnerEvent -=
                 ContainsExpiredAndUncompletedQuests;
-
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
         }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
@@ -113,25 +110,6 @@ namespace GameCore.Gameplay.Quests
             _questsStorage.ClearAll();
             _questsManagerDecorator.ActiveQuestsDataReceived();
             CreateQuests();
-        }
-
-#warning СЛОМАНО, СРОЧНО ЧИНИТЬ
-        private void HandleGameState(GameState gameState)
-        {
-            /*switch (gameState)
-            {
-                case GameState.ArrivedAtTheRoad:
-                    if (!IsServerOnly)
-                        return;
-
-                    DecreaseQuestsDaysServerRpc();
-                    break;
-
-                case GameState.QuestsRewarding:
-                    CalculateReward();
-                    CreateQuests();
-                    break;
-            }*/
         }
 
         private QuestsStorage GetQuestsStorage() => _questsStorage;
@@ -235,7 +213,5 @@ namespace GameCore.Gameplay.Quests
 
             SelectQuestServerRpc(questID);
         }
-
-        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
     }
 }

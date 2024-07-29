@@ -2265,7 +2265,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3c6a1f6d4e444ef9e2eb98566a667cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _soundEvent: {fileID: 11400000, guid: f938e4af8586c564bb5481b3e2e15769, type: 2}
   _baseStepSpeed: 0.55
   _crouchSpeedMultiplier: 1.2
   _sprintingSpeedMultiplier: 0.7

@@ -45,6 +45,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private PlayerEntity _playerEntity;
         private InputReader _inputReader;
         private Character _character;
         private MySprintAbility _sprintAbility;
@@ -180,6 +181,7 @@ namespace GameCore.Gameplay.Entities.Player
             _isEnabled = true;
             _isCameraEnabled = true;
             _canMove = true;
+            _playerEntity = playerEntity;
             _inputReader = playerEntity.InputReader;
 
             EnableCamera();
@@ -194,6 +196,9 @@ namespace GameCore.Gameplay.Entities.Player
             _inputReader.OnCrouchCanceledEvent += OnCrouchCanceled;
             _inputReader.OnSprintEvent += OnSprint;
             _inputReader.OnSprintCanceledEvent += OnSprintCanceled;
+
+            _character.Jumped += OnJumped;
+            _character.Landed += OnLanded;
         }
 
         public void ToggleActiveState(bool isEnabled) =>
@@ -264,6 +269,9 @@ namespace GameCore.Gameplay.Entities.Player
             _unCrouchedCamera.SetActive(true);
         }
 
+        private void PlaySound(PlayerEntity.SFXType sfxType) =>
+            _playerEntity.PlaySound(sfxType);
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnMove(Vector2 movementVector) =>
@@ -316,5 +324,9 @@ namespace GameCore.Gameplay.Entities.Player
 
             _sprintAbility.StopSprinting();
         }
+
+        private void OnJumped() => PlaySound(PlayerEntity.SFXType.Jump);
+
+        private void OnLanded(Vector3 landingVelocity) => PlaySound(PlayerEntity.SFXType.Land);
     }
 }

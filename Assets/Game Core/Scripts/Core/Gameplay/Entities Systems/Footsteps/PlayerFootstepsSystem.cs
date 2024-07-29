@@ -17,10 +17,11 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private PlayerEntity _playerEntity;
+        private InputReader _inputReader;
         private Character _character;
         private MySprintAbility _sprintAbility;
-        private InputReader _inputReader;
-        
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
@@ -32,12 +33,20 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Setup(PlayerReferences references, InputReader inputReader)
+        public void Setup(PlayerEntity playerEntity)
         {
+            _playerEntity = playerEntity;
+            _inputReader = playerEntity.InputReader;
+
+            PlayerReferences references = playerEntity.References;
             _character = references.Character;
-            _inputReader = inputReader;
             _sprintAbility = references.SprintAbility;
         }
+
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected override void PlaySound() =>
+            _playerEntity.PlaySound(PlayerEntity.SFXType.Footsteps);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

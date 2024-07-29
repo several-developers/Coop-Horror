@@ -12,6 +12,7 @@ using GameCore.Gameplay.EntitiesSystems.Footsteps;
 using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.EntitiesSystems.Inventory;
 using GameCore.Gameplay.EntitiesSystems.Ragdoll;
+using GameCore.Gameplay.EntitiesSystems.SoundReproducer;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.InputManagement;
@@ -31,6 +32,14 @@ namespace GameCore.Gameplay.Entities.Player
     [RequireComponent(typeof(PlayerInput))]
     public class PlayerEntity : NetcodeBehaviour, ITeleportableEntity, IDamageable
     {
+        public enum SFXType
+        {
+            //_ = 0,
+            Footsteps = 1,
+            Jump = 2,
+            Land = 3
+        }
+        
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
@@ -106,6 +115,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private PlayerConfigMeta _playerConfig;
         private StateMachine _playerStateMachine;
+        private PlayerSoundReproducer _soundReproducer;
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
@@ -163,6 +173,12 @@ namespace GameCore.Gameplay.Entities.Player
             _isDead.Value = isDead;
         }
 
+        public void PlaySound(SFXType sfxType)
+        {
+            PlaySoundLocal(sfxType);
+            PlaySoundServerRPC(sfxType);
+        }
+
         public void SendLeftMobileHQSeat() =>
             OnLeftMobileHQSeat.Invoke();
 
@@ -212,8 +228,8 @@ namespace GameCore.Gameplay.Entities.Player
         {
             AllPlayers.TryAdd(OwnerClientId, this);
 
+            _soundReproducer = new PlayerSoundReproducer(transform, _playerConfig);
             _inventory = new PlayerInventory();
-
             _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
 
             _sanity.OnValueChanged += OnSanityChanged;
@@ -257,7 +273,8 @@ namespace GameCore.Gameplay.Entities.Player
                 _healthSystem.Setup(health);
 
                 PlayerFootstepsSystem footstepsSystem = _references.FootstepsSystem;
-                footstepsSystem.Setup(_references, InputReader);
+                footstepsSystem.Setup(playerEntity: this);
+                footstepsSystem.ToggleActiveState(isActive: true);
                 
                 _playerStateMachine = new StateMachine();
 
@@ -363,6 +380,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void PlaySoundLocal(SFXType sfxType) =>
+            _soundReproducer.PlaySound(sfxType);
+
         private void CheckDeadStatus(HealthData healthData)
         {
             if (IsDead())
@@ -419,6 +439,14 @@ namespace GameCore.Gameplay.Entities.Player
         private void SetFloorServerRpc(Floor floor) =>
             _currentFloor.Value = floor;
 
+        [ServerRpc(RequireOwnership = false)]
+        private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+            
+            PlaySoundClientRPC(sfxType, senderClientID);
+        }
+
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)
         {
@@ -449,6 +477,18 @@ namespace GameCore.Gameplay.Entities.Player
 
             RagdollController ragdollController = _references.RagdollController;
             ragdollController.ToggleRagdoll(enable);
+        }
+
+        [ClientRpc]
+        private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
+        {
+            bool isClientIDMatches = NetworkHorror.ClientID == senderClientID;
+
+            // Don't reproduce sound twice on sender.
+            if (isClientIDMatches)
+                return;
+            
+            PlaySoundLocal(sfxType);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

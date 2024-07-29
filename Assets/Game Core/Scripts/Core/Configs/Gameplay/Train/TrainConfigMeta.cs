@@ -1,5 +1,6 @@
 ﻿using CustomEditors;
 using Sirenix.OdinInspector;
+using Sonity;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Train
@@ -24,6 +25,13 @@ namespace GameCore.Configs.Gameplay.Train
         [SerializeField, Range(0f, 1f), SuffixLabel("%", overlay: true)]
         private float _startPositionAtRoadLocation;
 
+        [Title(SFXTitle)]
+        [SerializeField, Required]
+        private SoundEvent _doorOpenSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _doorCloseSE;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float MovementSpeed => _roadLocationMoveSpeed;
@@ -32,7 +40,15 @@ namespace GameCore.Configs.Gameplay.Train
         public float SpeedChangeRate => _speedChangeRate;
         public float LeavingMainRoadSpeedMultiplier => _leavingMainRoadSpeedMultiplier;
         public float StartPositionAtRoadLocation => _startPositionAtRoadLocation;
+
+        // SFX
+        public SoundEvent DoorOpenSE => _doorOpenSE;
+        public SoundEvent DoorCloseSE => _doorCloseSE;
+
+        // FIELDS: --------------------------------------------------------------------------------
         
+        private const string SFXTitle = "SFX";
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override string GetMetaCategory() =>
