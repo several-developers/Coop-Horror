@@ -50,6 +50,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         public event Action<MyDateTime> OnTimeUpdatedEvent = delegate { };
         public event Action OnHourPassedEvent = delegate { };
+        public event Action OnMinutePassedEvent = delegate { };
 
         private readonly TimeConfigMeta _timeConfig;
 
@@ -84,6 +85,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
                 UpdateDayTime();
                 SendHourPassedEvent();
+                SendMinutePassedEvent();
                 return;
             }
 
@@ -103,18 +105,25 @@ namespace GameCore.Gameplay.GameTimeManagement
             currentTime = currentTime.AddMinutes(minute);
             currentTime = currentTime.AddSeconds(second);
 
+            bool soundHourPassedEvent = false;
+            bool soundMinutePassedEvent = false;
+
             if (_date.Hour != currentTime.Hour)
-            {
-                // Hour passed
-            }
+                soundHourPassedEvent = true;
 
             if (_date.Minute != currentTime.Minute)
-                SendHourPassedEvent();
+                soundMinutePassedEvent = true;
 
             _date = currentTime;
             _second = _date.Second;
             _minute = _date.Minute;
             _hour = _date.Hour;
+            
+            if (soundHourPassedEvent)
+                SendHourPassedEvent();
+
+            if (soundMinutePassedEvent)
+                SendMinutePassedEvent();
         }
 
         public void SyncDateTime(MyDateTime dateTime)
@@ -170,6 +179,14 @@ namespace GameCore.Gameplay.GameTimeManagement
             return timeOfDay;
         }
 
+        public int GetCurrentTimeInMinutes()
+        {
+            int hour = _date.Hour;
+            int minute = _date.Minute;
+            int totalMinutes = hour * 60 + minute;
+            return totalMinutes;
+        }
+
         public bool GetSimulateState() => _simulate;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -222,5 +239,8 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void SendHourPassedEvent() =>
             OnHourPassedEvent.Invoke();
+        
+        private void SendMinutePassedEvent() =>
+            OnMinutePassedEvent.Invoke();
     }
 }

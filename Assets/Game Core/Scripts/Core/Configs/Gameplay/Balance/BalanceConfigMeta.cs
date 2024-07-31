@@ -12,9 +12,13 @@ namespace GameCore.Configs.Gameplay.Balance
         [SerializeField, Min(0), SuffixLabel("seconds", overlay: true)]
         private float _gameRestartDelay = 5f;
 
+        [SerializeField, Space(5)]
+        private MonstersDangerLevelConfig _monstersDangerLevelConfig;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float GameRestartDelay => _gameRestartDelay;
+        public MonstersDangerLevelConfig MonstersDangerLevelConfig => _monstersDangerLevelConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

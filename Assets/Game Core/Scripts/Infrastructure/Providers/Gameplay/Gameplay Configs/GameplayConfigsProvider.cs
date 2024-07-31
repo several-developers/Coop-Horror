@@ -1,9 +1,9 @@
 ﻿using GameCore.Configs.Gameplay.Balance;
-using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Configs.Gameplay.LocationsList;
+using GameCore.Configs.Gameplay.MonstersGenerator;
 using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
@@ -30,7 +30,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _locationsListConfig = Load<LocationsListConfigMeta>(path: ConfigsPaths.LocationsListConfig);
             _timeConfig = Load<TimeConfigMeta>(path: ConfigsPaths.TimeConfig);
             _trainConfig = Load<TrainConfigMeta>(path: ConfigsPaths.TrainConfig);
-            _dungeonGeneratorConfig = Load<DungeonGeneratorConfigMeta>(path: ConfigsPaths.DungeonGeneratorConfig);
             _elevatorConfig = Load<ElevatorConfigMeta>(path: ConfigsPaths.ElevatorConfig);
             _prefabsListConfig = Load<PrefabsListConfigMeta>(path: ConfigsPaths.PrefabsListConfig);
             _questsConfig = Load<QuestsConfigMeta>(path: ConfigsPaths.QuestsConfig);
@@ -39,6 +38,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _visualConfig = Load<VisualConfigMeta>(path: ConfigsPaths.VisualConfig);
             _itemsSpawnConfig = Load<ItemsSpawnConfigMeta>(path: ConfigsPaths.ItemsSpawnConfig);
             _monstersListConfig = Load<MonstersListConfigMeta>(path: ConfigsPaths.MonstersListConfig);
+            _monstersGeneratorConfig = Load<MonstersGeneratorConfigMeta>(path: ConfigsPaths.MonstersGeneratorConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -49,7 +49,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly LocationsListConfigMeta _locationsListConfig;
         private readonly TimeConfigMeta _timeConfig;
         private readonly TrainConfigMeta _trainConfig;
-        private readonly DungeonGeneratorConfigMeta _dungeonGeneratorConfig;
         private readonly ElevatorConfigMeta _elevatorConfig;
         private readonly PrefabsListConfigMeta _prefabsListConfig;
         private readonly QuestsConfigMeta _questsConfig;
@@ -58,6 +57,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly VisualConfigMeta _visualConfig;
         private readonly ItemsSpawnConfigMeta _itemsSpawnConfig;
         private readonly MonstersListConfigMeta _monstersListConfig;
+        private readonly MonstersGeneratorConfigMeta _monstersGeneratorConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -67,8 +67,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public LocationsListConfigMeta GetLocationsListConfig() => _locationsListConfig;
         public TimeConfigMeta GetTimeConfig() => _timeConfig;
         public TrainConfigMeta GetTrainConfig() => _trainConfig;
-
-        public DungeonGeneratorConfigMeta GetDungeonGeneratorConfig() => _dungeonGeneratorConfig;
         public ElevatorConfigMeta GetElevatorConfig() => _elevatorConfig;
         public PrefabsListConfigMeta GetPrefabsListConfig() => _prefabsListConfig;
         public QuestsConfigMeta GetQuestsConfig() => _questsConfig;
@@ -77,5 +75,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public VisualConfigMeta GetVisualConfig() => _visualConfig;
         public ItemsSpawnConfigMeta GetItemsSpawnConfig() => _itemsSpawnConfig;
         public MonstersListConfigMeta GetMonstersListConfig() => _monstersListConfig;
+        public MonstersGeneratorConfigMeta GetMonstersGeneratorConfig() => _monstersGeneratorConfig;
     }
 }

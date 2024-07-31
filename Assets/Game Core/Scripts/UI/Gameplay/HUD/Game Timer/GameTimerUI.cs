@@ -37,7 +37,7 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         {
             base.Awake();
             
-            _timeCycle.OnHourPassedEvent += OnHourPassed;
+            _timeCycle.OnMinutePassedEvent += OnMinutePassed;
 
             _uiObserver.OnTriggerUIEvent += OnTriggerUIEvent;
         }
@@ -48,7 +48,7 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         {
             base.OnDestroy();
             
-            _timeCycle.OnHourPassedEvent -= OnHourPassed;
+            _timeCycle.OnMinutePassedEvent -= OnMinutePassed;
             
             _uiObserver.OnTriggerUIEvent -= OnTriggerUIEvent;
         }
@@ -69,7 +69,7 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
         
-        private void OnHourPassed() => UpdateTime();
+        private void OnMinutePassed() => UpdateTime();
 
         private void OnTriggerUIEvent(UIEventType eventType)
         {

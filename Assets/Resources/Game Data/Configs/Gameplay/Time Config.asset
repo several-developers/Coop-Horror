@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Time Config
   m_EditorClassIdentifier: 
   _metaName: Time Config
-  _cycleDurationInMinutes: 40
+  _cycleDurationInMinutes: 5
   _cycleLengthModifier: 1
   _second: 0
   _minute: 0

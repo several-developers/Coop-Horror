@@ -5,6 +5,7 @@ using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.GameTimeManagement;
+using GameCore.Gameplay.MonstersGeneration;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
@@ -25,6 +26,7 @@ namespace GameCore.Gameplay.GameManagement
             IGameObserver gameObserver,
             ICamerasManager camerasManager,
             IGameResetManager gameResetManager,
+            IMonstersGenerator monstersGenerator,
             ITrainEntity trainEntity,
             IPublisher<UIEventMessage> uiEventMessagePublisher)
         {
@@ -34,6 +36,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameObserver = gameObserver;
             _camerasManager = camerasManager;
             _gameResetManager = gameResetManager;
+            _monstersGenerator = monstersGenerator;
             _trainEntity = trainEntity;
             _uiEventMessagePublisher = uiEventMessagePublisher;
             
@@ -61,6 +64,7 @@ namespace GameCore.Gameplay.GameManagement
         private readonly IGameObserver _gameObserver;
         private readonly ICamerasManager _camerasManager;
         private readonly IGameResetManager _gameResetManager;
+        private readonly IMonstersGenerator _monstersGenerator;
         private readonly ITrainEntity _trainEntity;
         private readonly IPublisher<UIEventMessage> _uiEventMessagePublisher;
 
@@ -93,7 +97,10 @@ namespace GameCore.Gameplay.GameManagement
                     PublishUIEvent(UIEventType.HideGameplayHUD);
 
                     if (IsServer)
+                    {
                         _gameManagerDecorator.StartGameRestartTimer();
+                        _monstersGenerator.Stop();
+                    }
                     break;
 
                 case GameState.RestartGame:
@@ -125,13 +132,13 @@ namespace GameCore.Gameplay.GameManagement
             
             _gameTimeManagerDecorator.SetMidnight();
             _trainEntity.TeleportToTheRoad();
-            _trainEntity.PlaySound(TrainEntity.SFXType.MovementLoop);
             
             ToggleTrainMainLever(isEnabled: true);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.InfiniteMovement);
             SetPlayersEntityLocation(EntityLocation.Base);
             PublishUIEvent(UIEventType.HideGameTimer);
             PublishUIEvent(UIEventType.UpdateGameMap);
+            _monstersGenerator.Stop();
 
             if (!arrivedFromMarket)
                 _questsManagerDecorator.DecreaseQuestsDays();
@@ -158,6 +165,7 @@ namespace GameCore.Gameplay.GameManagement
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.StopAtPathEnd);
             SetPlayersEntityLocation(EntityLocation.Sector);
             _trainEntity.PlaySound(TrainEntity.SFXType.Arrival);
+            _monstersGenerator.Start();
         }
 
         private void TrainStoppedAtSector()

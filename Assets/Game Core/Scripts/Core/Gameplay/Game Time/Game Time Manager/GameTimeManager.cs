@@ -46,7 +46,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void InitOwner() =>
-            _timeCycle.OnHourPassedEvent += OnHourPassed;
+            _timeCycle.OnMinutePassedEvent += OnMinutePassed;
 
         protected override void InitNotOwner() =>
             _gameTimer.OnValueChanged += OnGameTimerUpdated;
@@ -55,7 +55,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             _timeCycle.Tick(); // Check for optimization
 
         protected override void DespawnOwner() =>
-            _timeCycle.OnHourPassedEvent -= OnHourPassed;
+            _timeCycle.OnMinutePassedEvent -= OnMinutePassed;
 
         protected override void DespawnNotOwner() =>
             _gameTimer.OnValueChanged -= OnGameTimerUpdated;
@@ -89,7 +89,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
         
-        private void OnHourPassed() => UpdateGameTimer();
+        private void OnMinutePassed() => UpdateGameTimer();
 
         private void OnGameTimerUpdated(MyDateTime previousDate, MyDateTime newDate) =>
             _timeCycle.SyncDateTime(newDate);

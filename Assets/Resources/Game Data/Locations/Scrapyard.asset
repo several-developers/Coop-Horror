@@ -13,6 +13,10 @@ MonoBehaviour:
   m_Name: Scrapyard
   m_EditorClassIdentifier: 
   _metaName: Scrapyard
-  _locationNameText: Scrapyard
+  _locationNameText: Scrapyard Location
   _locationName: 10
   _sceneName: 12
+  _maxIndoorDangerValue: 20
+  _maxOutdoorDangerValue: 20
+  _monstersSpawnMultipliersConfig:
+    _configs: []

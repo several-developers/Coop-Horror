@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -59,6 +60,10 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string HuntingChaseGroup = HuntingChaseSettingsTitle + "/Group";
         private const string SleepingGroup = SleepingSettingsTitle + "/Group";
 
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public override MonsterType GetMonsterType() => MonsterType.GoodClown;
+
         // INNER CLASSES: -------------------------------------------------------------------------
 
         #region Inner Classes
@@ -84,7 +89,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             public float FireExitInteractionDuration => _fireExitInteractionDuration;
             public float TransformationDelay => _transformationDelay;
         }
-        
+
         [Serializable]
         public class HunterSystemSettings
         {
@@ -97,7 +102,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             [SerializeField, Min(0f)]
             [Tooltip("Длительность охоты, после окончания которой клоун становится злым.")]
             private float _huntingDuration = 15f;
-            
+
             [SerializeField, Min(0f)]
             [Tooltip("Интервал проверки доступности охоты.")]
             private float _huntingCheckInterval = 0.5f;
@@ -132,7 +137,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         public class FollowTargetSettings
         {
             // MEMBERS: -------------------------------------------------------------------------------
-            
+
             [SerializeField, Min(0f)]
             private float _positionCheckInterval = 0.1f;
 
@@ -155,7 +160,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             private float _followEndDelay = 5f;
 
             // PROPERTIES: ----------------------------------------------------------------------------
-            
+
             public float PositionCheckInterval => _positionCheckInterval;
             public float MoveSpeed => _moveSpeed;
             public float DistanceCheckInterval => _distanceCheckInterval;
@@ -169,7 +174,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         public class WanderingSettings
         {
             // MEMBERS: -------------------------------------------------------------------------------
-            
+
             [SerializeField, Min(0f)]
             [Tooltip("Минимальная скорость блуждания.")]
             private float _minSpeed = 1f;
@@ -201,7 +206,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             private float _wanderingDistanceBreakCheckInterval = 0.25f;
 
             // PROPERTIES: ----------------------------------------------------------------------------
-            
+
             public float MinSpeed => _minSpeed;
             public float MaxSpeed => _maxSpeed;
             public float MinDistance => _minDistance;
@@ -232,12 +237,12 @@ namespace GameCore.Configs.Gameplay.Enemies
             public float DistanceCheckInterval => _distanceCheckInterval;
             public float RotationSpeed => _rotationSpeed;
         }
-        
+
         [Serializable]
         public class HuntingChaseSettings
         {
             // MEMBERS: -------------------------------------------------------------------------------
-            
+
             [SerializeField, Min(0f)]
             private float _positionCheckInterval = 0.1f;
 
@@ -260,7 +265,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             private float _chaseEndDelay = 5f;
 
             // PROPERTIES: ----------------------------------------------------------------------------
-            
+
             public float PositionCheckInterval => _positionCheckInterval;
             public float MoveSpeed => _moveSpeed;
             public float DistanceCheckInterval => _distanceCheckInterval;

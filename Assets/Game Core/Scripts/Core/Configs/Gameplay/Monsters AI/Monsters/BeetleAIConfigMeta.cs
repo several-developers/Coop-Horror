@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using GameCore.Enums.Gameplay;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Enemies
@@ -144,5 +145,9 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string ScreamStateGroup = ScreamStateSettings + "/Group";
         private const string ChaseStateGroup = ChaseStateSettings + "/Group";
         private const string AttackStateGroup = AttackStateSettings + "/Group";
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
+        public override MonsterType GetMonsterType() => MonsterType.Beetle;
     }
 }

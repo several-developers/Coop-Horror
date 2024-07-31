@@ -18,6 +18,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
         protected event Func<Vector2> GetInputEvent = () => Vector2.zero;
         protected event Func<float> GetStepSpeedMultiplierEvent = () => 1f;
         protected event Func<bool> GetGroundedEvent = () => true;
+        protected event Func<bool> GetCustomCheckEvent = () => true;
 
         private const string MainSettings = "Main Settings";
         
@@ -66,6 +67,11 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
             bool isInputZero = input.magnitude < 0.05f;
 
             if (isInputZero)
+                return;
+
+            bool isCustomCheckValid = GetCustomCheckEvent.Invoke();
+
+            if (!isCustomCheckValid)
                 return;
 
             _footstepTimer -= Time.deltaTime;

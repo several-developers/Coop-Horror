@@ -7,6 +7,8 @@ using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Items.SpawnSystem;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Locations;
+using GameCore.Gameplay.MonstersGeneration;
+using GameCore.Gameplay.RoundManagement;
 using GameCore.Gameplay.UIManagement;
 using GameCore.Gameplay.VisualManagement;
 using Sirenix.OdinInspector;
@@ -51,6 +53,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindGameResetManager();
             BindItemsSpawnSystem();
             BindGameEventsHandler();
+            BindRoundManager();
+            BindMonstersGenerator();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -167,6 +171,22 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<GameController>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindRoundManager()
+        {
+            Container
+                .BindInterfacesTo<RoundManager>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindMonstersGenerator()
+        {
+            Container
+                .BindInterfacesTo<MonstersGenerator>()
                 .AsSingle()
                 .NonLazy();
         }

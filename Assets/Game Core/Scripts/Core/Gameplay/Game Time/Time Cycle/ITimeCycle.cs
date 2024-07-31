@@ -6,6 +6,7 @@ namespace GameCore.Gameplay.GameTimeManagement
     {
         event Action<MyDateTime> OnTimeUpdatedEvent;
         event Action OnHourPassedEvent;
+        event Action OnMinutePassedEvent;
         void Tick();
         void SetDateTime(int second, int dateTimeMinute, int dateTimeHour, int day);
         void SyncDateTime(MyDateTime dateTime);
@@ -15,6 +16,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         void IncreaseDay();
         MyDateTime GetDateTime();
         float GetTimeOfDay();
+        int GetCurrentTimeInMinutes();
         bool GetSimulateState();
     }
 }

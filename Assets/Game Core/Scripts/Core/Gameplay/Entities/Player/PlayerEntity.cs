@@ -192,6 +192,26 @@ namespace GameCore.Gameplay.Entities.Player
 
         public static PlayerEntity GetLocalPlayer() => _localPlayer;
 
+        public static int GetPlayersAmount() =>
+            AllPlayers.Count;
+
+        public static int GetAlivePlayersAmount()
+        {
+            int alivePlayersAmount = 0;
+
+            foreach (PlayerEntity playerEntity in AllPlayers.Values)
+            {
+                bool isDead = playerEntity.IsDead();
+
+                if (isDead)
+                    continue;
+
+                alivePlayersAmount += 1;
+            }
+
+            return alivePlayersAmount;
+        }
+
         public MonoBehaviour GetMonoBehaviour() => this;
         
         public Transform GetTransform() => transform;

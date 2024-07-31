@@ -28,6 +28,9 @@ namespace GameCore.Gameplay.Entities.Monsters
         
         // FIELDS: --------------------------------------------------------------------------------
 
+        public static event Action<MonsterEntityBase> OnMonsterSpawnedEvent = delegate { };
+        public static event Action<MonsterEntityBase> OnMonsterDespawnedEvent = delegate { };
+        
         public event Action OnEntityTeleportedEvent = delegate { };
 
         private static readonly List<MonsterEntityBase> AllMonsters = new();
@@ -64,6 +67,8 @@ namespace GameCore.Gameplay.Entities.Monsters
         public Transform GetTransform() => transform;
 
         public NavMeshAgent GetAgent() => _agent;
+
+        public abstract MonsterType GetMonsterType();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -113,12 +118,14 @@ namespace GameCore.Gameplay.Entities.Monsters
         {
             base.OnNetworkSpawn();
             AllMonsters.Add(item: this);
+            OnMonsterSpawnedEvent.Invoke(this);
         }
 
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
             AllMonsters.Remove(item: this);
+            OnMonsterDespawnedEvent.Invoke(this);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -100,6 +101,10 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string AttackStateGroup = AttackStateSettings + "/Group";
         private const string AnimationGroup = AnimationSettingsTitle + "/Group";
 
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
+        public override MonsterType GetMonsterType() => MonsterType.EvilClown;
+        
         // INNER CLASSES: -------------------------------------------------------------------------
 
         #region Inner Classes

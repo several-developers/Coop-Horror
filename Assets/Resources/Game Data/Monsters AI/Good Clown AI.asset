@@ -13,8 +13,14 @@ MonoBehaviour:
   m_Name: Good Clown AI
   m_EditorClassIdentifier: 
   _metaName: Good Clown AI
+  _dangerLevel: 4
+  _spawnType: 0
   _isDamageable: 1
   _health: 100
+  _commonConfig:
+    _fireExitInteractionDistance: 0.5
+    _fireExitInteractionDuration: 0.5
+    _transformationDelay: 5
   _hunterSystemConfig:
     _disableHunting: 0
     _huntingDuration: 10
@@ -22,8 +28,6 @@ MonoBehaviour:
     _transformationCheckInterval: 0.1
     _targetDistanceForHunt: 20
     _distanceToOtherPlayersForHunt: 40
-  _transformationConfig:
-    _transformationDelay: 6.5
   _followTargetConfig:
     _positionCheckInterval: 0.15
     _moveSpeed: 3
@@ -32,8 +36,6 @@ MonoBehaviour:
     _reachDistance: 4
     _maxFollowDistance: 30
     _followEndDelay: 5
-    _fireExitInteractionDistance: 0.5
-    _fireExitInteractionDuration: 0.5
   _wanderingConfig:
     _minSpeed: 1
     _maxSpeed: 2

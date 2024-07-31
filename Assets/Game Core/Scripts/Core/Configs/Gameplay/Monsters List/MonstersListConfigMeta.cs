@@ -16,6 +16,7 @@ namespace GameCore.Configs.Gameplay.MonstersList
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+#warning ВЫНЕСТИ В ПРОВАЙДЕР С ПРОВЕРКАМИ НА ДУБЛИКАТЫ!
         public IReadOnlyList<MonsterReference> GetAllReferences() => _references;
 
         public override string GetMetaCategory() =>

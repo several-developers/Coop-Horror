@@ -14,3 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Balance Config
   _gameRestartDelay: 4
+  _monstersDangerLevelConfig:
+    _dangerLevelConfigs:
+    - _dangerLevel: 0
+      _dangerValue: 0
+    - _dangerLevel: 1
+      _dangerValue: 1
+    - _dangerLevel: 2
+      _dangerValue: 2
+    - _dangerLevel: 3
+      _dangerValue: 3
+    - _dangerLevel: 4
+      _dangerValue: 5

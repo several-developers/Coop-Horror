@@ -181,6 +181,8 @@ namespace GameCore.Gameplay.Entities.Train
             _trainController.InitAll();
 
             _soundReproducer = new TrainSoundReproducer(transform, _trainConfig);
+            PlaySoundLocal(SFXType.MovementLoop);
+            
 
             _isMainLeverEnabled.OnValueChanged += OnMainLeverStateChanged;
 

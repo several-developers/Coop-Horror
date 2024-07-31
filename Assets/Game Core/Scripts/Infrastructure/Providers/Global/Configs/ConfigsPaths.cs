@@ -13,7 +13,6 @@
         public const string LocationsListConfig = GameplayConfigs + "Locations List Config";
         public const string TimeConfig = GameplayConfigs + "Time Config";
         public const string TrainConfig = GameplayConfigs + "Train Config";
-        public const string DungeonGeneratorConfig = GameplayConfigs + "Dungeon Generator Config";
         public const string ElevatorConfig = GameplayConfigs + "Elevator Config";
         public const string PrefabsListConfig = GameplayConfigs + "Prefabs List Config";
         public const string QuestsConfig = GameplayConfigs + "Quests Config";
@@ -23,6 +22,7 @@
         public const string VisualConfig = GameplayConfigs + "Visual Config";
         public const string ItemsSpawnConfig = GameplayConfigs + "Items Spawn Config";
         public const string MonstersListConfig = GameplayConfigs + "Monsters List Config";
+        public const string MonstersGeneratorConfig = GameplayConfigs + "Monsters Generator Config";
 
         public const string GoodClownAIConfig = MonstersAIConfigs + "Good Clown AI";
         public const string EvilClownAIConfig = MonstersAIConfigs + "Evil Clown AI";

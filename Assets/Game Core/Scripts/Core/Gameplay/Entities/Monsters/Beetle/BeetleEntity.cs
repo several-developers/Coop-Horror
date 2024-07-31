@@ -111,6 +111,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         public PlayerEntity GetTargetPlayer() => _targetPlayer;
 
+        public override MonsterType GetMonsterType() =>
+            MonsterType.Beetle;
+
         public bool TryGetCurrentState(out IState state) =>
             _beetleStateMachine.TryGetCurrentState(out state);
         

@@ -29,6 +29,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
             GetInputEvent += GetInput;
             GetStepSpeedMultiplierEvent += GetStepSpeedMultiplier;
             GetGroundedEvent += IsGrounded;
+            GetCustomCheckEvent += IsVelocityValid;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -66,5 +67,12 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
 
         private bool IsGrounded() =>
             _character.IsGrounded();
+
+        private bool IsVelocityValid()
+        {
+            Vector3 velocity = _character.velocity;
+            bool isVelocityValid = velocity.magnitude < 0.15f;
+            return isVelocityValid;
+        }
     }
 }

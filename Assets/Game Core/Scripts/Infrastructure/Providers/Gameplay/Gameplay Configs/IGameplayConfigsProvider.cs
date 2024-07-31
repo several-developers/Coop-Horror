@@ -1,9 +1,9 @@
 ﻿using GameCore.Configs.Gameplay.Balance;
-using GameCore.Configs.Gameplay.DungeonGenerator;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Configs.Gameplay.LocationsList;
+using GameCore.Configs.Gameplay.MonstersGenerator;
 using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
@@ -24,7 +24,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         LocationsListConfigMeta GetLocationsListConfig();
         TimeConfigMeta GetTimeConfig();
         TrainConfigMeta GetTrainConfig();
-        DungeonGeneratorConfigMeta GetDungeonGeneratorConfig();
         ElevatorConfigMeta GetElevatorConfig();
         PrefabsListConfigMeta GetPrefabsListConfig();
         QuestsConfigMeta GetQuestsConfig();
@@ -33,5 +32,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         VisualConfigMeta GetVisualConfig();
         ItemsSpawnConfigMeta GetItemsSpawnConfig();
         MonstersListConfigMeta GetMonstersListConfig();
+        MonstersGeneratorConfigMeta GetMonstersGeneratorConfig();
     }
 }

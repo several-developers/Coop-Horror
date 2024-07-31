@@ -2,14 +2,19 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Configs.Gameplay.DungeonGenerator
+namespace GameCore.Configs.Gameplay.MonstersGenerator
 {
-    public class DungeonGeneratorConfigMeta : EditorMeta
+    public class MonstersGeneratorConfigMeta : EditorMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
-        
 
+        [Title(Constants.Settings)]
+        [SerializeField]
+        private MonstersSpawnAmountConfig _monstersSpawnAmountConfig;
+        
         // PROPERTIES: ----------------------------------------------------------------------------
+
+        public MonstersSpawnAmountConfig MonstersSpawnAmountConfig => _monstersSpawnAmountConfig;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

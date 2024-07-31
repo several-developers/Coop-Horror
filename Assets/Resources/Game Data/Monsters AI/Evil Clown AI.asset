@@ -13,8 +13,14 @@ MonoBehaviour:
   m_Name: Evil Clown AI
   m_EditorClassIdentifier: 
   _metaName: Evil Clown AI
+  _dangerLevel: 4
   _isDamageable: 0
   _health: 100
+  _spawnType: 3
+  _maxCount: 1
+  _spawnChance: 50
+  _spawnTime: {x: 0, y: 1440}
+  _spawnTimeText: 00:00 - 24:00
   _fireExitInteractionDistance: 0.5
   _fireExitInteractionDuration: 0.5
   _chaseDelay: 3

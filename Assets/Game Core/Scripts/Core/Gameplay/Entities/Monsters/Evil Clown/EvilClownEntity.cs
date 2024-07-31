@@ -95,6 +95,9 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         
         public WanderingTimer GetWanderingTimer() => _wanderingTimer;
 
+        public override MonsterType GetMonsterType() =>
+            MonsterType.EvilClown;
+
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void InitServerOnly()

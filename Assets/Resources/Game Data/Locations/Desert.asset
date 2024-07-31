@@ -16,3 +16,5 @@ MonoBehaviour:
   _locationNameText: Desert
   _locationName: 12
   _sceneName: 10
+  _maxIndoorDangerValue: 20
+  _maxOutdoorDangerValue: 20

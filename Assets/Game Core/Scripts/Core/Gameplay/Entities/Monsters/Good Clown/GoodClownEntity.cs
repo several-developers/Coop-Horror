@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.GoodClown.States;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Factories.Monsters;
@@ -112,6 +113,9 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         public HunterSystem GetHunterSystem() => _hunterSystem;
 
         public GoodClownUtilities GetClownUtilities() => _clownUtilities;
+
+        public override MonsterType GetMonsterType() =>
+            MonsterType.GoodClown;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 

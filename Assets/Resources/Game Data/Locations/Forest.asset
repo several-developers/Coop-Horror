@@ -16,3 +16,5 @@ MonoBehaviour:
   _locationNameText: Forest
   _locationName: 11
   _sceneName: 11
+  _maxIndoorDangerValue: 20
+  _maxOutdoorDangerValue: 20
