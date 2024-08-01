@@ -46,7 +46,7 @@ namespace GameCore.Gameplay.Interactable.Train
         public override bool CanInteract()
         {
             int activeQuestsAmount = _questsManagerDecorator.GetActiveQuestsAmount();
-            bool ignoreQuestsCheck = _questsConfig.IgnoreMobileHQQuestsCheck;
+            bool ignoreQuestsCheck = _questsConfig.IgnoreTrainQuestsCheck;
 
             if (activeQuestsAmount <= 0 && !ignoreQuestsCheck)
                 return false;

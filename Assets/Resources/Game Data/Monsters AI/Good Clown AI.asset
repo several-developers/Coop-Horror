@@ -14,9 +14,69 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _metaName: Good Clown AI
   _dangerLevel: 4
-  _spawnType: 0
   _isDamageable: 1
   _health: 100
+  _spawnType: 0
+  _maxCount: 1
+  _spawnChance: 50
+  _spawnChanceMultiplierByGameTime:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _spawnChanceMultiplierByMonstersCount:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _spawnTime: {x: 0, y: 1440}
+  _spawnTimeText: 00:00 - 24:00
+  _floorsChancesMultipliersConfig:
+    _configs:
+    - _floor: 1
+      _multiplier: 0.3
+    - _floor: 1
+      _multiplier: 0.5
+    - _floor: 1
+      _multiplier: 1.5
   _commonConfig:
     _fireExitInteractionDistance: 0.5
     _fireExitInteractionDuration: 0.5

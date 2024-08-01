@@ -13,30 +13,6 @@ namespace GameCore.Gameplay.Items.Spawners
 {
     public class DungeonItemsSpawner : RandomProp
     {
-        [Serializable]
-        public class SpawnPoint
-        {
-            // MEMBERS: -------------------------------------------------------------------------------
-
-            [SerializeField]
-            private Vector3 _position;
-
-            [SerializeField, Min(0f)]
-            private float _radius = 1f;
-
-            // PROPERTIES: ----------------------------------------------------------------------------
-
-            public Vector3 Position => _position;
-            public float Radius => _radius;
-
-            private string Label => $"'Position: {_position}',   'Radius: {_radius}'";
-
-            // PUBLIC METHODS: ------------------------------------------------------------------------
-            
-            public void SetPosition(Vector3 position) =>
-                _position = position;
-        }
-        
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
@@ -177,6 +153,32 @@ namespace GameCore.Gameplay.Items.Spawners
             Debug.LogWarning(log);
             
             return position;
+        }
+
+        // INNER CLASSES: -------------------------------------------------------------------------
+        
+        [Serializable]
+        public class SpawnPoint
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField]
+            private Vector3 _position;
+
+            [SerializeField, Min(0f)]
+            private float _radius = 1f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public Vector3 Position => _position;
+            public float Radius => _radius;
+
+            private string Label => $"'Position: {_position}',   'Radius: {_radius}'";
+
+            // PUBLIC METHODS: ------------------------------------------------------------------------
+            
+            public void SetPosition(Vector3 position) =>
+                _position = position;
         }
     }
 }

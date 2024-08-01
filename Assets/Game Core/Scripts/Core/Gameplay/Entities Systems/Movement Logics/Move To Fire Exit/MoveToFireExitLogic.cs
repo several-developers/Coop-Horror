@@ -62,7 +62,7 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
         {
             bool isFireExitFound = TryGetFireExit(out _fireExit);
 
-            if (!isFireExitFound)
+            if (!isFireExitFound || !_agent.isOnNavMesh)
             {
                 OnFireExitNotFoundEvent.Invoke();
                 return;

@@ -171,9 +171,13 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
 
         private bool TryGetDestinationPoint(out Vector3 result)
         {
+            result = Vector3.zero;
+            
+            if (!Agent.isOnNavMesh)
+                return false;
+            
             PlayerEntity targetPlayer = GetTargetPlayer();
             bool isTargetValid = targetPlayer != null && !targetPlayer.IsDead();
-            result = Vector3.zero;
 
             if (!isTargetValid)
                 return false;

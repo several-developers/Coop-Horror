@@ -179,6 +179,16 @@ namespace GameCore.Gameplay.GameTimeManagement
             return timeOfDay;
         }
 
+        public float GetHourDurationInSeconds()
+        {
+            float cycleDurationInMinutes = _timeConfig.CycleDurationInMinutes;
+            float cycleLengthModifier = _timeConfig.CycleLengthModifier;
+            float totalCycleDurationInMinutes = cycleDurationInMinutes * cycleLengthModifier;
+            float totalCycleDurationInSeconds = totalCycleDurationInMinutes * 60;
+            float hourDurationInSeconds = totalCycleDurationInSeconds / 24;
+            return hourDurationInSeconds;
+        }
+        
         public int GetCurrentTimeInMinutes()
         {
             int hour = _date.Hour;

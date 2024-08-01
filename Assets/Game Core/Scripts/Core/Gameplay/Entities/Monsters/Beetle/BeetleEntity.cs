@@ -5,7 +5,6 @@ using GameCore.Gameplay.Entities.Monsters.Beetle.States;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.Level;
-using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -62,9 +61,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         private void Start()
         {
+            if (!IsServerOnly)
+                return;
+            
             // TEMP
-            if (!IsSpawned && NetworkHorror.IsTrueServer)
+            if (!IsSpawned)
                 NetworkObject.Spawn();
+            
+            DecideStateByLocation();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -127,7 +131,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
             InitSystems();
             SetupStates();
-            DecideStateByLocation();
 
             _healthSystem.OnHealthChangedEvent += OnHealthChanged;
 

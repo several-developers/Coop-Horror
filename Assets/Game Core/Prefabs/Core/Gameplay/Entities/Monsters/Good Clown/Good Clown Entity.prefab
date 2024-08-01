@@ -2346,7 +2346,7 @@ PrefabInstance:
     - target: {fileID: 111205641803414154, guid: 4a078d8873b125146a7bc07d4059ec0a,
         type: 3}
       propertyPath: m_Name
-      value: Good Clown
+      value: Good Clown Entity
       objectReference: {fileID: 0}
     - target: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,
         type: 3}
@@ -2423,7 +2423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1730480432
+  GlobalObjectIdHash: 2639039971
   InScenePlacedSourceGlobalObjectIdHash: 2639039971
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

@@ -17,7 +17,7 @@ MonoBehaviour:
   _isDamageable: 1
   _health: 50
   _spawnType: 0
-  _maxCount: 1
+  _maxCount: 10
   _spawnChance: 50
   _spawnChanceMultiplierByGameTime:
     serializedVersion: 2
@@ -69,6 +69,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   _spawnTime: {x: 0, y: 1440}
   _spawnTimeText: 00:00 - 24:00
+  _floorsChancesMultipliersConfig:
+    _configs: []
   _fireExitInteractionDistance: 0.5
   _fireExitInteractionDuration: 0.5
   _fireExitDistanceCheckInterval: 0.2

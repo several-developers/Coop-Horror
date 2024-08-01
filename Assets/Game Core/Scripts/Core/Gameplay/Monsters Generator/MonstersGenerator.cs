@@ -5,6 +5,10 @@ using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Configs.Gameplay.MonstersGenerator;
 using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Monsters;
+using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.EntitiesSystems.Spawners;
+using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Locations;
@@ -13,7 +17,10 @@ using GameCore.Gameplay.RoundManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Utilities;
 using UnityEngine;
+using Zenject;
+using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.MonstersGeneration
 {
@@ -23,12 +30,13 @@ namespace GameCore.Gameplay.MonstersGeneration
         void Stop();
     }
 
-    public class MonstersGenerator : IMonstersGenerator, IDisposable
+    public class MonstersGenerator : IMonstersGenerator, ITickable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public MonstersGenerator(
             IGameManagerDecorator gameManagerDecorator,
+            IMonstersFactory monstersFactory,
             IRoundManager roundManager,
             ITimeCycle timeCycle,
             ILocationsMetaProvider locationsMetaProvider,
@@ -42,6 +50,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             BalanceConfigMeta balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
 
             _gameManagerDecorator = gameManagerDecorator;
+            _monstersFactory = monstersFactory;
             _roundManager = roundManager;
             _timeCycle = timeCycle;
             _locationsMetaProvider = locationsMetaProvider;
@@ -49,8 +58,18 @@ namespace GameCore.Gameplay.MonstersGeneration
             _monstersGeneratorConfig = gameplayConfigsProvider.GetMonstersGeneratorConfig();
             _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
             _monstersDangerLevelConfig = balanceConfig.MonstersDangerLevelConfig;
-            _monstersSpawnList = new List<MonsterToSpawn>();
+            _validMonstersList = new List<ValidMonster>();
             _monstersSpawnChancesList = new List<MonsterSpawnChance>();
+            _monstersSpawnList = new List<MonsterToSpawn>();
+
+            _monstersSpawners = new Dictionary<Floor, List<DungeonMonstersSpawner>>
+            {
+                { Floor.One, new List<DungeonMonstersSpawner>() },
+                { Floor.Two, new List<DungeonMonstersSpawner>() },
+                { Floor.Three, new List<DungeonMonstersSpawner>() }
+            };
+
+            DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent += OnRegisterMonstersSpawner;
 
             _timeCycle.OnHourPassedEvent += OnHourPassed;
         }
@@ -58,6 +77,7 @@ namespace GameCore.Gameplay.MonstersGeneration
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameManagerDecorator _gameManagerDecorator;
+        private readonly IMonstersFactory _monstersFactory;
         private readonly IRoundManager _roundManager;
         private readonly ITimeCycle _timeCycle;
         private readonly ILocationsMetaProvider _locationsMetaProvider;
@@ -65,23 +85,39 @@ namespace GameCore.Gameplay.MonstersGeneration
         private readonly MonstersGeneratorConfigMeta _monstersGeneratorConfig;
         private readonly MonstersListConfigMeta _monstersListConfig;
         private readonly MonstersDangerLevelConfig _monstersDangerLevelConfig;
-        private readonly List<MonsterToSpawn> _monstersSpawnList;
+        private readonly List<ValidMonster> _validMonstersList;
         private readonly List<MonsterSpawnChance> _monstersSpawnChancesList;
+        private readonly List<MonsterToSpawn> _monstersSpawnList;
+        private readonly Dictionary<Floor, List<DungeonMonstersSpawner>> _monstersSpawners;
 
         private int _monstersAmountToSpawn;
         private bool _isGeneratorEnabled;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Dispose() =>
+        public void Tick()
+        {
+            if (!_isGeneratorEnabled)
+                return;
+
+            TrySpawnMonster();
+        }
+
+        public void Dispose()
+        {
+            DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent -= OnRegisterMonstersSpawner;
+
             _timeCycle.OnHourPassedEvent -= OnHourPassed;
+        }
 
         public void Start() =>
             _isGeneratorEnabled = true;
 
-        // TO DO: Cancel all spawn delays
-        public void Stop() =>
+        public void Stop()
+        {
             _isGeneratorEnabled = false;
+            _monstersSpawnList.Clear();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -90,32 +126,21 @@ namespace GameCore.Gameplay.MonstersGeneration
         private void GeneratorTick()
         {
             GetMonstersAmountToSpawn();
-            CreateMonstersSpawnList();
-            ValidateMonstersSpawnList();
-            CreateMonstersSpawnChancesList();
 
-            //LogMonstersSpawnList();
-
-            return;
-
-            TrySpawnIndoorMonsters();
-            TrySpawnOutdoorMonsters();
-
-            void LogMonstersSpawnList()
+            for (int i = 0; i < _monstersAmountToSpawn; i++)
             {
-                foreach (MonsterToSpawn monsterToSpawn in _monstersSpawnList)
-                {
-                    MonsterType monsterType = monsterToSpawn.MonsterType;
-
-                    string log = Log.HandleLog($"Monster to spawn: <gb>{monsterType}</gb>");
-                    Debug.Log(log);
-                }
+                CreateValidMonstersList();
+                ValidateMonstersSpawnList();
+                CreateMonstersSpawnChancesList();
+                AddRandomMonsterToSpawnList();
             }
+
+            CleanUp();
         }
 
-        private void CreateMonstersSpawnList()
+        private void CreateValidMonstersList()
         {
-            _monstersSpawnList.Clear();
+            _validMonstersList.Clear();
 
             IReadOnlyList<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
 
@@ -134,23 +159,23 @@ namespace GameCore.Gameplay.MonstersGeneration
                 if (spawnType == MonsterSpawnType.NonSpawnable)
                     continue;
 
-                MonsterToSpawn monsterToSpawn = new(monsterAIConfig);
-                _monstersSpawnList.Add(monsterToSpawn);
+                ValidMonster validMonster = new(monsterAIConfig);
+                _validMonstersList.Add(validMonster);
             }
         }
 
         private void ValidateMonstersSpawnList()
         {
-            int monstersAmount = _monstersSpawnList.Count;
+            int monstersAmount = _validMonstersList.Count;
 
             if (monstersAmount == 0)
                 return;
 
             for (int i = monstersAmount - 1; i >= 0; i--)
             {
-                MonsterToSpawn monsterToSpawn = _monstersSpawnList[i];
-                MonsterAIConfigMeta monsterAIConfig = monsterToSpawn.MonsterAIConfig;
-                MonsterType monsterType = monsterToSpawn.MonsterType;
+                ValidMonster validMonster = _validMonstersList[i];
+                MonsterAIConfigMeta monsterAIConfig = validMonster.MonsterAIConfig;
+                MonsterType monsterType = validMonster.MonsterType;
 
                 int maxCount = monsterAIConfig.MaxCount;
                 int currentAmount = _roundManager.GetMonstersCount(monsterType);
@@ -158,7 +183,7 @@ namespace GameCore.Gameplay.MonstersGeneration
 
                 if (!isAmountValid)
                 {
-                    _monstersSpawnList.RemoveAt(i);
+                    _validMonstersList.RemoveAt(i);
                     continue;
                 }
 
@@ -168,12 +193,12 @@ namespace GameCore.Gameplay.MonstersGeneration
 
                 if (!isTimeValid)
                 {
-                    _monstersSpawnList.RemoveAt(i);
+                    _validMonstersList.RemoveAt(i);
                     continue;
                 }
 
                 MonsterDangerLevel dangerLevel = monsterAIConfig.DangerLevel;
-                MonsterSpawnType spawnType = monsterToSpawn.SpawnType;
+                MonsterSpawnType spawnType = validMonster.SpawnType;
 
                 int monsterDangerValue = _monstersDangerLevelConfig.GetDangerValue(dangerLevel);
                 int locationCurrentDangerLevel = GetCurrentDangerValue(spawnType);
@@ -185,7 +210,7 @@ namespace GameCore.Gameplay.MonstersGeneration
                 if (isLocationDangerValueValid)
                     continue;
 
-                _monstersSpawnList.RemoveAt(i);
+                _validMonstersList.RemoveAt(i);
             }
         }
 
@@ -193,7 +218,7 @@ namespace GameCore.Gameplay.MonstersGeneration
         {
             _monstersSpawnChancesList.Clear();
 
-            foreach (MonsterToSpawn monsterToSpawn in _monstersSpawnList)
+            foreach (ValidMonster monsterToSpawn in _validMonstersList)
             {
                 MonsterAIConfigMeta monsterAIConfig = monsterToSpawn.MonsterAIConfig;
                 MonsterType monsterType = monsterToSpawn.MonsterType;
@@ -231,19 +256,89 @@ namespace GameCore.Gameplay.MonstersGeneration
             }
         }
 
-        private void TrySpawnIndoorMonsters() => TrySpawnMonster(MonsterSpawnType.Indoor);
-
-        private void TrySpawnOutdoorMonsters() => TrySpawnMonster(MonsterSpawnType.Outdoor);
-
-        private void TrySpawnMonster(MonsterSpawnType spawnType)
+        private void AddRandomMonsterToSpawnList()
         {
-            if (_monstersAmountToSpawn <= 0)
+            int monstersAmountToSpawn = _monstersSpawnChancesList.Count;
+
+            if (monstersAmountToSpawn == 0)
                 return;
 
-            int maxDangerLevel = GetLocationMaxDangerValue(spawnType);
+            var chances = new double[monstersAmountToSpawn];
 
-            if (maxDangerLevel == 0)
+            for (int i = 0; i < monstersAmountToSpawn; i++)
+                chances[i] = _monstersSpawnChancesList[i].Chance;
+
+            int randomIndex = GlobalUtilities.GetRandomIndex(chances);
+            MonsterType monsterType = _monstersSpawnChancesList[randomIndex].MonsterType;
+            float spawnDelay = GetMonsterSpawnDelay();
+
+            MonsterToSpawn monsterToSpawn = new(monsterType, spawnDelay);
+            _monstersSpawnList.Add(monsterToSpawn);
+        }
+
+        private void TrySpawnMonster()
+        {
+            int monstersSpawnAmount = _monstersSpawnList.Count;
+            float deltaTime = Time.deltaTime;
+
+            for (int i = monstersSpawnAmount - 1; i >= 0; i--)
+            {
+                MonsterToSpawn monsterToSpawn = _monstersSpawnList[i];
+                monsterToSpawn.Tick(deltaTime);
+
+                bool canSpawn = monsterToSpawn.CanSpawn();
+
+                if (!canSpawn)
+                    continue;
+
+                MonsterType monsterType = monsterToSpawn.MonsterType;
+
+                _monstersSpawnList.RemoveAt(i);
+                SpawnMonsterIndoor(monsterType);
+            }
+        }
+
+        private void SpawnMonsterIndoor(MonsterType monsterType)
+        {
+            Floor floor = GetRandomFloor(monsterType);
+            bool isSpawnPositionFound = TryGetIndoorMonsterSpawnPosition(floor, out Vector3 spawnPosition);
+
+            if (!isSpawnPositionFound)
+            {
+                string log = Log.HandleLog("Monster spawn position <rb>not found</rb>!");
+                Debug.LogError(log);
                 return;
+            }
+
+            bool isMonsterSpawned = _monstersFactory.SpawnMonster(monsterType, spawnPosition, Quaternion.identity,
+                out MonsterEntityBase monsterEntity);
+
+            if (!isMonsterSpawned)
+                return;
+            
+            monsterEntity.SetEntityLocation(EntityLocation.Dungeon);
+            monsterEntity.SetFloor(floor);
+        }
+
+        private void SpawnMonsterOutdoor(MonsterType monsterType)
+        {
+            Floor floor = GetRandomFloor(monsterType);
+            bool isSpawnPositionFound = TryGetIndoorMonsterSpawnPosition(floor, out Vector3 spawnPosition);
+
+            if (!isSpawnPositionFound)
+            {
+                string log = Log.HandleLog("Monster spawn position <rb>not found</rb>!");
+                Debug.LogError(log);
+                return;
+            }
+
+            _monstersFactory.SpawnMonster(monsterType, spawnPosition, Quaternion.identity, out _);
+        }
+
+        private void CleanUp()
+        {
+            _validMonstersList.Clear();
+            _monstersSpawnChancesList.Clear();
         }
 
         #endregion
@@ -267,6 +362,82 @@ namespace GameCore.Gameplay.MonstersGeneration
 
             Log.PrintError(log: $"Location Meta <gb>{currentLocation}</gb> <rb>not found</rb>!");
             return false;
+        }
+
+        private bool TryGetIndoorMonsterSpawnPosition(Floor floor, out Vector3 spawnPosition)
+        {
+            spawnPosition = Vector3.zero;
+
+            bool isMonstersSpawnerFound =
+                TryGetRandomMonstersSpawner(floor, out DungeonMonstersSpawner monstersSpawner);
+
+            if (!isMonstersSpawnerFound)
+                return false;
+
+            spawnPosition = monstersSpawner.GetRandomSpawnWorldPosition();
+            return true;
+        }
+
+        private bool TryGetRandomMonstersSpawner(Floor floor, out DungeonMonstersSpawner monstersSpawner)
+        {
+            List<DungeonMonstersSpawner> spawnersList = _monstersSpawners[floor];
+            int spawnersCount = spawnersList.Count;
+            monstersSpawner = null;
+
+            if (spawnersCount == 0)
+                return false;
+
+            int randomIndex = Random.Range(0, spawnersCount);
+            monstersSpawner = spawnersList[randomIndex];
+
+            return true;
+        }
+
+        private Floor GetRandomFloor(MonsterType monsterType)
+        {
+            bool isMonsterConfigFound =
+                _monstersAIConfigsProvider.TryGetMonsterAIConfig(monsterType, out MonsterAIConfigMeta monsterAIConfig);
+
+            if (!isMonsterConfigFound)
+                return Floor.Three;
+
+            float firstFloorSpawnChance = 0.33f;
+            float secondFloorSpawnChance = 0.33f;
+            float thirdFloorSpawnChance = 0.33f;
+
+            float firstFloorMultiplier = monsterAIConfig.GetFloorSpawnChanceMultiplier(Floor.One);
+            float secondFloorMultiplier = monsterAIConfig.GetFloorSpawnChanceMultiplier(Floor.Two);
+            float thirdFloorMultiplier = monsterAIConfig.GetFloorSpawnChanceMultiplier(Floor.Three);
+
+            firstFloorSpawnChance *= firstFloorMultiplier;
+            secondFloorSpawnChance *= secondFloorMultiplier;
+            thirdFloorSpawnChance *= thirdFloorMultiplier;
+
+            var chances = new double[]
+            {
+                firstFloorSpawnChance,
+                secondFloorSpawnChance,
+                thirdFloorSpawnChance
+            };
+
+            int randomIndex = GlobalUtilities.GetRandomIndex(chances);
+
+            Floor floor = randomIndex switch
+            {
+                0 => Floor.One,
+                1 => Floor.Two,
+                2 => Floor.Three,
+                _ => Floor.Three
+            };
+
+            return floor;
+        }
+
+        private float GetMonsterSpawnDelay()
+        {
+            float hourDurationInSeconds = _timeCycle.GetHourDurationInSeconds();
+            float spawnDelay = Random.Range(0f, hourDurationInSeconds);
+            return spawnDelay;
         }
 
         private int GetAlivePlayersAmount() =>
@@ -325,22 +496,27 @@ namespace GameCore.Gameplay.MonstersGeneration
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnRegisterMonstersSpawner(DungeonMonstersSpawner dungeonMonstersSpawner)
+        {
+            Floor floor = dungeonMonstersSpawner.Floor;
+            _monstersSpawners[floor].Add(dungeonMonstersSpawner);
+        }
+
         private void OnHourPassed()
         {
             if (!_isGeneratorEnabled)
                 return;
 
-            Debug.Log("Hour passed");
             GeneratorTick();
         }
 
         // INNER CLASSES: -------------------------------------------------------------------------
 
-        private class MonsterToSpawn
+        private class ValidMonster
         {
             // CONSTRUCTORS: --------------------------------------------------------------------------
 
-            public MonsterToSpawn(MonsterAIConfigMeta monsterAIConfig) =>
+            public ValidMonster(MonsterAIConfigMeta monsterAIConfig) =>
                 MonsterAIConfig = monsterAIConfig;
 
             // PROPERTIES: ----------------------------------------------------------------------------
@@ -356,14 +532,41 @@ namespace GameCore.Gameplay.MonstersGeneration
 
             public MonsterSpawnChance(MonsterType monsterType, double chance)
             {
-                _monsterType = monsterType;
-                _chance = chance;
+                MonsterType = monsterType;
+                Chance = chance;
             }
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public MonsterType MonsterType { get; }
+            public double Chance { get; }
+        }
+
+        private class MonsterToSpawn
+        {
+            // CONSTRUCTORS: --------------------------------------------------------------------------
+
+            public MonsterToSpawn(MonsterType monsterType, float timeLeft)
+            {
+                MonsterType = monsterType;
+                _timeLeft = timeLeft;
+            }
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public MonsterType MonsterType { get; }
 
             // FIELDS: --------------------------------------------------------------------------------
 
-            private readonly MonsterType _monsterType;
-            private readonly double _chance;
+            private float _timeLeft;
+
+            // PUBLIC METHODS: ------------------------------------------------------------------------
+
+            public void Tick(float deltaTime) =>
+                _timeLeft -= deltaTime;
+
+            public bool CanSpawn() =>
+                _timeLeft <= 0.0f;
         }
     }
 }

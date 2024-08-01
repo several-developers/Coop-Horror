@@ -16,6 +16,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         void IncreaseDay();
         MyDateTime GetDateTime();
         float GetTimeOfDay();
+        float GetHourDurationInSeconds();
         int GetCurrentTimeInMinutes();
         bool GetSimulateState();
     }

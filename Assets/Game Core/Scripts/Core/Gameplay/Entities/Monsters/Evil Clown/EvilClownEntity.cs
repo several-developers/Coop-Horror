@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.EvilClown.States;
@@ -43,6 +44,17 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private AnimationController _animationController;
         private WanderingTimer _wanderingTimer;
         private PlayerEntity _targetPlayer;
+
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        private void Start()
+        {
+            if (!IsServerOnly)
+                return;
+            
+            //DecideStateByLocation();
+            EnterPrepareToChaseState();
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -106,8 +118,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
             InitSystems();
             SetupStates();
-            //DecideStateByLocation();
-            EnterPrepareToChaseState();
 
             // LOCAL METHODS: -----------------------------
 

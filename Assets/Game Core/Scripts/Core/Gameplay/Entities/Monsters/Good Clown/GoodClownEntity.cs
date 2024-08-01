@@ -70,9 +70,15 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 
         private void Start()
         {
+            if (!IsServerOnly)
+                return;
+            
             // TEMP
-            if (!IsSpawned && NetworkHorror.IsTrueServer)
+            if (!IsSpawned)
                 NetworkObject.Spawn();
+            
+            //DecideStateByLocation();
+            EnterSearchForTargetState();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -138,8 +144,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 
             InitSystems();
             SetupStates();
-            //DecideStateByLocation();
-            EnterSearchForTargetState();
 
             // LOCAL METHODS: -----------------------------
 

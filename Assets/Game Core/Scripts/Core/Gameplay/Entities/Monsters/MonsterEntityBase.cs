@@ -54,9 +54,15 @@ namespace GameCore.Gameplay.Entities.Monsters
             OnEntityTeleportedEvent.Invoke();
         }
 
+        /// <summary>
+        /// Вызывается после OnNetworkSpawn!
+        /// </summary>
         public void SetEntityLocation(EntityLocation entityLocation) =>
             EntityLocation = entityLocation;
 
+        /// <summary>
+        /// Вызывается после OnNetworkSpawn!
+        /// </summary>
         public void SetFloor(Floor floor) =>
             CurrentFloor = floor;
 

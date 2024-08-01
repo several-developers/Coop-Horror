@@ -18,8 +18,8 @@ namespace GameCore.Configs.Gameplay.Quests
         private int _maxActiveQuests = 3;
 
         [SerializeField]
-        [InfoBox(message: Warning, InfoMessageType.Error, nameof(_ignoreMobileHQQuestsCheck))]
-        private bool _ignoreMobileHQQuestsCheck;
+        [InfoBox(message: Warning, InfoMessageType.Error, nameof(_ignoreTrainQuestsCheck))]
+        private bool _ignoreTrainQuestsCheck;
 
         [SerializeField, Space(height: 5)]
         private QuestDifficulty[] _questsLookUpList;
@@ -32,7 +32,7 @@ namespace GameCore.Configs.Gameplay.Quests
 
         public int MaxQuestsAmount => _maxQuestsAmount;
         public int MaxActiveQuests => _maxActiveQuests;
-        public bool IgnoreMobileHQQuestsCheck => _ignoreMobileHQQuestsCheck;
+        public bool IgnoreTrainQuestsCheck => _ignoreTrainQuestsCheck;
 
         // FIELDS: --------------------------------------------------------------------------------
 
