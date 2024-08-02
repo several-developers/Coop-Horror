@@ -57,11 +57,11 @@ namespace GameCore.Gameplay.Interactable
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public virtual void InteractionStarted()
+        public virtual void InteractionStarted(IEntity entity = null)
         {
         }
 
-        public virtual void InteractionEnded()
+        public virtual void InteractionEnded(IEntity entity = null)
         {
         }
 

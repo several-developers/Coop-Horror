@@ -355,6 +355,11 @@ namespace GameCore.Gameplay.MonstersGeneration
         private bool TryGetCurrentLocationMeta(out LocationMeta locationMeta)
         {
             LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
+            locationMeta = null;
+            
+            if (currentLocation == LocationName.Base)
+                return false;
+            
             bool isLocationMetaFound = _locationsMetaProvider.TryGetLocationMeta(currentLocation, out locationMeta);
 
             if (isLocationMetaFound)

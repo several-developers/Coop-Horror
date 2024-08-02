@@ -13,6 +13,7 @@ using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace GameCore.Gameplay.GameManagement
@@ -38,6 +39,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameObserver = gameObserver;
             _levelObserver = levelObserver;
             _trainEntity = trainEntity;
+            _networkSceneManager = NetworkManager.Singleton.SceneManager;
             _balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
         }
 
@@ -60,9 +62,12 @@ namespace GameCore.Gameplay.GameManagement
         private IGameObserver _gameObserver;
         private ILevelObserver _levelObserver;
         private ITrainEntity _trainEntity;
+        private NetworkSceneManager _networkSceneManager;
         private BalanceConfigMeta _balanceConfig;
 
         private LocationName _previousSelectedLocation = DefaultSelectedLocation;
+        private bool _isScenesSynchronized;
+        private bool _isServerLocationLoaded;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -78,6 +83,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnResetPlayersGoldInnerEvent += ResetGold;
             _gameManagerDecorator.OnGetCurrentLocationInnerEvent += GetCurrentLocation;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent += GetSelectedLocation;
+            _gameManagerDecorator.OnGetPreviousLocationInnerEvent += GetPreviousLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent += GetGameState;
 
             PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
@@ -88,7 +94,7 @@ namespace GameCore.Gameplay.GameManagement
         {
             if (!IsServerOnly)
                 return;
-            
+
             _gameObserver.TrainArrivedAtBase(LocationName.Base);
         }
 
@@ -106,6 +112,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameManagerDecorator.OnResetPlayersGoldInnerEvent -= ResetGold;
             _gameManagerDecorator.OnGetCurrentLocationInnerEvent -= GetCurrentLocation;
             _gameManagerDecorator.OnGetSelectedLocationInnerEvent -= GetSelectedLocation;
+            _gameManagerDecorator.OnGetPreviousLocationInnerEvent -= GetPreviousLocation;
             _gameManagerDecorator.OnGetGameStateInnerEvent -= GetGameState;
 
             PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
@@ -117,11 +124,11 @@ namespace GameCore.Gameplay.GameManagement
         protected override void InitAll()
         {
             _currentLocation.OnValueChanged += OnCurrentLocationChanged;
-            
+
             _selectedLocation.OnValueChanged += OnSelectedLocationChanged;
-            
+
             _gameState.OnValueChanged += OnAllGameStateChanged;
-            
+
             _playersGold.OnValueChanged += OnPlayersGoldChanged;
         }
 
@@ -130,8 +137,11 @@ namespace GameCore.Gameplay.GameManagement
             _networkHorror.OnPlayerConnectedEvent += OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent += OnPlayerDisconnected;
 
-            _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
-            _levelObserver.OnLocationUnloadedEvent += OnLocationUnloaded;
+            _levelObserver.OnLocationLoadedEvent += OnServerLocationLoaded;
+            _levelObserver.OnLocationUnloadedEvent += OnServerLocationUnloaded;
+
+            _networkSceneManager.OnLoadEventCompleted += OnSceneLoadCompleted;
+            _networkSceneManager.OnUnloadEventCompleted += OnSceneUnloadCompleted;
 
             _trainEntity.OnMovementStoppedEvent += OnTrainMovementStopped;
             _trainEntity.OnMovementStartedEvent += OnTrainMovementStarted;
@@ -140,11 +150,11 @@ namespace GameCore.Gameplay.GameManagement
         protected override void DespawnAll()
         {
             _currentLocation.OnValueChanged -= OnCurrentLocationChanged;
-            
+
             _selectedLocation.OnValueChanged -= OnSelectedLocationChanged;
-            
+
             _gameState.OnValueChanged -= OnAllGameStateChanged;
-            
+
             _playersGold.OnValueChanged -= OnPlayersGoldChanged;
         }
 
@@ -153,9 +163,15 @@ namespace GameCore.Gameplay.GameManagement
             _networkHorror.OnPlayerConnectedEvent -= OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent -= OnPlayerDisconnected;
 
-            _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
-            _levelObserver.OnLocationUnloadedEvent -= OnLocationUnloaded;
-            
+            _levelObserver.OnLocationLoadedEvent -= OnServerLocationLoaded;
+            _levelObserver.OnLocationUnloadedEvent -= OnServerLocationUnloaded;
+
+            if (_networkSceneManager != null)
+            {
+                _networkSceneManager.OnLoadEventCompleted -= OnSceneLoadCompleted;
+                _networkSceneManager.OnUnloadEventCompleted -= OnSceneUnloadCompleted;
+            }
+
             _trainEntity.OnMovementStoppedEvent -= OnTrainMovementStopped;
             _trainEntity.OnMovementStartedEvent -= OnTrainMovementStarted;
         }
@@ -272,12 +288,35 @@ namespace GameCore.Gameplay.GameManagement
             ChangeGameState(newState);
         }
 
+        private async void LocationLoadedLogic()
+        {
+            bool isLocationLoaded = _isServerLocationLoaded && _isScenesSynchronized;
+
+            if (!isLocationLoaded)
+                return;
+
+            _gameObserver.TrainLeavingBase();
+
+            await UniTask.Delay(3000);
+            
+            _gameObserver.TrainArrivedAtSector();
+        }
+        
+        private void LocationUnloadedLogic()
+        {
+            bool isLocationUnloaded = !_isServerLocationLoaded && !_isScenesSynchronized;
+
+            if (!isLocationUnloaded)
+                return;
+            
+        }
+
         private void StartGameRestartTimer()
         {
             IEnumerator routine = RestartGameTimerCO();
             StartCoroutine(routine);
         }
-        
+
         private IEnumerator RestartGameTimerCO()
         {
             float delay = _balanceConfig.GameRestartDelay;
@@ -292,6 +331,8 @@ namespace GameCore.Gameplay.GameManagement
 
         private LocationName GetSelectedLocation() =>
             _selectedLocation.Value;
+
+        private LocationName GetPreviousLocation() => _previousSelectedLocation;
 
         private GameState GetGameState() =>
             _gameState.Value;
@@ -370,23 +411,25 @@ namespace GameCore.Gameplay.GameManagement
         private void OnPlayersGoldChanged(int previousValue, int newValue) =>
             _gameManagerDecorator.PlayersGoldChanged(playersGold: newValue);
 
-        private void OnLocationLoaded()
+        private void OnServerLocationLoaded()
         {
             LocationName selectedLocation = GetSelectedLocation();
             _currentLocation.Value = selectedLocation;
             _previousSelectedLocation = selectedLocation;
+            _isServerLocationLoaded = true;
             
-            _gameObserver.TrainArrivedAtSector();
+            LocationLoadedLogic();
         }
 
-        private void OnLocationUnloaded()
+        private void OnServerLocationUnloaded()
         {
             _currentLocation.Value = _selectedLocation.Value;
             _selectedLocation.Value = _previousSelectedLocation;
-            
-            _gameObserver.TrainArrivedAtBase(_previousSelectedLocation);
+            _isServerLocationLoaded = false;
+
+            LocationUnloadedLogic();
         }
-        
+
         private void OnTrainMovementStopped() =>
             _gameObserver.TrainStoppedAtSector();
 
@@ -394,13 +437,44 @@ namespace GameCore.Gameplay.GameManagement
         {
             LocationName currentLocation = GetCurrentLocation();
             bool isLeavingBase = currentLocation == LocationName.Base;
-            
-            if (isLeavingBase)
-                _gameObserver.TrainLeavingBase();
-            else
+
+            if (!isLeavingBase)
                 _gameObserver.TrainLeavingSector();
         }
-        
+
+        private void OnSceneLoadCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,
+            List<ulong> clientsTimedOut)
+        {
+            string log = Log.HandleLog(
+                $"Scene <gb>{sceneName}</gb> loaded,   " +
+                $"mode: <gb>{loadSceneMode}</gb>,   " +
+                $"clients: {clientsCompleted.Count}"
+            );
+
+            Debug.LogWarning(log);
+
+            if (loadSceneMode != LoadSceneMode.Additive)
+                return;
+
+            _isScenesSynchronized = true;
+            LocationLoadedLogic();
+        }
+
+        private void OnSceneUnloadCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,
+            List<ulong> clientsTimedOut)
+        {
+            string log = Log.HandleLog(
+                $"Scene <gb>{sceneName}</gb> unloaded,   " +
+                $"mode: <gb>{loadSceneMode}</gb>,   " +
+                $"clients: {clientsCompleted.Count}"
+            );
+
+            Debug.LogWarning(log);
+
+            _isScenesSynchronized = false;
+            LocationUnloadedLogic();
+        }
+
         private void OnPlayerSpawned(PlayerEntity playerEntity) =>
             playerEntity.OnDiedEvent += OnPlayerDied;
 

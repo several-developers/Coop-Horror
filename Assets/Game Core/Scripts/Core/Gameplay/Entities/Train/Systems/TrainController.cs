@@ -97,15 +97,11 @@ namespace GameCore.Gameplay.Entities.Train
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnOpenQuestsSelectionMenu()
-        {
+        private void OnOpenQuestsSelectionMenu() =>
             _trainEntity.SendOpenQuestsSelectionMenu();
-            _trainEntity.PlayQuestsButtonAnimationServerRpc();
-        }
 
         private void OnCompleteQuests()
         {
-            _trainEntity.PlayCompleteQuestsButtonAnimationServerRpc();
             _questsManagerDecorator.CompleteQuests();
             _gameManagerDecorator.ChangeGameState(GameState.QuestsRewarding);
         }

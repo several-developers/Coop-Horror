@@ -16,8 +16,11 @@ namespace GameCore.Gameplay.Entities.Train
         void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false);
         void SetMovementBehaviour(TrainEntity.MovementBehaviour movementBehaviour);
         void TeleportToTheRoad();
+        void TeleportToTheSector();
+        void TeleportLocalPlayerToTrainSeat(int seatIndex);
         void ToggleMainLeverState(bool isEnabled);
         void ToggleDoorState(bool isOpened);
+        void ToggleStoppedAtSectorState(bool isStoppedAtSector);
         void PlaySound(TrainEntity.SFXType sfxType);
         void StopSound(TrainEntity.SFXType sfxType);
         Camera GetOutsideCamera();

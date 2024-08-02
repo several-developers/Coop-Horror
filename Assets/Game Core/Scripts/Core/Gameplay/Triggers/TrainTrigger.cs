@@ -7,26 +7,18 @@ namespace GameCore.Gameplay.Triggers
     {
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void OnTriggerEnter(Collider other)
+        private void OnTriggerEnter(Collider other) => CheckForPlayer(other, enter: true);
+
+        private void OnTriggerExit(Collider other) => CheckForPlayer(other, enter: false);
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private static void CheckForPlayer(Component other, bool enter)
         {
             if (!other.TryGetComponent(out PlayerEntity playerEntity))
                 return;
-
-            bool isLocalPlayer = playerEntity.IsLocalPlayer();
-
-            if (!isLocalPlayer)
-                return;
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            if (!other.TryGetComponent(out PlayerEntity playerEntity))
-                return;
-
-            bool isLocalPlayer = playerEntity.IsLocalPlayer();
-
-            if (!isLocalPlayer)
-                return;
+            
+            playerEntity.ToggleInsideTrainState(enter);
         }
     }
 }

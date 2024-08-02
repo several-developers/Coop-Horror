@@ -91,11 +91,11 @@ namespace GameCore.Gameplay.Items
         public void Setup(int itemID) =>
             ItemID = itemID;
         
-        public virtual void InteractionStarted()
+        public virtual void InteractionStarted(IEntity entity = null)
         {
         }
 
-        public virtual void InteractionEnded()
+        public virtual void InteractionEnded(IEntity entity = null)
         {
         }
 

@@ -57,11 +57,11 @@ namespace GameCore.Gameplay.Level.Elevator
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void InteractionStarted()
+        public void InteractionStarted(IEntity entity = null)
         {
         }
 
-        public void InteractionEnded()
+        public void InteractionEnded(IEntity entity = null)
         {
         }
 

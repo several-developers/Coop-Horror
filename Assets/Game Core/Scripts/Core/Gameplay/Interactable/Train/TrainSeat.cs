@@ -15,7 +15,7 @@ namespace GameCore.Gameplay.Interactable.Train
         [Title(Constants.Settings)]
         [SerializeField]
         private float _spawnPositionY = 1.2f;
-        
+
         [Title(Constants.References)]
         [SerializeField, Required]
         private BoxCollider _boxCollider;
@@ -37,6 +37,7 @@ namespace GameCore.Gameplay.Interactable.Train
         public event Action<int> OnTakeSeatEvent = delegate { };
         public event Action<int> OnLeftSeatEvent = delegate { };
         public event Func<int, bool> IsSeatBusyEvent = _ => true;
+        public event Func<bool> ShouldRemovePlayerParentEvent = () => false;
 
         private PlayerEntity _lastPlayerEntity;
         private Tweener _playerPositionTN;
@@ -45,12 +46,20 @@ namespace GameCore.Gameplay.Interactable.Train
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void InteractionStarted()
+        public void InteractionStarted(IEntity entity = null)
         {
+            if (entity is not PlayerEntity playerEntity)
+                return;
+
+            playerEntity.OnParentChangedEvent += OnPlayerParentChanged;
         }
 
-        public void InteractionEnded()
+        public void InteractionEnded(IEntity entity = null)
         {
+            if (entity is not PlayerEntity playerEntity)
+                return;
+
+            playerEntity.OnParentChangedEvent -= OnPlayerParentChanged;
         }
 
         public void Interact(IEntity entity = null)
@@ -59,7 +68,12 @@ namespace GameCore.Gameplay.Interactable.Train
                 return;
 
             _lastPlayerEntity = playerEntity;
-            InteractLogic();
+            bool hasParent = _lastPlayerEntity.transform.parent != null;
+
+            if (hasParent)
+                InteractLogic();
+            else
+                _lastPlayerEntity.SetTrainAsParent();
         }
 
         public void ToggleInteract(bool canInteract)
@@ -73,7 +87,7 @@ namespace GameCore.Gameplay.Interactable.Train
 
         public void SetSeatIndex(int seatIndex) =>
             SeatIndex = seatIndex;
-        
+
         public InteractionType GetInteractionType() =>
             InteractionType.MobileHQSeat;
 
@@ -84,18 +98,13 @@ namespace GameCore.Gameplay.Interactable.Train
 
         private void InteractLogic()
         {
-            bool isSuccessful = _lastPlayerEntity.TrySetMobileHQAsParent();
-
-            if (!isSuccessful)
-                return;
-            
             Transform playerTransform = _lastPlayerEntity.transform;
             Vector3 endPosition = _teleportPoint.localPosition + transform.localPosition;
             endPosition.y = _spawnPositionY;
 
             _playerPositionTN.Kill();
             _playerRotationTN.Kill();
-            
+
             _playerPositionTN = playerTransform
                 .DOLocalMove(endPosition, PlayerRotationDuration)
                 .SetEase(PlayerAnimationEase);
@@ -115,16 +124,18 @@ namespace GameCore.Gameplay.Interactable.Train
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnPlayerParentChanged(bool hasParent) => InteractLogic();
+
         private void OnLeftMobileHQSeat()
         {
             _playerPositionTN.Kill();
             _playerRotationTN.Kill();
 
-            // bool shouldRemovePlayerParent = ShouldRemovePlayerParentEvent.Invoke();
-            //
-            // if (shouldRemovePlayerParent)
-            //     _lastPlayerEntity.TryRemoveParent();
+            bool shouldRemovePlayerParent = ShouldRemovePlayerParentEvent.Invoke();
             
+            if (shouldRemovePlayerParent)
+                _lastPlayerEntity.RemoveParent();
+
             _lastPlayerEntity.OnLeftMobileHQSeat -= OnLeftMobileHQSeat;
 
             OnLeftSeatEvent.Invoke(SeatIndex);

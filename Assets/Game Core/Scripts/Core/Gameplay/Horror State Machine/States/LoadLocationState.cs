@@ -44,11 +44,15 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         private void LoadLocation(LocationName locationName) =>
             _locationsLoader.LoadLocationNetwork(locationName);
 
+#warning СИНХРОНИЗИРОВАТЬ ЧТОБЫ ОЖИДАНИЕ ОДИНАКОВОЕ У ВСЕХ БЫЛО ПОКА НЕ СОЗДАСТСЯ
         private void EnterGenerateDungeonsState() =>
             _horrorStateMachine.ChangeState<GenerateDungeonsState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnLocationLoaded() => EnterGenerateDungeonsState();
+        private void OnLocationLoaded()
+        {
+            //EnterGenerateDungeonsState();
+        }
     }
 }

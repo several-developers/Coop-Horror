@@ -24,6 +24,7 @@ namespace GameCore.Gameplay.GameManagement
         event Action OnResetPlayersGoldInnerEvent;
         event Func<LocationName> OnGetCurrentLocationInnerEvent;
         event Func<LocationName> OnGetSelectedLocationInnerEvent;
+        event Func<LocationName> OnGetPreviousLocationInnerEvent;
         event Func<GameState> OnGetGameStateInnerEvent;
         /// <summary>
         /// State should be changed only once!
@@ -38,6 +39,7 @@ namespace GameCore.Gameplay.GameManagement
         void ResetPlayersGold();
         LocationName GetCurrentLocation();
         LocationName GetSelectedLocation();
+        LocationName GetPreviousLocation();
         GameState GetGameState();
     }
 }

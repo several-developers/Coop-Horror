@@ -1,4 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.GameManagement;
 using Zenject;
 
@@ -18,10 +19,10 @@ namespace GameCore.Gameplay.Interactable.Train
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public override void InteractionStarted() =>
+        public override void InteractionStarted(IEntity entity = null) =>
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
 
-        public override void InteractionEnded() =>
+        public override void InteractionEnded(IEntity entity = null) =>
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
 
         public override bool CanInteract()

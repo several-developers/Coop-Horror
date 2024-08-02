@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.Entities.Player
             Jump = 2,
             Land = 3
         }
-        
+
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
@@ -85,6 +85,7 @@ namespace GameCore.Gameplay.Entities.Player
         public InputReader InputReader { get; private set; }
         public EntityLocation EntityLocation => _entityLocation.Value;
         public Floor CurrentFloor => _currentFloor.Value;
+        public bool IsInsideTrain { get; private set; } = true;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -96,6 +97,7 @@ namespace GameCore.Gameplay.Entities.Player
         public event Action OnLeftMobileHQSeat = delegate { };
         public event Action OnDiedEvent = delegate { };
         public event Action OnRevivedEvent = delegate { };
+        public event Action<bool> OnParentChangedEvent = delegate { };
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
@@ -131,6 +133,15 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _references.NetworkTransform.InLocalSpace = false;
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
+        }
+
+        [Button(ButtonStyle.FoldoutButton)]
+        public void TeleportToTrainSeat(int seatIndex)
+        {
+            if (IsOwner)
+                TeleportToTrainSeatLocal(seatIndex);
+            else
+                TeleportToTrainSeatServerRPC(seatIndex);
         }
 
         public void SetEntityLocation(EntityLocation entityLocation)
@@ -173,6 +184,9 @@ namespace GameCore.Gameplay.Entities.Player
             _isDead.Value = isDead;
         }
 
+        public void ToggleInsideTrainState(bool isInsideTrain) =>
+            IsInsideTrain = isInsideTrain;
+
         public void PlaySound(SFXType sfxType)
         {
             PlaySoundLocal(sfxType);
@@ -185,7 +199,7 @@ namespace GameCore.Gameplay.Entities.Player
         public void EnterAliveState() => ChangeState<AliveState>();
 
         public void EnterReviveState() => ChangeState<ReviveState>();
-        
+
         public void EnterSittingState() => ChangeState<SittingState>();
 
         public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
@@ -213,7 +227,7 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         public MonoBehaviour GetMonoBehaviour() => this;
-        
+
         public Transform GetTransform() => transform;
 
         public PlayerInventory GetInventory() => _inventory;
@@ -224,20 +238,23 @@ namespace GameCore.Gameplay.Entities.Player
         public static bool TryGetPlayer(ulong clientID, out PlayerEntity playerEntity) =>
             AllPlayers.TryGetValue(clientID, out playerEntity);
 
-        public bool TrySetMobileHQAsParent()
+        [Button]
+        public void SetTrainAsParent()
         {
-            Transform newParent = _trainEntity.GetTransform();
-            Transform parent = transform.parent;
-            bool alreadyParented = parent != null && parent == newParent;
-
-            if (alreadyParented)
-                return true;
-            
-            return NetworkObject.TrySetParent(newParent);
+            if (IsServerOnly)
+                SetTrainAsParentLocal();
+            else
+                SetTrainAsParentServerRPC();
         }
 
-        public bool TryRemoveParent() =>
-            NetworkObject.TryRemoveParent();
+        [Button]
+        public void RemoveParent()
+        {
+            if (IsServerOnly)
+                RemoveParentLocal();
+            else
+                RemoveParentServerRPC();
+        }
 
         public bool IsDead() =>
             _isDead.Value;
@@ -295,7 +312,7 @@ namespace GameCore.Gameplay.Entities.Player
                 PlayerFootstepsSystem footstepsSystem = _references.FootstepsSystem;
                 footstepsSystem.Setup(playerEntity: this);
                 footstepsSystem.ToggleActiveState(isActive: true);
-                
+
                 _playerStateMachine = new StateMachine();
 
                 _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform,
@@ -403,6 +420,24 @@ namespace GameCore.Gameplay.Entities.Player
         private void PlaySoundLocal(SFXType sfxType) =>
             _soundReproducer.PlaySound(sfxType);
 
+        private void TeleportToTrainSeatLocal(int seatIndex) =>
+            _trainEntity.TeleportLocalPlayerToTrainSeat(seatIndex);
+
+        private void SetTrainAsParentLocal()
+        {
+            Transform newParent = _trainEntity.GetTransform();
+            Transform parent = transform.parent;
+            bool alreadyParented = parent != null && parent == newParent;
+
+            if (alreadyParented)
+                return;
+
+            NetworkObject.TrySetParent(newParent);
+        }
+        
+        private void RemoveParentLocal() =>
+            NetworkObject.TryRemoveParent();
+
         private void CheckDeadStatus(HealthData healthData)
         {
             if (IsDead())
@@ -453,7 +488,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         [ServerRpc(RequireOwnership = false)]
         private void SetPlayerLocationServerRpc(EntityLocation entityLocation) =>
-            _entityLocation.Value = entityLocation;
+            SetPlayerLocationClientRpc(entityLocation);
 
         [ServerRpc(RequireOwnership = false)]
         private void SetFloorServerRpc(Floor floor) =>
@@ -463,9 +498,18 @@ namespace GameCore.Gameplay.Entities.Player
         private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
         {
             ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-            
+
             PlaySoundClientRPC(sfxType, senderClientID);
         }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void TeleportToTrainSeatServerRPC(int seatIndex) => TeleportToTrainSeatClientRPC(seatIndex);
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetTrainAsParentServerRPC() => SetTrainAsParentLocal();
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RemoveParentServerRPC() => RemoveParentLocal();
 
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)
@@ -500,6 +544,13 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         [ClientRpc]
+        private void SetPlayerLocationClientRpc(EntityLocation entityLocation)
+        {
+            if (!IsOwner)
+                return;
+        }
+
+        [ClientRpc]
         private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
         {
             bool isClientIDMatches = NetworkHorror.ClientID == senderClientID;
@@ -507,9 +558,12 @@ namespace GameCore.Gameplay.Entities.Player
             // Don't reproduce sound twice on sender.
             if (isClientIDMatches)
                 return;
-            
+
             PlaySoundLocal(sfxType);
         }
+
+        [ClientRpc]
+        private void TeleportToTrainSeatClientRPC(int seatIndex) => TeleportToTrainSeatLocal(seatIndex);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -535,6 +589,8 @@ namespace GameCore.Gameplay.Entities.Player
             _references.Rigidbody.interpolation = hasParent
                 ? RigidbodyInterpolation.None
                 : RigidbodyInterpolation.Interpolate;
+            
+            OnParentChangedEvent.Invoke(hasParent);
         }
 
         private void OnScrollInventory(float scrollValue)

@@ -1695,6 +1695,7 @@ GameObject:
   - component: {fileID: 8649101030545050085}
   - component: {fileID: 6425260825504610594}
   - component: {fileID: 7222222120550699953}
+  - component: {fileID: 108418461887884827}
   m_Layer: 0
   m_Name: Train Entity
   m_TagString: Untagged
@@ -1730,7 +1731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1111314081
+  GlobalObjectIdHash: 1957246166
   InScenePlacedSourceGlobalObjectIdHash: 1957246166
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
@@ -1862,6 +1863,18 @@ MonoBehaviour:
   _distance: 0
   _changeTargetSpeed: 0
   _targetSpeed: 0
+--- !u!114 &108418461887884827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6195987239533786563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4b86244130231640bb1c6b0763d2146, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6195987239724444557
 GameObject:
   m_ObjectHideFlags: 0

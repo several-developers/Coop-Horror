@@ -6,7 +6,7 @@ namespace GameCore.Observers.Gameplay.Level
     {
         event Action OnLocationLoadedEvent;
         event Action OnLocationUnloadedEvent;
-        void LocationLoaded();
-        void LocationUnloaded();
+        void LocationLoaded(); // Only local, not synced between clients.
+        void LocationUnloaded(); // Only local, not synced between clients.
     }
 }

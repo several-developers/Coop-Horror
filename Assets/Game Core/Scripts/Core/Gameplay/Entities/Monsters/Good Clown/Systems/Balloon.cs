@@ -1,5 +1,4 @@
-﻿using System;
-using Sirenix.OdinInspector;
+﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown
@@ -55,6 +54,9 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
             }
             
             if (!_isInitialized)
+                return;
+
+            if (_lineRenderer == null)
                 return;
             
             _lineRenderer.SetPosition(index: 0, _pointOne.position);

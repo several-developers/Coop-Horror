@@ -31,7 +31,7 @@ MonoBehaviour:
       randomStartPosition: 0
       randomStartPositionMin: 0
       randomStartPositionMax: 1
-      startPosition: 0.1
+      startPosition: 0
       reverse: 0
       neverStealVoice: 0
       neverStealVoiceEffects: 0
@@ -647,4 +647,4 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     audioClips:
-    - {fileID: 8300000, guid: 0700027f3fe34c048b5e1b07c8277895, type: 3}
+    - {fileID: 8300000, guid: 760649a6ffb0ea147ac1cefad0748d5d, type: 3}

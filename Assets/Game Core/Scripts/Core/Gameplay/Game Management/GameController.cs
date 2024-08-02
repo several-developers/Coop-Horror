@@ -126,7 +126,8 @@ namespace GameCore.Gameplay.GameManagement
 
         private void TrainArrivedAtBase(LocationName previousLocationName)
         {
-            Debug.Log("--> Train Arrived At Base.");
+            string log = Log.HandleLog("--> Train arrived at <gb>Base</gb>.");
+            Debug.Log(log);
 
             bool arrivedFromMarket = previousLocationName == LocationName.Market;
             
@@ -146,14 +147,16 @@ namespace GameCore.Gameplay.GameManagement
 
         private void TrainLeavingBase()
         {
-            Debug.Log("--> Train Leaving Base.");
+            string log = Log.HandleLog("--> Train leaving <gb>Base</gb>.");
+            Debug.Log(log);
         }
 
         private void TrainArrivedAtSector()
         {
-            Debug.Log("--> Train Arrived At Sector.");
-
             LocationName currentLocation = GetCurrentLocation();
+            
+            string log = Log.HandleLog($"--> Train arrived at sector <gb>{currentLocation}</gb>.");
+            Debug.Log(log);
 
             if (currentLocation != LocationName.Market)
             {
@@ -161,7 +164,7 @@ namespace GameCore.Gameplay.GameManagement
                 _gameTimeManagerDecorator.IncreaseDay();
             }
 
-            _gameManagerDecorator.SelectLocation(LocationName.Base);
+            _trainEntity.TeleportToTheSector();
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.StopAtPathEnd);
             SetPlayersEntityLocation(EntityLocation.Sector);
             _trainEntity.PlaySound(TrainEntity.SFXType.Arrival);
@@ -170,9 +173,10 @@ namespace GameCore.Gameplay.GameManagement
 
         private void TrainStoppedAtSector()
         {
-            Debug.Log("--> Train Stopped At Sector.");
-            
             LocationName currentLocation = GetCurrentLocation();
+            
+            string log = Log.HandleLog($"--> Train stopped at sector <gb>{currentLocation}</gb>.");
+            Debug.Log(log);
             
             if (currentLocation != LocationName.Market)
             {
@@ -182,7 +186,9 @@ namespace GameCore.Gameplay.GameManagement
             ToggleTrainMainLever(isEnabled: true);
             ToggleTrainDoor(isOpened: true);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.LeaveAtPathEnd);
+            _gameManagerDecorator.SelectLocation(LocationName.Base); // TEMP, возможно данжи не успеют сгенерироваться
             RemovePlayersParent();
+            _trainEntity.ToggleStoppedAtSectorState(true);
             _trainEntity.StopSound(TrainEntity.SFXType.MovementLoop);
             _trainEntity.StopSound(TrainEntity.SFXType.Arrival);
         }
@@ -193,6 +199,7 @@ namespace GameCore.Gameplay.GameManagement
 
             ToggleTrainMainLever(isEnabled: false);
             ToggleTrainDoor(isOpened: false);
+            _trainEntity.ToggleStoppedAtSectorState(false);
             _trainEntity.PlaySound(TrainEntity.SFXType.Departure);
             _trainEntity.PlaySound(TrainEntity.SFXType.MovementLoop);
         }
@@ -231,21 +238,16 @@ namespace GameCore.Gameplay.GameManagement
                 if (isDead)
                     continue;
 
-                playerEntity.TryRemoveParent();
+                playerEntity.RemoveParent();
             }
         }
 
         private static void SetPlayersEntityLocation(EntityLocation entityLocation)
         {
-            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
-            
-            if (localPlayer != null)
-                localPlayer.SetEntityLocation(entityLocation);
+            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
 
-            // IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
-            //
-            // foreach (PlayerEntity playerEntity in allPlayers.Values)
-            //     playerEntity.SetEntityLocation(entityLocation);
+            foreach (PlayerEntity playerEntity in allPlayers.Values)
+                playerEntity.SetEntityLocation(entityLocation);
         }
 
         private LocationName GetCurrentLocation() =>

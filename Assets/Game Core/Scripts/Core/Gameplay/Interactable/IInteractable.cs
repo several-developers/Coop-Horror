@@ -7,8 +7,8 @@ namespace GameCore.Gameplay.Interactable
     public interface IInteractable
     {
         event Action OnInteractionStateChangedEvent;
-        void InteractionStarted();
-        void InteractionEnded();
+        void InteractionStarted(IEntity entity = null);
+        void InteractionEnded(IEntity entity = null);
         void Interact(IEntity entity = null);
         void ToggleInteract(bool canInteract);
         InteractionType GetInteractionType();

@@ -22,8 +22,11 @@ namespace GameCore.Gameplay.Network
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ITrainEntity trainEntity, ICamerasManager camerasManager,
-            IGameplayConfigsProvider gameplayConfigsProvider)
+        private void Construct(
+            ITrainEntity trainEntity,
+            ICamerasManager camerasManager,
+            IGameplayConfigsProvider gameplayConfigsProvider
+        )
         {
             _trainEntity = trainEntity;
             _camerasManager = camerasManager;
@@ -61,7 +64,7 @@ namespace GameCore.Gameplay.Network
 
             Vector3 spawnPosition = GetSpawnPosition();
             spawnPosition = Vector3.zero; // TEMP ?
-            
+
             PlayerEntity playerEntityPrefab = _playerConfig.PlayerPrefab;
             NetworkObject playerNetworkObjectPrefab = playerEntityPrefab.GetComponent<NetworkObject>();
 

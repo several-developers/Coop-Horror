@@ -58,11 +58,11 @@ namespace GameCore.Gameplay.Level
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void InteractionStarted()
+        public void InteractionStarted(IEntity entity = null)
         {
         }
 
-        public void InteractionEnded()
+        public void InteractionEnded(IEntity entity = null)
         {
         }
 

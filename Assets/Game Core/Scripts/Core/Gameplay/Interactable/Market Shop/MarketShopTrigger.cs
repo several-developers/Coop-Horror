@@ -32,13 +32,13 @@ namespace GameCore.Gameplay.Interactable.MarketShop
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void InteractionStarted()
+        public void InteractionStarted(IEntity entity = null)
         {
             PlayerInventory playerInventory = GetPlayerInventory();
             playerInventory.OnSelectedSlotChangedEvent += OnPlayerSelectedSlotChanged;
         }
 
-        public void InteractionEnded()
+        public void InteractionEnded(IEntity entity = null)
         {
             PlayerInventory playerInventory = GetPlayerInventory();
             playerInventory.OnSelectedSlotChangedEvent -= OnPlayerSelectedSlotChanged;

@@ -65,10 +65,10 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             _playerInventoryManager.PickUpItem(_lastInteractable);
 
         private void InteractionStarted() =>
-            _lastInteractable.InteractionStarted();
+            _lastInteractable.InteractionStarted(_playerEntity);
 
         private void InteractionEnded() =>
-            _lastInteractable.InteractionEnded();
+            _lastInteractable.InteractionEnded(_playerEntity);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

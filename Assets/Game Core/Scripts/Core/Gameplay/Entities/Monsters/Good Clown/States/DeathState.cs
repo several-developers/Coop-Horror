@@ -8,16 +8,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public DeathState(GoodClownEntity goodClownEntity, Balloon balloon)
-        {
+        public DeathState(GoodClownEntity goodClownEntity) =>
             _goodClownEntity = goodClownEntity;
-            _balloon = balloon;
-        }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly GoodClownEntity _goodClownEntity;
-        private readonly Balloon _balloon;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -45,7 +41,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         }
 
         private void ResetBalloon() => 
-            _balloon.Reset();
+            _goodClownEntity.ResetBalloonServerRpc();
 
         private void KillSelf()
         {

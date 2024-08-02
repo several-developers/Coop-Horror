@@ -13,7 +13,7 @@ namespace GameCore.Observers.Gameplay.Level
         
         public void LocationLoaded() =>
             OnLocationLoadedEvent.Invoke();
-
+        
         public void LocationUnloaded() =>
             OnLocationUnloadedEvent.Invoke();
     }

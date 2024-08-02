@@ -5,7 +5,6 @@ using GameCore.Gameplay.Entities.Monsters.GoodClown.States;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.Level;
-using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -65,6 +64,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         private GoodClownUtilities _clownUtilities;
 
         private bool _isBalloonReleased;
+        private bool _isBalloonReset;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -168,7 +168,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
                 HuntingIdleState huntingIdleState = new(goodClownEntity: this);
                 HuntingChaseState huntingChaseState = new(goodClownEntity: this, _levelProvider);
                 RespawnAsEvilClownState respawnAsEvilClownState = new(goodClownEntity: this, _monstersFactory);
-                DeathState deathState = new(goodClownEntity: this, _balloon);
+                DeathState deathState = new(goodClownEntity: this);
 
                 _goodClownStateMachine.AddState(searchForTargetState);
                 _goodClownStateMachine.AddState(followTargetState);
@@ -209,6 +209,16 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
             _isBalloonReleased = true;
             ReleaseBalloonClientRpc();
         }
+        
+        [ServerRpc(RequireOwnership = false)]
+        public void ResetBalloonServerRpc()
+        {
+            if (_isBalloonReset)
+                return;
+
+            _isBalloonReset = true;
+            ResetBalloonClientRpc();
+        }
 
         [ClientRpc]
         private void ReleaseBalloonClientRpc()
@@ -217,6 +227,13 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 
             if (_balloon != null)
                 _balloon.Release();
+        }
+
+        [ClientRpc]
+        private void ResetBalloonClientRpc()
+        {
+            if (_balloon != null)
+                _balloon.Reset();
         }
     }
 }

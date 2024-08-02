@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
+using GameCore.Observers.Gameplay.Game;
 using Object = UnityEngine.Object;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
@@ -16,26 +18,34 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LeaveLocationServerState(IHorrorStateMachine horrorStateMachine,
+        public LeaveLocationServerState(
+            IHorrorStateMachine horrorStateMachine,
             ILocationsLoader locationsLoader,
             ILevelProvider levelProvider,
-            IItemsProvider itemsProvider)
+            IItemsProvider itemsProvider,
+            IGameManagerDecorator gameManagerDecorator,
+            IGameObserver gameObserver
+        )
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
             _levelProvider = levelProvider;
             _itemsProvider = itemsProvider;
+            _gameManagerDecorator = gameManagerDecorator;
+            _gameObserver = gameObserver;
             _cancellationTokenSource = new CancellationTokenSource();
-            
+
             horrorStateMachine.AddState(this);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
         private readonly ILevelProvider _levelProvider;
         private readonly IItemsProvider _itemsProvider;
+        private readonly IGameManagerDecorator _gameManagerDecorator;
+        private readonly IGameObserver _gameObserver;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -45,6 +55,9 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         public async UniTaskVoid Enter()
         {
+            LocationName previousLocation = _gameManagerDecorator.GetPreviousLocation();
+            _gameObserver.TrainArrivedAtBase(previousLocation);
+
             // TEMP
             bool isCanceled = await UniTask
                 .Delay(millisecondsDelay: 500, cancellationToken: _cancellationTokenSource.Token)
@@ -52,7 +65,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
             if (isCanceled)
                 return;
-            
+
             DestroyAllItems();
             KillAllMonsters();
             ClearDungeonElevators();
@@ -78,7 +91,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                     allKeys.Remove(key);
                     continue;
                 }
-                
+
                 Object.Destroy(itemObject.gameObject);
             }
 
@@ -88,20 +101,19 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private void KillAllMonsters()
         {
-            
         }
 
         private void ClearDungeonElevators()
         {
             List<Floor> floors = new() { Floor.One, Floor.Two, Floor.Three };
-            
+
             foreach (Floor floor in floors)
             {
                 bool isElevatorFound = TryGetElevator(floor, out ElevatorBase elevatorBase);
-                
+
                 if (!isElevatorFound)
                     continue;
-                
+
                 Object.Destroy(elevatorBase.gameObject);
             }
 

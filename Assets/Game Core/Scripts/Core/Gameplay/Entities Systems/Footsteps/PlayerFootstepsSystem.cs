@@ -71,7 +71,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
         private bool IsVelocityValid()
         {
             Vector3 velocity = _character.velocity;
-            bool isVelocityValid = velocity.magnitude < 0.15f;
+            bool isVelocityValid = velocity.magnitude > 0.15f;
             return isVelocityValid;
         }
     }

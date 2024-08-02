@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cinemachine;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Train;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.EntitiesSystems.SoundReproducer;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.Train;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
-using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -45,14 +44,12 @@ namespace GameCore.Gameplay.Entities.Train
             IGameManagerDecorator gameManagerDecorator,
             ILocationManagerDecorator locationManagerDecorator,
             IQuestsManagerDecorator questsManagerDecorator,
-            ILevelObserver levelObserver,
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
             GameManagerDecorator = gameManagerDecorator;
             QuestsManagerDecorator = questsManagerDecorator;
             _locationManagerDecorator = locationManagerDecorator;
-            _levelObserver = levelObserver;
             _trainConfig = gameplayConfigsProvider.GetTrainConfig();
         }
 
@@ -86,7 +83,6 @@ namespace GameCore.Gameplay.Entities.Train
         private readonly NetworkVariable<bool> _isDoorOpened = new(writePerm: OwnerPermission);
 
         private ILocationManagerDecorator _locationManagerDecorator;
-        private ILevelObserver _levelObserver;
 
         private TrainConfigMeta _trainConfig;
         private TrainController _trainController;
@@ -95,6 +91,7 @@ namespace GameCore.Gameplay.Entities.Train
         private PathMovement _pathMovement;
 
         private MovementBehaviour _movementBehaviour;
+        private bool _isStoppedAtSector;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -125,6 +122,32 @@ namespace GameCore.Gameplay.Entities.Train
             ChangeToTheRoadPath();
         }
 
+        public void TeleportToTheSector()
+        {
+            CinemachinePath path = _locationManagerDecorator.GetEnterPath();
+
+            _pathMovement.ToggleArrived(isArrived: false);
+            ChangePath(path);
+            ToggleMovement(canMove: true);
+        }
+
+        public void TeleportLocalPlayerToTrainSeat(int seatIndex)
+        {
+            IReadOnlyList<TrainSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
+
+            foreach (TrainSeat mobileHQSeat in allMobileHQSeats)
+            {
+                bool isMatches = mobileHQSeat.SeatIndex == seatIndex;
+
+                if (!isMatches)
+                    continue;
+
+                PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+                mobileHQSeat.Interact(localPlayer);
+                break;
+            }
+        }
+
         [Button(ButtonStyle.FoldoutButton)]
         public void ToggleMainLeverState(bool isEnabled)
         {
@@ -144,6 +167,10 @@ namespace GameCore.Gameplay.Entities.Train
             SFXType sfxType = isOpened ? SFXType.DoorOpen : SFXType.DoorClose;
             PlaySound(sfxType);
         }
+
+        // MAKE  RPC
+        public void ToggleStoppedAtSectorState(bool isStoppedAtSector) =>
+            _isStoppedAtSector = isStoppedAtSector;
 
         public void PlaySound(SFXType sfxType)
         {
@@ -182,7 +209,11 @@ namespace GameCore.Gameplay.Entities.Train
 
             _soundReproducer = new TrainSoundReproducer(transform, _trainConfig);
             PlaySoundLocal(SFXType.MovementLoop);
-            
+
+            IReadOnlyList<TrainSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
+
+            foreach (TrainSeat trainSeat in allMobileHQSeats)
+                trainSeat.ShouldRemovePlayerParentEvent += ShouldRemovePlayerParent;
 
             _isMainLeverEnabled.OnValueChanged += OnMainLeverStateChanged;
 
@@ -197,8 +228,6 @@ namespace GameCore.Gameplay.Entities.Train
             int mobileHQSeatsAmount = allMobileHQSeats.Count;
             _seatsData.Value = new SeatsRuntimeDataContainer(mobileHQSeatsAmount);
 
-            _levelObserver.OnLocationLoadedEvent += OnLocationLoaded;
-            
             _pathMovement.OnDestinationReachedEvent += OnDestinationReached;
         }
 
@@ -219,12 +248,8 @@ namespace GameCore.Gameplay.Entities.Train
             PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
         }
 
-        protected override void DespawnServerOnly()
-        {
-            _levelObserver.OnLocationLoadedEvent -= OnLocationLoaded;
-            
+        protected override void DespawnServerOnly() =>
             _pathMovement.OnDestinationReachedEvent -= OnDestinationReached;
-        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -272,29 +297,29 @@ namespace GameCore.Gameplay.Entities.Train
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
 
-        private void TeleportLocalPlayerToRandomSeat()
+        private void TeleportAllPlayersToRandomSeats()
         {
-            PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
-            bool hasParent = playerEntity.transform.parent != null;
+            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
 
-            if (hasParent)
+            foreach (PlayerEntity playerEntity in allPlayers.Values)
+                TeleportPlayerToRandomSeat(playerEntity);
+        }
+
+        private void TeleportPlayerToRandomSeat(PlayerEntity playerEntity)
+        {
+            bool isDead = playerEntity.IsDead();
+
+            if (isDead)
+                return;
+
+            bool isInsideTrain = playerEntity.IsInsideTrain;
+
+            if (!isInsideTrain)
                 return;
 
             SeatsRuntimeDataContainer seatsRuntimeDataContainer = _seatsData.Value;
             int seatIndex = seatsRuntimeDataContainer.GetRandomFreeSeatIndex();
-
-            IReadOnlyList<TrainSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
-
-            foreach (TrainSeat mobileHQSeat in allMobileHQSeats)
-            {
-                bool isMatches = mobileHQSeat.SeatIndex == seatIndex;
-
-                if (!isMatches)
-                    continue;
-
-                mobileHQSeat.Interact(playerEntity);
-                break;
-            }
+            playerEntity.TeleportToTrainSeat(seatIndex);
         }
 
         private void ToggleSeatsColliders(bool isEnabled)
@@ -310,10 +335,7 @@ namespace GameCore.Gameplay.Entities.Train
         
         private void StopSoundLocal(SFXType sfxType) =>
             _soundReproducer.StopSound(sfxType);
-
-        private static bool IsCurrentPlayer(ulong senderClientID) =>
-            NetworkHorror.ClientID == senderClientID;
-
+        
         private bool IsSeatBusy(int seatIndex)
         {
             SeatsRuntimeDataContainer seatsRuntimeDataContainer = _seatsData.Value;
@@ -339,6 +361,8 @@ namespace GameCore.Gameplay.Entities.Train
             return isSeatBusy;
         }
 
+        private bool ShouldRemovePlayerParent() => _isStoppedAtSector;
+
         // RPC: -----------------------------------------------------------------------------------
 
 #warning TEMP
@@ -347,7 +371,8 @@ namespace GameCore.Gameplay.Entities.Train
         {
             OnMovementStartedEvent.Invoke();
 
-            TeleportLocalPlayerToRandomSeat();
+            //TeleportLocalPlayerToRandomSeat();
+            TeleportAllPlayersToRandomSeats();
             _pathMovement.ToggleArrived(isArrived: false);
             
             CinemachinePath exitPath = _locationManagerDecorator.GetExitPath();
@@ -359,20 +384,6 @@ namespace GameCore.Gameplay.Entities.Train
         {
             ulong senderClientId = serverRpcParams.Receive.SenderClientId;
             MainLeverAnimationClientRpc(senderClientId);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        public void PlayQuestsButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
-            PlayQuestsButtonAnimationClientRpc(senderClientId);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        public void PlayCompleteQuestsButtonAnimationServerRpc(ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
-            PlayCompleteQuestsButtonAnimationClientRpc(senderClientId);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -410,31 +421,13 @@ namespace GameCore.Gameplay.Entities.Train
         [ClientRpc]
         private void MainLeverAnimationClientRpc(ulong senderClientID)
         {
-            if (IsCurrentPlayer(senderClientID))
+            bool isCurrentPlayer = NetworkHorror.ClientID == senderClientID;
+            
+            if (isCurrentPlayer)
                 return;
 
             TrainMainLever mainLever = _references.MainLever;
             mainLever.InteractWithoutEvents(isLeverPulled: true);
-        }
-
-        [ClientRpc]
-        private void PlayQuestsButtonAnimationClientRpc(ulong senderClientID)
-        {
-            if (IsCurrentPlayer(senderClientID))
-                return;
-
-            SimpleButton openQuestsSelectionMenuButton = _references.OpenQuestsSelectionMenuButton;
-            openQuestsSelectionMenuButton.PlayInteractAnimation();
-        }
-
-        [ClientRpc]
-        private void PlayCompleteQuestsButtonAnimationClientRpc(ulong senderClientID)
-        {
-            if (IsCurrentPlayer(senderClientID))
-                return;
-
-            SimpleButton completeQuestsButton = _references.CompleteQuestsButton;
-            completeQuestsButton.PlayInteractAnimation();
         }
 
         [ClientRpc]
@@ -480,15 +473,6 @@ namespace GameCore.Gameplay.Entities.Train
             }
         }
 
-        private void OnLocationLoaded()
-        {
-            CinemachinePath path = _locationManagerDecorator.GetEnterPath();
-
-            _pathMovement.ToggleArrived(isArrived: false);
-            ChangePath(path);
-            ToggleMovement(canMove: true);
-        }
-
         private void OnTakeSeat(int seatIndex)
         {
             ToggleSeatsColliders(isEnabled: false);
@@ -507,14 +491,17 @@ namespace GameCore.Gameplay.Entities.Train
         private void OnDoorStateChanged(bool previousValue, bool newValue) =>
             _references.Doors.SetActive(!newValue);
 
-        private void OnPlayerSpawned(PlayerEntity playerEntity)
+        private async void OnPlayerSpawned(PlayerEntity playerEntity)
         {
-            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+            // Чтобы успел поменяться родитель у игрока.
+            bool isCanceled = await UniTask
+                .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
 
-            if (!isLocalPlayer)
+            if (isCanceled)
                 return;
             
-            TeleportLocalPlayerToRandomSeat();
+            TeleportPlayerToRandomSeat(playerEntity);
         }
     }
 }

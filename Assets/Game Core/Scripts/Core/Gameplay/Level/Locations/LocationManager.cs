@@ -37,9 +37,9 @@ namespace GameCore.Gameplay.Level.Locations
         {
             _locationManagerDecorator.OnGetEnterPathInnerEvent += GetEnterPath;
             _locationManagerDecorator.OnGetExitPathInnerEvent += GetExitPath;
+            
+            SendLocationLoaded();
         }
-
-        private void Start() => SendLocationLoaded();
 
         private void OnDestroy()
         {
