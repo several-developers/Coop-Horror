@@ -7,10 +7,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameLoopState(
-            IHorrorStateMachine horrorStateMachine,
-            ITrainEntity trainEntity
-        )
+        public GameLoopState(IHorrorStateMachine horrorStateMachine, ITrainEntity trainEntity)
         {
             _horrorStateMachine = horrorStateMachine;
             _trainEntity = trainEntity;

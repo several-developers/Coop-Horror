@@ -5,6 +5,8 @@ namespace GameCore.Gameplay.PubSub.Messages
 {
     public struct UIEventMessage : INetworkSerializeByMemcpy
     {
+        // FIELDS: --------------------------------------------------------------------------------
+        
         public UIEventType UIEventType;
     }
 }

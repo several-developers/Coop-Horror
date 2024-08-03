@@ -4,6 +4,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.NoiseMechanic;
 using GameCore.Gameplay.Quests;
 using GameCore.Observers.Gameplay.Game;
 using Sirenix.OdinInspector;
@@ -23,9 +24,6 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         private PlayerSpawner _playerSpawner;
         
         [SerializeField, Required]
-        private RpcHandler _rpcHandler;
-
-        [SerializeField, Required]
         private GameTimeManager _gameTimeManager;
 
         [SerializeField, Required]
@@ -39,17 +37,20 @@ namespace GameCore.Configs.Gameplay.PrefabsList
 
         [SerializeField, Required]
         private GameObserverNetwork _gameObserver;
+        
+        [SerializeField, Required]
+        private NoiseSystem _noiseSystem;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public ElevatorsManager ElevatorsManager => _elevatorsManager;
         public PlayerSpawner PlayerSpawner => _playerSpawner;
-        public RpcHandler RpcHandler => _rpcHandler;
         public GameTimeManager GameTimeManager => _gameTimeManager;
         public QuestsManager QuestsManager => _questsManager;
         public GameManager GameManager => _gameManager;
         public ChatManager ChatManager => _chatManager;
         public GameObserverNetwork GameObserver => _gameObserver;
+        public NoiseSystem NoiseSystem => _noiseSystem;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

@@ -2,7 +2,6 @@ using GameCore.Gameplay.ChatManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Quests;
@@ -18,7 +17,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         public override void InstallBindings()
         {
             BindGameManagerDecorator();
-            BindRpcHandlerDecorator();
             BindElevatorsManagerDecorator();
             BindQuestsManagerDecorator();
             BindGameTimeManagerDecorator();
@@ -35,14 +33,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .BindInterfacesTo<GameManagerDecorator>()
                 .AsSingle();
         }
-        
-        private void BindRpcHandlerDecorator()
-        {
-            Container
-                .BindInterfacesTo<RpcHandlerDecorator>()
-                .AsSingle();
-        }
-        
+
         private void BindElevatorsManagerDecorator()
         {
             Container
@@ -82,6 +73,10 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<NetworkedMessageChannel<UIEventMessage>>()
+                .AsSingle();
+            
+            Container
+                .BindInterfacesTo<NetworkedMessageChannel<GenerateDungeonsMessage>>()
                 .AsSingle();
         }
     }

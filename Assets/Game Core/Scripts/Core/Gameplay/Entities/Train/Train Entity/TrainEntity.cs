@@ -168,7 +168,7 @@ namespace GameCore.Gameplay.Entities.Train
             PlaySound(sfxType);
         }
 
-        // MAKE  RPC
+        // MAKE RPC
         public void ToggleStoppedAtSectorState(bool isStoppedAtSector) =>
             _isStoppedAtSector = isStoppedAtSector;
 

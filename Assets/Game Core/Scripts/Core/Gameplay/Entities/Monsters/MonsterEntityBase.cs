@@ -17,20 +17,22 @@ namespace GameCore.Gameplay.Entities.Monsters
         [Title(Constants.References)]
         [SerializeField, Required]
         private ClientNetworkTransform _networkTransform;
-        
+
         [SerializeField, Required]
         protected NavMeshAgent _agent;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+#warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
         public EntityLocation EntityLocation { get; private set; } = EntityLocation.Sector;
+#warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
         public Floor CurrentFloor { get; private set; }
-        
+
         // FIELDS: --------------------------------------------------------------------------------
 
         public static event Action<MonsterEntityBase> OnMonsterSpawnedEvent = delegate { };
         public static event Action<MonsterEntityBase> OnMonsterDespawnedEvent = delegate { };
-        
+
         public event Action OnEntityTeleportedEvent = delegate { };
 
         private static readonly List<MonsterEntityBase> AllMonsters = new();
@@ -40,6 +42,7 @@ namespace GameCore.Gameplay.Entities.Monsters
         protected virtual void Awake()
         {
             CheckAgentState();
+#warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
             FindEntityLocation();
         }
 
@@ -50,7 +53,7 @@ namespace GameCore.Gameplay.Entities.Monsters
             _agent.enabled = false;
             _networkTransform.Teleport(position, rotation, transform.localScale);
             _agent.enabled = true;
-            
+
             OnEntityTeleportedEvent.Invoke();
         }
 
@@ -69,7 +72,7 @@ namespace GameCore.Gameplay.Entities.Monsters
         public static IReadOnlyList<MonsterEntityBase> GetAllMonsters() => AllMonsters;
 
         public MonoBehaviour GetMonoBehaviour() => this;
-        
+
         public Transform GetTransform() => transform;
 
         public NavMeshAgent GetAgent() => _agent;
@@ -80,6 +83,9 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         private void CheckAgentState()
         {
+            if (!IsServerOnly)
+                return;
+
             if (!_agent.enabled)
             {
                 _agent.enabled = true;
@@ -113,7 +119,7 @@ namespace GameCore.Gameplay.Entities.Monsters
                 SetEntityLocation(EntityLocation.Dungeon);
                 return;
             }
-            
+
             int randomFloor = Random.Range(1, 4);
             CurrentFloor = (Floor)randomFloor;
         }

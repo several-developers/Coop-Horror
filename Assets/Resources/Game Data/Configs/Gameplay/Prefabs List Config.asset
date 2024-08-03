@@ -17,8 +17,6 @@ MonoBehaviour:
     type: 3}
   _playerSpawner: {fileID: 3767574992753507385, guid: e09cafe6053c7f94698faecb9d7a4ca6,
     type: 3}
-  _rpcHandler: {fileID: 821963907471402004, guid: 4882ad51cdb7a9940a0d147cfaecb943,
-    type: 3}
   _gameTimeManager: {fileID: 6677644779065434593, guid: f722e5c15e829314a872d28ce9ee5253,
     type: 3}
   _questsManager: {fileID: 6106899287118582781, guid: 564db287dbba7074b9aa8784cdc5015e,
@@ -28,4 +26,6 @@ MonoBehaviour:
   _chatManager: {fileID: 4873480105101363823, guid: b8551c9f4d433514ba00c2560a9a1b63,
     type: 3}
   _gameObserver: {fileID: 1844099179600854447, guid: f216399b76199784782edaa78eae9649,
+    type: 3}
+  _noiseSystem: {fileID: 4978374440362832137, guid: 8305819a5cde1cf488dadff3441fb04d,
     type: 3}

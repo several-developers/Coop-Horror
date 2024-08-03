@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
+using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.GameTimeManagement;
@@ -27,6 +28,7 @@ namespace GameCore.Gameplay.GameManagement
             ICamerasManager camerasManager,
             IGameResetManager gameResetManager,
             IMonstersGenerator monstersGenerator,
+            IDungeonsManager dungeonsManager,
             ITrainEntity trainEntity,
             IPublisher<UIEventMessage> uiEventMessagePublisher)
         {
@@ -37,6 +39,7 @@ namespace GameCore.Gameplay.GameManagement
             _camerasManager = camerasManager;
             _gameResetManager = gameResetManager;
             _monstersGenerator = monstersGenerator;
+            _dungeonsManager = dungeonsManager;
             _trainEntity = trainEntity;
             _uiEventMessagePublisher = uiEventMessagePublisher;
             
@@ -65,6 +68,7 @@ namespace GameCore.Gameplay.GameManagement
         private readonly ICamerasManager _camerasManager;
         private readonly IGameResetManager _gameResetManager;
         private readonly IMonstersGenerator _monstersGenerator;
+        private readonly IDungeonsManager _dungeonsManager;
         private readonly ITrainEntity _trainEntity;
         private readonly IPublisher<UIEventMessage> _uiEventMessagePublisher;
 
@@ -149,6 +153,8 @@ namespace GameCore.Gameplay.GameManagement
         {
             string log = Log.HandleLog("--> Train leaving <gb>Base</gb>.");
             Debug.Log(log);
+            
+            _dungeonsManager.GenerateAndSendSeeds();
         }
 
         private void TrainArrivedAtSector()

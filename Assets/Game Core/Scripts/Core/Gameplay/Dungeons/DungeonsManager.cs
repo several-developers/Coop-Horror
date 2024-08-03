@@ -1,24 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using DunGen;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Level;
+using GameCore.Gameplay.PubSub;
+using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Observers.Gameplay.Dungeons;
-using GameCore.Observers.Gameplay.Rpc;
 using Sirenix.OdinInspector;
 using Zenject;
 
 namespace GameCore.Gameplay.Dungeons
 {
-    public class DungeonsManager : IInitializable, IDisposable
+    public interface IDungeonsManager
+    {
+        void GenerateAndSendSeeds();
+    }
+
+    public class DungeonsManager : IDungeonsManager, IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public DungeonsManager(ILevelProvider levelProvider, IDungeonsObserver dungeonsObserver,
-            IRpcObserver rpcObserver)
+        public DungeonsManager(
+            ILevelProvider levelProvider,
+            IDungeonsObserver dungeonsObserver,
+            ISubscriber<GenerateDungeonsMessage> generateDungeonsMessageSubscriber,
+            IPublisher<GenerateDungeonsMessage> generateDungeonsMessagePublisher
+        )
         {
             _levelProvider = levelProvider;
             _dungeonsObserver = dungeonsObserver;
-            _rpcObserver = rpcObserver;
+            _generateDungeonsMessageSubscriber = generateDungeonsMessageSubscriber;
+            _generateDungeonsMessagePublisher = generateDungeonsMessagePublisher;
             _dungeonsList = new List<DungeonWrapper>(capacity: 3);
         }
 
@@ -26,7 +38,8 @@ namespace GameCore.Gameplay.Dungeons
 
         private readonly ILevelProvider _levelProvider;
         private readonly IDungeonsObserver _dungeonsObserver;
-        private readonly IRpcObserver _rpcObserver;
+        private readonly ISubscriber<GenerateDungeonsMessage> _generateDungeonsMessageSubscriber;
+        private readonly IPublisher<GenerateDungeonsMessage> _generateDungeonsMessagePublisher;
         private readonly List<DungeonWrapper> _dungeonsList;
 
         private int _generatedDungeonsAmount;
@@ -38,16 +51,38 @@ namespace GameCore.Gameplay.Dungeons
             GetDungeons();
             SetDungeonsRoots();
 
-            _rpcObserver.OnGenerateDungeonsEvent += OnGenerateDungeons;
+            _generateDungeonsMessageSubscriber.Subscribe(OnGenerateDungeonsMessageReceived);
 
             _dungeonsObserver.OnDungeonGenerationCompletedEvent += OnDungeonGenerationCompleted;
         }
 
         public void Dispose()
         {
-            _rpcObserver.OnGenerateDungeonsEvent -= OnGenerateDungeons;
+            _generateDungeonsMessageSubscriber.Unsubscribe(OnGenerateDungeonsMessageReceived);
 
             _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
+        }
+
+        public void GenerateAndSendSeeds()
+        {
+            RandomStream randomStream = new();
+            int seedOne = GenerateRandomSeed();
+            int seedTwo = GenerateRandomSeed();
+            int seedThree = GenerateRandomSeed();
+
+            GenerateDungeonsMessage message = new()
+            {
+                SeedOne = seedOne,
+                SeedTwo = seedTwo,
+                SeedThree = seedThree
+            };
+
+            _generateDungeonsMessagePublisher.Publish(message);
+
+            // LOCAL METHODS: -----------------------------
+
+            int GenerateRandomSeed() =>
+                randomStream.Next();
         }
 
         public void ClearDungeons()
@@ -103,7 +138,7 @@ namespace GameCore.Gameplay.Dungeons
                 dungeonWrapper.Generate();
         }
 
-        private void GenerateDungeonsWithSeed(DungeonsSeedData data)
+        private void GenerateDungeonsWithSeed(GenerateDungeonsMessage message)
         {
             _generatedDungeonsAmount = 0;
 
@@ -115,15 +150,15 @@ namespace GameCore.Gameplay.Dungeons
                 switch (floor)
                 {
                     case Floor.One:
-                        seed = data.SeedOne;
+                        seed = message.SeedOne;
                         break;
 
                     case Floor.Two:
-                        seed = data.SeedTwo;
+                        seed = message.SeedTwo;
                         break;
 
                     case Floor.Three:
-                        seed = data.SeedThree;
+                        seed = message.SeedThree;
                         break;
 
                     default:
@@ -137,6 +172,9 @@ namespace GameCore.Gameplay.Dungeons
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnGenerateDungeonsMessageReceived(GenerateDungeonsMessage message) =>
+            GenerateDungeonsWithSeed(message);
+
         private void OnDungeonGenerationCompleted(Floor floor)
         {
             _generatedDungeonsAmount++;
@@ -144,8 +182,6 @@ namespace GameCore.Gameplay.Dungeons
             if (_generatedDungeonsAmount >= 3)
                 _dungeonsObserver.DungeonsGenerationCompleted();
         }
-
-        private void OnGenerateDungeons(DungeonsSeedData data) => GenerateDungeonsWithSeed(data);
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
@@ -157,8 +193,14 @@ namespace GameCore.Gameplay.Dungeons
         [Button(buttonSize: 30, ButtonStyle.FoldoutButton), DisableInEditorMode]
         private void DebugGenerateDungeonsWithSeed(int seedOne, int seedTwo, int seedThree)
         {
-            DungeonsSeedData data = new(seedOne, seedTwo, seedThree);
-            GenerateDungeonsWithSeed(data);
+            GenerateDungeonsMessage message = new()
+            {
+                SeedOne = seedOne,
+                SeedTwo = seedTwo,
+                SeedThree = seedThree
+            };
+            
+            GenerateDungeonsWithSeed(message);
         }
 
         [Button(buttonSize: 30), DisableInEditorMode]

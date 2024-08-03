@@ -3,7 +3,6 @@ using GameCore.Observers.Gameplay.Game;
 using GameCore.Observers.Gameplay.Level;
 using GameCore.Observers.Gameplay.LevelManager;
 using GameCore.Observers.Gameplay.PlayerInteraction;
-using GameCore.Observers.Gameplay.Rpc;
 using GameCore.Observers.Gameplay.UI;
 using GameCore.Observers.Gameplay.UIManager;
 using Zenject;
@@ -21,7 +20,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindDungeonsObserver();
             BindLevelObserver();
             BindLevelProviderObserver();
-            BindRpcObserver();
             BindUIManagerObserver();
             BindGameStateObserver();
         }
@@ -61,13 +59,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<LevelProviderObserver>()
-                .AsSingle();
-        }
-
-        private void BindRpcObserver()
-        {
-            Container
-                .BindInterfacesTo<RpcObserver>()
                 .AsSingle();
         }
 

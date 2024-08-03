@@ -8,6 +8,7 @@ using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Observers.Gameplay.Game;
 using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
@@ -29,6 +30,7 @@ namespace GameCore.Gameplay.GameManagement
             INetworkHorror networkHorror,
             IGameObserver gameObserver,
             ILevelObserver levelObserver,
+            IDungeonsObserver dungeonsObserver,
             ITrainEntity trainEntity,
             IGameplayConfigsProvider gameplayConfigsProvider
         )
@@ -38,6 +40,7 @@ namespace GameCore.Gameplay.GameManagement
             _networkHorror = networkHorror;
             _gameObserver = gameObserver;
             _levelObserver = levelObserver;
+            _dungeonsObserver = dungeonsObserver;
             _trainEntity = trainEntity;
             _networkSceneManager = NetworkManager.Singleton.SceneManager;
             _balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
@@ -61,6 +64,7 @@ namespace GameCore.Gameplay.GameManagement
         private INetworkHorror _networkHorror;
         private IGameObserver _gameObserver;
         private ILevelObserver _levelObserver;
+        private IDungeonsObserver _dungeonsObserver;
         private ITrainEntity _trainEntity;
         private NetworkSceneManager _networkSceneManager;
         private BalanceConfigMeta _balanceConfig;
@@ -140,6 +144,8 @@ namespace GameCore.Gameplay.GameManagement
             _levelObserver.OnLocationLoadedEvent += OnServerLocationLoaded;
             _levelObserver.OnLocationUnloadedEvent += OnServerLocationUnloaded;
 
+            _dungeonsObserver.OnDungeonsGenerationCompletedEvent += OnDungeonsGenerationCompleted;
+
             _networkSceneManager.OnLoadEventCompleted += OnSceneLoadCompleted;
             _networkSceneManager.OnUnloadEventCompleted += OnSceneUnloadCompleted;
 
@@ -165,6 +171,8 @@ namespace GameCore.Gameplay.GameManagement
 
             _levelObserver.OnLocationLoadedEvent -= OnServerLocationLoaded;
             _levelObserver.OnLocationUnloadedEvent -= OnServerLocationUnloaded;
+
+            _dungeonsObserver.OnDungeonsGenerationCompletedEvent -= OnDungeonsGenerationCompleted;
 
             if (_networkSceneManager != null)
             {
@@ -288,7 +296,7 @@ namespace GameCore.Gameplay.GameManagement
             ChangeGameState(newState);
         }
 
-        private async void LocationLoadedLogic()
+        private void LocationLoadedLogic()
         {
             bool isLocationLoaded = _isServerLocationLoaded && _isScenesSynchronized;
 
@@ -296,19 +304,14 @@ namespace GameCore.Gameplay.GameManagement
                 return;
 
             _gameObserver.TrainLeavingBase();
-
-            await UniTask.Delay(3000);
-            
-            _gameObserver.TrainArrivedAtSector();
         }
-        
+
         private void LocationUnloadedLogic()
         {
             bool isLocationUnloaded = !_isServerLocationLoaded && !_isScenesSynchronized;
 
             if (!isLocationUnloaded)
                 return;
-            
         }
 
         private void StartGameRestartTimer()
@@ -417,7 +420,7 @@ namespace GameCore.Gameplay.GameManagement
             _currentLocation.Value = selectedLocation;
             _previousSelectedLocation = selectedLocation;
             _isServerLocationLoaded = true;
-            
+
             LocationLoadedLogic();
         }
 
@@ -429,6 +432,10 @@ namespace GameCore.Gameplay.GameManagement
 
             LocationUnloadedLogic();
         }
+
+#warning ЗАМЕНИТЬ НА СИНХРОНИЗИРУЕМУЮ У ВСЕХ ВЕРСИЮ
+        private void OnDungeonsGenerationCompleted() =>
+            _gameObserver.TrainArrivedAtSector();
 
         private void OnTrainMovementStopped() =>
             _gameObserver.TrainStoppedAtSector();

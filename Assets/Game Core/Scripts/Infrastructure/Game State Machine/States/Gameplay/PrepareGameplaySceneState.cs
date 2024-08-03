@@ -4,9 +4,9 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.NoiseMechanic;
 using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
-using GameCore.Observers.Gameplay.Game;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -53,12 +53,12 @@ namespace GameCore.Infrastructure.StateMachine
             _clientID = _networkManager.LocalClientId;
 
             CreateGameManager();
-            CreateRpcCaller();
             CreatePlayerSpawner();
             CreateElevatorsManager();
             CreateQuestsManager();
             CreateGameTimeManager();
             CreateChatManager();
+            CreateNoiseSystem();
             //CreateGameObserver();
         }
 
@@ -66,12 +66,6 @@ namespace GameCore.Infrastructure.StateMachine
         {
             GameManager gameManagerPrefab = _prefabsListConfig.GameManager;
             CreateNetworkPrefab(gameManagerPrefab.gameObject);
-        }
-
-        private void CreateRpcCaller()
-        {
-            RpcHandler rpcHandlerPrefab = _prefabsListConfig.RpcHandler;
-            CreateNetworkPrefab(rpcHandlerPrefab.gameObject);
         }
 
         private void CreatePlayerSpawner()
@@ -102,6 +96,12 @@ namespace GameCore.Infrastructure.StateMachine
         {
             ChatManager chatManagerPrefab = _prefabsListConfig.ChatManager;
             CreateNetworkPrefab(chatManagerPrefab.gameObject);
+        }
+
+        private void CreateNoiseSystem()
+        {
+            NoiseSystem noiseSystemPrefab = _prefabsListConfig.NoiseSystem;
+            CreateNetworkPrefab(noiseSystemPrefab.gameObject);
         }
 
         // private void CreateGameObserver()
