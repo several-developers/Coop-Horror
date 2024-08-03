@@ -17,10 +17,12 @@ namespace GameCore.Infrastructure.Providers.Gameplay.MonstersAI
             _goodClownAIConfig = Load<GoodClownAIConfigMeta>(path: ConfigsPaths.GoodClownAIConfig);
             _evilClownAIConfig = Load<EvilClownAIConfigMeta>(path: ConfigsPaths.EvilClownAIConfig);
             _beetleAIConfig = Load<BeetleAIConfigMeta>(path: ConfigsPaths.BeetleAIConfig);
+            _blindCreatureAIConfig = Load<BlindCreatureAIConfigMeta>(path: ConfigsPaths.BlindCreatureAIConfig);
 
             AddMonsterAIConfigToDictionary(_goodClownAIConfig);
             AddMonsterAIConfigToDictionary(_evilClownAIConfig);
             AddMonsterAIConfigToDictionary(_beetleAIConfig);
+            AddMonsterAIConfigToDictionary(_blindCreatureAIConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -29,6 +31,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.MonstersAI
         private readonly GoodClownAIConfigMeta _goodClownAIConfig;
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly BeetleAIConfigMeta _beetleAIConfig;
+        private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -46,6 +49,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.MonstersAI
         public GoodClownAIConfigMeta GetGoodClownAIConfig() => _goodClownAIConfig;
         public EvilClownAIConfigMeta GetEvilClownAIConfig() => _evilClownAIConfig;
         public BeetleAIConfigMeta GetBeetleAIConfig() => _beetleAIConfig;
+        public BlindCreatureAIConfigMeta GetBlindCreatureAIConfig() => _blindCreatureAIConfig;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

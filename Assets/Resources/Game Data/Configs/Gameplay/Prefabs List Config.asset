@@ -27,5 +27,5 @@ MonoBehaviour:
     type: 3}
   _gameObserver: {fileID: 1844099179600854447, guid: f216399b76199784782edaa78eae9649,
     type: 3}
-  _noiseSystem: {fileID: 4978374440362832137, guid: 8305819a5cde1cf488dadff3441fb04d,
+  _noiseManager: {fileID: 4978374440362832137, guid: 8305819a5cde1cf488dadff3441fb04d,
     type: 3}

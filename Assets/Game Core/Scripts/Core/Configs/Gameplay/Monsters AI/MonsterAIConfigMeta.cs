@@ -58,7 +58,8 @@ namespace GameCore.Configs.Gameplay.Enemies
         
         [BoxGroup(SpawnSettingsGroup), SerializeField, Space(height: 5)]
         [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
-        private FloorsChancesMultipliersConfig _floorsChancesMultipliersConfig;
+        [ListDrawerSettings(ListElementLabelName = "Label")]
+        private List<FloorChanceMultiplierConfig> _floorChanceMultiplierConfigs = new();
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -97,8 +98,18 @@ namespace GameCore.Configs.Gameplay.Enemies
         public override string GetMetaCategory() =>
             EditorConstants.MonstersAICategory;
 
-        public float GetFloorSpawnChanceMultiplier(Floor floor) =>
-            _floorsChancesMultipliersConfig.GetMultiplier(floor);
+        public float GetFloorSpawnChanceMultiplier(Floor floor)
+        {
+            foreach (FloorChanceMultiplierConfig config in _floorChanceMultiplierConfigs)
+            {
+                bool isMatches = config.Floor == floor;
+
+                if (isMatches)
+                    return config.Multiplier;
+            }
+
+            return 1f;
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -118,54 +129,22 @@ namespace GameCore.Configs.Gameplay.Enemies
         // INNER CLASSES: -------------------------------------------------------------------------
 
         [Serializable]
-        public class FloorsChancesMultipliersConfig
+        private class FloorChanceMultiplierConfig
         {
-            // CONSTRUCTORS: --------------------------------------------------------------------------
-
-            public FloorsChancesMultipliersConfig() =>
-                _configs = new List<FloorChanceMultiplierConfig>();
-
             // MEMBERS: -------------------------------------------------------------------------------
 
             [SerializeField]
-            [ListDrawerSettings(ListElementLabelName = "Label")]
-            private List<FloorChanceMultiplierConfig> _configs;
+            private Floor _floor = Floor.One;
 
-            // PUBLIC METHODS: ------------------------------------------------------------------------
+            [SerializeField, Range(0f, 5f)]
+            private float _multiplier = 1f;
 
-            public float GetMultiplier(Floor floor)
-            {
-                foreach (FloorChanceMultiplierConfig config in _configs)
-                {
-                    bool isMatches = config.Floor == floor;
+            // PROPERTIES: ----------------------------------------------------------------------------
 
-                    if (isMatches)
-                        return config.Multiplier;
-                }
-
-                return 1f;
-            }
-            
-            // INNER CLASSES: -------------------------------------------------------------------------
-
-            [Serializable]
-            public class FloorChanceMultiplierConfig
-            {
-                // MEMBERS: -------------------------------------------------------------------------------
-
-                [SerializeField]
-                private Floor _floor = Floor.One;
-
-                [SerializeField, Range(0f, 5f)]
-                private float _multiplier = 1f;
-
-                // PROPERTIES: ----------------------------------------------------------------------------
-
-                public Floor Floor => _floor;
-                public float Multiplier => _multiplier;
+            public Floor Floor => _floor;
+            public float Multiplier => _multiplier;
                 
-                private string Label => $"'Floor: {_floor}',   'Multiplier: {_multiplier}'";
-            }
+            private string Label => $"'Floor: {_floor}',   'Multiplier: {_multiplier}'";
         }
     }
 }

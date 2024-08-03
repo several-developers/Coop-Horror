@@ -23,3 +23,6 @@ MonoBehaviour:
   - _monsterType: 3
     _monsterPrefab: {fileID: 8485105040675278888, guid: 96346420cfba9a34ba2e7051915fc1ff,
       type: 3}
+  - _monsterType: 4
+    _monsterPrefab: {fileID: 3369362229999467226, guid: 3b82e74c90ef580488cb185825be0310,
+      type: 3}

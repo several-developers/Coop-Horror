@@ -17,6 +17,7 @@ using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.NoiseManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Observers.Gameplay.PlayerInteraction;
@@ -98,6 +99,9 @@ namespace GameCore.Gameplay.Entities.Player
         public event Action OnDiedEvent = delegate { };
         public event Action OnRevivedEvent = delegate { };
         public event Action<bool> OnParentChangedEvent = delegate { };
+        
+        public event Func<bool> IsCrouching = () => false;
+        public event Func<bool> IsSprinting = () => false;
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
@@ -296,6 +300,8 @@ namespace GameCore.Gameplay.Entities.Player
 
             _healthSystem.OnHealthChangedEvent += OnHealthChanged;
 
+            _soundReproducer.OnSoundWasPlayedEvent += MakeFootstepsNoise;
+
             // LOCAL METHODS: -----------------------------
 
             void Other()
@@ -410,6 +416,8 @@ namespace GameCore.Gameplay.Entities.Player
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
 
             _healthSystem.OnHealthChangedEvent -= OnHealthChanged;
+            
+            _soundReproducer.OnSoundWasPlayedEvent -= MakeFootstepsNoise;
         }
 
         protected override void DespawnNotOwner() =>
@@ -458,6 +466,26 @@ namespace GameCore.Gameplay.Entities.Player
             EnterDeathState();
         }
 
+        private void MakeFootstepsNoise()
+        {
+            float noiseRange = 17f;
+            float noiseLoudness = 0.4f;
+
+            if (IsSprinting.Invoke())
+            {
+                noiseRange = 22f;
+                noiseLoudness = 0.6f;
+            }
+
+            if (IsCrouching.Invoke())
+            {
+                noiseRange = 5f;
+                noiseLoudness = 0.05f;
+            }
+
+            NoiseManager.MakeNoise(transform.position, noiseRange, noiseLoudness);
+        }
+        
         private void EnterDeathState() => ChangeState<DeathState>();
 
         private void ChangeState<TState>() where TState : IState =>

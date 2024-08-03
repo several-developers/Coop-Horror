@@ -4,7 +4,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.NoiseMechanic;
+using GameCore.Gameplay.NoiseManagement;
 using GameCore.Gameplay.Quests;
 using GameCore.Observers.Gameplay.Game;
 using Sirenix.OdinInspector;
@@ -39,7 +39,7 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         private GameObserverNetwork _gameObserver;
         
         [SerializeField, Required]
-        private NoiseSystem _noiseSystem;
+        private NoiseManager _noiseManager;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         public GameManager GameManager => _gameManager;
         public ChatManager ChatManager => _chatManager;
         public GameObserverNetwork GameObserver => _gameObserver;
-        public NoiseSystem NoiseSystem => _noiseSystem;
+        public NoiseManager NoiseManager => _noiseManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

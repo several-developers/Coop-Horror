@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GameCore.Gameplay.NoiseMechanic
+namespace GameCore.Gameplay.NoiseManagement
 {
     public interface INoiseListener
     {

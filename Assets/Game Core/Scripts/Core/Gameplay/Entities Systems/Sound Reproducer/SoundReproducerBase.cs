@@ -1,4 +1,5 @@
-﻿using Sonity;
+﻿using System;
+using Sonity;
 using UnityEngine;
 
 namespace GameCore.Gameplay.EntitiesSystems.SoundReproducer
@@ -11,14 +12,19 @@ namespace GameCore.Gameplay.EntitiesSystems.SoundReproducer
             _owner = owner;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
+        public event Action OnSoundWasPlayedEvent = delegate { }; 
+
         private readonly Transform _owner;
         
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected void PlaySound(SoundEvent soundEvent) =>
+        protected void PlaySound(SoundEvent soundEvent)
+        {
             soundEvent.Play(_owner);
-        
+            OnSoundWasPlayedEvent.Invoke();
+        }
+
         protected void StopSound(SoundEvent soundEvent) =>
             soundEvent.Stop(_owner);
     }

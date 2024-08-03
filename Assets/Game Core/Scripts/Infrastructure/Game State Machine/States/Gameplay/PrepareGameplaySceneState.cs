@@ -4,7 +4,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.NoiseMechanic;
+using GameCore.Gameplay.NoiseManagement;
 using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Unity.Netcode;
@@ -58,7 +58,7 @@ namespace GameCore.Infrastructure.StateMachine
             CreateQuestsManager();
             CreateGameTimeManager();
             CreateChatManager();
-            CreateNoiseSystem();
+            CreateNoiseManager();
             //CreateGameObserver();
         }
 
@@ -98,10 +98,10 @@ namespace GameCore.Infrastructure.StateMachine
             CreateNetworkPrefab(chatManagerPrefab.gameObject);
         }
 
-        private void CreateNoiseSystem()
+        private void CreateNoiseManager()
         {
-            NoiseSystem noiseSystemPrefab = _prefabsListConfig.NoiseSystem;
-            CreateNetworkPrefab(noiseSystemPrefab.gameObject);
+            NoiseManager noiseManagerPrefab = _prefabsListConfig.NoiseManager;
+            CreateNetworkPrefab(noiseManagerPrefab.gameObject);
         }
 
         // private void CreateGameObserver()

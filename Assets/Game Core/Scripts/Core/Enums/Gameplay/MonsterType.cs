@@ -5,6 +5,7 @@
         _ = 0,
         GoodClown = 1,
         EvilClown = 2,
-        Beetle = 3
+        Beetle = 3,
+        BlindCreature = 4
     }
 }

@@ -27,6 +27,7 @@
         public const string GoodClownAIConfig = MonstersAIConfigs + "Good Clown AI";
         public const string EvilClownAIConfig = MonstersAIConfigs + "Evil Clown AI";
         public const string BeetleAIConfig = MonstersAIConfigs + "Beetle AI";
+        public const string BlindCreatureAIConfig = MonstersAIConfigs + "Blind Creature AI";
         
         public const string GameBalanceConfig = Configs + "Game Balance Config";
         

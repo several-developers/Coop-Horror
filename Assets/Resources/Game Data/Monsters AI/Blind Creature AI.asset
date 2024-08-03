@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d30f4c419dc5482283d48138f620e80e, type: 3}
+  m_Name: Blind Creature AI
+  m_EditorClassIdentifier: 
+  _metaName: Blind Creature AI
+  _dangerLevel: 2
+  _isDamageable: 1
+  _health: 100
+  _spawnType: 0
+  _maxCount: 5
+  _spawnChance: 50
+  _spawnChanceMultiplierByGameTime:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _spawnChanceMultiplierByMonstersCount:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _spawnTime: {x: 0, y: 1440}
+  _spawnTimeText: 00:00 - 24:00
+  _floorsChancesMultipliersConfig:
+    _configs: []
+  _fireExitInteractionDistance: 0.5
+  _fireExitInteractionDuration: 0.5
+  _fireExitDistanceCheckInterval: 0.2
+  _moveToDungeonSpeed: 1
+  _wanderingMinDelay: 0.5
+  _wanderingMaxDelay: 5
+  _wanderingMinSpeed: 1
+  _wanderingMaxSpeed: 2.5
+  _wanderingMinDistance: 1
+  _wanderingMaxDistance: 15
+  _triggerDistanceCheckInterval: 0.2
+  _triggerDistance: 5
+  _aggressionScale: 100
+  _aggressionIncreaseSpeed: 5
+  _aggressionDecreaseSpeed: 2
+  _screamDistance: 15
+  _screamCooldown: 5
+  _chasePositionCheckInterval: 0.1
+  _chaseSpeed: 5
+  _chaseDistanceCheckInterval: 0.1
+  _chaseStoppingDistance: 0.5
+  _maxChaseDistance: 10
+  _chaseEndDelay: 5
+  _attackDistance: 1
+  _attackCooldown: 2
+  _damage: 20

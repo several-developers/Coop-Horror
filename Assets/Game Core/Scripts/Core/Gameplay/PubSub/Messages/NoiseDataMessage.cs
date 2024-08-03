@@ -8,6 +8,7 @@ namespace GameCore.Gameplay.PubSub.Messages
         // FIELDS: --------------------------------------------------------------------------------
 
         public Vector3 noisePosition;
+        public float noiseRange;
         public float noiseLoudness;
         // Tag
     }
