@@ -300,8 +300,6 @@ namespace GameCore.Gameplay.Entities.Player
 
             _healthSystem.OnHealthChangedEvent += OnHealthChanged;
 
-            _soundReproducer.OnSoundWasPlayedEvent += MakeFootstepsNoise;
-
             // LOCAL METHODS: -----------------------------
 
             void Other()
@@ -318,6 +316,7 @@ namespace GameCore.Gameplay.Entities.Player
                 PlayerFootstepsSystem footstepsSystem = _references.FootstepsSystem;
                 footstepsSystem.Setup(playerEntity: this);
                 footstepsSystem.ToggleActiveState(isActive: true);
+                footstepsSystem.OnFootstepPerformedEvent += OnFootstepPerformed;
 
                 _playerStateMachine = new StateMachine();
 
@@ -416,8 +415,6 @@ namespace GameCore.Gameplay.Entities.Player
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
 
             _healthSystem.OnHealthChangedEvent -= OnHealthChanged;
-            
-            _soundReproducer.OnSoundWasPlayedEvent -= MakeFootstepsNoise;
         }
 
         protected override void DespawnNotOwner() =>
@@ -680,6 +677,12 @@ namespace GameCore.Gameplay.Entities.Player
                 OnDiedEvent.Invoke();
             else
                 OnRevivedEvent.Invoke();
+        }
+
+        private void OnFootstepPerformed(string colliderTag)
+        {
+            PlaySound(SFXType.Footsteps);
+            MakeFootstepsNoise();
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

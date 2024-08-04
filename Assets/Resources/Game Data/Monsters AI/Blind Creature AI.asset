@@ -16,7 +16,7 @@ MonoBehaviour:
   _dangerLevel: 2
   _isDamageable: 1
   _health: 100
-  _spawnType: 0
+  _spawnType: 3
   _maxCount: 5
   _spawnChance: 50
   _spawnChanceMultiplierByGameTime:
@@ -69,25 +69,13 @@ MonoBehaviour:
     m_RotationOrder: 4
   _spawnTime: {x: 0, y: 1440}
   _spawnTimeText: 00:00 - 24:00
-  _floorsChancesMultipliersConfig:
-    _configs: []
-  _fireExitInteractionDistance: 0.5
-  _fireExitInteractionDuration: 0.5
-  _fireExitDistanceCheckInterval: 0.2
-  _moveToDungeonSpeed: 1
+  _floorChanceMultiplierConfigs: []
   _wanderingMinDelay: 0.5
   _wanderingMaxDelay: 5
   _wanderingMinSpeed: 1
   _wanderingMaxSpeed: 2.5
   _wanderingMinDistance: 1
   _wanderingMaxDistance: 15
-  _triggerDistanceCheckInterval: 0.2
-  _triggerDistance: 5
-  _aggressionScale: 100
-  _aggressionIncreaseSpeed: 5
-  _aggressionDecreaseSpeed: 2
-  _screamDistance: 15
-  _screamCooldown: 5
   _chasePositionCheckInterval: 0.1
   _chaseSpeed: 5
   _chaseDistanceCheckInterval: 0.1
@@ -96,4 +84,3 @@ MonoBehaviour:
   _chaseEndDelay: 5
   _attackDistance: 1
   _attackCooldown: 2
-  _damage: 20

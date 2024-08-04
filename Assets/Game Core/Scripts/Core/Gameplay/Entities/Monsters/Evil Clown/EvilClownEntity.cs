@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.EvilClown.States;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.EntitiesSystems.Footsteps;
+using GameCore.Gameplay.EntitiesSystems.SoundReproducer;
 using GameCore.Gameplay.Level;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
@@ -16,6 +18,14 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 {
     public class EvilClownEntity : MonsterEntityBase
     {
+        public enum SFXType
+        {
+            // _ = 0,
+            Footsteps = 1,
+            Roar = 2,
+            Brainwash = 3
+        }
+
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
@@ -31,6 +41,9 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private Animator _animator;
 
         [SerializeField, Required]
+        private MonsterFootstepsSystem _footstepsSystem;
+        
+        [SerializeField, Required]
         private TextMeshPro _stateTMP;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -43,6 +56,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private StateMachine _evilClownStateMachine;
         private AnimationController _animationController;
         private WanderingTimer _wanderingTimer;
+        private EvilClownSoundReproducer _soundReproducer;
         private PlayerEntity _targetPlayer;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -51,7 +65,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         {
             if (!IsServerOnly)
                 return;
-            
+
             //DecideStateByLocation();
             EnterPrepareToChaseState();
         }
@@ -88,6 +102,13 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             EnterWanderingState(); // TEMP!!!!!!!!!!!!!!!!!!
         }
 
+#warning REFACTORING, MAKE UNIVERSAL
+        public void PlaySound(SFXType sfxType)
+        {
+            PlaySoundLocal(sfxType);
+            PlaySoundServerRPC(sfxType);
+        }
+
         [Button]
         public void EnterChaseState() => ChangeState<ChaseState>();
 
@@ -104,13 +125,18 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         public EvilClownAIConfigMeta GetEvilClownAIConfig() => _evilClownAIConfig;
 
         public AnimationController GetAnimationController() => _animationController;
-        
+
         public WanderingTimer GetWanderingTimer() => _wanderingTimer;
+
+        public MonsterFootstepsSystem GetFootstepsSystem() => _footstepsSystem;
 
         public override MonsterType GetMonsterType() =>
             MonsterType.EvilClown;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected override void InitAll() =>
+            _soundReproducer = new EvilClownSoundReproducer(transform, _evilClownAIConfig);
 
         protected override void InitServerOnly()
         {
@@ -118,6 +144,8 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
             InitSystems();
             SetupStates();
+            
+            _footstepsSystem.OnFootstepPerformedEvent += OnFootstepPerformed;
 
             // LOCAL METHODS: -----------------------------
 
@@ -126,10 +154,10 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
                 _evilClownStateMachine = new StateMachine();
                 _animationController = new AnimationController(evilClownEntity: this, _animator);
                 _wanderingTimer = new WanderingTimer(evilClownEntity: this);
-                
+
                 if (_targetPlayer == null)
                     _targetPlayer = PlayerEntity.GetLocalPlayer(); // TEMP!!!!!!!!!!!!!!!!!!
-                
+
                 _animationController.StartAnimationCheck();
 
                 _evilClownStateMachine.OnStateChangedEvent += state =>
@@ -175,6 +203,9 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void PlaySoundLocal(SFXType sfxType) =>
+            _soundReproducer.PlaySound(sfxType);
+        
         [Button]
         private void EnterPrepareToChaseState() => ChangeState<PrepareToChaseState>();
 
@@ -192,5 +223,31 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         private void ChangeState<TState>() where TState : IState =>
             _evilClownStateMachine.ChangeState<TState>();
+
+        // RPC: -----------------------------------------------------------------------------------
+        
+        [ServerRpc(RequireOwnership = false)]
+        private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+
+            PlaySoundClientRPC(sfxType, senderClientID);
+        }
+        
+        [ClientRpc]
+        private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
+        {
+            bool isClientIDMatches = IsClientIDMatches(senderClientID);
+
+            // Don't reproduce sound twice on sender.
+            if (isClientIDMatches)
+                return;
+
+            PlaySoundLocal(sfxType);
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnFootstepPerformed(string colliderTag) => PlaySound(SFXType.Footsteps);
     }
 }

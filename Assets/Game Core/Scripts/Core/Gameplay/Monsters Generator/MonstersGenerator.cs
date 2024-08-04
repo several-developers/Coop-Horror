@@ -175,10 +175,9 @@ namespace GameCore.Gameplay.MonstersGeneration
             {
                 ValidMonster validMonster = _validMonstersList[i];
                 MonsterAIConfigMeta monsterAIConfig = validMonster.MonsterAIConfig;
-                MonsterType monsterType = validMonster.MonsterType;
 
                 int maxCount = monsterAIConfig.MaxCount;
-                int currentAmount = _roundManager.GetMonstersCount(monsterType);
+                int currentAmount = GetMonstersCurrentAmount(monsterAIConfig);
                 bool isAmountValid = currentAmount < maxCount;
 
                 if (!isAmountValid)
@@ -233,7 +232,7 @@ namespace GameCore.Gameplay.MonstersGeneration
                 float gameTimeMultiplier = multiplierByGameTime.Evaluate(currentTimeNormalized);
 
                 int maxMonstersCount = monsterAIConfig.MaxCount;
-                int currentMonstersCount = _roundManager.GetMonstersCount(monsterType);
+                int currentMonstersCount = GetMonstersCurrentAmount(monsterAIConfig);
                 float currentMonstersCountNormalized = Mathf.Clamp01(currentMonstersCount / (float)maxMonstersCount);
                 float monstersCountMultiplier = multiplierByMonstersCount.Evaluate(currentMonstersCountNormalized);
 
@@ -495,6 +494,26 @@ namespace GameCore.Gameplay.MonstersGeneration
             }
 
             return currentDangerValue;
+        }
+
+        private int GetMonstersCurrentAmount(MonsterAIConfigMeta monsterAIConfig)
+        {
+            MonsterType monsterType = monsterAIConfig.GetMonsterType();
+            int monstersCount = _roundManager.GetMonstersCount(monsterType);
+            
+            IEnumerable<MonsterType> relatedMonstersToCount = monsterAIConfig.GetRelatedMonstersToCount();
+            
+            foreach (MonsterType relatedMonsterType in relatedMonstersToCount)
+            {
+                bool isAtLeastOneMonsterExists = _roundManager.IsAtLeastOneMonsterExists(relatedMonsterType);
+
+                if (!isAtLeastOneMonsterExists)
+                    continue;
+
+                monstersCount += 1;
+            }
+
+            return monstersCount;
         }
 
         #endregion

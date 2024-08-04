@@ -8,20 +8,27 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
     public abstract class FootstepsSystemBase : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
-        
+
         [Title(MainSettings)]
         [SerializeField, Min(0f)]
         private float _baseStepSpeed = 0.5f;
+        
+        [SerializeField, Min(0f)]
+        private float _minStepSpeed = 0.1f;
+        
+        [SerializeField, Min(0f)]
+        private float _maxStepSpeed = 10f;
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        protected event Func<Vector2> GetInputEvent = () => Vector2.zero;
+        public event Action<string> OnFootstepPerformedEvent = delegate { };
+        
         protected event Func<float> GetStepSpeedMultiplierEvent = () => 1f;
         protected event Func<bool> GetGroundedEvent = () => true;
-        protected event Func<bool> GetCustomCheckEvent = () => true;
+        protected event Func<bool> GetCustomChecksEvent = () => true;
 
         private const string MainSettings = "Main Settings";
-        
+
         private SoundEvent _soundEvent;
         private float _footstepTimer;
         private bool _isActive;
@@ -32,7 +39,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
         {
             if (!_isActive)
                 return;
-            
+
             HandleFootsteps();
         }
 
@@ -41,16 +48,14 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
         public void ToggleActiveState(bool isActive) =>
             _isActive = isActive;
 
-        public void SetSoundEvent(SoundEvent soundEvent) =>
-            _soundEvent = soundEvent;
-
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
+#warning DELETE AND REPLACE WITH EVENT?
         protected virtual void PlaySound()
         {
             if (_soundEvent == null)
                 return;
-            
+
             _soundEvent.Play(transform);
         }
 
@@ -63,13 +68,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
             if (!isGrounded)
                 return;
 
-            Vector2 input = GetInputEvent.Invoke();
-            bool isInputZero = input.magnitude < 0.05f;
-
-            if (isInputZero)
-                return;
-
-            bool isCustomCheckValid = GetCustomCheckEvent.Invoke();
+            bool isCustomCheckValid = GetCustomChecksEvent.Invoke();
 
             if (!isCustomCheckValid)
                 return;
@@ -80,7 +79,7 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
                 return;
 
             float footstepTimer = _baseStepSpeed * GetStepSpeedMultiplierEvent.Invoke();
-            _footstepTimer = footstepTimer;
+            _footstepTimer = Mathf.Clamp(value: footstepTimer, _minStepSpeed, _maxStepSpeed);
 
             bool hitSuccessfully =
                 Physics.Raycast(origin: transform.position, direction: Vector3.down, out RaycastHit hitInfo);
@@ -88,7 +87,10 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
             if (!hitSuccessfully)
                 return;
 
-            switch (hitInfo.collider.tag)
+            string colliderTag = hitInfo.collider.tag;
+            OnFootstepPerformedEvent.Invoke(colliderTag);
+            
+            switch (colliderTag)
             {
                 case "Footsteps/WOOD":
                     PlaySound();

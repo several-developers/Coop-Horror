@@ -1,4 +1,5 @@
-﻿using GameCore.Configs.Gameplay.Enemies;
+﻿using DG.Tweening;
+using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.EntitiesSystems.MovementLogics;
@@ -31,12 +32,11 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         private readonly WanderingTimer _wanderingTimer;
         private readonly ClownChaseLogic _chaseLogic;
 
-        private Coroutine _chaseCO;
-        private Coroutine _distanceCheckCO;
-        private Coroutine _chasingEndTimerCO;
+        private Tweener _moveSpeedChangeTN;
+
         private float _cachedAgentStoppingDistance;
         private bool _isStopChasingTimerEnabled;
-        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()
@@ -55,8 +55,9 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _chaseLogic.GetClownFloorEvent += GetClownFloor;
             _chaseLogic.GetFireExitInteractionDistanceEvent += GetFireExitInteractionDistance;
             _chaseLogic.GetStoppingDistanceEvent += GetStoppingDistance;
-            
+
             EnableAgent();
+            IncreaseMoveSpeed();
             _wanderingTimer.StopTimer();
             _chaseLogic.Start();
         }
@@ -82,21 +83,40 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _chaseLogic.GetStoppingDistanceEvent -= GetStoppingDistance;
             
             _chaseLogic.Stop();
+            StopIncreasingMoveSpeed();
             ResetAgent();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
         private void EnableAgent()
         {
             _cachedAgentStoppingDistance = _agent.stoppingDistance;
             
-            _agent.speed = _evilClownAIConfig.ChaseSpeed;
+            _agent.speed = _evilClownAIConfig.MinChaseSpeed;
             _agent.stoppingDistance = _evilClownAIConfig.ChaseStoppingDistance;
         }
 
         private void ResetAgent() =>
             _agent.stoppingDistance = _cachedAgentStoppingDistance;
+
+        private void IncreaseMoveSpeed()
+        {
+            float duration = _evilClownAIConfig.ChaseSpeedChangeDuration;
+            float minSpeed = _evilClownAIConfig.MinChaseSpeed;
+            float maxSpeed = _evilClownAIConfig.MaxChaseSpeed;
+            
+            _moveSpeedChangeTN = DOVirtual
+                .Float(from: 0, to: 1f, duration, onVirtualUpdate: t =>
+                {
+                    float moveSpeed = Mathf.Lerp(a: minSpeed, b: maxSpeed, t);
+                    _agent.speed = moveSpeed;
+                })
+                .SetLink(_evilClownEntity.gameObject);
+        }
+
+        private void StopIncreasingMoveSpeed() =>
+            _moveSpeedChangeTN.Kill();
 
         private void EnterAttackState() =>
             _evilClownEntity.EnterAttackState();

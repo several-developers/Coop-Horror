@@ -79,11 +79,16 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         public abstract MonsterType GetMonsterType();
 
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected bool IsClientIDMatches(ulong targetClientID) =>
+            NetworkHorror.ClientID == targetClientID;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CheckAgentState()
         {
-            if (!IsServerOnly)
+            if (!NetworkHorror.IsTrueServer)
                 return;
 
             if (!_agent.enabled)

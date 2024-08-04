@@ -54,6 +54,12 @@ namespace GameCore.Gameplay.RoundManagement
         public int GetCurrentOutdoorDangerValue() => _currentOutdoorDangerValue;
         
         public int GetMonstersCount(MonsterType monsterType) => _monstersAlive[monsterType];
+        
+        public bool IsAtLeastOneMonsterExists(MonsterType monsterType)
+        {
+            int monstersAmount = _monstersAlive[monsterType];
+            return monstersAmount > 0;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

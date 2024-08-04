@@ -465,7 +465,7 @@ namespace GameCore.Gameplay.GameManagement
                 $"clients: {clientsCompleted.Count}"
             );
 
-            Debug.LogWarning(log);
+            Debug.Log(log);
 
             if (loadSceneMode != LoadSceneMode.Additive)
                 return;

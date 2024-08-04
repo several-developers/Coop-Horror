@@ -67,7 +67,7 @@ MonoBehaviour:
       voiceStopTime: 5
       voiceEffectLimit: 32
       debugSoundEventsInSceneViewEnabled: 1
-      debugSoundEventsInGameViewEnabled: 1
+      debugSoundEventsInGameViewEnabled: 0
       debugSoundEventsFontSize: 10
       debugSoundEventsVolumeToAlpha: 0.5
       debugSoundEventsLifetimeToAlpha: 0.75

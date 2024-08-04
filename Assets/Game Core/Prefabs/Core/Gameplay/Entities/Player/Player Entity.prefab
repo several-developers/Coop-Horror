@@ -2266,6 +2266,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _baseStepSpeed: 0.55
+  _minStepSpeed: 0.1
+  _maxStepSpeed: 10
   _crouchSpeedMultiplier: 1.2
   _sprintingSpeedMultiplier: 0.7
 --- !u!114 &2451543691127853220

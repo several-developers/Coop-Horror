@@ -14,6 +14,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         public AnimationController(EvilClownEntity evilClownEntity, Animator animator)
         {
             _evilClownEntity = evilClownEntity;
+            _evilClownAIConfig = evilClownEntity.GetEvilClownAIConfig();
             _agent = evilClownEntity.GetAgent();
             _transform = evilClownEntity.transform;
             _animator = animator;
@@ -26,6 +27,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly EvilClownEntity _evilClownEntity;
+        private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly EvilClownAIConfigMeta.AnimationSettings _animationConfig;
         private readonly NavMeshAgent _agent;
         private readonly Transform _transform;
@@ -47,8 +49,10 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         {
             float dampTime = _animationConfig.TypeChangeDuration;
             float deltaTime = Time.deltaTime;
+            float moveSpeedMultiplier = GetAnimationMoveSpeedMultiplier();
             
             _animator.SetFloat(id: AnimatorHashes.RunningType, value: _runningType, dampTime, deltaTime);
+            _animator.SetFloat(id: AnimatorHashes.MoveSpeedMultiplier, value: moveSpeedMultiplier, dampTime, deltaTime);
         }
 
         public void StopAnimationCheck()
@@ -99,6 +103,25 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
                 CheckAnimation();
             }
+        }
+        
+        private float GetAnimationMoveSpeedMultiplier()
+        {
+            float maxMoveSpeed = _agent.speed;
+            maxMoveSpeed = _evilClownAIConfig.MaxChaseSpeed;
+            bool isZero = Mathf.Approximately(a: maxMoveSpeed, b: 0f);
+
+            if (isZero)
+                return 1f;
+
+            float currentMoveSpeed = _agent.velocity.magnitude;
+            float percent = currentMoveSpeed / maxMoveSpeed;
+
+            Vector2 range = _animationConfig.AnimationSpeedMultiplierRange;
+            float multiplier = Mathf.Lerp(a: 0f, b: range.y, t: percent);
+            float result = Mathf.Clamp(value: multiplier, min: range.x, max: range.y);
+            
+            return result;
         }
     }
 }

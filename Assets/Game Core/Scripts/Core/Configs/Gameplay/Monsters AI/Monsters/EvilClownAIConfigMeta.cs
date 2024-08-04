@@ -1,6 +1,7 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
+using Sonity;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Enemies
@@ -24,7 +25,13 @@ namespace GameCore.Configs.Gameplay.Enemies
         private float _chasePositionCheckInterval = 0.1f;
         
         [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseSpeed = 5f;
+        private float _minChaseSpeed = 3f;
+        
+        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
+        private float _maxChaseSpeed = 15f;
+        
+        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
+        private float _chaseSpeedChangeDuration = 15f;
 
         [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
         private float _chaseDistanceCheckInterval = 0.1f;
@@ -62,6 +69,21 @@ namespace GameCore.Configs.Gameplay.Enemies
         [BoxGroup(AnimationGroup, showLabel: false), SerializeField, HideLabel, InlineProperty]
         private AnimationSettings _animationConfig;
 
+        [TitleGroup("Sound Settings")]
+        [BoxGroup("Sound Settings/In", showLabel: false), SerializeField]
+        [MinMaxSlider(minValue: 0f, maxValue: 10f, showFields: true)]
+        private Vector2 _brainWashSoundsDelay;
+        
+        [Title(SFXTitle)]
+        [SerializeField, Required]
+        private SoundEvent _footstepsSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _roarSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _brainwashSE;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float FireExitInteractionDistance => _fireExitInteractionDistance;
@@ -69,7 +91,9 @@ namespace GameCore.Configs.Gameplay.Enemies
         
         public float ChaseDelay => _chaseDelay;
         public float ChasePositionCheckInterval => _chasePositionCheckInterval;
-        public float ChaseSpeed => _chaseSpeed;
+        public float MinChaseSpeed => _minChaseSpeed;
+        public float MaxChaseSpeed => _maxChaseSpeed;
+        public float ChaseSpeedChangeDuration => _chaseSpeedChangeDuration;
         public float ChaseDistanceCheckInterval => _chaseDistanceCheckInterval;
         public float ChaseStoppingDistance => _chaseStoppingDistance;
         public float MaxChaseDistance => _maxChaseDistance;
@@ -84,6 +108,13 @@ namespace GameCore.Configs.Gameplay.Enemies
         public float WanderingMaxDistance => _wanderingMaxDistance;
 
         public AnimationSettings AnimationConfig => _animationConfig;
+
+        public Vector2 BrainWashSoundsDelay => _brainWashSoundsDelay;
+        
+        // SFX
+        public SoundEvent FootstepsSE => _footstepsSE;
+        public SoundEvent RoarSE => _roarSE;
+        public SoundEvent BrainwashSE => _brainwashSE;
         
         // FIELDS: --------------------------------------------------------------------------------
         
@@ -100,6 +131,8 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string ChaseStateGroup = ChaseStateSettings + "/Group";
         private const string AttackStateGroup = AttackStateSettings + "/Group";
         private const string AnimationGroup = AnimationSettingsTitle + "/Group";
+
+        private const string SFXTitle = "SFX";
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -125,6 +158,9 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             [SerializeField, Min(0f)]
             private float _runningSecondTypeDistance = 15f;
+            
+            [SerializeField, MinMaxSlider(minValue: 0f, maxValue: 4f, showFields: true)]
+            private Vector2 _animationSpeedMultiplierRange = Vector2.one;
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -132,6 +168,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             public float TypeChangeDuration => _typeChangeDuration;
             public float RunningFirstTypeDistance => _runningFirstTypeDistance;
             public float RunningSecondTypeDistance => _runningSecondTypeDistance;
+            public Vector2 AnimationSpeedMultiplierRange => _animationSpeedMultiplierRange;
         }
 
         #endregion

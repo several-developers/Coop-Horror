@@ -86,8 +86,13 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
             if (monsterEntity is not EvilClownEntity evilClownEntity)
                 return;
+
+            EntityLocation goodClownLocation = _goodClownEntity.EntityLocation;
+            Floor goodClownFloor = _goodClownEntity.CurrentFloor;
             
             evilClownEntity.SetTargetPlayer(targetPlayer);
+            evilClownEntity.SetEntityLocation(goodClownLocation);
+            evilClownEntity.SetFloor(goodClownFloor);
         }
 
         private void EnterDeathState() =>

@@ -121,8 +121,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private float GetMaxChaseDistance() =>
             _followTargetConfig.MaxFollowDistance;
 
-        private float GetTargetReachDistance() =>
-            _followTargetConfig.ReachDistance;
+        private float GetTargetReachDistance()
+        {
+            bool isChasingPlayer = _chaseLogic.IsChasingPlayer();
+            float reachDistance = isChasingPlayer ? _followTargetConfig.ReachDistance : 0.1f;
+            return reachDistance;
+        }
 
         private float GetFireExitInteractionDistance() =>
             _commonConfig.FireExitInteractionDistance;

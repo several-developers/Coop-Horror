@@ -28,6 +28,8 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
 
         private readonly ILevelProvider _levelProvider;
 
+        private bool _isChasingPlayer;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void Start()
@@ -43,6 +45,8 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
 
             GetTargetPositionEvent -= GetTargetPosition;
         }
+
+        public bool IsChasingPlayer() => _isChasingPlayer;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -90,6 +94,7 @@ namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
             if (useClownPosition)
                 targetPosition = Transform.position;
 
+            _isChasingPlayer = isChasingPlayer;
             Agent.stoppingDistance = isChasingPlayer ? GetStoppingDistanceEvent.Invoke() : 0f;
 
             return targetPosition;

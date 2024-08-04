@@ -10,5 +10,6 @@ namespace GameCore.Gameplay.RoundManagement
         int GetCurrentIndoorDangerValue();
         int GetCurrentOutdoorDangerValue();
         int GetMonstersCount(MonsterType monsterType);
+        bool IsAtLeastOneMonsterExists(MonsterType monsterType);
     }
 }

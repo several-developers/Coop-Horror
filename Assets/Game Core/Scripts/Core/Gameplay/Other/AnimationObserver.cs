@@ -14,6 +14,8 @@ namespace GameCore.Gameplay.Other
         public event Action OnDoorOpenedEvent = delegate { };
         public event Action OnDoorClosedEvent = delegate { };
         public event Action OnInteractEvent = delegate { };
+        public event Action OnFootstepEvent = delegate { };
+        public event Action<float> OnFootstepComplexEvent = delegate { };
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -37,5 +39,14 @@ namespace GameCore.Gameplay.Other
 
         public void OnTriggerInteractEvent() =>
             OnInteractEvent.Invoke();
+
+        public void OnTriggerFootstepEvent() =>
+            OnFootstepEvent.Invoke();
+
+        public void OnTriggerFootstepComplexEvent(AnimationEvent animationEvent)
+        {
+            float weight = animationEvent.animatorClipInfo.weight;
+            OnFootstepComplexEvent.Invoke(weight);
+        }
     }
 }

@@ -17,7 +17,6 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private PlayerEntity _playerEntity;
         private InputReader _inputReader;
         private Character _character;
         private MySprintAbility _sprintAbility;
@@ -26,28 +25,21 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
 
         private void Awake()
         {
-            GetInputEvent += GetInput;
             GetStepSpeedMultiplierEvent += GetStepSpeedMultiplier;
             GetGroundedEvent += IsGrounded;
-            GetCustomCheckEvent += IsVelocityValid;
+            GetCustomChecksEvent += GetCustomChecks;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Setup(PlayerEntity playerEntity)
         {
-            _playerEntity = playerEntity;
             _inputReader = playerEntity.InputReader;
 
             PlayerReferences references = playerEntity.References;
             _character = references.Character;
             _sprintAbility = references.SprintAbility;
         }
-
-        // PROTECTED METHODS: ---------------------------------------------------------------------
-
-        protected override void PlaySound() =>
-            _playerEntity.PlaySound(PlayerEntity.SFXType.Footsteps);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -67,6 +59,13 @@ namespace GameCore.Gameplay.EntitiesSystems.Footsteps
 
         private bool IsGrounded() =>
             _character.IsGrounded();
+
+        private bool GetCustomChecks()
+        {
+            Vector2 input = GetInput();
+            bool isInputZero = input.magnitude < 0.05f;
+            return !isInputZero && IsVelocityValid();
+        }
 
         private bool IsVelocityValid()
         {

@@ -68,8 +68,10 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         private void OnTargetNotFound() => DecideStateByLocation();
 
-        private static void OnAttack(PlayerEntity targetPlayer) =>
+        private static void OnAttack(PlayerEntity targetPlayer)
+        {
             targetPlayer.Kill(PlayerDeathReason._);
+        }
 
         private void OnAttackEnded() => EnterChaseState();
     }

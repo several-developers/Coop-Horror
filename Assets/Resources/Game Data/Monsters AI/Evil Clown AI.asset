@@ -19,13 +19,64 @@ MonoBehaviour:
   _spawnType: 3
   _maxCount: 1
   _spawnChance: 50
+  _spawnChanceMultiplierByGameTime:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _spawnChanceMultiplierByMonstersCount:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   _spawnTime: {x: 0, y: 1440}
   _spawnTimeText: 00:00 - 24:00
+  _floorChanceMultiplierConfigs: []
   _fireExitInteractionDistance: 0.5
   _fireExitInteractionDuration: 0.5
   _chaseDelay: 3
   _chasePositionCheckInterval: 0.1
-  _chaseSpeed: 7
+  _minChaseSpeed: 1
+  _maxChaseSpeed: 15
+  _chaseSpeedChangeDuration: 30
   _chaseDistanceCheckInterval: 0.1
   _chaseStoppingDistance: 0.5
   _maxChaseDistance: 10000
@@ -37,7 +88,12 @@ MonoBehaviour:
   _wanderingMinDistance: 1
   _wanderingMaxDistance: 15
   _animationConfig:
-    _distanceCheckInterval: 0.2
+    _distanceCheckInterval: 0.1
     _typeChangeDuration: 0.15
-    _runningFirstTypeDistance: 20
-    _runningSecondTypeDistance: 10
+    _runningFirstTypeDistance: 24
+    _runningSecondTypeDistance: 14
+    _animationSpeedMultiplierRange: {x: 0.1, y: 2}
+  _brainWashSoundsDelay: {x: 0, y: 3}
+  _footstepsSE: {fileID: 11400000, guid: 7b8dd2117c5d6b64cb147cb6e62204cf, type: 2}
+  _roarSE: {fileID: 11400000, guid: 6137db42e67de1f4d93bea16ce56ca46, type: 2}
+  _brainwashSE: {fileID: 11400000, guid: 3b22c1e2cc487fd4092f635f98e060d1, type: 2}

@@ -18,7 +18,7 @@ MonoBehaviour:
   _health: 100
   _spawnType: 0
   _maxCount: 1
-  _spawnChance: 50
+  _spawnChance: 100
   _spawnChanceMultiplierByGameTime:
     serializedVersion: 2
     m_Curve:
@@ -69,21 +69,17 @@ MonoBehaviour:
     m_RotationOrder: 4
   _spawnTime: {x: 0, y: 1440}
   _spawnTimeText: 00:00 - 24:00
-  _floorsChancesMultipliersConfig:
-    _configs:
-    - _floor: 1
-      _multiplier: 0.3
-    - _floor: 1
-      _multiplier: 0.5
-    - _floor: 1
-      _multiplier: 1.5
+  _relatedMonstersToCount: 02000000
+  _floorChanceMultiplierConfigs:
+  - _floor: 3
+    _multiplier: 5
   _commonConfig:
     _fireExitInteractionDistance: 0.5
     _fireExitInteractionDuration: 0.5
     _transformationDelay: 5
   _hunterSystemConfig:
     _disableHunting: 0
-    _huntingDuration: 10
+    _huntingDuration: 3
     _huntingCheckInterval: 0.5
     _transformationCheckInterval: 0.1
     _targetDistanceForHunt: 20

@@ -47,6 +47,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             // TEMP
             if (!IsSpawned)
                 NetworkObject.Spawn();
+            
+            EnterIdleState();
         }
         
         // PUBLIC METHODS: ------------------------------------------------------------------------

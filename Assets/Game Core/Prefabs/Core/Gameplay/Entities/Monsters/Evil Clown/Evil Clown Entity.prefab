@@ -678,6 +678,20 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &1964790684394329761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521519558286138969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c81ec3b55371412dbbf08e8f3bbbecd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _minTriggerDelay: 0.1
+  _animationObserver: {fileID: 4412640274585751298}
 --- !u!195 &6473772066748775481
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -689,7 +703,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 720
   m_StoppingDistance: 0
@@ -746,6 +760,7 @@ MonoBehaviour:
   _networkTransform: {fileID: 7532550479335359029}
   _agent: {fileID: 6473772066748775481}
   _animator: {fileID: 7114961460094434182}
+  _footstepsSystem: {fileID: 1964790684394329761}
   _stateTMP: {fileID: 80038948945131714}
 --- !u!4 &3289452592362427517 stripped
 Transform:
@@ -848,6 +863,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 4683227004537905034}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4412640274585751298 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9062072403571216520, guid: da51ab1404177ab4da4bdbeb7c9665f4,
+    type: 3}
+  m_PrefabInstance: {fileID: 4683227004537905034}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 470eebc1c90c4e7bb1c2ebb048f836f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &7114961460094434182 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 2468889474755093516, guid: da51ab1404177ab4da4bdbeb7c9665f4,

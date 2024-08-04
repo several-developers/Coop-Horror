@@ -55,8 +55,13 @@ namespace GameCore.Configs.Gameplay.Enemies
         [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
         [LabelText("Converted Time")]
         private string _spawnTimeText;
-        
+
         [BoxGroup(SpawnSettingsGroup), SerializeField, Space(height: 5)]
+        [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
+        [Tooltip("Другие монстры, которых стоит учитывать при подсчёте кол-ва этого монстра в игре.")]
+        private List<MonsterType> _relatedMonstersToCount = new();
+
+        [BoxGroup(SpawnSettingsGroup), SerializeField]
         [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
         [ListDrawerSettings(ListElementLabelName = "Label")]
         private List<FloorChanceMultiplierConfig> _floorChanceMultiplierConfigs = new();
@@ -75,7 +80,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         public AnimationCurve SpawnChanceMultiplierByGameTime => _spawnChanceMultiplierByGameTime;
         public AnimationCurve SpawnChanceMultiplierByMonstersCount => _spawnChanceMultiplierByMonstersCount;
         public Vector2Int SpawnTime => _spawnTime;
-        
+
         // FIELDS: --------------------------------------------------------------------------------
         
         private const string BaseSettings = "Base Settings";
@@ -92,6 +97,8 @@ namespace GameCore.Configs.Gameplay.Enemies
             base.OnEnable();
             UpdateSpawnTimeText();
         }
+
+        public IEnumerable<MonsterType> GetRelatedMonstersToCount() => _relatedMonstersToCount;
 
         public abstract MonsterType GetMonsterType();
         
