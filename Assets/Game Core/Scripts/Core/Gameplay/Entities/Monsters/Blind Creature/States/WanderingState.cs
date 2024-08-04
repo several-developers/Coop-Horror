@@ -3,24 +3,24 @@ using GameCore.Gameplay.EntitiesSystems.MovementLogics;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
+namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 {
     public class WanderingState : IEnterState, ITickableState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public WanderingState(BeetleEntity beetleEntity)
+        public WanderingState(BlindCreatureEntity blindCreatureEntity)
         {
-            _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleEntity.GetAIConfig();
-            _agent = beetleEntity.GetAgent();
-            _wanderingMovementLogic = new WanderingMovementLogic(beetleEntity.transform, _agent);
+            _blindCreatureEntity = blindCreatureEntity;
+            _blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            _agent = blindCreatureEntity.GetAgent();
+            _wanderingMovementLogic = new WanderingMovementLogic(blindCreatureEntity.transform, _agent);
         }
-
+        
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly BeetleEntity _beetleEntity;
-        private readonly BeetleAIConfigMeta _beetleAIConfig;
+        private readonly BlindCreatureEntity _blindCreatureEntity;
+        private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
         private readonly NavMeshAgent _agent;
         private readonly WanderingMovementLogic _wanderingMovementLogic;
 
@@ -61,21 +61,21 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         }
 
         private void EnterIdleState() =>
-            _beetleEntity.EnterIdleState();
+            _blindCreatureEntity.EnterIdleState();
         
         private float GetWanderingSpeed()
         {
-            float minSpeed = _beetleAIConfig.WanderingMinSpeed;
-            float maxSpeed = _beetleAIConfig.WanderingMaxSpeed;
+            float minSpeed = _blindCreatureAIConfig.WanderingMinSpeed;
+            float maxSpeed = _blindCreatureAIConfig.WanderingMaxSpeed;
             float speed = Random.Range(minSpeed, maxSpeed);
             return speed;
         }
 
         private float GetWanderingMinDistance() =>
-            _beetleAIConfig.WanderingMinDistance;
+            _blindCreatureAIConfig.WanderingMinDistance;
         
         private float GetWanderingMaxDistance() =>
-            _beetleAIConfig.WanderingMaxDistance;
+            _blindCreatureAIConfig.WanderingMaxDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

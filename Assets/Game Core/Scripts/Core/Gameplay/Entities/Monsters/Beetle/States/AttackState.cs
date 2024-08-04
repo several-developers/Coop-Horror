@@ -8,10 +8,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public AttackState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig)
+        public AttackState(BeetleEntity beetleEntity)
         {
             _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleAIConfig;
+            _beetleAIConfig = beetleEntity.GetAIConfig();
             _attackLogic = new AttackLogic(beetleEntity);
         }
 

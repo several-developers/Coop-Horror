@@ -1,5 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Enemies;
-using GameCore.Gameplay.Entities.Player;
+﻿using GameCore.Gameplay.Entities.Player;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,17 +8,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public TriggerState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig)
+        public TriggerState(BeetleEntity beetleEntity)
         {
             _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleAIConfig;
             _transform = beetleEntity.transform;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly BeetleEntity _beetleEntity;
-        private readonly BeetleAIConfigMeta _beetleAIConfig;
         private readonly Transform _transform;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

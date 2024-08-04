@@ -47,7 +47,7 @@ namespace GameCore.Gameplay.NoiseManagement
                 noiseRange = noiseRange,
                 noiseLoudness = noiseLoudness
             };
-            
+
             _noiseDataMessagePublisher.Publish(message);
         }
 

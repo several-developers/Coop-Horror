@@ -111,6 +111,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         public static IReadOnlyList<BeetleEntity> GetAllBeetles() => AllBeetles;
 
+        public BeetleAIConfigMeta GetAIConfig() => _beetleAIConfig;
+        
         public AggressionSystem GetAggressionSystem() => _aggressionSystem;
 
         public PlayerEntity GetTargetPlayer() => _targetPlayer;
@@ -153,19 +155,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             
             void SetupStates()
             {
-                IdleState idleState = new(beetleEntity: this, _beetleAIConfig);
-                WanderingState wanderingState = new(beetleEntity: this, _beetleAIConfig);
-                TriggerState triggerState = new(beetleEntity: this, _beetleAIConfig);
-                ScreamState screamState = new(beetleEntity: this, _beetleAIConfig);
-                ChaseState chaseState = new(beetleEntity: this, _beetleAIConfig);
-                AttackState attackState = new(beetleEntity: this, _beetleAIConfig);
+                IdleState idleState = new(beetleEntity: this);
+                WanderingState wanderingState = new(beetleEntity: this);
+                TriggerState triggerState = new(beetleEntity: this);
+                ScreamState screamState = new(beetleEntity: this);
+                ChaseState chaseState = new(beetleEntity: this);
+                AttackState attackState = new(beetleEntity: this);
                 DeathState deathState = new(beetleEntity: this);
-
-                MoveToSurfaceFireExitState moveToSurfaceFireExitState =
-                    new(beetleEntity: this, _beetleAIConfig, _levelProvider);
-            
-                MoveToDungeonFireExitState moveToDungeonFireExitState =
-                    new(beetleEntity: this, _beetleAIConfig, _levelProvider);
+                MoveToSurfaceFireExitState moveToSurfaceFireExitState = new(beetleEntity: this, _levelProvider);
+                MoveToDungeonFireExitState moveToDungeonFireExitState = new(beetleEntity: this, _levelProvider);
 
                 _beetleStateMachine.AddState(idleState);
                 _beetleStateMachine.AddState(wanderingState);

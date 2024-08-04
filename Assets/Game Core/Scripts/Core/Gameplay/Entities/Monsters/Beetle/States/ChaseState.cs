@@ -10,10 +10,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public ChaseState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig)
+        public ChaseState(BeetleEntity beetleEntity)
         {
             _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleAIConfig;
+            _beetleAIConfig = beetleEntity.GetAIConfig();
             _agent = beetleEntity.GetAgent();
             _chaseLogic = new ChaseLogic(beetleEntity, _agent);
         }

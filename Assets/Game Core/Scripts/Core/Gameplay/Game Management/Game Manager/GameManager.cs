@@ -58,6 +58,7 @@ namespace GameCore.Gameplay.GameManagement
         private readonly NetworkVariable<int> _playersGold = new();
 
         private readonly Dictionary<ulong, GameState> _playersStates = new(capacity: 8); // Server only.
+        private readonly Dictionary<ulong, bool> _playersLoadingStates = new(capacity: 8); // Server only.
 
         private IGameManagerDecorator _gameManagerDecorator;
         private IHorrorStateMachine _horrorStateMachine;
@@ -386,11 +387,17 @@ namespace GameCore.Gameplay.GameManagement
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnPlayerConnected(ulong clientID) =>
+        private void OnPlayerConnected(ulong clientID)
+        {
             _playersStates.TryAdd(clientID, _gameState.Value);
+            _playersLoadingStates.TryAdd(clientID, false);
+        }
 
-        private void OnPlayerDisconnected(ulong clientID) =>
+        private void OnPlayerDisconnected(ulong clientID)
+        {
             _playersStates.Remove(clientID);
+            _playersLoadingStates.Remove(clientID);
+        }
 
         private void OnCurrentLocationChanged(LocationName previousValue, LocationName newValue) =>
             _gameManagerDecorator.CurrentLocationChanged(newValue);

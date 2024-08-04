@@ -11,10 +11,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ScreamState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig)
+        public ScreamState(BeetleEntity beetleEntity)
         {
             _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleAIConfig;
+            _beetleAIConfig = beetleEntity.GetAIConfig();
             _transform = beetleEntity.transform;
         }
 

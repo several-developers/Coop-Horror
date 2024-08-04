@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Monsters.BlindCreature.States;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.NoiseManagement;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
@@ -58,8 +59,14 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             Debug.Log("Noise detected!");
         }
 
+        public void EnterIdleState() => ChangeState<IdleState>();
+        
+        public void EnterWanderingState() => ChangeState<IdleState>();
+
         public static IReadOnlyList<BlindCreatureEntity> GetAllBlindCreatures() => AllBlindCreatures;
 
+        public BlindCreatureAIConfigMeta GetAIConfig() => _blindCreatureAIConfig;
+        
         public override MonsterType GetMonsterType() =>
             MonsterType.BlindCreature;
 
@@ -87,7 +94,11 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             void SetupStates()
             {
+                IdleState idleState = new(blindCreatureEntity: this);
+                WanderingState wanderingState = new(blindCreatureEntity: this);
                 
+                _blindCreatureStateMachine.AddState(idleState);
+                _blindCreatureStateMachine.AddState(wanderingState);
             }
         }
 

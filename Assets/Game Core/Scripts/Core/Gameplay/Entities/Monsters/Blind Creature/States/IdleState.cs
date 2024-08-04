@@ -3,32 +3,29 @@ using GameCore.Configs.Gameplay.Enemies;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
+namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 {
     public class IdleState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public IdleState(BeetleEntity beetleEntity)
+        public IdleState(BlindCreatureEntity blindCreatureEntity)
         {
-            _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleEntity.GetAIConfig();
+            _blindCreatureEntity = blindCreatureEntity;
+            _blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
-        private readonly BeetleEntity _beetleEntity;
-        private readonly BeetleAIConfigMeta _beetleAIConfig;
-
+        private readonly BlindCreatureEntity _blindCreatureEntity;
+        private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
+        
         private Coroutine _wanderingTimerCO;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void Enter()
         {
-            AggressionSystem aggressionSystem = _beetleEntity.GetAggressionSystem();
-            
-            EnableAggressionSystemTriggerCheck(aggressionSystem);
             DisableAgent();
             StopWanderingTimer();
             StartWanderingTimer();
@@ -38,23 +35,20 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static void EnableAggressionSystemTriggerCheck(AggressionSystem aggressionSystem) =>
-            aggressionSystem.ToggleTriggerCheckState(isEnabled: true);
-
         private void DisableAgent()
         {
-            NavMeshAgent agent = _beetleEntity.GetAgent();
+            NavMeshAgent agent = _blindCreatureEntity.GetAgent();
             agent.enabled = false;
         }
 
         private void StartWanderingTimer()
         {
-            float minDelay = _beetleAIConfig.WanderingMinDelay;
-            float maxDelay = _beetleAIConfig.WanderingMaxDelay;
+            float minDelay = _blindCreatureAIConfig.WanderingMinDelay;
+            float maxDelay = _blindCreatureAIConfig.WanderingMaxDelay;
             float timeBeforeWandering = Random.Range(minDelay, maxDelay);
 
             IEnumerator routine = WanderingTimerCO(timeBeforeWandering);
-            _wanderingTimerCO = _beetleEntity.StartCoroutine(routine);
+            _wanderingTimerCO = _blindCreatureEntity.StartCoroutine(routine);
         }
 
         private void StopWanderingTimer()
@@ -62,14 +56,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             if (_wanderingTimerCO == null)
                 return;
             
-            _beetleEntity.StopCoroutine(_wanderingTimerCO);
+            _blindCreatureEntity.StopCoroutine(_wanderingTimerCO);
         }
         
         private IEnumerator WanderingTimerCO(float timeBeforeWandering)
         {
             yield return new WaitForSeconds(timeBeforeWandering);
             
-            _beetleEntity.EnterWanderingState();
+            _blindCreatureEntity.EnterWanderingState();
         }
     }
 }

@@ -576,6 +576,8 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (!IsOwner)
                 return;
+
+            _entityLocation.Value = entityLocation;
         }
 
         [ClientRpc]

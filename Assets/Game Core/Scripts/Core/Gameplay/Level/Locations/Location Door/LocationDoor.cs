@@ -1,14 +1,14 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections;
 using DG.Tweening;
-using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Network;
-using GameCore.Utilities;
+using GameCore.Gameplay.Triggers;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Level.Locations
 {
+#warning MAYBE MOVE OUT LOGIC TO SERVER AND SYNC ONLY NETWORK VARIABLE?
     public class LocationDoor : NetcodeBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
@@ -22,57 +22,59 @@ namespace GameCore.Gameplay.Level.Locations
 
         [SerializeField, Min(0f)]
         private float _moveAmount = 2f;
-        
+
         [Title(Constants.References)]
         [SerializeField, Required]
-        private SimpleButton _buttonOne;
-        
+        private LocationDoorTrigger _firstDoorTrigger;
+
         [SerializeField, Required]
-        private SimpleButton _buttonTwo;
+        private LocationDoorTrigger _secondDoorTrigger;
 
         [SerializeField, Required]
         private Transform _leftDoor;
-        
+
         [SerializeField, Required]
         private Transform _rightDoor;
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private Coroutine _doorAutoCloseTimerCO;
         private Tweener _doorTN;
         private bool _isOpen;
-        
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
-        
+
         private void Awake()
         {
-            _buttonOne.OnTriggerEvent += OnButtonClicked;
-            _buttonTwo.OnTriggerEvent += OnButtonClicked;
+            _firstDoorTrigger.OnTriggeredEvent += OpenDoorServerRpc;
+            _secondDoorTrigger.OnTriggeredEvent += OpenDoorServerRpc;
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            _firstDoorTrigger.OnTriggeredEvent -= OpenDoorServerRpc;
+            _secondDoorTrigger.OnTriggeredEvent -= OpenDoorServerRpc;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async void OpenDoorLogic()
+        private void OpenDoorLogic()
         {
+            if (!_isOpen)
+                PlayDoorAnimation(open: true);
+
             _isOpen = true;
             
-            PlayDoorAnimation(open: true);
-
-            int delay = _autoCloseDelay.ConvertToMilliseconds();
-
-            bool isCanceled = await UniTask
-                .Delay(delay, cancellationToken: this.GetCancellationTokenOnDestroy())
-                .SuppressCancellationThrow();
-
-            if (isCanceled)
-                return;
-
-            CloseDoorLogic();
+            StopDoorAutoCloseTimer();
+            StartDoorAutoCloseTimer();
         }
 
         private void CloseDoorLogic()
         {
             _isOpen = false;
-            
+
             PlayDoorAnimation(open: false);
         }
 
@@ -83,8 +85,8 @@ namespace GameCore.Gameplay.Level.Locations
 
             float leftDoorStartZ = _leftDoor.localPosition.z;
             float rightDoorStartZ = _rightDoor.localPosition.z;
-            float leftDoorTargetZ = leftDoorStartZ + (open ? _moveAmount : -_moveAmount); 
-            float rightDoorTargetZ = rightDoorStartZ + (open ? -_moveAmount : _moveAmount); 
+            float leftDoorTargetZ = leftDoorStartZ + (open ? _moveAmount : -_moveAmount);
+            float rightDoorTargetZ = rightDoorStartZ + (open ? -_moveAmount : _moveAmount);
 
             _doorTN = DOVirtual.Float(from: 0f, to: 1f, _animationDuration, onVirtualUpdate: (t) =>
             {
@@ -101,7 +103,28 @@ namespace GameCore.Gameplay.Level.Locations
                 _rightDoor.localPosition = rightDoorPosition;
             });
         }
-        
+
+        private void StartDoorAutoCloseTimer()
+        {
+            IEnumerator routine = DoorAutoCloseTimerCO();
+            _doorAutoCloseTimerCO = StartCoroutine(routine);
+        }
+
+        private void StopDoorAutoCloseTimer()
+        {
+            if (_doorAutoCloseTimerCO == null)
+                return;
+            
+            StopCoroutine(_doorAutoCloseTimerCO);
+        }
+
+        private IEnumerator DoorAutoCloseTimerCO()
+        {
+            yield return new WaitForSeconds(_autoCloseDelay);
+
+            CloseDoorLogic();
+        }
+
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
@@ -109,15 +132,5 @@ namespace GameCore.Gameplay.Level.Locations
 
         [ClientRpc]
         private void OpenDoorClientRpc() => OpenDoorLogic();
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnButtonClicked()
-        {
-            if (_isOpen)
-                return;
-            
-            OpenDoorServerRpc();
-        }
     }
 }

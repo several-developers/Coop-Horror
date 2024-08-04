@@ -10,11 +10,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MoveToDungeonFireExitState(BeetleEntity beetleEntity, BeetleAIConfigMeta beetleAIConfig,
-            ILevelProvider levelProvider)
+        public MoveToDungeonFireExitState(BeetleEntity beetleEntity, ILevelProvider levelProvider)
         {
             _beetleEntity = beetleEntity;
-            _beetleAIConfig = beetleAIConfig;
+            _beetleAIConfig = beetleEntity.GetAIConfig();
             _agent = beetleEntity.GetAgent();
             _movementLogic = new MoveFromStairsToDungeonLogic(beetleEntity, _agent, levelProvider);
         }

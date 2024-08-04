@@ -189,6 +189,9 @@ namespace GameCore.Gameplay.Entities.Player
             _crouchedCamera.transform.SetParent(null);
             _unCrouchedCamera.transform.SetParent(null);
 
+            _playerEntity.IsCrouching += IsCrouching;
+            _playerEntity.IsSprinting += IsSprinting;
+
             _inputReader.OnMoveEvent += OnMove;
             _inputReader.OnJumpEvent += OnJump;
             _inputReader.OnJumpCanceledEvent += OnJumpCanceled;
@@ -251,26 +254,14 @@ namespace GameCore.Gameplay.Entities.Player
             _cameraTarget.localRotation = Quaternion.Euler(-_cameraTargetPitch, 0.0f, 0.0f);
         }
 
-        /// <summary>
-        /// When character crouches, toggle Crouched / UnCrouched cameras.
-        /// </summary>
-        private void OnCrouched()
-        {
-            _crouchedCamera.SetActive(true);
-            _unCrouchedCamera.SetActive(false);
-        }
-
-        /// <summary>
-        /// When character un-crouches, toggle Crouched / UnCrouched cameras.
-        /// </summary>
-        private void OnUnCrouched()
-        {
-            _crouchedCamera.SetActive(false);
-            _unCrouchedCamera.SetActive(true);
-        }
-
         private void PlaySound(PlayerEntity.SFXType sfxType) =>
             _playerEntity.PlaySound(sfxType);
+
+        private bool IsCrouching() =>
+            _character.IsCrouched();
+
+        private bool IsSprinting() =>
+            _sprintAbility.IsSprinting();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -328,5 +319,23 @@ namespace GameCore.Gameplay.Entities.Player
         private void OnJumped() => PlaySound(PlayerEntity.SFXType.Jump);
 
         private void OnLanded(Vector3 landingVelocity) => PlaySound(PlayerEntity.SFXType.Land);
+        
+        /// <summary>
+        /// When character crouches, toggle Crouched / UnCrouched cameras.
+        /// </summary>
+        private void OnCrouched()
+        {
+            _crouchedCamera.SetActive(true);
+            _unCrouchedCamera.SetActive(false);
+        }
+
+        /// <summary>
+        /// When character un-crouches, toggle Crouched / UnCrouched cameras.
+        /// </summary>
+        private void OnUnCrouched()
+        {
+            _crouchedCamera.SetActive(false);
+            _unCrouchedCamera.SetActive(true);
+        }
     }
 }
