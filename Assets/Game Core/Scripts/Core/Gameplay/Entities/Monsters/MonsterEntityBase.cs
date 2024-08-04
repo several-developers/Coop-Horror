@@ -4,6 +4,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
@@ -35,6 +36,10 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         public event Action OnEntityTeleportedEvent = delegate { };
 
+        protected event Action<ulong> OnTargetPlayerChangedEvent = delegate { }; 
+
+        protected ulong TargetPlayerID;
+        
         private static readonly List<MonsterEntityBase> AllMonsters = new();
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -56,6 +61,8 @@ namespace GameCore.Gameplay.Entities.Monsters
 
             OnEntityTeleportedEvent.Invoke();
         }
+
+        public void SetTargetPlayerByID(ulong playerID) => SetTargetPlayerServerRPC(playerID);
 
         /// <summary>
         /// Вызывается после OnNetworkSpawn!
@@ -81,7 +88,7 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected bool IsClientIDMatches(ulong targetClientID) =>
+        protected static bool IsClientIDMatches(ulong targetClientID) =>
             NetworkHorror.ClientID == targetClientID;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -128,6 +135,20 @@ namespace GameCore.Gameplay.Entities.Monsters
             int randomFloor = Random.Range(1, 4);
             CurrentFloor = (Floor)randomFloor;
         }
+
+        private void SetTargetPlayerLocal(ulong playerID)
+        {
+            TargetPlayerID = playerID;
+            OnTargetPlayerChangedEvent.Invoke(playerID);
+        }
+        
+        // RPC: -----------------------------------------------------------------------------------
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetTargetPlayerServerRPC(ulong playerID) => SetTargetPlayerClientRPC(playerID);
+
+        [ClientRpc]
+        private void SetTargetPlayerClientRPC(ulong playerID) => SetTargetPlayerLocal(playerID);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

@@ -68,8 +68,13 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         private void OnTargetNotFound() => DecideStateByLocation();
 
-        private static void OnAttack(PlayerEntity targetPlayer)
+        private void OnAttack(PlayerEntity targetPlayer)
         {
+            bool disableAttack = _evilClownAIConfig.DisableAttack;
+
+            if (disableAttack)
+                return;
+            
             targetPlayer.Kill(PlayerDeathReason._);
         }
 

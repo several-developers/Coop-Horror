@@ -12,6 +12,7 @@ using Sirenix.OdinInspector;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.EvilClown
@@ -42,9 +43,18 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         [SerializeField, Required]
         private MonsterFootstepsSystem _footstepsSystem;
+
+        [SerializeField, Required]
+        private Rig _rig;
+        
+        [SerializeField, Required]
+        private Transform _lookAtObject;
         
         [SerializeField, Required]
         private TextMeshPro _stateTMP;
+
+        [SerializeField]
+        private Vector3 _lookAtOffset;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -58,6 +68,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private WanderingTimer _wanderingTimer;
         private EvilClownSoundReproducer _soundReproducer;
         private PlayerEntity _targetPlayer;
+        private Transform _lookAtTarget;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -67,13 +78,17 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
                 return;
 
             //DecideStateByLocation();
+            GetLookAtTargetPlayer();
             EnterPrepareToChaseState();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void SetTargetPlayer(PlayerEntity playerEntity) =>
+        public void SetTargetPlayer(PlayerEntity playerEntity)
+        {
             _targetPlayer = playerEntity;
+            SetTargetPlayerByID(playerEntity.OwnerClientId);
+        }
 
         public void RunAway()
         {
@@ -128,15 +143,17 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         public WanderingTimer GetWanderingTimer() => _wanderingTimer;
 
-        public MonsterFootstepsSystem GetFootstepsSystem() => _footstepsSystem;
-
         public override MonsterType GetMonsterType() =>
             MonsterType.EvilClown;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitAll() =>
+        protected override void InitAll()
+        {
             _soundReproducer = new EvilClownSoundReproducer(transform, _evilClownAIConfig);
+
+            OnTargetPlayerChangedEvent += OnTargetPlayerChanged;
+        }
 
         protected override void InitServerOnly()
         {
@@ -169,11 +186,11 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
             void SetupStates()
             {
-                PrepareToChaseState idleState = new(evilClownEntity: this);
+                PrepareToChaseState idleState = new(evilClownEntity: this, _rig);
                 ChaseState chaseState = new(evilClownEntity: this, _levelProvider);
                 AttackState attackState = new(evilClownEntity: this);
                 WanderingState wanderingState = new(evilClownEntity: this);
-                DespawnState despawnState = new(evilClownEntity: this);
+                DespawnState despawnState = new(evilClownEntity: this, _rig);
                 RunAwayInDungeonState runAwayInDungeonState = new();
                 RunAwayInSurfaceState runAwayInSurfaceState = new();
                 RunAwayInStairsState runAwayInStairsState = new();
@@ -188,6 +205,8 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
                 _evilClownStateMachine.AddState(runAwayInStairsState);
             }
         }
+
+        protected override void TickAll() => LookAtTarget();
 
         protected override void TickServerOnly()
         {
@@ -205,6 +224,24 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         private void PlaySoundLocal(SFXType sfxType) =>
             _soundReproducer.PlaySound(sfxType);
+
+        private void GetLookAtTargetPlayer()
+        {
+            bool isPlayerFound = PlayerEntity.TryGetPlayer(TargetPlayerID, out PlayerEntity playerEntity);
+
+            if (!isPlayerFound)
+                return;
+
+            _lookAtTarget = playerEntity.transform;
+        }
+
+        private void LookAtTarget()
+        {
+            if (_lookAtTarget == null)
+                return;
+
+            _lookAtObject.position = _lookAtTarget.position + _lookAtOffset;
+        }
         
         [Button]
         private void EnterPrepareToChaseState() => ChangeState<PrepareToChaseState>();
@@ -248,6 +285,11 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+        private void OnTargetPlayerChanged(ulong playerID)
+        {
+            
+        }
+        
         private void OnFootstepPerformed(string colliderTag) => PlaySound(SFXType.Footsteps);
     }
 }

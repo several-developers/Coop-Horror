@@ -69,14 +69,16 @@ MonoBehaviour:
     m_RotationOrder: 4
   _spawnTime: {x: 0, y: 1440}
   _spawnTimeText: 00:00 - 24:00
+  _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
+  _disableAttack: 1
   _fireExitInteractionDistance: 0.5
   _fireExitInteractionDuration: 0.5
   _chaseDelay: 3
   _chasePositionCheckInterval: 0.1
   _minChaseSpeed: 1
   _maxChaseSpeed: 15
-  _chaseSpeedChangeDuration: 30
+  _chaseSpeedChangeDuration: 35
   _chaseDistanceCheckInterval: 0.1
   _chaseStoppingDistance: 0.5
   _maxChaseDistance: 10000

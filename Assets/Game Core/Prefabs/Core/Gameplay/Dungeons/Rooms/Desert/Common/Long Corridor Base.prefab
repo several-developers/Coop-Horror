@@ -1541,8 +1541,8 @@ MonoBehaviour:
   RepeatMode: 0
   OverrideAutomaticTileBounds: 1
   TileBoundsOverride:
-    m_Center: {x: 5, y: 2.5, z: 5}
-    m_Extent: {x: 10.25, y: 2.5, z: 5.25}
+    m_Center: {x: 5, y: 2.75, z: 5}
+    m_Extent: {x: 10.25, y: 3.5, z: 5.25}
   Entrance: {fileID: 0}
   Exit: {fileID: 0}
   OverrideConnectionChance: 0

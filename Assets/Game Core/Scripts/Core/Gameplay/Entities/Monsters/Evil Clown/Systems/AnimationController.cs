@@ -107,8 +107,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         
         private float GetAnimationMoveSpeedMultiplier()
         {
-            float maxMoveSpeed = _agent.speed;
-            maxMoveSpeed = _evilClownAIConfig.MaxChaseSpeed;
+            float maxMoveSpeed = _evilClownAIConfig.MaxChaseSpeed;
             bool isZero = Mathf.Approximately(a: maxMoveSpeed, b: 0f);
 
             if (isZero)

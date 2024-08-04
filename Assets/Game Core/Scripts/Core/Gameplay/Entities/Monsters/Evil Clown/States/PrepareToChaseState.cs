@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Utilities;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 {
@@ -10,11 +12,12 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PrepareToChaseState(EvilClownEntity evilClownEntity)
+        public PrepareToChaseState(EvilClownEntity evilClownEntity, Rig rig)
         {
             _evilClownEntity = evilClownEntity;
             _evilClownAIConfig = evilClownEntity.GetEvilClownAIConfig();
             _wanderingTimer = evilClownEntity.GetWanderingTimer();
+            _rig = rig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -22,23 +25,41 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         private readonly EvilClownEntity _evilClownEntity;
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly WanderingTimer _wanderingTimer;
+        private readonly Rig _rig;
         
         private Coroutine _brainwashSFXLoopCO;
+        private Tweener _rigTN;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
         public void Enter()
         {
+            PlayRoarSFX();
+            EnableRig();
             StopWanderingTimer();
             EnterChaseStateWithDelay();
             StopBrainwashSFXLoop();
-            _evilClownEntity.PlaySound(EvilClownEntity.SFXType.Roar);
         }
 
         public void Exit() => StartBrainwashSFXLoop();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void PlayRoarSFX() =>
+            _evilClownEntity.PlaySound(EvilClownEntity.SFXType.Roar);
+
+        private void EnableRig()
+        {
+            _rigTN.Kill();
+
+            _rigTN = DOVirtual
+                .Float(from: 0f, to: 1f, duration: 1f, onVirtualUpdate: t =>
+                {
+                    _rig.weight = t;
+                })
+                .SetLink(_evilClownEntity.gameObject);
+        }
+        
         private void StopWanderingTimer() =>
             _wanderingTimer.StopTimer();
         
