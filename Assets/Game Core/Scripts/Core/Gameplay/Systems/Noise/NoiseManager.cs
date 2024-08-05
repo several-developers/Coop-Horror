@@ -1,10 +1,11 @@
 ﻿using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
 
-namespace GameCore.Gameplay.NoiseManagement
+namespace GameCore.Gameplay.Systems.Noise
 {
     public class NoiseManager : NetcodeBehaviour
     {
@@ -18,6 +19,12 @@ namespace GameCore.Gameplay.NoiseManagement
             _noiseDataMessageSubscriber = noiseDataMessageSubscriber;
             _noiseDataMessagePublisher = noiseDataMessagePublisher;
         }
+
+        // MEMBERS: -------------------------------------------------------------------------------
+
+        [Title(Constants.Settings)]
+        [SerializeField, Required]
+        private NoiseDrawer _noiseDrawer;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -55,9 +62,14 @@ namespace GameCore.Gameplay.NoiseManagement
 
         private void DetectNoise(NoiseDataMessage message)
         {
+            if (!NetworkHorror.IsTrueServer)
+                return;
+            
             Vector3 noisePosition = message.noisePosition;
             float noiseLoudness = message.noiseLoudness;
-            int iterations = Physics.OverlapSphereNonAlloc(noisePosition, message.noiseRange, _collidersPull);
+            float noiseRange = message.noiseRange;
+            
+            int iterations = Physics.OverlapSphereNonAlloc(noisePosition, noiseRange, _collidersPull);
 
             for (int i = 0; i < iterations; i++)
             {
@@ -68,6 +80,10 @@ namespace GameCore.Gameplay.NoiseManagement
 
                 noiseListener.DetectNoise(noisePosition, noiseLoudness);
             }
+
+#if UNITY_EDITOR
+            _noiseDrawer.Draw(noisePosition, noiseRange);
+#endif
         }
     }
 }

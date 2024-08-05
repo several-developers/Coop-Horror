@@ -17,7 +17,7 @@ MonoBehaviour:
   _isDamageable: 1
   _health: 100
   _spawnType: 3
-  _maxCount: 5
+  _maxCount: 1
   _spawnChance: 50
   _spawnChanceMultiplierByGameTime:
     serializedVersion: 2
@@ -69,18 +69,20 @@ MonoBehaviour:
     m_RotationOrder: 4
   _spawnTime: {x: 0, y: 1440}
   _spawnTimeText: 00:00 - 24:00
+  _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
+  _minLoudnessToReact: 0.1
+  _suspicionMeterToAggro: 8
+  _suspicionMeterMaxAmount: 15
+  _instantAggroSuspicionMeterAmount: 11
+  _suspicionMeterDecreaseTime: 2
   _wanderingMinDelay: 0.5
   _wanderingMaxDelay: 5
   _wanderingMinSpeed: 1
   _wanderingMaxSpeed: 2.5
   _wanderingMinDistance: 1
   _wanderingMaxDistance: 15
-  _chasePositionCheckInterval: 0.1
+  _suspicionMoveSpeed: 5
   _chaseSpeed: 5
-  _chaseDistanceCheckInterval: 0.1
-  _chaseStoppingDistance: 0.5
-  _maxChaseDistance: 10
-  _chaseEndDelay: 5
   _attackDistance: 1
   _attackCooldown: 2

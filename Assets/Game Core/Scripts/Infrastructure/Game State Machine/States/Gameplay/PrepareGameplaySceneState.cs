@@ -4,7 +4,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.NoiseManagement;
+using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Unity.Netcode;

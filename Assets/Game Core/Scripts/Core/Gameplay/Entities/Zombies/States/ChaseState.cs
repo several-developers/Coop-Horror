@@ -8,20 +8,8 @@ namespace GameCore.Gameplay.Entities.Zombies.States
 {
     public class ChaseState : IEnterState, IExitState, ITickableState
     {
-        // CONSTRUCTORS: --------------------------------------------------------------------------
-
-        public ChaseState(ZombieEntity zombieEntity, PlayerEntity playerEntity)
-        {
-            _zombieEntity = zombieEntity;
-            _agent = zombieEntity.GetAgent();
-            _animator = zombieEntity.GetAnimator();
-            _transform = zombieEntity.transform;
-            _playerTransform = playerEntity.GetTransform();
-        }
-
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly ZombieEntity _zombieEntity;
         private readonly NavMeshAgent _agent;
         private readonly Animator _animator;
         private readonly Transform _transform;
@@ -34,7 +22,7 @@ namespace GameCore.Gameplay.Entities.Zombies.States
 
         public void Enter()
         {
-            float attackDistance = _zombieEntity.GetAttackDistance();
+            float attackDistance = 0;
             _agent.enabled = true;
             _agent.updatePosition = false;
             _agent.stoppingDistance = attackDistance;
@@ -46,8 +34,8 @@ namespace GameCore.Gameplay.Entities.Zombies.States
         {
             _animator.SetFloat(AnimatorHashes.Speed, 0);
 
-            _zombieEntity.OnAnimatorMoveEvent -= OnAnimatorMove;
-            _zombieEntity.OnMovementSpeedUpdatedEvent -= OnMovementSpeedUpdated;
+            //_zombieEntity.OnAnimatorMoveEvent -= OnAnimatorMove;
+            //_zombieEntity.OnMovementSpeedUpdatedEvent -= OnMovementSpeedUpdated;
         }
 
         public void Tick()
@@ -63,23 +51,15 @@ namespace GameCore.Gameplay.Entities.Zombies.States
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async void StartWithDelay()
+        private void StartWithDelay()
         {
             float randomTime = Random.Range(0f, 0.2f);
-            int delay = randomTime.ConvertToMilliseconds();
-            
-            bool isCanceled = await UniTask
-                .Delay(delay, cancellationToken: _zombieEntity.GetCancellationTokenOnDestroy())
-                .SuppressCancellationThrow();
 
-            if (isCanceled)
-                return;
-            
             UpdateAgentSpeed();
             UpdateMovementAnimationSpeed();
 
-            _zombieEntity.OnAnimatorMoveEvent += OnAnimatorMove;
-            _zombieEntity.OnMovementSpeedUpdatedEvent += OnMovementSpeedUpdated;
+            //_zombieEntity.OnAnimatorMoveEvent += OnAnimatorMove;
+            //_zombieEntity.OnMovementSpeedUpdatedEvent += OnMovementSpeedUpdated;
         }
         
         private void SetDestination() =>
@@ -120,22 +100,22 @@ namespace GameCore.Gameplay.Entities.Zombies.States
 
         private void UpdateAgentSpeed()
         {
-            float movementSpeed = _zombieEntity.GetMovementSpeed();
-            _agent.speed = movementSpeed;
+            //float movementSpeed = _zombieEntity.GetMovementSpeed();
+            //_agent.speed = movementSpeed;
         }
 
         private void UpdateMovementAnimationSpeed()
         {
-            float inputMagnitude = _zombieEntity.GetMovementInputMagnitude();
+            //float inputMagnitude = _zombieEntity.GetMovementInputMagnitude();
             //float movementSpeed = _zombieEntity.GetMovementSpeed();
 
             //_animator.SetFloat(AnimatorHashes.Speed, movementSpeed);
-            _animator.SetFloat(id: AnimatorHashes.MotionSpeed, inputMagnitude);
+            //_animator.SetFloat(id: AnimatorHashes.MotionSpeed, inputMagnitude);
         }
 
         private bool CanAttackTarget()
         {
-            float attackDistance = _zombieEntity.GetAttackDistance();
+            float attackDistance = 0;
             float distance = _agent.remainingDistance;
 
             if (float.IsInfinity(distance))
@@ -150,8 +130,9 @@ namespace GameCore.Gameplay.Entities.Zombies.States
             return false;
         }
 
-        private void EnterAttackState() =>
-            _zombieEntity.EnterAttackState();
+        private void EnterAttackState()
+        {
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

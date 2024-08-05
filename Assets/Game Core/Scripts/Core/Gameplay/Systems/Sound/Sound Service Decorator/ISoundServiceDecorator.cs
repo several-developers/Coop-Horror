@@ -2,7 +2,7 @@
 using Sonity;
 using UnityEngine;
 
-namespace GameCore.Gameplay.SoundSystem
+namespace GameCore.Gameplay.Systems.Sound
 {
     public interface ISoundServiceDecorator
     {

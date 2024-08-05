@@ -16,7 +16,7 @@ MonoBehaviour:
   _dangerLevel: 4
   _isDamageable: 1
   _health: 100
-  _spawnType: 0
+  _spawnType: 3
   _maxCount: 1
   _spawnChance: 100
   _spawnChanceMultiplierByGameTime:

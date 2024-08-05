@@ -25,5 +25,17 @@ namespace GameCore.Gameplay.Entities.Player
             cinemachinePov.m_VerticalAxis.Value = 0f;
             cinemachinePov.m_HorizontalAxis.Value = 0f;
         }
+
+        public float GetVerticalAxis()
+        {
+            var cinemachinePov = _camera.GetCinemachineComponent<CinemachinePOV>();
+            return cinemachinePov.m_VerticalAxis.Value;
+        }
+        
+        public float GetHorizontalAxis()
+        {
+            var cinemachinePov = _camera.GetCinemachineComponent<CinemachinePOV>();
+            return cinemachinePov.m_HorizontalAxis.Value;
+        }
     }
 }

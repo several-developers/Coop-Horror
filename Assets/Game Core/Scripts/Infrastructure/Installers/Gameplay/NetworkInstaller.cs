@@ -5,7 +5,7 @@ using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Quests;
-using GameCore.Gameplay.SoundSystem;
+using GameCore.Gameplay.Systems.Sound;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay

@@ -17,7 +17,7 @@ using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.NoiseManagement;
+using GameCore.Gameplay.Systems.Noise;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Observers.Gameplay.PlayerInteraction;
@@ -99,7 +99,7 @@ namespace GameCore.Gameplay.Entities.Player
         public event Action OnDiedEvent = delegate { };
         public event Action OnRevivedEvent = delegate { };
         public event Action<bool> OnParentChangedEvent = delegate { };
-        
+
         public event Func<bool> IsCrouching = () => false;
         public event Func<bool> IsSprinting = () => false;
 
@@ -340,6 +340,9 @@ namespace GameCore.Gameplay.Entities.Player
 
                 SittingCameraController sittingCameraController = _references.SittingCameraController;
                 sittingCameraController.ToggleActiveState(isEnabled: false);
+
+                character.Jumped += OnJumped;
+                character.Landed += OnLanded;
             }
 
             void DeactivatePlayerMesh()
@@ -359,7 +362,7 @@ namespace GameCore.Gameplay.Entities.Player
                 AliveState aliveState = new(_camerasManager);
                 DeathState deathState = new(playerEntity: this, _camerasManager);
                 ReviveState reviveState = new(playerEntity: this);
-                SittingState sittingState = new(playerEntity: this, _gameManagerDecorator, _camerasManager);
+                SittingState sittingState = new(playerEntity: this, _camerasManager);
 
                 _playerStateMachine.AddState(aliveState);
                 _playerStateMachine.AddState(deathState);
@@ -439,7 +442,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             NetworkObject.TrySetParent(newParent);
         }
-        
+
         private void RemoveParentLocal() =>
             NetworkObject.TryRemoveParent();
 
@@ -482,7 +485,38 @@ namespace GameCore.Gameplay.Entities.Player
 
             NoiseManager.MakeNoise(transform.position, noiseRange, noiseLoudness);
         }
-        
+
+#warning REPLACE
+        private void MakeLandingNoise(float velocity)
+        {
+            const float quiteLandingVelocity = 6;
+            const float loudLandingVelocity = 12;
+
+            float noiseRange;
+            float noiseLoudness;
+
+            // Loud
+            if (velocity > loudLandingVelocity)
+            {
+                noiseRange = 25f;
+                noiseLoudness = 0.6f;
+            }
+            // Quite
+            else if (velocity < quiteLandingVelocity)
+            {
+                noiseRange = 14f;
+                noiseLoudness = 0.4f;
+            }
+            // Middle
+            else
+            {
+                noiseRange = 19f;
+                noiseLoudness = 0.5f;
+            }
+
+            NoiseManager.MakeNoise(transform.position, noiseRange, noiseLoudness);
+        }
+
         private void EnterDeathState() => ChangeState<DeathState>();
 
         private void ChangeState<TState>() where TState : IState =>
@@ -616,7 +650,7 @@ namespace GameCore.Gameplay.Entities.Player
             _references.Rigidbody.interpolation = hasParent
                 ? RigidbodyInterpolation.None
                 : RigidbodyInterpolation.Interpolate;
-            
+
             OnParentChangedEvent.Invoke(hasParent);
         }
 
@@ -683,6 +717,21 @@ namespace GameCore.Gameplay.Entities.Player
         {
             PlaySound(SFXType.Footsteps);
             MakeFootstepsNoise();
+        }
+
+        private void OnJumped() => PlaySound(SFXType.Jump);
+
+        private void OnLanded(Vector3 landingVelocity)
+        {
+            const float minVelocity = 4.0f;
+            float velocity = landingVelocity.magnitude;
+            bool ignore = velocity <= minVelocity;
+
+            if (ignore)
+                return;
+
+            PlaySound(SFXType.Land);
+            MakeLandingNoise(velocity);
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

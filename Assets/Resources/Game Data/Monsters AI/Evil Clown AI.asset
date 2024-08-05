@@ -71,7 +71,7 @@ MonoBehaviour:
   _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
-  _disableAttack: 1
+  _disableAttack: 0
   _fireExitInteractionDistance: 0.5
   _fireExitInteractionDuration: 0.5
   _chaseDelay: 3

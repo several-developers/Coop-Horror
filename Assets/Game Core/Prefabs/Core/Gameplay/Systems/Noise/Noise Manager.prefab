@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5417534644542859651}
   - component: {fileID: 5417534644542859650}
   - component: {fileID: 4978374440362832137}
+  - component: {fileID: -1135758135973733549}
   m_Layer: 0
   m_Name: Noise Manager
   m_TagString: Untagged
@@ -66,3 +67,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3d159ca5e9b40cc89220408f8dd2815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _noiseDrawer: {fileID: -1135758135973733549}
+--- !u!114 &-1135758135973733549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5417534644542859649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afc8f3a65abc43ca98e17b45fd4b117d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gizmosDuration: 0.3

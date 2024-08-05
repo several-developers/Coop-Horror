@@ -13,6 +13,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         {
             _blindCreatureEntity = blindCreatureEntity;
             _blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            _suspicionSystem = blindCreatureEntity.GetSuspicionSystem();
             _agent = blindCreatureEntity.GetAgent();
             _wanderingMovementLogic = new WanderingMovementLogic(blindCreatureEntity.transform, _agent);
         }
@@ -21,6 +22,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         private readonly BlindCreatureEntity _blindCreatureEntity;
         private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
+        private readonly SuspicionSystem _suspicionSystem;
         private readonly NavMeshAgent _agent;
         private readonly WanderingMovementLogic _wanderingMovementLogic;
 
@@ -30,6 +32,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         public void Enter()
         {
+            _suspicionSystem.OnNoiseDetectedEvent += OnNoiseDetected;
+            
             _wanderingMovementLogic.OnStuckEvent += OnStuck;
             _wanderingMovementLogic.OnArrivedEvent += OnArrived;
             _wanderingMovementLogic.GetWanderingMinDistanceEvent += GetWanderingMinDistance;
@@ -46,6 +50,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         public void Exit()
         {
+            _suspicionSystem.OnNoiseDetectedEvent -= OnNoiseDetected;
+            
             _wanderingMovementLogic.OnStuckEvent -= OnStuck;
             _wanderingMovementLogic.OnArrivedEvent -= OnArrived;
             _wanderingMovementLogic.GetWanderingMinDistanceEvent -= GetWanderingMinDistance;
@@ -63,6 +69,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         private void EnterIdleState() =>
             _blindCreatureEntity.EnterIdleState();
         
+        private void EnterMoveToSuspicionPlaceState() =>
+            _blindCreatureEntity.EnterMoveToSuspicionPlaceState();
+        
         private float GetWanderingSpeed()
         {
             float minSpeed = _blindCreatureAIConfig.WanderingMinSpeed;
@@ -78,6 +87,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
             _blindCreatureAIConfig.WanderingMaxDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnNoiseDetected() => EnterMoveToSuspicionPlaceState();
 
         private void OnStuck() => EnterIdleState();
 

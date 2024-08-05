@@ -24,7 +24,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly EvilClownEntity _evilClownEntity;
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly NavMeshAgent _agent;
@@ -50,7 +50,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _chaseLogic.GetChaseEndDelayEvent += GetChaseEndDelay;
             _chaseLogic.GetMaxChaseDistanceEvent += GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent += GetTargetReachDistance;
-            
+
             _chaseLogic.GetClownLocationEvent += GetClownLocation;
             _chaseLogic.GetClownFloorEvent += GetClownFloor;
             _chaseLogic.GetFireExitInteractionDistanceEvent += GetFireExitInteractionDistance;
@@ -76,12 +76,12 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _chaseLogic.GetChaseEndDelayEvent -= GetChaseEndDelay;
             _chaseLogic.GetMaxChaseDistanceEvent -= GetMaxChaseDistance;
             _chaseLogic.GetTargetReachDistanceEvent -= GetTargetReachDistance;
-            
+
             _chaseLogic.GetClownLocationEvent -= GetClownLocation;
             _chaseLogic.GetClownFloorEvent -= GetClownFloor;
             _chaseLogic.GetFireExitInteractionDistanceEvent -= GetFireExitInteractionDistance;
             _chaseLogic.GetStoppingDistanceEvent -= GetStoppingDistance;
-            
+
             _chaseLogic.Stop();
             StopIncreasingMoveSpeed();
             ResetAgent();
@@ -92,7 +92,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         private void EnableAgent()
         {
             _cachedAgentStoppingDistance = _agent.stoppingDistance;
-            
+
             _agent.speed = _evilClownAIConfig.MinChaseSpeed;
             _agent.stoppingDistance = _evilClownAIConfig.ChaseStoppingDistance;
         }
@@ -105,13 +105,15 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             float duration = _evilClownAIConfig.ChaseSpeedChangeDuration;
             float minSpeed = _evilClownAIConfig.MinChaseSpeed;
             float maxSpeed = _evilClownAIConfig.MaxChaseSpeed;
-            
+            Ease ease = _evilClownAIConfig.ChaseSpeedChangeEase;
+
             _moveSpeedChangeTN = DOVirtual
                 .Float(from: 0, to: 1f, duration, onVirtualUpdate: t =>
                 {
                     float moveSpeed = Mathf.Lerp(a: minSpeed, b: maxSpeed, t);
                     _agent.speed = moveSpeed;
                 })
+                .SetEase(ease)
                 .SetLink(_evilClownEntity.gameObject);
         }
 
@@ -120,13 +122,13 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         private void EnterAttackState() =>
             _evilClownEntity.EnterAttackState();
-        
+
         private void EnterWanderingState() =>
             _evilClownEntity.EnterWanderingState();
 
         private PlayerEntity GetTargetPlayer() =>
             _evilClownEntity.GetTargetPlayer();
-        
+
         private EntityLocation GetClownLocation() =>
             _evilClownEntity.EntityLocation;
 
@@ -147,7 +149,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         private float GetTargetReachDistance() =>
             _evilClownAIConfig.AttackDistance;
-        
+
         private float GetFireExitInteractionDistance() =>
             _evilClownAIConfig.FireExitInteractionDistance;
 
@@ -155,7 +157,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _evilClownAIConfig.ChaseStoppingDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-        
+
         private void OnTargetNotFound() => EnterWanderingState();
 
         private void OnTargetReached(PlayerEntity targetPlayer) => EnterAttackState();

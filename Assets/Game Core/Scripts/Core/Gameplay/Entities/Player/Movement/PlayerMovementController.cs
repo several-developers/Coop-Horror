@@ -199,9 +199,6 @@ namespace GameCore.Gameplay.Entities.Player
             _inputReader.OnCrouchCanceledEvent += OnCrouchCanceled;
             _inputReader.OnSprintEvent += OnSprint;
             _inputReader.OnSprintCanceledEvent += OnSprintCanceled;
-
-            _character.Jumped += OnJumped;
-            _character.Landed += OnLanded;
         }
 
         public void ToggleActiveState(bool isEnabled) =>
@@ -232,13 +229,18 @@ namespace GameCore.Gameplay.Entities.Player
             _cameraTarget.localRotation = Quaternion.Euler(Vector3.zero);
         }
 
+        public void SetCameraTargetPitch(float value) =>
+            _cameraTargetPitch = value;
+
+        public Transform GetCameraTarget() => _cameraTarget;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         /// <summary>
         /// Add input (affecting Yaw).
         /// This is applied to the Character's rotation.
         /// </summary>
-        private void AddControlYawInput(float value) =>
+        public void AddControlYawInput(float value) =>
             _character.AddYawInput(value);
 
         /// <summary>
@@ -316,10 +318,6 @@ namespace GameCore.Gameplay.Entities.Player
             _sprintAbility.StopSprinting();
         }
 
-        private void OnJumped() => PlaySound(PlayerEntity.SFXType.Jump);
-
-        private void OnLanded(Vector3 landingVelocity) => PlaySound(PlayerEntity.SFXType.Land);
-        
         /// <summary>
         /// When character crouches, toggle Crouched / UnCrouched cameras.
         /// </summary>

@@ -13,7 +13,7 @@ namespace GameCore.Gameplay.Dungeons
 {
     public interface IDungeonsManager
     {
-        void GenerateAndSendSeeds();
+        void GenerateDungeonsOnAllClients();
     }
 
     public class DungeonsManager : IDungeonsManager, IInitializable, IDisposable
@@ -63,7 +63,7 @@ namespace GameCore.Gameplay.Dungeons
             _dungeonsObserver.OnDungeonGenerationCompletedEvent -= OnDungeonGenerationCompleted;
         }
 
-        public void GenerateAndSendSeeds()
+        public void GenerateDungeonsOnAllClients()
         {
             RandomStream randomStream = new();
             int seedOne = GenerateRandomSeed();

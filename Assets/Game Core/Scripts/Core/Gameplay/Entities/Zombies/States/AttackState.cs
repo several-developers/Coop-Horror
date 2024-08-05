@@ -7,22 +7,8 @@ namespace GameCore.Gameplay.Entities.Zombies.States
 {
     public class AttackState : IEnterState, IExitState, ITickableState
     {
-        // CONSTRUCTORS: --------------------------------------------------------------------------
-
-        public AttackState(ZombieEntity zombieEntity, PlayerEntity playerEntity)
-        {
-            _zombieEntity = zombieEntity;
-            _playerEntity = playerEntity;
-            _agent = zombieEntity.GetAgent();
-            _animationObserver = zombieEntity.GetAnimationObserver();
-            _animator = zombieEntity.GetAnimator();
-            _transform = zombieEntity.transform;
-            _playerTransform = playerEntity.GetTransform();
-        }
-
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly ZombieEntity _zombieEntity;
         private readonly PlayerEntity _playerEntity;
         private readonly NavMeshAgent _agent;
         private readonly AnimationObserver _animationObserver;
@@ -46,7 +32,7 @@ namespace GameCore.Gameplay.Entities.Zombies.States
             _animationObserver.OnAttackEvent += OnAttack;
             _animationObserver.OnAttackFinishedEvent += OnAttackFinished;
 
-            _zombieEntity.OnAnimatorMoveEvent += OnAnimatorMove;
+            // _zombieEntity.OnAnimatorMoveEvent += OnAnimatorMove;
         }
 
         public void Exit()
@@ -54,7 +40,7 @@ namespace GameCore.Gameplay.Entities.Zombies.States
             _animationObserver.OnAttackEvent -= OnAttack;
             _animationObserver.OnAttackFinishedEvent -= OnAttackFinished;
             
-            _zombieEntity.OnAnimatorMoveEvent -= OnAnimatorMove;
+            // _zombieEntity.OnAnimatorMoveEvent -= OnAnimatorMove;
         }
 
         public void Tick()
@@ -82,7 +68,7 @@ namespace GameCore.Gameplay.Entities.Zombies.States
                 return;
             }
 
-            _attackCdLeft = _zombieEntity.GetAttackCd();
+            //_attackCdLeft = _zombieEntity.GetAttackCd();
             
             StartAttackAnimation();
         }
@@ -144,7 +130,8 @@ namespace GameCore.Gameplay.Entities.Zombies.States
         
         private bool CanAttackTarget()
         {
-            float attackDistance = _zombieEntity.GetAttackDistance();
+            //float attackDistance = _zombieEntity.GetAttackDistance();
+            float attackDistance = 0f;
             float distance = _agent.remainingDistance;
             
             if (float.IsInfinity(distance))
@@ -159,11 +146,13 @@ namespace GameCore.Gameplay.Entities.Zombies.States
             return false;
         }
 
-        private void EnterIdleState() =>
-            _zombieEntity.EnterIdleState();
+        private void EnterIdleState()
+        {
+        }
 
-        private void EnterChaseState() =>
-            _zombieEntity.EnterChaseState();
+        private void EnterChaseState()
+        {
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

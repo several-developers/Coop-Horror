@@ -1,6 +1,6 @@
-﻿using GameCore.Enums.Gameplay;
+﻿using DG.Tweening;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.GameManagement;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player.States
@@ -9,14 +9,9 @@ namespace GameCore.Gameplay.Entities.Player.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public SittingState(
-            PlayerEntity playerEntity,
-            IGameManagerDecorator gameManagerDecorator,
-            ICamerasManager camerasManager
-        )
+        public SittingState(PlayerEntity playerEntity, ICamerasManager camerasManager)
         {
             _playerEntity = playerEntity;
-            _gameManagerDecorator = gameManagerDecorator;
             _camerasManager = camerasManager;
 
             PlayerReferences references = playerEntity.References;
@@ -28,7 +23,6 @@ namespace GameCore.Gameplay.Entities.Player.States
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly PlayerEntity _playerEntity;
-        private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly ICamerasManager _camerasManager;
         private readonly Animator _animator;
         private readonly PlayerMovementController _playerMovementController;
@@ -40,7 +34,7 @@ namespace GameCore.Gameplay.Entities.Player.States
         {
             Rigidbody rigidbody = _playerEntity.References.Rigidbody;
             rigidbody.velocity = Vector3.zero;
-            
+
             SetCameraFirstPersonStatus();
             TogglePlayerController(isEnabled: false);
             ToggleSittingCameraController(isEnabled: true);
@@ -78,7 +72,18 @@ namespace GameCore.Gameplay.Entities.Player.States
             }
             else
             {
-                _playerMovementController.ResetCameraTarget();
+#warning НАВЕСТИ КРАСОТУ СУЧЕЧКА
+                float verticalAxis = _sittingCameraController.GetVerticalAxis();
+                float horizontalAxis = _sittingCameraController.GetHorizontalAxis();
+
+                Transform cameraTarget = _playerMovementController.GetCameraTarget();
+                Vector3 eulerAngles = cameraTarget.localRotation.eulerAngles;
+                eulerAngles.x = verticalAxis;
+                cameraTarget.localRotation = Quaternion.Euler(eulerAngles);
+
+                //_playerMovementController.ResetCameraTarget();
+                //_playerMovementController.AddControlYawInput(horizontalAxis);
+                _playerMovementController.SetCameraTargetPitch(-eulerAngles.x);
                 _playerMovementController.EnableCamera();
             }
 
@@ -88,17 +93,8 @@ namespace GameCore.Gameplay.Entities.Player.States
         private void ToggleSittingAnimation(bool isSitting) =>
             _animator.SetBool(id: AnimatorHashes.IsSitting, isSitting);
 
-        private void TryLeftSeat()
-        {
-            // GameState gameState = _gameManagerDecorator.GetGameState();
-            // bool isGameStateValid = gameState == GameState.ReadyToLeaveTheLocation;
-            //
-            // if (!isGameStateValid)
-            //     return;
-            
-            EnterAliveState();
-        }
-        
+        private void TryLeftSeat() => EnterAliveState();
+
         private void EnterAliveState() =>
             _playerEntity.EnterAliveState();
 

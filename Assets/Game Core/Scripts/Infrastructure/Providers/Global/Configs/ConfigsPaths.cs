@@ -29,8 +29,6 @@
         public const string BeetleAIConfig = MonstersAIConfigs + "Beetle AI";
         public const string BlindCreatureAIConfig = MonstersAIConfigs + "Blind Creature AI";
         
-        public const string GameBalanceConfig = Configs + "Game Balance Config";
-        
         private const string GameData = "Game Data/";
         private const string Configs = GameData + "Configs/";
         private const string GlobalConfigs = Configs + "Global/";

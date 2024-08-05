@@ -1,11 +1,10 @@
-﻿using System;
-using GameCore.Gameplay.Network;
+﻿using GameCore.Gameplay.Network;
 using Sonity;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
-namespace GameCore.Gameplay.SoundSystem
+namespace GameCore.Gameplay.Systems.Sound
 {
     public class SoundService : NetcodeBehaviour
     {

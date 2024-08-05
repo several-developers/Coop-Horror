@@ -154,7 +154,7 @@ namespace GameCore.Gameplay.GameManagement
             string log = Log.HandleLog("--> Train leaving <gb>Base</gb>.");
             Debug.Log(log);
             
-            _dungeonsManager.GenerateAndSendSeeds();
+            _dungeonsManager.GenerateDungeonsOnAllClients();
         }
 
         private void TrainArrivedAtSector()

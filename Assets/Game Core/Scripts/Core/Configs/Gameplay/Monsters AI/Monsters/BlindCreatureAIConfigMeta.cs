@@ -8,6 +8,22 @@ namespace GameCore.Configs.Gameplay.Enemies
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [TitleGroup(title: SuspicionSystemSettings)]
+        [BoxGroup(SuspicionSystemGroup, showLabel: false), SerializeField, Min(0f)]
+        private float _minLoudnessToReact = 0.1f;
+        
+        [BoxGroup(SuspicionSystemGroup), SerializeField, Min(0)]
+        private int _suspicionMeterToAggro = 8;
+
+        [BoxGroup(SuspicionSystemGroup), SerializeField, Min(0)]
+        private int _suspicionMeterMaxAmount = 15;
+
+        [BoxGroup(SuspicionSystemGroup), SerializeField, Min(0)]
+        private int _instantAggroSuspicionMeterAmount = 11;
+
+        [BoxGroup(SuspicionSystemGroup), SerializeField, Min(0f)]
+        private float _suspicionMeterDecreaseTime = 3f;
+
         [TitleGroup(title: IdleStateSettings)]
         [BoxGroup(IdleStateGroup, showLabel: false), SerializeField, Min(0f)]
         private float _wanderingMinDelay = 0.5f;
@@ -28,24 +44,9 @@ namespace GameCore.Configs.Gameplay.Enemies
         [BoxGroup(WanderingStateGroup), SerializeField, Min(0f)]
         private float _wanderingMaxDistance = 15f;
         
-        [TitleGroup(title: ChaseStateSettings)]
-        [BoxGroup(ChaseStateGroup, showLabel: false), SerializeField, Min(0f)]
-        private float _chasePositionCheckInterval = 0.1f;
-        
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseSpeed = 5f;
-
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseDistanceCheckInterval = 0.1f;
-        
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseStoppingDistance = 0.5f;
-        
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _maxChaseDistance = 10f;
-
-        [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
-        private float _chaseEndDelay = 5f;
+        [TitleGroup(title: SuspicionMovementStateSettings)]
+        [BoxGroup(SuspicionMovementStateGroup, showLabel: false), SerializeField, Min(0f)]
+        private float _suspicionMoveSpeed = 5f;
 
         [TitleGroup(title: AttackStateSettings)]
         [BoxGroup(AttackStateGroup, showLabel: false), SerializeField, Min(0f)]
@@ -55,7 +56,14 @@ namespace GameCore.Configs.Gameplay.Enemies
         private float _attackCooldown = 2f;
 
         // PROPERTIES: ----------------------------------------------------------------------------
-        
+
+        // Suspicion System
+        public float MinLoudnessToReact => _minLoudnessToReact;
+        public int SuspicionMeterToAggro => _suspicionMeterToAggro;
+        public int SuspicionMeterMaxAmount => _suspicionMeterMaxAmount;
+        public int InstantAggroSuspicionMeterAmount => _instantAggroSuspicionMeterAmount;
+        public float SuspicionMeterDecreaseTime => _suspicionMeterDecreaseTime;
+
         public float WanderingMinDelay => _wanderingMinDelay;
         public float WanderingMaxDelay => _wanderingMaxDelay;
         
@@ -64,13 +72,8 @@ namespace GameCore.Configs.Gameplay.Enemies
         public float WanderingMinDistance => _wanderingMinDistance;
         public float WanderingMaxDistance => _wanderingMaxDistance;
 
-        public float ChasePositionCheckInterval => _chasePositionCheckInterval;
-        public float ChaseSpeed => _chaseSpeed;
-        public float ChaseDistanceCheckInterval => _chaseDistanceCheckInterval;
-        public float ChaseStoppingDistance => _chaseStoppingDistance;
-        public float MaxChaseDistance => _maxChaseDistance;
-        public float ChaseEndDelay => _chaseEndDelay;
-        
+        public float SuspicionMoveSpeed => _suspicionMoveSpeed;
+
         public float AttackDistance => _attackDistance;
         public float AttackCooldown => _attackCooldown;
 
@@ -79,14 +82,16 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string CommonSettings = "Common Settings";
         private const string IdleStateSettings = "Idle State Settings";
         private const string WanderingStateSettings = "Wandering State Settings";
-        private const string ChaseStateSettings = "Chase State Settings";
+        private const string SuspicionMovementStateSettings = "Suspicion Movement State Settings";
         private const string AttackStateSettings = "Attack State Settings";
+        private const string SuspicionSystemSettings = "Suspicion System Settings";
         
         private const string CommonGroup = CommonSettings + "/Group";
         private const string IdleStateGroup = IdleStateSettings + "/Group";
         private const string WanderingStateGroup = WanderingStateSettings + "/Group";
-        private const string ChaseStateGroup = ChaseStateSettings + "/Group";
+        private const string SuspicionMovementStateGroup = SuspicionMovementStateSettings + "/Group";
         private const string AttackStateGroup = AttackStateSettings + "/Group";
+        private const string SuspicionSystemGroup = SuspicionSystemSettings + "/Group";
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         

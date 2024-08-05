@@ -1,4 +1,5 @@
 ﻿using System;
+using DG.Tweening;
 using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
 using Sonity;
@@ -49,6 +50,9 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         [BoxGroup(ChaseStateGroup), SerializeField, Min(0f)]
         private float _chaseEndDelay = 5f;
+
+        [BoxGroup(ChaseStateGroup), SerializeField]
+        private Ease _chaseSpeedChangeEase = Ease.InQuad;
         
         [TitleGroup(title: AttackStateSettings)]
         [BoxGroup(AttackStateGroup, showLabel: false), SerializeField, Min(0f)]
@@ -105,6 +109,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         public float ChaseStoppingDistance => _chaseStoppingDistance;
         public float MaxChaseDistance => _maxChaseDistance;
         public float ChaseEndDelay => _chaseEndDelay;
+        public Ease ChaseSpeedChangeEase => _chaseSpeedChangeEase;
         
         public float AttackDistance => _attackDistance;
         public float AttackCooldown => _attackCooldown;
