@@ -38,7 +38,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             _dungeonsManager.ClearDungeons();
 
         private void ClearLevelProvider() =>
-            _levelProvider.Clear();
+            _levelProvider.ClearLevel();
 
         private void EnterGameLoopState() =>
             _horrorStateMachine.ChangeState<GameLoopState>();

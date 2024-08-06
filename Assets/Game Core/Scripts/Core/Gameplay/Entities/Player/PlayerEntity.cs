@@ -4,10 +4,10 @@ using ECM2;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
+using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.EntitiesSystems.Footsteps;
 using GameCore.Gameplay.EntitiesSystems.Health;
 using GameCore.Gameplay.EntitiesSystems.Inventory;
@@ -294,7 +294,7 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
 
-            _entityLocation.OnValueChanged += OnOwnerPlayerLocationChanged;
+            _entityLocation.OnValueChanged += OnPlayerLocationChanged;
 
             _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
 
@@ -413,7 +413,7 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
 
-            _entityLocation.OnValueChanged -= OnOwnerPlayerLocationChanged;
+            _entityLocation.OnValueChanged -= OnPlayerLocationChanged;
 
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
 
@@ -693,12 +693,8 @@ namespace GameCore.Gameplay.Entities.Player
             _inventoryManager.ToggleItemsState();
         }
 
-        private void OnOwnerPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue)
-        {
-            string log = Log.HandleLog($"New Location: <gb>{newValue}</gb>");
-            Debug.Log(log);
+        private void OnPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue) =>
             OnPlayerLocationChangedEvent.Invoke(newValue);
-        }
 
         private void OnSanityChanged(float previousValue, float newValue) =>
             OnSanityChangedEvent.Invoke(newValue);

@@ -25,7 +25,7 @@ namespace GameCore.Gameplay.Entities.Monsters
         // PROPERTIES: ----------------------------------------------------------------------------
 
 #warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
-        public EntityLocation EntityLocation { get; private set; } = EntityLocation.Sector;
+        public EntityLocation EntityLocation { get; private set; } = EntityLocation.Surface;
 #warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
         public Floor CurrentFloor { get; private set; }
 

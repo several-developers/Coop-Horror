@@ -79,6 +79,8 @@ MonoBehaviour:
       _text: Press 'E' to interact
     - _interactionType: 12
       _text: Press 'E' to sit down
+    - _interactionType: 13
+      _text: Press 'E' to open
     _interactionDisabledTextSettings:
     - _interactionType: 1
       _text: Can't pick up item now

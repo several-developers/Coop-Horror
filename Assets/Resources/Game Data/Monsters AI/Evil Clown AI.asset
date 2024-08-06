@@ -83,6 +83,7 @@ MonoBehaviour:
   _chaseStoppingDistance: 0.5
   _maxChaseDistance: 10000
   _chaseEndDelay: 10
+  _chaseSpeedChangeEase: 5
   _attackDistance: 1.25
   _attackCooldown: 2
   _wanderingMinSpeed: 1
@@ -95,7 +96,7 @@ MonoBehaviour:
     _runningFirstTypeDistance: 24
     _runningSecondTypeDistance: 14
     _animationSpeedMultiplierRange: {x: 0.1, y: 2}
-  _brainWashSoundsDelay: {x: 0, y: 3}
+  _brainWashSoundsDelay: {x: 1, y: 5}
   _footstepsSE: {fileID: 11400000, guid: 7b8dd2117c5d6b64cb147cb6e62204cf, type: 2}
   _roarSE: {fileID: 11400000, guid: 6137db42e67de1f4d93bea16ce56ca46, type: 2}
   _brainwashSE: {fileID: 11400000, guid: 3b22c1e2cc487fd4092f635f98e060d1, type: 2}

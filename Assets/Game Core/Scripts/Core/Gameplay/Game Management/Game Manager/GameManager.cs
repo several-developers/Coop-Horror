@@ -49,7 +49,7 @@ namespace GameCore.Gameplay.GameManagement
         // FIELDS: --------------------------------------------------------------------------------
 
         private const LocationName DefaultCurrentLocation = LocationName.Base;
-        private const LocationName DefaultSelectedLocation = LocationName.Scrapyard;
+        private const LocationName DefaultSelectedLocation = LocationName.Forest;
         private const GameState DefaultGameState = GameState.Gameplay;
 
         private readonly NetworkVariable<LocationName> _currentLocation = new(DefaultCurrentLocation);
@@ -483,7 +483,7 @@ namespace GameCore.Gameplay.GameManagement
                 $"clients: {clientsCompleted.Count}"
             );
 
-            Debug.LogWarning(log);
+            Debug.Log(log);
 
             _isScenesSynchronized = false;
             LocationUnloadedLogic();

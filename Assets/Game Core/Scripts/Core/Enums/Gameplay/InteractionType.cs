@@ -15,5 +15,6 @@
         SimpleButton = 10,
         MarketShop = 11,
         MobileHQSeat = 12,
+        MetroDoor = 13,
     }
 }

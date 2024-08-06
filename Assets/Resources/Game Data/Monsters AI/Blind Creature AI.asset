@@ -75,7 +75,7 @@ MonoBehaviour:
   _suspicionMeterToAggro: 8
   _suspicionMeterMaxAmount: 15
   _instantAggroSuspicionMeterAmount: 11
-  _suspicionMeterDecreaseTime: 2
+  _suspicionMeterDecreaseTime: 3
   _wanderingMinDelay: 0.5
   _wanderingMaxDelay: 5
   _wanderingMinSpeed: 1
@@ -83,6 +83,5 @@ MonoBehaviour:
   _wanderingMinDistance: 1
   _wanderingMaxDistance: 15
   _suspicionMoveSpeed: 5
-  _chaseSpeed: 5
   _attackDistance: 1
   _attackCooldown: 2

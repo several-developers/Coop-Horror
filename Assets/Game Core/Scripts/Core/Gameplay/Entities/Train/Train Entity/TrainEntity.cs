@@ -42,14 +42,12 @@ namespace GameCore.Gameplay.Entities.Train
         [Inject]
         private void Construct(
             IGameManagerDecorator gameManagerDecorator,
-            ILocationManagerDecorator locationManagerDecorator,
             IQuestsManagerDecorator questsManagerDecorator,
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
             GameManagerDecorator = gameManagerDecorator;
             QuestsManagerDecorator = questsManagerDecorator;
-            _locationManagerDecorator = locationManagerDecorator;
             _trainConfig = gameplayConfigsProvider.GetTrainConfig();
         }
 
@@ -82,13 +80,12 @@ namespace GameCore.Gameplay.Entities.Train
         private readonly NetworkVariable<bool> _isMainLeverEnabled = new(value: true, writePerm: OwnerPermission);
         private readonly NetworkVariable<bool> _isDoorOpened = new(writePerm: OwnerPermission);
 
-        private ILocationManagerDecorator _locationManagerDecorator;
-
         private TrainConfigMeta _trainConfig;
         private TrainController _trainController;
         private TrainSoundReproducer _soundReproducer;
         private MoveSpeedController _moveSpeedController;
         private PathMovement _pathMovement;
+        private MetroPlatformLocationManager _metroPlatformLocationManager;
 
         private MovementBehaviour _movementBehaviour;
         private bool _isStoppedAtSector;
@@ -106,6 +103,9 @@ namespace GameCore.Gameplay.Entities.Train
             InitMobileHQSeats();
         }
 
+        private void Start() =>
+            _metroPlatformLocationManager = MetroPlatformLocationManager.Get();
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void ChangePath(CinemachinePath path, float startDistancePercent = 0, bool stayAtSamePosition = false) =>
@@ -122,9 +122,9 @@ namespace GameCore.Gameplay.Entities.Train
             ChangeToTheRoadPath();
         }
 
-        public void TeleportToTheSector()
+        public void TeleportToTheMetroPlatform()
         {
-            CinemachinePath path = _locationManagerDecorator.GetEnterPath();
+            CinemachinePath path = _metroPlatformLocationManager.GetEnterPath();
 
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
@@ -271,22 +271,22 @@ namespace GameCore.Gameplay.Entities.Train
 
         private void ChangeToTheRoadPath()
         {
-            RoadLocationManager roadLocationManager = RoadLocationManager.Get();
+            MetroLocationManager metroLocationManager = MetroLocationManager.Get();
             CinemachinePath path;
             float startPositionAtRoadLocation = 0f;
 
             if (LastPathID == -1)
             {
-                path = roadLocationManager.GetMainPath();
+                path = metroLocationManager.GetMainPath();
                 startPositionAtRoadLocation = _trainConfig.StartPositionAtRoadLocation;
             }
             else
             {
-                bool isPathFound = roadLocationManager.TryGetEnterPathByID(LastPathID, out path);
+                bool isPathFound = metroLocationManager.TryGetEnterPathByID(LastPathID, out path);
 
                 if (!isPathFound)
                 {
-                    path = roadLocationManager.GetMainPath();
+                    path = metroLocationManager.GetMainPath();
                     Log.PrintError(log: $"Path with ID <gb>({LastPathID})</gb> <rb>not found</rb>!");
                 }
             }
@@ -375,7 +375,7 @@ namespace GameCore.Gameplay.Entities.Train
             TeleportAllPlayersToRandomSeats();
             _pathMovement.ToggleArrived(isArrived: false);
             
-            CinemachinePath exitPath = _locationManagerDecorator.GetExitPath();
+            CinemachinePath exitPath = _metroPlatformLocationManager.GetExitPath();
             ChangePath(exitPath);
         }
 

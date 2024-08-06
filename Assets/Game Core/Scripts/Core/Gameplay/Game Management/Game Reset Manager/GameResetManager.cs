@@ -125,6 +125,6 @@ namespace GameCore.Gameplay.GameManagement
         }
 
         private void ChangeVisualPreset() =>
-            _visualManager.ChangePreset(VisualPresetType.RoadLocation, instant: true);
+            _visualManager.ChangePreset(VisualPresetType.Metro, instant: true);
     }
 }

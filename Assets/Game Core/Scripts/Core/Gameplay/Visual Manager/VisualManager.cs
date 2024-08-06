@@ -61,7 +61,7 @@ namespace GameCore.Gameplay.VisualManagement
             if (!isGameStateValid)
                 return;
 
-            ChangePreset(VisualPresetType.RoadLocation, instant: true);
+            ChangePreset(VisualPresetType.Metro, instant: true);
         }
 
         private void OnDestroy() =>

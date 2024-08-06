@@ -83,7 +83,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         {
             switch (EntityLocation)
             {
-                case EntityLocation.Sector:
+                case EntityLocation.Surface:
                     EnterMoveToSurfaceFireExitState();
                     break;
                 

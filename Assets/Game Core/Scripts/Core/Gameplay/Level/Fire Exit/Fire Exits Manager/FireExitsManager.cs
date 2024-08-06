@@ -68,7 +68,7 @@ namespace GameCore.Gameplay.Level
             if (isInStairsLocation)
             {
                 entityLocation = floor == Floor.Surface
-                    ? EntityLocation.Sector
+                    ? EntityLocation.Surface
                     : EntityLocation.Dungeon;
             }
 
@@ -88,7 +88,7 @@ namespace GameCore.Gameplay.Level
             if (isInStairsLocation)
             {
                 entityLocation = floor == Floor.Surface
-                    ? EntityLocation.Sector
+                    ? EntityLocation.Surface
                     : EntityLocation.Dungeon;
             }
 
@@ -98,13 +98,17 @@ namespace GameCore.Gameplay.Level
 
         private void ChangeVisualPreset(EntityLocation entityLocation)
         {
-            VisualPresetType visualPresetType = VisualPresetType.DefaultLocation;
+            VisualPresetType visualPresetType;
             
             switch (entityLocation)
             {
                 case EntityLocation.Dungeon:
                 case EntityLocation.Stairs:
                     visualPresetType = VisualPresetType.Dungeon;
+                    break;
+                
+                default:
+                    visualPresetType = VisualPresetType.DefaultLocation;
                     break;
             }
             

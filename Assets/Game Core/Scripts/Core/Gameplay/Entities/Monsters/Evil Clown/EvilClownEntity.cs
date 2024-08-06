@@ -94,7 +94,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         {
             switch (EntityLocation)
             {
-                case EntityLocation.Sector:
+                case EntityLocation.Surface:
                     EnterRunAwayInSurfaceState();
                     break;
 

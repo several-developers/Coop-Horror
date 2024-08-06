@@ -170,9 +170,9 @@ namespace GameCore.Gameplay.GameManagement
                 _gameTimeManagerDecorator.IncreaseDay();
             }
 
-            _trainEntity.TeleportToTheSector();
+            _trainEntity.TeleportToTheMetroPlatform();
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.StopAtPathEnd);
-            SetPlayersEntityLocation(EntityLocation.Sector);
+            SetPlayersEntityLocation(EntityLocation.Surface);
             _trainEntity.PlaySound(TrainEntity.SFXType.Arrival);
             _monstersGenerator.Start();
         }
