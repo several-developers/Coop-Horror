@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameCore.Gameplay.EntitiesSystems.Utilities
+namespace GameCore.Gameplay.Systems.Utilities
 {
     public static class NavMeshUtilities
     {

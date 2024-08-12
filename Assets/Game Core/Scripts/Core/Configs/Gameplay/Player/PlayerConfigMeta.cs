@@ -39,6 +39,15 @@ namespace GameCore.Configs.Gameplay.Player
         
         [SerializeField, Required]
         private SoundEvent _landSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _itemPickupSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _itemDropSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _itemSwitchSE;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -49,6 +58,9 @@ namespace GameCore.Configs.Gameplay.Player
         public SoundEvent FootstepsSE => _footstepsSE;
         public SoundEvent JumpSE => _jumpSE;
         public SoundEvent LandSE => _landSE;
+        public SoundEvent ItemPickupSE => _itemPickupSE;
+        public SoundEvent ItemDropSE => _itemDropSE;
+        public SoundEvent ItemSwitchSE => _itemSwitchSE;
 
         // FIELDS: --------------------------------------------------------------------------------
 

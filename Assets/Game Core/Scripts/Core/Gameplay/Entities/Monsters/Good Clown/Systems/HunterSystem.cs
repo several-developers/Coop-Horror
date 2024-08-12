@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.Utilities;
+using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown

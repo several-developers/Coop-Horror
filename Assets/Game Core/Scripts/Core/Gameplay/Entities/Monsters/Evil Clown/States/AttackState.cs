@@ -1,7 +1,7 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.CombatLogics;
+using GameCore.Gameplay.Systems.CombatLogics;
 
 namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 {

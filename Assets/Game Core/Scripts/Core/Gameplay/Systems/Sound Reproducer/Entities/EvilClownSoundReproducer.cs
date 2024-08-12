@@ -3,7 +3,7 @@ using GameCore.Gameplay.Entities.Monsters.EvilClown;
 using Sonity;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.SoundReproducer
+namespace GameCore.Gameplay.Systems.SoundReproducer
 {
     public class EvilClownSoundReproducer : SoundReproducerBase
     {

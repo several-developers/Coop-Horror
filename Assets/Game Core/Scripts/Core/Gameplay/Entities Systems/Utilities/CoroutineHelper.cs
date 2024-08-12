@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.Utilities
+namespace GameCore.Gameplay.Systems.Utilities
 {
     public class CoroutineHelper
     {

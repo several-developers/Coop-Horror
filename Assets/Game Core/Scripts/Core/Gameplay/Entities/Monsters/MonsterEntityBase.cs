@@ -36,10 +36,10 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         public event Action OnEntityTeleportedEvent = delegate { };
 
-        protected event Action<ulong> OnTargetPlayerChangedEvent = delegate { }; 
+        protected event Action<ulong> OnTargetPlayerChangedEvent = delegate { };
 
         protected ulong TargetPlayerID;
-        
+
         private static readonly List<MonsterEntityBase> AllMonsters = new();
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -53,8 +53,11 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public virtual void Teleport(Vector3 position, Quaternion rotation)
+        public virtual void Teleport(Vector3 position, Quaternion rotation, bool resetVelocity = false)
         {
+            if (resetVelocity && TryGetComponent(out Rigidbody rigidBody))
+                rigidBody.velocity = Vector3.zero;
+            
             _agent.enabled = false;
             _networkTransform.Teleport(position, rotation, transform.localScale);
             _agent.enabled = true;
@@ -76,6 +79,9 @@ namespace GameCore.Gameplay.Entities.Monsters
         public void SetFloor(Floor floor) =>
             CurrentFloor = floor;
 
+        public static void ClearAllMonsters() =>
+            AllMonsters.Clear();
+        
         public static IReadOnlyList<MonsterEntityBase> GetAllMonsters() => AllMonsters;
 
         public MonoBehaviour GetMonoBehaviour() => this;
@@ -141,7 +147,7 @@ namespace GameCore.Gameplay.Entities.Monsters
             TargetPlayerID = playerID;
             OnTargetPlayerChangedEvent.Invoke(playerID);
         }
-        
+
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]

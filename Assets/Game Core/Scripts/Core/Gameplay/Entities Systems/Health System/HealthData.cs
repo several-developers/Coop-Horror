@@ -1,6 +1,6 @@
 ﻿using Unity.Netcode;
 
-namespace GameCore.Gameplay.EntitiesSystems.Health
+namespace GameCore.Gameplay.Systems.Health
 {
     public struct HealthData : INetworkSerializable
     {

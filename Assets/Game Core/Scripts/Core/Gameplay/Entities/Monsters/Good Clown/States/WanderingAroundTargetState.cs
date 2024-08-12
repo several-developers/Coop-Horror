@@ -2,8 +2,8 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.MovementLogics;
-using GameCore.Gameplay.EntitiesSystems.Utilities;
+using GameCore.Gameplay.Systems.MovementLogics;
+using GameCore.Gameplay.Systems.Utilities;
 using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.AI;

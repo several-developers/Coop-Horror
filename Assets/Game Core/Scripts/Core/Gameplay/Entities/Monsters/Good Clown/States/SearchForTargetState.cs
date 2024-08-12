@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.Utilities;
+using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 

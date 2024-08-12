@@ -9,9 +9,9 @@ namespace GameCore.Observers.Gameplay.Game
         
         public event Action<LocationName> OnTrainArrivedAtBaseEvent = delegate { };
         public event Action OnTrainLeavingBaseEvent = delegate { };
-        public event Action OnTrainArrivedAtSectorEvent = delegate { };
-        public event Action OnTrainStoppedAtSectorEvent = delegate { };
-        public event Action OnTrainLeavingSectorEvent = delegate { };
+        public event Action OnTrainArrivedAtLocationEvent = delegate { };
+        public event Action OnTrainStoppedAtLocationEvent = delegate { };
+        public event Action OnTrainLeavingLocationEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
@@ -21,13 +21,13 @@ namespace GameCore.Observers.Gameplay.Game
         public void TrainLeavingBase() =>
             OnTrainLeavingBaseEvent.Invoke();
 
-        public void TrainArrivedAtSector() =>
-            OnTrainArrivedAtSectorEvent.Invoke();
+        public void TrainArrivedAtLocation() =>
+            OnTrainArrivedAtLocationEvent.Invoke();
 
-        public void TrainStoppedAtSector() =>
-            OnTrainStoppedAtSectorEvent.Invoke();
+        public void TrainStoppedAtLocation() =>
+            OnTrainStoppedAtLocationEvent.Invoke();
 
-        public void TrainLeavingSector() =>
-            OnTrainLeavingSectorEvent.Invoke();
+        public void TrainLeavingLocation() =>
+            OnTrainLeavingLocationEvent.Invoke();
     }
 }

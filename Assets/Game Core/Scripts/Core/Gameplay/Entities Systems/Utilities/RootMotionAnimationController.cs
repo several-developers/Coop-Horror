@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.EntitiesSystems.Utilities
+namespace GameCore.Gameplay.Systems.Utilities
 {
     public class RootMotionAnimationController : MonoBehaviour
     {

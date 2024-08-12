@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.Spawners.Editor
+namespace GameCore.Gameplay.Systems.Spawners.Editor
 {
     [CustomEditor(typeof(DungeonMonstersSpawner))]
     public class DungeonMonstersSpawnerEditor : OdinEditor

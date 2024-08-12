@@ -3,7 +3,7 @@ using GameCore.Gameplay.Entities.Train;
 using Sonity;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.SoundReproducer
+namespace GameCore.Gameplay.Systems.SoundReproducer
 {
     public class TrainSoundReproducer : SoundReproducerBase
     {

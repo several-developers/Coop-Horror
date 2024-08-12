@@ -1,7 +1,7 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.EntitiesSystems.Health;
-using GameCore.Gameplay.EntitiesSystems.Inventory;
+using GameCore.Gameplay.Systems.Health;
+using GameCore.Gameplay.Systems.Inventory;
 
 namespace GameCore.Gameplay.Entities.Player.States
 {

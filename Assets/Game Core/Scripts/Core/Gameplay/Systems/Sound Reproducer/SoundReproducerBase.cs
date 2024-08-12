@@ -1,7 +1,7 @@
 ﻿using Sonity;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.SoundReproducer
+namespace GameCore.Gameplay.Systems.SoundReproducer
 {
     public abstract class SoundReproducerBase
     {

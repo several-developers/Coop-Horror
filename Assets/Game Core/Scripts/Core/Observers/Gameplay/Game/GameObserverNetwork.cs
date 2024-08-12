@@ -12,9 +12,9 @@ namespace GameCore.Observers.Gameplay.Game
         public event Action<LocationName> OnTrainArrivedAtBaseEvent = delegate { };
         public event Action OnTrainLeavingBaseEvent = delegate { };
         public event Action OnTrainLeftBaseEvent = delegate { };
-        public event Action OnTrainArrivedAtSectorEvent = delegate { };
-        public event Action OnTrainStoppedAtSectorEvent = delegate { };
-        public event Action OnTrainLeavingSectorEvent = delegate { };
+        public event Action OnTrainArrivedAtLocationEvent = delegate { };
+        public event Action OnTrainStoppedAtLocationEvent = delegate { };
+        public event Action OnTrainLeavingLocationEvent = delegate { };
         public event Action OnTrainLeftSectorEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -26,11 +26,11 @@ namespace GameCore.Observers.Gameplay.Game
 
         public void TrainLeftBase() => TrainLeftBaseServerRpc();
 
-        public void TrainArrivedAtSector() => TrainArrivedAtSectorServerRpc();
+        public void TrainArrivedAtLocation() => TrainArrivedAtSectorServerRpc();
 
-        public void TrainStoppedAtSector() => TrainStoppedAtSectorServerRpc();
+        public void TrainStoppedAtLocation() => TrainStoppedAtSectorServerRpc();
 
-        public void TrainLeavingSector() => TrainLeavingSectorServerRpc();
+        public void TrainLeavingLocation() => TrainLeavingSectorServerRpc();
 
         public void TrainLeftSector() => TrainLeftSectorServerRpc();
 
@@ -72,15 +72,15 @@ namespace GameCore.Observers.Gameplay.Game
 
         [ClientRpc]
         private void TrainArrivedAtSectorClientRpc() =>
-            OnTrainArrivedAtSectorEvent.Invoke();
+            OnTrainArrivedAtLocationEvent.Invoke();
 
         [ClientRpc]
         private void TrainStoppedAtSectorClientRpc() =>
-            OnTrainStoppedAtSectorEvent.Invoke();
+            OnTrainStoppedAtLocationEvent.Invoke();
 
         [ClientRpc]
         private void TrainLeavingSectorClientRpc() =>
-            OnTrainLeavingSectorEvent.Invoke();
+            OnTrainLeavingLocationEvent.Invoke();
 
         [ClientRpc]
         private void TrainLeftSectorClientRpc() =>

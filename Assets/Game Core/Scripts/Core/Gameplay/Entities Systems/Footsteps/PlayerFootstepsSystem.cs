@@ -3,7 +3,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.InputManagement;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.Footsteps
+namespace GameCore.Gameplay.Systems.Footsteps
 {
     public class PlayerFootstepsSystem : FootstepsSystemBase
     {

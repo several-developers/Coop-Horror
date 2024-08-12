@@ -53,9 +53,13 @@ namespace GameCore.Gameplay.GameManagement
                 DestroyAllMonsters();
                 ResetGameTime();
                 ResetGold();
-                TeleportMobileHQToTheRoad();
-                RespawnPlayersAtMobileHQ();
+                TeleportTrainToTheRoad();
+                ResetTrain();
+                RespawnPlayersAtTrain();
+                TeleportAllPlayersToRandomSeats();
                 ResetQuests();
+                _gameManagerDecorator.SelectLocation(LocationName.Base);
+                _trainEntity.SendLeaveLocation();
             }
 
             // Common logic.
@@ -73,10 +77,19 @@ namespace GameCore.Gameplay.GameManagement
         private void ResetGold() =>
             _gameManagerDecorator.ResetPlayersGold();
 
-        private void TeleportMobileHQToTheRoad() =>
+        private void TeleportTrainToTheRoad() =>
             _trainEntity.TeleportToTheRoad();
 
-        private void RespawnPlayersAtMobileHQ()
+        private void ResetTrain()
+        {
+            _trainEntity.ToggleMainLeverState(isEnabled: true);
+            _trainEntity.ToggleDoorState(isOpened: false);
+            _trainEntity.ToggleStoppedAtSectorState(false);
+            _trainEntity.SetMovementBehaviour(TrainEntity.MovementBehaviour.InfiniteMovement);
+            _trainEntity.PlaySound(TrainEntity.SFXType.MovementLoop); // TEMP
+        }
+        
+        private void RespawnPlayersAtTrain()
         {
             IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
             NetworkObject parent = _trainEntity.GetNetworkObject();
@@ -91,9 +104,8 @@ namespace GameCore.Gameplay.GameManagement
                 Vector3 spawnPosition = GetSpawnPosition();
                 Quaternion rotation = Quaternion.identity;
 
-                playerEntity.Teleport(spawnPosition, rotation);
+                playerEntity.Teleport(spawnPosition, rotation, resetVelocity: true);
                 playerEntity.NetworkObject.TrySetParent(parent, worldPositionStays: false);
-                playerEntity.EnterSittingState();
             }
 
             // LOCAL METHODS: -----------------------------
@@ -106,6 +118,9 @@ namespace GameCore.Gameplay.GameManagement
                 return isSpawnPointFound ? spawnPoint.GetSpawnPosition() : Vector3.zero;
             }
         }
+
+        private void TeleportAllPlayersToRandomSeats() =>
+            _trainEntity.TeleportAllPlayersToRandomSeats(ignoreChecks: true);
 
         private void ResetQuests() =>
             _questsManagerDecorator.ResetQuests();
@@ -122,6 +137,8 @@ namespace GameCore.Gameplay.GameManagement
 
             foreach (MonsterEntityBase monsterEntity in allMonsters)
                 Object.Destroy(monsterEntity.gameObject);
+            
+            MonsterEntityBase.ClearAllMonsters();
         }
 
         private void ChangeVisualPreset() =>

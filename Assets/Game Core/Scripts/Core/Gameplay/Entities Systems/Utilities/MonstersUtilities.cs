@@ -4,7 +4,7 @@ using GameCore.Gameplay.Entities.Player;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.EntitiesSystems.Utilities
+namespace GameCore.Gameplay.Systems.Utilities
 {
     public static class MonstersUtilities
     {

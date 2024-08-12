@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.EntitiesSystems.Health;
+﻿using GameCore.Gameplay.Systems.Health;
 
 namespace GameCore.Gameplay.Entities.Player.States
 {

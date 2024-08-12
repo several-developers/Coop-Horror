@@ -1,5 +1,5 @@
 ﻿using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.Health;
+using GameCore.Gameplay.Systems.Health;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
 using TMPro;

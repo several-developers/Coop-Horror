@@ -1,4 +1,4 @@
-﻿namespace GameCore.Gameplay.EntitiesSystems.Inventory
+﻿namespace GameCore.Gameplay.Systems.Inventory
 {
     public class InventoryItemData
     {

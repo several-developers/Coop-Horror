@@ -4,7 +4,7 @@ using Cinemachine;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Train;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.SoundReproducer;
+using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable.Train;
 using GameCore.Gameplay.Level.Locations;
@@ -79,6 +79,7 @@ namespace GameCore.Gameplay.Entities.Train
         private readonly NetworkVariable<SeatsRuntimeDataContainer> _seatsData = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<bool> _isMainLeverEnabled = new(value: true, writePerm: OwnerPermission);
         private readonly NetworkVariable<bool> _isDoorOpened = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<bool> _isStoppedAtSector = new(writePerm: OwnerPermission);
 
         private TrainConfigMeta _trainConfig;
         private TrainController _trainController;
@@ -88,13 +89,12 @@ namespace GameCore.Gameplay.Entities.Train
         private MetroPlatformLocationManager _metroPlatformLocationManager;
 
         private MovementBehaviour _movementBehaviour;
-        private bool _isStoppedAtSector;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
-            _pathMovement = new PathMovement(trainEntity: this);
+            _pathMovement = new PathMovement(trainEntity: this, _trainConfig);
             _trainController = new TrainController(trainEntity: this);
             _moveSpeedController = _references.MoveSpeedController;
             LastPathID = -1;
@@ -119,7 +119,8 @@ namespace GameCore.Gameplay.Entities.Train
             LastPathID = -1;
             _pathMovement.ResetDistance();
             _pathMovement.ToggleArrived(isArrived: false);
-            ChangeToTheRoadPath();
+            ChangeToTheMetroPath();
+            _pathMovement.SetMovementType(PathMovement.MovementType.Cycle);
         }
 
         public void TeleportToTheMetroPlatform()
@@ -129,8 +130,18 @@ namespace GameCore.Gameplay.Entities.Train
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
             ToggleMovement(canMove: true);
+            _pathMovement.SetMovementType(PathMovement.MovementType.SlowingDown);
+            _pathMovement.SlowDownTrain();
         }
 
+        public void TeleportAllPlayersToRandomSeats(bool ignoreChecks = false)
+        {
+            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
+
+            foreach (PlayerEntity playerEntity in allPlayers.Values)
+                TeleportPlayerToRandomSeat(playerEntity);
+        }
+        
         public void TeleportLocalPlayerToTrainSeat(int seatIndex)
         {
             IReadOnlyList<TrainSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
@@ -168,9 +179,13 @@ namespace GameCore.Gameplay.Entities.Train
             PlaySound(sfxType);
         }
 
-        // MAKE RPC
-        public void ToggleStoppedAtSectorState(bool isStoppedAtSector) =>
-            _isStoppedAtSector = isStoppedAtSector;
+        public void ToggleStoppedAtSectorState(bool isStoppedAtSector)
+        {
+            if (IsOwner)
+                _isStoppedAtSector.Value = isStoppedAtSector;
+            else
+                ToggleStoppedAtSectorStateServerRPC(isStoppedAtSector);
+        }
 
         public void PlaySound(SFXType sfxType)
         {
@@ -192,6 +207,9 @@ namespace GameCore.Gameplay.Entities.Train
 
         public void SendOpenGameMapEvent() =>
             OnOpenGameMapEvent.Invoke();
+        
+        public void SendLeaveLocation() =>
+            OnLeaveLocationEvent.Invoke();
 
         public MonoBehaviour GetMonoBehaviour() => this;
 
@@ -269,7 +287,7 @@ namespace GameCore.Gameplay.Entities.Train
             }
         }
 
-        private void ChangeToTheRoadPath()
+        private void ChangeToTheMetroPath()
         {
             MetroLocationManager metroLocationManager = MetroLocationManager.Get();
             CinemachinePath path;
@@ -297,15 +315,7 @@ namespace GameCore.Gameplay.Entities.Train
         private void ToggleMovement(bool canMove) =>
             _pathMovement.ToggleMovement(canMove);
 
-        private void TeleportAllPlayersToRandomSeats()
-        {
-            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
-
-            foreach (PlayerEntity playerEntity in allPlayers.Values)
-                TeleportPlayerToRandomSeat(playerEntity);
-        }
-
-        private void TeleportPlayerToRandomSeat(PlayerEntity playerEntity)
+        private void TeleportPlayerToRandomSeat(PlayerEntity playerEntity, bool ignoreChecks = false)
         {
             bool isDead = playerEntity.IsDead();
 
@@ -314,7 +324,7 @@ namespace GameCore.Gameplay.Entities.Train
 
             bool isInsideTrain = playerEntity.IsInsideTrain;
 
-            if (!isInsideTrain)
+            if (!isInsideTrain && !ignoreChecks)
                 return;
 
             SeatsRuntimeDataContainer seatsRuntimeDataContainer = _seatsData.Value;
@@ -361,7 +371,8 @@ namespace GameCore.Gameplay.Entities.Train
             return isSeatBusy;
         }
 
-        private bool ShouldRemovePlayerParent() => _isStoppedAtSector;
+        private bool ShouldRemovePlayerParent() =>
+            _isStoppedAtSector.Value;
 
         // RPC: -----------------------------------------------------------------------------------
 
@@ -377,6 +388,9 @@ namespace GameCore.Gameplay.Entities.Train
             
             CinemachinePath exitPath = _metroPlatformLocationManager.GetExitPath();
             ChangePath(exitPath);
+            
+            _pathMovement.SetMovementType(PathMovement.MovementType.SpeedingUp);
+            _pathMovement.SpeedUpTrain();
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -403,6 +417,10 @@ namespace GameCore.Gameplay.Entities.Train
             _isDoorOpened.Value = isOpened;
 
         [ServerRpc(RequireOwnership = false)]
+        private void ToggleStoppedAtSectorStateServerRPC(bool isStoppedAtSector) =>
+            _isStoppedAtSector.Value = isStoppedAtSector;
+
+        [ServerRpc(RequireOwnership = false)]
         private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
         {
             ulong senderClientID = serverRpcParams.Receive.SenderClientId;
@@ -417,7 +435,7 @@ namespace GameCore.Gameplay.Entities.Train
 
             StopSoundClientRPC(sfxType, senderClientID);
         }
-        
+
         [ClientRpc]
         private void MainLeverAnimationClientRpc(ulong senderClientID)
         {
@@ -468,7 +486,7 @@ namespace GameCore.Gameplay.Entities.Train
                     break;
                 
                 case MovementBehaviour.LeaveAtPathEnd:
-                    OnLeaveLocationEvent.Invoke();
+                    SendLeaveLocation();
                     break;
             }
         }

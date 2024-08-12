@@ -3,7 +3,7 @@ using GameCore.Gameplay.Level;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
+namespace GameCore.Gameplay.Systems.MovementLogics
 {
     public class MoveFromSurfaceToStairsLogic : MoveToFireExitLogic
     {

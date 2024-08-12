@@ -1,4 +1,5 @@
 ﻿using CustomEditors;
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using Sonity;
 using UnityEngine;
@@ -25,6 +26,22 @@ namespace GameCore.Configs.Gameplay.Train
         [SerializeField, Range(0f, 1f), SuffixLabel("%", overlay: true)]
         private float _startPositionAtRoadLocation;
 
+        [Title("New Settings")]
+        [SerializeField, Min(0f)]
+        private float _movementSpeed = 15f;
+
+        [SerializeField, Min(0f)]
+        private float _slowDownDuration = 5f;
+        
+        [SerializeField, Min(0f)]
+        private float _speedUpDuration = 5f;
+
+        [SerializeField]
+        private Ease _slowDownEase;
+        
+        [SerializeField]
+        private Ease _speedUpEase;
+
         [Title(SFXTitle)]
         [SerializeField, Required]
         private SoundEvent _doorOpenSE;
@@ -49,6 +66,12 @@ namespace GameCore.Configs.Gameplay.Train
         public float SpeedChangeRate => _speedChangeRate;
         public float LeavingMainRoadSpeedMultiplier => _leavingMainRoadSpeedMultiplier;
         public float StartPositionAtRoadLocation => _startPositionAtRoadLocation;
+        
+        public float MovementSpeed2 => _movementSpeed;
+        public float SlowDownDuration => _slowDownDuration;
+        public float SpeedUpDuration => _speedUpDuration;
+        public Ease SlowDownEase => _slowDownEase;
+        public Ease SpeedUpEase => _speedUpEase;
 
         // SFX
         public SoundEvent DoorOpenSE => _doorOpenSE;

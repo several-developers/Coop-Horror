@@ -15,3 +15,8 @@ MonoBehaviour:
   _metaName: Elevator Config
   _floorMovementDuration: 3
   _reactivationDelay: 2
+  _doorOpenDelay: 1
+  _doorOpeningSE: {fileID: 11400000, guid: a4a0610a1a9effc41908172e743abdd2, type: 2}
+  _doorClosingSE: {fileID: 11400000, guid: c52d2d312f6c11440b3c047f93068b81, type: 2}
+  _floorChangeSE: {fileID: 11400000, guid: 87c42c258b705c14182484ab4b022fbe, type: 2}
+  _buttonPushSE: {fileID: 11400000, guid: 3255ce4600e08d94ca5b9b69fb122689, type: 2}

@@ -2,11 +2,11 @@
 using System.Collections;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.Utilities;
+using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
+namespace GameCore.Gameplay.Systems.MovementLogics
 {
     public class ChaseLogic
     {

@@ -3,7 +3,7 @@ using Sirenix.OdinInspector;
 using Sonity;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.Footsteps
+namespace GameCore.Gameplay.Systems.Footsteps
 {
     public abstract class FootstepsSystemBase : MonoBehaviour
     {

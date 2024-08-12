@@ -1,6 +1,6 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.EntitiesSystems.MovementLogics;
+using GameCore.Gameplay.Systems.MovementLogics;
 using GameCore.Gameplay.Level;
 using UnityEngine.AI;
 

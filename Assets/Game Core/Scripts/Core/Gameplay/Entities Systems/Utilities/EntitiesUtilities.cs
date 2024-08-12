@@ -1,7 +1,7 @@
 ﻿using GameCore.Enums.Gameplay;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.Utilities
+namespace GameCore.Gameplay.Systems.Utilities
 {
     public static class EntitiesUtilities
     {

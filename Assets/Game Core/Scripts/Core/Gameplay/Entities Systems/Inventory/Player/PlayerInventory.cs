@@ -2,7 +2,7 @@
 using GameCore.Gameplay.Network;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.Inventory
+namespace GameCore.Gameplay.Systems.Inventory
 {
     public class PlayerInventory
     {
@@ -76,12 +76,12 @@ namespace GameCore.Gameplay.EntitiesSystems.Inventory
             return true;
         }
 
-        public void DropItem(bool destroy = false)
+        public bool DropItem(bool destroy = false)
         {
             bool hasItemInSelectedSlot = _inventory.HasItemInSelectedSlot();
 
             if (!hasItemInSelectedSlot)
-                return;
+                return false;
 
             //LogItemDrop(itemData.ItemID);
 
@@ -91,6 +91,8 @@ namespace GameCore.Gameplay.EntitiesSystems.Inventory
             ulong clientID = GetClientID();
             DroppedItemStaticData data = new(clientID, slotIndex, randomPosition, destroy);
             OnItemDroppedEvent.Invoke(data);
+            
+            return true;
         }
         
         public void DropAllItems()

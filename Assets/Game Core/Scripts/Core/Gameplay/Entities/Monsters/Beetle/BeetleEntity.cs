@@ -3,7 +3,7 @@ using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.Beetle.States;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.Health;
+using GameCore.Gameplay.Systems.Health;
 using GameCore.Gameplay.Level;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Utilities;

@@ -8,11 +8,11 @@ using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
 using GameCore.Gameplay.Entities.Train;
-using GameCore.Gameplay.EntitiesSystems.Footsteps;
-using GameCore.Gameplay.EntitiesSystems.Health;
-using GameCore.Gameplay.EntitiesSystems.Inventory;
-using GameCore.Gameplay.EntitiesSystems.Ragdoll;
-using GameCore.Gameplay.EntitiesSystems.SoundReproducer;
+using GameCore.Gameplay.Systems.Footsteps;
+using GameCore.Gameplay.Systems.Health;
+using GameCore.Gameplay.Systems.Inventory;
+using GameCore.Gameplay.Systems.Ragdoll;
+using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.InputManagement;
@@ -38,7 +38,10 @@ namespace GameCore.Gameplay.Entities.Player
             //_ = 0,
             Footsteps = 1,
             Jump = 2,
-            Land = 3
+            Land = 3,
+            ItemPickup = 4,
+            ItemDrop = 5,
+            ItemSwitch = 6
         }
 
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -133,8 +136,11 @@ namespace GameCore.Gameplay.Entities.Player
         public void TakeDamage(float damage, IEntity source = null) =>
             _healthSystem.TakeDamage(damage);
 
-        public void Teleport(Vector3 position, Quaternion rotation)
+        public void Teleport(Vector3 position, Quaternion rotation, bool resetVelocity = false)
         {
+            if (resetVelocity)
+                _references.Rigidbody.velocity = Vector3.zero;
+            
             _references.NetworkTransform.InLocalSpace = false;
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
         }
@@ -169,7 +175,12 @@ namespace GameCore.Gameplay.Entities.Player
             if (IsDead())
                 return;
 
-            _inventory.DropItem(destroy);
+            bool isItemDropped = _inventory.DropItem(destroy);
+
+            if (!isItemDropped)
+                return;
+            
+            PlaySound(SFXType.ItemDrop, onlyLocal: true);
         }
 
         public void Kill(PlayerDeathReason deathReason)
@@ -191,9 +202,13 @@ namespace GameCore.Gameplay.Entities.Player
         public void ToggleInsideTrainState(bool isInsideTrain) =>
             IsInsideTrain = isInsideTrain;
 
-        public void PlaySound(SFXType sfxType)
+        public void PlaySound(SFXType sfxType, bool onlyLocal = false)
         {
             PlaySoundLocal(sfxType);
+
+            if (onlyLocal)
+                return;
+            
             PlaySoundServerRPC(sfxType);
         }
 
@@ -296,6 +311,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             _entityLocation.OnValueChanged += OnPlayerLocationChanged;
 
+            _inventory.OnItemEquippedEvent += OnItemEquipped;
             _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
 
             _healthSystem.OnHealthChangedEvent += OnHealthChanged;
@@ -415,6 +431,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             _entityLocation.OnValueChanged -= OnPlayerLocationChanged;
 
+            _inventory.OnItemEquippedEvent -= OnItemEquipped;
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
 
             _healthSystem.OnHealthChangedEvent -= OnHealthChanged;
@@ -677,6 +694,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnDropItem() => DropItem();
 
+        private void OnItemEquipped(EquippedItemStaticData data) => PlaySound(SFXType.ItemPickup);
+
         private void OnOwnerSelectedSlotChanged(ChangedSlotStaticData data)
         {
             int slotIndex = data.SlotIndex;
@@ -685,6 +704,8 @@ namespace GameCore.Gameplay.Entities.Player
                 _currentSelectedSlotIndex.Value = slotIndex;
             else
                 ChangeSelectedSlotServerRpc(slotIndex);
+            
+            PlaySound(SFXType.ItemSwitch, onlyLocal: true);
         }
 
         private void OnNotOwnerSelectedSlotChanged(int previousValue, int newValue)

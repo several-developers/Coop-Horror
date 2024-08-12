@@ -7,7 +7,7 @@ using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.EntitiesSystems.Spawners;
+using GameCore.Gameplay.Systems.Spawners;
 using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
@@ -105,8 +105,11 @@ namespace GameCore.Gameplay.MonstersGeneration
 
         public void Dispose()
         {
+            if (!NetworkHorror.IsTrueServer)
+                return;
+            
             DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent -= OnRegisterMonstersSpawner;
-
+            
             _timeCycle.OnHourPassedEvent -= OnHourPassed;
         }
 

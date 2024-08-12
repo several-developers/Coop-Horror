@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
+namespace GameCore.Gameplay.Systems.MovementLogics
 {
     public class WanderingMovementLogic
     {

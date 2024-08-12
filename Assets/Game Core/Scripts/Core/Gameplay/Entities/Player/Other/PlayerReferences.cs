@@ -1,8 +1,8 @@
 ﻿using System;
 using ECM2;
-using GameCore.Gameplay.EntitiesSystems.Footsteps;
-using GameCore.Gameplay.EntitiesSystems.Health;
-using GameCore.Gameplay.EntitiesSystems.Ragdoll;
+using GameCore.Gameplay.Systems.Footsteps;
+using GameCore.Gameplay.Systems.Health;
+using GameCore.Gameplay.Systems.Ragdoll;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using UnityEngine;

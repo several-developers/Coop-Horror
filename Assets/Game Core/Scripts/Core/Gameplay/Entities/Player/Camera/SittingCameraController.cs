@@ -29,12 +29,26 @@ namespace GameCore.Gameplay.Entities.Player
         public float GetVerticalAxis()
         {
             var cinemachinePov = _camera.GetCinemachineComponent<CinemachinePOV>();
+
+            if (cinemachinePov == null)
+            {
+                Debug.LogWarning("Error!");
+                return 0f;
+            }
+            
             return cinemachinePov.m_VerticalAxis.Value;
         }
         
         public float GetHorizontalAxis()
         {
             var cinemachinePov = _camera.GetCinemachineComponent<CinemachinePOV>();
+            
+            if (cinemachinePov == null)
+            {
+                Debug.LogWarning("Error!");
+                return 0f;
+            }
+            
             return cinemachinePov.m_HorizontalAxis.Value;
         }
     }

@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace GameCore.Gameplay.EntitiesSystems.Spawners
+namespace GameCore.Gameplay.Systems.Spawners
 {
     public class DungeonMonstersSpawner : RandomProp
     {

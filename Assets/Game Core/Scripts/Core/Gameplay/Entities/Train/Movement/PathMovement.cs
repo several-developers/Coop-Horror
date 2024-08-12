@@ -1,34 +1,38 @@
 ﻿using System;
 using Cinemachine;
+using DG.Tweening;
+using GameCore.Configs.Gameplay.Train;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Train
 {
     public class PathMovement
     {
+        public enum MovementType
+        {
+            Cycle = 0,
+            SlowingDown = 1,
+            SpeedingUp = 2
+        }
+
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PathMovement(TrainEntity trainEntity)
+        public PathMovement(TrainEntity trainEntity, TrainConfigMeta trainConfig)
         {
-            TrainReferences references = trainEntity.References;
-            
+            _trainConfig = trainConfig;
             _transform = trainEntity.transform;
-            _animator = references.Animator;
-            _moveSpeedController = references.MoveSpeedController;
-
-            _moveSpeedController.OnDistanceChangedEvent += OnDistanceChanged;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnDestinationReachedEvent;
 
+        private readonly TrainConfigMeta _trainConfig;
         private readonly Transform _transform;
-        private readonly Animator _animator;
-        private readonly MoveSpeedController _moveSpeedController;
 
         private CinemachinePathBase _path;
-        private float _animationBlend;
+        private Tweener _moveSpeedTN;
+        private MovementType _movementType = MovementType.Cycle;
         private float _distance;
         private float _syncCurrentTime;
         private bool _isArrived;
@@ -41,10 +45,18 @@ namespace GameCore.Gameplay.Entities.Train
             if (_path == null)
                 return;
 
-            float targetSpeed = _canMove ? _moveSpeedController.GetCurrentSpeed() : 0f;
-            _distance += targetSpeed * Time.deltaTime;
+            if (_movementType != MovementType.Cycle)
+            {
+                UpdateTrainPosition();
+                return;
+            }
 
-            if (_distance > _path.PathLength)
+            float movementSpeed = _trainConfig.MovementSpeed2;
+            _distance += movementSpeed * Time.deltaTime;
+
+            float pathLength = GetPathLength();
+
+            if (_distance >= pathLength)
             {
                 if (!_isArrived)
                 {
@@ -53,18 +65,15 @@ namespace GameCore.Gameplay.Entities.Train
                 }
                 else
                 {
-                    _distance = _path.PathLength;
+                    _distance = pathLength;
                 }
             }
 
-            Move(_distance, targetSpeed);
+            Move(_distance, movementSpeed);
         }
 
         public void ToggleMovement(bool canMove) =>
             _canMove = canMove;
-
-        public void ToggleMoveAnimation(bool canMove) =>
-            _animator.SetBool(id: AnimatorHashes.CanMove, value: canMove);
 
         public void ChangePath(CinemachinePath path, float startDistancePercent = 0f, bool stayAtSamePosition = false)
         {
@@ -95,11 +104,56 @@ namespace GameCore.Gameplay.Entities.Train
         public void ToggleArrived(bool isArrived) =>
             _isArrived = isArrived;
 
+        public void SetMovementType(MovementType movementType) =>
+            _movementType = movementType;
+
+        public void SpeedUpTrain()
+        {
+            _moveSpeedTN.Kill();
+
+            float duration = _trainConfig.SpeedUpDuration;
+            float pathLength = GetPathLength();
+            Ease ease = _trainConfig.SpeedUpEase;
+
+            _moveSpeedTN = DOVirtual
+                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
+                {
+                    _distance = Mathf.Lerp(a: 0f, b: pathLength, t);
+                })
+                .SetEase(ease)
+                .OnComplete(() =>
+                {
+                    _isArrived = true;
+                    OnDestinationReachedEvent?.Invoke();
+                });
+        }
+
+        public void SlowDownTrain()
+        {
+            _moveSpeedTN.Kill();
+
+            float duration = _trainConfig.SlowDownDuration;
+            float pathLength = GetPathLength();
+            Ease ease = _trainConfig.SlowDownEase;
+
+            _moveSpeedTN = DOVirtual
+                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
+                {
+                    _distance = Mathf.Lerp(a: 0f, b: pathLength, t);
+                })
+                .SetEase(ease)
+                .OnComplete(() =>
+                {
+                    _isArrived = true;
+                    OnDestinationReachedEvent?.Invoke();
+                });
+        }
+
         public void ResetDistance()
         {
             if (_path == null)
                 return;
-            
+
             float difference = _distance - _path.PathLength;
             _distance = difference;
         }
@@ -119,6 +173,15 @@ namespace GameCore.Gameplay.Entities.Train
             _transform.rotation = rotation;
         }
 
+        private void UpdateTrainPosition()
+        {
+            Vector3 position = EvaluatePositionAtUnit(_distance);
+            Quaternion rotation = EvaluateOrientationAtUnit(_distance);
+            
+            _transform.position = position;
+            _transform.rotation = rotation;
+        }
+
         private Vector3 EvaluatePositionAtUnit(float distance) =>
             _path.EvaluatePositionAtUnit(distance, CinemachinePathBase.PositionUnits.Distance);
 
@@ -132,9 +195,20 @@ namespace GameCore.Gameplay.Entities.Train
 
             float pathDistance =
                 _path.FromPathNativeUnits(distanceAtPathUnits, CinemachinePathBase.PositionUnits.Distance);
-            
+
             return pathDistance;
         }
+
+        private float GetNormalizedPosition()
+        {
+            float pathLength = GetPathLength();
+            float distance = _distance > pathLength ? pathLength : _distance;
+            float normalizedPosition = distance / pathLength;
+            return normalizedPosition;
+        }
+
+        private float GetPathLength() =>
+            _path.PathLength;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -145,7 +219,7 @@ namespace GameCore.Gameplay.Entities.Train
 
             float newDistance = _path.PathLength * distance;
             _distance = newDistance;
-            
+
             Vector3 position = EvaluatePositionAtUnit(_distance);
             Quaternion rotation = EvaluateOrientationAtUnit(_distance);
 

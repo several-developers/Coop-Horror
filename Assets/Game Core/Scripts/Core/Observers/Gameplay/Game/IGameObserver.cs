@@ -7,14 +7,14 @@ namespace GameCore.Observers.Gameplay.Game
     {
         event Action<LocationName> OnTrainArrivedAtBaseEvent;
         event Action OnTrainLeavingBaseEvent;
-        event Action OnTrainArrivedAtSectorEvent;
-        event Action OnTrainStoppedAtSectorEvent;
-        event Action OnTrainLeavingSectorEvent;
-        
+        event Action OnTrainArrivedAtLocationEvent;
+        event Action OnTrainStoppedAtLocationEvent;
+        event Action OnTrainLeavingLocationEvent;
+
         void TrainArrivedAtBase(LocationName previousLocationName);
         void TrainLeavingBase();
-        void TrainArrivedAtSector();
-        void TrainStoppedAtSector();
-        void TrainLeavingSector();
+        void TrainArrivedAtLocation();
+        void TrainStoppedAtLocation();
+        void TrainLeavingLocation();
     }
 }

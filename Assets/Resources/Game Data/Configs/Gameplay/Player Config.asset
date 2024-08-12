@@ -23,3 +23,6 @@ MonoBehaviour:
   _footstepsSE: {fileID: 11400000, guid: f938e4af8586c564bb5481b3e2e15769, type: 2}
   _jumpSE: {fileID: 11400000, guid: a7f57135654e8a14c84713594d442c20, type: 2}
   _landSE: {fileID: 11400000, guid: 12687ca9a9a3d574389bfa8d6ab5b50c, type: 2}
+  _itemPickupSE: {fileID: 11400000, guid: 29adf4f2b84a99a4985221f42c523ea1, type: 2}
+  _itemDropSE: {fileID: 11400000, guid: b8a0958759b8d274c86061a8ac043098, type: 2}
+  _itemSwitchSE: {fileID: 11400000, guid: cdd95b785f9309646a91cb86ebf505fe, type: 2}

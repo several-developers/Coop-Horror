@@ -42,17 +42,55 @@ namespace GameCore.Gameplay.GameManagement
             _dungeonsManager = dungeonsManager;
             _trainEntity = trainEntity;
             _uiEventMessagePublisher = uiEventMessagePublisher;
-            
+
             _gameManagerDecorator.OnGameStateChangedEvent += HandleGameState;
 
             if (!IsServer)
                 return;
 
+            SubscribeToLogs();
+
             _gameObserver.OnTrainArrivedAtBaseEvent += TrainArrivedAtBase;
             _gameObserver.OnTrainLeavingBaseEvent += TrainLeavingBase;
-            _gameObserver.OnTrainArrivedAtSectorEvent += TrainArrivedAtSector;
-            _gameObserver.OnTrainStoppedAtSectorEvent += TrainStoppedAtSector;
-            _gameObserver.OnTrainLeavingSectorEvent += TrainLeavingSector;
+            _gameObserver.OnTrainArrivedAtLocationEvent += TrainArrivedAtLocation;
+            _gameObserver.OnTrainStoppedAtLocationEvent += TrainStoppedAtLocation;
+            _gameObserver.OnTrainLeavingLocationEvent += TrainLeavingLocation;
+
+            // LOCAL METHODS: -----------------------------
+            
+            void SubscribeToLogs()
+            {
+                _gameObserver.OnTrainArrivedAtBaseEvent += location =>
+                {
+                    string log = Log.HandleLog($"--> Train arrived at <gb>Base</gb> from <gb>{location}</gb>.");
+                    Debug.Log(log);
+                };
+                
+                _gameObserver.OnTrainLeavingBaseEvent += () =>
+                {
+                    string log = Log.HandleLog("--> Train leaving <gb>Base</gb>.");
+                    Debug.Log(log);
+                };
+                
+                _gameObserver.OnTrainArrivedAtLocationEvent += () =>
+                {
+                    LocationName currentLocation = GetCurrentLocation();
+                    string log = Log.HandleLog($"--> Train arrived at location <gb>{currentLocation}</gb>.");
+                    Debug.Log(log);
+                };
+                
+                _gameObserver.OnTrainStoppedAtLocationEvent += () =>
+                {
+                    LocationName currentLocation = GetCurrentLocation();
+                    string log = Log.HandleLog($"--> Train stopped at location <gb>{currentLocation}</gb>.");
+                    Debug.Log(log);
+                };
+                
+                _gameObserver.OnTrainLeavingLocationEvent += () =>
+                {
+                    Debug.Log("--> Train Leaving location.");
+                };
+            }
         }
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -83,9 +121,9 @@ namespace GameCore.Gameplay.GameManagement
 
             _gameObserver.OnTrainArrivedAtBaseEvent -= TrainArrivedAtBase;
             _gameObserver.OnTrainLeavingBaseEvent -= TrainLeavingBase;
-            _gameObserver.OnTrainArrivedAtSectorEvent -= TrainArrivedAtSector;
-            _gameObserver.OnTrainStoppedAtSectorEvent -= TrainStoppedAtSector;
-            _gameObserver.OnTrainLeavingSectorEvent -= TrainLeavingSector;
+            _gameObserver.OnTrainArrivedAtLocationEvent -= TrainArrivedAtLocation;
+            _gameObserver.OnTrainStoppedAtLocationEvent -= TrainStoppedAtLocation;
+            _gameObserver.OnTrainLeavingLocationEvent -= TrainLeavingLocation;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -105,11 +143,19 @@ namespace GameCore.Gameplay.GameManagement
                         _gameManagerDecorator.StartGameRestartTimer();
                         _monstersGenerator.Stop();
                     }
+
                     break;
 
                 case GameState.RestartGame:
                     PublishUIEvent(UIEventType.ShowGameplayHUD);
                     _gameResetManager.Reset();
+
+                    if (IsServer)
+                    {
+                        _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.Gameplay,
+                            previousState: GameState.RestartGame);
+                    }
+
                     break;
 
                 case GameState.WaitingForPlayers:
@@ -130,14 +176,11 @@ namespace GameCore.Gameplay.GameManagement
 
         private void TrainArrivedAtBase(LocationName previousLocationName)
         {
-            string log = Log.HandleLog("--> Train arrived at <gb>Base</gb>.");
-            Debug.Log(log);
-
             bool arrivedFromMarket = previousLocationName == LocationName.Market;
-            
+
             _gameTimeManagerDecorator.SetMidnight();
             _trainEntity.TeleportToTheRoad();
-            
+
             ToggleTrainMainLever(isEnabled: true);
             SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.InfiniteMovement);
             SetPlayersEntityLocation(EntityLocation.Base);
@@ -151,18 +194,12 @@ namespace GameCore.Gameplay.GameManagement
 
         private void TrainLeavingBase()
         {
-            string log = Log.HandleLog("--> Train leaving <gb>Base</gb>.");
-            Debug.Log(log);
-            
             _dungeonsManager.GenerateDungeonsOnAllClients();
         }
 
-        private void TrainArrivedAtSector()
+        private void TrainArrivedAtLocation()
         {
             LocationName currentLocation = GetCurrentLocation();
-            
-            string log = Log.HandleLog($"--> Train arrived at sector <gb>{currentLocation}</gb>.");
-            Debug.Log(log);
 
             if (currentLocation != LocationName.Market)
             {
@@ -177,13 +214,10 @@ namespace GameCore.Gameplay.GameManagement
             _monstersGenerator.Start();
         }
 
-        private void TrainStoppedAtSector()
+        private void TrainStoppedAtLocation()
         {
             LocationName currentLocation = GetCurrentLocation();
-            
-            string log = Log.HandleLog($"--> Train stopped at sector <gb>{currentLocation}</gb>.");
-            Debug.Log(log);
-            
+
             if (currentLocation != LocationName.Market)
             {
                 PublishUIEvent(UIEventType.ShowGameTimer);
@@ -199,10 +233,8 @@ namespace GameCore.Gameplay.GameManagement
             _trainEntity.StopSound(TrainEntity.SFXType.Arrival);
         }
 
-        private void TrainLeavingSector()
+        private void TrainLeavingLocation()
         {
-            Debug.Log("--> Train Leaving Sector.");
-
             ToggleTrainMainLever(isEnabled: false);
             ToggleTrainDoor(isOpened: false);
             _trainEntity.ToggleStoppedAtSectorState(false);
@@ -223,7 +255,7 @@ namespace GameCore.Gameplay.GameManagement
 
             _uiEventMessagePublisher.Publish(eventMessage);
         }
-        
+
         private void SetTrainMovementBehaviour(TrainEntity.MovementBehaviour movementBehaviour) =>
             _trainEntity.SetMovementBehaviour(movementBehaviour);
 
@@ -235,7 +267,7 @@ namespace GameCore.Gameplay.GameManagement
 
         private static void RemovePlayersParent()
         {
-            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
+            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = GetAllPlayers();
 
             foreach (PlayerEntity playerEntity in allPlayers.Values)
             {
@@ -250,11 +282,14 @@ namespace GameCore.Gameplay.GameManagement
 
         private static void SetPlayersEntityLocation(EntityLocation entityLocation)
         {
-            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
+            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = GetAllPlayers();
 
             foreach (PlayerEntity playerEntity in allPlayers.Values)
                 playerEntity.SetEntityLocation(entityLocation);
         }
+        
+        private static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() =>
+            PlayerEntity.GetAllPlayers();
 
         private LocationName GetCurrentLocation() =>
             _gameManagerDecorator.GetCurrentLocation();

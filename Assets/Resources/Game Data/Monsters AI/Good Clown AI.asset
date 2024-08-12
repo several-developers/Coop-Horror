@@ -16,7 +16,7 @@ MonoBehaviour:
   _dangerLevel: 4
   _isDamageable: 1
   _health: 100
-  _spawnType: 3
+  _spawnType: 0
   _maxCount: 1
   _spawnChance: 100
   _spawnChanceMultiplierByGameTime:
@@ -70,9 +70,7 @@ MonoBehaviour:
   _spawnTime: {x: 0, y: 1440}
   _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 02000000
-  _floorChanceMultiplierConfigs:
-  - _floor: 3
-    _multiplier: 5
+  _floorChanceMultiplierConfigs: []
   _commonConfig:
     _fireExitInteractionDistance: 0.5
     _fireExitInteractionDuration: 0.5

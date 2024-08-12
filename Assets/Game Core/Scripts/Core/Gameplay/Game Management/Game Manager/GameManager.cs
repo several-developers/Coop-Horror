@@ -442,10 +442,10 @@ namespace GameCore.Gameplay.GameManagement
 
 #warning ЗАМЕНИТЬ НА СИНХРОНИЗИРУЕМУЮ У ВСЕХ ВЕРСИЮ
         private void OnDungeonsGenerationCompleted() =>
-            _gameObserver.TrainArrivedAtSector();
+            _gameObserver.TrainArrivedAtLocation();
 
         private void OnTrainMovementStopped() =>
-            _gameObserver.TrainStoppedAtSector();
+            _gameObserver.TrainStoppedAtLocation();
 
         private void OnTrainMovementStarted()
         {
@@ -453,7 +453,7 @@ namespace GameCore.Gameplay.GameManagement
             bool isLeavingBase = currentLocation == LocationName.Base;
 
             if (!isLeavingBase)
-                _gameObserver.TrainLeavingSector();
+                _gameObserver.TrainLeavingLocation();
         }
 
         private void OnSceneLoadCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,

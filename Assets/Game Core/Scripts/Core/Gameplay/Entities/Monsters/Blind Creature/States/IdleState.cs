@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using GameCore.Configs.Gameplay.Enemies;
-using GameCore.Gameplay.EntitiesSystems.Utilities;
+using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 

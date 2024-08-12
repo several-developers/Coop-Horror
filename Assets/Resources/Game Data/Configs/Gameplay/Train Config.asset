@@ -17,7 +17,12 @@ MonoBehaviour:
   _gameplayLocationMoveSpeed: 10
   _speedChangeRate: 0.65
   _leavingMainRoadSpeedMultiplier: 0.7
-  _startPositionAtRoadLocation: 0.9
+  _startPositionAtRoadLocation: 0.5
+  _movementSpeed: 15
+  _slowDownDuration: 10
+  _speedUpDuration: 8
+  _slowDownEase: 6
+  _speedUpEase: 5
   _doorOpenSE: {fileID: 11400000, guid: 636bab7bd2954e64da787a0659397eb5, type: 2}
   _doorCloseSE: {fileID: 11400000, guid: e3638c52a61454647a4485821f8b82a2, type: 2}
   _departureSE: {fileID: 11400000, guid: 7c6bd8d9ef748fa43b4a275b22211303, type: 2}

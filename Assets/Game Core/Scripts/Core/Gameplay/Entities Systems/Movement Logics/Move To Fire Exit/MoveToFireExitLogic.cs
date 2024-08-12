@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
-using GameCore.Gameplay.EntitiesSystems.Utilities;
 using GameCore.Gameplay.Level;
+using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.EntitiesSystems.MovementLogics
+namespace GameCore.Gameplay.Systems.MovementLogics
 {
     public abstract class MoveToFireExitLogic
     {

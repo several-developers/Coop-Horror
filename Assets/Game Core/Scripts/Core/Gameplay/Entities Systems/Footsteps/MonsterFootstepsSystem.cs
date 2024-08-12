@@ -3,7 +3,7 @@ using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Gameplay.EntitiesSystems.Footsteps
+namespace GameCore.Gameplay.Systems.Footsteps
 {
     public class MonsterFootstepsSystem : MonoBehaviour
     {
