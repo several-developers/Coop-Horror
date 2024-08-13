@@ -1,8 +1,11 @@
 ﻿using System;
+using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Other;
+using GameCore.Gameplay.Systems.SoundReproducer;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -14,8 +17,14 @@ namespace GameCore.Gameplay.Level.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
+        private void Construct(
+            IElevatorsManagerDecorator elevatorsManagerDecorator,
+            IGameplayConfigsProvider gameplayConfigsProvider)
+        {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
+            _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
+            _soundReproducer = new ElevatorSoundReproducer(transform, _elevatorConfig);
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -37,6 +46,8 @@ namespace GameCore.Gameplay.Level.Elevator
         public event Action OnInteractionStateChangedEvent;
 
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
+        private ElevatorConfigMeta _elevatorConfig;
+        private ElevatorSoundReproducer _soundReproducer;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -103,6 +114,8 @@ namespace GameCore.Gameplay.Level.Elevator
                 OpenElevator(floor);
             else
                 StartElevator(floor);
+
+            PlayButtonPushSound();
         }
 
         private void OpenElevator(Floor floor) =>
@@ -110,6 +123,9 @@ namespace GameCore.Gameplay.Level.Elevator
 
         private void StartElevator(Floor floor) =>
             _controlPanel.StartElevator(floor);
+
+        private void PlayButtonPushSound() =>
+            _soundReproducer.PlaySound(ElevatorBase.SFXType.ButtonPush);
 
         private bool IsElevatorMoving() =>
             _elevatorsManagerDecorator.IsElevatorMoving();

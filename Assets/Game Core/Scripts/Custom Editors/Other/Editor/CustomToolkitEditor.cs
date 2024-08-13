@@ -15,9 +15,9 @@ namespace CustomEditors
         private const string ScenesPath = "Assets/Game Core/Scenes/";
         private const string LocationsScenesPath = ScenesPath + "Locations/";
 
-        private const string ScrapyardLocationSceneMenuItem = LocationsScenesMenuItem + "🗑️ Scrapyard";
         private const string DesertLocationSceneMenuItem = LocationsScenesMenuItem + "🌵 Desert";
         private const string ForestLocationSceneMenuItem = LocationsScenesMenuItem + "🌲 Forest";
+        private const string ScrapyardLocationSceneMenuItem = LocationsScenesMenuItem + "🗑️ Scrapyard";
 
         private const string BootstrapSceneMenuItem = ScenesMenuItem + "🚀 Bootstrap";
         //private const string LoginSceneMenuItem = ScenesMenuItem + "🗝 Login";
@@ -37,9 +37,9 @@ namespace CustomEditors
         private const string MarketScenePath = ScenesPath + "Market.unity";
         private const string GameplayScenePath = ScenesPath + "Gameplay.unity";
 
-        private const string ScrapyardLocationScenePath = LocationsScenesPath + "Scrapyard.unity";
         private const string DesertLocationScenePath = LocationsScenesPath + "Desert.unity";
         private const string ForestLocationScenePath = LocationsScenesPath + "Forest.unity";
+        private const string ScrapyardLocationScenePath = LocationsScenesPath + "Scrapyard.unity";
 
         private const string RestoreSceneKey = "RestoreScene";
         private const string ScenePathKey = "ScenePath";
@@ -50,10 +50,6 @@ namespace CustomEditors
         private static void Init() =>
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
 
-        [MenuItem(ScrapyardLocationSceneMenuItem)]
-        private static void LoadScrapyardLocationScene() =>
-            OpenScene(ScrapyardLocationScenePath);
-
         [MenuItem(DesertLocationSceneMenuItem)]
         private static void LoadDesertLocationScene() =>
             OpenScene(DesertLocationScenePath);
@@ -61,6 +57,10 @@ namespace CustomEditors
         [MenuItem(ForestLocationSceneMenuItem)]
         private static void LoadForestLocationScene() =>
             OpenScene(ForestLocationScenePath);
+        
+        [MenuItem(ScrapyardLocationSceneMenuItem)]
+        private static void LoadScrapyardLocationScene() =>
+            OpenScene(ScrapyardLocationScenePath);
         
         [MenuItem(BootstrapSceneMenuItem)]
         private static void LoadBootstrapScene() =>
