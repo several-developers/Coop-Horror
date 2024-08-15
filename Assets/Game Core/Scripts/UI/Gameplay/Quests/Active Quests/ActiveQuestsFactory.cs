@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using UnityEngine;
 

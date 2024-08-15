@@ -1,6 +1,6 @@
 using Unity.Netcode;
 
-namespace GameCore.Gameplay.Quests
+namespace GameCore.Gameplay.Systems.Quests
 {
     public struct QuestItemData : INetworkSerializable
     {

@@ -5,7 +5,7 @@ using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Noise;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Observers.Gameplay.Game;
 using Sirenix.OdinInspector;
 using UnityEngine;

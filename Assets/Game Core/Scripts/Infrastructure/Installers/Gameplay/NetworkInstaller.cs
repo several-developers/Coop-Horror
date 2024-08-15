@@ -4,7 +4,7 @@ using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Gameplay.Systems.Sound;
 using Zenject;
 

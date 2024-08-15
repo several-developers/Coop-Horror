@@ -6,7 +6,7 @@ using GameCore.Gameplay.Items;
 using Sirenix.Utilities;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Quests
+namespace GameCore.Gameplay.Systems.Quests
 {
     public class QuestsFactory
     {

@@ -1,6 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;

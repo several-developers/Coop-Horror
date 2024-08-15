@@ -6,7 +6,7 @@ using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items.Spawners;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Utilities;

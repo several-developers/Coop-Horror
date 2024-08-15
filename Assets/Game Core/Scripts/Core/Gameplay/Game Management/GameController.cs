@@ -10,7 +10,7 @@ using GameCore.Gameplay.MonstersGeneration;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Observers.Gameplay.Game;
 using UnityEngine;
 

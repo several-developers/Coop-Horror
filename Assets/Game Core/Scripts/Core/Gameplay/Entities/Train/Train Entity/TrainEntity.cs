@@ -9,7 +9,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable.Train;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -86,7 +86,6 @@ namespace GameCore.Gameplay.Entities.Train
         private TrainSoundReproducer _soundReproducer;
         private MoveSpeedController _moveSpeedController;
         private PathMovement _pathMovement;
-        private MetroPlatformLocationManager _metroPlatformLocationManager;
 
         private MovementBehaviour _movementBehaviour;
 
@@ -102,9 +101,6 @@ namespace GameCore.Gameplay.Entities.Train
             _moveSpeedController.Init(_trainConfig);
             InitMobileHQSeats();
         }
-
-        private void Start() =>
-            _metroPlatformLocationManager = MetroPlatformLocationManager.Get();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -125,7 +121,8 @@ namespace GameCore.Gameplay.Entities.Train
 
         public void TeleportToTheMetroPlatform()
         {
-            CinemachinePath path = _metroPlatformLocationManager.GetEnterPath();
+            LocationManager locationManager = LocationManager.Get();
+            CinemachinePath path = locationManager.GetEnterPath();
 
             _pathMovement.ToggleArrived(isArrived: false);
             ChangePath(path);
@@ -386,7 +383,8 @@ namespace GameCore.Gameplay.Entities.Train
             TeleportAllPlayersToRandomSeats();
             _pathMovement.ToggleArrived(isArrived: false);
             
-            CinemachinePath exitPath = _metroPlatformLocationManager.GetExitPath();
+            LocationManager locationManager = LocationManager.Get();
+            CinemachinePath exitPath = locationManager.GetExitPath();
             ChangePath(exitPath);
             
             _pathMovement.SetMovementType(PathMovement.MovementType.SpeedingUp);

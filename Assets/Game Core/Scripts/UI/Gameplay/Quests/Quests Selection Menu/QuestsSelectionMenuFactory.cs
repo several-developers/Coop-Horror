@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using UnityEngine;
 
 namespace GameCore.UI.Gameplay.Quests

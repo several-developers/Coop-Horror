@@ -2,7 +2,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Interactable.Train;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 
 namespace GameCore.Gameplay.Entities.Train
 {

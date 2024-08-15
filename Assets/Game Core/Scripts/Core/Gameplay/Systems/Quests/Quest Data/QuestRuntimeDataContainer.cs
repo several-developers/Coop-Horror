@@ -2,7 +2,7 @@
 using GameCore.Enums.Gameplay;
 using Unity.Netcode;
 
-namespace GameCore.Gameplay.Quests
+namespace GameCore.Gameplay.Systems.Quests
 {
     public struct QuestRuntimeDataContainer : INetworkSerializable
     {

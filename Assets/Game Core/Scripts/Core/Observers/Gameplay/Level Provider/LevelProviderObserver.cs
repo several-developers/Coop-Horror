@@ -3,7 +3,6 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Elevator;
-using GameCore.Gameplay.Level.Locations;
 
 namespace GameCore.Observers.Gameplay.LevelManager
 {
@@ -17,7 +16,6 @@ namespace GameCore.Observers.Gameplay.LevelManager
         public event Action<Floor, FireExit> OnRegisterOtherFireExitEvent;
         public event Action<DungeonWrapper> OnRegisterDungeonEvent;
         public event Action<Floor, DungeonRoot> OnRegisterDungeonRootEvent;
-        public event Action<MetroDoor, bool> OnRegisterMetroDoorEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -38,8 +36,5 @@ namespace GameCore.Observers.Gameplay.LevelManager
 
         public void RegisterDungeonRoot(Floor floor, DungeonRoot dungeonRoot) =>
             OnRegisterDungeonRootEvent?.Invoke(floor, dungeonRoot);
-
-        public void RegisterMetroDoor(MetroDoor metroDoor, bool placedAtSurface) =>
-            OnRegisterMetroDoorEvent?.Invoke(metroDoor, placedAtSurface);
     }
 }

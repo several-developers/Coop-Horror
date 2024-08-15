@@ -4,7 +4,7 @@ using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Systems.Inventory;
 using GameCore.Gameplay.Items;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
 using UnityEngine;
 using Zenject;

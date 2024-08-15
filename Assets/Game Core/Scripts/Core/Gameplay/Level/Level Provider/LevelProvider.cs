@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Level.Elevator;
-using GameCore.Gameplay.Level.Locations;
 using GameCore.Observers.Gameplay.LevelManager;
 
 namespace GameCore.Gameplay.Level
@@ -27,7 +26,6 @@ namespace GameCore.Gameplay.Level
             _levelProviderObserver.OnRegisterOtherFireExitEvent += OnRegisterOtherFireExit;
             _levelProviderObserver.OnRegisterDungeonEvent += OnRegisterDungeon;
             _levelProviderObserver.OnRegisterDungeonRootEvent += OnRegisterDungeonRoot;
-            _levelProviderObserver.OnRegisterMetroDoorEvent += OnRegisterMetroDoor;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -38,9 +36,6 @@ namespace GameCore.Gameplay.Level
         private readonly Dictionary<Floor, FireExit> _otherFireExits;
         private readonly Dictionary<Floor, DungeonWrapper> _dungeons;
         private readonly Dictionary<Floor, DungeonRoot> _dungeonRoots;
-
-        private MetroDoor _platformMetroDoor;
-        private MetroDoor _surfaceMetroDoor;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -58,8 +53,6 @@ namespace GameCore.Gameplay.Level
         {
             _elevatorsReferences.Clear();
             _otherFireExits.Clear();
-            
-            _surfaceMetroDoor = null;
         }
 
         public bool TryGetElevator(Floor floor, out ElevatorBase elevator)
@@ -105,12 +98,6 @@ namespace GameCore.Gameplay.Level
 
             Log.PrintError(log: $"Dungeon Root <gb>'{floor}'</gb> <rb>not found</rb>!");
             return false;
-        }
-
-        public bool TryGetMetroDoor(bool placedAtSurface, out MetroDoor metroDoor)
-        {
-            metroDoor = placedAtSurface ? _surfaceMetroDoor : _platformMetroDoor;
-            return metroDoor != null;
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
@@ -175,14 +162,6 @@ namespace GameCore.Gameplay.Level
                 return;
 
             Log.PrintError(log: $"Dungeon Root <gb>{floor}</gb> is already added!");
-        }
-        
-        private void OnRegisterMetroDoor(MetroDoor metroDoor, bool placedAtSurface)
-        {
-            if (placedAtSurface)
-                _surfaceMetroDoor = metroDoor;
-            else
-                _platformMetroDoor = metroDoor;
         }
     }
 }

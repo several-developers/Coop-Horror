@@ -2,7 +2,7 @@
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Quests;
+using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Zenject;
 

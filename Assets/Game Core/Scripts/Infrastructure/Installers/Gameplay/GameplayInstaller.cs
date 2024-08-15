@@ -44,7 +44,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindLevelProvider();
             BindDungeonsManager();
             BindFireExitsManager();
-            BindMetroManager();
             BindUIManager();
             BindVisualManager();
             BindPlayerCamera();
@@ -102,13 +101,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<FireExitsManager>()
-                .AsSingle();
-        }
-
-        private void BindMetroManager()
-        {
-            Container
-                .BindInterfacesTo<MetroManager>()
                 .AsSingle();
         }
 

@@ -7,7 +7,7 @@ using GameCore.Observers.Gameplay.UI;
 using Unity.Netcode;
 using Zenject;
 
-namespace GameCore.Gameplay.Quests
+namespace GameCore.Gameplay.Systems.Quests
 {
     public class QuestsManager : NetcodeBehaviour
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameCore.Gameplay.Quests
+namespace GameCore.Gameplay.Systems.Quests
 {
     public interface IQuestsManagerDecorator
     {

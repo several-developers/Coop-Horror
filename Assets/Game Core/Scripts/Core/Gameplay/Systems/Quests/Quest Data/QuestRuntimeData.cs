@@ -2,7 +2,7 @@
 using GameCore.Enums.Gameplay;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Quests
+namespace GameCore.Gameplay.Systems.Quests
 {
     public class QuestRuntimeData
     {

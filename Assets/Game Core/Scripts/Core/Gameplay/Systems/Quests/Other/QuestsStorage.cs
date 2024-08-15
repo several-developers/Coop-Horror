@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GameCore.Gameplay.Quests
+namespace GameCore.Gameplay.Systems.Quests
 {
     public class QuestsStorage
     {

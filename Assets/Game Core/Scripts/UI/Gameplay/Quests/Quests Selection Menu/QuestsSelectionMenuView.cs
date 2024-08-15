@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.Quests;
+﻿using GameCore.Gameplay.Systems.Quests;
 using GameCore.Observers.Gameplay.UIManager;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
