@@ -19,7 +19,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly EvilClownEntity _evilClownEntity;
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly NavMeshAgent _agent;
@@ -36,7 +36,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _wanderingMovementLogic.OnArrivedEvent += OnArrived;
             _wanderingMovementLogic.GetWanderingMinDistanceEvent += GetWanderingMinDistance;
             _wanderingMovementLogic.GetWanderingMaxDistanceEvent += GetWanderingMaxDistance;
-            
+
             EnableAgent();
             _wanderingTimer.TryStartTimer();
 
@@ -65,7 +65,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         private void EnterWanderingState() =>
             _evilClownEntity.EnterWanderingState();
-        
+
         private float GetWanderingSpeed()
         {
             float minSpeed = _evilClownAIConfig.WanderingMinSpeed;
@@ -82,6 +82,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
+#warning Stack overflow, добавить задержку между сменой стейтов
         private void OnStuck() => EnterWanderingState();
 
         private void OnArrived() => EnterWanderingState();

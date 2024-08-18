@@ -690,7 +690,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c81ec3b55371412dbbf08e8f3bbbecd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minTriggerDelay: 0.1
+  _ignoreRaycastCheck: 0
   _animationObserver: {fileID: 4412640274585751298}
 --- !u!195 &6473772066748775481
 NavMeshAgent:
