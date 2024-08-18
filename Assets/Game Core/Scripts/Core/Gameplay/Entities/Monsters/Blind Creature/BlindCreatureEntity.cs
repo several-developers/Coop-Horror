@@ -15,7 +15,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 {
-    public class BlindCreatureEntity : MonsterEntityBase, INoiseListener
+    public class BlindCreatureEntity : NavmeshMonsterEntityBase, INoiseListener
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -52,11 +52,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
+        protected override void StartServerOnly()
         {
-            if (!IsServerOnly)
-                return;
-
             // TEMP
             if (!IsSpawned)
                 NetworkObject.Spawn();

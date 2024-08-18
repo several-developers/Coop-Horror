@@ -16,7 +16,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 {
-    public class GoodClownEntity : MonsterEntityBase
+    public class GoodClownEntity : NavmeshMonsterEntityBase
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -68,11 +68,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
+        protected override void StartServerOnly()
         {
-            if (!IsServerOnly)
-                return;
-            
             // TEMP
             if (!IsSpawned)
                 NetworkObject.Spawn();

@@ -10,5 +10,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.MonstersAI
         EvilClownAIConfigMeta GetEvilClownAIConfig();
         BeetleAIConfigMeta GetBeetleAIConfig();
         BlindCreatureAIConfigMeta GetBlindCreatureAIConfig();
+        SirenHeadAIConfigMeta GetSirenHeadAIConfig();
     }
 }

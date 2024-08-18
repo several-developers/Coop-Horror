@@ -28,6 +28,7 @@
         public const string EvilClownAIConfig = MonstersAIConfigs + "Evil Clown AI";
         public const string BeetleAIConfig = MonstersAIConfigs + "Beetle AI";
         public const string BlindCreatureAIConfig = MonstersAIConfigs + "Blind Creature AI";
+        public const string SirenHeadAIConfig = MonstersAIConfigs + "Siren Head AI";
         
         private const string GameData = "Game Data/";
         private const string Configs = GameData + "Configs/";

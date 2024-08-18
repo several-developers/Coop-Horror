@@ -6,7 +6,6 @@ using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Entities.Monsters
@@ -19,15 +18,14 @@ namespace GameCore.Gameplay.Entities.Monsters
         [SerializeField, Required]
         private ClientNetworkTransform _networkTransform;
 
-        [SerializeField, Required]
-        protected NavMeshAgent _agent;
-
         // PROPERTIES: ----------------------------------------------------------------------------
 
 #warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
         public EntityLocation EntityLocation { get; private set; } = EntityLocation.Surface;
 #warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
         public Floor CurrentFloor { get; private set; }
+
+        protected ClientNetworkTransform NetworkTransform => _networkTransform;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -46,9 +44,37 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         protected virtual void Awake()
         {
-            CheckAgentState();
 #warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
             FindEntityLocation();
+        }
+
+        protected void Start()
+        {
+            StartServerOnly();
+            StartClientOnly();
+        }
+
+        protected virtual void StartServerOnly()
+        {
+        }
+
+        protected virtual void StartClientOnly()
+        {
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            OnDestroyServerOnly();
+            OnDestroyClientOnly();
+        }
+
+        protected virtual void OnDestroyServerOnly()
+        {
+        }
+
+        protected virtual void OnDestroyClientOnly()
+        {
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -58,13 +84,11 @@ namespace GameCore.Gameplay.Entities.Monsters
             if (resetVelocity && TryGetComponent(out Rigidbody rigidBody))
                 rigidBody.velocity = Vector3.zero;
             
-            _agent.enabled = false;
             _networkTransform.Teleport(position, rotation, transform.localScale);
-            _agent.enabled = true;
 
-            OnEntityTeleportedEvent.Invoke();
+            SendEntityTeleportedEvent();
         }
-
+        
         public void SetTargetPlayerByID(ulong playerID) => SetTargetPlayerServerRPC(playerID);
 
         /// <summary>
@@ -88,30 +112,17 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         public Transform GetTransform() => transform;
 
-        public NavMeshAgent GetAgent() => _agent;
-
         public abstract MonsterType GetMonsterType();
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
+        protected void SendEntityTeleportedEvent() =>
+            OnEntityTeleportedEvent.Invoke();
+        
         protected static bool IsClientIDMatches(ulong targetClientID) =>
             NetworkHorror.ClientID == targetClientID;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void CheckAgentState()
-        {
-            if (!NetworkHorror.IsTrueServer)
-                return;
-
-            if (!_agent.enabled)
-            {
-                _agent.enabled = true;
-                return;
-            }
-
-            Log.PrintError(log: "Nav Mesh Agent enabled! Disable it in prefab!");
-        }
 
         private void FindEntityLocation()
         {

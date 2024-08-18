@@ -4,7 +4,7 @@ using GameCore.Utilities;
 
 namespace GameCore.Infrastructure.Providers.Global
 {
-    public class ConfigsProvider : AssetsProviderBase, IConfigsProvider
+    public sealed class ConfigsProvider : AssetsProviderBase, IConfigsProvider
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 

@@ -3,9 +3,9 @@ using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.EvilClown.States;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.SoundReproducer;
-using GameCore.Gameplay.Level;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -17,7 +17,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 {
-    public class EvilClownEntity : MonsterEntityBase
+    public class EvilClownEntity : NavmeshMonsterEntityBase
     {
         public enum SFXType
         {
@@ -72,11 +72,8 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
+        protected override void StartServerOnly()
         {
-            if (!IsServerOnly)
-                return;
-
             //DecideStateByLocation();
             GetLookAtTargetPlayer();
             EnterPrepareToChaseState();

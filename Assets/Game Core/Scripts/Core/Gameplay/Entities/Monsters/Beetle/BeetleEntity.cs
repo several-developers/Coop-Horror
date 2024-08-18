@@ -3,8 +3,8 @@ using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.Beetle.States;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Systems.Health;
 using GameCore.Gameplay.Level;
+using GameCore.Gameplay.Systems.Health;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -14,7 +14,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.Beetle
 {
-    public class BeetleEntity : MonsterEntityBase, IDamageable
+    public class BeetleEntity : NavmeshMonsterEntityBase, IDamageable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -59,11 +59,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
+        protected override void StartServerOnly()
         {
-            if (!IsServerOnly)
-                return;
-            
             // TEMP
             if (!IsSpawned)
                 NetworkObject.Spawn();

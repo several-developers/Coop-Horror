@@ -6,6 +6,7 @@
         GoodClown = 1,
         EvilClown = 2,
         Beetle = 3,
-        BlindCreature = 4
+        BlindCreature = 4,
+        SirenHead = 5
     }
 }

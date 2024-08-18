@@ -6,7 +6,7 @@ namespace GameCore.Utilities
     {
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected static T Load<T>(string path) where T : Object =>
+        protected virtual T Load<T>(string path) where T : Object =>
             Resources.Load<T>(path);
 
         protected static T[] LoadAll<T>(string path) where T : Object =>

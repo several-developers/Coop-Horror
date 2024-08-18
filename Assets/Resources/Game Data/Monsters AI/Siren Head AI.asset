@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5d1367c96c7476bbd13493077d1a526, type: 3}
+  m_Name: Siren Head AI
+  m_EditorClassIdentifier: 
+  _metaName: Siren Head AI
+  _dangerLevel: 4
+  _isDamageable: 1
+  _health: 100
+  _spawnType: 3
+  _maxCount: 1
+  _spawnChance: 50
+  _spawnChanceMultiplierByGameTime:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _spawnChanceMultiplierByMonstersCount:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _spawnTime: {x: 0, y: 1440}
+  _spawnTimeText: 00:00 - 24:00
+  _relatedMonstersToCount: 
+  _floorChanceMultiplierConfigs: []
+  _animationSpeed: 0.1
+  _arriveTimeOffset: 0
+  _arriveTimeOffsetConverted: 00:00
+  _soundSettings:
+    _roarConfigs: []
+  _footstepsSE: {fileID: 11400000, guid: e5a57dab744a03642b1c2124d9e5903f, type: 2}

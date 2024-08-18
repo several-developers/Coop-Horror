@@ -10,8 +10,11 @@ namespace GameCore.Gameplay.Systems.Footsteps
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
-        [SerializeField, Min(0f)]
-        private float _minTriggerDelay = 0.1f;
+        [SerializeField]
+        private bool _ignoreRaycastCheck;
+        
+        //[SerializeField, Min(0f)]
+        //private float _minTriggerDelay = 0.1f;
         
         [Title(Constants.References)]
         [SerializeField, Required]
@@ -36,10 +39,11 @@ namespace GameCore.Gameplay.Systems.Footsteps
             bool hitSuccessfully =
                 Physics.Raycast(origin: transform.position, direction: Vector3.down, out RaycastHit hitInfo);
 
-            if (!hitSuccessfully)
+            if (!hitSuccessfully && !_ignoreRaycastCheck)
                 return;
 
-            string colliderTag = hitInfo.collider.tag;
+            Collider hitCollider = hitInfo.collider;
+            string colliderTag = hitCollider == null ? string.Empty : hitCollider.tag;
             OnFootstepPerformedEvent.Invoke(colliderTag);
             
             switch (colliderTag)

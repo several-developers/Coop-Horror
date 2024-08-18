@@ -18,7 +18,7 @@ using GameCore.Utilities;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
 {
-    public class GameplayConfigsProvider : AssetsProviderBase, IGameplayConfigsProvider
+    public sealed class GameplayConfigsProvider : AssetsProviderBase, IGameplayConfigsProvider
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 

@@ -175,7 +175,7 @@ namespace GameCore.Gameplay.GameTimeManagement
                                  _minute * secondsInMinute +
                                  _second;
 
-            float timeOfDay = Mathf.Clamp01(totalSeconds / (float)secondsInDay);
+            float timeOfDay = Mathf.Clamp01(totalSeconds / secondsInDay);
             return timeOfDay;
         }
 
@@ -187,6 +187,16 @@ namespace GameCore.Gameplay.GameTimeManagement
             float totalCycleDurationInSeconds = totalCycleDurationInMinutes * 60;
             float hourDurationInSeconds = totalCycleDurationInSeconds / 24;
             return hourDurationInSeconds;
+        }
+        
+        public float GetMinuteDurationInSeconds()
+        {
+            float cycleDurationInMinutes = _timeConfig.CycleDurationInMinutes;
+            float cycleLengthModifier = _timeConfig.CycleLengthModifier;
+            float totalCycleDurationInMinutes = cycleDurationInMinutes * cycleLengthModifier;
+            float totalCycleDurationInSeconds = totalCycleDurationInMinutes * 60;
+            float minuteDurationInSeconds = totalCycleDurationInSeconds / 24 / 60;
+            return minuteDurationInSeconds;
         }
         
         public int GetCurrentTimeInMinutes()

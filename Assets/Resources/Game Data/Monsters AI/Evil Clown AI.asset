@@ -78,7 +78,7 @@ MonoBehaviour:
   _chasePositionCheckInterval: 0.1
   _minChaseSpeed: 1
   _maxChaseSpeed: 15
-  _chaseSpeedChangeDuration: 35
+  _chaseSpeedChangeDuration: 20
   _chaseDistanceCheckInterval: 0.1
   _chaseStoppingDistance: 0.5
   _maxChaseDistance: 10000
