@@ -12,7 +12,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Level.Elevator
 {
-    public class CallButton : MonoBehaviour, IInteractable
+    public class CallButton : SoundProducerMonoBehaviour<ElevatorBase.SFXType>, IInteractable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.Level.Elevator
         {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
             _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
-            _soundReproducer = new ElevatorSoundReproducer(transform, _elevatorConfig);
+            _soundReproducer = new ElevatorSoundReproducer(soundProducer: this, _elevatorConfig);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

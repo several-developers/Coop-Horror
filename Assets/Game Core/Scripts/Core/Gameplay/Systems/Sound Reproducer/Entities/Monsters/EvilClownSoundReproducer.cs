@@ -1,46 +1,38 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Monsters.EvilClown;
 using Sonity;
-using UnityEngine;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer
 {
-    public class EvilClownSoundReproducer : SoundReproducerBase
+    public class EvilClownSoundReproducer : SoundReproducerBase<EvilClownEntity.SFXType>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
-        
-        public EvilClownSoundReproducer(Transform owner, EvilClownAIConfigMeta evilClownAIConfig) : base(owner) =>
+
+        public EvilClownSoundReproducer(
+            ISoundProducer<EvilClownEntity.SFXType> soundProducer,
+            EvilClownAIConfigMeta evilClownAIConfig
+        ) : base(soundProducer)
+        {
             _evilClownAIConfig = evilClownAIConfig;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
-        
-        // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void PlaySound(EvilClownEntity.SFXType sfxType)
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected override SoundEvent GetSoundEvent(EvilClownEntity.SFXType sfxType)
         {
-            SoundEvent soundEvent = null;
-            
-            switch (sfxType)
+            SoundEvent soundEvent = sfxType switch
             {
-                case EvilClownEntity.SFXType.Footsteps:
-                    soundEvent = _evilClownAIConfig.FootstepsSE;
-                    break;
-                
-                case EvilClownEntity.SFXType.Roar:
-                    soundEvent = _evilClownAIConfig.RoarSE;
-                    break;
-                
-                case EvilClownEntity.SFXType.Brainwash:
-                    soundEvent = _evilClownAIConfig.BrainwashSE;
-                    break;
-            }
+                EvilClownEntity.SFXType.Footsteps => _evilClownAIConfig.FootstepsSE,
+                EvilClownEntity.SFXType.Roar => _evilClownAIConfig.RoarSE,
+                EvilClownEntity.SFXType.Brainwash => _evilClownAIConfig.BrainwashSE,
+                _ => null
+            };
 
-            if (soundEvent == null)
-                return;
-            
-            PlaySound(soundEvent);
+            return soundEvent;
         }
     }
 }

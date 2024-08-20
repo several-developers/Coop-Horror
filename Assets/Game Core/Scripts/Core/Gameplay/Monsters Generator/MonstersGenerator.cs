@@ -24,12 +24,6 @@ using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.MonstersGeneration
 {
-    public interface IMonstersGenerator
-    {
-        void Start();
-        void Stop();
-    }
-
     public class MonstersGenerator : IMonstersGenerator, ITickable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------

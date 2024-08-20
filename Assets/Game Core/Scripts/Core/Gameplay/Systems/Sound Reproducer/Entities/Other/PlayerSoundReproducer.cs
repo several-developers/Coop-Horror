@@ -1,23 +1,25 @@
 ﻿using GameCore.Configs.Gameplay.Player;
 using GameCore.Gameplay.Entities.Player;
 using Sonity;
-using UnityEngine;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer
 {
-    public class PlayerSoundReproducer : SoundReproducerBase
+    public class PlayerSoundReproducer : SoundReproducerBase<PlayerEntity.SFXType>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
-        public PlayerSoundReproducer(Transform owner, PlayerConfigMeta playerConfig) : base(owner) =>
+        public PlayerSoundReproducer(ISoundProducer<PlayerEntity.SFXType> soundProducer, PlayerConfigMeta playerConfig)
+            : base(soundProducer)
+        {
             _playerConfig = playerConfig;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly PlayerConfigMeta _playerConfig;
 
-        // PUBLIC METHODS: ------------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        public void PlaySound(PlayerEntity.SFXType sfxType)
+        protected override SoundEvent GetSoundEvent(PlayerEntity.SFXType sfxType)
         {
             SoundEvent soundEvent = sfxType switch
             {
@@ -30,10 +32,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
                 _ => null
             };
 
-            if (soundEvent == null)
-                return;
-            
-            PlaySound(soundEvent);
+            return soundEvent;
         }
     }
 }

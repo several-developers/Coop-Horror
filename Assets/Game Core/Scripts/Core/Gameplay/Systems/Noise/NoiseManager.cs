@@ -1,6 +1,8 @@
-﻿using GameCore.Gameplay.Network;
+﻿using GameCore.Configs.Global.Game;
+using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
+using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -13,9 +15,11 @@ namespace GameCore.Gameplay.Systems.Noise
 
         [Inject]
         private void Construct(
+            IConfigsProvider configsProvider,
             ISubscriber<NoiseDataMessage> noiseDataMessageSubscriber,
             IPublisher<NoiseDataMessage> noiseDataMessagePublisher)
         {
+            _gameConfig = configsProvider.GetGameConfig();
             _noiseDataMessageSubscriber = noiseDataMessageSubscriber;
             _noiseDataMessagePublisher = noiseDataMessagePublisher;
         }
@@ -32,6 +36,8 @@ namespace GameCore.Gameplay.Systems.Noise
         private static IPublisher<NoiseDataMessage> _noiseDataMessagePublisher;
 
         private readonly Collider[] _collidersPull = new Collider[20];
+
+        private GameConfigMeta _gameConfig;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -68,9 +74,10 @@ namespace GameCore.Gameplay.Systems.Noise
             Vector3 noisePosition = message.noisePosition;
             float noiseLoudness = message.noiseLoudness;
             float noiseRange = message.noiseRange;
-            
-            int iterations = Physics.OverlapSphereNonAlloc(noisePosition, noiseRange, _collidersPull);
 
+            LayerMask noiseLayers = _gameConfig.NoiseLayers;
+            int iterations = Physics.OverlapSphereNonAlloc(noisePosition, noiseRange, _collidersPull, noiseLayers);
+            
             for (int i = 0; i < iterations; i++)
             {
                 bool isNoiseListenerFound = _collidersPull[i].TryGetComponent(out INoiseListener noiseListener);

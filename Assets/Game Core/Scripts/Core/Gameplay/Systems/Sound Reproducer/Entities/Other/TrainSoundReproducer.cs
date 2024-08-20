@@ -1,46 +1,26 @@
 ﻿using GameCore.Configs.Gameplay.Train;
 using GameCore.Gameplay.Entities.Train;
 using Sonity;
-using UnityEngine;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer
 {
-    public class TrainSoundReproducer : SoundReproducerBase
+    public class TrainSoundReproducer : SoundReproducerBase<TrainEntity.SFXType>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public TrainSoundReproducer(Transform owner, TrainConfigMeta trainConfig) : base(owner) =>
+        public TrainSoundReproducer(ISoundProducer<TrainEntity.SFXType> soundProducer, TrainConfigMeta trainConfig)
+            : base(soundProducer)
+        {
             _trainConfig = trainConfig;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly TrainConfigMeta _trainConfig;
 
-        // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void PlaySound(TrainEntity.SFXType sfxType)
-        {
-            SoundEvent soundEvent = GetSoundEvent(sfxType);
-
-            if (soundEvent == null)
-                return;
-            
-            PlaySound(soundEvent);
-        }
-        
-        public void StopSound(TrainEntity.SFXType sfxType)
-        {
-            SoundEvent soundEvent = GetSoundEvent(sfxType);
-
-            if (soundEvent == null)
-                return;
-            
-            StopSound(soundEvent);
-        }
-
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private SoundEvent GetSoundEvent(TrainEntity.SFXType sfxType)
+        protected override SoundEvent GetSoundEvent(TrainEntity.SFXType sfxType)
         {
             SoundEvent soundEvent = sfxType switch
             {

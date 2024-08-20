@@ -1,18 +1,16 @@
 ﻿using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
-using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Level.Elevator
 {
-    public abstract class ElevatorBase : NetcodeBehaviour
+    public abstract class ElevatorBase : SoundProducerEntity<ElevatorBase.SFXType>
     {
         public enum SFXType
         {
@@ -46,7 +44,7 @@ namespace GameCore.Gameplay.Level.Elevator
         private Animator _animator;
 
         // FIELDS: --------------------------------------------------------------------------------
-
+        
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private ElevatorConfigMeta _elevatorConfig;
 
@@ -72,19 +70,13 @@ namespace GameCore.Gameplay.Level.Elevator
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
-        public void PlaySound(SFXType sfxType)
-        {
-            PlaySoundLocal(sfxType);
-            PlaySoundServerRpc(sfxType);
-        }
         
         public Floor GetElevatorFloor() => _floor;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void InitAll() =>
-            _soundReproducer = new ElevatorSoundReproducer(transform, _elevatorConfig);
+            _soundReproducer = new ElevatorSoundReproducer(soundProducer: this, _elevatorConfig);
 
         protected void SetElevatorFloor(Floor floor) =>
             _floor = floor;
@@ -115,32 +107,7 @@ namespace GameCore.Gameplay.Level.Elevator
             _isOpen = false;
             _animator.SetTrigger(id: AnimatorHashes.Close);
         }
-
-        private void PlaySoundLocal(SFXType sfxType) =>
-            _soundReproducer.PlaySound(sfxType);
-
-        // RPC: -----------------------------------------------------------------------------------
-
-        [ServerRpc(RequireOwnership = false)]
-        private void PlaySoundServerRpc(SFXType sfxType, ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-
-            PlaySoundClientRPC(sfxType, senderClientID);
-        }
-
-        [ClientRpc]
-        private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
-        {
-            bool isClientIDMatches = NetworkHorror.ClientID == senderClientID;
-
-            // Don't reproduce sound twice on sender.
-            if (isClientIDMatches)
-                return;
-
-            PlaySoundLocal(sfxType);
-        }
-
+        
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnElevatorsStarted(ElevatorStaticData data)

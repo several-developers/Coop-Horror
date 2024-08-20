@@ -9,7 +9,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Level.Elevator
 {
-    public class ControlPanel : MonoBehaviour
+    public class ControlPanel : SoundProducerMonoBehaviour<ElevatorBase.SFXType>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace GameCore.Gameplay.Level.Elevator
         {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
             _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
-            _soundReproducer = new ElevatorSoundReproducer(transform, _elevatorConfig);
+            _soundReproducer = new ElevatorSoundReproducer(soundProducer: this, _elevatorConfig);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ namespace GameCore.Gameplay.Level.Elevator
         private List<ControlPanelButton> _panelButtons;
 
         // FIELDS: --------------------------------------------------------------------------------
-
+        
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private ElevatorConfigMeta _elevatorConfig;
         private ElevatorSoundReproducer _soundReproducer;

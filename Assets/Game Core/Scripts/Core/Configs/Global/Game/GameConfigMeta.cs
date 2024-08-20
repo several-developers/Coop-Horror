@@ -8,8 +8,11 @@ namespace GameCore.Configs.Global.Game
     public class GameConfigMeta : EditorMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
-        
+
         [TitleGroup(Constants.Settings)]
+        [SerializeField]
+        private LayerMask _noiseLayers;
+        
         [BoxGroup(EditorOnly), SerializeField]
         private bool _useStartScene;
 
@@ -20,6 +23,8 @@ namespace GameCore.Configs.Global.Game
         private SceneName _startScene;
 
         // PROPERTIES: ----------------------------------------------------------------------------
+
+        public LayerMask NoiseLayers => _noiseLayers;
         
         public bool UseStartScene => _useStartScene;
         public bool ForceLoadBootstrapScene => _forceLoadBootstrapScene;

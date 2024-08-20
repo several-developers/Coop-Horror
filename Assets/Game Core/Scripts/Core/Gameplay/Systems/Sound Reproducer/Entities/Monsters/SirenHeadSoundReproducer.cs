@@ -1,53 +1,49 @@
 ﻿using System;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Monsters.SirenHead;
-using GameCore.Gameplay.GameTimeManagement;
 using Sonity;
-using UnityEngine;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer
 {
-    public class SirenHeadSoundReproducer : SoundReproducerBase
+    public class SirenHeadSoundReproducer : SoundReproducerBase<SirenHeadEntity.SFXType>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public SirenHeadSoundReproducer(Transform owner, SirenHeadAIConfigMeta sirenHeadAIConfig) : base(owner) =>
+        public SirenHeadSoundReproducer(
+            ISoundProducer<SirenHeadEntity.SFXType> soundProducer,
+            SirenHeadAIConfigMeta sirenHeadAIConfig
+        ) : base(soundProducer)
+        {
             _sirenHeadAIConfig = sirenHeadAIConfig;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Func<int> GetCurrentTimeInMunutesEvent = () => 0; 
+        public event Func<int> GetCurrentTimeInMinutesEvent = () => 0;
 
         private readonly SirenHeadAIConfigMeta _sirenHeadAIConfig;
 
-        // PUBLIC METHODS: ------------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        public void PlaySound(SirenHeadEntity.SFXType sfxType)
+        protected override SoundEvent GetSoundEvent(SirenHeadEntity.SFXType sfxType)
         {
-            SoundEvent soundEvent = null;
-
-            switch (sfxType)
+            SoundEvent soundEvent = sfxType switch
             {
-                case SirenHeadEntity.SFXType.Footsteps:
-                    soundEvent = _sirenHeadAIConfig.FootstepsSE;
-                    break;
+                SirenHeadEntity.SFXType.Footsteps => _sirenHeadAIConfig.FootstepsSE,
+                SirenHeadEntity.SFXType.Roar => GetRoarSound(),
+                _ => null
+            };
 
-                case SirenHeadEntity.SFXType.Roar:
-                    PlayRoarSound();
-                    break;
-            }
-
-            if (soundEvent == null)
-                return;
-
-            PlaySound(soundEvent);
+            return soundEvent;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void PlayRoarSound()
+        private SoundEvent GetRoarSound()
         {
-            int currentTimeInMinutes = GetCurrentTimeInMunutesEvent.Invoke();
+            int currentTimeInMinutes = GetCurrentTimeInMinutesEvent.Invoke();
+            _sirenHeadAIConfig.TryGetRoarSE(currentTimeInMinutes, out SoundEvent soundEvent);
+            return soundEvent;
         }
     }
 }

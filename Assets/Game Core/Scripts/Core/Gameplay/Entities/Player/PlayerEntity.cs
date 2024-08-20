@@ -8,16 +8,16 @@ using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
 using GameCore.Gameplay.Entities.Train;
-using GameCore.Gameplay.Systems.Footsteps;
-using GameCore.Gameplay.Systems.Health;
-using GameCore.Gameplay.Systems.Inventory;
-using GameCore.Gameplay.Systems.Ragdoll;
-using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Systems.Footsteps;
+using GameCore.Gameplay.Systems.Health;
+using GameCore.Gameplay.Systems.Inventory;
 using GameCore.Gameplay.Systems.Noise;
+using GameCore.Gameplay.Systems.Ragdoll;
+using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Observers.Gameplay.PlayerInteraction;
@@ -31,7 +31,7 @@ using Zenject;
 namespace GameCore.Gameplay.Entities.Player
 {
     [RequireComponent(typeof(PlayerInput))]
-    public class PlayerEntity : NetcodeBehaviour, ITeleportableEntity, IDamageable
+    public class PlayerEntity : SoundProducerEntity<PlayerEntity.SFXType>, ITeleportableEntity, IDamageable
     {
         public enum SFXType
         {
@@ -140,7 +140,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             if (resetVelocity)
                 _references.Rigidbody.velocity = Vector3.zero;
-            
+
             _references.NetworkTransform.InLocalSpace = false;
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
         }
@@ -179,7 +179,7 @@ namespace GameCore.Gameplay.Entities.Player
 
             if (!isItemDropped)
                 return;
-            
+
             PlaySound(SFXType.ItemDrop, onlyLocal: true);
         }
 
@@ -201,16 +201,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         public void ToggleInsideTrainState(bool isInsideTrain) =>
             IsInsideTrain = isInsideTrain;
-
-        public void PlaySound(SFXType sfxType, bool onlyLocal = false)
-        {
-            PlaySoundLocal(sfxType);
-
-            if (onlyLocal)
-                return;
-            
-            PlaySoundServerRPC(sfxType);
-        }
 
         public void SendLeftMobileHQSeat() =>
             OnLeftMobileHQSeat.Invoke();
@@ -247,8 +237,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         public MonoBehaviour GetMonoBehaviour() => this;
 
-        public Transform GetTransform() => transform;
-
         public PlayerInventory GetInventory() => _inventory;
 
         public float GetSanity() =>
@@ -284,7 +272,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             AllPlayers.TryAdd(OwnerClientId, this);
 
-            _soundReproducer = new PlayerSoundReproducer(transform, _playerConfig);
+            _soundReproducer = new PlayerSoundReproducer(soundProducer: this, _playerConfig);
             _inventory = new PlayerInventory();
             _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
 
@@ -442,9 +430,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void PlaySoundLocal(SFXType sfxType) =>
-            _soundReproducer.PlaySound(sfxType);
-
         private void TeleportToTrainSeatLocal(int seatIndex) =>
             _trainEntity.TeleportLocalPlayerToTrainSeat(seatIndex);
 
@@ -571,14 +556,6 @@ namespace GameCore.Gameplay.Entities.Player
             _currentFloor.Value = floor;
 
         [ServerRpc(RequireOwnership = false)]
-        private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-
-            PlaySoundClientRPC(sfxType, senderClientID);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
         private void TeleportToTrainSeatServerRPC(int seatIndex) => TeleportToTrainSeatClientRPC(seatIndex);
 
         [ServerRpc(RequireOwnership = false)]
@@ -626,18 +603,6 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             _entityLocation.Value = entityLocation;
-        }
-
-        [ClientRpc]
-        private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
-        {
-            bool isClientIDMatches = NetworkHorror.ClientID == senderClientID;
-
-            // Don't reproduce sound twice on sender.
-            if (isClientIDMatches)
-                return;
-
-            PlaySoundLocal(sfxType);
         }
 
         [ClientRpc]
@@ -704,7 +669,7 @@ namespace GameCore.Gameplay.Entities.Player
                 _currentSelectedSlotIndex.Value = slotIndex;
             else
                 ChangeSelectedSlotServerRpc(slotIndex);
-            
+
             PlaySound(SFXType.ItemSwitch, onlyLocal: true);
         }
 
@@ -732,8 +697,10 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnFootstepPerformed(string colliderTag)
         {
-            PlaySound(SFXType.Footsteps);
             MakeFootstepsNoise();
+
+            if (!IsCrouching.Invoke())
+                PlaySound(SFXType.Footsteps);
         }
 
         private void OnJumped() => PlaySound(SFXType.Jump);

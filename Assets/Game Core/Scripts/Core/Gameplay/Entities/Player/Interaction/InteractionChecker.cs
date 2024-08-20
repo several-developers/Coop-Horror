@@ -89,6 +89,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private bool IsInteractableObjectFound()
         {
             Ray ray = GetRay();
+            
             bool isInteractableObjectFound =
                 Physics.Raycast(ray, out RaycastHit hitInfo, _interactionMaxDistance, _interactionLm);
 

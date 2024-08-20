@@ -10,14 +10,13 @@ using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 {
-    public class EvilClownEntity : NavmeshMonsterEntityBase
+    public class EvilClownEntity : SoundProducerNavmeshMonsterEntity<EvilClownEntity.SFXType>
     {
         public enum SFXType
         {
@@ -114,13 +113,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             EnterWanderingState(); // TEMP!!!!!!!!!!!!!!!!!!
         }
 
-#warning REFACTORING, MAKE UNIVERSAL
-        public void PlaySound(SFXType sfxType)
-        {
-            PlaySoundLocal(sfxType);
-            PlaySoundServerRPC(sfxType);
-        }
-
         [Button]
         public void EnterChaseState() => ChangeState<ChaseState>();
 
@@ -147,7 +139,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         protected override void InitAll()
         {
-            _soundReproducer = new EvilClownSoundReproducer(transform, _evilClownAIConfig);
+            _soundReproducer = new EvilClownSoundReproducer(soundProducer: this, _evilClownAIConfig);
 
             OnTargetPlayerChangedEvent += OnTargetPlayerChanged;
         }
@@ -219,9 +211,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void PlaySoundLocal(SFXType sfxType) =>
-            _soundReproducer.PlaySound(sfxType);
-
         private void GetLookAtTargetPlayer()
         {
             bool isPlayerFound = PlayerEntity.TryGetPlayer(TargetPlayerID, out PlayerEntity playerEntity);
@@ -257,28 +246,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         private void ChangeState<TState>() where TState : IState =>
             _evilClownStateMachine.ChangeState<TState>();
-
-        // RPC: -----------------------------------------------------------------------------------
-        
-        [ServerRpc(RequireOwnership = false)]
-        private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-
-            PlaySoundClientRPC(sfxType, senderClientID);
-        }
-        
-        [ClientRpc]
-        private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
-        {
-            bool isClientIDMatches = IsClientIDMatches(senderClientID);
-
-            // Don't reproduce sound twice on sender.
-            if (isClientIDMatches)
-                return;
-
-            PlaySoundLocal(sfxType);
-        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

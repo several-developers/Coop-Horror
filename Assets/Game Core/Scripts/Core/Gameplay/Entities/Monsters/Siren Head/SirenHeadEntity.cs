@@ -3,18 +3,16 @@ using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.SirenHead.States;
 using GameCore.Gameplay.GameTimeManagement;
-using GameCore.Gameplay.Other;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using Sirenix.OdinInspector;
-using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.SirenHead
 {
-    public class SirenHeadEntity : MonsterEntityBase
+    public class SirenHeadEntity : SoundProducerMonsterEntity<SirenHeadEntity.SFXType>
     {
         public enum SFXType
         {
@@ -34,13 +32,11 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
 
         // MEMBERS: -------------------------------------------------------------------------------
 
-        [BoxGroup(ReferencesTitle, showLabel: false), SerializeField]
+        [BoxGroup(Constants.References, showLabel: false), SerializeField]
         private References _references;
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const string ReferencesTitle = "References";
-        
         private ITimeCycle _timeCycle;
         private SirenHeadAIConfigMeta _sirenHeadAIConfig;
         
@@ -88,12 +84,6 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void PlaySound(SFXType sfxType)
-        {
-            PlaySoundLocal(sfxType);
-            PlaySoundServerRPC(sfxType);
-        }
-        
         public void EnterIdleState() => ChangeState<IdleState>();
 
         public SirenHeadAIConfigMeta GetAIConfig() => _sirenHeadAIConfig;
@@ -107,8 +97,11 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitAll() =>
-            _soundReproducer = new SirenHeadSoundReproducer(transform, _sirenHeadAIConfig);
+        protected override void InitAll()
+        {
+            _soundReproducer = new SirenHeadSoundReproducer(soundProducer: this, _sirenHeadAIConfig);
+            _soundReproducer.GetCurrentTimeInMinutesEvent += GetCurrentTimeInMinutes;
+        }
 
         protected override void InitServerOnly()
         {
@@ -151,36 +144,14 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void PlaySoundLocal(SFXType sfxType) =>
-            _soundReproducer.PlaySound(sfxType);
         
         private void EnterMoveState() => ChangeState<MoveState>();
 
         private void ChangeState<TState>() where TState : IState =>
             _sirenHeadStateMachine.ChangeState<TState>();
 
-        // RPC: -----------------------------------------------------------------------------------
-
-        [ServerRpc(RequireOwnership = false)]
-        private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-
-            PlaySoundClientRPC(sfxType, senderClientID);
-        }
-
-        [ClientRpc]
-        private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
-        {
-            bool isClientIDMatches = IsClientIDMatches(senderClientID);
-
-            // Don't reproduce sound twice on sender.
-            if (isClientIDMatches)
-                return;
-
-            PlaySoundLocal(sfxType);
-        }
+        private int GetCurrentTimeInMinutes() =>
+            _timeCycle.GetCurrentTimeInMinutes();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

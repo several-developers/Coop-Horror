@@ -1,24 +1,28 @@
 ﻿using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Gameplay.Level.Elevator;
 using Sonity;
-using UnityEngine;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer
 {
-    public class ElevatorSoundReproducer : SoundReproducerBase
+    public class ElevatorSoundReproducer : SoundReproducerBase<ElevatorBase.SFXType>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ElevatorSoundReproducer(Transform owner, ElevatorConfigMeta elevatorConfig) : base(owner) =>
+        public ElevatorSoundReproducer(
+            ISoundProducer<ElevatorBase.SFXType> soundProducer,
+            ElevatorConfigMeta elevatorConfig
+            ) : base(soundProducer)
+        {
             _elevatorConfig = elevatorConfig;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly ElevatorConfigMeta _elevatorConfig;
 
-        // PUBLIC METHODS: ------------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        public void PlaySound(ElevatorBase.SFXType sfxType)
+        protected override SoundEvent GetSoundEvent(ElevatorBase.SFXType sfxType)
         {
             SoundEvent soundEvent = sfxType switch
             {
@@ -29,10 +33,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
                 _ => null
             };
 
-            if (soundEvent == null)
-                return;
-            
-            PlaySound(soundEvent);
+            return soundEvent;
         }
     }
 }

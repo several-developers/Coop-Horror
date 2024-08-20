@@ -12,31 +12,36 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         public SuspicionSystem(BlindCreatureEntity blindCreatureEntity, BalanceConfigMeta balanceConfig)
         {
+            BlindCreatureAIConfigMeta blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+
             _blindCreatureEntity = blindCreatureEntity;
-            _blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            _references = blindCreatureEntity.GetReferences();
+            _suspicionSystemConfig = blindCreatureAIConfig.GetSuspicionSystemConfig();
             _balanceConfig = balanceConfig;
             _transform = blindCreatureEntity.transform;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         public event Action<int> OnSuspicionMeterChangedEvent = delegate { };
         public event Action OnNoiseDetectedEvent = delegate { };
 
         private readonly BlindCreatureEntity _blindCreatureEntity;
-        private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
+        private readonly BlindCreatureEntity.References _references;
+        private readonly BlindCreatureAIConfigMeta.SuspicionSystemConfig _suspicionSystemConfig;
         private readonly BalanceConfigMeta _balanceConfig;
         private readonly Transform _transform;
 
         private Coroutine _decreaseTimerCO;
         private Vector3 _lastNoisePosition;
         private int _suspicionMeter;
-        
+        private bool _isAggressive;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void DetectNoise(Vector3 noisePosition, float noiseLoudness)
         {
-            if (!IsLoudnessValid(noiseLoudness))
+            if (!IsLoudEnough(noiseLoudness))
                 return;
 
             _lastNoisePosition = noisePosition;
@@ -44,9 +49,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             if (instantAggro)
             {
-                int suspicionMeterAmount = _blindCreatureAIConfig.InstantAggroSuspicionMeterAmount;
+                int suspicionMeterAmount = _suspicionSystemConfig.SuspicionMeterAfterInstantAggro;
                 bool isValid = suspicionMeterAmount > _suspicionMeter;
-                
+
                 if (isValid)
                     SetSuspicionMeter(suspicionMeterAmount);
             }
@@ -54,16 +59,16 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             {
                 IncreaseSuspicionMeter();
             }
-            
+
             OnNoiseDetectedEvent.Invoke();
             StartDecreaseTimer();
         }
-        
+
         public void StartDecreaseTimer()
         {
             if (_decreaseTimerCO != null)
                 StopDecreaseTimer();
-            
+
             IEnumerator routine = DecreaseTimerCO();
             _decreaseTimerCO = _blindCreatureEntity.StartCoroutine(routine);
         }
@@ -72,7 +77,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         {
             if (_decreaseTimerCO == null)
                 return;
-            
+
             _blindCreatureEntity.StopCoroutine(_decreaseTimerCO);
         }
 
@@ -80,6 +85,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             _lastNoisePosition;
 
         public int GetSuspicionMeter() => _suspicionMeter;
+
+        public bool IsAggressive() => _isAggressive;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -94,43 +101,68 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             int value = a + b;
 
             if (increase && CheckForAggro())
-                value = _blindCreatureAIConfig.InstantAggroSuspicionMeterAmount;
-            
+                value = _suspicionSystemConfig.SuspicionMeterAfterInstantAggro;
+
             SetSuspicionMeter(value);
         }
 
         private void SetSuspicionMeter(int value)
         {
-            //int previousSuspicionMeter = _suspicionMeter;
-            int max = _blindCreatureAIConfig.SuspicionMeterMaxAmount;
+            int max = _suspicionSystemConfig.SuspicionMeterMaxAmount;
             _suspicionMeter = Mathf.Clamp(value, min: 0, max);
 
-            // bool sendEvent = _suspicionMeter != previousSuspicionMeter;
-            //
-            // if (!sendEvent)
-            //     return;
-            
+            if (CheckForAggro())
+                EnterAggressiveMode();
+            else
+                ExitAggressiveMode();
+
             OnSuspicionMeterChangedEvent.Invoke(_suspicionMeter);
+        }
+
+        private void EnterAggressiveMode()
+        {
+            if (_isAggressive)
+                return;
+
+            _isAggressive = true;
+            ChangeCreatureVisual();
+        }
+
+        private void ExitAggressiveMode()
+        {
+            if (!_isAggressive)
+                return;
+
+            _isAggressive = false;
+            ChangeCreatureVisual();
+        }
+
+        private void ChangeCreatureVisual()
+        {
+            _references.CalmFace.SetActive(!_isAggressive);
+            _references.AngryFace.SetActive(_isAggressive);
+            _references.CalmCape.SetActive(!_isAggressive);
+            _references.AngryCape.SetActive(_isAggressive);
         }
 
         private IEnumerator DecreaseTimerCO()
         {
             while (_suspicionMeter > 0)
             {
-                float delay = _blindCreatureAIConfig.SuspicionMeterDecreaseTime;
+                float delay = _suspicionSystemConfig.SuspicionMeterDecreaseTime;
                 yield return new WaitForSeconds(delay);
 
                 DecreaseSuspicionMeter();
             }
         }
 
-        private bool IsLoudnessValid(float noiseLoudness)
+        private bool IsLoudEnough(float noiseLoudness)
         {
-            float minLoudnessToReact = _blindCreatureAIConfig.MinLoudnessToReact;
+            float minLoudnessToReact = _suspicionSystemConfig.MinLoudnessToReact;
             bool isValid = noiseLoudness >= minLoudnessToReact;
             return isValid;
         }
-        
+
         private bool CheckForInstantAggro(Vector3 noisePosition, float noiseLoudness)
         {
             float noiseLoudnessMultiplier = _balanceConfig.NoiseLoudnessMultiplier;
@@ -142,7 +174,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         private bool CheckForAggro()
         {
-            int suspicionMeterToAggro = _blindCreatureAIConfig.SuspicionMeterToAggro;
+            int suspicionMeterToAggro = _suspicionSystemConfig.SuspicionMeterToAggro;
             bool canAggro = _suspicionMeter >= suspicionMeterToAggro;
             return canAggro;
         }

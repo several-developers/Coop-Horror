@@ -64,6 +64,9 @@ namespace GameCore.Configs.Gameplay.Enemies
         public override MonsterType GetMonsterType() =>
             MonsterType.SirenHead;
 
+        public bool TryGetRoarSE(int currentTimeInMinutes, out SoundEvent result) =>
+            _soundSettings.TryGetRoarSE(currentTimeInMinutes, out result);
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
         private void UpdateArriveTimeOffset()
@@ -81,9 +84,15 @@ namespace GameCore.Configs.Gameplay.Enemies
         [Serializable]
         public class SoundSettings
         {
+            // CONSTRUCTORS: --------------------------------------------------------------------------
+
+            public SoundSettings() =>
+                _roarConfigs = new List<RoarConfig>();
+            
             // MEMBERS: -------------------------------------------------------------------------------
 
             [SerializeField]
+            [InfoBox(message: "Время должно быть в порядке возрастания.")]
             private List<RoarConfig> _roarConfigs;
 
             // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -95,6 +104,29 @@ namespace GameCore.Configs.Gameplay.Enemies
             }
             
             public IReadOnlyList<RoarConfig> GetAllRoarConfigs() => _roarConfigs;
+            
+            public bool TryGetRoarSE(int currentTimeInMinutes, out SoundEvent result)
+            {
+                int configsAmount = _roarConfigs.Count;
+                result = null;
+
+                if (configsAmount == 0)
+                    return false;
+
+                for (int i = configsAmount - 1; i >= 0; i--)
+                {
+                    RoarConfig roarConfig = _roarConfigs[i];
+                    bool isValid = currentTimeInMinutes >= roarConfig.Time;
+                    
+                    if (!isValid)
+                        continue;
+
+                    result = roarConfig.RoarSE;
+                    return true;
+                }
+
+                return false;
+            }
 
             // INNER CLASSES: -------------------------------------------------------------------------
 

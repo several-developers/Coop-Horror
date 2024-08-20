@@ -22,6 +22,9 @@ namespace GameCore.Gameplay.Items.Spawners
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
+        [SerializeField, Min(0)]
+        private int _amount = 1;
+        
         [SerializeField]
         private bool _spawnAtStart = true;
 
@@ -65,8 +68,9 @@ namespace GameCore.Gameplay.Items.Spawners
 
             if (!NetworkHorror.IsTrueServer)
                 return;
-            
-            SpawnItem();
+
+            for (int i = 0; i < _amount; i++)
+                SpawnItem();
         }
         
         private void SpawnItem()

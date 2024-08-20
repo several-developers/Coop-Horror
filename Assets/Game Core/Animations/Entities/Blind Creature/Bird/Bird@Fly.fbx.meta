@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6f0a9691c5e0ca24b9bd0df079a9ff30
+guid: 80743484e356413448c64c68fec262e7
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -33,11 +33,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Pursuit
+      name: Fly
       takeName: Scene
       internalID: -623603649343465320
       firstFrame: 1
-      lastFrame: 60
+      lastFrame: 120
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

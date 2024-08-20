@@ -1,25 +1,53 @@
-﻿using Sonity;
+﻿using System;
+using Sonity;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer
 {
-    public abstract class SoundReproducerBase
+    public abstract class SoundReproducerBase<TSFXType> where TSFXType : Enum
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        protected SoundReproducerBase(Transform owner) =>
-            _owner = owner;
+        protected SoundReproducerBase(ISoundProducer<TSFXType> soundProducer)
+        {
+            _owner = soundProducer.GetTransform();
+
+            soundProducer.OnPlaySoundEvent += PlaySound;
+            soundProducer.OnStopSoundEvent += StopSound;
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly Transform _owner;
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void PlaySound(TSFXType sfxType)
+        {
+            SoundEvent soundEvent = GetSoundEvent(sfxType);
+
+            if (soundEvent == null)
+                return;
+            
+            soundEvent.Play(_owner);
+        }
+        
+        public void StopSound(TSFXType sfxType)
+        {
+            SoundEvent soundEvent = GetSoundEvent(sfxType);
+
+            if (soundEvent == null)
+                return;
+            
+            soundEvent.Stop(_owner);
+        }
         
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected void PlaySound(SoundEvent soundEvent) =>
-            soundEvent.Play(_owner);
+        protected abstract SoundEvent GetSoundEvent(TSFXType sfxType);
 
-        protected void StopSound(SoundEvent soundEvent) =>
-            soundEvent.Stop(_owner);
+        // На память.
+        // private static TSFXType ConvertToSFXType(int sfxTypeIndex) =>
+        //     (TSFXType)Enum.ToObject(typeof(TSFXType), sfxTypeIndex);
     }
 }

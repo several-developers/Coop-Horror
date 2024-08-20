@@ -684,6 +684,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Beetle Entity
       objectReference: {fileID: 0}
+    - target: {fileID: 111205641803414154, guid: 4a078d8873b125146a7bc07d4059ec0a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 4121051766840258734, guid: 4a078d8873b125146a7bc07d4059ec0a,
         type: 3}
       propertyPath: m_RootOrder

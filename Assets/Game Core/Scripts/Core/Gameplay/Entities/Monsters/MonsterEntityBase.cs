@@ -118,7 +118,7 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         protected void SendEntityTeleportedEvent() =>
             OnEntityTeleportedEvent.Invoke();
-        
+
         protected static bool IsClientIDMatches(ulong targetClientID) =>
             NetworkHorror.ClientID == targetClientID;
 
@@ -163,7 +163,7 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         [ServerRpc(RequireOwnership = false)]
         private void SetTargetPlayerServerRPC(ulong playerID) => SetTargetPlayerClientRPC(playerID);
-
+        
         [ClientRpc]
         private void SetTargetPlayerClientRPC(ulong playerID) => SetTargetPlayerLocal(playerID);
 

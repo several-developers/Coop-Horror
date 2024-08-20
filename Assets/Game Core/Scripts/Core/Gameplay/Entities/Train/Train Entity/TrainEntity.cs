@@ -4,12 +4,12 @@ using Cinemachine;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Train;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable.Train;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Quests;
+using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -18,7 +18,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.Train
 {
-    public class TrainEntity : NetcodeBehaviour, ITrainEntity
+    public class TrainEntity : SoundProducerEntity<TrainEntity.SFXType>, ITrainEntity
     {
         public enum MovementBehaviour
         {
@@ -184,18 +184,6 @@ namespace GameCore.Gameplay.Entities.Train
                 ToggleStoppedAtSectorStateServerRPC(isStoppedAtSector);
         }
 
-        public void PlaySound(SFXType sfxType)
-        {
-            PlaySoundLocal(sfxType);
-            PlaySoundServerRPC(sfxType);
-        }
-        
-        public void StopSound(SFXType sfxType)
-        {
-            StopSoundLocal(sfxType);
-            StopSoundServerRPC(sfxType);
-        }
-        
         public void SendOpenQuestsSelectionMenu() =>
             OnOpenQuestsSelectionMenuEvent.Invoke();
 
@@ -209,9 +197,7 @@ namespace GameCore.Gameplay.Entities.Train
             OnLeaveLocationEvent.Invoke();
 
         public MonoBehaviour GetMonoBehaviour() => this;
-
-        public Transform GetTransform() => transform;
-
+        
         public NetworkObject GetNetworkObject() => NetworkObject;
 
         public Camera GetOutsideCamera() => _references.OutsideCamera;
@@ -222,8 +208,8 @@ namespace GameCore.Gameplay.Entities.Train
         {
             _trainController.InitAll();
 
-            _soundReproducer = new TrainSoundReproducer(transform, _trainConfig);
-            PlaySoundLocal(SFXType.MovementLoop);
+            _soundReproducer = new TrainSoundReproducer(this, _trainConfig);
+            PlaySound(SFXType.MovementLoop, onlyLocal: true);
 
             IReadOnlyList<TrainSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
 
@@ -337,12 +323,6 @@ namespace GameCore.Gameplay.Entities.Train
                 mobileHQSeat.ToggleCollider(isEnabled);
         }
 
-        private void PlaySoundLocal(SFXType sfxType) =>
-            _soundReproducer.PlaySound(sfxType);
-        
-        private void StopSoundLocal(SFXType sfxType) =>
-            _soundReproducer.StopSound(sfxType);
-        
         private bool IsSeatBusy(int seatIndex)
         {
             SeatsRuntimeDataContainer seatsRuntimeDataContainer = _seatsData.Value;
@@ -418,22 +398,6 @@ namespace GameCore.Gameplay.Entities.Train
         private void ToggleStoppedAtSectorStateServerRPC(bool isStoppedAtSector) =>
             _isStoppedAtSector.Value = isStoppedAtSector;
 
-        [ServerRpc(RequireOwnership = false)]
-        private void PlaySoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-
-            PlaySoundClientRPC(sfxType, senderClientID);
-        }
-        
-        [ServerRpc(RequireOwnership = false)]
-        private void StopSoundServerRPC(SFXType sfxType, ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-
-            StopSoundClientRPC(sfxType, senderClientID);
-        }
-
         [ClientRpc]
         private void MainLeverAnimationClientRpc(ulong senderClientID)
         {
@@ -444,28 +408,6 @@ namespace GameCore.Gameplay.Entities.Train
 
             TrainMainLever mainLever = _references.MainLever;
             mainLever.InteractWithoutEvents(isLeverPulled: true);
-        }
-
-        [ClientRpc]
-        private void PlaySoundClientRPC(SFXType sfxType, ulong senderClientID)
-        {
-            bool isClientIDMatches = senderClientID == NetworkHorror.ClientID;
-
-            if (isClientIDMatches)
-                return;
-            
-            PlaySoundLocal(sfxType);
-        }
-        
-        [ClientRpc]
-        private void StopSoundClientRPC(SFXType sfxType, ulong senderClientID)
-        {
-            bool isClientIDMatches = senderClientID == NetworkHorror.ClientID;
-
-            if (isClientIDMatches)
-                return;
-            
-            StopSoundLocal(sfxType);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

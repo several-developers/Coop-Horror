@@ -12,8 +12,10 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         public IdleState(BlindCreatureEntity blindCreatureEntity)
         {
+            BlindCreatureAIConfigMeta blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            
             _blindCreatureEntity = blindCreatureEntity;
-            _blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            _wanderingConfig = blindCreatureAIConfig.GetWanderingConfig();
             _suspicionSystem = blindCreatureEntity.GetSuspicionSystem();
             _wanderingTimerRoutine = new CoroutineHelper(blindCreatureEntity);
         }
@@ -21,7 +23,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         // FIELDS: --------------------------------------------------------------------------------
         
         private readonly BlindCreatureEntity _blindCreatureEntity;
-        private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
+        private readonly BlindCreatureAIConfigMeta.WanderingConfig _wanderingConfig;
         private readonly SuspicionSystem _suspicionSystem;
         private readonly CoroutineHelper _wanderingTimerRoutine;
 
@@ -59,8 +61,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         private IEnumerator WanderingTimerCO()
         {
-            float minDelay = _blindCreatureAIConfig.WanderingMinDelay;
-            float maxDelay = _blindCreatureAIConfig.WanderingMaxDelay;
+            float minDelay = _wanderingConfig.MinDelay;
+            float maxDelay = _wanderingConfig.MaxDelay;
             float timeBeforeWandering = Random.Range(minDelay, maxDelay);
             
             yield return new WaitForSeconds(timeBeforeWandering);

@@ -11,8 +11,10 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         public WanderingState(BlindCreatureEntity blindCreatureEntity)
         {
+            BlindCreatureAIConfigMeta blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            
             _blindCreatureEntity = blindCreatureEntity;
-            _blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            _wanderingConfig = blindCreatureAIConfig.GetWanderingConfig();
             _suspicionSystem = blindCreatureEntity.GetSuspicionSystem();
             _agent = blindCreatureEntity.GetAgent();
             _wanderingMovementLogic = new WanderingMovementLogic(blindCreatureEntity.transform, _agent);
@@ -21,7 +23,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly BlindCreatureEntity _blindCreatureEntity;
-        private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
+        private readonly BlindCreatureAIConfigMeta.WanderingConfig _wanderingConfig;
         private readonly SuspicionSystem _suspicionSystem;
         private readonly NavMeshAgent _agent;
         private readonly WanderingMovementLogic _wanderingMovementLogic;
@@ -74,17 +76,17 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         
         private float GetWanderingSpeed()
         {
-            float minSpeed = _blindCreatureAIConfig.WanderingMinSpeed;
-            float maxSpeed = _blindCreatureAIConfig.WanderingMaxSpeed;
+            float minSpeed = _wanderingConfig.MinSpeed;
+            float maxSpeed = _wanderingConfig.MaxSpeed;
             float speed = Random.Range(minSpeed, maxSpeed);
             return speed;
         }
 
         private float GetWanderingMinDistance() =>
-            _blindCreatureAIConfig.WanderingMinDistance;
+            _wanderingConfig.MinDistance;
         
         private float GetWanderingMaxDistance() =>
-            _blindCreatureAIConfig.WanderingMaxDistance;
+            _wanderingConfig.MaxDistance;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

@@ -22,7 +22,7 @@ namespace GameCore.Gameplay.Entities.Train
         void ToggleMainLeverState(bool isEnabled);
         void ToggleDoorState(bool isOpened);
         void ToggleStoppedAtSectorState(bool isStoppedAtSector);
-        void PlaySound(TrainEntity.SFXType sfxType);
+        void PlaySound(TrainEntity.SFXType sfxType, bool onlyLocal = false);
         void StopSound(TrainEntity.SFXType sfxType);
         void SendLeaveLocation();
         Camera GetOutsideCamera();

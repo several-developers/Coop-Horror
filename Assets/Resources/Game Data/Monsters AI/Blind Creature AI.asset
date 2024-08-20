@@ -16,7 +16,7 @@ MonoBehaviour:
   _dangerLevel: 2
   _isDamageable: 1
   _health: 100
-  _spawnType: 0
+  _spawnType: 3
   _maxCount: 5
   _spawnChance: 50
   _spawnChanceMultiplierByGameTime:
@@ -71,17 +71,24 @@ MonoBehaviour:
   _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
-  _minLoudnessToReact: 0.1
-  _suspicionMeterToAggro: 8
-  _suspicionMeterMaxAmount: 15
-  _instantAggroSuspicionMeterAmount: 11
-  _suspicionMeterDecreaseTime: 3
-  _wanderingMinDelay: 0.5
-  _wanderingMaxDelay: 5
-  _wanderingMinSpeed: 1
-  _wanderingMaxSpeed: 2.5
-  _wanderingMinDistance: 1
-  _wanderingMaxDistance: 15
+  _suspicionSystemConfig:
+    _minLoudnessToReact: 0.1
+    _suspicionMeterToAggro: 8
+    _suspicionMeterMaxAmount: 15
+    _suspicionMeterAfterInstantAggro: 11
+    _suspicionMeterDecreaseTime: 3
+  _wanderingConfig:
+    _minSpeed: 1
+    _maxSpeed: 2.5
+    _minDistance: 1
+    _maxDistance: 15
+    _minDelay: 0.5
+    _maxDelay: 5
+  _animationConfig:
+    _dampTime: 0.15
+    _levitatingRange: {x: 0, y: 0.3}
+    _levitatingDuration: {x: 1.5, y: 2}
+    _levitatingEase: 4
   _suspicionMoveSpeed: 5
   _attackDistance: 1
   _attackCooldown: 2
