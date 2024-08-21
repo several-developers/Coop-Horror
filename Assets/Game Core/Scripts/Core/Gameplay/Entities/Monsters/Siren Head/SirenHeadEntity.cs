@@ -7,11 +7,13 @@ using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.SirenHead
 {
+    [GenerateSerializationForType(typeof(SFXType))]
     public class SirenHeadEntity : SoundProducerMonsterEntity<SirenHeadEntity.SFXType>
     {
         public enum SFXType

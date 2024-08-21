@@ -71,12 +71,15 @@ MonoBehaviour:
   _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
+  _disableAttack: 0
   _suspicionSystemConfig:
     _minLoudnessToReact: 0.1
     _suspicionMeterToAggro: 8
     _suspicionMeterMaxAmount: 15
     _suspicionMeterAfterInstantAggro: 11
     _suspicionMeterDecreaseTime: 3
+  _suspicionStateConfig:
+    _suspicionMoveSpeed: 10
   _wanderingConfig:
     _minSpeed: 1
     _maxSpeed: 2.5
@@ -84,11 +87,17 @@ MonoBehaviour:
     _maxDistance: 15
     _minDelay: 0.5
     _maxDelay: 5
+  _combatConfig:
+    _attackCooldown: 2
+    _attackDistance: 1.5
+    _triggerRadius: 1
+    _layerMask:
+      serializedVersion: 2
+      m_Bits: 0
   _animationConfig:
-    _dampTime: 0.15
+    _dampTime: 0.1
     _levitatingRange: {x: 0, y: 0.3}
     _levitatingDuration: {x: 1.5, y: 2}
     _levitatingEase: 4
-  _suspicionMoveSpeed: 5
-  _attackDistance: 1
-  _attackCooldown: 2
+  _birdTweetSE: {fileID: 0}
+  _birdScreamSE: {fileID: 0}

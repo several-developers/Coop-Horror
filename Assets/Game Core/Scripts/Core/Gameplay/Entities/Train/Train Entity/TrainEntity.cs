@@ -18,6 +18,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Entities.Train
 {
+    [GenerateSerializationForType(typeof(SFXType))]
     public class TrainEntity : SoundProducerEntity<TrainEntity.SFXType>, ITrainEntity
     {
         public enum MovementBehaviour

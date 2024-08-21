@@ -100,6 +100,46 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cage Model
       objectReference: {fileID: 0}
+    - target: {fileID: 2679535670081659871, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0923
+      objectReference: {fileID: 0}
+    - target: {fileID: 2679535670081659871, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.2509
+      objectReference: {fileID: 0}
+    - target: {fileID: 2679535670081659871, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.61237276
+      objectReference: {fileID: 0}
+    - target: {fileID: 2679535670081659871, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.6123728
+      objectReference: {fileID: 0}
+    - target: {fileID: 2679535670081659871, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.3535528
+      objectReference: {fileID: 0}
+    - target: {fileID: 2679535670081659871, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.35355282
+      objectReference: {fileID: 0}
+    - target: {fileID: 2679535670081659871, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2679535670081659871, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 60
+      objectReference: {fileID: 0}
     - target: {fileID: 3606896601871664607, guid: 0281d95f5f4b4664c8f25d8a5f5b3890,
         type: 3}
       propertyPath: m_LocalPosition.x

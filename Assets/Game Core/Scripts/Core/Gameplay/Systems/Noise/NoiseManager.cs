@@ -35,7 +35,7 @@ namespace GameCore.Gameplay.Systems.Noise
         private static ISubscriber<NoiseDataMessage> _noiseDataMessageSubscriber;
         private static IPublisher<NoiseDataMessage> _noiseDataMessagePublisher;
 
-        private readonly Collider[] _collidersPull = new Collider[20];
+        private readonly Collider[] _collidersPull = new Collider[32];
 
         private GameConfigMeta _gameConfig;
 
@@ -76,9 +76,9 @@ namespace GameCore.Gameplay.Systems.Noise
             float noiseRange = message.noiseRange;
 
             LayerMask noiseLayers = _gameConfig.NoiseLayers;
-            int iterations = Physics.OverlapSphereNonAlloc(noisePosition, noiseRange, _collidersPull, noiseLayers);
+            int hits = Physics.OverlapSphereNonAlloc(noisePosition, noiseRange, _collidersPull, noiseLayers);
             
-            for (int i = 0; i < iterations; i++)
+            for (int i = 0; i < hits; i++)
             {
                 bool isNoiseListenerFound = _collidersPull[i].TryGetComponent(out INoiseListener noiseListener);
 

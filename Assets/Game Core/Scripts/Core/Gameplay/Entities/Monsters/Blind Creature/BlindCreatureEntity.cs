@@ -15,10 +15,12 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 {
+    [GenerateSerializationForType(typeof(SFXType))]
     public class BlindCreatureEntity : SoundProducerNavmeshMonsterEntity<BlindCreatureEntity.SFXType>, INoiseListener
     {
         public enum SFXType
@@ -67,12 +69,13 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         private const string ReferencesTitle = "References";
 
         private static readonly List<BlindCreatureEntity> AllBlindCreatures = new();
-        
+
         private BlindCreatureAIConfigMeta _blindCreatureAIConfig;
         private BalanceConfigMeta _balanceConfig;
 
         private StateMachine _blindCreatureStateMachine;
         private SuspicionSystem _suspicionSystem;
+        private CombatSystem _combatSystem;
         private AnimationController _animationController;
         private CageBirdController _cageBirdController;
         private BlindCreatureSoundReproducer _soundReproducer;
@@ -96,11 +99,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         public void SetTargetPlayer(PlayerEntity playerEntity) =>
             _targetPlayer = playerEntity;
 
-        public void TriggerBird(BirdReactionType reactionType)
-        {
-            
-        }
-        
+        [Button(ButtonStyle.FoldoutButton), DisableInEditorMode]
+        public void TriggerBird(BirdReactionType reactionType) => TriggerBirdServerRPC(reactionType);
+
         public void DetectNoise(Vector3 noisePosition, float noiseLoudness) =>
             _suspicionSystem.DetectNoise(noisePosition, noiseLoudness);
 
@@ -111,6 +112,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         public void EnterMoveToSuspicionPlaceState() => ChangeState<MoveToSuspicionPlaceState>();
         
         public void EnterLookAroundSuspicionPlaceState() => ChangeState<LookAroundSuspicionPlaceState>();
+        
+        public void EnterAttackSuspicionPlaceState() => ChangeState<AttackSuspicionPlaceState>();
 
         public static IReadOnlyList<BlindCreatureEntity> GetAllBlindCreatures() => AllBlindCreatures;
 
@@ -119,6 +122,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         public References GetReferences() => _references;
 
         public SuspicionSystem GetSuspicionSystem() => _suspicionSystem;
+
+        public CombatSystem GetCombatSystem() => _combatSystem;
 
         public override MonsterType GetMonsterType() =>
             MonsterType.BlindCreature;
@@ -159,6 +164,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
                 _blindCreatureStateMachine = new StateMachine();
                 _suspicionSystem = new SuspicionSystem(blindCreatureEntity: this, _balanceConfig);
                 _animationController = new AnimationController(blindCreatureEntity: this);
+                _combatSystem = new CombatSystem(blindCreatureEntity: this, _animationController);
                 
                 _animationController.Start();
             }
@@ -169,11 +175,13 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
                 WanderingState wanderingState = new(blindCreatureEntity: this);
                 MoveToSuspicionPlaceState moveToSuspicionPlaceState = new(blindCreatureEntity: this);
                 LookAroundSuspicionPlaceState lookAroundSuspicionPlaceState = new(blindCreatureEntity: this);
+                AttackSuspicionPlaceState attackSuspicionPlaceState = new(blindCreatureEntity: this);
 
                 _blindCreatureStateMachine.AddState(idleState);
                 _blindCreatureStateMachine.AddState(wanderingState);
                 _blindCreatureStateMachine.AddState(moveToSuspicionPlaceState);
                 _blindCreatureStateMachine.AddState(lookAroundSuspicionPlaceState);
+                _blindCreatureStateMachine.AddState(attackSuspicionPlaceState);
             }
         }
 
@@ -187,7 +195,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             AllBlindCreatures.Remove(item: this);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
+        
         private void ChangeState<TState>() where TState : IState =>
             _blindCreatureStateMachine.ChangeState<TState>();
         
@@ -208,6 +216,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             // MEMBERS: -------------------------------------------------------------------------------
 
             [SerializeField, Required]
+            private Rig _rig;
+            
+            [SerializeField, Required]
             private Animator _creatureAnimator;
 
             [SerializeField, Required]
@@ -218,6 +229,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             [SerializeField, Required]
             private Transform _modelPivot;
+            
+            [SerializeField, Required]
+            private Transform _lookAtObject;
             
             [SerializeField, Required]
             private GameObject _calmFace;
@@ -233,10 +247,12 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
+            public Rig Rig => _rig;
             public Animator CreatureAnimator => _creatureAnimator;
             public Animator BirdAnimator => _birdAnimator;
             public NetworkAnimator NetworkAnimator => _networkAnimator;
             public Transform ModelPivot => _modelPivot;
+            public Transform LookAtObject => _lookAtObject;
             public GameObject CalmFace => _calmFace;
             public GameObject AngryFace => _angryFace;
             public GameObject CalmCape => _calmCape;

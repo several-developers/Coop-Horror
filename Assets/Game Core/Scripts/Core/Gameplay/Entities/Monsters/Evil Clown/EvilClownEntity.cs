@@ -10,12 +10,14 @@ using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 {
+    [GenerateSerializationForType(typeof(SFXType))]
     public class EvilClownEntity : SoundProducerNavmeshMonsterEntity<EvilClownEntity.SFXType>
     {
         public enum SFXType

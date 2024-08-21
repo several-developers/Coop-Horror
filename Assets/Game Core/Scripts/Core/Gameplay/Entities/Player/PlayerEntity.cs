@@ -31,6 +31,7 @@ using Zenject;
 namespace GameCore.Gameplay.Entities.Player
 {
     [RequireComponent(typeof(PlayerInput))]
+    [GenerateSerializationForType(typeof(SFXType))]
     public class PlayerEntity : SoundProducerEntity<PlayerEntity.SFXType>, ITeleportableEntity, IDamageable
     {
         public enum SFXType
@@ -135,6 +136,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         public void TakeDamage(float damage, IEntity source = null) =>
             _healthSystem.TakeDamage(damage);
+
+        public void KillInstant() => Kill(PlayerDeathReason._);
 
         public void Teleport(Vector3 position, Quaternion rotation, bool resetVelocity = false)
         {

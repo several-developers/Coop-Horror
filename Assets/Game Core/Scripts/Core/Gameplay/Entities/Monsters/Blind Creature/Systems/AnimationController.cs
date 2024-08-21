@@ -1,6 +1,7 @@
 ﻿using DG.Tweening;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Systems.Utilities;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,6 +21,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             _suspicionSystem = blindCreatureEntity.GetSuspicionSystem();
             _agent = blindCreatureEntity.GetAgent();
             _animator = references.CreatureAnimator;
+            _networkAnimator = references.NetworkAnimator;
             _modelPivot = references.ModelPivot;
         }
 
@@ -30,6 +32,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         private readonly SuspicionSystem _suspicionSystem;
         private readonly NavMeshAgent _agent;
         private readonly Animator _animator;
+        private readonly NetworkAnimator _networkAnimator;
         private readonly Transform _modelPivot;
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -41,6 +44,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             // TEMP
             UpdateAnimation();
         }
+
+        public void PlayAttackAnimation() =>
+            _networkAnimator.SetTrigger(hash: AnimatorHashes.Attack);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

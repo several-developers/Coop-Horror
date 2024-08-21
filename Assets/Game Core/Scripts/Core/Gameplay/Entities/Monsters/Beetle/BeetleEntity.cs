@@ -73,6 +73,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         public void TakeDamage(float damage, IEntity source = null) =>
             _healthSystem.TakeDamage(damage);
 
+        public void KillInstant() =>
+            _healthSystem.Kill();
+
         public void SetTargetPlayer(PlayerEntity playerEntity) =>
             _targetPlayer = playerEntity;
 

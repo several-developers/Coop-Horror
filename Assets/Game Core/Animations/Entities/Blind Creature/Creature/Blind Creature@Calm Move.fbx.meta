@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2c80c124518a8c9428d66548d67b2a30
+guid: 2f0894e2aaef53340b0ae5d734e553fb
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -33,7 +33,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Idle
+      name: Calm Move
       takeName: Scene
       internalID: -623603649343465320
       firstFrame: 1

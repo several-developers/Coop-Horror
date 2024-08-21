@@ -45,7 +45,7 @@ namespace GameCore.Gameplay.Systems.Health
                 TakeDamageServerRpc(damage);
         }
 
-        public void Kill() => TakeDamage(damage: 10000f);
+        public void Kill() => TakeDamage(damage: 100000f);
 
         public void Reset()
         {

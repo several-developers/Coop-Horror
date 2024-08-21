@@ -11,29 +11,31 @@ namespace GameCore.Configs.Gameplay.Enemies
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [TitleGroup(title: DebugSettings)]
+        [BoxGroup(DebugGroup, showLabel: false), SerializeField]
+        [InfoBox(message: DisableAttackWarning, InfoMessageType.Error, nameof(_disableAttack))]
+        private bool _disableAttack;
+        
         [TitleGroup(title: SuspicionSystemSettings)]
         [BoxGroup(SuspicionSystemGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private SuspicionSystemConfig _suspicionSystemConfig;
+        
+        [TitleGroup(title: SuspicionStateSettings)]
+        [BoxGroup(SuspicionStateGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
+        private SuspicionStateConfig _suspicionStateConfig;
 
         [TitleGroup(title: WanderingSettings)]
         [BoxGroup(WanderingGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private WanderingConfig _wanderingConfig;
 
+        [TitleGroup(title: CombatSettings)]
+        [BoxGroup(CombatGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
+        private CombatConfig _combatConfig;
+
         [TitleGroup(title: AnimationSettings)]
         [BoxGroup(AnimationGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private AnimationConfig _animationConfig;
 
-        [TitleGroup(title: SuspicionMovementStateSettings)]
-        [BoxGroup(SuspicionMovementStateGroup, showLabel: false), SerializeField, Min(0f)]
-        private float _suspicionMoveSpeed = 5f;
-
-        [TitleGroup(title: AttackStateSettings)]
-        [BoxGroup(AttackStateGroup, showLabel: false), SerializeField, Min(0f)]
-        private float _attackDistance = 1f;
-
-        [BoxGroup(AttackStateGroup), SerializeField, Min(0f)]
-        private float _attackCooldown = 2f;
-        
         [Title(SFXTitle)]
         [SerializeField, Required]
         private SoundEvent _birdTweetSE;
@@ -42,39 +44,40 @@ namespace GameCore.Configs.Gameplay.Enemies
         private SoundEvent _birdScreamSE;
 
         // PROPERTIES: ----------------------------------------------------------------------------
-        
-        public float SuspicionMoveSpeed => _suspicionMoveSpeed;
 
-        public float AttackDistance => _attackDistance;
-        public float AttackCooldown => _attackCooldown;
-        
-        // SFX
+        public bool DisableAttack => _disableAttack;
         public SoundEvent BirdTweetSE => _birdTweetSE;
         public SoundEvent BirdScreamSE => _birdScreamSE;
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private const string DebugSettings = "Debug Settings";
         private const string ConfigTitle = "Config";
         private const string CommonSettings = "Common Settings";
         private const string WanderingSettings = "Wandering Config";
-        private const string SuspicionMovementStateSettings = "Suspicion Movement State Settings";
-        private const string AttackStateSettings = "Attack State Settings";
         private const string SuspicionSystemSettings = "Suspicion System Config";
+        private const string SuspicionStateSettings = "Suspicion State Config";
         private const string AnimationSettings = "Animation Config";
+        private const string CombatSettings = "Combat Config";
         
+        private const string DebugGroup = DebugSettings + "/Group";
         private const string CommonGroup = CommonSettings + "/Group";
         private const string WanderingGroup = WanderingSettings + "/Group";
-        private const string SuspicionMovementStateGroup = SuspicionMovementStateSettings + "/Group";
-        private const string AttackStateGroup = AttackStateSettings + "/Group";
         private const string SuspicionSystemGroup = SuspicionSystemSettings + "/Group";
+        private const string SuspicionStateGroup = SuspicionStateSettings + "/Group";
         private const string AnimationGroup = AnimationSettings + "/Group";
+        private const string CombatGroup = CombatSettings + "/Group";
         
         private const string SFXTitle = "SFX";
+        
+        private const string DisableAttackWarning = "Warning! This must be disabled for the release.";
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public SuspicionSystemConfig GetSuspicionSystemConfig() => _suspicionSystemConfig;
+        public SuspicionStateConfig GetSuspicionStateConfig() => _suspicionStateConfig;
         public WanderingConfig GetWanderingConfig() => _wanderingConfig;
+        public CombatConfig GetCombatConfig() => _combatConfig;
         public AnimationConfig GetAnimationConfig() => _animationConfig;
         
         public override MonsterType GetMonsterType() =>
@@ -115,6 +118,44 @@ namespace GameCore.Configs.Gameplay.Enemies
             public float SuspicionMeterDecreaseTime => _suspicionMeterDecreaseTime;
         }
 
+        [Serializable]
+        public class SuspicionStateConfig
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+            
+            [SerializeField, Min(0f)]
+            private float _suspicionMoveSpeed = 5f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float SuspicionMoveSpeed => _suspicionMoveSpeed;
+        }
+
+        [Serializable]
+        public class CombatConfig
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
+            private float _attackCooldown = 2f;
+
+            [SerializeField, Min(0f)]
+            private float _attackDistance = 1.5f;
+            
+            [SerializeField, Min(0f)]
+            private float _triggerRadius = 1f;
+
+            [SerializeField]
+            private LayerMask _layerMask;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float AttackCooldown => _attackCooldown;
+            public float AttackDistance => _attackDistance;
+            public float TriggerRadius => _triggerRadius;
+            public LayerMask LayerMask => _layerMask;
+        }
+        
         [Serializable]
         public class WanderingConfig
         {

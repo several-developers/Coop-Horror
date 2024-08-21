@@ -11,13 +11,14 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
     // Проблема в RPC методах. Для них нужен NetworkBehaviour, т.е. я не могу засунуть класс в переменную и 
     // использовать её везде где нужно. Вместо этого приходится дублировать ебучие классы для корректного
     // наследования. Можно попробовать заменить на кастомные сообщения для синхронизации, должно помочь.
+    
     public interface ISoundProducer<out TSFXType> where TSFXType : Enum
     {
         event Action<TSFXType> OnPlaySoundEvent;
         event Action<TSFXType> OnStopSoundEvent;
         Transform GetTransform();
     }
-
+    
     public class SoundProducerEntity<TSFXType> : NetcodeBehaviour, ISoundProducer<TSFXType> where TSFXType : Enum
     {
         // FIELDS: --------------------------------------------------------------------------------

@@ -22,6 +22,8 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private const float RigAnimationDuration = 1f;
+        
         private readonly EvilClownEntity _evilClownEntity;
         private readonly EvilClownAIConfigMeta _evilClownAIConfig;
         private readonly WanderingTimer _wanderingTimer;
@@ -53,7 +55,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _rigTN.Kill();
 
             _rigTN = DOVirtual
-                .Float(from: 0f, to: 1f, duration: 1f, onVirtualUpdate: t =>
+                .Float(from: 0f, to: 1f, RigAnimationDuration, onVirtualUpdate: t =>
                 {
                     _rig.weight = t;
                 })

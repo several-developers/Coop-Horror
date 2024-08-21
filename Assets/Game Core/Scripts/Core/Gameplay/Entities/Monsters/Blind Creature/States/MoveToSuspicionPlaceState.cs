@@ -2,6 +2,7 @@
 using GameCore.Gameplay.Systems.MovementLogics;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Animations.Rigging;
 
 namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 {
@@ -11,10 +12,14 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         public MoveToSuspicionPlaceState(BlindCreatureEntity blindCreatureEntity)
         {
+            BlindCreatureAIConfigMeta blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            BlindCreatureEntity.References references = blindCreatureEntity.GetReferences();
+            
             _blindCreatureEntity = blindCreatureEntity;
-            _blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            _suspicionStateConfig = blindCreatureAIConfig.GetSuspicionStateConfig();
             _suspicionSystem = blindCreatureEntity.GetSuspicionSystem();
             _agent = blindCreatureEntity.GetAgent();
+            _rig = references.Rig;
 
             Transform transform = blindCreatureEntity.transform;
             _movementLogic = new FollowPositionMovementLogic(transform, _agent);
@@ -23,10 +28,11 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly BlindCreatureEntity _blindCreatureEntity;
-        private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
+        private readonly BlindCreatureAIConfigMeta.SuspicionStateConfig _suspicionStateConfig;
         private readonly SuspicionSystem _suspicionSystem;
         private readonly NavMeshAgent _agent;
         private readonly FollowPositionMovementLogic _movementLogic;
+        private readonly Rig _rig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -61,14 +67,17 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         private void EnableAgent()
         {
             _agent.enabled = true;
-            _agent.speed = _blindCreatureAIConfig.SuspicionMoveSpeed;
+            _agent.speed = _suspicionStateConfig.SuspicionMoveSpeed;
         }
 
         private void EnterIdleState() =>
             _blindCreatureEntity.EnterIdleState();
-
+        
         private void EnterLookAroundSuspicionPlaceState() =>
             _blindCreatureEntity.EnterLookAroundSuspicionPlaceState();
+
+        private void EnterAttackSuspicionPlaceState() =>
+            _blindCreatureEntity.EnterAttackSuspicionPlaceState();
 
         private Vector3 GetTargetPosition() =>
             _suspicionSystem.GetLastNoisePosition();
@@ -80,8 +89,24 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         private void OnNoiseDetected() => TryUpdateTargetPoint();
 
-        private void OnArrived() => EnterLookAroundSuspicionPlaceState();
+        private void OnArrived()
+        {
+            bool isAggressive = _suspicionSystem.IsAggressive();
+            
+            if (isAggressive)
+                EnterAttackSuspicionPlaceState();
+            else
+                EnterLookAroundSuspicionPlaceState();
+        }
 
-        private void OnStuck() => EnterLookAroundSuspicionPlaceState();
+        private void OnStuck()
+        {
+            bool isAggressive = _suspicionSystem.IsAggressive();
+            
+            if (isAggressive)
+                EnterAttackSuspicionPlaceState();
+            else
+                EnterLookAroundSuspicionPlaceState();
+        }
     }
 }
