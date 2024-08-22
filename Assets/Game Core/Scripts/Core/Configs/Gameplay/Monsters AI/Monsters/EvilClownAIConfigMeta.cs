@@ -92,6 +92,9 @@ namespace GameCore.Configs.Gameplay.Enemies
         
         [SerializeField, Required]
         private SoundEvent _brainwashSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _slashSE;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -127,6 +130,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         public SoundEvent FootstepsSE => _footstepsSE;
         public SoundEvent RoarSE => _roarSE;
         public SoundEvent BrainwashSE => _brainwashSE;
+        public SoundEvent SlashSE => _slashSE;
         
         // FIELDS: --------------------------------------------------------------------------------
         

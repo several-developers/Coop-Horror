@@ -5,6 +5,7 @@ using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.BlindCreature.States;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Other;
 using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -15,7 +16,6 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
@@ -26,9 +26,11 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         public enum SFXType
         {
             // _ = 0,
-            Growl = 1,
-            
-            BirdTweet = 5,
+            Whispering = 1,
+            Swing = 2,
+            Slash = 3,
+
+            BirdChirp = 5,
             BirdScream = 6
         }
         
@@ -61,12 +63,10 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         [SerializeField, Required]
         private TextMeshPro _suspicionTMP;
 
-        [BoxGroup(ReferencesTitle, showLabel: false), SerializeField]
+        [BoxGroup(Constants.References, showLabel: false), SerializeField]
         private References _references;
 
         // FIELDS: --------------------------------------------------------------------------------
-
-        private const string ReferencesTitle = "References";
 
         private static readonly List<BlindCreatureEntity> AllBlindCreatures = new();
 
@@ -92,6 +92,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
                 NetworkObject.Spawn();
 
             EnterIdleState();
+            PlaySound(SFXType.Whispering);
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -127,6 +128,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         public override MonsterType GetMonsterType() =>
             MonsterType.BlindCreature;
+
+        public bool IsDead() => _isDead;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -216,9 +219,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             // MEMBERS: -------------------------------------------------------------------------------
 
             [SerializeField, Required]
-            private Rig _rig;
-            
-            [SerializeField, Required]
             private Animator _creatureAnimator;
 
             [SerializeField, Required]
@@ -228,10 +228,13 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             private NetworkAnimator _networkAnimator;
 
             [SerializeField, Required]
+            private AnimationObserver _animationObserver;
+
+            [SerializeField, Required]
             private Transform _modelPivot;
             
             [SerializeField, Required]
-            private Transform _lookAtObject;
+            private Transform _attackPoint;
             
             [SerializeField, Required]
             private GameObject _calmFace;
@@ -247,12 +250,12 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
-            public Rig Rig => _rig;
             public Animator CreatureAnimator => _creatureAnimator;
             public Animator BirdAnimator => _birdAnimator;
             public NetworkAnimator NetworkAnimator => _networkAnimator;
+            public AnimationObserver AnimationObserver => _animationObserver;
             public Transform ModelPivot => _modelPivot;
-            public Transform LookAtObject => _lookAtObject;
+            public Transform AttackPoint => _attackPoint;
             public GameObject CalmFace => _calmFace;
             public GameObject AngryFace => _angryFace;
             public GameObject CalmCape => _calmCape;

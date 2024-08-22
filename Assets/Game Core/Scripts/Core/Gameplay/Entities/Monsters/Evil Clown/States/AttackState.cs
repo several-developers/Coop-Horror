@@ -76,6 +76,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
                 return;
             
             targetPlayer.Kill(PlayerDeathReason._);
+            _evilClownEntity.PlaySound(EvilClownEntity.SFXType.Slash);
         }
 
         private void OnAttackEnded() => EnterChaseState();

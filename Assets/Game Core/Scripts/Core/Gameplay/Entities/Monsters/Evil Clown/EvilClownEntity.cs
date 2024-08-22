@@ -25,7 +25,8 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             // _ = 0,
             Footsteps = 1,
             Roar = 2,
-            Brainwash = 3
+            Brainwash = 3,
+            Slash = 4
         }
 
         // CONSTRUCTORS: --------------------------------------------------------------------------

@@ -29,6 +29,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
                 EvilClownEntity.SFXType.Footsteps => _evilClownAIConfig.FootstepsSE,
                 EvilClownEntity.SFXType.Roar => _evilClownAIConfig.RoarSE,
                 EvilClownEntity.SFXType.Brainwash => _evilClownAIConfig.BrainwashSE,
+                EvilClownEntity.SFXType.Slash => _evilClownAIConfig.SlashSE,
                 _ => null
             };
 

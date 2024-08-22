@@ -54,7 +54,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         private void Tweet()
         {
-            PlaySound(BlindCreatureEntity.SFXType.BirdTweet);
+            PlaySound(BlindCreatureEntity.SFXType.BirdChirp);
             _birdAnimator.SetTrigger(id: AnimatorHashes.Tweet);
         }
 

@@ -2,7 +2,6 @@
 using GameCore.Gameplay.Systems.MovementLogics;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Animations.Rigging;
 
 namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 {
@@ -19,7 +18,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
             _suspicionStateConfig = blindCreatureAIConfig.GetSuspicionStateConfig();
             _suspicionSystem = blindCreatureEntity.GetSuspicionSystem();
             _agent = blindCreatureEntity.GetAgent();
-            _rig = references.Rig;
 
             Transform transform = blindCreatureEntity.transform;
             _movementLogic = new FollowPositionMovementLogic(transform, _agent);
@@ -32,7 +30,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         private readonly SuspicionSystem _suspicionSystem;
         private readonly NavMeshAgent _agent;
         private readonly FollowPositionMovementLogic _movementLogic;
-        private readonly Rig _rig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

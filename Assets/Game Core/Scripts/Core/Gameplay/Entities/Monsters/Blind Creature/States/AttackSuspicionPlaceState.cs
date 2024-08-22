@@ -36,7 +36,7 @@
             bool isAttackOnCooldown = _combatSystem.IsAttackOnCooldown();
             
             if (!isAttackOnCooldown)
-                _combatSystem.TryAttack();
+                _combatSystem.TryStartAttackAnimation();
             
             EnterLookAroundSuspicionPlaceState();
         }

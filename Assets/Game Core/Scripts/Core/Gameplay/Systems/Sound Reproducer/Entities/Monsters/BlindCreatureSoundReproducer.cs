@@ -26,7 +26,10 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
         {
             SoundEvent soundEvent = sfxType switch
             {
-                BlindCreatureEntity.SFXType.BirdTweet => _blindCreatureAIConfig.BirdTweetSE,
+                BlindCreatureEntity.SFXType.Whispering => _blindCreatureAIConfig.WhisperingSE,
+                BlindCreatureEntity.SFXType.Swing => _blindCreatureAIConfig.SwingSE,
+                BlindCreatureEntity.SFXType.Slash => _blindCreatureAIConfig.SlashSE,
+                BlindCreatureEntity.SFXType.BirdChirp => _blindCreatureAIConfig.BirdChirpSE,
                 BlindCreatureEntity.SFXType.BirdScream => _blindCreatureAIConfig.BirdScreamSE,
                 _ => null
             };

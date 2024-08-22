@@ -38,7 +38,16 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         [Title(SFXTitle)]
         [SerializeField, Required]
-        private SoundEvent _birdTweetSE;
+        private SoundEvent _whisperingSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _swingSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _slashSE;
+        
+        [SerializeField, Required]
+        private SoundEvent _birdChirpSE;
         
         [SerializeField, Required]
         private SoundEvent _birdScreamSE;
@@ -46,7 +55,11 @@ namespace GameCore.Configs.Gameplay.Enemies
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public bool DisableAttack => _disableAttack;
-        public SoundEvent BirdTweetSE => _birdTweetSE;
+        
+        public SoundEvent WhisperingSE => _whisperingSE;
+        public SoundEvent SwingSE => _swingSE;
+        public SoundEvent SlashSE => _slashSE;
+        public SoundEvent BirdChirpSE => _birdChirpSE;
         public SoundEvent BirdScreamSE => _birdScreamSE;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -136,6 +149,9 @@ namespace GameCore.Configs.Gameplay.Enemies
         {
             // MEMBERS: -------------------------------------------------------------------------------
 
+            [SerializeField, Min(0)]
+            private int _damage = 50;
+            
             [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _attackCooldown = 2f;
 
@@ -150,6 +166,7 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
+            public int Damage => _damage;
             public float AttackCooldown => _attackCooldown;
             public float AttackDistance => _attackDistance;
             public float TriggerRadius => _triggerRadius;

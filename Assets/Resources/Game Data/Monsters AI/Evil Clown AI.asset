@@ -100,3 +100,4 @@ MonoBehaviour:
   _footstepsSE: {fileID: 11400000, guid: 7b8dd2117c5d6b64cb147cb6e62204cf, type: 2}
   _roarSE: {fileID: 11400000, guid: 6137db42e67de1f4d93bea16ce56ca46, type: 2}
   _brainwashSE: {fileID: 11400000, guid: 3b22c1e2cc487fd4092f635f98e060d1, type: 2}
+  _slashSE: {fileID: 11400000, guid: ecfd46fca99c81140b69c60be3b51ae8, type: 2}

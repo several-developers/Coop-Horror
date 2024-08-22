@@ -83,21 +83,25 @@ MonoBehaviour:
   _wanderingConfig:
     _minSpeed: 1
     _maxSpeed: 2.5
-    _minDistance: 1
-    _maxDistance: 15
+    _minDistance: 1.5
+    _maxDistance: 10
     _minDelay: 0.5
     _maxDelay: 5
   _combatConfig:
-    _attackCooldown: 2
-    _attackDistance: 1.5
-    _triggerRadius: 1
+    _damage: 5
+    _attackCooldown: 1.2
+    _attackDistance: 2
+    _triggerRadius: 2
     _layerMask:
       serializedVersion: 2
-      m_Bits: 0
+      m_Bits: 64
   _animationConfig:
     _dampTime: 0.1
     _levitatingRange: {x: 0, y: 0.3}
     _levitatingDuration: {x: 1.5, y: 2}
     _levitatingEase: 4
-  _birdTweetSE: {fileID: 0}
+  _whisperingSE: {fileID: 11400000, guid: 820a67458eacbfe408665e0437c4bfea, type: 2}
+  _swingSE: {fileID: 11400000, guid: b879216a006089646b0adab6cdb5f554, type: 2}
+  _slashSE: {fileID: 11400000, guid: 93c4943d18c27274fbb268d74df82a9e, type: 2}
+  _birdChirpSE: {fileID: 11400000, guid: c47f56f019a8b95418b1a65ea32c47f9, type: 2}
   _birdScreamSE: {fileID: 0}
