@@ -56,9 +56,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
             agent.enabled = false;
         }
 
-        private void EnterMoveToSuspicionPlaceState() =>
-            _blindCreatureEntity.EnterMoveToSuspicionPlaceState();
-
         private IEnumerator WanderingTimerCO()
         {
             float minDelay = _wanderingConfig.MinDelay;
@@ -72,6 +69,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnNoiseDetected() => EnterMoveToSuspicionPlaceState();
+        private void OnNoiseDetected() =>
+            _blindCreatureEntity.DecideStateAfterNoiseDetect();
     }
 }

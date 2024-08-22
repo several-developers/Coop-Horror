@@ -49,36 +49,30 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             if (instantAggro)
             {
-                int suspicionMeterAmount = _suspicionSystemConfig.SuspicionMeterAfterInstantAggro;
-                bool isValid = suspicionMeterAmount > _suspicionMeter;
+                InstantAggro(noisePosition);
+                return;
+            }
 
-                if (isValid)
-                    SetSuspicionMeter(suspicionMeterAmount);
-            }
-            else
-            {
-                IncreaseSuspicionMeter();
-            }
+            IncreaseSuspicionMeter();
 
             OnNoiseDetectedEvent.Invoke();
             StartDecreaseTimer();
+            _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.BirdScream);
         }
 
-        public void StartDecreaseTimer()
+        public void InstantAggro(Vector3 noisePosition)
         {
-            if (_decreaseTimerCO != null)
-                StopDecreaseTimer();
+            _lastNoisePosition = noisePosition;
+            
+            int suspicionMeterAmount = _suspicionSystemConfig.SuspicionMeterAfterInstantAggro;
+            bool isValid = suspicionMeterAmount > _suspicionMeter;
 
-            IEnumerator routine = DecreaseTimerCO();
-            _decreaseTimerCO = _blindCreatureEntity.StartCoroutine(routine);
-        }
-
-        public void StopDecreaseTimer()
-        {
-            if (_decreaseTimerCO == null)
-                return;
-
-            _blindCreatureEntity.StopCoroutine(_decreaseTimerCO);
+            if (isValid)
+                SetSuspicionMeter(suspicionMeterAmount);
+            
+            OnNoiseDetectedEvent.Invoke();
+            StartDecreaseTimer();
+            _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.BirdScream);
         }
 
         public Vector3 GetLastNoisePosition() =>
@@ -90,6 +84,23 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void StartDecreaseTimer()
+        {
+            if (_decreaseTimerCO != null)
+                StopDecreaseTimer();
+
+            IEnumerator routine = DecreaseTimerCO();
+            _decreaseTimerCO = _blindCreatureEntity.StartCoroutine(routine);
+        }
+
+        private void StopDecreaseTimer()
+        {
+            if (_decreaseTimerCO == null)
+                return;
+
+            _blindCreatureEntity.StopCoroutine(_decreaseTimerCO);
+        }
+        
         private void IncreaseSuspicionMeter() => ChangeSuspicionMeter(increase: true);
 
         private void DecreaseSuspicionMeter() => ChangeSuspicionMeter(increase: false);

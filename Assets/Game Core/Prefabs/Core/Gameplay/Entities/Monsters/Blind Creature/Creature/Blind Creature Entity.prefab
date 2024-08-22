@@ -344,6 +344,65 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 5549581583863457280}
   m_maskType: 0
+--- !u!1 &1507995737612282010
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 658836952038872917}
+  - component: {fileID: 615297122197655555}
+  - component: {fileID: 7272981861704698951}
+  m_Layer: 7
+  m_Name: Attack Trigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &658836952038872917
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1507995737612282010}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7548729798860119721}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &615297122197655555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1507995737612282010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33a1ed17fbb84b008b2ae15f7fab1ccf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!136 &7272981861704698951
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1507995737612282010}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4145865742387666491
 GameObject:
   m_ObjectHideFlags: 0
@@ -389,7 +448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _draw: 0
-  _radius: 2
+  _radius: 2.5
   _color: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &4188190046374730123
 GameObject:
@@ -833,17 +892,17 @@ PrefabInstance:
     - target: {fileID: 3316069374079058440, guid: 2d86bfd158948fd4a8061612e12370ff,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: -0.4
+      value: -0.38
       objectReference: {fileID: 0}
     - target: {fileID: 3316069374079058440, guid: 2d86bfd158948fd4a8061612e12370ff,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.4
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 3316069374079058440, guid: 2d86bfd158948fd4a8061612e12370ff,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.4
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 3316069374079058440, guid: 2d86bfd158948fd4a8061612e12370ff,
         type: 3}
@@ -853,7 +912,7 @@ PrefabInstance:
     - target: {fileID: 3316069374079058440, guid: 2d86bfd158948fd4a8061612e12370ff,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.37
+      value: -0.4
       objectReference: {fileID: 0}
     - target: {fileID: 3316069374079058440, guid: 2d86bfd158948fd4a8061612e12370ff,
         type: 3}
@@ -1696,6 +1755,7 @@ MonoBehaviour:
   _stateTMP: {fileID: 1764638490193598653}
   _suspicionTMP: {fileID: 7280468304145934518}
   _references:
+    _attackTrigger: {fileID: 615297122197655555}
     _creatureAnimator: {fileID: 4145456504883919100}
     _birdAnimator: {fileID: 9197964968382737867}
     _networkAnimator: {fileID: 8466749874944882127}
@@ -1748,10 +1808,10 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 720
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1

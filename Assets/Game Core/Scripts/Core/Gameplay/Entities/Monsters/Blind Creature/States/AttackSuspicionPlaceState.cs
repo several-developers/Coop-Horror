@@ -33,12 +33,21 @@
 
         private void TryAttack()
         {
+            bool isTargetAtRange = _combatSystem.IsTargetAtRange();
             bool isAttackOnCooldown = _combatSystem.IsAttackOnCooldown();
-            
-            if (!isAttackOnCooldown)
+            bool canAttack = isTargetAtRange && !isAttackOnCooldown;
+
+            if (canAttack)
+            {
                 _combatSystem.TryStartAttackAnimation();
-            
-            EnterLookAroundSuspicionPlaceState();
+                EnterMoveToSuspicionPlaceState();
+                return;
+            }
+
+            if (isTargetAtRange)
+                EnterLookAroundSuspicionPlaceState();
+            else
+                EnterMoveToSuspicionPlaceState();
         }
 
         private void EnterLookAroundSuspicionPlaceState() =>
@@ -49,15 +58,6 @@
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnNoiseDetected()
-        {
-            bool isTargetAtRange = _combatSystem.IsTargetAtRange();
-            bool isAttackOnCooldown = _combatSystem.IsAttackOnCooldown();
-            
-            if (isTargetAtRange && !isAttackOnCooldown)
-                TryAttack();
-            else
-                EnterMoveToSuspicionPlaceState();
-        }
+        private void OnNoiseDetected() => TryAttack();
     }
 }

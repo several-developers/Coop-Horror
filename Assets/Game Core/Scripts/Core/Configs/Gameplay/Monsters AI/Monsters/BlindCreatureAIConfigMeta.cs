@@ -27,29 +27,40 @@ namespace GameCore.Configs.Gameplay.Enemies
         [TitleGroup(title: WanderingSettings)]
         [BoxGroup(WanderingGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private WanderingConfig _wanderingConfig;
+        
+        [TitleGroup(title: LookAroundSettings)]
+        [BoxGroup(LookAroundGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
+        private WanderingConfig _lookAroundConfig;
 
         [TitleGroup(title: CombatSettings)]
         [BoxGroup(CombatGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private CombatConfig _combatConfig;
+        
+        [TitleGroup(title: CageBirdSettings)]
+        [BoxGroup(CageBirdGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
+        private CageBirdConfig _cageBirdConfig;
 
         [TitleGroup(title: AnimationSettings)]
         [BoxGroup(AnimationGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private AnimationConfig _animationConfig;
 
-        [Title(SFXTitle)]
-        [SerializeField, Required]
+        [TitleGroup(SFXTitle)]
+        [BoxGroup(SFXGroup, showLabel: false), SerializeField, Required]
         private SoundEvent _whisperingSE;
         
-        [SerializeField, Required]
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _whispersSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
         private SoundEvent _swingSE;
         
-        [SerializeField, Required]
+        [BoxGroup(SFXGroup), SerializeField, Required]
         private SoundEvent _slashSE;
         
-        [SerializeField, Required]
+        [BoxGroup(SFXGroup), SerializeField, Required]
         private SoundEvent _birdChirpSE;
         
-        [SerializeField, Required]
+        [BoxGroup(SFXGroup), SerializeField, Required]
         private SoundEvent _birdScreamSE;
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -57,6 +68,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         public bool DisableAttack => _disableAttack;
         
         public SoundEvent WhisperingSE => _whisperingSE;
+        public SoundEvent WhispersSE => _whispersSE;
         public SoundEvent SwingSE => _swingSE;
         public SoundEvent SlashSE => _slashSE;
         public SoundEvent BirdChirpSE => _birdChirpSE;
@@ -66,23 +78,27 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         private const string DebugSettings = "Debug Settings";
         private const string ConfigTitle = "Config";
+        private const string SFXTitle = "SFX";
         private const string CommonSettings = "Common Settings";
         private const string WanderingSettings = "Wandering Config";
+        private const string LookAroundSettings = "Look Around Config";
         private const string SuspicionSystemSettings = "Suspicion System Config";
         private const string SuspicionStateSettings = "Suspicion State Config";
         private const string AnimationSettings = "Animation Config";
         private const string CombatSettings = "Combat Config";
+        private const string CageBirdSettings = "Cage Bird Config";
         
+        private const string SFXGroup = SFXTitle + "/Group";
         private const string DebugGroup = DebugSettings + "/Group";
         private const string CommonGroup = CommonSettings + "/Group";
         private const string WanderingGroup = WanderingSettings + "/Group";
+        private const string LookAroundGroup = LookAroundSettings + "/Group";
         private const string SuspicionSystemGroup = SuspicionSystemSettings + "/Group";
         private const string SuspicionStateGroup = SuspicionStateSettings + "/Group";
         private const string AnimationGroup = AnimationSettings + "/Group";
         private const string CombatGroup = CombatSettings + "/Group";
-        
-        private const string SFXTitle = "SFX";
-        
+        private const string CageBirdGroup = CageBirdSettings + "/Group";
+
         private const string DisableAttackWarning = "Warning! This must be disabled for the release.";
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -90,7 +106,9 @@ namespace GameCore.Configs.Gameplay.Enemies
         public SuspicionSystemConfig GetSuspicionSystemConfig() => _suspicionSystemConfig;
         public SuspicionStateConfig GetSuspicionStateConfig() => _suspicionStateConfig;
         public WanderingConfig GetWanderingConfig() => _wanderingConfig;
+        public WanderingConfig GetLookAroundConfig() => _lookAroundConfig;
         public CombatConfig GetCombatConfig() => _combatConfig;
+        public CageBirdConfig GetCageBirdConfig() => _cageBirdConfig;
         public AnimationConfig GetAnimationConfig() => _animationConfig;
         
         public override MonsterType GetMonsterType() =>
@@ -138,10 +156,18 @@ namespace GameCore.Configs.Gameplay.Enemies
             
             [SerializeField, Min(0f)]
             private float _suspicionMoveSpeed = 5f;
+            
+            [SerializeField, Min(0f)]
+            private float _suspicionAcceleration = 20f;
+
+            [SerializeField, MinMaxSlider(minValue: 0f, maxValue: 10f, showFields: true)]
+            private Vector2 _whispersDelay;
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
             public float SuspicionMoveSpeed => _suspicionMoveSpeed;
+            public float SuspicionAcceleration => _suspicionAcceleration;
+            public Vector2 WhispersDelay => _whispersDelay;
         }
 
         [Serializable]
@@ -150,7 +176,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             // MEMBERS: -------------------------------------------------------------------------------
 
             [SerializeField, Min(0)]
-            private int _damage = 50;
+            private float _damage = 50f;
             
             [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _attackCooldown = 2f;
@@ -166,7 +192,7 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
-            public int Damage => _damage;
+            public float Damage => _damage;
             public float AttackCooldown => _attackCooldown;
             public float AttackDistance => _attackDistance;
             public float TriggerRadius => _triggerRadius;
@@ -196,6 +222,9 @@ namespace GameCore.Configs.Gameplay.Enemies
             [SerializeField, Min(0f)]
             private float _maxDelay = 5f;
 
+            [SerializeField, Min(0f)]
+            private float _acceleration = 8f;
+
             // PROPERTIES: ----------------------------------------------------------------------------
             
             public float MinSpeed => _minSpeed;
@@ -204,6 +233,20 @@ namespace GameCore.Configs.Gameplay.Enemies
             public float MaxDistance => _maxDistance;
             public float MinDelay => _minDelay;
             public float MaxDelay => _maxDelay;
+            public float Acceleration => _acceleration;
+        }
+
+        [Serializable]
+        public class CageBirdConfig
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, MinMaxSlider(minValue: 0f, maxValue: 15f, showFields: true)]
+            private Vector2 _chirpDelay;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public Vector2 ChirpDelay => _chirpDelay;
         }
 
         [Serializable]

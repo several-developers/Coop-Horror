@@ -1,4 +1,7 @@
-﻿using GameCore.Gameplay.Network;
+﻿using System.Collections;
+using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
@@ -9,16 +12,23 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         public CageBirdController(BlindCreatureEntity blindCreatureEntity)
         {
+            BlindCreatureAIConfigMeta blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
+            BlindCreatureEntity.References references = blindCreatureEntity.GetReferences();
+
             _blindCreatureEntity = blindCreatureEntity;
-            _references = blindCreatureEntity.GetReferences();
-            _birdAnimator = _references.BirdAnimator;
+            _cageBirdConfig = blindCreatureAIConfig.GetCageBirdConfig();
+            _birdAnimator = references.BirdAnimator;
+            _chirpRoutine = new CoroutineHelper(blindCreatureEntity);
+
+            _chirpRoutine.GetRoutineEvent += BirdChirpCO;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly BlindCreatureEntity _blindCreatureEntity;
-        private readonly BlindCreatureEntity.References _references;
+        private readonly BlindCreatureAIConfigMeta.CageBirdConfig _cageBirdConfig;
         private readonly Animator _birdAnimator;
+        private readonly CoroutineHelper _chirpRoutine;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -26,10 +36,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         {
             switch (reactionType)
             {
-                case BlindCreatureEntity.BirdReactionType.Tweet:
-                    Tweet();
-                    break;
-
                 case BlindCreatureEntity.BirdReactionType.StartScreaming:
                     ToggleScreaming(isScreaming: true);
                     break;
@@ -44,15 +50,19 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             }
         }
 
+        public void StartChirping() =>
+            _chirpRoutine.Start();
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void ToggleScreaming(bool isScreaming)
         {
+            StopSound(BlindCreatureEntity.SFXType.BirdChirp);
             PlaySound(BlindCreatureEntity.SFXType.BirdScream);
             _birdAnimator.SetBool(id: AnimatorHashes.IsScreaming, isScreaming);
         }
 
-        private void Tweet()
+        private void Chirp()
         {
             PlaySound(BlindCreatureEntity.SFXType.BirdChirp);
             _birdAnimator.SetTrigger(id: AnimatorHashes.Tweet);
@@ -75,10 +85,23 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             if (!IsServer())
                 return;
 
-            _blindCreatureEntity.PlaySound(sfxType);
+            _blindCreatureEntity.StopSound(sfxType);
         }
 
-        private bool IsServer() =>
+        private IEnumerator BirdChirpCO()
+        {
+            while (true)
+            {
+                Vector2 chirpDelay = _cageBirdConfig.ChirpDelay;
+                float delay = Random.Range(chirpDelay.x, chirpDelay.y);
+
+                yield return new WaitForSeconds(delay);
+                
+                Chirp();
+            }
+        }
+        
+        private static bool IsServer() =>
             NetworkHorror.IsTrueServer;
     }
 }

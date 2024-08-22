@@ -68,7 +68,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private StateMachine _evilClownStateMachine;
         private AnimationController _animationController;
         private WanderingTimer _wanderingTimer;
-        private EvilClownSoundReproducer _soundReproducer;
         private PlayerEntity _targetPlayer;
         private Transform _lookAtTarget;
 
@@ -142,7 +141,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         protected override void InitAll()
         {
-            _soundReproducer = new EvilClownSoundReproducer(soundProducer: this, _evilClownAIConfig);
+            SoundReproducer = new EvilClownSoundReproducer(soundProducer: this, _evilClownAIConfig);
 
             OnTargetPlayerChangedEvent += OnTargetPlayerChanged;
         }

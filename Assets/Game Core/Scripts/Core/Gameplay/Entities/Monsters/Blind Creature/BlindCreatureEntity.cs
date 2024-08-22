@@ -29,7 +29,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             Whispering = 1,
             Swing = 2,
             Slash = 3,
-
+            Whispers = 4,
             BirdChirp = 5,
             BirdScream = 6
         }
@@ -37,10 +37,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         public enum BirdReactionType
         {
             //_ = 0,
-            Tweet = 1,
-            StartScreaming = 2,
-            StopScreaming = 3,
-            Die = 4
+            StartScreaming = 1,
+            StopScreaming = 2,
+            Die = 3
         }
         
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -78,7 +77,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         private CombatSystem _combatSystem;
         private AnimationController _animationController;
         private CageBirdController _cageBirdController;
-        private BlindCreatureSoundReproducer _soundReproducer;
         private PlayerEntity _targetPlayer;
 
         private bool _isDead;
@@ -106,6 +104,19 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         public void DetectNoise(Vector3 noisePosition, float noiseLoudness) =>
             _suspicionSystem.DetectNoise(noisePosition, noiseLoudness);
 
+        public void DecideStateAfterNoiseDetect()
+        {
+            bool isAggressive = _suspicionSystem.IsAggressive();
+            bool isTargetAtRange = _combatSystem.IsTargetAtRange();
+            bool isAttackOnCooldown = _combatSystem.IsAttackOnCooldown();
+            bool canAttack = isAggressive && isTargetAtRange && !isAttackOnCooldown;
+            
+            if (canAttack)
+                EnterAttackSuspicionPlaceState();
+            else
+                EnterMoveToSuspicionPlaceState();
+        }
+        
         public void EnterIdleState() => ChangeState<IdleState>();
 
         public void EnterWanderingState() => ChangeState<WanderingState>();
@@ -135,7 +146,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         protected override void InitAll()
         {
-            _soundReproducer = new BlindCreatureSoundReproducer(soundProducer: this, _blindCreatureAIConfig);
+            SoundReproducer = new BlindCreatureSoundReproducer(soundProducer: this, _blindCreatureAIConfig);
             _cageBirdController = new CageBirdController(blindCreatureEntity: this);
         }
 
@@ -150,9 +161,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             {
                 string stateName = state.GetType().Name.Replace(oldValue: "State", newValue: "").GetNiceName();
                 _stateTMP.text = $"State: {stateName}";
-
-                string log = Log.HandleLog($"New state: <gb>{stateName}</gb>");
-                Debug.Log(log);
             };
 
             _suspicionSystem.OnSuspicionMeterChangedEvent += suspicionMeter =>
@@ -168,8 +176,13 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
                 _suspicionSystem = new SuspicionSystem(blindCreatureEntity: this, _balanceConfig);
                 _animationController = new AnimationController(blindCreatureEntity: this);
                 _combatSystem = new CombatSystem(blindCreatureEntity: this, _animationController);
-                
+
                 _animationController.Start();
+                _cageBirdController.StartChirping();
+
+                BlindCreatureAttackTrigger attackTrigger = _references.AttackTrigger;
+                attackTrigger.IsServerEvent += IsOwnerServer;
+                attackTrigger.OnTriggerEnterEvent += OnAttackTriggerEnter;
             }
 
             void SetupStates()
@@ -201,7 +214,12 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         
         private void ChangeState<TState>() where TState : IState =>
             _blindCreatureStateMachine.ChangeState<TState>();
-        
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnAttackTriggerEnter(Collider other) =>
+            _combatSystem.CheckAttackTrigger(other);
+
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
@@ -218,6 +236,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         {
             // MEMBERS: -------------------------------------------------------------------------------
 
+            [SerializeField, Required]
+            private BlindCreatureAttackTrigger _attackTrigger;
+            
             [SerializeField, Required]
             private Animator _creatureAnimator;
 
@@ -250,6 +271,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
+            public BlindCreatureAttackTrigger AttackTrigger => _attackTrigger;
             public Animator CreatureAnimator => _creatureAnimator;
             public Animator BirdAnimator => _birdAnimator;
             public NetworkAnimator NetworkAnimator => _networkAnimator;

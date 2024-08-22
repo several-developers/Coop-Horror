@@ -125,7 +125,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         private PlayerConfigMeta _playerConfig;
         private StateMachine _playerStateMachine;
-        private PlayerSoundReproducer _soundReproducer;
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
@@ -273,7 +272,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             AllPlayers.TryAdd(OwnerClientId, this);
 
-            _soundReproducer = new PlayerSoundReproducer(soundProducer: this, _playerConfig);
+            SoundReproducer = new PlayerSoundReproducer(soundProducer: this, _playerConfig);
             _inventory = new PlayerInventory();
             _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
 

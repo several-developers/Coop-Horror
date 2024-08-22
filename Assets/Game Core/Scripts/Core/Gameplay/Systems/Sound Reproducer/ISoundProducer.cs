@@ -25,6 +25,8 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
 
         public event Action<TSFXType> OnPlaySoundEvent = delegate { };
         public event Action<TSFXType> OnStopSoundEvent = delegate { };
+        
+        protected SoundReproducerBase<TSFXType> SoundReproducer;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -106,6 +108,8 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
 
         public event Action<TSFXType> OnPlaySoundEvent = delegate { };
         public event Action<TSFXType> OnStopSoundEvent = delegate { };
+        
+        protected SoundReproducerBase<TSFXType> SoundReproducer;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -183,6 +187,8 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
         public event Action<TSFXType> OnPlaySoundEvent = delegate { };
         public event Action<TSFXType> OnStopSoundEvent = delegate { };
 
+        protected SoundReproducerBase<TSFXType> SoundReproducer;
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void PlaySound(TSFXType sfxType, bool onlyLocal = false)
@@ -257,6 +263,8 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
 
         public event Action<TSFXType> OnPlaySoundEvent = delegate { };
         public event Action<TSFXType> OnStopSoundEvent = delegate { };
+        
+        protected SoundReproducerBase<TSFXType> SoundReproducer;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

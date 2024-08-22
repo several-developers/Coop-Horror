@@ -208,6 +208,8 @@ namespace GameCore.Gameplay.Network
         {
         }
 
+        protected bool IsOwnerServer() => IsServerOnly;
+        
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()

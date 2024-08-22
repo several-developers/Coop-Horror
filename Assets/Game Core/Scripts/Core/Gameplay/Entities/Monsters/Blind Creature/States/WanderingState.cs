@@ -66,14 +66,12 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         {
             _agent.enabled = true;
             _agent.speed = GetWanderingSpeed();
+            _agent.acceleration = _wanderingConfig.Acceleration;
         }
 
         private void EnterIdleState() =>
             _blindCreatureEntity.EnterIdleState();
-        
-        private void EnterMoveToSuspicionPlaceState() =>
-            _blindCreatureEntity.EnterMoveToSuspicionPlaceState();
-        
+
         private float GetWanderingSpeed()
         {
             float minSpeed = _wanderingConfig.MinSpeed;
@@ -90,7 +88,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnNoiseDetected() => EnterMoveToSuspicionPlaceState();
+        private void OnNoiseDetected() =>
+            _blindCreatureEntity.DecideStateAfterNoiseDetect();
 
         private void OnStuck() => EnterIdleState();
 

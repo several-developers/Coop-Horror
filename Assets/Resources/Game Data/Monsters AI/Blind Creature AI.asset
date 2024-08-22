@@ -79,7 +79,9 @@ MonoBehaviour:
     _suspicionMeterAfterInstantAggro: 11
     _suspicionMeterDecreaseTime: 3
   _suspicionStateConfig:
-    _suspicionMoveSpeed: 10
+    _suspicionMoveSpeed: 14
+    _suspicionAcceleration: 20
+    _whispersDelay: {x: 3.5, y: 8}
   _wanderingConfig:
     _minSpeed: 1
     _maxSpeed: 2.5
@@ -87,21 +89,33 @@ MonoBehaviour:
     _maxDistance: 10
     _minDelay: 0.5
     _maxDelay: 5
+    _acceleration: 8
+  _lookAroundConfig:
+    _minSpeed: 2
+    _maxSpeed: 5
+    _minDistance: 2
+    _maxDistance: 6
+    _minDelay: 1.5
+    _maxDelay: 4
+    _acceleration: 8
   _combatConfig:
-    _damage: 5
-    _attackCooldown: 1.2
-    _attackDistance: 2
-    _triggerRadius: 2
+    _damage: 1
+    _attackCooldown: 0.6
+    _attackDistance: 1.5
+    _triggerRadius: 2.5
     _layerMask:
       serializedVersion: 2
       m_Bits: 64
+  _cageBirdConfig:
+    _chirpDelay: {x: 2.5, y: 7}
   _animationConfig:
     _dampTime: 0.1
     _levitatingRange: {x: 0, y: 0.3}
     _levitatingDuration: {x: 1.5, y: 2}
     _levitatingEase: 4
   _whisperingSE: {fileID: 11400000, guid: 820a67458eacbfe408665e0437c4bfea, type: 2}
+  _whispersSE: {fileID: 11400000, guid: 1a4ed631bd3399148a218dc8ea122cb2, type: 2}
   _swingSE: {fileID: 11400000, guid: b879216a006089646b0adab6cdb5f554, type: 2}
   _slashSE: {fileID: 11400000, guid: 93c4943d18c27274fbb268d74df82a9e, type: 2}
   _birdChirpSE: {fileID: 11400000, guid: c47f56f019a8b95418b1a65ea32c47f9, type: 2}
-  _birdScreamSE: {fileID: 0}
+  _birdScreamSE: {fileID: 11400000, guid: 050bb5dfa8e9be546bcb9e00fcc926c7, type: 2}

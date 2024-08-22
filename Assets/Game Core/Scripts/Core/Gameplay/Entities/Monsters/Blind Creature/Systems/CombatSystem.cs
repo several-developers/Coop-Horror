@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Other;
@@ -33,6 +34,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         }
 
         // FIELDS: --------------------------------------------------------------------------------
+
+        public event Action OnAttackPerformedEvent = delegate { };
         
         private readonly BlindCreatureEntity _blindCreatureEntity;
         private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
@@ -61,12 +64,29 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.Swing);
         }
 
+        public void CheckAttackTrigger(Collider collider)
+        {
+            if (_blindCreatureEntity.IsDead())
+                return;
+            
+            bool isDamageableFound = collider.TryGetComponent(out IDamageable damageable);
+
+            if (!isDamageableFound)
+                return;
+
+            if (damageable is not PlayerEntity)
+                return;
+
+            Vector3 targetPosition = collider.transform.position;
+            _suspicionSystem.InstantAggro(targetPosition);
+        }
+
         public bool IsTargetAtRange()
         {
             Vector3 thisPosition = _transform.position;
             Vector3 lastNoisePosition = _suspicionSystem.GetLastNoisePosition();
             float distance = Vector3.Distance(a: thisPosition, b: lastNoisePosition);
-            bool isTargetAtRange = _combatConfig.AttackDistance <= distance;
+            bool isTargetAtRange = distance <= _combatConfig.AttackDistance;
             return isTargetAtRange;
         }
 
@@ -98,17 +118,20 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
                 if (disableAttack)
                     continue;
-                
+            
                 playSlashSound = true;
                 damageable.TakeDamage(damage, _blindCreatureEntity);
             }
             
             if (playSlashSound)
-                _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.Slash);
+                PlaySound(BlindCreatureEntity.SFXType.Slash);
 
             _attackCooldownRoutine.Start();
         }
-        
+
+        private void PlaySound(BlindCreatureEntity.SFXType sfxType) =>
+            _blindCreatureEntity.PlaySound(sfxType);
+
         private IEnumerator AttackCooldownCO()
         {
             float cooldown = _combatConfig.AttackCooldown;
@@ -122,7 +145,10 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         private void OnAttack() => TryAttack();
         
-        private void OnAttackFinished() =>
+        private void OnAttackFinished()
+        {
             _attackCooldownRoutine.Start();
+            OnAttackPerformedEvent.Invoke();
+        }
     }
 }

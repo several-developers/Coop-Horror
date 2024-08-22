@@ -12,11 +12,11 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         public MoveToSuspicionPlaceState(BlindCreatureEntity blindCreatureEntity)
         {
             BlindCreatureAIConfigMeta blindCreatureAIConfig = blindCreatureEntity.GetAIConfig();
-            BlindCreatureEntity.References references = blindCreatureEntity.GetReferences();
-            
+
             _blindCreatureEntity = blindCreatureEntity;
             _suspicionStateConfig = blindCreatureAIConfig.GetSuspicionStateConfig();
             _suspicionSystem = blindCreatureEntity.GetSuspicionSystem();
+            _combatSystem = blindCreatureEntity.GetCombatSystem();
             _agent = blindCreatureEntity.GetAgent();
 
             Transform transform = blindCreatureEntity.transform;
@@ -28,6 +28,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         private readonly BlindCreatureEntity _blindCreatureEntity;
         private readonly BlindCreatureAIConfigMeta.SuspicionStateConfig _suspicionStateConfig;
         private readonly SuspicionSystem _suspicionSystem;
+        private readonly CombatSystem _combatSystem;
         private readonly NavMeshAgent _agent;
         private readonly FollowPositionMovementLogic _movementLogic;
 
@@ -36,6 +37,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         public void Enter()
         {
             _suspicionSystem.OnNoiseDetectedEvent += OnNoiseDetected;
+
+            _combatSystem.OnAttackPerformedEvent += OnAttackPerformed;
 
             _movementLogic.OnArrivedEvent += OnArrived;
             _movementLogic.OnStuckEvent += OnStuck;
@@ -54,6 +57,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         {
             _suspicionSystem.OnNoiseDetectedEvent -= OnNoiseDetected;
             
+            _combatSystem.OnAttackPerformedEvent -= OnAttackPerformed;
+
             _movementLogic.OnArrivedEvent -= OnArrived;
             _movementLogic.OnStuckEvent -= OnStuck;
             _movementLogic.GetTargetPositionEvent -= GetTargetPosition;
@@ -65,11 +70,24 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         {
             _agent.enabled = true;
             _agent.speed = _suspicionStateConfig.SuspicionMoveSpeed;
+            _agent.acceleration = _suspicionStateConfig.SuspicionAcceleration;
+        }
+
+        private void DecideStateAfterArriving()
+        {
+            bool isAggressive = _suspicionSystem.IsAggressive();
+            bool isAttackOnCooldown = _combatSystem.IsAttackOnCooldown();
+            bool canAttack = isAggressive && !isAttackOnCooldown;
+
+            if (canAttack)
+                EnterAttackSuspicionPlaceState();
+            else
+                EnterLookAroundSuspicionPlaceState();
         }
 
         private void EnterIdleState() =>
             _blindCreatureEntity.EnterIdleState();
-        
+
         private void EnterLookAroundSuspicionPlaceState() =>
             _blindCreatureEntity.EnterLookAroundSuspicionPlaceState();
 
@@ -86,24 +104,10 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
 
         private void OnNoiseDetected() => TryUpdateTargetPoint();
 
-        private void OnArrived()
-        {
-            bool isAggressive = _suspicionSystem.IsAggressive();
-            
-            if (isAggressive)
-                EnterAttackSuspicionPlaceState();
-            else
-                EnterLookAroundSuspicionPlaceState();
-        }
+        private void OnAttackPerformed() => EnterLookAroundSuspicionPlaceState();
 
-        private void OnStuck()
-        {
-            bool isAggressive = _suspicionSystem.IsAggressive();
-            
-            if (isAggressive)
-                EnterAttackSuspicionPlaceState();
-            else
-                EnterLookAroundSuspicionPlaceState();
-        }
+        private void OnArrived() => DecideStateAfterArriving();
+
+        private void OnStuck() => DecideStateAfterArriving();
     }
 }
