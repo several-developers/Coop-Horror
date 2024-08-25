@@ -113,7 +113,9 @@ namespace GameCore.Gameplay.MonstersGeneration
         public void Stop()
         {
             _isGeneratorEnabled = false;
+            
             _monstersSpawnList.Clear();
+            _monstersSpawners.Clear();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

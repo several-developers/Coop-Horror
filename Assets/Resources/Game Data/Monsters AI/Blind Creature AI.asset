@@ -16,8 +16,8 @@ MonoBehaviour:
   _dangerLevel: 2
   _isDamageable: 1
   _health: 100
-  _spawnType: 3
-  _maxCount: 5
+  _spawnType: 0
+  _maxCount: 3
   _spawnChance: 50
   _spawnChanceMultiplierByGameTime:
     serializedVersion: 2
@@ -92,9 +92,9 @@ MonoBehaviour:
     _acceleration: 8
   _lookAroundConfig:
     _minSpeed: 2
-    _maxSpeed: 5
+    _maxSpeed: 5.5
     _minDistance: 2
-    _maxDistance: 6
+    _maxDistance: 7
     _minDelay: 1.5
     _maxDelay: 4
     _acceleration: 8

@@ -5,11 +5,13 @@ using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Level.Elevator
 {
+    [GenerateSerializationForType(typeof(SFXType))]
     public abstract class ElevatorBase : SoundProducerEntity<ElevatorBase.SFXType>
     {
         public enum SFXType

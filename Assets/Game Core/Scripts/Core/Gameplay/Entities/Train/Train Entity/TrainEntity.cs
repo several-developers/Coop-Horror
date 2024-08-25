@@ -152,6 +152,8 @@ namespace GameCore.Gameplay.Entities.Train
                     continue;
 
                 PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+                localPlayer.References.Rigidbody.velocity = Vector3.zero;
+                
                 mobileHQSeat.Interact(localPlayer);
                 break;
             }

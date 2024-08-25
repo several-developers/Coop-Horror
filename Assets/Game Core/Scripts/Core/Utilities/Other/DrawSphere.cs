@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace GameCore.Utilities
 {
-#if UNITY_EDITOR
     public class DrawSphere : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
@@ -20,6 +19,7 @@ namespace GameCore.Utilities
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             if (!_draw)
@@ -33,6 +33,7 @@ namespace GameCore.Utilities
 
             Gizmos.color = gizmosColor;
         }
-    }
 #endif
+
+    }
 }

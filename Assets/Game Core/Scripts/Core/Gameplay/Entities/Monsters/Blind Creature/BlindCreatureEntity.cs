@@ -4,7 +4,6 @@ using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.BlindCreature.States;
-using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Other;
 using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.SoundReproducer;
@@ -77,7 +76,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         private CombatSystem _combatSystem;
         private AnimationController _animationController;
         private CageBirdController _cageBirdController;
-        private PlayerEntity _targetPlayer;
 
         private bool _isDead;
 
@@ -94,9 +92,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
-        public void SetTargetPlayer(PlayerEntity playerEntity) =>
-            _targetPlayer = playerEntity;
 
         [Button(ButtonStyle.FoldoutButton), DisableInEditorMode]
         public void TriggerBird(BirdReactionType reactionType) => TriggerBirdServerRPC(reactionType);
