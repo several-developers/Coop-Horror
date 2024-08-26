@@ -115,7 +115,9 @@ namespace GameCore.Gameplay.MonstersGeneration
             _isGeneratorEnabled = false;
             
             _monstersSpawnList.Clear();
-            _monstersSpawners.Clear();
+            _monstersSpawners[Floor.One].Clear();
+            _monstersSpawners[Floor.Two].Clear();
+            _monstersSpawners[Floor.Three].Clear();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

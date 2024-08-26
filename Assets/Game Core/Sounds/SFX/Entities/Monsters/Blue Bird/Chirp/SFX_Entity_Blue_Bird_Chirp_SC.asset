@@ -18,7 +18,7 @@ MonoBehaviour:
       previewAudioMixerGroup: {fileID: 0}
       expandPreview: 0
       expandAudioClips: 1
-      expandSettings: 1
+      expandSettings: 0
       previewCurves: 1
       audioMixerGroup: {fileID: 0}
       priority: 0.5
@@ -255,8 +255,8 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
       spatialSpreadExpand: 0
-      spatialSpreadDegrees: 180
-      spatialSpreadRatio: 0.5
+      spatialSpreadDegrees: 90
+      spatialSpreadRatio: 0.25
       spatialSpreadDistanceRolloff: -4
       spatialSpreadDistanceCurve:
         serializedVersion: 2
