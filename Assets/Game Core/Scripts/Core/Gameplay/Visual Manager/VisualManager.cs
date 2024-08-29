@@ -118,6 +118,7 @@ namespace GameCore.Gameplay.VisualManagement
 #warning СЛОМАНО, СРОЧНО ЧИНИТЬ
         private void HandleGameState(GameState gameState)
         {
+            
             // switch (gameState)
             // {
             //     case GameState.ArrivedAtTheRoad:

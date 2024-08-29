@@ -11,6 +11,7 @@ using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Systems.Quests;
+using GameCore.Gameplay.VisualManagement;
 using GameCore.Observers.Gameplay.Game;
 using UnityEngine;
 
@@ -29,6 +30,7 @@ namespace GameCore.Gameplay.GameManagement
             IGameResetManager gameResetManager,
             IMonstersGenerator monstersGenerator,
             IDungeonsManager dungeonsManager,
+            IVisualManager visualManager,
             ITrainEntity trainEntity,
             IPublisher<UIEventMessage> uiEventMessagePublisher)
         {
@@ -40,6 +42,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameResetManager = gameResetManager;
             _monstersGenerator = monstersGenerator;
             _dungeonsManager = dungeonsManager;
+            _visualManager = visualManager;
             _trainEntity = trainEntity;
             _uiEventMessagePublisher = uiEventMessagePublisher;
 
@@ -107,6 +110,7 @@ namespace GameCore.Gameplay.GameManagement
         private readonly IGameResetManager _gameResetManager;
         private readonly IMonstersGenerator _monstersGenerator;
         private readonly IDungeonsManager _dungeonsManager;
+        private readonly IVisualManager _visualManager;
         private readonly ITrainEntity _trainEntity;
         private readonly IPublisher<UIEventMessage> _uiEventMessagePublisher;
 
@@ -205,6 +209,7 @@ namespace GameCore.Gameplay.GameManagement
             {
                 _gameTimeManagerDecorator.SetSunrise();
                 _gameTimeManagerDecorator.IncreaseDay();
+                _visualManager.ChangePreset(VisualPresetType.ForestLocation);
             }
 
             _trainEntity.TeleportToTheMetroPlatform();

@@ -6,5 +6,6 @@
         Dungeon = 1,
         Metro = 2,
         DefaultLocation = 3,
+        ForestLocation = 4
     }
 }
