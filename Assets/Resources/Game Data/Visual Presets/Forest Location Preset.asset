@@ -20,7 +20,7 @@ MonoBehaviour:
   _volumeProfile: {fileID: 11400000, guid: c3e3feaf6cc11db4080fc3723e7f9833, type: 2}
   _useNativeFog: 1
   _nativeFogColor: {r: 0.972549, g: 0.7647059, b: 0.7176471, a: 1}
-  _nativeFogDensity: 0.004
+  _nativeFogDensity: 0.009
   _changeCameraDistance: 1
   _cameraDistance: 400
   _useSkybox: 1
