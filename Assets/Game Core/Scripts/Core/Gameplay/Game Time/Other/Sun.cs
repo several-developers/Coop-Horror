@@ -64,6 +64,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void UpdateLighting(float timeOfDay)
         {
+            return;
             RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
 
             if (_changeAmbientSkyColor)

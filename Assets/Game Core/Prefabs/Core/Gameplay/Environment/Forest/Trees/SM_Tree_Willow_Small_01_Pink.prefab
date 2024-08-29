@@ -9,7 +9,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1041271695553482, guid: d12c0f1f2a84250488476e8a89cf4125, type: 3}
       propertyPath: m_Name
-      value: SM_Tree_Willow_Small_01_Red
+      value: SM_Tree_Willow_Small_01_Pink
       objectReference: {fileID: 0}
     - target: {fileID: 4324618753771670, guid: d12c0f1f2a84250488476e8a89cf4125, type: 3}
       propertyPath: m_RootOrder
