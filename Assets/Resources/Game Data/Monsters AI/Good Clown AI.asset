@@ -18,7 +18,7 @@ MonoBehaviour:
   _health: 100
   _spawnType: 0
   _maxCount: 1
-  _spawnChance: 100
+  _spawnChance: 10
   _spawnChanceMultiplierByGameTime:
     serializedVersion: 2
     m_Curve:

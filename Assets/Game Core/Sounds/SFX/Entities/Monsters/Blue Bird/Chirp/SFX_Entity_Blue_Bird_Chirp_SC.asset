@@ -254,7 +254,7 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      spatialSpreadExpand: 0
+      spatialSpreadExpand: 1
       spatialSpreadDegrees: 90
       spatialSpreadRatio: 0.25
       spatialSpreadDistanceRolloff: -4
