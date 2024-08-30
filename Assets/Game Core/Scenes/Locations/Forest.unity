@@ -187,21 +187,6 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 933628244
       objectReference: {fileID: 0}
-    - target: {fileID: 5001912646569138759, guid: be45d9156082bed4ebe64381a40387c4,
-        type: 3}
-      propertyPath: layerSettings.Array.data[0].modifierStack.Array.data[0]
-      value: 
-      objectReference: {fileID: 154566756}
-    - target: {fileID: 5001912646569138759, guid: be45d9156082bed4ebe64381a40387c4,
-        type: 3}
-      propertyPath: layerSettings.Array.data[1].modifierStack.Array.data[0]
-      value: 
-      objectReference: {fileID: 1275581184}
-    - target: {fileID: 5001912646569138759, guid: be45d9156082bed4ebe64381a40387c4,
-        type: 3}
-      propertyPath: layerSettings.Array.data[1].modifierStack.Array.data[1]
-      value: 
-      objectReference: {fileID: 1283248031}
     - target: {fileID: 5135733480357345431, guid: be45d9156082bed4ebe64381a40387c4,
         type: 3}
       propertyPath: m_Mesh
@@ -287,6 +272,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1905501566}
+    - target: {fileID: 7896295494709201374, guid: be45d9156082bed4ebe64381a40387c4,
+        type: 3}
+      propertyPath: m_DrawInstanced
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8038601223157069462, guid: be45d9156082bed4ebe64381a40387c4,
         type: 3}
       propertyPath: m_Mesh
@@ -304,26 +294,6 @@ PrefabInstance:
       objectReference: {fileID: 1163353667}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be45d9156082bed4ebe64381a40387c4, type: 3}
---- !u!114 &154566756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2562637f396e4c10acd3fa9926b53a12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enabled: 1
-  label: Slope
-  blendMode: 0
-  opacity: 100
-  passIndex: 1
-  minMax: {x: 10, y: 55}
-  minFalloff: 10
-  maxFalloff: 10
 --- !u!1001 &204541607
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2300,47 +2270,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!114 &1275581184
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e07d49e90874d70b9937cb753327a2d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enabled: 1
-  label: Noise
-  blendMode: 0
-  opacity: 100
-  passIndex: 4
-  noiseType: 0
-  noiseScale: 50
-  noiseOffset: {x: 0, y: 0}
-  levels: {x: 0, y: 0.49999982}
---- !u!114 &1283248031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2562637f396e4c10acd3fa9926b53a12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enabled: 1
-  label: Slope
-  blendMode: 0
-  opacity: 100
-  passIndex: 1
-  minMax: {x: 8, y: 55}
-  minFalloff: 10
-  maxFalloff: 10
 --- !u!1 &1328086010
 GameObject:
   m_ObjectHideFlags: 0

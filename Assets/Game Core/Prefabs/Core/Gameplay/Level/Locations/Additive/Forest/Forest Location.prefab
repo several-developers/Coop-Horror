@@ -149,8 +149,6 @@ GameObject:
   - component: {fileID: 4757783122314531752}
   - component: {fileID: 7896295494709201374}
   - component: {fileID: 8719479582456019360}
-  - component: {fileID: 5001912646569138759}
-  - component: {fileID: 8627788842629571987}
   m_Layer: 0
   m_Name: Terrain - Forest
   m_TagString: Untagged
@@ -218,55 +216,6 @@ TerrainCollider:
   m_Enabled: 1
   m_TerrainData: {fileID: 15600000, guid: 15f85608f346c264796f61dd1f8b63e8, type: 2}
   m_EnableTreeColliders: 1
---- !u!114 &5001912646569138759
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6404639111199193415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6af2d410bf489d842a543a60d605af5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  terrains:
-  - {fileID: 7896295494709201374}
-  splatmapResolution: 512
-  colorMapResolution: 512
-  layerSettings:
-  - enabled: 1
-    layer: {fileID: 8574412962073106934, guid: aa0921c959ea57c469a69199becc25fe, type: 2}
-    modifierStack:
-    - {fileID: 0}
-  - enabled: 1
-    layer: {fileID: 8574412962073106934, guid: aed7378bebcb2cf47baf1234c6d80143, type: 2}
-    modifierStack:
-    - {fileID: 0}
-    - {fileID: 0}
-  - enabled: 1
-    layer: {fileID: 8574412962073106934, guid: 125ce5c8840417b4ab3c43e1a2ed0042, type: 2}
-    modifierStack: []
-  autoRepaint: 1
-  terrainListeners:
-  - {fileID: 8627788842629571987}
-  bounds:
-    m_Center: {x: 6, y: 300, z: -2}
-    m_Extent: {x: 250, y: 300, z: 250}
-  filterShader: {fileID: 4800000, guid: 0f44df78e3d64d9cb2616cac3d84cb77, type: 3}
---- !u!114 &8627788842629571987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6404639111199193415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1db11228c23499742957c29c86d7afba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  terrain: {fileID: 7896295494709201374}
 --- !u!1 &6511489626669119333
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,22 +422,22 @@ PrefabInstance:
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.37
+      value: 10.97
       objectReference: {fileID: 0}
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.54
+      value: 0.497
       objectReference: {fileID: 0}
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 31.6
+      value: 32.6
       objectReference: {fileID: 0}
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.37169704
+      value: 0.40657628
       objectReference: {fileID: 0}
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}
@@ -498,7 +447,7 @@ PrefabInstance:
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.9283541
+      value: -0.91361684
       objectReference: {fileID: 0}
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}
@@ -513,7 +462,7 @@ PrefabInstance:
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -136.359
+      value: -132.02
       objectReference: {fileID: 0}
     - target: {fileID: 9196869240076005072, guid: b11f0eda7dcbb4347b1106c1c8e32b06,
         type: 3}

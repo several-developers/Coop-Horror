@@ -64,7 +64,16 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void UpdateLighting(float timeOfDay)
         {
-            return;
+            PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
+            
+            if (playerEntity == null)
+                return;
+
+            EntityLocation playerLocation = playerEntity.EntityLocation;
+
+            if (playerLocation is not (EntityLocation.Dungeon or EntityLocation.Stairs))
+                return;
+            
             RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
 
             if (_changeAmbientSkyColor)
