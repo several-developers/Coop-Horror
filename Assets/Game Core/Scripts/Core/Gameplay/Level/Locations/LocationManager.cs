@@ -1,4 +1,6 @@
-﻿using Cinemachine;
+﻿using System.Collections.Generic;
+using Cinemachine;
+using GameCore.Gameplay.Level.LocationsMechanics;
 using GameCore.Observers.Gameplay.Level;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -22,6 +24,9 @@ namespace GameCore.Gameplay.Level.Locations
         
         [SerializeField, Required]
         private CinemachinePath _exitPath;
+
+        [SerializeField, Required, Space(height: 5)]
+        private List<LocationMechanic> _locationMechanics;
 
         // FIELDS: --------------------------------------------------------------------------------
         
