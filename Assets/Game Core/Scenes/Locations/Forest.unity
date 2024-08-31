@@ -1994,6 +1994,7 @@ Transform:
   m_Children:
   - {fileID: 330585546}
   - {fileID: 410087041}
+  - {fileID: 746926669}
   - {fileID: 2007480838}
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -2010,6 +2011,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9594e08593509a74299e468a55c5f54b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &746926668
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 746926669}
+  - component: {fileID: 746926670}
+  m_Layer: 0
+  m_Name: Main Global Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &746926669
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746926668}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 672958529}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &746926670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 746926668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: a16baf3d54adfab41a88d4724fa121f5, type: 2}
 --- !u!1 &793111739
 GameObject:
   m_ObjectHideFlags: 0
@@ -2368,7 +2418,7 @@ PrefabInstance:
     - target: {fileID: 7468525056161317415, guid: 8d637b5671952804391343ad0fcebd84,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 53.07
+      value: 45.07
       objectReference: {fileID: 0}
     - target: {fileID: 7468525056161317415, guid: 8d637b5671952804391343ad0fcebd84,
         type: 3}
@@ -2864,7 +2914,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 672958529}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2007480839
 MonoBehaviour:
@@ -2879,7 +2929,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsGlobal: 1
-  priority: 0
+  priority: 1
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: c3e3feaf6cc11db4080fc3723e7f9833, type: 2}

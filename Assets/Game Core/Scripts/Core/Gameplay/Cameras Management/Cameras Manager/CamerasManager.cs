@@ -11,8 +11,7 @@ namespace GameCore.Gameplay.CamerasManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CamerasManager(ITrainEntity trainEntity, PlayerCamera playerCamera,
-            SpectatorCamera spectatorCamera)
+        public CamerasManager(ITrainEntity trainEntity, PlayerCamera playerCamera, SpectatorCamera spectatorCamera)
         {
             _trainEntity = trainEntity;
             _playerCamera = playerCamera;
