@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Level.LocationsMechanics
 {
-    public class ChestsSpawnPointsLocationMechanic : LocationMechanic
+    public class ChestsSpawnPointsStorage : LocationMechanic
     {
         // MEMBERS: -------------------------------------------------------------------------------
 

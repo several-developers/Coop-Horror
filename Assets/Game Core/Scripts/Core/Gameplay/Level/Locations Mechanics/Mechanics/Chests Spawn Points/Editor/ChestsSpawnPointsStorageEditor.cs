@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Level.LocationsMechanics
 {
-    [CustomEditor(typeof(ChestsSpawnPointsLocationMechanic))]
-    public class ChestsSpawnPointsLocationMechanicEditor : OdinEditor
+    [CustomEditor(typeof(ChestsSpawnPointsStorage))]
+    public class ChestsSpawnPointsStorageEditor : OdinEditor
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ChestsSpawnPointsLocationMechanic _chestsSpawnPointsLocationMechanic;
+        private ChestsSpawnPointsStorage _chestsSpawnPointsStorage;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -17,18 +17,18 @@ namespace GameCore.Gameplay.Level.LocationsMechanics
         {
             DrawDefaultInspector();
 
-            _chestsSpawnPointsLocationMechanic = target as ChestsSpawnPointsLocationMechanic;
+            _chestsSpawnPointsStorage = target as ChestsSpawnPointsStorage;
         }
 
         private void OnSceneGUI()
         {
-            _chestsSpawnPointsLocationMechanic = target as ChestsSpawnPointsLocationMechanic;
+            _chestsSpawnPointsStorage = target as ChestsSpawnPointsStorage;
 
-            if (_chestsSpawnPointsLocationMechanic == null)
+            if (_chestsSpawnPointsStorage == null)
                 return;
 
-            bool editLocationCenter = _chestsSpawnPointsLocationMechanic.EditLocationCenter;
-            bool editSpawnPointsCenter = _chestsSpawnPointsLocationMechanic.EditSpawnPointsCenter;
+            bool editLocationCenter = _chestsSpawnPointsStorage.EditLocationCenter;
+            bool editSpawnPointsCenter = _chestsSpawnPointsStorage.EditSpawnPointsCenter;
             bool isEditModeOn = editLocationCenter || editSpawnPointsCenter;
 
             if (!isEditModeOn)
@@ -45,7 +45,7 @@ namespace GameCore.Gameplay.Level.LocationsMechanics
             if (!editSpawnPointsCenter)
                 return;
 
-            int spawnPointsAmount = _chestsSpawnPointsLocationMechanic.GetSpawnPointsAmount();
+            int spawnPointsAmount = _chestsSpawnPointsStorage.GetSpawnPointsAmount();
 
             for (int i = 0; i < spawnPointsAmount; i++)
                 ShowSpawnPointHandle(i);
@@ -54,7 +54,7 @@ namespace GameCore.Gameplay.Level.LocationsMechanics
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         [DrawGizmo(GizmoType.Selected | GizmoType.InSelectionHierarchy)]
-        public static void RenderCustomGizmo(ChestsSpawnPointsLocationMechanic obj, GizmoType gizmo)
+        public static void RenderCustomGizmo(ChestsSpawnPointsStorage obj, GizmoType gizmo)
         {
             DrawSpawnZone(obj);
             DrawPossibleSpawnPoints(obj);
@@ -69,24 +69,24 @@ namespace GameCore.Gameplay.Level.LocationsMechanics
 
             EditorGUI.BeginChangeCheck();
 
-            Vector3 transformPosition = _chestsSpawnPointsLocationMechanic.transform.position;
-            Vector3 spawnPointPosition = _chestsSpawnPointsLocationMechanic.LocationCenter;
+            Vector3 transformPosition = _chestsSpawnPointsStorage.transform.position;
+            Vector3 spawnPointPosition = _chestsSpawnPointsStorage.LocationCenter;
             Vector3 pointPosition = spawnPointPosition + transformPosition;
             Vector3 newTargetPosition = Handles.PositionHandle(pointPosition, Quaternion.identity);
 
             if (!EditorGUI.EndChangeCheck())
                 return;
 
-            Undo.RecordObject(_chestsSpawnPointsLocationMechanic, name: "Move Location Center");
+            Undo.RecordObject(_chestsSpawnPointsStorage, name: "Move Location Center");
 
             Vector3 undoPosition = newTargetPosition - transformPosition;
-            _chestsSpawnPointsLocationMechanic.SetLocationCenter(undoPosition);
+            _chestsSpawnPointsStorage.SetLocationCenter(undoPosition);
         }
 
         private void ShowSpawnPointHandle(int index)
         {
             bool isSpawnPointExists =
-                _chestsSpawnPointsLocationMechanic.TryGetSpawnPointByIndex(index, out Vector3 spawnPointPosition);
+                _chestsSpawnPointsStorage.TryGetSpawnPointByIndex(index, out Vector3 spawnPointPosition);
 
             if (!isSpawnPointExists)
                 return;
@@ -95,28 +95,28 @@ namespace GameCore.Gameplay.Level.LocationsMechanics
 
             EditorGUI.BeginChangeCheck();
 
-            bool useTemporaryHeight = _chestsSpawnPointsLocationMechanic.UseTemporaryHeight;
+            bool useTemporaryHeight = _chestsSpawnPointsStorage.UseTemporaryHeight;
                 
             if (useTemporaryHeight)
-                spawnPointPosition.y = _chestsSpawnPointsLocationMechanic.TemporaryHeight;
+                spawnPointPosition.y = _chestsSpawnPointsStorage.TemporaryHeight;
 
-            Vector3 transformPosition = _chestsSpawnPointsLocationMechanic.transform.position;
+            Vector3 transformPosition = _chestsSpawnPointsStorage.transform.position;
             Vector3 pointPosition = spawnPointPosition + transformPosition;
             Vector3 newTargetPosition = Handles.PositionHandle(pointPosition, Quaternion.identity);
 
             if (useTemporaryHeight)
-                newTargetPosition.y = _chestsSpawnPointsLocationMechanic.LocationCenter.y;
+                newTargetPosition.y = _chestsSpawnPointsStorage.LocationCenter.y;
 
             if (!EditorGUI.EndChangeCheck())
                 return;
 
-            Undo.RecordObject(_chestsSpawnPointsLocationMechanic, name: "Move Location Chest Spawn Point");
+            Undo.RecordObject(_chestsSpawnPointsStorage, name: "Move Location Chest Spawn Point");
 
             Vector3 undoPosition = newTargetPosition - transformPosition;
-            _chestsSpawnPointsLocationMechanic.SetSpawnPoint(index, undoPosition);
+            _chestsSpawnPointsStorage.SetSpawnPoint(index, undoPosition);
         }
 
-        private static void DrawSpawnZone(ChestsSpawnPointsLocationMechanic obj)
+        private static void DrawSpawnZone(ChestsSpawnPointsStorage obj)
         {
             Color handlesColor = Handles.color;
             Handles.color = ColorsConstants.BaseObjectColor;
@@ -133,7 +133,7 @@ namespace GameCore.Gameplay.Level.LocationsMechanics
             Handles.color = handlesColor;
         }
 
-        private static void DrawPossibleSpawnPoints(ChestsSpawnPointsLocationMechanic obj)
+        private static void DrawPossibleSpawnPoints(ChestsSpawnPointsStorage obj)
         {
             bool drawPossiblePoints = obj.DrawPossiblePoints;
 
@@ -157,7 +157,7 @@ namespace GameCore.Gameplay.Level.LocationsMechanics
             }
         }
 
-        private static void DrawSpawnPoints(ChestsSpawnPointsLocationMechanic obj)
+        private static void DrawSpawnPoints(ChestsSpawnPointsStorage obj)
         {
             Color handlesColor = Handles.color;
             Handles.color = ColorsConstants.ZoneColor;

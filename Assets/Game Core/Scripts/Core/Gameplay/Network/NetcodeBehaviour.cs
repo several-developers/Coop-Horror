@@ -21,6 +21,25 @@ namespace GameCore.Gameplay.Network
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
+        protected void Start()
+        {
+            StartAll();
+            StartServerOnly();
+            StartClientOnly();
+        }
+
+        protected virtual void StartAll()
+        {
+        }
+        
+        protected virtual void StartServerOnly()
+        {
+        }
+
+        protected virtual void StartClientOnly()
+        {
+        }
+        
         protected virtual void Update()
         {
             if (!_isInitialized)

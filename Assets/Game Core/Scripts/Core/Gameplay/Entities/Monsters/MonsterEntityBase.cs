@@ -48,20 +48,6 @@ namespace GameCore.Gameplay.Entities.Monsters
             FindEntityLocation();
         }
 
-        protected void Start()
-        {
-            StartServerOnly();
-            StartClientOnly();
-        }
-
-        protected virtual void StartServerOnly()
-        {
-        }
-
-        protected virtual void StartClientOnly()
-        {
-        }
-
         public override void OnDestroy()
         {
             base.OnDestroy();

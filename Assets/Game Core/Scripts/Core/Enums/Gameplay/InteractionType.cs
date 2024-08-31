@@ -16,5 +16,6 @@
         MarketShop = 11,
         MobileHQSeat = 12,
         MetroDoor = 13,
+        OutdoorChest = 14
     }
 }
