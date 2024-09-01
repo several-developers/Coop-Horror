@@ -68,6 +68,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 34f0378d30e92f14397bba391555af3d,
         type: 2}
+    - target: {fileID: 3615795059259026717, guid: a6767bbb2f93b3a4d8c272d763eaa99c,
+        type: 3}
+      propertyPath: Generator.GenerateAsynchronously
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3615795059259026717, guid: a6767bbb2f93b3a4d8c272d763eaa99c,
+        type: 3}
+      propertyPath: Generator.MaxAsyncFrameMilliseconds
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 3615795059259026719, guid: a6767bbb2f93b3a4d8c272d763eaa99c,
         type: 3}
       propertyPath: m_Name

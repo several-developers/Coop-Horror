@@ -2900,11 +2900,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2195564044846364809, guid: 259f11aa5ba99bd4bbcca4bb448956fa,
-        type: 3}
-      propertyPath: Generator.GenerateAsynchronously
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2195564044846364811, guid: 259f11aa5ba99bd4bbcca4bb448956fa,
         type: 3}
       propertyPath: m_Name
@@ -3565,11 +3560,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2195564044846364809, guid: af7ceeab27128dc42884520f7d4a34fb,
-        type: 3}
-      propertyPath: Generator.GenerateAsynchronously
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2195564044846364811, guid: af7ceeab27128dc42884520f7d4a34fb,
         type: 3}
@@ -10977,11 +10967,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2195564044846364809, guid: faba3c9203568bb4c9a9a4830be82718,
-        type: 3}
-      propertyPath: Generator.GenerateAsynchronously
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2195564044846364811, guid: faba3c9203568bb4c9a9a4830be82718,
         type: 3}

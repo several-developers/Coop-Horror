@@ -163,8 +163,6 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
                     continue;
 
                 radius = chestsSpawnPointsStorage.SpawnPointRadius;
-                
-                Debug.DrawRay(spawnPoint, Vector3.down * 100, Color.red, 1000);
                 return true;
             }
 

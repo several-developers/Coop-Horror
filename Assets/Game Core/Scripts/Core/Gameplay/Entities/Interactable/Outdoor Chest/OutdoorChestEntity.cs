@@ -119,6 +119,8 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
                 Vector3 worldPosition = itemSpawnPoint.position;
                 _itemsFactory.CreateItem(itemID, worldPosition, out _);
             }
+            
+            _itemsList.Clear();
         }
 
         private Transform GetRandomItemSpawnPoint()

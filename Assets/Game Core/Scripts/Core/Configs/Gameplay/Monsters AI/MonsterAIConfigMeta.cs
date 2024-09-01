@@ -118,7 +118,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             return 1f;
         }
 
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void UpdateSpawnTimeText()
         {
