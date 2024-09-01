@@ -48,10 +48,26 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _itemsSpawnConfigs:
+  _spawnConfigsReferences:
   - _locationName: 10
     _config: {fileID: 11400000, guid: 79917301b0535864a92ce6ee9adf1522, type: 2}
   - _locationName: 11
     _config: {fileID: 11400000, guid: 79917301b0535864a92ce6ee9adf1522, type: 2}
   - _locationName: 12
     _config: {fileID: 11400000, guid: 79917301b0535864a92ce6ee9adf1522, type: 2}
+  _outdoorChestsItemsSpawnConfig:
+    _questsItemsSpawnChance: 30
+    _chestsAmountConfigs:
+    - _amount: 1
+      _chance: 35
+    - _amount: 2
+      _chance: 50
+    - _amount: 3
+      _chance: 15
+    _itemsAmountInChestConfigs:
+    - _amount: 1
+      _chance: 50
+    - _amount: 2
+      _chance: 35
+    - _amount: 3
+      _chance: 15

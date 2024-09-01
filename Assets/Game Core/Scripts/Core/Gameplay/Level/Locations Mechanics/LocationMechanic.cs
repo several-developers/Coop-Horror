@@ -2,7 +2,7 @@
 
 namespace GameCore.Gameplay.Level.LocationsMechanics
 {
-    public abstract class LocationMechanic : MonoBehaviour, ILocationMechanic
+    public abstract class LocationMechanic : MonoBehaviour
     {
         
     }

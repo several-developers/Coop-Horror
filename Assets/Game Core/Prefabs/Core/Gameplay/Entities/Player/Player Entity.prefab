@@ -2334,7 +2334,7 @@ MonoBehaviour:
     minMoveDistance: 0
     maxMovementIterations: 5
     maxDepenetrationIterations: 1
-    enablePhysicsInteraction: 0
+    enablePhysicsInteraction: 1
     allowPushCharacters: 0
     impartPlatformMovement: 0
     impartPlatformRotation: 0
@@ -2388,7 +2388,7 @@ MonoBehaviour:
   _impartPlatformMovement: 0
   _impartPlatformRotation: 0
   _impartPlatformVelocity: 0
-  _enablePhysicsInteraction: 0
+  _enablePhysicsInteraction: 1
   _applyPushForceToCharacters: 0
   _applyStandingDownwardForce: 0
   _mass: 1

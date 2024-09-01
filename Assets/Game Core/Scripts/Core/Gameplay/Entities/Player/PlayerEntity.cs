@@ -235,8 +235,6 @@ namespace GameCore.Gameplay.Entities.Player
             return alivePlayersAmount;
         }
 
-        public MonoBehaviour GetMonoBehaviour() => this;
-
         public PlayerInventory GetInventory() => _inventory;
 
         public float GetSanity() =>

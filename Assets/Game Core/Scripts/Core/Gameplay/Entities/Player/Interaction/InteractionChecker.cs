@@ -19,7 +19,8 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
             _interactionMaxDistance = interactionMaxDistance;
             _interactionLm = interactionLM;
             _interactionObstaclesLM = interactionObstaclesLM;
-            _hits = new RaycastHit[24];
+            _interactableHits = new RaycastHit[12];
+            _obstaclesHits = new RaycastHit[24];
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -30,7 +31,8 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private readonly float _interactionMaxDistance;
         private readonly LayerMask _interactionLm;
         private readonly LayerMask _interactionObstaclesLM;
-        private readonly RaycastHit[] _hits;
+        private readonly RaycastHit[] _interactableHits;
+        private readonly RaycastHit[] _obstaclesHits;
 
         private IInteractable _lastInteractable;
         private int _lastInteractableItemIndex;
@@ -73,7 +75,7 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         {
             if (_isInteractionFound && interactable == _lastInteractable)
                 return;
-            
+
             _lastInteractable = interactable;
             _isInteractionFound = true;
 
@@ -89,14 +91,40 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private bool IsInteractableObjectFound()
         {
             Ray ray = GetRay();
-            
-            bool isInteractableObjectFound =
-                Physics.Raycast(ray, out RaycastHit hitInfo, _interactionMaxDistance, _interactionLm);
+            int hits = Physics.RaycastNonAlloc(ray, _interactableHits, _interactionMaxDistance, _interactionLm);
 
-            if (!isInteractableObjectFound)
+            if (hits == 0)
                 return false;
-            
-            bool isInteractableComponentExists = hitInfo.transform.TryGetComponent(out IInteractable _);
+
+            Vector3 playerPosition = _playerTransform.position;
+            float closestDistance = float.MaxValue;
+            int closestInteractableIndex = 0;
+            bool isInteractableComponentExists;
+
+            for (int i = 0; i < hits; i++)
+            {
+                Transform interactableTransform = _interactableHits[i].transform;
+                isInteractableComponentExists = interactableTransform.TryGetComponent(out IInteractable interactable);
+
+                if (!isInteractableComponentExists)
+                {
+                    Log.PrintError(log: $"Object <gb>{_interactableHits[i].transform.name}</gb> " +
+                                        $"<rb>missing interactable component</rb>!");
+                    continue;
+                }
+
+                Vector3 interactablePosition = interactableTransform.position;
+                float distance = Vector3.Distance(playerPosition, interactablePosition);
+
+                if (distance >= closestDistance)
+                    continue;
+
+                closestInteractableIndex = i;
+                closestDistance = distance;
+            }
+
+            Transform closestInteractable = _interactableHits[closestInteractableIndex].transform;
+            isInteractableComponentExists = closestInteractable.TryGetComponent(out IInteractable _);
 
             if (!isInteractableComponentExists)
                 return false;
@@ -107,7 +135,8 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
         private bool IsObstaclesFound(out IInteractable interactable)
         {
             Ray ray = GetRay();
-            int hitsAmount = Physics.RaycastNonAlloc(ray, _hits, _interactionMaxDistance, _interactionObstaclesLM);
+            int hitsAmount =
+                Physics.RaycastNonAlloc(ray, _obstaclesHits, _interactionMaxDistance, _interactionObstaclesLM);
             interactable = null;
 
             if (hitsAmount == 0)
@@ -118,24 +147,24 @@ namespace GameCore.Gameplay.Entities.Player.Interaction
 
             for (int i = 0; i < hitsAmount; i++)
             {
-                RaycastHit hitInfo = _hits[i];
+                RaycastHit hitInfo = _obstaclesHits[i];
                 float distance = Vector3.Distance(_playerTransform.position, hitInfo.point);
                 //Debug.Log($"Hit: '{hitInfo.transform.name}',  Distance: '{distance:F2}'");
-                
+
                 if (distance >= minDistance)
                     continue;
 
                 minDistance = distance;
                 closestObjectIndex = i;
             }
-            
-            RaycastHit closestObjectHitInfo = _hits[closestObjectIndex];
+
+            RaycastHit closestObjectHitInfo = _obstaclesHits[closestObjectIndex];
             int objectLayer = closestObjectHitInfo.transform.gameObject.layer;
             bool isObstacle = !_interactionLm.Contains(objectLayer);
 
             if (!isObstacle)
                 interactable = closestObjectHitInfo.transform.GetComponent<IInteractable>();
-            
+
             return isObstacle;
         }
 

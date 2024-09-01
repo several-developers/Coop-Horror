@@ -18,13 +18,15 @@ namespace GameCore.Gameplay.VisualManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameManagerDecorator gameManagerDecorator, PlayerCamera playerCamera,
-            IGameplayConfigsProvider gameplayConfigsProvider)
+        private void Construct(
+            IGameManagerDecorator gameManagerDecorator,
+            PlayerCamera playerCamera,
+            IGameplayConfigsProvider gameplayConfigsProvider
+        )
         {
+            _gameplayConfigsProvider = gameplayConfigsProvider;
             _gameManagerDecorator = gameManagerDecorator;
             _playerCamera = playerCamera;
-
-            SetupPresetsDictionary(gameplayConfigsProvider);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -42,6 +44,8 @@ namespace GameCore.Gameplay.VisualManagement
 
         private IGameManagerDecorator _gameManagerDecorator;
         private PlayerCamera _playerCamera;
+        private IGameplayConfigsProvider _gameplayConfigsProvider;
+
         private Tweener _volumeTN;
         private Tweener _nativeFogTN;
         private Tweener _cameraTN;
@@ -49,8 +53,12 @@ namespace GameCore.Gameplay.VisualManagement
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
+        private void Awake()
+        {
+            SetupPresetsDictionary();
+
             _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+        }
 
 #warning ВЫНЕСТИ В GAME STATES HANDLER
         private void Start()
@@ -95,9 +103,9 @@ namespace GameCore.Gameplay.VisualManagement
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SetupPresetsDictionary(IGameplayConfigsProvider gameplayConfigsProvider)
+        private void SetupPresetsDictionary()
         {
-            VisualConfigMeta visualConfig = gameplayConfigsProvider.GetVisualConfig();
+            VisualConfigMeta visualConfig = _gameplayConfigsProvider.GetVisualConfig();
             IEnumerable<VisualPresetConfig> allPresetsConfigs = visualConfig.GetAllPresetsConfigs();
 
             foreach (VisualPresetConfig presetConfig in allPresetsConfigs)
@@ -118,7 +126,6 @@ namespace GameCore.Gameplay.VisualManagement
 #warning СЛОМАНО, СРОЧНО ЧИНИТЬ
         private void HandleGameState(GameState gameState)
         {
-            
             // switch (gameState)
             // {
             //     case GameState.ArrivedAtTheRoad:

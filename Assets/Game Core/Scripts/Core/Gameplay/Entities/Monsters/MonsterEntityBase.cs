@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Entities.Monsters
 {
-    public abstract class MonsterEntityBase : NetcodeBehaviour, ITeleportableEntity
+    public abstract class MonsterEntityBase : Entity, ITeleportableEntity
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -93,10 +93,6 @@ namespace GameCore.Gameplay.Entities.Monsters
             AllMonsters.Clear();
         
         public static IReadOnlyList<MonsterEntityBase> GetAllMonsters() => AllMonsters;
-
-        public MonoBehaviour GetMonoBehaviour() => this;
-
-        public Transform GetTransform() => transform;
 
         public abstract MonsterType GetMonsterType();
 

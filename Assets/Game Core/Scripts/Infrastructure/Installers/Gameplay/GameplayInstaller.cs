@@ -4,7 +4,8 @@ using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
-using GameCore.Gameplay.Items.SpawnSystem;
+using GameCore.Gameplay.Items.Generators.Dungeon;
+using GameCore.Gameplay.Items.Generators.OutdoorChest;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.MonstersGeneration;
@@ -50,7 +51,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindSpectatorCamera();
             BindCamerasManager();
             BindGameResetManager();
-            BindItemsSpawnSystem();
+            BindDungeonItemsGenerator();
+            BindOutdoorChestItemsGenerator();
             BindGameEventsHandler();
             BindRoundManager();
             BindMonstersGenerator();
@@ -150,10 +152,19 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle();
         }
 
-        private void BindItemsSpawnSystem()
+        private void BindDungeonItemsGenerator()
         {
             Container
-                .BindInterfacesTo<ItemsSpawnSystem>()
+                .BindInterfacesAndSelfTo<DungeonItemsGenerator>()
+                .AsSingle()
+                .NonLazy();
+            
+        }
+        
+        private void BindOutdoorChestItemsGenerator()
+        {
+            Container
+                .BindInterfacesAndSelfTo<OutdoorChestItemsGenerator>()
                 .AsSingle()
                 .NonLazy();
         }

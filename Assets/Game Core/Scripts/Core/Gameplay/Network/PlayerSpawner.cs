@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.Session_Manager;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -23,23 +23,24 @@ namespace GameCore.Gameplay.Network
 
         [Inject]
         private void Construct(
+            IEntitiesFactory entitiesFactory,
             ITrainEntity trainEntity,
-            ICamerasManager camerasManager,
-            IGameplayConfigsProvider gameplayConfigsProvider
+            ICamerasManager camerasManager
         )
         {
+            _entitiesFactory = entitiesFactory;
             _trainEntity = trainEntity;
             _camerasManager = camerasManager;
-            _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private const bool SpawnAsChild = true;
 
+        private IEntitiesFactory _entitiesFactory;
         private ITrainEntity _trainEntity;
         private ICamerasManager _camerasManager;
-        private PlayerConfigMeta _playerConfig;
+
         private NetworkManager _networkManager;
         private bool _initialSpawnDone;
 
@@ -62,21 +63,21 @@ namespace GameCore.Gameplay.Network
         {
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
 
-            Vector3 spawnPosition = GetSpawnPosition();
-            spawnPosition = Vector3.zero; // TEMP ?
+            // Vector3 spawnPosition = GetSpawnPosition();
+            Vector3 spawnPosition = Vector3.zero; // TEMP ?
 
-            PlayerEntity playerEntityPrefab = _playerConfig.PlayerPrefab;
-            NetworkObject playerNetworkObjectPrefab = playerEntityPrefab.GetComponent<NetworkObject>();
+            bool isEntityCreated =
+                _entitiesFactory.TryCreateEntity<PlayerEntity>(spawnPosition, clientID, out Entity entity);
 
-            //PlayerEntity playerInstance = Instantiate(_playerConfig.PlayerPrefab, spawnPosition, Quaternion.identity);
-            NetworkObject playerNetworkObjectInstance = _networkManager.SpawnManager
-                .InstantiateAndSpawn(playerNetworkObjectPrefab, clientID, position: spawnPosition);
-
-            bool isPlayerEntityFound = playerNetworkObjectInstance.TryGetComponent(out PlayerEntity playerInstance);
-
-            if (!isPlayerEntityFound)
+            if (!isEntityCreated)
             {
-                Log.PrintError(log: $"<gb>Player Entity</gb> <rb>not found</rb>!");
+                Log.PrintError(log: "<gb>Player creation</gb> has <rb>failed</gb>!");
+                return;
+            }
+
+            if (entity is not PlayerEntity playerEntity)
+            {
+                Log.PrintError(log: "<gb>Player Entity</gb> <rb>not found</rb>!");
                 return;
             }
 
@@ -95,14 +96,14 @@ namespace GameCore.Gameplay.Network
                 {
                     Vector3 position = sessionPlayerData.Value.PlayerPosition;
                     Quaternion rotation = sessionPlayerData.Value.PlayerRotation;
-                    playerInstance.transform.SetPositionAndRotation(position, rotation);
+                    playerEntity.transform.SetPositionAndRotation(position, rotation);
                 }
             }
 
             if (SpawnAsChild)
             {
                 NetworkObject parent = _trainEntity.GetNetworkObject();
-                playerInstance.NetworkObject.TrySetParent(parent, worldPositionStays: false);
+                playerEntity.NetworkObject.TrySetParent(parent, worldPositionStays: false);
             }
 
             // Spawn players characters with 'destroyWithScene = true'.

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Level.LocationsMechanics
 {
@@ -122,6 +123,22 @@ namespace GameCore.Gameplay.Level.LocationsMechanics
                 return false;
 
             spawnPoint = _spawnPoints[index];
+            return true;
+        }
+
+        public bool TryGetRandomSpawnPoint(out Vector3 spawnPointWorldPosition)
+        {
+            spawnPointWorldPosition = Vector3.zero;
+
+            int spawnPointAmount = _spawnPoints.Count;
+
+            if (spawnPointAmount == 0)
+                return false;
+
+            int randomIndex = Random.Range(0, spawnPointAmount);
+            Vector3 spawnPointLocalPosition = _spawnPoints[randomIndex];
+            spawnPointWorldPosition = transform.TransformPoint(spawnPointLocalPosition);
+            
             return true;
         }
 

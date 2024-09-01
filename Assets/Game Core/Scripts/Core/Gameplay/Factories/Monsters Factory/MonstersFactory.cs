@@ -6,29 +6,32 @@ using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Unity.Netcode;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.Factories.Monsters
 {
-    public class MonstersFactory : IMonstersFactory
+    public class MonstersFactory : IMonstersFactory, IInitializable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public MonstersFactory(IGameplayConfigsProvider gameplayConfigsProvider)
         {
+            _gameplayConfigsProvider = gameplayConfigsProvider;
             _networkManager = NetworkManager.Singleton;
             _monstersPrefabs = new Dictionary<MonsterType, MonsterEntityBase>();
             _serverID = NetworkHorror.ServerID;
-
-            SetupMonstersPrefabsDictionary(gameplayConfigsProvider);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private readonly IGameplayConfigsProvider _gameplayConfigsProvider;
         private readonly NetworkManager _networkManager;
         private readonly Dictionary<MonsterType, MonsterEntityBase> _monstersPrefabs;
         private readonly ulong _serverID;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void Initialize() => SetupMonstersPrefabsDictionary();
 
         public bool SpawnMonster(
             MonsterType monsterType,
@@ -55,9 +58,9 @@ namespace GameCore.Gameplay.Factories.Monsters
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
-        private void SetupMonstersPrefabsDictionary(IGameplayConfigsProvider gameplayConfigsProvider)
+        private void SetupMonstersPrefabsDictionary()
         {
-            MonstersListConfigMeta monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
+            MonstersListConfigMeta monstersListConfig = _gameplayConfigsProvider.GetMonstersListConfig();
             IReadOnlyList<MonsterReference> allReferences = monstersListConfig.GetAllReferences();
 
             foreach (MonsterReference monsterReference in allReferences)

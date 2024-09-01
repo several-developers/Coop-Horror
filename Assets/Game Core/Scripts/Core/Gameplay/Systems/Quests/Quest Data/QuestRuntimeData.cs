@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using GameCore.Enums.Gameplay;
 using UnityEngine;
 
@@ -87,6 +88,9 @@ namespace GameCore.Gameplay.Systems.Quests
         }
         
         public IReadOnlyDictionary<int, QuestItemData> GetQuestItems() => _questItems;
+
+        public IEnumerable<int> GetQuestsItemsID() =>
+            _questItems.Keys.ToList();
 
         public float GetQuestProgress()
         {

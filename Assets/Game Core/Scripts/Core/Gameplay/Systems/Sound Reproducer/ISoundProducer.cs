@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Network;
 using Unity.Netcode;
@@ -19,7 +20,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
         Transform GetTransform();
     }
     
-    public class SoundProducerEntity<TSFXType> : NetcodeBehaviour, ISoundProducer<TSFXType> where TSFXType : Enum
+    public class SoundProducerEntity<TSFXType> : Entity, ISoundProducer<TSFXType> where TSFXType : Enum
     {
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -45,8 +46,6 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
             StopSoundLocal(sfxType);
             StopSoundServerRPC(sfxType);
         }
-
-        public Transform GetTransform() => transform;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

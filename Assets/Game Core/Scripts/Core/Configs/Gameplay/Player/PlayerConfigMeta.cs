@@ -1,5 +1,4 @@
 ﻿using CustomEditors;
-using GameCore.Gameplay.Entities.Player;
 using Sirenix.OdinInspector;
 using Sonity;
 using UnityEngine;
@@ -26,10 +25,6 @@ namespace GameCore.Configs.Gameplay.Player
         [SerializeField, Min(0f)]
         private float _sittingRadius = 0.25f;
         
-        [Title(Constants.References)]
-        [SerializeField, Required]
-        private PlayerEntity _playerPrefab; // TEMP
-
         [Title(SFXTitle)]
         [SerializeField, Required]
         private SoundEvent _footstepsSE;
@@ -52,7 +47,6 @@ namespace GameCore.Configs.Gameplay.Player
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float Health => _health;
-        public PlayerEntity PlayerPrefab => _playerPrefab;
         
         // SFX
         public SoundEvent FootstepsSE => _footstepsSE;

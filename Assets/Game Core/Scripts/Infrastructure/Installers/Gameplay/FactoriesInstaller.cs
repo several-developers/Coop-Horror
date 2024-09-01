@@ -1,7 +1,7 @@
-﻿using GameCore.Gameplay.Factories.Items;
+﻿using GameCore.Gameplay.Factories.Entities;
+using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.Factories.Monsters;
-using GameCore.Gameplay.Factories.Player;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -12,7 +12,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         public override void InstallBindings()
         {
-            BindPlayerFactory();
+            BindEntitiesFactory();
             BindItemsPreviewFactory();
             BindItemsFactory();
             BindMonstersFactory();
@@ -20,10 +20,10 @@ namespace GameCore.Infrastructure.Installers.Gameplay
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void BindPlayerFactory()
+        private void BindEntitiesFactory()
         {
             Container
-                .BindInterfacesTo<PlayerFactory>()
+                .BindInterfacesTo<EntitiesFactory>()
                 .AsSingle();
         }
 

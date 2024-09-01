@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using GameCore.Configs.Gameplay.EntitiesList;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.MonstersList;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
@@ -17,6 +19,7 @@ namespace GameCore.Gameplay.Network.Utilities
         [Inject]
         private void Construct(DiContainer diContainer, IGameplayConfigsProvider gameplayConfigsProvider)
         {
+            _entitiesListConfig = gameplayConfigsProvider.GetEntitiesListConfig();
             _itemsListConfig = gameplayConfigsProvider.GetItemsListConfig();
             _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
             
@@ -33,7 +36,8 @@ namespace GameCore.Gameplay.Network.Utilities
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly List<GameObject> _prefabsToRegister = new();
-        
+
+        private EntitiesListConfigMeta _entitiesListConfig;
         private ItemsListConfigMeta _itemsListConfig;
         private MonstersListConfigMeta _monstersListConfig;
 
@@ -51,6 +55,7 @@ namespace GameCore.Gameplay.Network.Utilities
                 return;
 
             AddLocalListPrefabs();
+            AddEntitiesPrefabs();
             AddItemsPrefabs();
             AddMonstersPrefabs();
 
@@ -74,6 +79,14 @@ namespace GameCore.Gameplay.Network.Utilities
         private void AddLocalListPrefabs() =>
             _prefabsToRegister.AddRange(_prefabs);
 
+        private void AddEntitiesPrefabs()
+        {
+            IEnumerable<Entity> allEntities = _entitiesListConfig.GetAllEntities();
+
+            foreach (Entity entity in allEntities)
+                _prefabsToRegister.Add(entity.gameObject);
+        }
+
         private void AddItemsPrefabs()
         {
             IEnumerable<ItemMeta> allItems = _itemsListConfig.GetAllItems();
@@ -84,7 +97,7 @@ namespace GameCore.Gameplay.Network.Utilities
                 _prefabsToRegister.Add(prefab);
             }
         }
-        
+
         private void AddMonstersPrefabs()
         {
             IReadOnlyList<MonsterReference> allItems = _monstersListConfig.GetAllReferences();

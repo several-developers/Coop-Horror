@@ -45,7 +45,9 @@ namespace GameCore.Gameplay.Level.Locations
         private void OnDestroy() => SendLocationUnloaded();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
+        public IEnumerable<LocationMechanic> GetAllLocationMechanics() => _locationMechanics;
+
         public static LocationManager Get() => _instance;
 
         public CinemachinePath GetEnterPath() => _enterPath;

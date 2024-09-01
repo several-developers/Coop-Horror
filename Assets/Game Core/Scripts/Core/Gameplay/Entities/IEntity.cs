@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 namespace GameCore.Gameplay.Entities
 {
@@ -6,5 +7,6 @@ namespace GameCore.Gameplay.Entities
     {
         MonoBehaviour GetMonoBehaviour();
         Transform GetTransform();
+        NetworkObject GetNetworkObject();
     }
 }

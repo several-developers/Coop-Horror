@@ -1,5 +1,6 @@
 ﻿using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Elevator;
+using GameCore.Configs.Gameplay.EntitiesList;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Configs.Gameplay.LocationsList;
@@ -39,6 +40,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _itemsSpawnConfig = Load<ItemsSpawnConfigMeta>(path: ConfigsPaths.ItemsSpawnConfig);
             _monstersListConfig = Load<MonstersListConfigMeta>(path: ConfigsPaths.MonstersListConfig);
             _monstersGeneratorConfig = Load<MonstersGeneratorConfigMeta>(path: ConfigsPaths.MonstersGeneratorConfig);
+            _entitiesListConfig = Load<EntitiesListConfigMeta>(path: ConfigsPaths.EntitiesListConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -58,6 +60,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly ItemsSpawnConfigMeta _itemsSpawnConfig;
         private readonly MonstersListConfigMeta _monstersListConfig;
         private readonly MonstersGeneratorConfigMeta _monstersGeneratorConfig;
+        private readonly EntitiesListConfigMeta _entitiesListConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -76,5 +79,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public ItemsSpawnConfigMeta GetItemsSpawnConfig() => _itemsSpawnConfig;
         public MonstersListConfigMeta GetMonstersListConfig() => _monstersListConfig;
         public MonstersGeneratorConfigMeta GetMonstersGeneratorConfig() => _monstersGeneratorConfig;
+        public EntitiesListConfigMeta GetEntitiesListConfig() => _entitiesListConfig;
     }
 }
