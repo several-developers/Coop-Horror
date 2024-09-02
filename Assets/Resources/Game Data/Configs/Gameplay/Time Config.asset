@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Time Config
   m_EditorClassIdentifier: 
   _metaName: Time Config
-  _cycleDurationInMinutes: 10
+  _cycleDurationInMinutes: 4
   _cycleLengthModifier: 1
   _second: 0
   _minute: 0
   _hour: 0
   _simulate: 1
-  _stopAtNight: 1
+  _stopAtNight: 0
   _sunIntensityCurve:
     serializedVersion: 2
     m_Curve:
@@ -149,4 +149,40 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
-  _ambientColor: {r: 0, g: 0, b: 0, a: 1}
+  _lightIntensityCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.044443518
+      value: 0.7987883
+      inSlope: 0.6490434
+      outSlope: 0.6490434
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.05777665
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _maxSunIntensity: 1.5
+  _maxMoonIntensity: 0.5
+  _dayAmbientLight: {r: 0, g: 0, b: 0, a: 0}
+  _nightAmbientLight: {r: 0, g: 0, b: 0, a: 0}

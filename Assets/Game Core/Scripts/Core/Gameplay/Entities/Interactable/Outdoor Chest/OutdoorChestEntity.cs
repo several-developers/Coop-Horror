@@ -121,6 +121,7 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
             }
             
             _itemsList.Clear();
+            _itemsList = null;
         }
 
         private Transform GetRandomItemSpawnPoint()

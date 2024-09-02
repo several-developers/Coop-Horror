@@ -1,5 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameTimeManagement;
+using GameCore.Observers.Gameplay.Time;
 using GameCore.Observers.Gameplay.UI;
 using GameCore.UI.Global;
 using Sirenix.OdinInspector;
@@ -14,9 +15,9 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ITimeCycle timeCycle, IUIObserver uiObserver)
+        private void Construct(ITimeObserver timeObserver, IUIObserver uiObserver)
         {
-            _timeCycle = timeCycle;
+            _timeObserver = timeObserver;
             _uiObserver = uiObserver;
         }
 
@@ -28,7 +29,7 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ITimeCycle _timeCycle;
+        private ITimeObserver _timeObserver;
         private IUIObserver _uiObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -37,7 +38,7 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         {
             base.Awake();
             
-            _timeCycle.OnMinutePassedEvent += OnMinutePassed;
+            _timeObserver.OnMinutePassedEvent += OnMinutePassed;
 
             _uiObserver.OnTriggerUIEvent += OnTriggerUIEvent;
         }
@@ -48,7 +49,7 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
         {
             base.OnDestroy();
             
-            _timeCycle.OnMinutePassedEvent -= OnMinutePassed;
+            _timeObserver.OnMinutePassedEvent -= OnMinutePassed;
             
             _uiObserver.OnTriggerUIEvent -= OnTriggerUIEvent;
         }
@@ -57,7 +58,7 @@ namespace GameCore.UI.Gameplay.HUD.GameTimer
 
         private void UpdateTime()
         {
-            MyDateTime dateTime = _timeCycle.GetDateTime();
+            MyDateTime dateTime = _timeObserver.GetDateTime();
             UpdateTime(dateTime.Minute, dateTime.Hour, dateTime.Day);
         }
 

@@ -6,17 +6,16 @@ using GameCore.Configs.Gameplay.MonstersGenerator;
 using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters;
-using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Systems.Spawners;
 using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.RoundManagement;
+using GameCore.Gameplay.Systems.Spawners;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Observers.Gameplay.Time;
 using GameCore.Utilities;
 using UnityEngine;
 using Zenject;
@@ -32,7 +31,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             IGameManagerDecorator gameManagerDecorator,
             IMonstersFactory monstersFactory,
             IRoundManager roundManager,
-            ITimeCycle timeCycle,
+            ITimeObserver timeObserver,
             ILocationsMetaProvider locationsMetaProvider,
             IMonstersAIConfigsProvider monstersAIConfigsProvider,
             IGameplayConfigsProvider gameplayConfigsProvider
@@ -46,7 +45,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             _gameManagerDecorator = gameManagerDecorator;
             _monstersFactory = monstersFactory;
             _roundManager = roundManager;
-            _timeCycle = timeCycle;
+            _timeObserver = timeObserver;
             _locationsMetaProvider = locationsMetaProvider;
             _monstersAIConfigsProvider = monstersAIConfigsProvider;
             _monstersGeneratorConfig = gameplayConfigsProvider.GetMonstersGeneratorConfig();
@@ -65,7 +64,7 @@ namespace GameCore.Gameplay.MonstersGeneration
 
             DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent += OnRegisterMonstersSpawner;
 
-            _timeCycle.OnHourPassedEvent += OnHourPassed;
+            _timeObserver.OnHourPassedEvent += OnHourPassed;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -73,7 +72,7 @@ namespace GameCore.Gameplay.MonstersGeneration
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly IMonstersFactory _monstersFactory;
         private readonly IRoundManager _roundManager;
-        private readonly ITimeCycle _timeCycle;
+        private readonly ITimeObserver _timeObserver;
         private readonly ILocationsMetaProvider _locationsMetaProvider;
         private readonly IMonstersAIConfigsProvider _monstersAIConfigsProvider;
         private readonly MonstersGeneratorConfigMeta _monstersGeneratorConfig;
@@ -104,7 +103,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             
             DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent -= OnRegisterMonstersSpawner;
             
-            _timeCycle.OnHourPassedEvent -= OnHourPassed;
+            _timeObserver.OnHourPassedEvent -= OnHourPassed;
         }
 
         public void Start() =>
@@ -187,7 +186,7 @@ namespace GameCore.Gameplay.MonstersGeneration
                     continue;
                 }
 
-                int currentTimeInMinutes = _timeCycle.GetCurrentTimeInMinutes();
+                int currentTimeInMinutes = _timeObserver.GetCurrentTimeInMinutes();
                 Vector2Int spawnTime = monsterAIConfig.SpawnTime;
                 bool isTimeValid = currentTimeInMinutes >= spawnTime.x && currentTimeInMinutes <= spawnTime.y;
 
@@ -228,7 +227,7 @@ namespace GameCore.Gameplay.MonstersGeneration
                 AnimationCurve multiplierByMonstersCount = monsterAIConfig.SpawnChanceMultiplierByMonstersCount;
 
                 const int minutesInDay = Constants.MinutesInDay;
-                int currentTimeInMinutes = _timeCycle.GetCurrentTimeInMinutes();
+                int currentTimeInMinutes = _timeObserver.GetCurrentTimeInMinutes();
                 float currentTimeNormalized = Mathf.Clamp01(currentTimeInMinutes / (float)minutesInDay);
                 float gameTimeMultiplier = multiplierByGameTime.Evaluate(currentTimeNormalized);
 
@@ -440,7 +439,7 @@ namespace GameCore.Gameplay.MonstersGeneration
 
         private float GetMonsterSpawnDelay()
         {
-            float hourDurationInSeconds = _timeCycle.GetHourDurationInSeconds();
+            float hourDurationInSeconds = _timeObserver.GetHourDurationInSeconds();
             float spawnDelay = Random.Range(0f, hourDurationInSeconds);
             return spawnDelay;
         }

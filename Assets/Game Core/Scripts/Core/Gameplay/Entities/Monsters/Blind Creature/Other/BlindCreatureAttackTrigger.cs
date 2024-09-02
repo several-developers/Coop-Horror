@@ -14,12 +14,23 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
         private void OnTriggerEnter(Collider other)
         {
-            bool isServer = IsServerEvent.Invoke();
-
-            if (!isServer)
+            if (!IsServer())
                 return;
             
             OnTriggerEnterEvent.Invoke(other);
         }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (!IsServer())
+                return;
+            
+            OnTriggerEnterEvent.Invoke(other);
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private bool IsServer() =>
+            IsServerEvent.Invoke();
     }
 }

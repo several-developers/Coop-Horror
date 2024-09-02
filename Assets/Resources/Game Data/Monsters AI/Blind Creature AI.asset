@@ -17,7 +17,7 @@ MonoBehaviour:
   _isDamageable: 1
   _health: 100
   _spawnType: 0
-  _maxCount: 3
+  _maxCount: 20
   _spawnChance: 50
   _spawnChanceMultiplierByGameTime:
     serializedVersion: 2
@@ -79,7 +79,7 @@ MonoBehaviour:
     _suspicionMeterAfterInstantAggro: 11
     _suspicionMeterDecreaseTime: 3
   _suspicionStateConfig:
-    _suspicionMoveSpeed: 14
+    _suspicionMoveSpeed: 12
     _suspicionAcceleration: 20
     _whispersDelay: {x: 3.5, y: 8}
   _wanderingConfig:

@@ -20,6 +20,7 @@ namespace GameCore
         public static readonly int Close = Animator.StringToHash(name: "Close");
         public static readonly int Trigger = Animator.StringToHash(name: "Trigger");
         public static readonly int Aggressiveness = Animator.StringToHash(name: "Aggressiveness");
+        public static readonly int Suspicion = Animator.StringToHash(name: "Suspicion");
         public static readonly int IdleType = Animator.StringToHash(name: "IdleType");
         public static readonly int RunningType = Animator.StringToHash(name: "RunningType");
         public static readonly int MoveSpeedMultiplier = Animator.StringToHash(name: "MoveSpeedMultiplier");

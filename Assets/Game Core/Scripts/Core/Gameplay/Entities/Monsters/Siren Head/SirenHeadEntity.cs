@@ -2,10 +2,10 @@
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.SirenHead.States;
-using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Observers.Gameplay.Time;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -26,9 +26,9 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ITimeCycle timeCycle, IMonstersAIConfigsProvider monstersAIConfigsProvider)
+        private void Construct(ITimeObserver timeObserver, IMonstersAIConfigsProvider monstersAIConfigsProvider)
         {
-            _timeCycle = timeCycle;
+            _timeObserver = timeObserver;
             _sirenHeadAIConfig = monstersAIConfigsProvider.GetSirenHeadAIConfig();
         }
 
@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ITimeCycle _timeCycle;
+        private ITimeObserver _timeObserver;
         private SirenHeadAIConfigMeta _sirenHeadAIConfig;
         
         private StateMachine _sirenHeadStateMachine;
@@ -138,7 +138,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
             void SetupStates()
             {
                 IdleState idleState = new(sirenHeadEntity: this);
-                MoveState moveState = new(sirenHeadEntity: this, _timeCycle);
+                MoveState moveState = new(sirenHeadEntity: this, _timeObserver);
 
                 _sirenHeadStateMachine.AddState(idleState);
                 _sirenHeadStateMachine.AddState(moveState);
@@ -153,7 +153,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
             _sirenHeadStateMachine.ChangeState<TState>();
 
         private int GetCurrentTimeInMinutes() =>
-            _timeCycle.GetCurrentTimeInMinutes();
+            _timeObserver.GetCurrentTimeInMinutes();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

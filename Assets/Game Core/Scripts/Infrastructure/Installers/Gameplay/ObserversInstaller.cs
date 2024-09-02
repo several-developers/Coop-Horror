@@ -3,6 +3,7 @@ using GameCore.Observers.Gameplay.Game;
 using GameCore.Observers.Gameplay.Level;
 using GameCore.Observers.Gameplay.LevelManager;
 using GameCore.Observers.Gameplay.PlayerInteraction;
+using GameCore.Observers.Gameplay.Time;
 using GameCore.Observers.Gameplay.UI;
 using GameCore.Observers.Gameplay.UIManager;
 using Zenject;
@@ -21,7 +22,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindLevelObserver();
             BindLevelProviderObserver();
             BindUIManagerObserver();
-            BindGameStateObserver();
+            BindGameObserver();
+            BindTimeObserver();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -69,10 +71,17 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle();
         }
 
-        private void BindGameStateObserver()
+        private void BindGameObserver()
         {
             Container
                 .BindInterfacesTo<GameObserver>()
+                .AsSingle();
+        }
+
+        private void BindTimeObserver()
+        {
+            Container
+                .BindInterfacesTo<TimeObserver>()
                 .AsSingle();
         }
     }

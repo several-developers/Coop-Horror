@@ -28,7 +28,11 @@ namespace GameCore
         public const string DefaultIP = "127.0.0.1";
         public const int DefaultPort = 9998;
 
+        public const int HoursInDay = 24;
         public const int MinutesInDay = 1440;
+        public const int SecondsInDay = 86400;
+        public const int SecondsInHour = 3600;
+        public const int SecondsInMinute = 60;
 
         public const int SaveCellsAmount = 3;
         public const int MaxPlayers = 4;

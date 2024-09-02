@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.Network;
+using GameCore.Observers.Gameplay.Time;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Zenject;
@@ -10,10 +11,15 @@ namespace GameCore.Gameplay.GameTimeManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IGameTimeManagerDecorator gameTimeManagerDecorator, ITimeCycle timeCycle)
+        private void Construct(
+            IGameTimeManagerDecorator gameTimeManagerDecorator,
+            ITimeCycle timeCycle,
+            ITimeObserver timeObserver
+        )
         {
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
             _timeCycle = timeCycle;
+            _timeObserver = timeObserver;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -22,6 +28,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private IGameTimeManagerDecorator _gameTimeManagerDecorator;
         private ITimeCycle _timeCycle;
+        private ITimeObserver _timeObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -46,7 +53,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void InitOwner() =>
-            _timeCycle.OnMinutePassedEvent += OnMinutePassed;
+            _timeObserver.OnMinutePassedEvent += OnMinutePassed;
 
         protected override void InitNotOwner() =>
             _gameTimer.OnValueChanged += OnGameTimerUpdated;
@@ -55,7 +62,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             _timeCycle.Tick(); // Check for optimization
 
         protected override void DespawnOwner() =>
-            _timeCycle.OnMinutePassedEvent -= OnMinutePassed;
+            _timeObserver.OnMinutePassedEvent -= OnMinutePassed;
 
         protected override void DespawnNotOwner() =>
             _gameTimer.OnValueChanged -= OnGameTimerUpdated;
@@ -76,7 +83,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void SetSunrise() =>
             _timeCycle.SetSunrise();
-        
+
         private void SetMidnight() =>
             _timeCycle.SetMidnight();
 
@@ -88,7 +95,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
-        
+
         private void OnMinutePassed() => UpdateGameTimer();
 
         private void OnGameTimerUpdated(MyDateTime previousDate, MyDateTime newDate) =>

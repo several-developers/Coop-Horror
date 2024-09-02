@@ -62,7 +62,7 @@ namespace GameCore.Gameplay.Level
             Transform teleportPoint = fireExit.GetTeleportPoint();
             Vector3 position = teleportPoint.position;
             Quaternion rotation = teleportPoint.rotation;
-            
+
             var entityLocation = EntityLocation.Stairs;
 
             if (isInStairsLocation)
@@ -98,21 +98,12 @@ namespace GameCore.Gameplay.Level
 
         private void ChangeVisualPreset(EntityLocation entityLocation)
         {
-            VisualPresetType visualPresetType;
-            
-            switch (entityLocation)
-            {
-                case EntityLocation.Dungeon:
-                case EntityLocation.Stairs:
-                    visualPresetType = VisualPresetType.Dungeon;
-                    break;
-                
-                default:
-                    visualPresetType = VisualPresetType.DefaultLocation;
-                    break;
-            }
-            
-            _visualManager.ChangePreset(visualPresetType, instant: true);
+            bool useDungeonPreset = entityLocation is EntityLocation.Dungeon or EntityLocation.Stairs;
+
+            if (useDungeonPreset)
+                _visualManager.ChangePreset(VisualPresetType.Dungeon, instant: true);
+            else
+                _visualManager.SetLocationPreset(instant: true);
         }
     }
 }

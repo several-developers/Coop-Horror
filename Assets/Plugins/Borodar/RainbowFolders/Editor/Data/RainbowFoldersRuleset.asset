@@ -23,7 +23,7 @@ MonoBehaviour:
     IsIconRecursive: 0
     BackgroundType: 70
     BackgroundTexture: {fileID: 0}
-    IsBackgroundRecursive: 0
+    IsBackgroundRecursive: 1
     IsHidden: 0
   - Type: 0
     Key: Audio
@@ -239,7 +239,7 @@ MonoBehaviour:
     IsIconRecursive: 0
     BackgroundType: 60
     BackgroundTexture: {fileID: 0}
-    IsBackgroundRecursive: 0
+    IsBackgroundRecursive: 1
     IsHidden: 0
   - Type: 0
     Key: Textures
@@ -407,5 +407,5 @@ MonoBehaviour:
     IsIconRecursive: 0
     BackgroundType: 40
     BackgroundTexture: {fileID: 0}
-    IsBackgroundRecursive: 0
+    IsBackgroundRecursive: 1
     IsHidden: 0

@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using GameCore.Observers.Gameplay.Time;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
 
@@ -9,8 +10,11 @@ namespace GameCore.Gameplay.GameTimeManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ITimeCycle timeCycle) =>
+        private void Construct(ITimeCycle timeCycle, ITimeObserver timeObserver)
+        {
             _timeCycle = timeCycle;
+            _timeObserver = timeObserver;
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -49,11 +53,12 @@ namespace GameCore.Gameplay.GameTimeManagement
         private const string CycleInfo = "Cycle Info";
         
         private ITimeCycle _timeCycle;
+        private ITimeObserver _timeObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() =>
-            _timeCycle.OnTimeUpdatedEvent += OnTimeUpdated;
+            _timeObserver.OnTimeUpdatedEvent += OnTimeUpdated;
 
         private void Start()
         {
@@ -64,7 +69,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         }
 
         private void OnDestroy() =>
-            _timeCycle.OnTimeUpdatedEvent -= OnTimeUpdated;
+            _timeObserver.OnTimeUpdatedEvent -= OnTimeUpdated;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

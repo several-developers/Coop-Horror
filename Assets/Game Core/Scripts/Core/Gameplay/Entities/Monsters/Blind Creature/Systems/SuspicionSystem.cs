@@ -151,9 +151,9 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         private void ChangeCreatureVisual()
         {
             _references.CalmFace.SetActive(!_isAggressive);
-            _references.AngryFace.SetActive(_isAggressive);
-            _references.CalmCape.SetActive(!_isAggressive);
-            _references.AngryCape.SetActive(_isAggressive);
+            _references.AngryFace.SetActive(_isAggressive); 
+            // _references.CalmCape.SetActive(!_isAggressive);
+            // _references.AngryCape.SetActive(_isAggressive);
         }
 
         private IEnumerator DecreaseTimerCO()

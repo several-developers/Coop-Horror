@@ -35,6 +35,9 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         [SerializeField, Required]
         private VisualManager _visualManager;
 
+        [SerializeField, Required]
+        private Sun _sun;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override void InstallBindings()
@@ -47,6 +50,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindFireExitsManager();
             BindUIManager();
             BindVisualManager();
+            BindSun();
             BindPlayerCamera();
             BindSpectatorCamera();
             BindCamerasManager();
@@ -119,6 +123,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .Bind<IVisualManager>()
                 .FromInstance(_visualManager)
+                .AsSingle();
+        }
+
+        private void BindSun()
+        {
+            Container
+                .Bind<Sun>()
+                .FromInstance(_sun)
                 .AsSingle();
         }
 

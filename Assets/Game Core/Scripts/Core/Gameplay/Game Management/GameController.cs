@@ -48,9 +48,6 @@ namespace GameCore.Gameplay.GameManagement
 
             _gameManagerDecorator.OnGameStateChangedEvent += HandleGameState;
 
-            if (!IsServer)
-                return;
-
             SubscribeToLogs();
 
             _gameObserver.OnTrainArrivedAtBaseEvent += TrainArrivedAtBase;
@@ -60,7 +57,7 @@ namespace GameCore.Gameplay.GameManagement
             _gameObserver.OnTrainLeavingLocationEvent += TrainLeavingLocation;
 
             // LOCAL METHODS: -----------------------------
-            
+
             void SubscribeToLogs()
             {
                 _gameObserver.OnTrainArrivedAtBaseEvent += location =>
@@ -68,31 +65,28 @@ namespace GameCore.Gameplay.GameManagement
                     string log = Log.HandleLog($"--> Train arrived at <gb>Base</gb> from <gb>{location}</gb>.");
                     Debug.Log(log);
                 };
-                
+
                 _gameObserver.OnTrainLeavingBaseEvent += () =>
                 {
                     string log = Log.HandleLog("--> Train leaving <gb>Base</gb>.");
                     Debug.Log(log);
                 };
-                
+
                 _gameObserver.OnTrainArrivedAtLocationEvent += () =>
                 {
                     LocationName currentLocation = GetCurrentLocation();
                     string log = Log.HandleLog($"--> Train arrived at location <gb>{currentLocation}</gb>.");
                     Debug.Log(log);
                 };
-                
+
                 _gameObserver.OnTrainStoppedAtLocationEvent += () =>
                 {
                     LocationName currentLocation = GetCurrentLocation();
                     string log = Log.HandleLog($"--> Train stopped at location <gb>{currentLocation}</gb>.");
                     Debug.Log(log);
                 };
-                
-                _gameObserver.OnTrainLeavingLocationEvent += () =>
-                {
-                    Debug.Log("--> Train Leaving location.");
-                };
+
+                _gameObserver.OnTrainLeavingLocationEvent += () => { Debug.Log("--> Train Leaving location."); };
             }
         }
 
@@ -120,9 +114,6 @@ namespace GameCore.Gameplay.GameManagement
         {
             _gameManagerDecorator.OnGameStateChangedEvent -= HandleGameState;
 
-            if (!IsServer)
-                return;
-
             _gameObserver.OnTrainArrivedAtBaseEvent -= TrainArrivedAtBase;
             _gameObserver.OnTrainLeavingBaseEvent -= TrainLeavingBase;
             _gameObserver.OnTrainArrivedAtLocationEvent -= TrainArrivedAtLocation;
@@ -139,27 +130,11 @@ namespace GameCore.Gameplay.GameManagement
             switch (gameState)
             {
                 case GameState.GameOver:
-                    _camerasManager.SetCameraStatus(CameraStatus.OutsideTrain);
-                    PublishUIEvent(UIEventType.HideGameplayHUD);
-
-                    if (IsServer)
-                    {
-                        _gameManagerDecorator.StartGameRestartTimer();
-                        _monstersGenerator.Stop();
-                    }
-
+                    HandleGameOver();
                     break;
 
                 case GameState.RestartGame:
-                    PublishUIEvent(UIEventType.ShowGameplayHUD);
-                    _gameResetManager.Reset();
-
-                    if (IsServer)
-                    {
-                        _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.Gameplay,
-                            previousState: GameState.RestartGame);
-                    }
-
+                    HandleRestartGame();
                     break;
 
                 case GameState.WaitingForPlayers:
@@ -169,82 +144,134 @@ namespace GameCore.Gameplay.GameManagement
                     break;
 
                 case GameState.QuestsRewarding:
-                    _questsManagerDecorator.CalculateReward();
-                    // Create quests
+                    HandleQuestsRewarding();
                     break;
 
                 case GameState.KillPlayersByMetroMonster:
                     break;
             }
+
+            // LOCAL METHODS: -----------------------------
+
+            void HandleGameOver()
+            {
+                _camerasManager.SetCameraStatus(CameraStatus.OutsideTrain);
+                PublishUIEvent(UIEventType.HideGameplayHUD);
+
+                if (!IsServer)
+                    return;
+
+                _gameManagerDecorator.StartGameRestartTimer();
+                _monstersGenerator.Stop();
+            }
+
+            void HandleRestartGame()
+            {
+                PublishUIEvent(UIEventType.ShowGameplayHUD);
+                _gameResetManager.Reset();
+
+                if (!IsServer)
+                    return;
+
+                _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(newState: GameState.Gameplay,
+                    previousState: GameState.RestartGame);
+            }
+
+            void HandleQuestsRewarding()
+            {
+                _questsManagerDecorator.CalculateReward();
+                // Create quests
+            }
         }
 
         private void TrainArrivedAtBase(LocationName previousLocationName)
         {
-            bool arrivedFromMarket = previousLocationName == LocationName.Market;
+            if (IsServer)
+            {
+                bool arrivedFromMarket = previousLocationName == LocationName.Market;
 
-            _gameTimeManagerDecorator.SetMidnight();
-            _trainEntity.TeleportToTheRoad();
+                _gameTimeManagerDecorator.SetMidnight();
+                _trainEntity.TeleportToTheRoad();
 
-            ToggleTrainMainLever(isEnabled: true);
-            SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.InfiniteMovement);
-            SetPlayersEntityLocation(EntityLocation.Base);
-            PublishUIEvent(UIEventType.HideGameTimer);
-            PublishUIEvent(UIEventType.UpdateGameMap);
-            _monstersGenerator.Stop();
+                ToggleTrainMainLever(isEnabled: true);
+                SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.InfiniteMovement);
+                SetPlayersEntityLocation(EntityLocation.Base);
+                PublishUIEvent(UIEventType.HideGameTimer);
+                PublishUIEvent(UIEventType.UpdateGameMap);
+                _monstersGenerator.Stop();
 
-            if (!arrivedFromMarket)
-                _questsManagerDecorator.DecreaseQuestsDays();
+                if (!arrivedFromMarket)
+                    _questsManagerDecorator.DecreaseQuestsDays();
+            }
+
+            _visualManager.ChangePreset(VisualPresetType.Metro);
         }
 
         private void TrainLeavingBase()
         {
-            _dungeonsManager.GenerateDungeonsOnAllClients();
+            if (IsServer)
+            {
+                _dungeonsManager.GenerateDungeonsOnAllClients();
+            }
         }
 
         private void TrainArrivedAtLocation()
         {
             LocationName currentLocation = GetCurrentLocation();
+            bool isGameplayLocation = currentLocation != LocationName.Market;
 
-            if (currentLocation != LocationName.Market)
+            if (IsServer)
             {
-                _gameTimeManagerDecorator.SetSunrise();
-                _gameTimeManagerDecorator.IncreaseDay();
-                _visualManager.ChangePreset(VisualPresetType.ForestLocation);
+                if (isGameplayLocation)
+                {
+                    _gameTimeManagerDecorator.SetSunrise();
+                    _gameTimeManagerDecorator.IncreaseDay();
+                }
+
+                _trainEntity.TeleportToTheMetroPlatform();
+                SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.StopAtPathEnd);
+                SetPlayersEntityLocation(EntityLocation.Surface);
+                _trainEntity.PlaySound(TrainEntity.SFXType.Arrival);
+                _monstersGenerator.Start();
             }
 
-            _trainEntity.TeleportToTheMetroPlatform();
-            SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.StopAtPathEnd);
-            SetPlayersEntityLocation(EntityLocation.Surface);
-            _trainEntity.PlaySound(TrainEntity.SFXType.Arrival);
-            _monstersGenerator.Start();
+            if (isGameplayLocation)
+                _visualManager.SetLocationPreset();
         }
 
         private void TrainStoppedAtLocation()
         {
-            LocationName currentLocation = GetCurrentLocation();
-
-            if (currentLocation != LocationName.Market)
+            if (IsServer)
             {
-                PublishUIEvent(UIEventType.ShowGameTimer);
-            }
+                LocationName currentLocation = GetCurrentLocation();
 
-            ToggleTrainMainLever(isEnabled: true);
-            ToggleTrainDoor(isOpened: true);
-            SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.LeaveAtPathEnd);
-            _gameManagerDecorator.SelectLocation(LocationName.Base); // TEMP, возможно данжи не успеют сгенерироваться
-            RemovePlayersParent();
-            _trainEntity.ToggleStoppedAtSectorState(true);
-            _trainEntity.StopSound(TrainEntity.SFXType.MovementLoop);
-            _trainEntity.StopSound(TrainEntity.SFXType.Arrival);
+                if (currentLocation != LocationName.Market)
+                {
+                    PublishUIEvent(UIEventType.ShowGameTimer);
+                }
+
+                ToggleTrainMainLever(isEnabled: true);
+                ToggleTrainDoor(isOpened: true);
+                SetTrainMovementBehaviour(TrainEntity.MovementBehaviour.LeaveAtPathEnd);
+                _gameManagerDecorator
+                    .SelectLocation(LocationName.Base); // TEMP, возможно данжи не успеют сгенерироваться
+                RemovePlayersParent();
+                _trainEntity.ToggleStoppedAtSectorState(true);
+                _trainEntity.StopSound(TrainEntity.SFXType.MovementLoop);
+                _trainEntity.StopSound(TrainEntity.SFXType.Arrival);
+            }
         }
 
         private void TrainLeavingLocation()
         {
-            ToggleTrainMainLever(isEnabled: false);
-            ToggleTrainDoor(isOpened: false);
-            _trainEntity.ToggleStoppedAtSectorState(false);
-            _trainEntity.PlaySound(TrainEntity.SFXType.Departure);
-            _trainEntity.PlaySound(TrainEntity.SFXType.MovementLoop);
+            if (IsServer)
+            {
+                ToggleTrainMainLever(isEnabled: false);
+                ToggleTrainDoor(isOpened: false);
+                _trainEntity.ToggleStoppedAtSectorState(false);
+                _trainEntity.PlaySound(TrainEntity.SFXType.Departure);
+                _trainEntity.PlaySound(TrainEntity.SFXType.MovementLoop);
+            }
         }
 
         #endregion
@@ -292,7 +319,7 @@ namespace GameCore.Gameplay.GameManagement
             foreach (PlayerEntity playerEntity in allPlayers.Values)
                 playerEntity.SetEntityLocation(entityLocation);
         }
-        
+
         private static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() =>
             PlayerEntity.GetAllPlayers();
 

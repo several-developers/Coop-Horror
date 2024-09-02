@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
-using DG.Tweening;
+using GameCore.Configs.Gameplay.Time;
 using GameCore.Configs.Gameplay.Visual;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameManagement;
+using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
-using GameCore.Utilities;
+using GameCore.Observers.Gameplay.Time;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -21,12 +23,17 @@ namespace GameCore.Gameplay.VisualManagement
         private void Construct(
             IGameManagerDecorator gameManagerDecorator,
             PlayerCamera playerCamera,
+            Sun sun,
+            ITimeObserver timeObserver,
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
-            _gameplayConfigsProvider = gameplayConfigsProvider;
+            TimeConfigMeta timeConfig = gameplayConfigsProvider.GetTimeConfig();
+
             _gameManagerDecorator = gameManagerDecorator;
-            _playerCamera = playerCamera;
+            _timeObserver = timeObserver;
+            _gameplayConfigsProvider = gameplayConfigsProvider;
+            _visualController = new VisualController(gameObject, playerCamera, sun, _volumeOne, _volumeTwo, timeConfig);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -43,12 +50,10 @@ namespace GameCore.Gameplay.VisualManagement
         private readonly Dictionary<VisualPresetType, VisualPresetConfig> _visualPresets = new();
 
         private IGameManagerDecorator _gameManagerDecorator;
-        private PlayerCamera _playerCamera;
+        private ITimeObserver _timeObserver;
         private IGameplayConfigsProvider _gameplayConfigsProvider;
 
-        private Tweener _volumeTN;
-        private Tweener _nativeFogTN;
-        private Tweener _cameraTN;
+        private VisualController _visualController;
         private VisualPresetType _previousPresetType;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -57,7 +62,10 @@ namespace GameCore.Gameplay.VisualManagement
         {
             SetupPresetsDictionary();
 
-            _gameManagerDecorator.OnGameStateChangedEvent += OnGameStateChanged;
+            _timeObserver.OnTimeUpdatedEvent += OnTimeUpdated;
+
+            PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
         }
 
 #warning ВЫНЕСТИ В GAME STATES HANDLER
@@ -72,12 +80,17 @@ namespace GameCore.Gameplay.VisualManagement
             ChangePreset(VisualPresetType.Metro, instant: true);
         }
 
-        private void OnDestroy() =>
-            _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
+        private void OnDestroy()
+        {
+            _timeObserver.OnTimeUpdatedEvent -= OnTimeUpdated;
+
+            PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
+            PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        [Button(ButtonStyle.FoldoutButton)]
+        [Button(ButtonStyle.FoldoutButton), DisableInEditorMode]
         public void ChangePreset(VisualPresetType presetType, bool instant = false)
         {
             bool isPresetTypeValid = presetType != _previousPresetType;
@@ -93,12 +106,18 @@ namespace GameCore.Gameplay.VisualManagement
                 return;
             }
 
-            string log = Log.HandleLog($"Changing visual preset to the <gb>{presetType.GetNiceName()}</gb>.");
+            string log = Log.HandleLog($"Changing visual preset to the <gb>{presetType}</gb>.");
             Debug.Log(log);
 
             _previousPresetType = presetType;
 
-            ApplyEffects(presetConfig, instant);
+            _visualController.ApplyEffects(presetConfig, instant);
+        }
+
+        [Button(ButtonStyle.FoldoutButton), DisableInEditorMode]
+        public void SetLocationPreset(bool instant = false)
+        {
+            ChangePreset(VisualPresetType.ForestLocation, instant);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -123,118 +142,48 @@ namespace GameCore.Gameplay.VisualManagement
             }
         }
 
-#warning СЛОМАНО, СРОЧНО ЧИНИТЬ
-        private void HandleGameState(GameState gameState)
-        {
-            // switch (gameState)
-            // {
-            //     case GameState.ArrivedAtTheRoad:
-            //         ChangePreset(VisualPresetType.RoadLocation);
-            //         break;
-            //
-            //     case GameState.HeadingToTheLocation:
-            //         ChangePreset(VisualPresetType.DefaultLocation);
-            //         break;
-            // }
-        }
-
-        private void ApplyEffects(VisualPresetConfig presetConfig, bool instant = false)
-        {
-            ChangeVolume(presetConfig, instant);
-            ChangeNativeFog(presetConfig, instant);
-            ChangeCameraDistance(presetConfig, instant);
-            ChangeCameraBackgroundType(presetConfig);
-        }
-
-        private void ChangeVolume(VisualPresetConfig presetConfig, bool instant = false)
-        {
-            float duration = instant ? 0f : presetConfig.ChangeDuration;
-            Ease ease = presetConfig.ChangeEase;
-
-            _volumeTN.Kill();
-
-            _volumeTwo.profile = presetConfig.UseVolumeProfile ? presetConfig.VolumeProfile : null;
-            _volumeOne.weight = 1f;
-            _volumeTwo.weight = 0f;
-
-            _volumeTN = DOVirtual
-                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
-                {
-                    float volumeOne = 1f - t;
-                    float volumeTwo = t;
-
-                    _volumeOne.weight = volumeOne;
-                    _volumeTwo.weight = volumeTwo;
-                })
-                .SetEase(ease)
-                .OnComplete(() =>
-                {
-                    _volumeOne.profile = presetConfig.UseVolumeProfile ? presetConfig.VolumeProfile : null;
-                    _volumeTwo.profile = null;
-                    _volumeOne.weight = 1f;
-                    _volumeTwo.weight = 0f;
-                });
-        }
-
-        private void ChangeNativeFog(VisualPresetConfig presetConfig, bool instant = false)
-        {
-            bool useNativeFog = presetConfig.UseNativeFog;
-            float densityFrom = RenderSettings.fogDensity;
-            float densityTo = useNativeFog ? presetConfig.NativeFogDensity : 0f;
-            float duration = instant ? 0f : presetConfig.ChangeDuration;
-            Color colorFrom = RenderSettings.fogColor;
-            Color colorTo = presetConfig.NativeFogColor;
-            Ease ease = presetConfig.ChangeEase;
-
-            if (useNativeFog && !RenderSettings.fog)
-                RenderSettings.fog = true;
-
-            _nativeFogTN.Kill();
-
-            _nativeFogTN = DOVirtual
-                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
-                {
-                    float density = Mathf.Lerp(a: densityFrom, b: densityTo, t);
-                    Color color = Color.Lerp(a: colorFrom, b: colorTo, t);
-
-                    RenderSettings.fogDensity = density;
-                    RenderSettings.fogColor = color;
-                })
-                .SetEase(ease)
-                .OnComplete(() => { RenderSettings.fog = useNativeFog; });
-        }
-
-        private void ChangeCameraDistance(VisualPresetConfig presetConfig, bool instant = false)
-        {
-            Camera mainCamera = _playerCamera.CameraReferences.MainCamera;
-            float distanceFrom = mainCamera.farClipPlane;
-            float distanceTo = presetConfig.ChangeCameraDistance ? presetConfig.CameraDistance : distanceFrom;
-            float duration = instant ? 0f : presetConfig.ChangeDuration;
-            Ease ease = presetConfig.ChangeEase;
-
-            _cameraTN.Kill();
-
-            _cameraTN = DOVirtual
-                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
-                {
-                    float distance = Mathf.Lerp(a: distanceFrom, b: distanceTo, t);
-                    mainCamera.farClipPlane = distance;
-                })
-                .SetEase(ease);
-        }
-
-        private void ChangeCameraBackgroundType(VisualPresetConfig presetConfig)
-        {
-            bool useSkybox = presetConfig.UseSkybox;
-            Camera mainCamera = _playerCamera.CameraReferences.MainCamera;
-            mainCamera.clearFlags = useSkybox ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
-        }
-
         private bool TryGetPresetConfig(VisualPresetType presetType, out VisualPresetConfig presetConfig) =>
             _visualPresets.TryGetValue(presetType, out presetConfig);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnGameStateChanged(GameState gameState) => HandleGameState(gameState);
+        private void OnTimeUpdated(MyDateTime dateTime)
+        {
+            float timeOfDay = _timeObserver.GetDateTimeNormalized();
+            
+            _visualController.UpdateRenderSettings(timeOfDay);
+            _visualController.UpdateLightSettings(timeOfDay);
+        }
+
+        private void OnPlayerSpawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+
+            playerEntity.OnPlayerLocationChangedEvent += OnPlayerLocationChanged;
+        }
+
+        private void OnPlayerDespawned(PlayerEntity playerEntity)
+        {
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+
+            playerEntity.OnPlayerLocationChangedEvent -= OnPlayerLocationChanged;
+        }
+
+        private void OnPlayerLocationChanged(EntityLocation location)
+        {
+            bool changeAmbientSkyColor = location switch
+            {
+                EntityLocation.Dungeon => false,
+                _ => true
+            };
+
+            _visualController.ToggleAmbientSkyColorState(changeAmbientSkyColor);
+        }
     }
 }

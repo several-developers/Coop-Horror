@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3595bd140e7f4a898bebccb7d80ed63f, type: 3}
-  m_Name: Default Location Preset
+  m_Name: Default Preset
   m_EditorClassIdentifier: 
-  _metaName: Default Location Preset
+  _metaName: Default Preset
   _presetType: 3
   _changeDuration: 1
   _changeEase: 5
@@ -24,3 +24,4 @@ MonoBehaviour:
   _changeCameraDistance: 1
   _cameraDistance: 400
   _useSkybox: 1
+  _sunIntensity: 1

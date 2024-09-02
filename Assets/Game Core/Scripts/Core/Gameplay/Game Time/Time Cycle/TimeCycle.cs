@@ -2,17 +2,19 @@
 using GameCore.Configs.Gameplay.Time;
 using GameCore.Enums.Gameplay;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Observers.Gameplay.Time;
 using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.GameTimeManagement
 {
-    public class TimeCycle : ITimeCycle, IInitializable
+    public class TimeCycle : ITimeCycle, IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public TimeCycle(IGameplayConfigsProvider gameplayConfigsProvider)
+        public TimeCycle(ITimeObserver timeObserver, IGameplayConfigsProvider gameplayConfigsProvider)
         {
+            _timeObserver = timeObserver;
             _timeConfig = gameplayConfigsProvider.GetTimeConfig();
             _simulate = _timeConfig.Simulate;
             _stopAtNight = _timeConfig.StopAtNight;
@@ -48,10 +50,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<MyDateTime> OnTimeUpdatedEvent = delegate { };
-        public event Action OnHourPassedEvent = delegate { };
-        public event Action OnMinutePassedEvent = delegate { };
-
+        private readonly ITimeObserver _timeObserver;
         private readonly TimeConfigMeta _timeConfig;
 
         private DayTime _dayTime;
@@ -68,8 +67,23 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         public void Initialize()
         {
+            _timeObserver.GetDateTimeInnerEvent += GetDateTime;
+            _timeObserver.GetDateTimeNormalizedInnerEvent += GetDateTimeNormalized;
+            _timeObserver.GetHourDurationInSecondsInnerEvent += GetHourDurationInSeconds;
+            _timeObserver.GetMinuteDurationInSecondsInnerEvent += GetMinuteDurationInSeconds;
+            _timeObserver.GetCurrentTimeInMinutesInnerEvent += GetCurrentTimeInMinutes;
+            
             UpdateDayTime();
             SendTimeUpdatedEvent();
+        }
+
+        public void Dispose()
+        {
+            _timeObserver.GetDateTimeInnerEvent -= GetDateTime;
+            _timeObserver.GetDateTimeNormalizedInnerEvent -= GetDateTimeNormalized;
+            _timeObserver.GetHourDurationInSecondsInnerEvent -= GetHourDurationInSeconds;
+            _timeObserver.GetMinuteDurationInSecondsInnerEvent -= GetMinuteDurationInSeconds;
+            _timeObserver.GetCurrentTimeInMinutesInnerEvent -= GetCurrentTimeInMinutes;
         }
 
         public void Tick()
@@ -165,11 +179,11 @@ namespace GameCore.Gameplay.GameTimeManagement
             return dateTime;
         }
 
-        public float GetTimeOfDay()
+        public float GetDateTimeNormalized()
         {
-            const int secondsInDay = 86400;
-            const int secondsInHour = 3600;
-            const int secondsInMinute = 60;
+            const int secondsInDay = Constants.SecondsInDay;
+            const int secondsInHour = Constants.SecondsInHour;
+            const int secondsInMinute = Constants.SecondsInMinute;
 
             float totalSeconds = _hour * secondsInHour +
                                  _minute * secondsInMinute +
@@ -181,29 +195,37 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         public float GetHourDurationInSeconds()
         {
+            const float hoursInDay = Constants.HoursInDay;
+            const float secondsInMinute = Constants.SecondsInMinute;
+            
             float cycleDurationInMinutes = _timeConfig.CycleDurationInMinutes;
             float cycleLengthModifier = _timeConfig.CycleLengthModifier;
             float totalCycleDurationInMinutes = cycleDurationInMinutes * cycleLengthModifier;
-            float totalCycleDurationInSeconds = totalCycleDurationInMinutes * 60;
-            float hourDurationInSeconds = totalCycleDurationInSeconds / 24;
+            float totalCycleDurationInSeconds = totalCycleDurationInMinutes * secondsInMinute;
+            float hourDurationInSeconds = totalCycleDurationInSeconds / hoursInDay;
             return hourDurationInSeconds;
         }
         
         public float GetMinuteDurationInSeconds()
         {
+            const float hoursInDay = Constants.HoursInDay;
+            const float secondsInMinute = Constants.SecondsInMinute;
+            
             float cycleDurationInMinutes = _timeConfig.CycleDurationInMinutes;
             float cycleLengthModifier = _timeConfig.CycleLengthModifier;
             float totalCycleDurationInMinutes = cycleDurationInMinutes * cycleLengthModifier;
-            float totalCycleDurationInSeconds = totalCycleDurationInMinutes * 60;
-            float minuteDurationInSeconds = totalCycleDurationInSeconds / 24 / 60;
+            float totalCycleDurationInSeconds = totalCycleDurationInMinutes * secondsInMinute;
+            float minuteDurationInSeconds = totalCycleDurationInSeconds / hoursInDay / secondsInMinute;
             return minuteDurationInSeconds;
         }
         
         public int GetCurrentTimeInMinutes()
         {
+            const int secondsInMinute = Constants.SecondsInMinute;
+            
             int hour = _date.Hour;
             int minute = _date.Minute;
-            int totalMinutes = hour * 60 + minute;
+            int totalMinutes = hour * secondsInMinute + minute;
             return totalMinutes;
         }
 
@@ -213,10 +235,14 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void UpdateModule()
         {
+            const float hoursInDay = Constants.HoursInDay;
+            const float secondsInMinute = Constants.SecondsInMinute;
+            const float secondsInHour = Constants.SecondsInHour;
+            
             float cycleDurationInMinutes = _timeConfig.CycleDurationInMinutes;
             float cycleLengthModifier = _timeConfig.CycleLengthModifier;
-            float t = 24f / 60f / (cycleDurationInMinutes * cycleLengthModifier);
-            t = t * 3600f * Time.deltaTime;
+            float t = hoursInDay / secondsInMinute / (cycleDurationInMinutes * cycleLengthModifier);
+            t = t * secondsInHour * Time.deltaTime;
 
             if (t < 1f)
                 _internalTimeOverflow += t;
@@ -254,13 +280,13 @@ namespace GameCore.Gameplay.GameTimeManagement
         private void SendTimeUpdatedEvent()
         {
             MyDateTime dateTime = GetDateTime();
-            OnTimeUpdatedEvent.Invoke(dateTime);
+            _timeObserver.TimeUpdated(dateTime);
         }
 
         private void SendHourPassedEvent() =>
-            OnHourPassedEvent.Invoke();
-        
+            _timeObserver.HourPassed();
+
         private void SendMinutePassedEvent() =>
-            OnMinutePassedEvent.Invoke();
+            _timeObserver.MinutePassed();
     }
 }

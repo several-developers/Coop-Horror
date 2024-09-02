@@ -59,8 +59,12 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             bool isAggressive = _suspicionSystem.IsAggressive();
             float aggressiveness = isAggressive ? 1f : 0f;
 
+            int suspicionMeter = _suspicionSystem.GetSuspicionMeter();
+            float suspicion = suspicionMeter > 0 ? 1f : 0f;
+
             _animator.SetFloat(id: AnimatorHashes.MoveSpeed, value: moveSpeed, dampValue, deltaTime);
             _animator.SetFloat(id: AnimatorHashes.Aggressiveness, value: aggressiveness, dampValue, deltaTime);
+            _animator.SetFloat(id: AnimatorHashes.Suspicion, value: suspicion, dampValue, deltaTime);
         }
 
         private void LevitateCycle(bool moveUp)

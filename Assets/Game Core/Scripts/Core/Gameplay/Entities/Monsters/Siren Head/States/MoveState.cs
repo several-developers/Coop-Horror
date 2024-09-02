@@ -1,6 +1,7 @@
 ﻿using DG.Tweening;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.GameTimeManagement;
+using GameCore.Observers.Gameplay.Time;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Monsters.SirenHead.States
@@ -9,12 +10,12 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead.States
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MoveState(SirenHeadEntity sirenHeadEntity, ITimeCycle timeCycle)
+        public MoveState(SirenHeadEntity sirenHeadEntity, ITimeObserver timeObserver)
         {
             _sirenHeadEntity = sirenHeadEntity;
             _references = sirenHeadEntity.GetReferences();
             _sirenHeadAIConfig = sirenHeadEntity.GetAIConfig();
-            _timeCycle = timeCycle;
+            _timeObserver = timeObserver;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -22,7 +23,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead.States
         private readonly SirenHeadEntity _sirenHeadEntity;
         private readonly SirenHeadEntity.References _references;
         private readonly SirenHeadAIConfigMeta _sirenHeadAIConfig;
-        private readonly ITimeCycle _timeCycle;
+        private readonly ITimeObserver _timeObserver;
 
         private Tweener _movementTN;
 
@@ -71,12 +72,12 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead.States
         private float CalculateMoveTime()
         {
             const int minutesInDay = Constants.MinutesInDay;
-            int currentTimeInMinutes = _timeCycle.GetCurrentTimeInMinutes();
+            int currentTimeInMinutes = _timeObserver.GetCurrentTimeInMinutes();
             int arriveTimeOffset = _sirenHeadAIConfig.ArriveTimeOffset;
             int arriveTime = minutesInDay + arriveTimeOffset;
 
             int timeLeftInMinutes = arriveTime - currentTimeInMinutes;
-            float minuteDurationInSeconds = _timeCycle.GetMinuteDurationInSeconds();
+            float minuteDurationInSeconds = _timeObserver.GetMinuteDurationInSeconds();
 
             float moveTime = timeLeftInMinutes * minuteDurationInSeconds;
 

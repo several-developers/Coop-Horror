@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.GameTimeManagement;
+﻿using GameCore.Observers.Gameplay.Time;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -10,8 +10,8 @@ namespace GameCore.Gameplay.Level.Particles
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ITimeCycle timeCycle) =>
-            _timeCycle = timeCycle;
+        private void Construct(ITimeObserver timeObserver) =>
+            _timeObserver = timeObserver;
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace GameCore.Gameplay.Level.Particles
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private ITimeCycle _timeCycle;
+        private ITimeObserver _timeObserver;
         private bool _isActivePeriod;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -35,14 +35,14 @@ namespace GameCore.Gameplay.Level.Particles
         {
             base.Awake();
             
-            _timeCycle.OnMinutePassedEvent += OnMinutePassed;
+            _timeObserver.OnMinutePassedEvent += OnMinutePassed;
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
             
-            _timeCycle.OnMinutePassedEvent -= OnMinutePassed;
+            _timeObserver.OnMinutePassedEvent -= OnMinutePassed;
         }
 
 #if UNITY_EDITOR
@@ -68,7 +68,7 @@ namespace GameCore.Gameplay.Level.Particles
 
         private void CheckParticlesActivePeriod()
         {
-            int currentTimeInMinutes = _timeCycle.GetCurrentTimeInMinutes();
+            int currentTimeInMinutes = _timeObserver.GetCurrentTimeInMinutes();
             _isActivePeriod = currentTimeInMinutes >= _activePeriod.x && currentTimeInMinutes <= _activePeriod.y;
         }
 
