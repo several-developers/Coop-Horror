@@ -30,6 +30,9 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         [SerializeField, ReadOnly]
         private bool _cycleSimulate;
+        
+        [SerializeField, ReadOnly, Space(height: 3)]
+        private float _normalized;
 
         [Title(Constants.Settings)]
         [SerializeField, Range(0, 60), DisableInEditorMode]
@@ -78,6 +81,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             _cycleSecond = dateTime.Second;
             _cycleMinute = dateTime.Minute;
             _cycleHour = dateTime.Hour;
+            _normalized = _timeCycle.GetDateTimeNormalized();
             
             UpdateSimulateField();
         }

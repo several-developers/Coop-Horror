@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Time Config
   m_EditorClassIdentifier: 
   _metaName: Time Config
-  _cycleDurationInMinutes: 4
+  _cycleDurationInMinutes: 10
   _cycleLengthModifier: 1
   _second: 0
   _minute: 0
   _hour: 0
   _simulate: 1
-  _stopAtNight: 0
+  _stopAtNight: 1
   _sunIntensityCurve:
     serializedVersion: 2
     m_Curve:
@@ -153,36 +153,132 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
+      time: 0.20741653
       value: 0
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
+      inSlope: 5.1141067
+      outSlope: 5.1141067
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.044443518
-      value: 0.7987883
-      inSlope: 0.6490434
-      outSlope: 0.6490434
+      time: 0.4029541
+      value: 1
+      inSlope: -0.017169667
+      outSlope: -0.017169667
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.05777665
+      outWeight: 0.17835915
     - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      time: 0.60461336
+      value: 0.9969063
+      inSlope: -0.016086405
+      outSlope: -0.016086405
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.11862826
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.87730426
+      value: 0
+      inSlope: -3.6558106
+      outSlope: -3.6558106
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   _maxSunIntensity: 1.5
   _maxMoonIntensity: 0.5
-  _dayAmbientLight: {r: 0, g: 0, b: 0, a: 0}
-  _nightAmbientLight: {r: 0, g: 0, b: 0, a: 0}
+  _defaultAmbient: {r: 0.21176471, g: 0.22745098, b: 0.25882354, a: 0}
+  _dayAmbient: {r: 0.97254896, g: 0.76470584, b: 0.717647, a: 0}
+  _nightAmbient: {r: 0.052941177, g: 0.056862745, b: 0.064705886, a: 0}
+  _ambientReflectionsCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.20741653
+      value: 0
+      inSlope: 5.1141067
+      outSlope: 5.1141067
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.4029541
+      value: 1
+      inSlope: -0.017169667
+      outSlope: -0.017169667
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.17835915
+    - serializedVersion: 3
+      time: 0.60461336
+      value: 0.9969063
+      inSlope: -0.016086405
+      outSlope: -0.016086405
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.11862826
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.87730426
+      value: 0
+      inSlope: -3.6558106
+      outSlope: -3.6558106
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _fogColorCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.20278168
+      value: 0
+      inSlope: 5.5405164
+      outSlope: 5.5405164
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.38327026
+      value: 1
+      inSlope: -0.017169667
+      outSlope: -0.017169667
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.17835915
+    - serializedVersion: 3
+      time: 0.6557617
+      value: 1
+      inSlope: -0.016086405
+      outSlope: -0.016086405
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.11862826
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.85772705
+      value: 0
+      inSlope: -4.951345
+      outSlope: -4.951345
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _dayFog: {r: 0.972549, g: 0.7647059, b: 0.7176471, a: 0}
+  _nightFog: {r: 0, g: 0, b: 0, a: 0}

@@ -52,12 +52,29 @@ namespace GameCore.Configs.Gameplay.Time
 
         [SerializeField]
         public float _maxMoonIntensity = 0.5f;
+
+        [SerializeField, ColorUsage(showAlpha: true, hdr: true)]
+        private Color _defaultAmbient;
+        
+        [ColorUsage(showAlpha: true, hdr: true)]
+        public Color _dayAmbient;
+        
+        [ColorUsage(showAlpha: true, hdr: true)]
+        public Color _nightAmbient;
+        
+        [Space(5)]
+        [SerializeField]
+        public AnimationCurve _ambientReflectionsCurve;
+
+        [Space(5)]
+        [SerializeField]
+        public AnimationCurve _fogColorCurve;
+
+        [SerializeField]
+        public Color _dayFog;
         
         [SerializeField]
-        public Color _dayAmbientLight;
-        
-        [SerializeField]
-        public Color _nightAmbientLight;
+        public Color _nightFog;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 

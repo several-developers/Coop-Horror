@@ -61,14 +61,32 @@ namespace GameCore.Gameplay.VisualManagement
         
         public void UpdateRenderSettings(float timeOfDay)
         {
-            RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
+            // RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
 
             if (_changeAmbientSkyColor)
             {
-                if (RenderSettings.ambientMode != AmbientMode.Skybox)
-                    RenderSettings.ambientMode = AmbientMode.Skybox;
+                //if (RenderSettings.ambientMode != AmbientMode.Skybox)
+                    //RenderSettings.ambientMode = AmbientMode.Skybox;
 
-                RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
+                // RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
+
+                //float dotProduct = Vector3.Dot(_sun.transform.forward, Vector3.down);
+                //float dotProductClamped = Mathf.Clamp01(dotProduct);
+                
+                Color dayAmbient = _timeConfig._dayAmbient;
+                Color nightAmbient = _timeConfig._nightAmbient;
+                float ambientT = _timeConfig._lightIntensityCurve.Evaluate(timeOfDay);
+                Color ambientColor = Color.Lerp(nightAmbient, dayAmbient, ambientT);
+                RenderSettings.ambientSkyColor = ambientColor;
+
+                float reflectionIntensity = _timeConfig._ambientReflectionsCurve.Evaluate(timeOfDay);
+                RenderSettings.reflectionIntensity = reflectionIntensity;
+
+                float fogT = _timeConfig._fogColorCurve.Evaluate(timeOfDay);
+                Color dayFog = _timeConfig._dayFog;
+                Color nightFog = _timeConfig._nightFog;
+                Color fogColor = Color.Lerp(nightFog, dayFog, fogT);
+                RenderSettings.fogColor = fogColor;
             }
             else
             {
@@ -83,7 +101,7 @@ namespace GameCore.Gameplay.VisualManagement
         {
             float t = _timeConfig._lightIntensityCurve.Evaluate(timeOfDay);
             float sunIntensity = Mathf.Lerp(0, _timeConfig._maxSunIntensity, t);
-            float moonIntensity = Mathf.Lerp(_timeConfig._maxMoonIntensity, 0, t);
+            //float moonIntensity = Mathf.Lerp(_timeConfig._maxMoonIntensity, 0, t);
             
             _sun.SetIntensity(sunIntensity);
         }
@@ -146,7 +164,7 @@ namespace GameCore.Gameplay.VisualManagement
                     Color color = Color.Lerp(a: colorFrom, b: colorTo, t);
 
                     RenderSettings.fogDensity = density;
-                    RenderSettings.fogColor = color;
+                    // RenderSettings.fogColor = color;
                 })
                 .SetEase(ease)
                 .SetLink(_owner)
