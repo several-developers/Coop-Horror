@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using GameCore.Gameplay.Entities.Player;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,6 +10,9 @@ namespace GameCore.Gameplay.Level.Particles
 
         [Title(Constants.References)]
         [SerializeField, Required]
+        private PlayerTrigger _playerTrigger;
+        
+        [SerializeField, Required, Space(height: 5)]
         private List<ParticleSystem> _particlesList;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -19,20 +21,16 @@ namespace GameCore.Gameplay.Level.Particles
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void OnTriggerEnter(Collider other)
+        protected virtual void Awake()
         {
-            if (!other.TryGetComponent(out PlayerEntity _))
-                return;
-
-            EnableParticles();
+            _playerTrigger.OnPlayerEnterEvent += OnPlayerEnter;
+            _playerTrigger.OnPlayerExitEvent += OnPlayerExit;
         }
 
-        private void OnTriggerExit(Collider other)
+        protected virtual void OnDestroy()
         {
-            if (!other.TryGetComponent(out PlayerEntity _))
-                return;
-
-            DisableParticles();
+            _playerTrigger.OnPlayerEnterEvent -= OnPlayerEnter;
+            _playerTrigger.OnPlayerExitEvent -= OnPlayerExit;
         }
 
 #if UNITY_EDITOR
@@ -42,6 +40,12 @@ namespace GameCore.Gameplay.Level.Particles
             
             foreach (ParticleSystem system in _particlesList)
             {
+                if (system == null)
+                {
+                    Debug.LogWarning(message: "Particle is missing!");
+                    continue;
+                }
+                
                 Vector3 particlePosition = system.transform.position;
                 Color color = ColorsConstants.ZoneColor;
                 Color gizmosColor = Gizmos.color;
@@ -77,6 +81,12 @@ namespace GameCore.Gameplay.Level.Particles
                     system.Stop();
             }
         }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnPlayerEnter() => EnableParticles();
+
+        private void OnPlayerExit() => DisableParticles();
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

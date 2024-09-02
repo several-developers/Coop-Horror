@@ -31,20 +31,29 @@ namespace GameCore.Gameplay.Level.Particles
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake() =>
+        protected override void Awake()
+        {
+            base.Awake();
+            
             _timeCycle.OnMinutePassedEvent += OnMinutePassed;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            
+            _timeCycle.OnMinutePassedEvent -= OnMinutePassed;
+        }
 
 #if UNITY_EDITOR
+
         protected override void OnDrawGizmosSelected()
         {
             base.OnDrawGizmosSelected();
             UpdateSpawnTimeText();
         }
 #endif
-
-        private void OnDestroy() =>
-            _timeCycle.OnMinutePassedEvent -= OnMinutePassed;
-
+        
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void EnableParticles()

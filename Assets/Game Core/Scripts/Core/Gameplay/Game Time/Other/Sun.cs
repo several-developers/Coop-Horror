@@ -64,7 +64,6 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void UpdateLighting(float timeOfDay)
         {
-            return;
             PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
             
             if (playerEntity == null)
