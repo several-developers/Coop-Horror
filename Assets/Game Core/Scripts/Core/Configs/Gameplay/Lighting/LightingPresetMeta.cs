@@ -34,20 +34,28 @@ namespace GameCore.Configs.Gameplay.Lighting
 
         [TitleGroup(FogTitle)]
         [BoxGroup(FogGroup, showLabel: false), SerializeField]
-        private bool _overrideNativeFog;
+        private bool _overrideNativeFogColor;
         
         [BoxGroup(FogGroup), SerializeField]
-        [ShowIf(nameof(_overrideNativeFog))]
+        [ShowIf(nameof(_overrideNativeFogColor))]
         private AnimationCurve _fogColorCurve;
 
         [BoxGroup(FogGroup), SerializeField]
-        [ShowIf(nameof(_overrideNativeFog))]
+        [ShowIf(nameof(_overrideNativeFogColor))]
         private Color _dayFog;
         
         [BoxGroup(FogGroup), SerializeField]
-        [ShowIf(nameof(_overrideNativeFog))]
+        [ShowIf(nameof(_overrideNativeFogColor))]
         private Color _nightFog;
 
+        [BoxGroup(FogGroup), SerializeField]
+        private bool _overrideNativeFogDensity;
+
+        [BoxGroup(FogGroup), SerializeField, Min(0f)]
+        [ShowIf(nameof(_overrideNativeFogDensity))]
+        private float _nativeFogDensity = 0.05f;
+
+        // ReSharper disable once NotAccessedField.Local
         [SerializeField, ColorUsage(showAlpha: true, hdr: true), Space(height: 15), ReadOnly]
         private Color _defaultAmbient = new(r: 0.212f, g: 0.227f, b: 0.259f);
 
@@ -62,10 +70,12 @@ namespace GameCore.Configs.Gameplay.Lighting
         public bool OverrideSunIntensity => _overrideSunIntensity;
         public float SunIntensity => _sunIntensity;
         
-        public bool OverrideNativeFog => _overrideNativeFog;
+        public bool OverrideNativeFogColor => _overrideNativeFogColor;
         public AnimationCurve FogColorCurve => _fogColorCurve;
         public Color DayFog => _dayFog;
         public Color NightFog => _nightFog;
+        public bool OverrideNativeFogDensity => _overrideNativeFogDensity;
+        public float NativeFogDensity => _nativeFogDensity;
         
         // FIELDS: --------------------------------------------------------------------------------
 

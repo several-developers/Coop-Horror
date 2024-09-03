@@ -143,7 +143,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _overrideSunIntensity: 0
   _sunIntensity: 1.5
-  _overrideNativeFog: 0
+  _overrideNativeFogColor: 0
   _fogColorCurve:
     serializedVersion: 2
     m_Curve:
@@ -188,4 +188,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   _dayFog: {r: 0.972549, g: 0.7647059, b: 0.7176471, a: 0}
   _nightFog: {r: 0, g: 0, b: 0, a: 0}
+  _overrideNativeFogDensity: 0
+  _nativeFogDensity: 0.05
   _defaultAmbient: {r: 0.212, g: 0.227, b: 0.259, a: 1}

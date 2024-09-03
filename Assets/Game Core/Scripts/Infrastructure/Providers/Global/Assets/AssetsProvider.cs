@@ -9,7 +9,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace GameCore.Infrastructure.Providers.Global
 {
-    public class AssetsProvider : AssetsProviderBase, IAssetsProvider
+    public sealed class AssetsProvider : AssetsProviderBase, IAssetsProvider
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 

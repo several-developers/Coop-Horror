@@ -69,31 +69,27 @@ namespace GameCore.Gameplay.VisualManagement
             if (!_isLightingPresetExists)
                 return;
 
+            UpdateAmbientMode();
             UpdateAmbientColor();
             UpdateAmbientReflections();
             UpdateSunIntensity();
-            UpdateNativeFog();
+            UpdateNativeFogColor();
+            UpdateNativeFogDensity();
             
             //float dotProduct = Vector3.Dot(_sun.transform.forward, Vector3.down);
             //float dotProductClamped = Mathf.Clamp01(dotProduct);
 
             // LOCAL METHODS: -----------------------------
 
+            void UpdateAmbientMode()
+            {
+                AmbientMode ambientMode = GetAmbientMode();
+                SetAmbientMode(ambientMode);
+            }
+            
             void UpdateAmbientColor()
             {
-                if (_playerInDungeon)
-                {
-                    if (RenderSettings.ambientMode != AmbientMode.Flat)
-                        RenderSettings.ambientMode = AmbientMode.Flat;
-
-                    RenderSettings.ambientSkyColor = Color.black;
-                    return;
-                }
-                
-                Color dayAmbient = _lightingPreset.DayAmbient;
-                Color nightAmbient = _lightingPreset.NightAmbient;
-                float t = _lightingPreset.AmbientColorCurve.Evaluate(timeOfDay);
-                Color ambientColor = Color.Lerp(a: nightAmbient, b: dayAmbient, t);
+                Color ambientColor = GetAmbientColor();
                 RenderSettings.ambientSkyColor = ambientColor;
             }
 
@@ -111,6 +107,83 @@ namespace GameCore.Gameplay.VisualManagement
                 if (_playerInDungeon)
                     return;
 
+                float sunIntensity = GetSunIntensity();
+                _sun.SetIntensity(sunIntensity);
+            }
+
+            void UpdateNativeFogColor()
+            {
+                if (_playerInDungeon)
+                    return;
+
+                Color fogColor = GetNativeFogColor();
+                RenderSettings.fogColor = fogColor;
+            }
+
+            void UpdateNativeFogDensity()
+            {
+                if (_playerInDungeon)
+                    return;
+                
+                float fogDensity = GetNativeFogDensity();
+                RenderSettings.fogDensity = fogDensity;
+            }
+
+            void SetAmbientMode(AmbientMode ambientMode)
+            {
+                if (RenderSettings.ambientMode == ambientMode)
+                    return;
+
+                RenderSettings.ambientMode = ambientMode;
+            }
+
+            AmbientMode GetAmbientMode()
+            {
+                bool useFlat = _playerInDungeon || _isVisualPresetExists && !_visualPreset.UseSkybox;
+                return useFlat ? AmbientMode.Flat : AmbientMode.Skybox;
+            }
+            
+            Color GetAmbientColor()
+            {
+                if (_playerInDungeon)
+                    return Color.black;
+
+                Color dayAmbient = _lightingPreset.DayAmbient;
+                Color nightAmbient = _lightingPreset.NightAmbient;
+                float t = _lightingPreset.AmbientColorCurve.Evaluate(timeOfDay);
+                Color ambientColor = Color.Lerp(a: nightAmbient, b: dayAmbient, t);
+                return ambientColor;
+            }
+
+            Color GetNativeFogColor()
+            {
+                bool overrideNativeFogColor = _lightingPreset.OverrideNativeFogColor;
+                bool useVisualPresetFogColor = !overrideNativeFogColor && _isVisualPresetExists;
+
+                if (useVisualPresetFogColor)
+                    return _visualPreset.NativeFogColor;
+
+                Color dayFog = _lightingPreset.DayFog;
+                Color nightFog = _lightingPreset.NightFog;
+                float t = _lightingPreset.FogColorCurve.Evaluate(timeOfDay);
+                Color fogColor = Color.Lerp(a: nightFog, b: dayFog, t);
+                return fogColor;
+            }
+
+            float GetNativeFogDensity()
+            {
+                bool overrideNativeFogDensity = _lightingPreset.OverrideNativeFogDensity;
+                bool useVisualPresetFogDensity = !overrideNativeFogDensity && _isVisualPresetExists;
+
+                float fogDensity = useVisualPresetFogDensity
+                    ? _visualPreset.NativeFogDensity
+                    : _lightingPreset.NativeFogDensity;
+
+                return fogDensity;
+            }
+            
+            float GetSunIntensity()
+            {
                 bool overrideSunIntensity = _lightingPreset.OverrideSunIntensity && _isVisualPresetExists;
                 
                 float sunIntensity = overrideSunIntensity
@@ -119,25 +192,7 @@ namespace GameCore.Gameplay.VisualManagement
                 
                 float t = _lightingPreset.SunIntensityCurve.Evaluate(timeOfDay);
                 float intensity = Mathf.Lerp(a: 0f, b: sunIntensity, t);
-
-                _sun.SetIntensity(intensity);
-            }
-
-            void UpdateNativeFog()
-            {
-                if (_playerInDungeon)
-                    return;
-                
-                bool overrideNativeFog = _lightingPreset.OverrideNativeFog;
-
-                if (!overrideNativeFog)
-                    return;
-                
-                Color dayFog = _lightingPreset.DayFog;
-                Color nightFog = _lightingPreset.NightFog;
-                float t = _lightingPreset.FogColorCurve.Evaluate(timeOfDay);
-                Color fogColor = Color.Lerp(a: nightFog, b: dayFog, t);
-                RenderSettings.fogColor = fogColor;
+                return intensity;
             }
         }
 
@@ -179,15 +234,24 @@ namespace GameCore.Gameplay.VisualManagement
 
         private void ChangeNativeFog(VisualPresetMeta preset, bool instant = false)
         {
-            bool useNativeFog = preset.UseNativeFog;
+            bool ignoreColorChange = false;
+            bool ignoreDensityChange = false;
+            
+            if (_isLightingPresetExists)
+            {
+                ignoreColorChange = _lightingPreset.OverrideNativeFogColor;
+                ignoreDensityChange = _lightingPreset.OverrideNativeFogDensity;
+            }
+            
+            bool enableFog = preset.UseNativeFog;
             float densityFrom = RenderSettings.fogDensity;
-            float densityTo = useNativeFog ? preset.NativeFogDensity : 0f;
+            float densityTo = enableFog ? preset.NativeFogDensity : 0f;
             float duration = instant ? 0f : preset.ChangeDuration;
             Color colorFrom = RenderSettings.fogColor;
             Color colorTo = preset.NativeFogColor;
             Ease ease = preset.ChangeEase;
 
-            if (useNativeFog && !RenderSettings.fog)
+            if (enableFog && !RenderSettings.fog)
                 RenderSettings.fog = true;
 
             _nativeFogTN.Kill();
@@ -195,15 +259,18 @@ namespace GameCore.Gameplay.VisualManagement
             _nativeFogTN = DOVirtual
                 .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
                 {
-                    float density = Mathf.Lerp(a: densityFrom, b: densityTo, t);
                     Color color = Color.Lerp(a: colorFrom, b: colorTo, t);
+                    float density = Mathf.Lerp(a: densityFrom, b: densityTo, t);
 
-                    RenderSettings.fogDensity = density;
-                    // RenderSettings.fogColor = color;
+                    if (!ignoreColorChange)
+                        RenderSettings.fogColor = color;
+
+                    if (!ignoreDensityChange)
+                        RenderSettings.fogDensity = density;
                 })
                 .SetEase(ease)
                 .SetLink(_owner)
-                .OnComplete(() => { RenderSettings.fog = useNativeFog; });
+                .OnComplete(() => { RenderSettings.fog = enableFog; });
         }
 
         private void ChangeCameraDistance(VisualPresetMeta preset, bool instant = false)

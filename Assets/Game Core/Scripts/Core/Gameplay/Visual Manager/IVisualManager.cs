@@ -6,6 +6,5 @@ namespace GameCore.Gameplay.VisualManagement
     {
         void ChangePreset(VisualPresetType presetType, bool instant = false);
         void SetLocationPreset(bool instant = false);
-        void UpdateLightingPreset();
     }
 }

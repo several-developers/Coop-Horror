@@ -97,7 +97,7 @@ namespace GameCore.Gameplay.VisualManagement
         [Button(ButtonStyle.FoldoutButton), DisableInEditorMode]
         public void ChangePreset(VisualPresetType presetType, bool instant = false)
         {
-            UpdateLightingPreset();
+            UpdateLightingPreset(); // TEMP
             
             bool isPresetTypeValid = presetType != _previousPresetType;
 
@@ -126,20 +126,6 @@ namespace GameCore.Gameplay.VisualManagement
             ChangePreset(VisualPresetType.ForestLocation, instant);
         }
 
-        public void UpdateLightingPreset()
-        {
-            LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
-
-            bool isLocationMetaFound =
-                _locationsMetaProvider.TryGetLocationMeta(currentLocation, out LocationMeta locationMeta);
-
-            if (!isLocationMetaFound)
-                return;
-
-            LightingPresetMeta lightingPreset = locationMeta.LightingPreset;
-            _visualController.SetLightingPreset(lightingPreset);
-        }
-
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void SetupPresetsDictionary()
@@ -160,6 +146,20 @@ namespace GameCore.Gameplay.VisualManagement
 
                 _visualPresets.Add(presetType, presetConfig);
             }
+        }
+        
+        private void UpdateLightingPreset()
+        {
+            LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
+
+            bool isLocationMetaFound =
+                _locationsMetaProvider.TryGetLocationMeta(currentLocation, out LocationMeta locationMeta);
+
+            if (!isLocationMetaFound)
+                return;
+
+            LightingPresetMeta lightingPreset = locationMeta.LightingPreset;
+            _visualController.SetLightingPreset(lightingPreset);
         }
 
         private bool TryGetPresetConfig(VisualPresetType presetType, out VisualPresetMeta preset) =>

@@ -23,5 +23,5 @@ MonoBehaviour:
   _nativeFogDensity: 0.009
   _changeCameraDistance: 1
   _cameraDistance: 400
-  _useSkybox: 1
+  _useSkybox: 0
   _sunIntensity: 1.5
