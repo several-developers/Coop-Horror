@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8d230428fb994b9895d80e51445d3344, type: 3}
-  m_Name: Quests Config
+  m_Name: Quests
   m_EditorClassIdentifier: 
-  _metaName: Quests Config
+  _metaName: Quests
   _maxQuestsAmount: 5
   _maxActiveQuests: 3
   _ignoreTrainQuestsCheck: 1

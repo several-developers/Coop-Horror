@@ -19,6 +19,6 @@ namespace GameCore.Configs.Gameplay.LocationsList
         public IEnumerable<LocationMeta> GetAllLocationsMeta() => _locationsMeta;
 
         public override string GetMetaCategory() =>
-            EditorConstants.GameplayConfigsCategory;
+            EditorConstants.GameplayConfigsListsCategory;
     }
 }

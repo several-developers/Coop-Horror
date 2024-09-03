@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: caa862e9ef89416e82aaa57a5c142230, type: 3}
-  m_Name: Elevator Config
+  m_Name: Elevator
   m_EditorClassIdentifier: 
-  _metaName: Elevator Config
+  _metaName: Elevator
   _floorMovementDuration: 3
   _reactivationDelay: 2
   _doorOpenDelay: 1

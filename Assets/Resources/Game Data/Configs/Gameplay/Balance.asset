@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a184ea0043ce46a786e2ca4551bf93e1, type: 3}
-  m_Name: Balance Config
+  m_Name: Balance
   m_EditorClassIdentifier: 
-  _metaName: Balance Config
+  _metaName: Balance
   _gameRestartDelay: 4
+  _noiseLoudnessMultiplier: 18
+  _noiseObstacleMultiplier: 0.5
   _monstersDangerLevelConfig:
     _dangerLevelConfigs:
     - _dangerLevel: 0

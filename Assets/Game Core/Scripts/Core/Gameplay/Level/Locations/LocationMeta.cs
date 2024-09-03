@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CustomEditors;
+using GameCore.Configs.Gameplay.Lighting;
 using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using Sirenix.OdinInspector;
@@ -31,6 +32,10 @@ namespace GameCore.Gameplay.Level.Locations
         [SerializeField, Space(height: 5)]
         private MonstersSpawnMultipliersConfig _monstersSpawnMultipliersConfig;
 
+        [Title(Constants.References)]
+        [SerializeField, Required]
+        private LightingPresetMeta _lightingPreset;
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public string LocationNameText => _locationNameText;
@@ -38,6 +43,7 @@ namespace GameCore.Gameplay.Level.Locations
         public SceneName SceneName => _sceneName;
         public int MaxIndoorDangerValue => _maxIndoorDangerValue;
         public int MaxOutdoorDangerValue => _maxOutdoorDangerValue;
+        public LightingPresetMeta LightingPreset => _lightingPreset;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

@@ -8,7 +8,9 @@
         
         public const string GlobalConfigsCategory = ConfigsCategory + "/Global";
         public const string GameplayConfigsCategory = ConfigsCategory + "/Gameplay";
-        public const string GameplayListsConfigsCategory = GameplayConfigsCategory + "/Lists";
+        
+        public const string GlobalConfigsListsCategory = ConfigsListsCategory + "/Global";
+        public const string GameplayConfigsListsCategory = ConfigsListsCategory + "/Gameplay";
         
         public const string ItemsCategory = "Items";
         public const string ItemsSpawnCategory = "Items Spawn";
@@ -26,6 +28,7 @@
         public const string Debug = "Debug";
         
         private const string ConfigsCategory = "Configs";
+        private const string ConfigsListsCategory = "Configs Lists";
         private const string Settings = "Settings/";
     }
 }

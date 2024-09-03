@@ -12,11 +12,11 @@ namespace GameCore.Configs.Gameplay.Visual
         [Title(Constants.References)]
         [SerializeField, Required]
         [ListDrawerSettings]
-        private List<VisualPresetConfig> _presetsConfigs;
+        private List<VisualPresetMeta> _presetsConfigs;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public IEnumerable<VisualPresetConfig> GetAllPresetsConfigs() => _presetsConfigs;
+        public IEnumerable<VisualPresetMeta> GetAllPresetsConfigs() => _presetsConfigs;
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;

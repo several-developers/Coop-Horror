@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02a192a093344d5f8dcb53151620dd00, type: 3}
-  m_Name: Items Spawn Config
+  m_Name: Items Spawn
   m_EditorClassIdentifier: 
-  _metaName: Items Spawn Config
+  _metaName: Items Spawn
   _firstFloorChance: 25
   _secondFloorChance: 30
   _itemsDistribution:

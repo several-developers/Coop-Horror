@@ -19,7 +19,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             _simulate = _timeConfig.Simulate;
             _stopAtNight = _timeConfig.StopAtNight;
 
-            SetDateTime(_timeConfig.Second, _timeConfig.Minute, _timeConfig.Hour, day: 0);
+            SetDateTime(_timeConfig.StartAtSecond, _timeConfig.StartAtMinute, _timeConfig.StartAtHour, day: 0);
         }
 
         // PROPERTIES: ----------------------------------------------------------------------------

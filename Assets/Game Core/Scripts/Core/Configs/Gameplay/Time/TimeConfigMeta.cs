@@ -8,87 +8,37 @@ namespace GameCore.Configs.Gameplay.Time
     {
         // MEMBERS: -------------------------------------------------------------------------------
         
-        [Title(Constants.Settings)]
-        [SerializeField]
+        [TitleGroup(title: Constants.Settings)]
+        [BoxGroup(Constants.SettingsIn, showLabel: false), SerializeField]
         private float _cycleDurationInMinutes = 20f;
 
-        [SerializeField, Range(0.1f, 10f)]
+        [BoxGroup(Constants.SettingsIn), SerializeField, Range(0.1f, 10f)]
         private float _cycleLengthModifier = 1f;
 
-        [SerializeField, Range(0, 60)]
-        private int _second;
+        [BoxGroup(Constants.SettingsIn), SerializeField, Range(0, 60)]
+        private int _startAtSecond;
 
-        [SerializeField, Range(0, 60)]
-        private int _minute;
+        [BoxGroup(Constants.SettingsIn), SerializeField, Range(0, 60)]
+        private int _startAtMinute;
 
-        [SerializeField, Range(0, 23)]
-        private int _hour;
+        [BoxGroup(Constants.SettingsIn), SerializeField, Range(0, 23)]
+        private int _startAtHour;
 
-        [SerializeField]
-        private bool _simulate;
-
-        [SerializeField]
+        [BoxGroup(Constants.SettingsIn), SerializeField]
         private bool _stopAtNight;
 
-        [Title("Location Visual Settings")]
-        [SerializeField]
-        private AnimationCurve _sunIntensityCurve;
-
-        [SerializeField]
-        private Gradient _skyColor;
-
-        [SerializeField]
-        private Gradient _equatorColor;
-
-        [SerializeField]
-        private Gradient _sunColor;
-
-        [Space(10)]
-        [SerializeField]
-        public AnimationCurve _lightIntensityCurve;
-
-        [SerializeField]
-        public float _maxSunIntensity = 1.5f;
-
-        [SerializeField]
-        public float _maxMoonIntensity = 0.5f;
-
-        [SerializeField, ColorUsage(showAlpha: true, hdr: true)]
-        private Color _defaultAmbient;
-        
-        [ColorUsage(showAlpha: true, hdr: true)]
-        public Color _dayAmbient;
-        
-        [ColorUsage(showAlpha: true, hdr: true)]
-        public Color _nightAmbient;
-        
-        [Space(5)]
-        [SerializeField]
-        public AnimationCurve _ambientReflectionsCurve;
-
-        [Space(5)]
-        [SerializeField]
-        public AnimationCurve _fogColorCurve;
-
-        [SerializeField]
-        public Color _dayFog;
-        
-        [SerializeField]
-        public Color _nightFog;
+        [BoxGroup(Constants.SettingsIn), SerializeField]
+        private bool _simulate;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float CycleDurationInMinutes => _cycleDurationInMinutes;
         public float CycleLengthModifier => _cycleLengthModifier;
-        public int Second => _second;
-        public int Minute => _minute;
-        public int Hour => _hour;
-        public bool Simulate => _simulate;
+        public int StartAtSecond => _startAtSecond;
+        public int StartAtMinute => _startAtMinute;
+        public int StartAtHour => _startAtHour;
         public bool StopAtNight => _stopAtNight;
-        public AnimationCurve SunIntensityCurve => _sunIntensityCurve;
-        public Gradient SkyColor => _skyColor;
-        public Gradient EquatorColor => _equatorColor;
-        public Gradient SunColor => _sunColor;
+        public bool Simulate => _simulate;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 
 namespace GameCore.Configs.Gameplay.Visual
 {
-    public class VisualPresetConfig : EditorMeta
+    public class VisualPresetMeta : EditorMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -52,9 +52,6 @@ namespace GameCore.Configs.Gameplay.Visual
         [BoxGroup(LightingTitle), SerializeField, Range(0f, 5f)]
         private float _sunIntensity = 1f;
 
-        [BoxGroup(LightingTitle), SerializeField, Range(0f, 5f)]
-        private float _skyboxIntensity = 1f;
-
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public VisualPresetType PresetType => _presetType;
@@ -73,7 +70,6 @@ namespace GameCore.Configs.Gameplay.Visual
         public bool UseSkybox => _useSkybox;
 
         public float SunIntensity => _sunIntensity;
-        public float SkyboxIntensity => _skyboxIntensity;
 
         // FIELDS: --------------------------------------------------------------------------------
 

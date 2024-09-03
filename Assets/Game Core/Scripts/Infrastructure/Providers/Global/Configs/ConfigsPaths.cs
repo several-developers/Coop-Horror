@@ -6,25 +6,28 @@
         
         public const string InputReader = "Input Reader"; // TEMP
         
-        public const string GameConfig = GlobalConfigs + "Game Config";
+        // Configs
+        public const string GameConfig = GlobalConfigs + "Game";
+        public const string BalanceConfig = GameplayConfigs + "Balance";
+        public const string TimeConfig = GameplayConfigs + "Time";
+        public const string TrainConfig = GameplayConfigs + "Train";
+        public const string ElevatorConfig = GameplayConfigs + "Elevator";
+        public const string QuestsConfig = GameplayConfigs + "Quests";
+        public const string QuestsItemsConfig = GameplayConfigs + "Quests Items";
+        public const string PlayerConfig = GameplayConfigs + "Player";
+        public const string RigPresetsConfig = GameplayConfigs + "Rig Presets";
+        public const string VisualConfig = GameplayConfigs + "Visual";
+        public const string ItemsSpawnConfig = GameplayConfigs + "Items Spawn";
+        public const string MonstersGeneratorConfig = GameplayConfigs + "Monsters Generator";
         
-        public const string BalanceConfig = GameplayConfigs + "Balance Config";
-        public const string ItemsListConfig = GameplayConfigs + "Items List Config";
-        public const string LocationsListConfig = GameplayConfigs + "Locations List Config";
-        public const string TimeConfig = GameplayConfigs + "Time Config";
-        public const string TrainConfig = GameplayConfigs + "Train Config";
-        public const string ElevatorConfig = GameplayConfigs + "Elevator Config";
-        public const string PrefabsListConfig = GameplayConfigs + "Prefabs List Config";
-        public const string QuestsConfig = GameplayConfigs + "Quests Config";
-        public const string QuestsItemsConfig = GameplayConfigs + "Quests Items Config";
-        public const string PlayerConfig = GameplayConfigs + "Player Config";
-        public const string RigPresetsConfig = GameplayConfigs + "Rig Presets Config";
-        public const string VisualConfig = GameplayConfigs + "Visual Config";
-        public const string ItemsSpawnConfig = GameplayConfigs + "Items Spawn Config";
-        public const string MonstersListConfig = GameplayConfigs + "Monsters List Config";
-        public const string MonstersGeneratorConfig = GameplayConfigs + "Monsters Generator Config";
-        public const string EntitiesListConfig = GameplayConfigs + "Entities List Config";
-
+        // Configs Lists
+        public const string ItemsListConfig = GameplayConfigsLists + "Items List";
+        public const string LocationsListConfig = GameplayConfigsLists + "Locations List";
+        public const string PrefabsListConfig = GameplayConfigsLists + "Prefabs List";
+        public const string MonstersListConfig = GameplayConfigsLists + "Monsters List";
+        public const string EntitiesListConfig = GameplayConfigsLists + "Entities List";
+        
+        // Monsters AI
         public const string GoodClownAIConfig = MonstersAIConfigs + "Good Clown AI";
         public const string EvilClownAIConfig = MonstersAIConfigs + "Evil Clown AI";
         public const string BeetleAIConfig = MonstersAIConfigs + "Beetle AI";
@@ -32,9 +35,14 @@
         public const string SirenHeadAIConfig = MonstersAIConfigs + "Siren Head AI";
         
         private const string GameData = "Game Data/";
+        
         private const string Configs = GameData + "Configs/";
         private const string GlobalConfigs = Configs + "Global/";
         private const string GameplayConfigs = Configs + "Gameplay/";
+        
+        private const string ConfigsLists = GameData + "Configs Lists/";
+        private const string GlobalConfigsLists = ConfigsLists + "Global/";
+        private const string GameplayConfigsLists = ConfigsLists + "Gameplay/";
         
         private const string MonstersAIConfigs = GameData + "Monsters AI/";
     }

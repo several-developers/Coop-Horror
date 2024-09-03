@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69d8728d8a5e4519a97a09c7893267a4, type: 3}
-  m_Name: Locations List Config
+  m_Name: Locations List
   m_EditorClassIdentifier: 
-  _metaName: Locations List Config
+  _metaName: Locations List
   _locationsMeta:
   - {fileID: 11400000, guid: c2ac7d4c412f0c34d8c9ca87da127f1a, type: 2}
   - {fileID: 11400000, guid: 1322bc351cbd0a04e8e0158327a1e9c0, type: 2}

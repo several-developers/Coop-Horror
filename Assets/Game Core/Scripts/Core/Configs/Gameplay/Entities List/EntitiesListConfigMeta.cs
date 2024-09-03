@@ -24,6 +24,6 @@ namespace GameCore.Configs.Gameplay.EntitiesList
         public IEnumerable<Entity> GetAllEntities() => _entitiesList;
 
         public override string GetMetaCategory() =>
-            EditorConstants.GameplayConfigsCategory;
+            EditorConstants.GameplayConfigsListsCategory;
     }
 }

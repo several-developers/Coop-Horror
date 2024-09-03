@@ -10,7 +10,7 @@ namespace GameCore.Configs.Gameplay.MonstersList
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
-        [SerializeField]
+        [SerializeField, LabelText("List")]
         [ListDrawerSettings(ListElementLabelName = "Label")]
         private List<MonsterReference> _references;
 
@@ -20,6 +20,6 @@ namespace GameCore.Configs.Gameplay.MonstersList
         public IReadOnlyList<MonsterReference> GetAllReferences() => _references;
 
         public override string GetMetaCategory() =>
-            EditorConstants.GameplayConfigsCategory;
+            EditorConstants.GameplayConfigsListsCategory;
     }
 }

@@ -19,6 +19,6 @@ namespace GameCore.Configs.Gameplay.ItemsList
         public IEnumerable<ItemMeta> GetAllItems() => _itemsMeta;
 
         public override string GetMetaCategory() =>
-            EditorConstants.GameplayConfigsCategory;
+            EditorConstants.GameplayConfigsListsCategory;
     }
 }

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c11fa1dd59124c5899e362a5fb47eebd, type: 3}
-  m_Name: Prefabs List Config
+  m_Name: Prefabs List
   m_EditorClassIdentifier: 
-  _metaName: Prefabs List Config
+  _metaName: Prefabs List
   _elevatorsManager: {fileID: 7910312692771768809, guid: 96c893cd92814744d9080566f4947cae,
     type: 3}
   _playerSpawner: {fileID: 3767574992753507385, guid: e09cafe6053c7f94698faecb9d7a4ca6,

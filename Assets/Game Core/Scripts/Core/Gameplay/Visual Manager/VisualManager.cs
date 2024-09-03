@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Time;
+using GameCore.Configs.Gameplay.Lighting;
 using GameCore.Configs.Gameplay.Visual;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
+using GameCore.Gameplay.Level.Locations;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using GameCore.Observers.Gameplay.Time;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -25,15 +28,15 @@ namespace GameCore.Gameplay.VisualManagement
             PlayerCamera playerCamera,
             Sun sun,
             ITimeObserver timeObserver,
-            IGameplayConfigsProvider gameplayConfigsProvider
+            IGameplayConfigsProvider gameplayConfigsProvider,
+            ILocationsMetaProvider locationsMetaProvider
         )
         {
-            TimeConfigMeta timeConfig = gameplayConfigsProvider.GetTimeConfig();
-
             _gameManagerDecorator = gameManagerDecorator;
             _timeObserver = timeObserver;
             _gameplayConfigsProvider = gameplayConfigsProvider;
-            _visualController = new VisualController(gameObject, playerCamera, sun, _volumeOne, _volumeTwo, timeConfig);
+            _locationsMetaProvider = locationsMetaProvider;
+            _visualController = new VisualController(gameObject, playerCamera, sun, _volumeOne, _volumeTwo);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -47,11 +50,12 @@ namespace GameCore.Gameplay.VisualManagement
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly Dictionary<VisualPresetType, VisualPresetConfig> _visualPresets = new();
+        private readonly Dictionary<VisualPresetType, VisualPresetMeta> _visualPresets = new();
 
         private IGameManagerDecorator _gameManagerDecorator;
         private ITimeObserver _timeObserver;
         private IGameplayConfigsProvider _gameplayConfigsProvider;
+        private ILocationsMetaProvider _locationsMetaProvider;
 
         private VisualController _visualController;
         private VisualPresetType _previousPresetType;
@@ -93,12 +97,14 @@ namespace GameCore.Gameplay.VisualManagement
         [Button(ButtonStyle.FoldoutButton), DisableInEditorMode]
         public void ChangePreset(VisualPresetType presetType, bool instant = false)
         {
+            UpdateLightingPreset();
+            
             bool isPresetTypeValid = presetType != _previousPresetType;
 
             if (!isPresetTypeValid)
                 return;
 
-            bool isPresetFound = TryGetPresetConfig(presetType, out VisualPresetConfig presetConfig);
+            bool isPresetFound = TryGetPresetConfig(presetType, out VisualPresetMeta presetConfig);
 
             if (!isPresetFound)
             {
@@ -106,12 +112,12 @@ namespace GameCore.Gameplay.VisualManagement
                 return;
             }
 
-            string log = Log.HandleLog($"Changing visual preset to the <gb>{presetType}</gb>.");
+            string log = Log.HandleLog($"Changing visual preset to the <gb>{presetType.GetNiceName()}</gb>.");
             Debug.Log(log);
 
             _previousPresetType = presetType;
 
-            _visualController.ApplyEffects(presetConfig, instant);
+            _visualController.UpdateVisual(presetConfig, instant);
         }
 
         [Button(ButtonStyle.FoldoutButton), DisableInEditorMode]
@@ -120,14 +126,28 @@ namespace GameCore.Gameplay.VisualManagement
             ChangePreset(VisualPresetType.ForestLocation, instant);
         }
 
+        public void UpdateLightingPreset()
+        {
+            LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
+
+            bool isLocationMetaFound =
+                _locationsMetaProvider.TryGetLocationMeta(currentLocation, out LocationMeta locationMeta);
+
+            if (!isLocationMetaFound)
+                return;
+
+            LightingPresetMeta lightingPreset = locationMeta.LightingPreset;
+            _visualController.SetLightingPreset(lightingPreset);
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void SetupPresetsDictionary()
         {
             VisualConfigMeta visualConfig = _gameplayConfigsProvider.GetVisualConfig();
-            IEnumerable<VisualPresetConfig> allPresetsConfigs = visualConfig.GetAllPresetsConfigs();
+            IEnumerable<VisualPresetMeta> allPresetsConfigs = visualConfig.GetAllPresetsConfigs();
 
-            foreach (VisualPresetConfig presetConfig in allPresetsConfigs)
+            foreach (VisualPresetMeta presetConfig in allPresetsConfigs)
             {
                 VisualPresetType presetType = presetConfig.PresetType;
                 bool containsKey = _visualPresets.ContainsKey(presetType);
@@ -142,17 +162,15 @@ namespace GameCore.Gameplay.VisualManagement
             }
         }
 
-        private bool TryGetPresetConfig(VisualPresetType presetType, out VisualPresetConfig presetConfig) =>
-            _visualPresets.TryGetValue(presetType, out presetConfig);
+        private bool TryGetPresetConfig(VisualPresetType presetType, out VisualPresetMeta preset) =>
+            _visualPresets.TryGetValue(presetType, out preset);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnTimeUpdated(MyDateTime dateTime)
         {
             float timeOfDay = _timeObserver.GetDateTimeNormalized();
-            
-            _visualController.UpdateRenderSettings(timeOfDay);
-            _visualController.UpdateLightSettings(timeOfDay);
+            _visualController.UpdateLightingSettings(timeOfDay);
         }
 
         private void OnPlayerSpawned(PlayerEntity playerEntity)
@@ -179,11 +197,11 @@ namespace GameCore.Gameplay.VisualManagement
         {
             bool changeAmbientSkyColor = location switch
             {
-                EntityLocation.Dungeon => false,
-                _ => true
+                EntityLocation.Dungeon => true,
+                _ => false
             };
 
-            _visualController.ToggleAmbientSkyColorState(changeAmbientSkyColor);
+            _visualController.TogglePlayerInDungeonState(changeAmbientSkyColor);
         }
     }
 }

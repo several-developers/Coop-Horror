@@ -10,14 +10,14 @@ namespace GameCore.Configs.Gameplay.Quests
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
-        [Title(Constants.Settings)]
-        [SerializeField, Range(1, 5)]
+        [TitleGroup(title: Constants.Settings)]
+        [BoxGroup(Constants.SettingsIn, showLabel: false), SerializeField, Range(1, 5)]
         private int _maxQuestsAmount = 5;
 
-        [SerializeField, Range(1, 5)]
+        [BoxGroup(Constants.SettingsIn), SerializeField, Range(1, 5)]
         private int _maxActiveQuests = 3;
 
-        [SerializeField]
+        [BoxGroup(Constants.SettingsIn), SerializeField]
         [InfoBox(message: Warning, InfoMessageType.Error, nameof(_ignoreTrainQuestsCheck))]
         private bool _ignoreTrainQuestsCheck;
 

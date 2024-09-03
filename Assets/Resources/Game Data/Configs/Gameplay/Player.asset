@@ -10,16 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ffcea5511e396994f9252e24a1cb036e, type: 3}
-  m_Name: Player Config
+  m_Name: Player
   m_EditorClassIdentifier: 
-  _metaName: Player Config
+  _metaName: Player
   _health: 100
   _defaultHeight: 1.7
   _defaultRadius: 0.35
   _sittingHeight: 1
   _sittingRadius: 0.25
-  _playerPrefab: {fileID: 5746002443945451132, guid: a77369042e11ddd49be3f82d556be8a1,
-    type: 3}
   _footstepsSE: {fileID: 11400000, guid: f938e4af8586c564bb5481b3e2e15769, type: 2}
   _jumpSE: {fileID: 11400000, guid: a7f57135654e8a14c84713594d442c20, type: 2}
   _landSE: {fileID: 11400000, guid: 12687ca9a9a3d574389bfa8d6ab5b50c, type: 2}

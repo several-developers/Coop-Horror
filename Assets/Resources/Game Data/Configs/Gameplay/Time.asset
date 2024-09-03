@@ -9,13 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b09a936456cdc524689284a2744987fb, type: 3}
-  m_Name: Game Config
+  m_Script: {fileID: 11500000, guid: fa81e00aa61d43488b19dcd3a6456d5b, type: 3}
+  m_Name: Time
   m_EditorClassIdentifier: 
-  _metaName: Game Config
-  _noiseLayers:
-    serializedVersion: 2
-    m_Bits: 128
-  _useStartScene: 0
-  _forceLoadBootstrapScene: 0
-  _startScene: 1
+  _metaName: Time
+  _cycleDurationInMinutes: 10
+  _cycleLengthModifier: 1
+  _startAtSecond: 0
+  _startAtMinute: 0
+  _startAtHour: 0
+  _stopAtNight: 1
+  _simulate: 1

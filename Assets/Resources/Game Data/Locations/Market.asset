@@ -16,3 +16,8 @@ MonoBehaviour:
   _locationNameText: Market
   _locationName: 2
   _sceneName: 3
+  _maxIndoorDangerValue: 0
+  _maxOutdoorDangerValue: 0
+  _monstersSpawnMultipliersConfig:
+    _configs: []
+  _lightingPreset: {fileID: 0}

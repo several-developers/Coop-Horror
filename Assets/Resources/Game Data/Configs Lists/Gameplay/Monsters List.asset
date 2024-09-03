@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4e09166ad264b64948f61ae7e27494a, type: 3}
-  m_Name: Monsters List Config
+  m_Name: Monsters List
   m_EditorClassIdentifier: 
-  _metaName: Monsters List Config
+  _metaName: Monsters List
   _references:
   - _monsterType: 1
     _monsterPrefab: {fileID: 4870548347698269539, guid: 0fb27fc3f913e2d4aac7d5ac1fa23e46,

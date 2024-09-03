@@ -315,6 +315,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             if (!isMonsterSpawned)
                 return;
             
+            Debug.LogWarning($"Spawned Monster <gb>{monsterType.GetNiceName()}</gb>");
             monsterEntity.SetEntityLocation(EntityLocation.Dungeon);
             monsterEntity.SetFloor(floor);
         }
@@ -346,9 +347,8 @@ namespace GameCore.Gameplay.MonstersGeneration
 
         private void GetMonstersAmountToSpawn()
         {
-            MonstersSpawnAmountConfig monstersSpawnAmountConfig = _monstersGeneratorConfig.MonstersSpawnAmountConfig;
             int alivePlayersAmount = GetAlivePlayersAmount();
-            _monstersAmountToSpawn = monstersSpawnAmountConfig.GetRandomMonstersAmount(alivePlayersAmount);
+            _monstersAmountToSpawn = _monstersGeneratorConfig.GetRandomMonstersAmount(alivePlayersAmount);
         }
 
         private bool TryGetCurrentLocationMeta(out LocationMeta locationMeta)

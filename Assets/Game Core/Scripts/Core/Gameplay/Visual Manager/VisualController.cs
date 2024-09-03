@@ -1,5 +1,5 @@
 ﻿using DG.Tweening;
-using GameCore.Configs.Gameplay.Time;
+using GameCore.Configs.Gameplay.Lighting;
 using GameCore.Configs.Gameplay.Visual;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameTimeManagement;
@@ -17,8 +17,7 @@ namespace GameCore.Gameplay.VisualManagement
             PlayerCamera playerCamera,
             Sun sun,
             Volume volumeOne,
-            Volume volumeTwo,
-            TimeConfigMeta timeConfig
+            Volume volumeTwo
         )
         {
             _owner = owner;
@@ -26,7 +25,6 @@ namespace GameCore.Gameplay.VisualManagement
             _sun = sun;
             _volumeOne = volumeOne;
             _volumeTwo = volumeTwo;
-            _timeConfig = timeConfig;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -36,89 +34,126 @@ namespace GameCore.Gameplay.VisualManagement
         private readonly Sun _sun;
         private readonly Volume _volumeOne;
         private readonly Volume _volumeTwo;
-        private readonly TimeConfigMeta _timeConfig;
 
         private Tweener _volumeTN;
         private Tweener _nativeFogTN;
         private Tweener _cameraTN;
-        private Tweener _sunTN;
-        private Tweener _skyboxTN;
 
-        private float _previousSunIntensity = 1.5f;
-        private bool _changeAmbientSkyColor = true;
+        private LightingPresetMeta _lightingPreset;
+        private VisualPresetMeta _visualPreset;
+        private bool _playerInDungeon = true;
+        private bool _isLightingPresetExists;
+        private bool _isVisualPresetExists;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void ApplyEffects(VisualPresetConfig presetConfig, bool instant = false)
+        public void UpdateVisual(VisualPresetMeta preset, bool instant = false)
         {
-            ChangeVolume(presetConfig, instant);
-            ChangeNativeFog(presetConfig, instant);
-            ChangeCameraDistance(presetConfig, instant);
-            ChangeCameraBackgroundType(presetConfig);
-            ChangeSkyboxIntensity(presetConfig, instant);
-            ChangeSun(presetConfig, instant);
+            _visualPreset = preset;
+            _isVisualPresetExists = preset != null;
+            
+            ChangeVolume(preset, instant);
+            ChangeNativeFog(preset, instant);
+            ChangeCameraDistance(preset, instant);
+            ChangeCameraBackgroundType(preset);
         }
-        
-        public void UpdateRenderSettings(float timeOfDay)
+
+        public void SetLightingPreset(LightingPresetMeta lightingPreset)
         {
-            // RenderSettings.ambientEquatorColor = _timeConfig.EquatorColor.Evaluate(timeOfDay);
+            _lightingPreset = lightingPreset;
+            _isLightingPresetExists = lightingPreset != null;
+        }
 
-            if (_changeAmbientSkyColor)
+        public void UpdateLightingSettings(float timeOfDay)
+        {
+            if (!_isLightingPresetExists)
+                return;
+
+            UpdateAmbientColor();
+            UpdateAmbientReflections();
+            UpdateSunIntensity();
+            UpdateNativeFog();
+            
+            //float dotProduct = Vector3.Dot(_sun.transform.forward, Vector3.down);
+            //float dotProductClamped = Mathf.Clamp01(dotProduct);
+
+            // LOCAL METHODS: -----------------------------
+
+            void UpdateAmbientColor()
             {
-                //if (RenderSettings.ambientMode != AmbientMode.Skybox)
-                    //RenderSettings.ambientMode = AmbientMode.Skybox;
+                if (_playerInDungeon)
+                {
+                    if (RenderSettings.ambientMode != AmbientMode.Flat)
+                        RenderSettings.ambientMode = AmbientMode.Flat;
 
-                // RenderSettings.ambientSkyColor = _timeConfig.SkyColor.Evaluate(timeOfDay);
-
-                //float dotProduct = Vector3.Dot(_sun.transform.forward, Vector3.down);
-                //float dotProductClamped = Mathf.Clamp01(dotProduct);
+                    RenderSettings.ambientSkyColor = Color.black;
+                    return;
+                }
                 
-                Color dayAmbient = _timeConfig._dayAmbient;
-                Color nightAmbient = _timeConfig._nightAmbient;
-                float ambientT = _timeConfig._lightIntensityCurve.Evaluate(timeOfDay);
-                Color ambientColor = Color.Lerp(nightAmbient, dayAmbient, ambientT);
+                Color dayAmbient = _lightingPreset.DayAmbient;
+                Color nightAmbient = _lightingPreset.NightAmbient;
+                float t = _lightingPreset.AmbientColorCurve.Evaluate(timeOfDay);
+                Color ambientColor = Color.Lerp(a: nightAmbient, b: dayAmbient, t);
                 RenderSettings.ambientSkyColor = ambientColor;
+            }
 
-                float reflectionIntensity = _timeConfig._ambientReflectionsCurve.Evaluate(timeOfDay);
+            void UpdateAmbientReflections()
+            {
+                if (_playerInDungeon)
+                    return;
+                
+                float reflectionIntensity = _lightingPreset.AmbientReflectionsCurve.Evaluate(timeOfDay);
                 RenderSettings.reflectionIntensity = reflectionIntensity;
+            }
 
-                float fogT = _timeConfig._fogColorCurve.Evaluate(timeOfDay);
-                Color dayFog = _timeConfig._dayFog;
-                Color nightFog = _timeConfig._nightFog;
-                Color fogColor = Color.Lerp(nightFog, dayFog, fogT);
+            void UpdateSunIntensity()
+            {
+                if (_playerInDungeon)
+                    return;
+
+                bool overrideSunIntensity = _lightingPreset.OverrideSunIntensity && _isVisualPresetExists;
+                
+                float sunIntensity = overrideSunIntensity
+                    ? _lightingPreset.SunIntensity
+                    : _visualPreset.SunIntensity;
+                
+                float t = _lightingPreset.SunIntensityCurve.Evaluate(timeOfDay);
+                float intensity = Mathf.Lerp(a: 0f, b: sunIntensity, t);
+
+                _sun.SetIntensity(intensity);
+            }
+
+            void UpdateNativeFog()
+            {
+                if (_playerInDungeon)
+                    return;
+                
+                bool overrideNativeFog = _lightingPreset.OverrideNativeFog;
+
+                if (!overrideNativeFog)
+                    return;
+                
+                Color dayFog = _lightingPreset.DayFog;
+                Color nightFog = _lightingPreset.NightFog;
+                float t = _lightingPreset.FogColorCurve.Evaluate(timeOfDay);
+                Color fogColor = Color.Lerp(a: nightFog, b: dayFog, t);
                 RenderSettings.fogColor = fogColor;
             }
-            else
-            {
-                if (RenderSettings.ambientMode != AmbientMode.Flat)
-                    RenderSettings.ambientMode = AmbientMode.Flat;
-
-                RenderSettings.ambientSkyColor = Color.black;
-            }
         }
 
-        public void UpdateLightSettings(float timeOfDay)
-        {
-            float t = _timeConfig._lightIntensityCurve.Evaluate(timeOfDay);
-            float sunIntensity = Mathf.Lerp(0, _timeConfig._maxSunIntensity, t);
-            //float moonIntensity = Mathf.Lerp(_timeConfig._maxMoonIntensity, 0, t);
-            
-            _sun.SetIntensity(sunIntensity);
-        }
-
-        public void ToggleAmbientSkyColorState(bool changeAmbientSkyColor) =>
-            _changeAmbientSkyColor = changeAmbientSkyColor;
+        public void TogglePlayerInDungeonState(bool playerInDungeon) =>
+            _playerInDungeon = playerInDungeon;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void ChangeVolume(VisualPresetConfig presetConfig, bool instant = false)
+        private void ChangeVolume(VisualPresetMeta preset, bool instant = false)
         {
-            float duration = instant ? 0f : presetConfig.ChangeDuration;
-            Ease ease = presetConfig.ChangeEase;
+            float duration = instant ? 0f : preset.ChangeDuration;
+            Ease ease = preset.ChangeEase;
 
             _volumeTN.Kill();
 
-            _volumeTwo.profile = presetConfig.UseVolumeProfile ? presetConfig.VolumeProfile : null;
+            _volumeTwo.profile = preset.UseVolumeProfile ? preset.VolumeProfile : null;
             _volumeOne.weight = 1f;
             _volumeTwo.weight = 0f;
 
@@ -135,22 +170,22 @@ namespace GameCore.Gameplay.VisualManagement
                 .SetLink(_owner)
                 .OnComplete(() =>
                 {
-                    _volumeOne.profile = presetConfig.UseVolumeProfile ? presetConfig.VolumeProfile : null;
+                    _volumeOne.profile = preset.UseVolumeProfile ? preset.VolumeProfile : null;
                     _volumeTwo.profile = null;
                     _volumeOne.weight = 1f;
                     _volumeTwo.weight = 0f;
                 });
         }
 
-        private void ChangeNativeFog(VisualPresetConfig presetConfig, bool instant = false)
+        private void ChangeNativeFog(VisualPresetMeta preset, bool instant = false)
         {
-            bool useNativeFog = presetConfig.UseNativeFog;
+            bool useNativeFog = preset.UseNativeFog;
             float densityFrom = RenderSettings.fogDensity;
-            float densityTo = useNativeFog ? presetConfig.NativeFogDensity : 0f;
-            float duration = instant ? 0f : presetConfig.ChangeDuration;
+            float densityTo = useNativeFog ? preset.NativeFogDensity : 0f;
+            float duration = instant ? 0f : preset.ChangeDuration;
             Color colorFrom = RenderSettings.fogColor;
-            Color colorTo = presetConfig.NativeFogColor;
-            Ease ease = presetConfig.ChangeEase;
+            Color colorTo = preset.NativeFogColor;
+            Ease ease = preset.ChangeEase;
 
             if (useNativeFog && !RenderSettings.fog)
                 RenderSettings.fog = true;
@@ -171,13 +206,13 @@ namespace GameCore.Gameplay.VisualManagement
                 .OnComplete(() => { RenderSettings.fog = useNativeFog; });
         }
 
-        private void ChangeCameraDistance(VisualPresetConfig presetConfig, bool instant = false)
+        private void ChangeCameraDistance(VisualPresetMeta preset, bool instant = false)
         {
             Camera mainCamera = _playerCamera.CameraReferences.MainCamera;
             float distanceFrom = mainCamera.farClipPlane;
-            float distanceTo = presetConfig.ChangeCameraDistance ? presetConfig.CameraDistance : distanceFrom;
-            float duration = instant ? 0f : presetConfig.ChangeDuration;
-            Ease ease = presetConfig.ChangeEase;
+            float distanceTo = preset.ChangeCameraDistance ? preset.CameraDistance : distanceFrom;
+            float duration = instant ? 0f : preset.ChangeDuration;
+            Ease ease = preset.ChangeEase;
 
             _cameraTN.Kill();
 
@@ -191,52 +226,11 @@ namespace GameCore.Gameplay.VisualManagement
                 .SetLink(_owner);
         }
 
-        private void ChangeCameraBackgroundType(VisualPresetConfig presetConfig)
+        private void ChangeCameraBackgroundType(VisualPresetMeta preset)
         {
-            bool useSkybox = presetConfig.UseSkybox;
+            bool useSkybox = preset.UseSkybox;
             Camera mainCamera = _playerCamera.CameraReferences.MainCamera;
             mainCamera.clearFlags = useSkybox ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
-        }
-
-        private void ChangeSkyboxIntensity(VisualPresetConfig presetConfig, bool instant = false)
-        {
-            float intensityFrom = RenderSettings.ambientIntensity;
-            float intensityTo = presetConfig.SkyboxIntensity;
-            float duration = instant ? 0f : presetConfig.ChangeDuration;
-            Ease ease = presetConfig.ChangeEase;
-
-            _skyboxTN.Kill();
-
-            _skyboxTN = DOVirtual
-                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
-                {
-                    float intensity = Mathf.Lerp(a: intensityFrom, b: intensityTo, t);
-                    RenderSettings.ambientIntensity = intensity;
-                })
-                .SetEase(ease)
-                .SetLink(_owner);
-        }
-
-        private void ChangeSun(VisualPresetConfig presetConfig, bool instant = false)
-        {
-            _previousSunIntensity = presetConfig.SunIntensity;
-            
-            return;
-            float intensityFrom = _sun.GetIntensity();
-            float intensityTo = presetConfig.SunIntensity;
-            float duration = instant ? 0f : presetConfig.ChangeDuration;
-            Ease ease = presetConfig.ChangeEase;
-            
-            _sunTN.Kill();
-
-            _sunTN = DOVirtual
-                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
-                {
-                    float intensity = Mathf.Lerp(a: intensityFrom, b: intensityTo, t);
-                    _sun.SetIntensity(intensity);
-                })
-                .SetEase(ease)
-                .SetLink(_owner);
         }
     }
 }

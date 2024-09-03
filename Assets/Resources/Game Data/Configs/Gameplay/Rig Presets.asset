@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f83398f7cd924667b951fbdccf7dd2e9, type: 3}
-  m_Name: Rig Presets Config
+  m_Name: Rig Presets
   m_EditorClassIdentifier: 
-  _metaName: Rig Presets Config
+  _metaName: Rig Presets
   _presetsReferences:
   - _presetType: 0
     _presetMeta: {fileID: 11400000, guid: 287fba0580419c54ab46c65a9c9cc869, type: 2}

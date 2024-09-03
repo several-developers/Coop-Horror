@@ -55,6 +55,6 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override string GetMetaCategory() =>
-            EditorConstants.GameplayConfigsCategory;
+            EditorConstants.GameplayConfigsListsCategory;
     }
 }
