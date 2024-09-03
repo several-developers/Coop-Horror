@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: c9c334ec9a0a6ab48a38ddd2dc666fda
+  m_SerializeEntries:
+  - m_GUID: 3c925b17e183a1c49aa064decc1aaf0e
+    m_Address: MainMenu
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b2bf899e600d75e44bc1a8e1dd9f2c50
+    m_Address: Gameplay
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5eeb4c2879517e14bbbe756e35a28386
+    m_Address: Market
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 94125c3d369b50348960125d36938ef5
+    m_Address: Forest
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75fa75dd9a346a04eb1c4dc9bcb6f9ca, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: f120d4fcc35cf20439c1052a52d026a1, type: 2}
+    - {fileID: 11400000, guid: f7488aec498e1be42859682d297c60d3, type: 2}
