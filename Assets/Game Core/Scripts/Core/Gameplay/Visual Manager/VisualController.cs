@@ -139,7 +139,7 @@ namespace GameCore.Gameplay.VisualManagement
 
             AmbientMode GetAmbientMode()
             {
-                bool useFlat = _playerInDungeon || _isVisualPresetExists && !_visualPreset.UseSkybox;
+                bool useFlat = _playerInDungeon;
                 return useFlat ? AmbientMode.Flat : AmbientMode.Skybox;
             }
             

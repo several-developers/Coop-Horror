@@ -201,8 +201,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<MonstersGenerator>()
-                .AsSingle()
-                .NonLazy();
+                .AsSingle();
         }
     }
 }

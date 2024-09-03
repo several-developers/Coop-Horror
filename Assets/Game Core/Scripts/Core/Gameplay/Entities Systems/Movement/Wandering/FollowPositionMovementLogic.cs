@@ -1,15 +1,14 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.AI;
-using Random = UnityEngine.Random;
 
-namespace GameCore.Gameplay.Systems.MovementLogics
+namespace GameCore.Gameplay.Systems.Movement
 {
-    public class WanderingMovementLogic
+    public class FollowPositionMovementLogic
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public WanderingMovementLogic(Transform transform, NavMeshAgent agent)
+        public FollowPositionMovementLogic(Transform transform, NavMeshAgent agent)
         {
             _transform = transform;
             _agent = agent;
@@ -19,15 +18,14 @@ namespace GameCore.Gameplay.Systems.MovementLogics
 
         public event Action OnStuckEvent = delegate { };
         public event Action OnArrivedEvent = delegate { };
-        public event Func<Vector3> GetRandomPositionEvent; 
-        public event Func<float> GetWanderingMinDistanceEvent = () => 0f;
-        public event Func<float> GetWanderingMaxDistanceEvent = () => 1f;
+        public event Func<Vector3> GetTargetPositionEvent = () => Vector3.zero;
+        public event Func<float> GetMinDistanceEvent = () => MinDistance;
 
         private const float MinDistance = 0.5f;
-
+        
         private readonly Transform _transform;
         private readonly NavMeshAgent _agent;
-
+        
         private Vector3 _previousTargetPoint;
         private Vector3 _targetPoint;
 
@@ -47,8 +45,8 @@ namespace GameCore.Gameplay.Systems.MovementLogics
             if (IsStuck())
                 OnStuckEvent.Invoke();
         }
-
-        public bool TrySetDestinationPoint()
+        
+        public bool TryUpdateTargetPoint()
         {
             bool isOnNavMesh = IsOnNavMesh();
 
@@ -57,40 +55,25 @@ namespace GameCore.Gameplay.Systems.MovementLogics
 
             return isOnNavMesh;
         }
-
+        
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
+        
         private void SetDestinationPoint()
         {
-            _targetPoint = GetRandomPositionEvent?.Invoke() ?? GetRandomPosition();
+            _targetPoint = GetTargetPositionEvent.Invoke();
             _agent.destination = _targetPoint;
         }
-
-        private Vector3 GetRandomPosition()
-        {
-            float minDistance = GetWanderingMinDistanceEvent.Invoke();
-            float maxDistance = GetWanderingMaxDistanceEvent.Invoke();
-            float distance = Random.Range(minDistance, maxDistance);
-
-            Vector2 circle = Random.insideUnitCircle;
-            circle *= distance;
-
-            Vector3 circlePosition = new(x: circle.x, y: 0f, z: circle.y);
-            Vector3 thisPosition = _transform.position;
-            Vector3 newPosition = circlePosition + thisPosition;
-
-            return newPosition;
-        }
-
+        
         private bool IsArrivedToTargetPoint()
         {
             Vector3 position = _transform.position;
             float distance = Vector3.Distance(a: position, b: _targetPoint);
-            bool isArrived = distance < MinDistance;
+            float minDistance = GetMinDistanceEvent.Invoke();
+            bool isArrived = distance < minDistance;
 
             return isArrived;
         }
-
+        
         private bool IsSameTargetPoint()
         {
             bool isSame = _previousTargetPoint == _targetPoint;

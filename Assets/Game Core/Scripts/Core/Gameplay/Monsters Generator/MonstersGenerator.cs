@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Configs.Gameplay.MonstersGenerator;
@@ -12,6 +13,7 @@ using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.RoundManagement;
 using GameCore.Gameplay.Systems.Spawners;
+using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
@@ -23,7 +25,7 @@ using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.MonstersGeneration
 {
-    public class MonstersGenerator : IMonstersGenerator, ITickable, IDisposable
+    public class MonstersGenerator : IMonstersGenerator, IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -51,6 +53,10 @@ namespace GameCore.Gameplay.MonstersGeneration
             _monstersGeneratorConfig = gameplayConfigsProvider.GetMonstersGeneratorConfig();
             _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
             _monstersDangerLevelConfig = balanceConfig.MonstersDangerLevelConfig;
+
+            _cts = new CancellationTokenSource();
+            _monstersSpawnCycle = new SimpleRoutine(_cts, MonstersSpawnTickInterval);
+            
             _validMonstersList = new List<ValidMonster>();
             _monstersSpawnChancesList = new List<MonsterSpawnChance>();
             _monstersSpawnList = new List<MonsterToSpawn>();
@@ -61,14 +67,12 @@ namespace GameCore.Gameplay.MonstersGeneration
                 { Floor.Two, new List<DungeonMonstersSpawner>() },
                 { Floor.Three, new List<DungeonMonstersSpawner>() }
             };
-
-            DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent += OnRegisterMonstersSpawner;
-
-            _timeObserver.OnHourPassedEvent += OnHourPassed;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private const float MonstersSpawnTickInterval = 1f;
+        
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly IMonstersFactory _monstersFactory;
         private readonly IRoundManager _roundManager;
@@ -78,28 +82,39 @@ namespace GameCore.Gameplay.MonstersGeneration
         private readonly MonstersGeneratorConfigMeta _monstersGeneratorConfig;
         private readonly MonstersListConfigMeta _monstersListConfig;
         private readonly MonstersDangerLevelConfig _monstersDangerLevelConfig;
+
+        private readonly CancellationTokenSource _cts;
+        private readonly SimpleRoutine _monstersSpawnCycle;
+
         private readonly List<ValidMonster> _validMonstersList;
         private readonly List<MonsterSpawnChance> _monstersSpawnChancesList;
         private readonly List<MonsterToSpawn> _monstersSpawnList;
         private readonly Dictionary<Floor, List<DungeonMonstersSpawner>> _monstersSpawners;
 
-        private int _monstersAmountToSpawn;
         private bool _isGeneratorEnabled;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Tick()
+        public void Initialize()
         {
-            if (!_isGeneratorEnabled)
+            if (!NetworkHorror.IsTrueServer)
                 return;
+            
+            _monstersSpawnCycle.OnActionEvent += MonstersSpawnTick;
 
-            TrySpawnMonster();
+            DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent += OnRegisterMonstersSpawner;
+
+            _timeObserver.OnHourPassedEvent += OnHourPassed;
+            
+            _monstersSpawnCycle.Start();
         }
 
         public void Dispose()
         {
             if (!NetworkHorror.IsTrueServer)
                 return;
+            
+            _cts.Dispose();
             
             DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent -= OnRegisterMonstersSpawner;
             
@@ -123,11 +138,19 @@ namespace GameCore.Gameplay.MonstersGeneration
 
         #region Main Methods
 
-        private void GeneratorTick()
+        private void MonstersSpawnTick()
         {
-            GetMonstersAmountToSpawn();
+            if (!_isGeneratorEnabled)
+                return;
 
-            for (int i = 0; i < _monstersAmountToSpawn; i++)
+            TrySpawnMonster();
+        }
+        
+        private void TryAddMonsterToSpawnList()
+        {
+            int monstersAmountToSpawn = GetMonstersAmountToSpawn();
+
+            for (int i = 0; i < monstersAmountToSpawn; i++)
             {
                 CreateValidMonstersList();
                 ValidateMonstersSpawnList();
@@ -175,7 +198,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             {
                 ValidMonster validMonster = _validMonstersList[i];
                 MonsterAIConfigMeta monsterAIConfig = validMonster.MonsterAIConfig;
-
+                
                 int maxCount = monsterAIConfig.MaxCount;
                 int currentAmount = GetMonstersCurrentAmount(monsterAIConfig);
                 bool isAmountValid = currentAmount < maxCount;
@@ -279,7 +302,7 @@ namespace GameCore.Gameplay.MonstersGeneration
         {
             int monstersSpawnAmount = _monstersSpawnList.Count;
             float deltaTime = Time.deltaTime;
-
+            
             for (int i = monstersSpawnAmount - 1; i >= 0; i--)
             {
                 MonsterToSpawn monsterToSpawn = _monstersSpawnList[i];
@@ -314,8 +337,10 @@ namespace GameCore.Gameplay.MonstersGeneration
 
             if (!isMonsterSpawned)
                 return;
+
+            string monsterSpawnLog = Log.HandleLog($"Spawned Monster <gb>{monsterType.GetNiceName()}</gb>");
+            Debug.LogWarning(monsterSpawnLog);
             
-            Debug.LogWarning($"Spawned Monster <gb>{monsterType.GetNiceName()}</gb>");
             monsterEntity.SetEntityLocation(EntityLocation.Dungeon);
             monsterEntity.SetFloor(floor);
         }
@@ -344,12 +369,6 @@ namespace GameCore.Gameplay.MonstersGeneration
         #endregion
 
         #region Helper Methods
-
-        private void GetMonstersAmountToSpawn()
-        {
-            int alivePlayersAmount = GetAlivePlayersAmount();
-            _monstersAmountToSpawn = _monstersGeneratorConfig.GetRandomMonstersAmount(alivePlayersAmount);
-        }
 
         private bool TryGetCurrentLocationMeta(out LocationMeta locationMeta)
         {
@@ -444,6 +463,13 @@ namespace GameCore.Gameplay.MonstersGeneration
             return spawnDelay;
         }
 
+        private int GetMonstersAmountToSpawn()
+        {
+            int alivePlayersAmount = GetAlivePlayersAmount();
+            int monstersAmountToSpawn = _monstersGeneratorConfig.GetRandomMonstersAmount(alivePlayersAmount);
+            return monstersAmountToSpawn;
+        }
+        
         private int GetAlivePlayersAmount() =>
             _roundManager.GetAlivePlayersAmount();
 
@@ -499,21 +525,56 @@ namespace GameCore.Gameplay.MonstersGeneration
         private int GetMonstersCurrentAmount(MonsterAIConfigMeta monsterAIConfig)
         {
             MonsterType monsterType = monsterAIConfig.GetMonsterType();
-            int monstersCount = _roundManager.GetMonstersCount(monsterType);
+
+            int spawnedAmount = GetSpawnedMonstersAmount();
+            int relatedAmount = GetRelatedMonstersAmount();
+            int amountInSpawnList = GetAmountInSpawnList();
+
+            int currentAmount = spawnedAmount + relatedAmount + amountInSpawnList;
+            return currentAmount;
             
-            IEnumerable<MonsterType> relatedMonstersToCount = monsterAIConfig.GetRelatedMonstersToCount();
-            
-            foreach (MonsterType relatedMonsterType in relatedMonstersToCount)
+            // LOCAL METHODS: -----------------------------
+
+            int GetSpawnedMonstersAmount()
             {
-                bool isAtLeastOneMonsterExists = _roundManager.IsAtLeastOneMonsterExists(relatedMonsterType);
-
-                if (!isAtLeastOneMonsterExists)
-                    continue;
-
-                monstersCount += 1;
+                int amount = _roundManager.GetMonstersCount(monsterType);
+                return amount;
             }
 
-            return monstersCount;
+            int GetRelatedMonstersAmount()
+            {
+                IEnumerable<MonsterType> relatedMonstersToCount = monsterAIConfig.GetRelatedMonstersToCount();
+                int amount = 0;
+            
+                foreach (MonsterType relatedMonsterType in relatedMonstersToCount)
+                {
+                    bool isAtLeastOneMonsterExists = _roundManager.IsAtLeastOneMonsterExists(relatedMonsterType);
+
+                    if (!isAtLeastOneMonsterExists)
+                        continue;
+
+                    amount += 1;
+                }
+
+                return amount;
+            }
+
+            int GetAmountInSpawnList()
+            {
+                int amount = 0;
+            
+                foreach (MonsterToSpawn monsterToSpawn in _monstersSpawnList)
+                {
+                    bool isSameMonster = monsterToSpawn.MonsterType == monsterType;
+
+                    if (!isSameMonster)
+                        continue;
+                
+                    amount += 1;
+                }
+
+                return amount;
+            }
         }
 
         #endregion
@@ -531,7 +592,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             if (!_isGeneratorEnabled)
                 return;
 
-            GeneratorTick();
+            TryAddMonsterToSpawnList();
         }
 
         // INNER CLASSES: -------------------------------------------------------------------------

@@ -7,7 +7,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
     public class TrainSoundReproducer : SoundReproducerBase<TrainEntity.SFXType>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
-        
+
         public TrainSoundReproducer(ISoundProducer<TrainEntity.SFXType> soundProducer, TrainConfigMeta trainConfig)
             : base(soundProducer)
         {
@@ -15,7 +15,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
         }
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly TrainConfigMeta _trainConfig;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

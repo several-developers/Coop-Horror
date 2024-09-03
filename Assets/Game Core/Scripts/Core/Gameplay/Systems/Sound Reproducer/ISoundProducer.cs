@@ -13,6 +13,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
     // использовать её везде где нужно. Вместо этого приходится дублировать ебучие классы для корректного
     // наследования. Можно попробовать заменить на кастомные сообщения для синхронизации, должно помочь.
     
+    // [GenerateSerializationForType(typeof(SFXType))]
     public interface ISoundProducer<out TSFXType> where TSFXType : Enum
     {
         event Action<TSFXType> OnPlaySoundEvent;

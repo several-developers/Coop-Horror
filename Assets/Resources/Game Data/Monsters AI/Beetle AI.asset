@@ -17,7 +17,7 @@ MonoBehaviour:
   _isDamageable: 1
   _health: 50
   _spawnType: 0
-  _maxCount: 10
+  _maxCount: 2
   _spawnChance: 50
   _spawnChanceMultiplierByGameTime:
     serializedVersion: 2

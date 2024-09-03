@@ -34,6 +34,9 @@
         public const string BlindCreatureAIConfig = MonstersAIConfigs + "Blind Creature AI";
         public const string SirenHeadAIConfig = MonstersAIConfigs + "Siren Head AI";
         
+        // Entities
+        public const string OutdoorChestConfig = EntitiesConfigs + "Outdoor Chest";
+        
         private const string GameData = "Game Data/";
         
         private const string Configs = GameData + "Configs/";
@@ -45,5 +48,6 @@
         private const string GameplayConfigsLists = ConfigsLists + "Gameplay/";
         
         private const string MonstersAIConfigs = GameData + "Monsters AI/";
+        private const string EntitiesConfigs = GameData + "Entities Configs/";
     }
 }

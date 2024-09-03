@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Systems.MovementLogics;
+using GameCore.Gameplay.Systems.Movement;
 using GameCore.Gameplay.Systems.Utilities;
 using GameCore.Utilities;
 using UnityEngine;

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameCore.Configs.Gameplay.Entities;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.Interactable;
+using GameCore.Gameplay.Systems.SoundReproducer;
+using GameCore.Infrastructure.Providers.Gameplay.EntitiesConfigs;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,13 +14,23 @@ using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
 {
-    public class OutdoorChestEntity : Entity, IInteractable
+    [GenerateSerializationForType(typeof(SFXType))]
+    public class OutdoorChestEntity : SoundProducerEntity<OutdoorChestEntity.SFXType>, IInteractable
     {
+        public enum SFXType
+        {
+            //_ = 0,
+            Open = 1
+        }
+        
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsFactory itemsFactory) =>
+        private void Construct(IItemsFactory itemsFactory, IEntitiesConfigsProvider entitiesConfigsProvider)
+        {
             _itemsFactory = itemsFactory;
+            _outdoorChestConfig = entitiesConfigsProvider.GetOutdoorChestConfig();
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -38,6 +51,8 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
         private readonly NetworkVariable<bool> _isOpen = new(writePerm: Constants.OwnerPermission);
         
         private IItemsFactory _itemsFactory;
+        private OutdoorChestConfigMeta _outdoorChestConfig;
+        private OutdoorChestSoundReproducer _soundReproducer;
 
         private List<int> _itemsList;
         private bool _canInteract = true;
@@ -58,6 +73,8 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
                 OpenChestLocal();
             else
                 OpenChestServerRpc();
+            
+            PlaySound(SFXType.Open);
         }
 
         public void ToggleInteract(bool canInteract)
@@ -79,8 +96,12 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitAll() =>
+        protected override void InitAll()
+        {
+            _soundReproducer = new OutdoorChestSoundReproducer(soundProducer: this, _outdoorChestConfig);
+            
             _isOpen.OnValueChanged += OnChestOpenStateChanged;
+        }
 
         protected override void DespawnAll() =>
             _isOpen.OnValueChanged -= OnChestOpenStateChanged;

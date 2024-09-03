@@ -6,7 +6,7 @@ using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace GameCore.Gameplay.Systems.MovementLogics
+namespace GameCore.Gameplay.Systems.Movement
 {
     public class ChaseLogic
     {

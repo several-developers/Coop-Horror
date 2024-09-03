@@ -1,5 +1,5 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
-using GameCore.Gameplay.Systems.MovementLogics;
+using GameCore.Gameplay.Systems.Movement;
 using UnityEngine;
 using UnityEngine.AI;
 

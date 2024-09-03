@@ -21,13 +21,6 @@ namespace GameCore.Gameplay.Entities.Train
     [GenerateSerializationForType(typeof(SFXType))]
     public class TrainEntity : SoundProducerEntity<TrainEntity.SFXType>, ITrainEntity
     {
-        public enum MovementBehaviour
-        {
-            InfiniteMovement = 0,
-            StopAtPathEnd = 1,
-            LeaveAtPathEnd = 2
-        }
-
         public enum SFXType
         {
             //_ = 0,
@@ -37,7 +30,14 @@ namespace GameCore.Gameplay.Entities.Train
             Arrival = 4,
             MovementLoop = 5
         }
-        
+
+        public enum MovementBehaviour
+        {
+            InfiniteMovement = 0,
+            StopAtPathEnd = 1,
+            LeaveAtPathEnd = 2
+        }
+
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]

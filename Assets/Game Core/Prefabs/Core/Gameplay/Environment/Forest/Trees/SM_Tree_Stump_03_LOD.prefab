@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8910199195108866043}
   - component: {fileID: 307962178703872714}
+  - component: {fileID: 6918907451164350002}
   m_Layer: 0
   m_Name: SM_Tree_Stump_03_LOD
   m_TagString: Untagged
@@ -52,6 +53,19 @@ LODGroup:
     renderers:
     - renderer: {fileID: 8620107470882888732}
   m_Enabled: 1
+--- !u!65 &6918907451164350002
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2037536565573015180}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.51447463, y: 1.1453446, z: 0.49664938}
+  m_Center: {x: -0.0053527355, y: 0.4958834, z: 0.01753354}
 --- !u!1001 &8643097067566385398
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -107,7 +121,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 64980137729958294, guid: cf0cdbf9571848c4aa09fdb81ac4a5f2, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: cf0cdbf9571848c4aa09fdb81ac4a5f2, type: 3}
 --- !u!23 &8620107470882888732 stripped
 MeshRenderer:
