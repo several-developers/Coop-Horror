@@ -126,7 +126,7 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private void AddMonstersPrefabs()
         {
-            IReadOnlyList<MonsterReference> allItems = _monstersListConfig.GetAllReferences();
+            IEnumerable<MonsterReference> allItems = _monstersListConfig.GetAllReferences();
 
             foreach (MonsterReference monsterReference in allItems)
             {

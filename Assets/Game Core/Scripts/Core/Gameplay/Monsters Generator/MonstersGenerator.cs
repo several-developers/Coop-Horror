@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Configs.Gameplay.MonstersGenerator;
 using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters;
+using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Level.Locations;
@@ -31,7 +33,7 @@ namespace GameCore.Gameplay.MonstersGeneration
 
         public MonstersGenerator(
             IGameManagerDecorator gameManagerDecorator,
-            IMonstersFactory monstersFactory,
+            IEntitiesFactory entitiesFactory,
             IRoundManager roundManager,
             ITimeObserver timeObserver,
             ILocationsMetaProvider locationsMetaProvider,
@@ -45,7 +47,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             BalanceConfigMeta balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
 
             _gameManagerDecorator = gameManagerDecorator;
-            _monstersFactory = monstersFactory;
+            _entitiesFactory = entitiesFactory;
             _roundManager = roundManager;
             _timeObserver = timeObserver;
             _locationsMetaProvider = locationsMetaProvider;
@@ -54,8 +56,8 @@ namespace GameCore.Gameplay.MonstersGeneration
             _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
             _monstersDangerLevelConfig = balanceConfig.MonstersDangerLevelConfig;
 
-            _cts = new CancellationTokenSource();
-            _monstersSpawnCycle = new SimpleRoutine(_cts, MonstersSpawnTickInterval);
+            var cts = new CancellationTokenSource();
+            _monstersSpawnCycle = new SimpleRoutine(cts, MonstersSpawnTickInterval);
             
             _validMonstersList = new List<ValidMonster>();
             _monstersSpawnChancesList = new List<MonsterSpawnChance>();
@@ -74,7 +76,7 @@ namespace GameCore.Gameplay.MonstersGeneration
         private const float MonstersSpawnTickInterval = 1f;
         
         private readonly IGameManagerDecorator _gameManagerDecorator;
-        private readonly IMonstersFactory _monstersFactory;
+        private readonly IEntitiesFactory _entitiesFactory;
         private readonly IRoundManager _roundManager;
         private readonly ITimeObserver _timeObserver;
         private readonly ILocationsMetaProvider _locationsMetaProvider;
@@ -83,7 +85,6 @@ namespace GameCore.Gameplay.MonstersGeneration
         private readonly MonstersListConfigMeta _monstersListConfig;
         private readonly MonstersDangerLevelConfig _monstersDangerLevelConfig;
 
-        private readonly CancellationTokenSource _cts;
         private readonly SimpleRoutine _monstersSpawnCycle;
 
         private readonly List<ValidMonster> _validMonstersList;
@@ -165,7 +166,7 @@ namespace GameCore.Gameplay.MonstersGeneration
         {
             _validMonstersList.Clear();
 
-            IReadOnlyList<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
+            IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
 
             foreach (MonsterReference monsterReference in allReferences)
             {
@@ -320,7 +321,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             }
         }
 
-        private void SpawnMonsterIndoor(MonsterType monsterType)
+        private async UniTaskVoid SpawnMonsterIndoor(MonsterType monsterType)
         {
             Floor floor = GetRandomFloor(monsterType);
             bool isSpawnPositionFound = TryGetIndoorMonsterSpawnPosition(floor, out Vector3 spawnPosition);
@@ -331,18 +332,18 @@ namespace GameCore.Gameplay.MonstersGeneration
                 Debug.LogError(log);
                 return;
             }
-
-            bool isMonsterSpawned = _monstersFactory.SpawnMonster(monsterType, spawnPosition, Quaternion.identity,
-                out MonsterEntityBase monsterEntity);
-
-            if (!isMonsterSpawned)
-                return;
-
-            string monsterSpawnLog = Log.HandleLog($"Spawned Monster <gb>{monsterType.GetNiceName()}</gb>");
-            Debug.LogWarning(monsterSpawnLog);
             
-            monsterEntity.SetEntityLocation(EntityLocation.Dungeon);
-            monsterEntity.SetFloor(floor);
+            // bool isMonsterSpawned = _monstersFactory.SpawnMonster(monsterType, spawnPosition, Quaternion.identity,
+            //     out MonsterEntityBase monsterEntity);
+            //
+            // if (!isMonsterSpawned)
+            //     return;
+            //
+            // string monsterSpawnLog = Log.HandleLog($"Spawned Monster <gb>{monsterType.GetNiceName()}</gb>");
+            // Debug.LogWarning(monsterSpawnLog);
+            //
+            // monsterEntity.SetEntityLocation(EntityLocation.Dungeon);
+            // monsterEntity.SetFloor(floor);
         }
 
         private void SpawnMonsterOutdoor(MonsterType monsterType)
@@ -357,9 +358,14 @@ namespace GameCore.Gameplay.MonstersGeneration
                 return;
             }
 
-            _monstersFactory.SpawnMonster(monsterType, spawnPosition, Quaternion.identity, out _);
+            // _monstersFactory.SpawnMonster(monsterType, spawnPosition, Quaternion.identity, out _);
         }
 
+        private void MonsterSpawned(MonsterEntityBase monsterEntity)
+        {
+            
+        }
+        
         private void CleanUp()
         {
             _validMonstersList.Clear();

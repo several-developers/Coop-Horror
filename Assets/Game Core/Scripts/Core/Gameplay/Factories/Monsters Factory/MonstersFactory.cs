@@ -1,96 +1,78 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Monsters;
-using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Factories.Entities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
-using Unity.Netcode;
+using GameCore.Utilities;
 using UnityEngine;
-using Zenject;
+using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Factories.Monsters
 {
-    public class MonstersFactory : IMonstersFactory, IInitializable
+    public class MonstersFactory : IMonstersFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MonstersFactory(IGameplayConfigsProvider gameplayConfigsProvider)
+        public MonstersFactory(IEntitiesFactory entitiesFactory, IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            _gameplayConfigsProvider = gameplayConfigsProvider;
-            _networkManager = NetworkManager.Singleton;
-            _monstersPrefabs = new Dictionary<MonsterType, MonsterEntityBase>();
-            _serverID = NetworkHorror.ServerID;
+            _entitiesFactory = entitiesFactory;
+            _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
+            _prefabsKeysDictionary = new Dictionary<MonsterType, AssetReferenceGameObject>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly IGameplayConfigsProvider _gameplayConfigsProvider;
-        private readonly NetworkManager _networkManager;
-        private readonly Dictionary<MonsterType, MonsterEntityBase> _monstersPrefabs;
-        private readonly ulong _serverID;
+        private readonly IEntitiesFactory _entitiesFactory;
+        private readonly MonstersListConfigMeta _monstersListConfig;
+        private readonly Dictionary<MonsterType, AssetReferenceGameObject> _prefabsKeysDictionary;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Initialize() => SetupMonstersPrefabsDictionary();
+        public async UniTask WarmUp() =>
+            await SetupReferencesDictionary();
 
-        public bool SpawnMonster(
-            MonsterType monsterType,
-            Vector3 worldPosition,
-            Quaternion rotation,
-            out MonsterEntityBase monsterEntity
-        )
+        public async UniTask SpawnMonster<TMonsterEntity>(MonsterType monsterType, Vector3 worldPosition,
+            Quaternion rotation, Action<string> fail = null, Action<TMonsterEntity> success = null)
+            where TMonsterEntity : MonsterEntityBase
         {
-            bool isPrefabFound = TryGetPrefabNetworkObject(monsterType, out NetworkObject prefabNetworkObject);
+            var isAssetReferenceFound =
+                _prefabsKeysDictionary.TryGetValue(monsterType, out AssetReferenceGameObject assetReference);
 
-            if (!isPrefabFound)
+            if (!isAssetReferenceFound)
             {
-                monsterEntity = null;
-                return false;
+                fail?.Invoke(obj: $"Asset Reference not found for '{monsterType.GetNiceName()}'!");
+                return;
             }
-            
-            NetworkObject networkObject = _networkManager.SpawnManager
-                .InstantiateAndSpawn(prefabNetworkObject, _serverID, destroyWithScene: true, position: worldPosition);
 
-            monsterEntity = networkObject.GetComponent<MonsterEntityBase>();
-
-            return true;
+            await _entitiesFactory.CreateEntity(assetReference, worldPosition, rotation, fail, success);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
-        private void SetupMonstersPrefabsDictionary()
+
+        private async UniTask SetupReferencesDictionary()
         {
-            MonstersListConfigMeta monstersListConfig = _gameplayConfigsProvider.GetMonstersListConfig();
-            IReadOnlyList<MonsterReference> allReferences = monstersListConfig.GetAllReferences();
+            IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
 
             foreach (MonsterReference monsterReference in allReferences)
             {
                 MonsterType monsterType = monsterReference.MonsterType;
-                bool containsKey = _monstersPrefabs.TryAdd(monsterType, monsterReference.MonsterPrefab);
+                bool containsKey = _prefabsKeysDictionary.ContainsKey(monsterType);
 
                 if (containsKey)
+                {
+                    Log.PrintError(log: $"Dictionary <rb>already contains</rb> Monster <gb>{monsterType}</gb>!");
                     continue;
+                }
 
-                Log.PrintError(log: $"Dictionary <rb>already contains</rb> Monster <gb>{monsterType}</gb>!");
+                AssetReferenceGameObject assetReference = monsterReference.AssetReference;
+
+                await _entitiesFactory.LoadAssetReference<IEntity>(assetReference);
+                _prefabsKeysDictionary.Add(monsterType, assetReference);
             }
-        }
-        
-        private bool TryGetPrefabNetworkObject(MonsterType monsterType, out NetworkObject networkObject)
-        {
-            networkObject = null;
-            
-            bool isPrefabFound = _monstersPrefabs.TryGetValue(monsterType, out MonsterEntityBase monsterPrefab);
-            
-            if (!isPrefabFound)
-                return false;
-
-            bool isNetworkObjectFound = monsterPrefab.TryGetComponent(out networkObject);
-
-            if (isNetworkObjectFound)
-                return true;
-
-            Log.PrintError(log: $"Network Object of Monster <gb>({monsterType})</gb> <rb>not found</rb>!");
-            return false;
         }
     }
 }

@@ -23,40 +23,47 @@ namespace GameCore.Utilities
         private readonly IAssetsProvider _assetsProvider;
         private readonly Dictionary<Type, AssetReference> _referencesDictionary;
 
-        // PROTECTED METHODS: ---------------------------------------------------------------------
-
-        protected async UniTask SetupReferencesDictionary<T>(IEnumerable<AssetReference> assetReferences)
-            where T : class
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+        
+        public async UniTask LoadAssetReference<T>(AssetReference assetReference) where T : class
         {
-            List<AsyncOperationHandle<GameObject>> handles = new();
+            var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
+            
+            await Load();
+            Addressables.Release(handle);
 
-            foreach (AssetReference assetReference in assetReferences)
+            // LOCAL METHODS: -----------------------------
+
+            async UniTask Load()
             {
-                var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
-                handles.Add(handle);
-
                 GameObject menuPrefab = await handle.Task;
 
                 if (!menuPrefab.TryGetComponent(out T menuView))
                 {
                     Log.PrintError(log: $"<gb>Asset Reference '{assetReference.AssetGUID}'</gb> " +
                                         "was <rb>not found</rb>!");
-                    continue;
+                    return;
                 }
 
                 Type type = menuView.GetType();
                 bool success = _referencesDictionary.TryAdd(type, assetReference);
-
+            
                 if (success)
-                    continue;
+                    return;
 
                 Log.PrintError(log: $"Key '<gb>{type.Name}</gb>' <rb>already exists</rb>!");
             }
-
-            foreach (var handle in handles)
-                Addressables.Release(handle);
         }
         
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected async UniTask SetupReferencesDictionary<T>(IEnumerable<AssetReference> assetReferences)
+            where T : class
+        {
+            foreach (AssetReference assetReference in assetReferences)
+                await LoadAssetReference<T>(assetReference);
+        }
+
         protected async UniTask<T> LoadAsset<T>() where T : class
         {
             bool isAssetReferenceFound = TryGetAssetReference<T>(out AssetReference assetReference);

@@ -54,17 +54,15 @@ namespace GameCore.Gameplay.Network
 
             if (isCanceled)
                 return;
-
-            SpawnPlayerLogicOLD(clientID, lateJoin);
-
-            // TrySpawnPlayer(clientID, lateJoin);
+            
+            TrySpawnPlayer(clientID, lateJoin);
         }
 
         private void TrySpawnPlayer(ulong clientID, bool lateJoin)
         {
             Vector3 spawnPosition = Vector3.zero; // TEMP ?
 
-            _entitiesFactory.TryCreateEntity<PlayerEntity>(
+            _entitiesFactory.CreateEntity<PlayerEntity>(
                 spawnPosition,
                 clientID,
                 fail: PlayerSpawnFail,

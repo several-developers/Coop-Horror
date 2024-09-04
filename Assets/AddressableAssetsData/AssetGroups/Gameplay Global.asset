@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Gameplay Global
+  m_EditorClassIdentifier: 
+  m_GroupName: Gameplay Global
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 70c19b15aed939c468fc69ee57308ea9
+  m_SerializeEntries:
+  - m_GUID: a77369042e11ddd49be3f82d556be8a1
+    m_Address: Player Entity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4282ea88a0f59e5439ffd10a9117092e
+    m_Address: Beetle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 75e70588a6ef7314db23007815ec8aca
+    m_Address: Blind Creature
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4664030f2032e1f4899213c342676280
+    m_Address: Evil Clown
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: ecba960fb87a70c44915348072ec812c
+    m_Address: Good Clown
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 9d92d756e707b5645a76aef3839f7029
+    m_Address: Siren Head
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75fa75dd9a346a04eb1c4dc9bcb6f9ca, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 5f594580038fcaf4395c351505939704, type: 2}
+    - {fileID: 11400000, guid: 377073271ce396745b94f41719971750, type: 2}

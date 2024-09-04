@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
@@ -11,6 +12,7 @@ using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Level.LocationsMechanics;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Quests;
+using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Utilities;
@@ -47,7 +49,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
         // FIELDS: --------------------------------------------------------------------------------
 
         private const float SpawnOffsetY = 1f;
-        
+
         private readonly IQuestsManagerDecorator _questsManagerDecorator;
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly IEntitiesFactory _entitiesFactory;
@@ -106,14 +108,14 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
 
             Vector3 spawnPoint = hitInfo.point;
             spawnPoint.y += SpawnOffsetY;
-            
+
             TrySpawnChest(spawnPoint);
         }
 
-        private void TrySpawnChest(Vector3 worldPosition)
+        private async UniTaskVoid TrySpawnChest(Vector3 worldPosition)
         {
             int itemsAmount = GetRandomItemsAmount();
-            
+
             if (itemsAmount == 0)
                 return;
 
@@ -122,17 +124,26 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
             if (!isItemsListCreated)
                 return;
 
-            bool isEntityCreated =
-                _entitiesFactory.TryCreateEntity<OutdoorChestEntity>(worldPosition, out Entity entity);
+            EntitySpawnParams spawnParams = new EntitySpawnParams<OutdoorChestEntity>.Builder()
+                .SetWorldPosition(worldPosition)
+                .SetFailCallback(ChestSpawnFailed)
+                .SetSuccessCallback(entity => { ChestSpawned(entity, itemsList); })
+                .Build();
 
-            if (!isEntityCreated)
-                return;
-
-            if (entity is not OutdoorChestEntity outdoorChestEntity)
-                return;
-
-            outdoorChestEntity.SetupItemsList(itemsList);
+            await _entitiesFactory.CreateEntity<OutdoorChestEntity>(spawnParams);
+            
+            
+            await _entitiesFactory.CreateEntity<OutdoorChestEntity>(
+                worldPosition,
+                fail: ChestSpawnFailed,
+                success: entity => ChestSpawned(entity, itemsList));
         }
+
+        private static void ChestSpawned(OutdoorChestEntity outdoorChestEntity, List<int> itemsList) =>
+            outdoorChestEntity.SetupItemsList(itemsList);
+
+        private static void ChestSpawnFailed(string reason) =>
+            Debug.LogError(message: "Chest spawn failed: " + reason);
 
         private int GetRandomChestsAmount() =>
             _outdoorChestsItemsSpawnConfig.GetRandomChestsAmount();
