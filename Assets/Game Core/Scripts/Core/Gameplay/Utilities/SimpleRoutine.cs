@@ -47,6 +47,13 @@ namespace GameCore.Gameplay.Utilities
             _forceStop = true;
             _cts.Cancel();
         }
+        
+        public void FullStop()
+        {
+            _forceStop = true;
+            _cts.Cancel();
+            _cts?.Dispose();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

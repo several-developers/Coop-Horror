@@ -24,8 +24,8 @@ namespace CustomEditors
         //private const string LoginSceneMenuItem = ScenesMenuItem + "🗝 Login";
         //private const string TitleSceneMenuItem = ScenesMenuItem + "✨ Title";
         private const string MainMenuSceneMenuItem = ScenesMenuItem + "🌐 Main Menu";
-        private const string MarketSceneMenuItem = ScenesMenuItem + "🛒 Market";
         private const string GameplaySceneMenuItem = ScenesMenuItem + "⚔ Gameplay";
+        private const string MarketSceneMenuItem = ScenesMenuItem + "🛒 Market";
         private const string QuickStartMenuItem = EditorConstants.GameMenuName + "/⚡ Quick Start";
         //private const string MultiplayerTestSceneMenuItem = ScenesMenuItem + "⚔ Multiplayer Test";
         //private const string PrototypesSceneMenuItem = ScenesMenuItem + "⏳ Prototypes";
@@ -35,8 +35,8 @@ namespace CustomEditors
         //private const string LoginScenePath = ScenesPath + "PixelBattleLogin.unity";
         //private const string TitleScenePath = ScenesPath + "TitleScreen.unity";
         private const string MainMenuScenePath = ScenesPath + "MainMenu.unity";
-        private const string MarketScenePath = ScenesPath + "Market.unity";
         private const string GameplayScenePath = ScenesPath + "Gameplay.unity";
+        private const string MarketScenePath = ScenesPath + "Market.unity";
 
         private const string ForestLocationScenePath = LocationsScenesPath + "Forest.unity";
         private const string DesertLocationScenePath = LocationsScenesPath + "Desert.unity";
@@ -69,11 +69,11 @@ namespace CustomEditors
         [MenuItem(MainMenuSceneMenuItem)]
         private static void LoadMainMenuScene() => OpenScene(MainMenuScenePath);
 
-        [MenuItem(MarketSceneMenuItem)]
-        private static void LoadMarketScene() => OpenScene(MarketScenePath);
-
         [MenuItem(GameplaySceneMenuItem)]
         private static void LoadGameScene() => OpenScene(GameplayScenePath);
+
+        [MenuItem(MarketSceneMenuItem)]
+        private static void LoadMarketScene() => OpenScene(MarketScenePath);
 
         [MenuItem(QuickStartMenuItem)]
         private static void QuickStart()

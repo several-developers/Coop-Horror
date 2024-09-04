@@ -114,7 +114,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             if (!NetworkHorror.IsTrueServer)
                 return;
             
-            _cts.Dispose();
+            _monstersSpawnCycle.FullStop();
             
             DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent -= OnRegisterMonstersSpawner;
             

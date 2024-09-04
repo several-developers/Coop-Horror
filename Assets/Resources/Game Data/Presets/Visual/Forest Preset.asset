@@ -24,4 +24,4 @@ MonoBehaviour:
   _changeCameraDistance: 1
   _cameraDistance: 400
   _useSkybox: 1
-  _sunIntensity: 1.5
+  _sunIntensity: 1

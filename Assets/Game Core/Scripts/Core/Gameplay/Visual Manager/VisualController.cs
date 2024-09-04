@@ -139,8 +139,9 @@ namespace GameCore.Gameplay.VisualManagement
 
             AmbientMode GetAmbientMode()
             {
-                bool useFlat = _playerInDungeon;
-                return useFlat ? AmbientMode.Flat : AmbientMode.Skybox;
+                // bool useFlat = _playerInDungeon;
+                // return useFlat ? AmbientMode.Flat : AmbientMode.Skybox;
+                return AmbientMode.Flat;
             }
             
             Color GetAmbientColor()
