@@ -1,62 +1,51 @@
 using System;
 using GameCore.Gameplay.Entities;
-using GameCore.Gameplay.Entities.Monsters.GoodClown;
 using GameCore.Gameplay.Network;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Utilities
 {
-    public class Test
-    {
-        public void Test2()
-        {
-            var entitySpawnParams = new EntitySpawnParams<GoodClownEntity>.Builder()
-                .SetWorldPosition(Vector3.zero)
-                .SetRotation(Quaternion.identity)
-                .SetOwnerID(123)
-                .SetFailCallback(reason => { Debug.LogError(reason); })
-                .SetSuccessCallback(entity => { Type type = entity.GetType(); })
-                .Build();
-            
-        }
-    }
-
-    public class EntitySpawnParams
-    {
-        
-    }
-    public class EntitySpawnParams<TEntity> : EntitySpawnParams where TEntity : Entity
+    public class EntitySpawnParams<TEntity> where TEntity : Entity
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        private EntitySpawnParams(Vector3 worldPosition, Quaternion rotation, ulong ownerID,
-            Action<string> failCallback, Action<TEntity> successCallback)
+        private EntitySpawnParams(AssetReference assetReference, Vector3 worldPosition, Quaternion rotation,
+            ulong ownerID, Action<string> failCallback, Action<TEntity> successCallback)
         {
+            AssetReference = assetReference;
             WorldPosition = worldPosition;
             Rotation = rotation;
             OwnerID = ownerID;
-            FailCallback = failCallback;
-            SuccessCallback = successCallback;
+            FailCallbackEvent += failCallback;
+            SuccessCallbackEvent += successCallback;
         }
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public AssetReference AssetReference { get; private set; }
         public Vector3 WorldPosition { get; }
         public Quaternion Rotation { get; }
         public ulong OwnerID { get; }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<string> FailCallback;
-        public event Action<TEntity> SuccessCallback;
+        public event Action<string> FailCallbackEvent;
+        public event Action<TEntity> SuccessCallbackEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void SendFailCallback(string reason) =>
-            FailCallback?.Invoke(reason);
+        public void SetAssetReference(AssetReference assetReference) =>
+            AssetReference = assetReference;
+
+        public void SendFailCallback(string reason)
+        {
+            Debug.LogError(reason);
+            FailCallbackEvent?.Invoke(reason);
+        }
 
         public void SendSuccessCallback(TEntity entity) =>
-            SuccessCallback?.Invoke(entity);
+            SuccessCallbackEvent?.Invoke(entity);
 
         // INNER CLASSES: -------------------------------------------------------------------------
 
@@ -72,6 +61,7 @@ namespace GameCore.Gameplay.Utilities
 
             // FIELDS: --------------------------------------------------------------------------------
 
+            private AssetReference _assetReference;
             private Vector3 _worldPosition;
             private Quaternion _rotation;
             private ulong _ownerID;
@@ -80,7 +70,13 @@ namespace GameCore.Gameplay.Utilities
 
             // PUBLIC METHODS: ------------------------------------------------------------------------
 
-            public Builder SetWorldPosition(Vector3 worldPosition)
+            public Builder SetAssetReference(AssetReference assetReference)
+            {
+                _assetReference = assetReference;
+                return this;
+            }
+
+            public Builder SetSpawnPosition(Vector3 worldPosition)
             {
                 _worldPosition = worldPosition;
                 return this;
@@ -103,16 +99,17 @@ namespace GameCore.Gameplay.Utilities
                 _failCallback = failCallback;
                 return this;
             }
-            
+
             public Builder SetSuccessCallback(Action<TEntity> successCallback)
             {
                 _successCallback = successCallback;
                 return this;
             }
 
-            public EntitySpawnParams Build()
+            public EntitySpawnParams<TEntity> Build()
             {
                 var spawnParams = new EntitySpawnParams<TEntity>(
+                    _assetReference,
                     _worldPosition,
                     _rotation,
                     _ownerID,

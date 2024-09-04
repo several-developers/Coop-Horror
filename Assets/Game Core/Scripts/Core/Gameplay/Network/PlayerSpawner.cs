@@ -2,12 +2,12 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
-using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.Session_Manager;
+using GameCore.Gameplay.Utilities;
 using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -46,7 +46,7 @@ namespace GameCore.Gameplay.Network
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async void SpawnPlayer(ulong clientID, bool lateJoin)
+        private async UniTaskVoid LoadAndCreatePlayer(ulong clientID, bool lateJoin)
         {
             bool isCanceled = await UniTask
                 .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
@@ -55,71 +55,18 @@ namespace GameCore.Gameplay.Network
             if (isCanceled)
                 return;
             
-            TrySpawnPlayer(clientID, lateJoin);
-        }
-
-        private void TrySpawnPlayer(ulong clientID, bool lateJoin)
-        {
             Vector3 spawnPosition = Vector3.zero; // TEMP ?
 
-            _entitiesFactory.CreateEntity<PlayerEntity>(
-                spawnPosition,
-                clientID,
-                fail: PlayerSpawnFail,
-                success: playerEntity => { PlayerSpawnSuccess(playerEntity, clientID, lateJoin); }
-            );
+            var spawnParams = new EntitySpawnParams<PlayerEntity>.Builder()
+                .SetSpawnPosition(spawnPosition)
+                .SetOwnerID(clientID)
+                .SetSuccessCallback(playerEntity => { SetupPlayer(playerEntity, clientID, lateJoin); })
+                .Build();
+
+            await _entitiesFactory.CreateEntity(spawnParams);
         }
 
-        private void PlayerSpawnSuccess(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
-        {
-            SpawnPlayerLogic(playerEntity, clientID, lateJoin);
-            SetCameraFirstPersonStatus();
-        }
-
-        private void PlayerSpawnFail(string reason)
-        {
-            Debug.LogError(reason);
-        }
-
-        private async void SpawnPlayerLogicOLD(ulong clientID, bool lateJoin)
-        {
-            // Vector3 spawnPosition = GetSpawnPosition();
-            Vector3 spawnPosition = Vector3.zero; // TEMP ?
-            Entity entity = null;
-
-            while (true)
-            {
-                bool isEntityCreated =
-                    _entitiesFactory.TryCreateEntity<PlayerEntity>(spawnPosition, clientID, out entity);
-
-                if (!isEntityCreated)
-                {
-                    Log.PrintError(log: "<gb>Player creation</gb> has <rb>failed</gb>!");
-
-                    bool isCanceled = await UniTask
-                        .Delay(100, cancellationToken: this.GetCancellationTokenOnDestroy())
-                        .SuppressCancellationThrow();
-
-                    if (isCanceled)
-                        return;
-                    
-                    continue;
-                }
-
-                break;
-            }
-
-            if (entity is not PlayerEntity playerEntity)
-            {
-                Log.PrintError(log: "<gb>Player Entity</gb> <rb>not found</rb>!");
-                return;
-            }
-
-            SpawnPlayerLogic(playerEntity, clientID, lateJoin);
-            SetCameraFirstPersonStatus();
-        }
-
-        private void SpawnPlayerLogic(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
+        private void SetupPlayer(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
         {
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
 
@@ -147,6 +94,8 @@ namespace GameCore.Gameplay.Network
                 NetworkObject parent = _trainEntity.GetNetworkObject();
                 playerEntity.NetworkObject.TrySetParent(parent, worldPositionStays: false);
             }
+
+            SetCameraFirstPersonStatus(); // TEMP ?
 
             // Spawn players characters with 'destroyWithScene = true'.
             //playerInstance.NetworkObject.SpawnWithOwnership(clientId, destroyWithScene: true);
@@ -216,7 +165,7 @@ namespace GameCore.Gameplay.Network
                 {
                     Debug.Log($"Player #{pair.Key} ready");
 
-                    SpawnPlayer(pair.Key, lateJoin: false);
+                    LoadAndCreatePlayer(pair.Key, lateJoin: false);
                 }
             }
         }
@@ -234,7 +183,7 @@ namespace GameCore.Gameplay.Network
             // (either because multiple people are late-joining at once, or because some dynamic entities are
             // getting spawned while joining. But that's not something we can fully address by changes in
             // this script.
-            SpawnPlayer(clientId, lateJoin: true);
+            LoadAndCreatePlayer(clientId, lateJoin: true);
         }
     }
 }

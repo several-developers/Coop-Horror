@@ -1,8 +1,7 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters;
-using UnityEngine;
+using GameCore.Gameplay.Utilities;
 
 namespace GameCore.Gameplay.Factories.Monsters
 {
@@ -10,7 +9,7 @@ namespace GameCore.Gameplay.Factories.Monsters
     {
         UniTask WarmUp();
 
-        UniTask SpawnMonster<TMonsterEntity>(MonsterType monsterType, Vector3 worldPosition, Quaternion rotation,
-            Action<string> fail = null, Action<TMonsterEntity> success = null) where TMonsterEntity : MonsterEntityBase;
+        UniTask CreateMonster<TMonsterEntity>(MonsterType monsterType, EntitySpawnParams<TMonsterEntity> spawnParams)
+            where TMonsterEntity : MonsterEntityBase;
     }
 }

@@ -1,5 +1,4 @@
 using GameCore.Infrastructure.Providers.Gameplay.EntitiesConfigs;
-using GameCore.Infrastructure.Providers.Gameplay.EntitiesPrefabs;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
@@ -19,7 +18,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindGameplayConfigsProvider();
             BindMonstersAIConfigsProvider();
             BindEntitiesConfigsProvider();
-            BindEntitiesPrefabsProvider();
             BindItemsMetaProvider();
             BindItemsProvider();
             BindRigPresetsProvider();
@@ -48,14 +46,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .BindInterfacesTo<EntitiesConfigsProvider>()
                 .AsSingle();
         }
-        
-        private void BindEntitiesPrefabsProvider()
-        {
-            Container
-                .BindInterfacesTo<EntitiesPrefabsProvider>()
-                .AsSingle();
-        }
-        
+
         private void BindItemsMetaProvider()
         {
             Container

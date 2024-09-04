@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.EntitiesList;
 using GameCore.Gameplay.Entities;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Utilities;
-using GameCore.Infrastructure.Providers.Gameplay.EntitiesPrefabs;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
@@ -19,146 +16,98 @@ namespace GameCore.Gameplay.Factories.Entities
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public EntitiesFactory(IAssetsProvider assetsProvider, IEntitiesPrefabsProvider entitiesPrefabsProvider,
-            IGameplayConfigsProvider gameplayConfigsProvider) : base(assetsProvider)
+        public EntitiesFactory(IAssetsProvider assetsProvider, IGameplayConfigsProvider gameplayConfigsProvider)
+            : base(assetsProvider)
         {
-            _entitiesPrefabsProvider = entitiesPrefabsProvider;
             _entitiesListConfig = gameplayConfigsProvider.GetEntitiesListConfig();
             _networkManager = NetworkManager.Singleton;
-            _serverID = NetworkHorror.ServerID;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly IEntitiesPrefabsProvider _entitiesPrefabsProvider;
         private readonly EntitiesListConfigMeta _entitiesListConfig;
         private readonly NetworkManager _networkManager;
-        private readonly ulong _serverID;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public async UniTask WarmUp() =>
             await SetupReferencesDictionary();
 
-        public async UniTask CreateEntity<TEntity>(Vector3 worldPosition, Action<string> fail = null,
-            Action<TEntity> success = null) where TEntity : Entity
-        {
-            await CreateFinalEntity(worldPosition, Quaternion.identity, _serverID, fail, success);
-        }
-
-        public async UniTask CreateEntity<TEntity>(Vector3 worldPosition, ulong ownerID, Action<string> fail = null,
-            Action<TEntity> success = null) where TEntity : Entity
-        {
-            await CreateFinalEntity(worldPosition, Quaternion.identity, ownerID, fail, success);
-        }
-
-        public async UniTask CreateEntity<TEntity>(Vector3 worldPosition, Quaternion rotation,
-            Action<string> fail = null, Action<TEntity> success = null) where TEntity : Entity
-        {
-            await CreateFinalEntity(worldPosition, rotation, _serverID, fail, success);
-        }
-
-        public async UniTask CreateEntity<TEntity>(Vector3 worldPosition, Quaternion rotation, ulong ownerID,
-            Action<string> fail = null, Action<TEntity> success = null) where TEntity : Entity
-        {
-            await CreateFinalEntity(worldPosition, Quaternion.identity, ownerID, fail, success);
-        }
-
-        public async UniTask CreateEntity<TEntity>(AssetReference assetReference, Vector3 worldPosition,
-            Action<string> fail = null, Action<TEntity> success = null) where TEntity : Entity
-        {
-            await CreateEntity(assetReference, worldPosition, Quaternion.identity, _serverID, fail, success);
-        }
-
-        public async UniTask CreateEntity<TEntity>(AssetReference assetReference, Vector3 worldPosition, ulong ownerID,
-            Action<string> fail = null, Action<TEntity> success = null) where TEntity : Entity
-        {
-            await CreateEntity(assetReference, worldPosition, Quaternion.identity, ownerID, fail, success);
-        }
-
-        public async UniTask CreateEntity<TEntity>(AssetReference assetReference, Vector3 worldPosition,
-            Quaternion rotation, Action<string> fail = null, Action<TEntity> success = null) where TEntity : Entity
-        {
-            await CreateEntity(assetReference, worldPosition, rotation, _serverID, fail, success);
-        }
-
-        public async UniTask CreateEntity<TEntity>(AssetReference assetReference, Vector3 worldPosition,
-            Quaternion rotation, ulong ownerID, Action<string> fail = null, Action<TEntity> success = null)
-            where TEntity : Entity
-        {
-            await CreateFinalEntity<TEntity>(assetReference, worldPosition, rotation, ownerID);
-        }
-
-        public async UniTask CreateEntity<TEntity>(EntitySpawnParams spawnParams) where TEntity : Entity
-        {
-            await CreateFinalEntity<TEntity>(spawnParams);
-        }
+        public async UniTask CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity =>
+            await LoadAndCreateEntity(spawnParams);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private async UniTask SetupReferencesDictionary()
         {
             IEnumerable<AssetReferenceGameObject> allEntitiesReferences =
-                _entitiesListConfig.GetAllEntitiesReferences();
+                _entitiesListConfig.GetAllReferences();
 
             await SetupReferencesDictionary<IEntity>(allEntitiesReferences);
         }
 
-        private async UniTask CreateFinalEntity<TEntity>(Vector3 worldPosition, Quaternion rotation, ulong ownerID,
-            Action<string> fail = null, Action<TEntity> success = null) where TEntity : Entity
-        {
-            var entityPrefab = await LoadAsset<TEntity>();
-            CreateFinalEntity(entityPrefab, worldPosition, rotation, ownerID, fail, success);
-        }
-
-        private async UniTask CreateFinalEntity<TEntity>(AssetReference assetReference, Vector3 worldPosition,
-            Quaternion rotation, ulong ownerID, Action<string> fail = null, Action<TEntity> success = null)
+        private async UniTask LoadAndCreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams)
             where TEntity : Entity
         {
-            var entityPrefab = await LoadAsset<TEntity>(assetReference);
-            CreateFinalEntity(entityPrefab, worldPosition, rotation, ownerID, fail, success);
+            AssetReference assetReference = spawnParams.AssetReference;
+            bool containsAssetReference = assetReference != null;
+
+            TEntity entityPrefab;
+
+            if (containsAssetReference)
+                entityPrefab = await LoadAsset<TEntity>(assetReference);
+            else
+                entityPrefab = await LoadAsset<TEntity>();
+
+            CreateEntity(entityPrefab, spawnParams);
         }
 
-        private async UniTask CreateFinalEntity<TEntity>(EntitySpawnParams spawnParams) where TEntity : Entity
+        private void CreateEntity<TEntity>(TEntity entityPrefab, EntitySpawnParams<TEntity> spawnParams)
+            where TEntity : Entity
         {
-            Vector3 worldPosition = spawnParams.WorldPosition;
-            var entityPrefab = await LoadAsset<TEntity>(assetReference);
-            CreateFinalEntity(entityPrefab, worldPosition, rotation, ownerID, fail, success);
-        }
+            NetworkObject prefabNetworkObject = null;
 
-        private void CreateFinalEntity<TEntity>(
-            TEntity entityPrefab,
-            Vector3 worldPosition,
-            Quaternion rotation,
-            ulong ownerID,
-            Action<string> fail = null,
-            Action<TEntity> success = null
-        ) where TEntity : Entity
-        {
-            bool isPrefabFound = entityPrefab == null;
-
-            if (!isPrefabFound)
-            {
-                fail?.Invoke(obj: "Entity prefab not found!");
+            if (!TryGetNetworkObject())
                 return;
-            }
 
-            bool isNetworkObjectFound = entityPrefab.TryGetComponent(out NetworkObject prefabNetworkObject);
-
-            if (!isNetworkObjectFound)
-            {
-                fail?.Invoke(obj: "Network Object not found!");
-                return;
-            }
-
-            NetworkObject networkObject = _networkManager.SpawnManager
-                .InstantiateAndSpawn(prefabNetworkObject, ownerID, destroyWithScene: true, position: worldPosition);
-
+            NetworkObject networkObject = InstantiateNetworkObject();
             var instance = networkObject.GetComponent<TEntity>();
-            success?.Invoke(instance);
-        }
 
-        private bool TryGetEntityPrefab<TEntityType>(out Entity entityPrefab) where TEntityType : IEntity =>
-            _entitiesPrefabsProvider.TryGetEntityPrefab<TEntityType>(out entityPrefab);
+            spawnParams.SendSuccessCallback(instance);
+
+            // LOCAL METHODS: -----------------------------
+
+            bool TryGetNetworkObject()
+            {
+                bool isPrefabFound = entityPrefab == null;
+
+                if (!isPrefabFound)
+                {
+                    SendFailCallback(reason: "Entity prefab not found!");
+                    return false;
+                }
+
+                bool isNetworkObjectFound = entityPrefab.TryGetComponent(out prefabNetworkObject);
+
+                if (isNetworkObjectFound)
+                    return true;
+
+                SendFailCallback(reason: "Network Object not found!");
+                return false;
+            }
+
+            void SendFailCallback(string reason) =>
+                spawnParams.SendFailCallback(reason);
+
+            NetworkObject InstantiateNetworkObject()
+            {
+                Vector3 worldPosition = spawnParams.WorldPosition;
+                Quaternion rotation = spawnParams.Rotation;
+                ulong ownerID = spawnParams.OwnerID;
+
+                return _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, ownerID,
+                    destroyWithScene: true, position: worldPosition);
+            }
+        }
     }
 }

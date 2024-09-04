@@ -51,7 +51,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
             return chestsAmount;
         }
         
-        public int GetRandomItemsAmount()
+        public int GetItemsRandomAmount()
         {
             int itemsConfigsAmount = _itemsAmountInChestConfigs.Count;
             

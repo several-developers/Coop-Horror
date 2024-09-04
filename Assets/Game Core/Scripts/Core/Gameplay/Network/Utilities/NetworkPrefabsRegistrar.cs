@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.EntitiesList;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.MonstersList;
-using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
@@ -51,23 +49,42 @@ namespace GameCore.Gameplay.Network.Utilities
         private void Awake()
         {
             RegisterPrefabs();
-            StartLoadingPrefabs();
+            RegisterAddressables();
         }
 
         private void OnDestroy() => RemovePrefabs();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTaskVoid StartLoadingPrefabs()
+        private async UniTaskVoid RegisterAddressables()
         {
-            IEnumerable<AssetReferenceGameObject>
-                allEntitiesReferences = _entitiesListConfig.GetAllEntitiesReferences();
+            await RegisterAllEntities();
+            await RegisterMonsterEntities();
+        }
+        
+        private async UniTask RegisterAllEntities()
+        {
+            IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
 
-            foreach (AssetReferenceGameObject assetReference in allEntitiesReferences)
+            foreach (AssetReferenceGameObject assetReference in allReferences)
+                await LoadAndRegisterAsset(assetReference);
+        }
+        
+        private async UniTask RegisterMonsterEntities()
+        {
+            IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
+
+            foreach (MonsterReference monsterReference in allReferences)
             {
-                GameObject prefab = await assetReference.LoadAssetAsync().Task;
-                RegisterPrefab(prefab);
+                AssetReferenceGameObject assetReference = monsterReference.AssetReference;
+                await LoadAndRegisterAsset(assetReference);
             }
+        }
+
+        private async UniTask LoadAndRegisterAsset(AssetReferenceGameObject assetReference)
+        {
+            GameObject prefab = await assetReference.LoadAssetAsync().Task;
+            RegisterPrefab(prefab);
         }
 
         private void RegisterPrefabs()
@@ -78,9 +95,7 @@ namespace GameCore.Gameplay.Network.Utilities
                 return;
 
             AddLocalListPrefabs();
-            // AddEntitiesPrefabs();
             AddItemsPrefabs();
-            AddMonstersPrefabs();
 
             foreach (GameObject prefab in _prefabsToRegister)
                 RegisterPrefab(prefab);
@@ -105,14 +120,6 @@ namespace GameCore.Gameplay.Network.Utilities
         private void AddLocalListPrefabs() =>
             _prefabsToRegister.AddRange(_prefabs);
 
-        private void AddEntitiesPrefabs()
-        {
-            IEnumerable<Entity> allEntities = _entitiesListConfig.GetAllEntities();
-
-            foreach (Entity entity in allEntities)
-                _prefabsToRegister.Add(entity.gameObject);
-        }
-
         private void AddItemsPrefabs()
         {
             IEnumerable<ItemMeta> allItems = _itemsListConfig.GetAllItems();
@@ -120,17 +127,6 @@ namespace GameCore.Gameplay.Network.Utilities
             foreach (ItemMeta itemMeta in allItems)
             {
                 GameObject prefab = itemMeta.ItemPrefab.gameObject;
-                _prefabsToRegister.Add(prefab);
-            }
-        }
-
-        private void AddMonstersPrefabs()
-        {
-            IEnumerable<MonsterReference> allItems = _monstersListConfig.GetAllReferences();
-
-            foreach (MonsterReference monsterReference in allItems)
-            {
-                GameObject prefab = monsterReference.MonsterPrefab.gameObject;
                 _prefabsToRegister.Add(prefab);
             }
         }

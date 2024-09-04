@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Factories.Entities;
+using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Utilities;
 using UnityEngine;
@@ -34,24 +34,24 @@ namespace GameCore.Gameplay.Factories.Monsters
 
         public async UniTask WarmUp() =>
             await SetupReferencesDictionary();
-
-        public async UniTask SpawnMonster<TMonsterEntity>(MonsterType monsterType, Vector3 worldPosition,
-            Quaternion rotation, Action<string> fail = null, Action<TMonsterEntity> success = null)
-            where TMonsterEntity : MonsterEntityBase
+        
+        public async UniTask CreateMonster<TMonsterEntity>(MonsterType monsterType,
+            EntitySpawnParams<TMonsterEntity> spawnParams) where TMonsterEntity : MonsterEntityBase
         {
-            var isAssetReferenceFound =
-                _prefabsKeysDictionary.TryGetValue(monsterType, out AssetReferenceGameObject assetReference);
-
-            if (!isAssetReferenceFound)
+            if (!TryGetAssetReference(monsterType, out AssetReferenceGameObject assetReference))
             {
-                fail?.Invoke(obj: $"Asset Reference not found for '{monsterType.GetNiceName()}'!");
+                spawnParams.FailCallbackEvent += _ => AssetReferenceNotFoundError(monsterType);
                 return;
             }
-
-            await _entitiesFactory.CreateEntity(assetReference, worldPosition, rotation, fail, success);
+            
+            spawnParams.SetAssetReference(assetReference);
+            await _entitiesFactory.CreateEntity(spawnParams);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private static void AssetReferenceNotFoundError(MonsterType monsterType) =>
+            Debug.LogError($"Asset Reference not found for '{monsterType.GetNiceName()}'!");
 
         private async UniTask SetupReferencesDictionary()
         {
@@ -74,5 +74,8 @@ namespace GameCore.Gameplay.Factories.Monsters
                 _prefabsKeysDictionary.Add(monsterType, assetReference);
             }
         }
+
+        private bool TryGetAssetReference(MonsterType monsterType, out AssetReferenceGameObject assetReference) =>
+            _prefabsKeysDictionary.TryGetValue(monsterType, out assetReference);
     }
 }

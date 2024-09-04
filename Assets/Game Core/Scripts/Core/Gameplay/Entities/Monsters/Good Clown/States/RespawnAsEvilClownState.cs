@@ -4,13 +4,14 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.EvilClown;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Factories.Monsters;
+using GameCore.Gameplay.Utilities;
 using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 {
-    public class RespawnAsEvilClownState : IEnterState
+    public class RespawnAsEvilClownState : IEnterStateAsync
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -27,11 +28,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
+        public async UniTaskVoid Enter()
         {
             DisableAgent();
             SetAgonizeAnimation();
-            DelayedLogic();
+            await AwaitAndCreateEvilClown();
+            EnterDeathState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -48,32 +50,46 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             clownUtilities.SetAgonizeAnimation();
         }
 
-        private async UniTaskVoid DelayedLogic()
+        private async UniTask AwaitAndCreateEvilClown()
         {
-            GoodClownAIConfigMeta goodClownAIConfig = _goodClownEntity.GetGoodClownAIConfig();
-            GoodClownAIConfigMeta.CommonSettings commonConfig = goodClownAIConfig.CommonConfig;
-            float delayInSeconds = commonConfig.TransformationDelay;
-            int delay = delayInSeconds.ConvertToMilliseconds();
-
-            bool isCanceled = await UniTask
-                .Delay(delay, cancellationToken: _goodClownEntity.GetCancellationTokenOnDestroy())
-                .SuppressCancellationThrow();
-
+            bool isCanceled = false;
+            
+            await Delay();
+            
             if (isCanceled)
                 return;
+            
+            await LoadAndCreate();
+            
+            // LOCAL METHODS: -----------------------------
 
-            await SpawnEvilClown();
-            EnterDeathState();
-        }
+            async UniTask Delay()
+            {
+                GoodClownAIConfigMeta goodClownAIConfig = _goodClownEntity.GetGoodClownAIConfig();
+                GoodClownAIConfigMeta.CommonSettings commonConfig = goodClownAIConfig.CommonConfig;
+                
+                float delayInSeconds = commonConfig.TransformationDelay;
+                int delay = delayInSeconds.ConvertToMilliseconds();
 
-        private async UniTask SpawnEvilClown()
-        {
-            Transform transform = _goodClownEntity.transform;
-            Vector3 position = transform.position;
-            Quaternion rotation = transform.rotation;
+                isCanceled = await UniTask
+                    .Delay(delay, cancellationToken: _goodClownEntity.GetCancellationTokenOnDestroy())
+                    .SuppressCancellationThrow();
+            }
 
-            await _monstersFactory.SpawnMonster<EvilClownEntity>(MonsterType.EvilClown, position, rotation,
-                fail: EvilClownSpawnFailed, success: EvilClownSpawned);
+            async UniTask LoadAndCreate()
+            {
+                Transform transform = _goodClownEntity.transform;
+                Vector3 position = transform.position;
+                Quaternion rotation = transform.rotation;
+
+                var spawnParams = new EntitySpawnParams<EvilClownEntity>.Builder()
+                    .SetSpawnPosition(position)
+                    .SetRotation(rotation)
+                    .SetSuccessCallback(EvilClownSpawned)
+                    .Build();
+
+                await _monstersFactory.CreateMonster(MonsterType.EvilClown, spawnParams);
+            }
         }
 
         private void EvilClownSpawned(EvilClownEntity evilClownEntity)
@@ -91,9 +107,6 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             evilClownEntity.SetEntityLocation(goodClownLocation);
             evilClownEntity.SetFloor(goodClownFloor);
         }
-
-        private static void EvilClownSpawnFailed(string reason) =>
-            Debug.LogError(message: $"Evil Clown spawn failed. Reason: {reason}");
 
         private void EnterDeathState() =>
             _goodClownEntity.EnterDeathState();
