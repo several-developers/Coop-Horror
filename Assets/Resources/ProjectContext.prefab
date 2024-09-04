@@ -30,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2136740719814258509}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3838204953052700474
 MonoBehaviour:
@@ -45,6 +45,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _netcodeHooks: {fileID: 4589641552807671778}
+--- !u!1 &1100373637916901483
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6781459443801689702}
+  - component: {fileID: 1376709466097695079}
+  m_Layer: 0
+  m_Name: Factories Installer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6781459443801689702
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100373637916901483}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2136740719814258509}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1376709466097695079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1100373637916901483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85216bdd81ff4d82b0098aa31e4be0d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1956429670948329491
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,7 +119,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2136740719814258509}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5167180121493555239
 MonoBehaviour:
@@ -163,6 +207,7 @@ Transform:
   m_Children:
   - {fileID: 8478300018531776088}
   - {fileID: 1212887729662564930}
+  - {fileID: 6781459443801689702}
   - {fileID: 8533657397535768807}
   - {fileID: 3937820775200889795}
   - {fileID: 6863067862255667607}
@@ -200,7 +245,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2136740719814258509}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5298618941250825909
 MonoBehaviour:
@@ -353,6 +398,7 @@ MonoBehaviour:
   _monoInstallers:
   - {fileID: 2404243815429056924}
   - {fileID: 5004749042148896633}
+  - {fileID: 1376709466097695079}
   - {fileID: 3838204953052700474}
   - {fileID: 174123186921606405}
   - {fileID: 5298618941250825909}
@@ -401,7 +447,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2136740719814258509}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &174123186921606405
 MonoBehaviour:
@@ -424,6 +470,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3226179477506710472}
     m_Modifications:
+    - target: {fileID: -1475263349559186575, guid: 5570cba3d8dd9fe468867974f8bf0ae0,
+        type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3795331600
+      objectReference: {fileID: 0}
     - target: {fileID: 2101684869486416732, guid: 5570cba3d8dd9fe468867974f8bf0ae0,
         type: 3}
       propertyPath: m_Name

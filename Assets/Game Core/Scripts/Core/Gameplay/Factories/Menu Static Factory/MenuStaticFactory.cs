@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameCore.Configs.Global.MenuPrefabsList;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Global.MenuView;
 using GameCore.UI.Global.Other;
@@ -8,14 +9,14 @@ using Zenject;
 
 namespace GameCore.Gameplay.Factories
 {
-    public class MenuFactory
+    public class MenuStaticFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MenuFactory(DiContainer diContainer, IAssetsProvider assetsProvider)
+        public MenuStaticFactory(DiContainer diContainer, IAssetsProvider assetsProvider)
         {
             _diContainer = diContainer;
-            _menusDictionary = new Dictionary<Type, MenuView>(capacity: 16);
+            _menusDictionary = new Dictionary<Type, MenuView>();
 
             SetupMenuDictionary(assetsProvider);
         }
@@ -54,18 +55,11 @@ namespace GameCore.Gameplay.Factories
         public static TMenu Create<TMenu>(DiContainer diContainer) where TMenu : MenuView =>
             Create<TMenu>(MainCanvas.Transform, diContainer);
 
-        public static TMenu Create<TMenu>(Transform container) where TMenu : MenuView
-        {
-            TMenu menuPrefab = GetMenu<TMenu>();
-            TMenu menuInstance = InstantiatePrefabForComponent(menuPrefab, container, _diContainer);
-            return menuInstance;
-        }
-        
-        public static TMenu Create<TMenu>(Transform container, DiContainer diContainer) where TMenu : MenuView
-        {
-            TMenu menu = GetMenu<TMenu>();
-            return InstantiatePrefabForComponent(menu, container, diContainer);
-        }
+        public static TMenu Create<TMenu>(Transform container) where TMenu : MenuView =>
+            Create<TMenu>(container, _diContainer);
+
+        public static TMenu Create<TMenu>(Transform container, DiContainer diContainer) where TMenu : MenuView =>
+            InstantiatePrefabForComponent<TMenu>(container, diContainer);
 
         public static void Create<TMenu, TPayload>(TPayload param)
             where TMenu : MenuView, IComplexMenuView<TPayload>
@@ -82,8 +76,7 @@ namespace GameCore.Gameplay.Factories
         public static void Create<TMenu, TPayload>(Transform container, TPayload param, DiContainer diContainer)
             where TMenu : MenuView, IComplexMenuView<TPayload>
         {
-            TMenu menu = GetMenu<TMenu>();
-            TMenu menuInstance = InstantiatePrefabForComponent<TMenu>(menu, container, diContainer);
+            var menuInstance = InstantiatePrefabForComponent<TMenu>(container, diContainer);
             menuInstance.Setup(param);
         }
 
@@ -91,12 +84,12 @@ namespace GameCore.Gameplay.Factories
 
         private static void SetupMenuDictionary(IAssetsProvider assetsProvider)
         {
-            MenuPrefabsListMeta menuPrefabsListMeta = assetsProvider.GetMenuPrefabsList();
-            
-            if (menuPrefabsListMeta == null)
+            MenuPrefabsListConfigMeta menuPrefabsListConfigMeta = assetsProvider.GetMenuPrefabsListConfig();
+
+            if (menuPrefabsListConfigMeta == null)
                 return;
-            
-            MenuView[] menuPrefabs = menuPrefabsListMeta.GetMenuPrefabs();
+
+            MenuView[] menuPrefabs = menuPrefabsListConfigMeta.GetMenuPrefabs();
 
             foreach (MenuView menuPrefab in menuPrefabs)
             {
@@ -118,16 +111,17 @@ namespace GameCore.Gameplay.Factories
             }
         }
 
-        private static TMenu GetMenu<TMenu>() where TMenu : MenuView, IMenuView =>
-            _menusDictionary[typeof(TMenu)] as TMenu;
-
         private static GameObject InstantiatePrefab(MenuView menuView, Transform container, DiContainer diContainer) =>
             diContainer.InstantiatePrefab(menuView, container);
 
-        private static TMenu InstantiatePrefabForComponent<TMenu>(TMenu menu, Transform container,
-            DiContainer diContainer) where TMenu : MenuView
+        private static TMenu InstantiatePrefabForComponent<TMenu>(Transform container, DiContainer diContainer)
+            where TMenu : MenuView
         {
+            var menu = GetMenu<TMenu>();
             return diContainer.InstantiatePrefabForComponent<TMenu>(menu, container);
         }
+
+        private static TMenu GetMenu<TMenu>() where TMenu : MenuView, IMenuView =>
+            _menusDictionary[typeof(TMenu)] as TMenu;
     }
 }

@@ -1,16 +1,15 @@
-﻿using GameCore.Gameplay.Factories;
-using GameCore.Gameplay.Other;
-using GameCore.UI.MainMenu.PlayModeSelectionMenu;
+﻿using GameCore.Infrastructure.Providers.Global;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class PrepareMainMenuState : IEnterState, IExitState
+    public class PrepareMainMenuState : IEnterState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PrepareMainMenuState(IGameStateMachine gameStateMachine)
+        public PrepareMainMenuState(IGameStateMachine gameStateMachine, IAssetsProvider assetsProvider)
         {
             _gameStateMachine = gameStateMachine;
+            _assetsProvider = assetsProvider;
 
             _gameStateMachine.AddState(this);
         }
@@ -18,32 +17,22 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-
-        private PlayModeSelectionMenuView _playModeSelectionMenu;
+        private readonly IAssetsProvider _assetsProvider;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter() => EnterSignInState();
-
-        public void Exit()
+        public void Enter()
         {
+            CleanUpAddressables();
+            EnterSignInState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void CreatePlayModeSelectionMenu() =>
-            _playModeSelectionMenu = MenuFactory.Create<PlayModeSelectionMenuView>();
+        private void CleanUpAddressables() =>
+            _assetsProvider.Cleanup();
 
         private void EnterSignInState() =>
             _gameStateMachine.ChangeState<SignInState>();
-
-        private void EnterOfflineMenuState() =>
-            _gameStateMachine.ChangeState<OfflineMenuState>();
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnOnlineClicked() => EnterSignInState();
-
-        private void OnOfflineClicked() => EnterOfflineMenuState();
     }
 }

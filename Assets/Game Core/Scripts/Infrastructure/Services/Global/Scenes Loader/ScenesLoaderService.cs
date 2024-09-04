@@ -1,5 +1,5 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
+using System.Collections;
 using GameCore.Enums.Global;
 using Unity.Netcode;
 using UnityEngine;
@@ -81,7 +81,7 @@ namespace GameCore.Infrastructure.Services.Global
             else
             {
                 // Load using SceneManager
-                SceneLoader(sceneName, loadSceneMode);
+                StartCoroutine(routine: SceneLoaderCO(sceneName, loadSceneMode));
             }
         }
 
@@ -123,7 +123,7 @@ namespace GameCore.Infrastructure.Services.Global
             }
         }
 
-        private async UniTaskVoid SceneLoader(SceneName sceneName, LoadSceneMode loadSceneMode, Action callback = null)
+        private IEnumerator SceneLoaderCO(SceneName sceneName, LoadSceneMode loadSceneMode, Action callback = null)
         {
             // The Application loads the Scene in the background as the current Scene runs.
             // This is particularly good for creating loading screens.
@@ -145,10 +145,7 @@ namespace GameCore.Infrastructure.Services.Global
 
             // Wait until the asynchronous scene fully loads
             while (!asyncOperation.isDone)
-            {
-#warning ЗАДЕРЖКА ПОД ВОПРОСОМ
-                await UniTask.Delay(millisecondsDelay: 100);
-            }
+                yield return null;
 
             callback?.Invoke();
             OnSceneLoadedEvent.Invoke();

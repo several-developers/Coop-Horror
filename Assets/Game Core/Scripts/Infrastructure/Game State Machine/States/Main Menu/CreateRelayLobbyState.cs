@@ -1,4 +1,5 @@
-using GameCore.Gameplay.Factories;
+using Cysharp.Threading.Tasks;
+using GameCore.Gameplay.Factories.Menu;
 using GameCore.Infrastructure.Services.Global;
 using GameCore.UI.MainMenu.LobbiesMenu.RelayLobby;
 
@@ -8,10 +9,15 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CreateRelayLobbyState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
+        public CreateRelayLobbyState(
+            IGameStateMachine gameStateMachine,
+            IScenesLoaderService scenesLoaderService,
+            IMenuFactory menuFactory
+        )
         {
             _gameStateMachine = gameStateMachine;
             _scenesLoaderService = scenesLoaderService;
+            _menuFactory = menuFactory;
 
             _gameStateMachine.AddState(this);
         }
@@ -20,6 +26,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IScenesLoaderService _scenesLoaderService;
+        private readonly IMenuFactory _menuFactory;
 
         private RelayLobbyMenuView _relayLobbyMenu;
 
@@ -27,19 +34,20 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Enter()
         {
-            CreateRelayLobbyMenu();
-
             _scenesLoaderService.OnSceneLoadedEvent += OnSceneLoaded;
+
+            CreateRelayLobbyMenu();
         }
 
         public void Exit() =>
             _scenesLoaderService.OnSceneLoadedEvent -= OnSceneLoaded;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
-        private void CreateRelayLobbyMenu()
+
+        private async UniTask CreateRelayLobbyMenu()
         {
-            _relayLobbyMenu = MenuFactory.Create<RelayLobbyMenuView>();
+            // _relayLobbyMenu = MenuFactory.Create<RelayLobbyMenuView>();
+            _relayLobbyMenu = await _menuFactory.Create<RelayLobbyMenuView>();
 
             _relayLobbyMenu.OnCloseClickedEvent += OnCloseClicked;
         }
@@ -49,7 +57,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void EnterMainMenuState() =>
             _gameStateMachine.ChangeState<MainMenuState>();
-        
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnCloseClicked() => EnterMainMenuState();

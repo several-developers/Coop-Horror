@@ -15,17 +15,11 @@ MonoBehaviour:
   _metaName: Menu Prefabs List
   _menuPrefabs:
   - {fileID: 887434323679259847, guid: 197a1778898125b4081fcb4bf47fd064, type: 3}
-  - {fileID: 6730085623244092400, guid: fb95334b486dbc74c9028efc5b294a36, type: 3}
   - {fileID: 4546651808884384119, guid: 5c3210ad28cb53f49ac8dd594cc065d3, type: 3}
   - {fileID: 2651539423633516570, guid: eb03c8ee9f640884e8e659238f5a93ef, type: 3}
-  - {fileID: 6012097309446875665, guid: 3ed5db9fec13c85428f1a90b988f37b6, type: 3}
-  - {fileID: -394650447384873199, guid: c8e430d4319bcaa4ca2fdac7efc71fa3, type: 3}
   - {fileID: 2470992630333890731, guid: 9b6d2129fc6ad0c4c9d567441fed1508, type: 3}
   - {fileID: 5635386254805255597, guid: fbe4355b1922db645bdf6c7828c9987d, type: 3}
   - {fileID: 5672098283768960201, guid: b4e7aa3cab50cdc44ad55034551f7a28, type: 3}
-  - {fileID: 6118321602526512980, guid: eea72635ac93220499d564981743e7db, type: 3}
-  - {fileID: 1488906763527896677, guid: fe595881225376147823686c9a62d8fa, type: 3}
-  - {fileID: 6355928139941960217, guid: 9ca7fa9a7b5af4942ac4a27979c27dde, type: 3}
   - {fileID: 567258000779151784, guid: 16c204e5315696a42b68cf77a6ade1f3, type: 3}
   - {fileID: 2705068617436145543, guid: 18cb5c371722d774bacd4aa2939fd2cb, type: 3}
   - {fileID: 5265896468369102281, guid: 70ee5d30afeabbf43a958fc9fc5172ea, type: 3}
@@ -33,3 +27,24 @@ MonoBehaviour:
   - {fileID: 1858713010386980758, guid: 4b17a6a66bdfbd9469ac84f3b9de16de, type: 3}
   - {fileID: 5934206341648115615, guid: 531759cada2271f44a5fb5666d2a205b, type: 3}
   - {fileID: 413065418497333429, guid: b97ba182e58f97d4d83a1367dc8accbd, type: 3}
+  _menuReferences:
+  - m_AssetGUID: fb95334b486dbc74c9028efc5b294a36
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 3ed5db9fec13c85428f1a90b988f37b6
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: eea72635ac93220499d564981743e7db
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 9ca7fa9a7b5af4942ac4a27979c27dde
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: fe595881225376147823686c9a62d8fa
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0

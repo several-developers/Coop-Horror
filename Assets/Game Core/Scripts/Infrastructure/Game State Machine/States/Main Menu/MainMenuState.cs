@@ -1,4 +1,5 @@
-using GameCore.Gameplay.Factories;
+using Cysharp.Threading.Tasks;
+using GameCore.Gameplay.Factories.Menu;
 using GameCore.UI.MainMenu.SelectLobbyMenu;
 
 namespace GameCore.Infrastructure.StateMachine
@@ -7,9 +8,10 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MainMenuState(IGameStateMachine gameStateMachine)
+        public MainMenuState(IGameStateMachine gameStateMachine, IMenuFactory menuFactory)
         {
             _gameStateMachine = gameStateMachine;
+            _menuFactory = menuFactory;
 
             _gameStateMachine.AddState(this);
         }
@@ -17,18 +19,23 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
+        private readonly IMenuFactory _menuFactory;
 
         private SelectLobbyMenuView _selectLobbyMenu;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter() => CreateSelectLobbyMenu();
+        public void Enter()
+        {
+            //EnterCreateRelayLobbyState();
+            CreateSelectLobbyMenu();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void CreateSelectLobbyMenu()
+        private async UniTask CreateSelectLobbyMenu()
         {
-            _selectLobbyMenu = MenuFactory.Create<SelectLobbyMenuView>();
+            _selectLobbyMenu = await _menuFactory.Create<SelectLobbyMenuView>();
 
             _selectLobbyMenu.OnStartWithLobbyClickedEvent += OnStartWithLobbyClicked;
             _selectLobbyMenu.OnStartWithDirectIPClickedEvent += OnStartWithDirectIPClicked;

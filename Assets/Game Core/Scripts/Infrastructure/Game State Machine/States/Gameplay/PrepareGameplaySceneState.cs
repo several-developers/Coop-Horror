@@ -7,6 +7,7 @@ using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Global;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -16,10 +17,14 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public PrepareGameplaySceneState(IGameStateMachine gameStateMachine,
-            IGameplayConfigsProvider gameplayConfigsProvider)
+        public PrepareGameplaySceneState(
+            IGameStateMachine gameStateMachine,
+            IAssetsProvider assetsProvider,
+            IGameplayConfigsProvider gameplayConfigsProvider
+        )
         {
             _gameStateMachine = gameStateMachine;
+            _assetsProvider = assetsProvider;
             _prefabsListConfig = gameplayConfigsProvider.GetPrefabsListConfig();
 
             _gameStateMachine.AddState(this);
@@ -28,6 +33,7 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
+        private readonly IAssetsProvider _assetsProvider;
         private readonly PrefabsListConfigMeta _prefabsListConfig;
 
         private NetworkManager _networkManager;
@@ -37,19 +43,23 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Enter()
         {
+            CleanUpAddressables();
             CreateNetworkPrefabs();
             EnterGameplaySceneState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void CleanUpAddressables() =>
+            _assetsProvider.Cleanup();
+
         private void CreateNetworkPrefabs()
         {
             _networkManager = NetworkManager.Singleton;
-            
+
             if (!_networkManager.IsHost)
                 return;
-            
+
             _clientID = _networkManager.LocalClientId;
 
             CreateGameManager();

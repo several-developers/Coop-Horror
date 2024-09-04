@@ -64,7 +64,9 @@ MonoBehaviour:
       _chance: 50
     - _amount: 3
       _chance: 15
-    - _amount: 30
+    - _amount: 50
+      _chance: 100
+    - _amount: 50
       _chance: 100
     _itemsAmountInChestConfigs:
     - _amount: 1

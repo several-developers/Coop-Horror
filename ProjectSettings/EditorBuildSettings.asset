@@ -9,11 +9,20 @@ EditorBuildSettings:
     path: Assets/Game Core/Scenes/Bootstrap.unity
     guid: 7b41b69d482a0574784f6d004dffab02
   - enabled: 1
-    path: Assets/Game Core/Scenes/Locations/Scrapyard.unity
-    guid: 6358488ffdf90fe4f8686a7e89ad9671
+    path: Assets/Game Core/Scenes/MainMenu.unity
+    guid: 3c925b17e183a1c49aa064decc1aaf0e
+  - enabled: 1
+    path: Assets/Game Core/Scenes/Gameplay.unity
+    guid: b2bf899e600d75e44bc1a8e1dd9f2c50
+  - enabled: 1
+    path: Assets/Game Core/Scenes/Locations/Forest.unity
+    guid: 94125c3d369b50348960125d36938ef5
   - enabled: 1
     path: Assets/Game Core/Scenes/Locations/Desert.unity
     guid: 7bb0b14dc8183a74699c123d29eadaaa
+  - enabled: 1
+    path: Assets/Game Core/Scenes/Locations/Scrapyard.unity
+    guid: 6358488ffdf90fe4f8686a7e89ad9671
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: c8558dd72855da64c8ab34e1de0045f7,
       type: 2}

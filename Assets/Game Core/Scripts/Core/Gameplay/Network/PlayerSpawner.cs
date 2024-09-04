@@ -55,24 +55,60 @@ namespace GameCore.Gameplay.Network
             if (isCanceled)
                 return;
 
-            SpawnPlayerLogic(clientID, lateJoin);
+            SpawnPlayerLogicOLD(clientID, lateJoin);
+
+            // TrySpawnPlayer(clientID, lateJoin);
+        }
+
+        private void TrySpawnPlayer(ulong clientID, bool lateJoin)
+        {
+            Vector3 spawnPosition = Vector3.zero; // TEMP ?
+
+            _entitiesFactory.TryCreateEntity<PlayerEntity>(
+                spawnPosition,
+                clientID,
+                fail: PlayerSpawnFail,
+                success: playerEntity => { PlayerSpawnSuccess(playerEntity, clientID, lateJoin); }
+            );
+        }
+
+        private void PlayerSpawnSuccess(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
+        {
+            SpawnPlayerLogic(playerEntity, clientID, lateJoin);
             SetCameraFirstPersonStatus();
         }
 
-        private void SpawnPlayerLogic(ulong clientID, bool lateJoin)
+        private void PlayerSpawnFail(string reason)
         {
-            NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
+            Debug.LogError(reason);
+        }
 
+        private async void SpawnPlayerLogicOLD(ulong clientID, bool lateJoin)
+        {
             // Vector3 spawnPosition = GetSpawnPosition();
             Vector3 spawnPosition = Vector3.zero; // TEMP ?
+            Entity entity = null;
 
-            bool isEntityCreated =
-                _entitiesFactory.TryCreateEntity<PlayerEntity>(spawnPosition, clientID, out Entity entity);
-
-            if (!isEntityCreated)
+            while (true)
             {
-                Log.PrintError(log: "<gb>Player creation</gb> has <rb>failed</gb>!");
-                return;
+                bool isEntityCreated =
+                    _entitiesFactory.TryCreateEntity<PlayerEntity>(spawnPosition, clientID, out entity);
+
+                if (!isEntityCreated)
+                {
+                    Log.PrintError(log: "<gb>Player creation</gb> has <rb>failed</gb>!");
+
+                    bool isCanceled = await UniTask
+                        .Delay(100, cancellationToken: this.GetCancellationTokenOnDestroy())
+                        .SuppressCancellationThrow();
+
+                    if (isCanceled)
+                        return;
+                    
+                    continue;
+                }
+
+                break;
             }
 
             if (entity is not PlayerEntity playerEntity)
@@ -80,6 +116,14 @@ namespace GameCore.Gameplay.Network
                 Log.PrintError(log: "<gb>Player Entity</gb> <rb>not found</rb>!");
                 return;
             }
+
+            SpawnPlayerLogic(playerEntity, clientID, lateJoin);
+            SetCameraFirstPersonStatus();
+        }
+
+        private void SpawnPlayerLogic(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
+        {
+            NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
 
             bool persistentPlayerExists = playerNetworkObject.TryGetComponent(out PersistentPlayer _);
 

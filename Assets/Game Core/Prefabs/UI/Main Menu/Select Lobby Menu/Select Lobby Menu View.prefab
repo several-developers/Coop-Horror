@@ -54,9 +54,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hiddenByAwake: 1
-  _ignoreScaleTime: 0
   _changeInteractableState: 0
   _changeCanvasState: 0
+  _ignoreScaleTime: 0
+  _ignoreCanvasGroupFade: 0
   _canvas: {fileID: 0}
   _fadeTime: 0.35
   _targetCG: {fileID: 6118321602526512969}
@@ -99,7 +100,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 36855
+    m_Bits: 34807
 --- !u!225 &6118321602526512969
 CanvasGroup:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 ﻿using GameCore.Enums.Global;
 using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Factories.Menu;
 using GameCore.Gameplay.Network;
 using GameCore.UI.MainMenu.ConnectingMenu;
 using UnityEngine;
@@ -10,9 +11,10 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public JoinGameState(IGameStateMachine gameStateMachine)
+        public JoinGameState(IGameStateMachine gameStateMachine, IMenuFactory menuFactory)
         {
             _gameStateMachine = gameStateMachine;
+            _menuFactory = menuFactory;
 
             _gameStateMachine.AddState(this);
         }
@@ -20,6 +22,7 @@ namespace GameCore.Infrastructure.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
+        private readonly IMenuFactory _menuFactory;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -46,7 +49,7 @@ namespace GameCore.Infrastructure.StateMachine
         }
 
         private static ConnectingMenuView CreateConnectingMenu() =>
-            MenuFactory.Create<ConnectingMenuView>();
+            MenuStaticFactory.Create<ConnectingMenuView>();
 
         private void EnterOnlineMenuState() =>
             _gameStateMachine.ChangeState<OnlineMenuState>();

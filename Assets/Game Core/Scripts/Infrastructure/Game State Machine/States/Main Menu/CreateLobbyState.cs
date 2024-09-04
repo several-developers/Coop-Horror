@@ -1,33 +1,35 @@
-﻿using GameCore.Gameplay.Factories;
-using GameCore.Gameplay.Network;
+﻿using Cysharp.Threading.Tasks;
+using GameCore.Gameplay.Factories.Menu;
 using GameCore.UI.MainMenu.CreateLobbyMenu;
 using GameCore.UI.MainMenu.SaveSelectionMenu;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class CreateLobbyState : IEnterState, IExitState
+    public class CreateLobbyState : IEnterStateAsync, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CreateLobbyState(IGameStateMachine gameStateMachine)
+        public CreateLobbyState(IGameStateMachine gameStateMachine, IMenuFactory menuFactory)
         {
             _gameStateMachine = gameStateMachine;
+            _menuFactory = menuFactory;
             _gameStateMachine.AddState(this);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
+        private readonly IMenuFactory _menuFactory;
 
         private CreateLobbyMenuView _createLobbyMenuView;
         private SaveSelectionMenuView _saveSelectionMenuView;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
+        public async UniTaskVoid Enter()
         {
-            CreateCreateLobbyMenu();
-            CreateSaveSelectionMenuView();
+            await CreateCreateLobbyMenu();
+            await CreateSaveSelectionMenuView();
 
             _createLobbyMenuView.OnBackButtonClickedEvent += OnBackButtonClicked;
             _createLobbyMenuView.OnStartGameClickedEvent += OnStartGameClicked;
@@ -41,11 +43,11 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void CreateCreateLobbyMenu() =>
-            _createLobbyMenuView = MenuFactory.Create<CreateLobbyMenuView>();
+        private async UniTask CreateCreateLobbyMenu() =>
+            _createLobbyMenuView = await _menuFactory.Create<CreateLobbyMenuView>();
 
-        private void CreateSaveSelectionMenuView() =>
-            _saveSelectionMenuView = MenuFactory.Create<SaveSelectionMenuView>();
+        private async UniTask CreateSaveSelectionMenuView() =>
+            _saveSelectionMenuView = await _menuFactory.Create<SaveSelectionMenuView>();
 
         private void HideSaveSelectionMenu() =>
             _saveSelectionMenuView.Hide();

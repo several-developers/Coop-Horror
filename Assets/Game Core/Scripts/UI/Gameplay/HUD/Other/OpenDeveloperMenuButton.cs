@@ -20,6 +20,6 @@ namespace GameCore.UI.Gameplay.HUD
         // PROTECTED METHODS: ---------------------------------------------------------------------
         
         protected override void ClickLogic() =>
-            MenuFactory.Create<DeveloperMenuView>(_diContainer);
+            MenuStaticFactory.Create<DeveloperMenuView>(_diContainer);
     }
 }

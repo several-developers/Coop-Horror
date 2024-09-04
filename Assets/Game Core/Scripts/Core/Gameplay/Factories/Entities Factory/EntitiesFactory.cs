@@ -1,37 +1,58 @@
 ﻿using System;
-using System.Collections.Generic;
-using GameCore.Configs.Gameplay.EntitiesList;
+using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Network;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Gameplay.EntitiesPrefabs;
+using GameCore.Infrastructure.Providers.Global;
 using Unity.Netcode;
 using UnityEngine;
-using Zenject;
+using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Factories.Entities
 {
-    public class EntitiesFactory : IEntitiesFactory, IInitializable
+    public class EntitiesFactory : IEntitiesFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public EntitiesFactory(IGameplayConfigsProvider gameplayConfigsProvider)
+        public EntitiesFactory(IAssetsProvider assetsProvider, IEntitiesPrefabsProvider entitiesPrefabsProvider)
         {
+            _assetsProvider = assetsProvider;
+            _entitiesPrefabsProvider = entitiesPrefabsProvider;
             _networkManager = NetworkManager.Singleton;
-            _entitiesListConfig = gameplayConfigsProvider.GetEntitiesListConfig();
-            _prefabsDictionary = new Dictionary<Type, Entity>();
             _serverID = NetworkHorror.ServerID;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private readonly IAssetsProvider _assetsProvider;
+        private readonly IEntitiesPrefabsProvider _entitiesPrefabsProvider;
         private readonly NetworkManager _networkManager;
-        private readonly EntitiesListConfigMeta _entitiesListConfig;
-        private readonly Dictionary<Type, Entity> _prefabsDictionary;
         private readonly ulong _serverID;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Initialize() => SetupPrefabsDictionary();
+        public async UniTask TryCreateEntity<TEntityType>(Vector3 worldPosition, ulong ownerID,
+            Action<string> fail = null, Action<TEntityType> success = null) where TEntityType : IEntity
+        {
+            bool isAssetReferenceFound =
+                _entitiesPrefabsProvider.TryGetEntityAsset<TEntityType>(out AssetReferenceGameObject assetReference);
+
+            if (!isAssetReferenceFound)
+            {
+                fail?.Invoke(obj: "Asset Reference not found.");
+                return;
+            }
+
+            GameObject instance =
+                await Addressables.InstantiateAsync(assetReference, worldPosition, Quaternion.identity).Task;
+
+            bool isEntityComponentFound = instance.TryGetComponent(out TEntityType entity);
+
+            if (isEntityComponentFound)
+                success?.Invoke(entity);
+            else
+                fail?.Invoke(obj: "Entity component not found.");
+        }
 
         public bool TryCreateEntity<TEntityType>(Vector3 worldPosition, out Entity entity)
             where TEntityType : IEntity
@@ -65,7 +86,7 @@ namespace GameCore.Gameplay.Factories.Entities
 
             if (!isNetworkObjectFound)
                 return false;
-            
+
             NetworkObject networkObject = _networkManager.SpawnManager
                 .InstantiateAndSpawn(prefabNetworkObject, ownerID, destroyWithScene: true, position: worldPosition);
 
@@ -73,28 +94,9 @@ namespace GameCore.Gameplay.Factories.Entities
             return true;
         }
 
-        public bool TryGetEntityPrefab<TEntityType>(out Entity entityPrefab) where TEntityType : IEntity
-        {
-            Type type = typeof(TEntityType);
-            bool isPrefabFound = _prefabsDictionary.TryGetValue(type, out entityPrefab);
-
-            if (!isPrefabFound)
-                Log.PrintError(log: $"<gb>Entity '{type.Name}' prefab</gb> was <rb>not found</rb>!");
-
-            return isPrefabFound;
-        }
-
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SetupPrefabsDictionary()
-        {
-            IEnumerable<Entity> allEntities = _entitiesListConfig.GetAllEntities();
-
-            foreach (Entity entity in allEntities)
-            {
-                Type type = entity.GetType();
-                _prefabsDictionary.Add(type, entity);
-            }
-        }
+        private bool TryGetEntityPrefab<TEntityType>(out Entity entityPrefab) where TEntityType : IEntity =>
+            _entitiesPrefabsProvider.TryGetEntityPrefab<TEntityType>(out entityPrefab);
     }
 }

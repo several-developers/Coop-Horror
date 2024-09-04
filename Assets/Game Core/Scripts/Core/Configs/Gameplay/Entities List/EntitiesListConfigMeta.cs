@@ -3,6 +3,7 @@ using CustomEditors;
 using GameCore.Gameplay.Entities;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace GameCore.Configs.Gameplay.EntitiesList
 {
@@ -19,9 +20,14 @@ namespace GameCore.Configs.Gameplay.EntitiesList
         [SerializeField, Required]
         private List<Entity> _entitiesList;
 
+        [SerializeField, Required]
+        private List<AssetReferenceGameObject> _entitiesReferences;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public IEnumerable<Entity> GetAllEntities() => _entitiesList;
+        
+        public IEnumerable<AssetReferenceGameObject> GetAllEntitiesReferences() => _entitiesReferences;
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsListsCategory;

@@ -1,29 +1,30 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.Factories;
+using GameCore.Configs.Global.MenuPrefabsList;
 using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using Zenject;
 
 namespace GameCore.Infrastructure.Providers.Global
 {
-    public sealed class AssetsProvider : AssetsProviderBase, IAssetsProvider
+    public sealed class AssetsProvider : AssetsProviderBase, IAssetsProvider, IInitializable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public AssetsProvider()
         {
             _scenesLoaderPrefab = Load<GameObject>(path: AssetsPaths.ScenesLoaderPrefab);
-            _menuPrefabsList = Load<MenuPrefabsListMeta>(path: AssetsPaths.MenuPrefabsList);
+            _menuPrefabsListConfig = Load<MenuPrefabsListConfigMeta>(path: AssetsPaths.MenuPrefabsList);
             _networkManager = Load<NetworkManager>(path: AssetsPaths.NetworkManager);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly GameObject _scenesLoaderPrefab;
-        private readonly MenuPrefabsListMeta _menuPrefabsList;
+        private readonly MenuPrefabsListConfigMeta _menuPrefabsListConfig;
         private readonly NetworkManager _networkManager;
         
         private readonly Dictionary<string, AsyncOperationHandle> _completedCache = new();
@@ -31,7 +32,7 @@ namespace GameCore.Infrastructure.Providers.Global
         
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Instantiate() =>
+        public void Initialize() =>
             Addressables.InitializeAsync();
 
         public async UniTask<T> LoadAsset<T>(AssetReference assetReference) where T : class
@@ -60,7 +61,7 @@ namespace GameCore.Infrastructure.Providers.Global
 
         public async UniTask<GameObject> Instantiate(string address, Transform parent) =>
             await Addressables.InstantiateAsync(address, parent).Task;
-        
+
         public void Cleanup()
         {
             foreach (List<AsyncOperationHandle> resourceHandles in _handles.Values)
@@ -77,7 +78,7 @@ namespace GameCore.Infrastructure.Providers.Global
         
         public GameObject GetScenesLoaderPrefab() => _scenesLoaderPrefab;
         
-        public MenuPrefabsListMeta GetMenuPrefabsList() => _menuPrefabsList;
+        public MenuPrefabsListConfigMeta GetMenuPrefabsListConfig() => _menuPrefabsListConfig;
 
         public NetworkManager GetNetworkManager() => _networkManager;
         

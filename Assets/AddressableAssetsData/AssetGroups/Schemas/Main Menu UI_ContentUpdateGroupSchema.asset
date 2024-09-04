@@ -9,13 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 108f0f80c0374969944d18bbb80bc70a, type: 3}
-  m_Name: Entities List
+  m_Script: {fileID: 11500000, guid: 5834b5087d578d24c926ce20cd31e6d6, type: 3}
+  m_Name: Main Menu UI_ContentUpdateGroupSchema
   m_EditorClassIdentifier: 
-  _metaName: Entities List
-  _entitiesList: []
-  _entitiesReferences:
-  - m_AssetGUID: a77369042e11ddd49be3f82d556be8a1
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
+  m_Group: {fileID: 11400000, guid: 27a3235f55f081147abcc6ac46623b5e, type: 2}
+  m_StaticContent: 0

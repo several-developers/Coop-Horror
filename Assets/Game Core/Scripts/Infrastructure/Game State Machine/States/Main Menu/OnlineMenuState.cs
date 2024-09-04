@@ -43,7 +43,7 @@ namespace GameCore.Infrastructure.StateMachine
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CreateOnlineMenu() =>
-            _onlineMenuView = MenuFactory.Create<OnlineMenuView>();
+            _onlineMenuView = MenuStaticFactory.Create<OnlineMenuView>();
 
         private void EnterPrepareMainMenuState() =>
             _gameStateMachine.ChangeState<PrepareMainMenuState>();

@@ -1,10 +1,15 @@
-﻿using GameCore.Gameplay.Entities;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using GameCore.Gameplay.Entities;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Factories.Entities
 {
     public interface IEntitiesFactory
     {
+        UniTask TryCreateEntity<TEntityType>(Vector3 worldPosition, ulong ownerID, Action<string> fail = null,
+            Action<TEntityType> success = null) where TEntityType : IEntity;
+        
         bool TryCreateEntity<TEntityType>(Vector3 worldPosition, out Entity entity)
             where TEntityType : IEntity;
 
@@ -15,9 +20,6 @@ namespace GameCore.Gameplay.Factories.Entities
             where TEntityType : IEntity;
 
         bool TryCreateEntity<TEntityType>(Vector3 worldPosition, Quaternion rotation, ulong ownerID, out Entity entity)
-            where TEntityType : IEntity;
-
-        bool TryGetEntityPrefab<TEntityType>(out Entity entityPrefab)
             where TEntityType : IEntity;
     }
 }

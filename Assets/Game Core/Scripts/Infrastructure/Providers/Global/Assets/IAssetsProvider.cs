@@ -1,5 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.Factories;
+using GameCore.Configs.Global.MenuPrefabsList;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -8,7 +8,6 @@ namespace GameCore.Infrastructure.Providers.Global
 {
     public interface IAssetsProvider
     {
-        void Instantiate();
         UniTask<T> LoadAsset<T>(AssetReference assetReference) where T : class;
         UniTask<T> LoadAsset<T>(string address) where T : class;
         UniTask<GameObject> Instantiate(string address);
@@ -16,7 +15,7 @@ namespace GameCore.Infrastructure.Providers.Global
         UniTask<GameObject> Instantiate(string address, Transform parent);
         void Cleanup();
         GameObject GetScenesLoaderPrefab(); // TEMP
-        MenuPrefabsListMeta GetMenuPrefabsList(); // TEMP
+        MenuPrefabsListConfigMeta GetMenuPrefabsListConfig(); // TEMP
         NetworkManager GetNetworkManager();
     }
 }

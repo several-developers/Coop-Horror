@@ -42,10 +42,10 @@ namespace GameCore.Infrastructure.StateMachine
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CreateOfflineMenu() =>
-            _offlineMenuView = MenuFactory.Create<OfflineMenuView>();
+            _offlineMenuView = MenuStaticFactory.Create<OfflineMenuView>();
 
         private void CreateSaveSelectionMenu() =>
-            _saveSelectionMenuView = MenuFactory.Create<SaveSelectionMenuView>();
+            _saveSelectionMenuView = MenuStaticFactory.Create<SaveSelectionMenuView>();
 
         private void HideSaveSelectionMenuView() =>
             _saveSelectionMenuView.Hide();

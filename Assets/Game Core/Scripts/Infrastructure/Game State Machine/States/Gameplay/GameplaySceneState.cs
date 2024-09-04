@@ -125,31 +125,31 @@ namespace GameCore.Infrastructure.StateMachine
             _inputReader.EnableGameplayInput();
 
         private void CreateChatMenu() =>
-            _chatMenuUI = MenuFactory.Create<ChatMenuUI>(_diContainer);
+            _chatMenuUI = MenuStaticFactory.Create<ChatMenuUI>(_diContainer);
 
         private void CreateActiveQuestsView() =>
-            MenuFactory.Create<ActiveQuestsView>(_diContainer);
+            MenuStaticFactory.Create<ActiveQuestsView>(_diContainer);
 
         private void CreateQuestsSelectionMenuView() =>
-            _questsSelectionMenuView = MenuFactory.Create<QuestsSelectionMenuView>(_diContainer);
+            _questsSelectionMenuView = MenuStaticFactory.Create<QuestsSelectionMenuView>(_diContainer);
 
         private void CreateGameMapMenu() =>
-            _gameMapUI = MenuFactory.Create<GameMapUI>(_diContainer);
+            _gameMapUI = MenuStaticFactory.Create<GameMapUI>(_diContainer);
 
         private void CreateGameOverMenu() =>
-            _gameOverMenuView = MenuFactory.Create<GameOverMenuView>(_diContainer);
+            _gameOverMenuView = MenuStaticFactory.Create<GameOverMenuView>(_diContainer);
 
         private void CreateRewardMenu() =>
-            MenuFactory.Create<RewardMenuView>(_diContainer);
+            MenuStaticFactory.Create<RewardMenuView>(_diContainer);
 
         private void CreateGameOverWarningMenuView() =>
-            _gameOverWarningMenuView = MenuFactory.Create<GameOverWarningMenuView>(_diContainer);
+            _gameOverWarningMenuView = MenuStaticFactory.Create<GameOverWarningMenuView>(_diContainer);
         
         private void CreatePauseMenu() =>
-            _pauseMenuView = MenuFactory.Create<PauseMenuView>(_diContainer);
+            _pauseMenuView = MenuStaticFactory.Create<PauseMenuView>(_diContainer);
 
         private void CreateQuitConfirmMenuView() =>
-            _quitConfirmMenuView = MenuFactory.Create<QuitConfirmMenuView>(_diContainer);
+            _quitConfirmMenuView = MenuStaticFactory.Create<QuitConfirmMenuView>(_diContainer);
 
         private void ShowQuitConfirmMenu() =>
             _quitConfirmMenuView.Show();

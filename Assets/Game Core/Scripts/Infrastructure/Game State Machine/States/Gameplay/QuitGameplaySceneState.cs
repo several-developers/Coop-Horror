@@ -8,8 +8,11 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public QuitGameplaySceneState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
-            ConnectionManager connectionManager)
+        public QuitGameplaySceneState(
+            IGameStateMachine gameStateMachine,
+            IHorrorStateMachine horrorStateMachine,
+            ConnectionManager connectionManager
+        )
         {
             _gameStateMachine = gameStateMachine;
             _horrorStateMachine = horrorStateMachine;
@@ -40,7 +43,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private void QuitHorrorStateMachine() =>
             _horrorStateMachine.ChangeState<QuitState>();
-        
+
         private static void SendSessionEnded() =>
             SessionManager<SessionPlayerData>.Instance.OnSessionEnded();
     }

@@ -54,7 +54,7 @@ namespace GameCore.Infrastructure.Installers.Global
         private void BindMenuFactory()
         {
             Container
-                .Bind<MenuFactory>()
+                .Bind<MenuStaticFactory>()
                 .AsSingle()
                 .NonLazy();
         }
