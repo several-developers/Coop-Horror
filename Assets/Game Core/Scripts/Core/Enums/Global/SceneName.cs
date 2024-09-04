@@ -6,6 +6,7 @@
         MainMenu = 1,
         Gameplay = 2,
         Market = 3,
+        FactoriesWarmUp = 4,
 
         Desert = 10,
         Forest = 11,

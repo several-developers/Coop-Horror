@@ -20,6 +20,7 @@ namespace CustomEditors
         private const string ScrapyardLocationSceneMenuItem = LocationsScenesMenuItem + "🗑️ Scrapyard";
 
         private const string BootstrapSceneMenuItem = ScenesMenuItem + "🚀 Bootstrap";
+        private const string FactoriesWarmUpSceneMenuItem = ScenesMenuItem + "🏗️ Factories Warm Up";
         //private const string LoginSceneMenuItem = ScenesMenuItem + "🗝 Login";
         //private const string TitleSceneMenuItem = ScenesMenuItem + "✨ Title";
         private const string MainMenuSceneMenuItem = ScenesMenuItem + "🌐 Main Menu";
@@ -30,7 +31,7 @@ namespace CustomEditors
         //private const string PrototypesSceneMenuItem = ScenesMenuItem + "⏳ Prototypes";
 
         private const string BootstrapScenePath = ScenesPath + "Bootstrap.unity";
-
+        private const string FactoriesWarmUpScenePath = ScenesPath + "FactoriesWarmUp.unity";
         //private const string LoginScenePath = ScenesPath + "PixelBattleLogin.unity";
         //private const string TitleScenePath = ScenesPath + "TitleScreen.unity";
         private const string MainMenuScenePath = ScenesPath + "MainMenu.unity";
@@ -51,32 +52,28 @@ namespace CustomEditors
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         
         [MenuItem(ForestLocationSceneMenuItem)]
-        private static void LoadForestLocationScene() =>
-            OpenScene(ForestLocationScenePath);
+        private static void LoadForestLocationScene() => OpenScene(ForestLocationScenePath);
 
         [MenuItem(DesertLocationSceneMenuItem)]
-        private static void LoadDesertLocationScene() =>
-            OpenScene(DesertLocationScenePath);
+        private static void LoadDesertLocationScene() => OpenScene(DesertLocationScenePath);
 
         [MenuItem(ScrapyardLocationSceneMenuItem)]
-        private static void LoadScrapyardLocationScene() =>
-            OpenScene(ScrapyardLocationScenePath);
+        private static void LoadScrapyardLocationScene() => OpenScene(ScrapyardLocationScenePath);
         
         [MenuItem(BootstrapSceneMenuItem)]
-        private static void LoadBootstrapScene() =>
-            OpenScene(BootstrapScenePath);
+        private static void LoadBootstrapScene() => OpenScene(BootstrapScenePath);
+
+        [MenuItem(FactoriesWarmUpSceneMenuItem)]
+        private static void LoadFactoriesWarmUpScene() => OpenScene(FactoriesWarmUpScenePath);
 
         [MenuItem(MainMenuSceneMenuItem)]
-        private static void LoadMainMenuScene() =>
-            OpenScene(MainMenuScenePath);
+        private static void LoadMainMenuScene() => OpenScene(MainMenuScenePath);
 
         [MenuItem(MarketSceneMenuItem)]
-        private static void LoadMarketScene() =>
-            OpenScene(MarketScenePath);
+        private static void LoadMarketScene() => OpenScene(MarketScenePath);
 
         [MenuItem(GameplaySceneMenuItem)]
-        private static void LoadGameScene() =>
-            OpenScene(GameplayScenePath);
+        private static void LoadGameScene() => OpenScene(GameplayScenePath);
 
         [MenuItem(QuickStartMenuItem)]
         private static void QuickStart()

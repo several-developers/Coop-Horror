@@ -8,6 +8,7 @@ namespace GameCore.Gameplay.Factories.Menu
 {
     public interface IMenuFactory
     {
+        UniTask WarmUp();
         UniTask<GameObject> Create(Type menuType);
         UniTask<GameObject> Create<TPayload>(Type menuType, TPayload param);
         UniTask<TMenu> Create<TMenu>() where TMenu : MenuView;

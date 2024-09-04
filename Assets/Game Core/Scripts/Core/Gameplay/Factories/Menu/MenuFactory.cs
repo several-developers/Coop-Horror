@@ -5,32 +5,32 @@ using GameCore.Configs.Global.MenuPrefabsList;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Global.MenuView;
 using GameCore.UI.Global.Other;
+using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Zenject;
 
 namespace GameCore.Gameplay.Factories.Menu
 {
-    public class MenuFactory : IMenuFactory, IInitializable
+    public class MenuFactory : AddressablesFactoryBase, IMenuFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MenuFactory(DiContainer diContainer, IAssetsProvider assetsProvider)
+        public MenuFactory(DiContainer diContainer, IAssetsProvider assetsProvider) : base(assetsProvider)
         {
             _diContainer = diContainer;
             _assetsProvider = assetsProvider;
-            _referencesDictionary = new Dictionary<Type, AssetReferenceGameObject>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly DiContainer _diContainer;
         private readonly IAssetsProvider _assetsProvider;
-        private readonly Dictionary<Type, AssetReferenceGameObject> _referencesDictionary;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Initialize() => SetupReferencesDictionary();
+        public async UniTask WarmUp() =>
+            await SetupReferencesDictionary();
 
         public async UniTask<GameObject> Create(Type menuType) =>
             await InstantiatePrefab(menuType, MainCanvas.Transform, _diContainer);
@@ -73,8 +73,7 @@ namespace GameCore.Gameplay.Factories.Menu
         }
 
         public async UniTask<TMenu> Create<TMenu, TPayload>(Transform container, TPayload param,
-            DiContainer diContainer)
-            where TMenu : MenuView, IComplexMenuView<TPayload>
+            DiContainer diContainer) where TMenu : MenuView, IComplexMenuView<TPayload>
         {
             var menuInstance = await InstantiatePrefabForComponent<TMenu>(container, diContainer);
             menuInstance.Setup(param);
@@ -84,7 +83,7 @@ namespace GameCore.Gameplay.Factories.Menu
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SetupReferencesDictionary()
+        private async UniTask SetupReferencesDictionary()
         {
             MenuPrefabsListConfigMeta menuPrefabsListConfig = _assetsProvider.GetMenuPrefabsListConfig();
 
@@ -92,47 +91,18 @@ namespace GameCore.Gameplay.Factories.Menu
                 return;
 
             IEnumerable<AssetReferenceGameObject> allMenuReferences = menuPrefabsListConfig.GetAllMenuReferences();
-
-            foreach (AssetReferenceGameObject assetReference in allMenuReferences)
-            {
-                if (!assetReference.editorAsset.TryGetComponent(out MenuView menuView))
-                {
-                    Log.PrintError(log: $"<gb>Entity '{assetReference.AssetGUID}' asset</gb> was <rb>not found</rb>!");
-                    continue;
-                }
-
-                Type type = menuView.GetType();
-                bool success = _referencesDictionary.TryAdd(type, assetReference);
-
-                if (success)
-                    continue;
-
-                Log.PrintError(log: $"Key '<gb>{type.Name}</gb>' <rb>already exists</rb>!");
-            }
+            await SetupReferencesDictionary<MenuView>(allMenuReferences);
         }
 
-        private AssetReferenceGameObject GetMenuReference<TMenu>() where TMenu : MenuView, IMenuView
-        {
-            Type key = typeof(TMenu);
-
-            bool isAssetReferenceFound =
-                _referencesDictionary.TryGetValue(key, out AssetReferenceGameObject assetReference);
-
-            if (!isAssetReferenceFound)
-                Log.PrintError(log: $"<gb>Asset Reference '<gb>{key.Name}</gb>' <rb>not found</rb>!");
-
-            return assetReference;
-        }
-
+#warning Maybe working not correctly with Zenject, need to be checked.
         private async UniTask<GameObject> InstantiatePrefab(Type menuType, Transform container, DiContainer diContainer)
         {
-            bool isAssetReferenceFound =
-                _referencesDictionary.TryGetValue(menuType, out AssetReferenceGameObject assetReference);
+            bool isAssetReferenceFound = TryGetAssetReference(menuType, out AssetReference assetReference);
 
             if (!isAssetReferenceFound)
-                Log.PrintError(log: $"<gb>Asset Reference '<gb>{menuType.Name}</gb>' <rb>not found</rb>!");
+                return null;
 
-            MenuView menuPrefab = await LoadAsset(assetReference);
+            var menuPrefab = await LoadAsset<MenuView>(assetReference);
             return diContainer.InstantiatePrefab(menuPrefab, container);
         }
 
@@ -142,29 +112,6 @@ namespace GameCore.Gameplay.Factories.Menu
         {
             var menuPrefab = await LoadAsset<TMenu>();
             return diContainer.InstantiatePrefabForComponent<TMenu>(menuPrefab, container);
-        }
-
-        private async UniTask<TMenu> LoadAsset<TMenu>() where TMenu : MenuView
-        {
-            AssetReferenceGameObject assetReference = GetMenuReference<TMenu>();
-            var menuPrefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
-            bool isMenuViewFound = menuPrefab.TryGetComponent(out TMenu menuView);
-
-            if (!isMenuViewFound)
-                Log.PrintError(log: "Menu View not found");
-
-            return menuView;
-        }
-
-        private async UniTask<MenuView> LoadAsset(AssetReferenceGameObject assetReference)
-        {
-            var menuPrefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
-            bool isMenuViewFound = menuPrefab.TryGetComponent(out MenuView menuView);
-
-            if (!isMenuViewFound)
-                Log.PrintError(log: "Menu View not found");
-
-            return menuView;
         }
     }
 }

@@ -1,7 +1,9 @@
+using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Factories.Menu;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.InputManagement;
@@ -19,16 +21,23 @@ using Zenject;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class GameplaySceneState : IEnterState, IExitState
+    public class GameplaySceneState : IEnterStateAsync, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameplaySceneState(IGameStateMachine gameStateMachine, IHorrorStateMachine horrorStateMachine,
-            ITrainEntity trainEntity, IConfigsProvider configsProvider,
-            IGameManagerDecorator gameManagerDecorator, DiContainer diContainer)
+        public GameplaySceneState(
+            IGameStateMachine gameStateMachine,
+            IHorrorStateMachine horrorStateMachine,
+            IMenuFactory menuFactory,
+            ITrainEntity trainEntity,
+            IConfigsProvider configsProvider,
+            IGameManagerDecorator gameManagerDecorator,
+            DiContainer diContainer
+        )
         {
             _gameStateMachine = gameStateMachine;
             _horrorStateMachine = horrorStateMachine;
+            _menuFactory = menuFactory;
             _trainEntity = trainEntity;
             _gameManagerDecorator = gameManagerDecorator;
             _diContainer = diContainer;
@@ -41,6 +50,7 @@ namespace GameCore.Infrastructure.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IHorrorStateMachine _horrorStateMachine;
+        private readonly IMenuFactory _menuFactory;
         private readonly ITrainEntity _trainEntity;
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly DiContainer _diContainer;
@@ -56,20 +66,20 @@ namespace GameCore.Infrastructure.StateMachine
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Enter()
+        public async UniTaskVoid Enter()
         {
             LockCursor();
             EnableGameplayInput();
 
-            CreateChatMenu();
-            CreateActiveQuestsView(); // TEMP
-            CreateQuestsSelectionMenuView(); // TEMP
-            CreateGameMapMenu(); // TEMP
-            CreateGameOverMenu(); // TEMP
-            CreateRewardMenu(); // TEMP
-            CreateGameOverWarningMenuView(); // TEMP
-            CreatePauseMenu(); // TEMP
-            CreateQuitConfirmMenuView(); // TEMP
+            await CreateChatMenu();
+            await CreateActiveQuestsView(); // TEMP
+            await CreateQuestsSelectionMenuView(); // TEMP
+            await CreateGameMapMenu(); // TEMP
+            await CreateGameOverMenu(); // TEMP
+            await CreateRewardMenu(); // TEMP
+            await CreateGameOverWarningMenuView(); // TEMP
+            await CreatePauseMenu(); // TEMP
+            await CreateQuitConfirmMenuView(); // TEMP
 
             InitHorrorStateMachine();
 
@@ -80,7 +90,7 @@ namespace GameCore.Infrastructure.StateMachine
             _trainEntity.OnOpenQuestsSelectionMenuEvent += OnOpenQuestsSelectionMenu;
             _trainEntity.OnOpenGameOverWarningMenuEvent += OnOpenGameOverWarningMenu;
             _trainEntity.OnOpenGameMapEvent += OnOpenGameMap;
-            
+
             _pauseMenuView.OnContinueClickedEvent += OnContinueClicked;
             _pauseMenuView.OnQuitClickedEvent += OnQuitClicked;
 
@@ -109,7 +119,7 @@ namespace GameCore.Infrastructure.StateMachine
             _gameOverWarningMenuView.OnCancelClickedEvent -= OnGameOverWarningCancelClicked;
 
             _quitConfirmMenuView.OnConfirmClickedEvent -= OnQuitConfirmClicked;
-            
+
             _gameManagerDecorator.OnGameStateChangedEvent -= GameStateChanged;
         }
 
@@ -124,32 +134,32 @@ namespace GameCore.Infrastructure.StateMachine
         private void EnableGameplayInput() =>
             _inputReader.EnableGameplayInput();
 
-        private void CreateChatMenu() =>
-            _chatMenuUI = MenuStaticFactory.Create<ChatMenuUI>(_diContainer);
+        private async UniTask CreateChatMenu() =>
+            _chatMenuUI = await _menuFactory.Create<ChatMenuUI>(_diContainer);
 
-        private void CreateActiveQuestsView() =>
-            MenuStaticFactory.Create<ActiveQuestsView>(_diContainer);
+        private async UniTask CreateActiveQuestsView() =>
+            await _menuFactory.Create<ActiveQuestsView>(_diContainer);
 
-        private void CreateQuestsSelectionMenuView() =>
-            _questsSelectionMenuView = MenuStaticFactory.Create<QuestsSelectionMenuView>(_diContainer);
+        private async UniTask CreateQuestsSelectionMenuView() =>
+            _questsSelectionMenuView = await _menuFactory.Create<QuestsSelectionMenuView>(_diContainer);
 
-        private void CreateGameMapMenu() =>
-            _gameMapUI = MenuStaticFactory.Create<GameMapUI>(_diContainer);
+        private async UniTask CreateGameMapMenu() =>
+            _gameMapUI = await _menuFactory.Create<GameMapUI>(_diContainer);
 
-        private void CreateGameOverMenu() =>
-            _gameOverMenuView = MenuStaticFactory.Create<GameOverMenuView>(_diContainer);
+        private async UniTask CreateGameOverMenu() =>
+            _gameOverMenuView = await _menuFactory.Create<GameOverMenuView>(_diContainer);
 
-        private void CreateRewardMenu() =>
-            MenuStaticFactory.Create<RewardMenuView>(_diContainer);
+        private async UniTask CreateRewardMenu() =>
+            await _menuFactory.Create<RewardMenuView>(_diContainer);
 
-        private void CreateGameOverWarningMenuView() =>
-            _gameOverWarningMenuView = MenuStaticFactory.Create<GameOverWarningMenuView>(_diContainer);
-        
-        private void CreatePauseMenu() =>
-            _pauseMenuView = MenuStaticFactory.Create<PauseMenuView>(_diContainer);
+        private async UniTask CreateGameOverWarningMenuView() =>
+            _gameOverWarningMenuView = await _menuFactory.Create<GameOverWarningMenuView>(_diContainer);
 
-        private void CreateQuitConfirmMenuView() =>
-            _quitConfirmMenuView = MenuStaticFactory.Create<QuitConfirmMenuView>(_diContainer);
+        private async UniTask CreatePauseMenu() =>
+            _pauseMenuView = await _menuFactory.Create<PauseMenuView>(_diContainer);
+
+        private async UniTask CreateQuitConfirmMenuView() =>
+            _quitConfirmMenuView = await _menuFactory.Create<QuitConfirmMenuView>(_diContainer);
 
         private void ShowQuitConfirmMenu() =>
             _quitConfirmMenuView.Show();
@@ -157,7 +167,7 @@ namespace GameCore.Infrastructure.StateMachine
         private void InitHorrorStateMachine() =>
             _horrorStateMachine.ChangeState<PrepareGameState>();
 
-        #warning СЛОМАНО, СРОЧНО ПОЧИНИТЬ
+#warning СЛОМАНО, СРОЧНО ПОЧИНИТЬ
         private void HandleGameState(GameState gameState)
         {
             switch (gameState)
@@ -165,21 +175,21 @@ namespace GameCore.Infrastructure.StateMachine
                 case GameState.GameOver:
                     _gameOverMenuView.Show();
                     break;
-                
+
                 case GameState.QuestsRewarding:
                     // Open reward menu
                     break;
-                
+
                 // case GameState.KillPlayersOnTheRoad:
                 //     PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
                 //     localPlayer.Kill(PlayerDeathReason.FailedQuests);
                 //     break;
-                
+
                 case GameState.RestartGame:
                     _gameOverMenuView.Hide();
                     break;
             }
-            
+
             if (_questsSelectionMenuView.IsShown)
                 _questsSelectionMenuView.Hide();
         }
@@ -201,7 +211,7 @@ namespace GameCore.Infrastructure.StateMachine
         {
             if (_chatMenuUI.IsShown)
                 return;
-            
+
             _chatMenuUI.ActivateChat();
             _chatMenuUI.Show();
         }
@@ -218,7 +228,7 @@ namespace GameCore.Infrastructure.StateMachine
         {
             if (_chatMenuUI.IsShown)
                 return;
-            
+
             _gameMapUI.Show();
         }
 
@@ -226,10 +236,10 @@ namespace GameCore.Infrastructure.StateMachine
         {
             GameState gameState = _gameManagerDecorator.GetGameState();
             bool canOpenMenu = gameState == GameState.Gameplay;
-            
+
             if (!canOpenMenu)
                 return;
-            
+
             if (_questsSelectionMenuView.IsShown)
                 _questsSelectionMenuView.Hide();
             else

@@ -55,7 +55,13 @@ namespace GameCore.Infrastructure.StateMachine
         {
             if (IsSceneMatches(SceneName.Bootstrap))
             {
-                EnterLoadMainMenuState();
+                EnterLoadFactoriesWarmUpState();
+                return;
+            }
+
+            if (IsSceneMatches(SceneName.FactoriesWarmUp))
+            {
+                EnterFactoriesWarmUpState();
                 return;
             }
 
@@ -99,8 +105,11 @@ namespace GameCore.Infrastructure.StateMachine
             return true;
         }
 
-        private void EnterLoadMainMenuState() =>
-            _gameStateMachine.ChangeState<LoadMainMenuState>();
+        private void EnterLoadFactoriesWarmUpState() =>
+            _gameStateMachine.ChangeState<LoadFactoriesWarmUpState>();
+
+        private void EnterFactoriesWarmUpState() =>
+            _gameStateMachine.ChangeState<FactoriesWarmUpState>();
 
         private void EnterPrepareMainMenuState() =>
             _gameStateMachine.ChangeState<PrepareMainMenuState>();
@@ -111,7 +120,7 @@ namespace GameCore.Infrastructure.StateMachine
         private static bool IsSceneMatches(SceneName sceneName)
         {
             string name = SceneManager.GetActiveScene().name;
-            bool isSceneMainMenu = string.Equals(name, sceneName.ToString());
+            bool isSceneMainMenu = string.Equals(a: name, b: sceneName.ToString());
             return isSceneMainMenu;
         }
 

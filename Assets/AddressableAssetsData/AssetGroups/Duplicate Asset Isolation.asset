@@ -10,20 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Gameplay UI
+  m_Name: Duplicate Asset Isolation
   m_EditorClassIdentifier: 
-  m_GroupName: Gameplay UI
+  m_GroupName: Duplicate Asset Isolation
   m_Data:
     m_SerializedData: []
-  m_GUID: 7d2905afd237bed478a6d805597d1ac9
+  m_GUID: 54c1a775d9f73404d81d3b3a901ad9ff
   m_SerializeEntries:
-  - m_GUID: 18f8c626cb72e834daf160d7b0b9af46
-    m_Address: Gameplay
+  - m_GUID: 6d58f232604d1a54ea188908c9035f21
+    m_Address: Assets/Game Core/Sprites/Compression/UI/Global/Box.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a13aec664e0d0254897caead8459b01a
+    m_Address: Assets/Game Core/Sprites/Compression/UI/Global/Round button.png
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 75fa75dd9a346a04eb1c4dc9bcb6f9ca, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 3cfc828147515374a90ada8182df0a37, type: 2}
-    - {fileID: 11400000, guid: dac68c239e57fa94caac486a6eff565d, type: 2}
+    - {fileID: 11400000, guid: a621327a1d87a934c8b0ee92a319d161, type: 2}
+    - {fileID: 11400000, guid: 933f644d69f0bf54b81b5c05c05a0636, type: 2}

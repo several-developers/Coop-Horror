@@ -17,20 +17,8 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 6521a65ef80833a4a9a3d771628e3105
   m_SerializeEntries:
-  - m_GUID: 9a00af2574e8c10498ed6201d8091665
-    m_Address: Lobbies Menu
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 9ca913657ccc4744084ae9d9faf4926d
-    m_Address: Save Selection Menu
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 175a163fee4ed12409d19a0f4b1d631d
-    m_Address: Create Lobby Menu
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 84aa17cf664a69c46ad53097dd058e24
-    m_Address: Select Lobby Menu
+  - m_GUID: 809a323cef1f9b7449213f41f59f62e9
+    m_Address: Main Menu
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

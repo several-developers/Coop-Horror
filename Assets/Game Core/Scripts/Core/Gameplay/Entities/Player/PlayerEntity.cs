@@ -409,6 +409,8 @@ namespace GameCore.Gameplay.Entities.Player
 
         protected override void DespawnOwner()
         {
+            _localPlayer = null;
+            
             _interactionHandler.Dispose();
 
             InputReader.OnScrollEvent -= OnScrollInventory;

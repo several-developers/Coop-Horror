@@ -1,17 +1,20 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Factories.Menu;
-using GameCore.UI.MainMenu.SaveSelectionMenu;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class CreateLobbyState : IEnterStateAsync, IExitState
+    public class FactoriesWarmUpState : IEnterStateAsync
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CreateLobbyState(IGameStateMachine gameStateMachine, IMenuFactory menuFactory)
+        public FactoriesWarmUpState(
+            IGameStateMachine gameStateMachine,
+            IMenuFactory menuFactory
+        )
         {
             _gameStateMachine = gameStateMachine;
             _menuFactory = menuFactory;
+
             _gameStateMachine.AddState(this);
         }
 
@@ -20,22 +23,22 @@ namespace GameCore.Infrastructure.StateMachine
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IMenuFactory _menuFactory;
 
-        private SaveSelectionMenuView _saveSelectionMenuView;
-
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public async UniTaskVoid Enter()
         {
-            await CreateSaveSelectionMenuView();
-        }
-
-        public void Exit()
-        {
+            await WarmUpFactories();
+            EnterLoadMainMenuState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTask CreateSaveSelectionMenuView() =>
-            _saveSelectionMenuView = await _menuFactory.Create<SaveSelectionMenuView>();
+        private async UniTask WarmUpFactories()
+        {
+            await _menuFactory.WarmUp();
+        }
+        
+        private void EnterLoadMainMenuState() =>
+            _gameStateMachine.ChangeState<LoadMainMenuState>();
     }
 }

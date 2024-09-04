@@ -16,8 +16,11 @@ namespace GameCore.Infrastructure.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public BootstrapState(IGameStateMachine gameStateMachine, IAssetsProvider assetsProvider, 
-            DiContainer diContainer)
+        public BootstrapState(
+            IGameStateMachine gameStateMachine,
+            IAssetsProvider assetsProvider,
+            DiContainer diContainer
+        )
         {
             _gameStateMachine = gameStateMachine;
             _assetsProvider = assetsProvider;

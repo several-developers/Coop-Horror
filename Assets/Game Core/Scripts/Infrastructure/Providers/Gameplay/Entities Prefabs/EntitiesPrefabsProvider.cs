@@ -74,7 +74,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.EntitiesPrefabs
 
             foreach (AssetReferenceGameObject assetReference in allEntitiesReferences)
             {
-                if (!assetReference.editorAsset.TryGetComponent(out Entity entity))
+                /*if (!assetReference.editorAsset.TryGetComponent(out Entity entity))
                 {
                     Log.PrintError(log: $"<gb>Entity '' asset</gb> was <rb>not found</rb>!");
                     continue;
@@ -86,7 +86,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.EntitiesPrefabs
                 if (success)
                     continue;
 
-                Log.PrintError(log: $"Key '<gb>{type.Name}</gb>' <rb>already exists</rb>!");
+                Log.PrintError(log: $"Key '<gb>{type.Name}</gb>' <rb>already exists</rb>!");*/
             }
         }
 

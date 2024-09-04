@@ -11,6 +11,8 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             BindBootstrapState();
             BindLoadDataState();
+            BindFactoriesWarmUpState();
+            BindLoadFactoriesWarmUpState();
             BindLoadMainMenuState();
             BindLoadGameplayState();
 
@@ -33,6 +35,22 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .Bind<LoadDataState>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindFactoriesWarmUpState()
+        {
+            Container
+                .Bind<FactoriesWarmUpState>()
+                .AsSingle()
+                .NonLazy();
+        }
+
+        private void BindLoadFactoriesWarmUpState()
+        {
+            Container
+                .Bind<LoadFactoriesWarmUpState>()
                 .AsSingle()
                 .NonLazy();
         }

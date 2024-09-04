@@ -38,7 +38,7 @@ namespace GameCore.Infrastructure.StateMachine
 #if UNITY_EDITOR
             EnterGameSetupForEditorState();
 #else
-            EnterLoadMainMenuState();
+            EnterLoadFactoriesWarmUpState();
 #endif
         }
 
@@ -63,7 +63,7 @@ namespace GameCore.Infrastructure.StateMachine
             _gameStateMachine.ChangeState<GameSetupForEditorState>();
 #endif
 
-        private void EnterLoadMainMenuState() =>
-            _gameStateMachine.ChangeState<LoadMainMenuState>();
+        private void EnterLoadFactoriesWarmUpState() =>
+            _gameStateMachine.ChangeState<LoadFactoriesWarmUpState>();
     }
 }
