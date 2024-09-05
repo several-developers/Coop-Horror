@@ -83,7 +83,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             NetworkManager.OnClientConnectedCallback -= OnClientConnectedCallback;
             NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
             NetworkManager.OnServerStarted -= OnServerStarted;
-            NetworkManager.ConnectionApprovalCallback -= OnApprovalCheck;
+            //NetworkManager.ConnectionApprovalCallback -= OnApprovalCheck;
             NetworkManager.OnTransportFailure -= OnTransportFailure;
         }
 
@@ -134,7 +134,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
             NetworkManager.OnServerStarted += OnServerStarted;
-            NetworkManager.ConnectionApprovalCallback += OnApprovalCheck;
+            //NetworkManager.ConnectionApprovalCallback += OnApprovalCheck;
             NetworkManager.OnTransportFailure += OnTransportFailure;
         }
 

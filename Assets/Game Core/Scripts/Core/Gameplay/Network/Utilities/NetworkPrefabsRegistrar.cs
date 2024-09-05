@@ -71,7 +71,7 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private async UniTaskVoid RegisterAddressables()
         {
-            await RegisterAllEntities();
+            //await RegisterAllEntities();
             await RegisterMonsterEntities();
             IsPrefabsRegistered = true;
         }

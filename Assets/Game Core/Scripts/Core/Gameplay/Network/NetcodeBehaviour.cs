@@ -24,8 +24,11 @@ namespace GameCore.Gameplay.Network
         protected void Start()
         {
             StartAll();
-            StartServerOnly();
-            StartClientOnly();
+            
+            if (IsServerOnly)
+                StartServerOnly();
+            else
+                StartClientOnly();
         }
 
         protected virtual void StartAll()
@@ -79,6 +82,30 @@ namespace GameCore.Gameplay.Network
 
             if (IsLocalPlayer())
                 LateTickLocalPlayer();
+        }
+
+        public override void OnDestroy()
+        {
+            OnDestroyAll();
+            
+            if (IsServerOnly)
+                OnDestroyServerOnly();
+            else
+                OnDestroyClientOnly();
+            
+            base.OnDestroy();
+        }
+        
+        protected virtual void OnDestroyAll()
+        {
+        }
+        
+        protected virtual void OnDestroyServerOnly()
+        {
+        }
+
+        protected virtual void OnDestroyClientOnly()
+        {
         }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
