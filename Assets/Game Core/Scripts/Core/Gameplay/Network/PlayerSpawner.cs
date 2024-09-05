@@ -6,7 +6,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Network.ConnectionManagement;
-using GameCore.Gameplay.Network.Session_Manager;
+using GameCore.Gameplay.Network.SessionManagement;
 using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Utilities;
 using GameCore.Utilities;

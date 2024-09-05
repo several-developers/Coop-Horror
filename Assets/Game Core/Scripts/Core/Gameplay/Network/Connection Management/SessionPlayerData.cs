@@ -1,5 +1,5 @@
 using GameCore.Gameplay.Network.Other;
-using GameCore.Gameplay.Network.Session_Manager;
+using GameCore.Gameplay.Network.SessionManagement;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Network.ConnectionManagement

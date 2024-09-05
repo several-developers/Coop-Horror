@@ -1,6 +1,6 @@
 namespace GameCore
 {
-    public interface ILateTickableState
+    public interface ILateTickableState : IState
     {
         void LateTick();
     }

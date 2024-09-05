@@ -1,4 +1,4 @@
-namespace GameCore.Gameplay.Network.Session_Manager
+namespace GameCore.Gameplay.Network.SessionManagement
 {
     public interface ISessionPlayerData
     {

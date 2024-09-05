@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace GameCore.Gameplay.Network.Session_Manager
+namespace GameCore.Gameplay.Network.SessionManagement
 {
     /// <summary>
     /// This class uses a unique player ID to bind a player to a session. Once that player connects to a host, the host

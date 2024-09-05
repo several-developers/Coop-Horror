@@ -6,6 +6,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Systems.Health;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Infrastructure.StateMachine;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -51,7 +52,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         private ILevelProvider _levelProvider;
         private BeetleAIConfigMeta _beetleAIConfig;
 
-        private StateMachine _beetleStateMachine;
+        private StateMachineBase _beetleStateMachine;
         private AggressionSystem _aggressionSystem;
         private PlayerEntity _targetPlayer;
 
@@ -143,7 +144,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
             
             void InitSystems()
             {
-                _beetleStateMachine = new StateMachine();
+                _beetleStateMachine = new StateMachineBase();
                 _aggressionSystem = new AggressionSystem(beetleEntity: this, _beetleAIConfig);
 
                 float health = _beetleAIConfig.Health;

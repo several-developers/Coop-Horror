@@ -9,6 +9,7 @@ using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Infrastructure.StateMachine;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -71,7 +72,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         private BlindCreatureAIConfigMeta _blindCreatureAIConfig;
         private BalanceConfigMeta _balanceConfig;
 
-        private StateMachine _blindCreatureStateMachine;
+        private StateMachineBase _blindCreatureStateMachine;
         private SuspicionSystem _suspicionSystem;
         private CombatSystem _combatSystem;
         private AnimationController _animationController;
@@ -167,7 +168,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             void InitSystems()
             {
-                _blindCreatureStateMachine = new StateMachine();
+                _blindCreatureStateMachine = new StateMachineBase();
                 _suspicionSystem = new SuspicionSystem(blindCreatureEntity: this, _balanceConfig);
                 _animationController = new AnimationController(blindCreatureEntity: this);
                 _combatSystem = new CombatSystem(blindCreatureEntity: this, _animationController);

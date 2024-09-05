@@ -20,6 +20,7 @@ using GameCore.Gameplay.Systems.Ragdoll;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
+using GameCore.Infrastructure.StateMachine;
 using GameCore.Observers.Gameplay.PlayerInteraction;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -124,7 +125,7 @@ namespace GameCore.Gameplay.Entities.Player
         private ITrainEntity _trainEntity;
 
         private PlayerConfigMeta _playerConfig;
-        private StateMachine _playerStateMachine;
+        private StateMachineBase _playerStateMachine;
         private PlayerInventoryManager _inventoryManager;
         private PlayerInventory _inventory;
         private InteractionChecker _interactionChecker;
@@ -320,7 +321,7 @@ namespace GameCore.Gameplay.Entities.Player
                 footstepsSystem.ToggleActiveState(isActive: true);
                 footstepsSystem.OnFootstepPerformedEvent += OnFootstepPerformed;
 
-                _playerStateMachine = new StateMachine();
+                _playerStateMachine = new StateMachineBase();
 
                 _interactionChecker = new InteractionChecker(_playerInteractionObserver, transform,
                     mainCamera, _interactionMaxDistance, interactionLM: _interactionLM, _interactionObstaclesLM);

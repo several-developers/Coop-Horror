@@ -1,38 +1,39 @@
 ﻿using System;
 using GameCore.Infrastructure.StateMachine;
+using GameCore.Observers.Global.StateMachine;
 using GameCore.Utilities;
 using UnityEngine;
 
-namespace GameCore.Gameplay.HorrorStateMachineSpace
+namespace GameCore.StateMachine
 {
-    public class HorrorStateMachine : IHorrorStateMachine
+    public class GameStateMachine : IGameStateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public HorrorStateMachine() =>
+        public GameStateMachine(IGameStateMachineObserver gameStateMachineObserver)
+        {
+            _gameStateMachineObserver = gameStateMachineObserver;
             _stateMachine = new StateMachineBase();
+        }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly StateMachineBase _stateMachine;
+        private readonly IGameStateMachineObserver _gameStateMachineObserver;
 
         private IState _currentState;
-        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void AddState(IState state) =>
             _stateMachine.AddStateWithRemove(state);
 
-        public void ChangeState<TState>() where TState : IState
+        public void ChangeState<T>() where T : IState
         {
-            LogStateChange<TState>();
-            _stateMachine.ChangeState<TState>();
-        }
-
-        public void ChangeState<TState, TEnterParams>(TEnterParams enterParams) where TState : IState
-        {
-            LogStateChange<TState>();
-            _stateMachine.ChangeState<TState, TEnterParams>(enterParams);
+            LogStateChange<T>();
+            
+            _stateMachine.ChangeState<T>();
+            _gameStateMachineObserver.SendStateChanged();
         }
 
         public bool TryGetCurrentState(out IState state) =>
@@ -44,7 +45,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         {
             Type type = typeof(T);
             string stateName = type.Name.GetNiceName();
-            string log = Log.HandleLog(tag: "Horror State Machine", log: $"Enter ><cb>{stateName}</cb>");
+            string log = Log.HandleLog(tag: "Game State Machine", log: $"Enter ><cb>{stateName}</cb>");
             Debug.Log(log);
         }
     }

@@ -155,7 +155,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                 _lobbyServiceFacade, _localLobby, _reconnectMessagePublisher);
 
             StartingHostState = new StartingHostState(connectionManager: this, _connectStatusPublisher, _localLobby);
-            
+
             HostingState = new HostingState(connectionManager: this, _connectStatusPublisher, _connectionEventPublisher,
                 _gameStateMachine, _lobbyServiceFacade);
 
@@ -182,58 +182,36 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         public void RequestShutdown() =>
             _currentState.OnUserRequestedShutdown();
 
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnClientConnectedCallback(ulong clientId) =>
-            _currentState.OnClientConnected(clientId);
-
-        private void OnClientDisconnectCallback(ulong clientId) =>
-            _currentState.OnClientDisconnect(clientId);
-
-        private void OnServerStarted() =>
-            _currentState.OnServerStarted();
-
-        private void OnApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
+        private bool FirstStepApproval(NetworkManager.ConnectionApprovalRequest request,
             NetworkManager.ConnectionApprovalResponse response)
         {
-            Debug.Log(message: "Client is trying to connect " + request.ClientNetworkId);
-
             byte[] connectionData = request.Payload;
             ulong clientID = request.ClientNetworkId;
 
+            // Allow the host to connect.
             if (clientID == NetworkManager.LocalClientId)
-            {
-                // Allow the host to connect.
-                Approve();
-                return;
-            }
+                return true;
 
             // A sample-specific denial on clients after k_MaxConnectedClientCount clients have been connected.
-            if (NetworkManager.ConnectedClientsList.Count >= 4)
-            {
-                ImmediateDeny();
-                return;
-            }
+            if (NetworkManager.ConnectedClientsList.Count >= MaxConnectedPlayers)
+                return false;
 
+            // If connectionData is too big, deny immediately to avoid wasting time on the server. This is intended
+            // as a bit of light protection against DOS attacks that rely on sending silly big buffers of garbage.
             if (connectionData.Length > 1024)
-            {
-                // If connectionData is too big, deny immediately to avoid wasting time on the server. This is intended
-                // as a bit of light protection against DOS attacks that rely on sending silly big buffers of garbage.
-                ImmediateDeny();
-                return;
-            }
+                return false;
 
+            // Immediately approve the connection if we haven't loaded any prefabs yet.
             if (DynamicPrefabLoadingUtilities.LoadedPrefabCount == 0)
-            {
-                // Immediately approve the connection if we haven't loaded any prefabs yet.
-                Approve();
-                return;
-            }
+                return true;
 
             string payload = Encoding.UTF8.GetString(connectionData);
 
             // https://docs.unity3d.com/2020.2/Documentation/Manual/JSONSerialization.html
-            var connectionPayload = JsonUtility.FromJson<GameCore.Gameplay.Network.DynamicPrefabs.ConnectionPayload>(payload);
+            var connectionPayload =
+                JsonUtility.FromJson<GameCore.Gameplay.Network.DynamicPrefabs.ConnectionPayload>(payload);
 
             int clientPrefabHash = connectionPayload.hashOfDynamicPrefabGUIDs;
             int serverPrefabHash = DynamicPrefabLoadingUtilities.HashOfDynamicPrefabGUIDs;
@@ -243,7 +221,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             {
                 Approve();
                 DynamicPrefabLoadingUtilities.RecordThatClientHasLoadedAllPrefabs(clientID);
-                return;
+                return true;
             }
 
             // In order for clients to not just get disconnected with no feedback, the server needs to tell the client
@@ -260,7 +238,32 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             response.Reason = DynamicPrefabLoadingUtilities.GenerateDisconnectionPayload();
 
-            ImmediateDeny();
+            return false;
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnClientConnectedCallback(ulong clientId) =>
+            _currentState.OnClientConnected(clientId);
+
+        private void OnClientDisconnectCallback(ulong clientId) =>
+            _currentState.OnClientDisconnect(clientId);
+
+        private void OnServerStarted() =>
+            _currentState.OnServerStarted();
+
+        private void OnApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
+            NetworkManager.ConnectionApprovalResponse response)
+        {
+            Debug.Log(message: "Client is trying to connect " + request.ClientNetworkId);
+
+            ulong clientID = request.ClientNetworkId;
+            bool isFirstStepApproved = FirstStepApproval(request, response);
+
+            if (isFirstStepApproved)
+                Approve();
+            else
+                ImmediateDeny();
 
             // LOCAL METHODS: -----------------------------
 
@@ -271,12 +274,12 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             void Approve()
             {
-                _currentState.ApprovalCheck(request, response);
-
                 Debug.Log(message: $"Client {clientID} approved");
 
                 response.Approved = true;
                 response.CreatePlayerObject = true; // We're not going to spawn a player object for this sample.
+
+                _currentState.ApprovalCheck(request, response);
             }
 
             void ImmediateDeny()

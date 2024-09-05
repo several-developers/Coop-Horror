@@ -6,6 +6,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.Level;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Infrastructure.StateMachine;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -58,7 +59,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         private IMonstersFactory _monstersFactory;
         private GoodClownAIConfigMeta _goodClownAIConfig;
 
-        private StateMachine _goodClownStateMachine;
+        private StateMachineBase _goodClownStateMachine;
         private PlayerEntity _targetPlayer;
         private HunterSystem _hunterSystem;
         private GoodClownUtilities _clownUtilities;
@@ -146,7 +147,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 
             void InitSystems()
             {
-                _goodClownStateMachine = new StateMachine();
+                _goodClownStateMachine = new StateMachineBase();
                 _hunterSystem = new HunterSystem(goodClownEntity: this);
                 _clownUtilities = new GoodClownUtilities(goodClownEntity: this, _animator);
 

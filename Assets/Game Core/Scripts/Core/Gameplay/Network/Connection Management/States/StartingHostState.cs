@@ -1,7 +1,7 @@
 using System;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.Other;
-using GameCore.Gameplay.Network.Session_Manager;
+using GameCore.Gameplay.Network.SessionManagement;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
 using Unity.Netcode;

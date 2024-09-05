@@ -1,5 +1,5 @@
 using GameCore.Gameplay.Network.ConnectionManagement;
-using GameCore.Gameplay.Network.Session_Manager;
+using GameCore.Gameplay.Network.SessionManagement;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -61,17 +61,17 @@ namespace GameCore.Gameplay.Network
         {
             if (!IsServer)
                 return;
-            
+
             SessionPlayerData? sessionPlayerData =
                 SessionManager<SessionPlayerData>.Instance.GetPlayerData(OwnerClientId);
 
             if (!sessionPlayerData.HasValue)
                 return;
-            
+
             SessionPlayerData playerData = sessionPlayerData.Value;
             //playerData.PlayerName = m_NetworkNameState.Name.Value;
             //playerData.AvatarNetworkGuid = m_NetworkAvatarGuidState.AvatarGuid.Value;
-            
+
             SessionManager<SessionPlayerData>.Instance.SetPlayerData(OwnerClientId, playerData);
         }
     }

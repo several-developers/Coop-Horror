@@ -1,6 +1,6 @@
 namespace GameCore
 {
-    public interface ITickableState
+    public interface ITickableState : IState
     {
         void Tick();
     }

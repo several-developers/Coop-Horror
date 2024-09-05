@@ -5,6 +5,7 @@ using GameCore.Gameplay.Entities.Monsters.SirenHead.States;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Infrastructure.StateMachine;
 using GameCore.Observers.Gameplay.Time;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -42,7 +43,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
         private ITimeObserver _timeObserver;
         private SirenHeadAIConfigMeta _sirenHeadAIConfig;
         
-        private StateMachine _sirenHeadStateMachine;
+        private StateMachineBase _sirenHeadStateMachine;
         private SirenHeadSoundReproducer _soundReproducer;
 
         private Vector3 _startPosition;
@@ -128,7 +129,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
 
             void InitSystems()
             {
-                _sirenHeadStateMachine = new StateMachine();
+                _sirenHeadStateMachine = new StateMachineBase();
                 _startPosition = transform.position;
 
                 Animator animator = _references.Animator;

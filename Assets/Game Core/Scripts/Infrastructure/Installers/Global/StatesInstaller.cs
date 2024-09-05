@@ -1,4 +1,4 @@
-﻿using GameCore.Infrastructure.StateMachine;
+﻿using GameCore.StateMachine;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Global

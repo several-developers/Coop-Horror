@@ -7,6 +7,7 @@ using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Infrastructure.StateMachine;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -65,7 +66,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private ILevelProvider _levelProvider;
         private EvilClownAIConfigMeta _evilClownAIConfig;
 
-        private StateMachine _evilClownStateMachine;
+        private StateMachineBase _evilClownStateMachine;
         private AnimationController _animationController;
         private WanderingTimer _wanderingTimer;
         private PlayerEntity _targetPlayer;
@@ -159,7 +160,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
             void InitSystems()
             {
-                _evilClownStateMachine = new StateMachine();
+                _evilClownStateMachine = new StateMachineBase();
                 _animationController = new AnimationController(evilClownEntity: this, _animator);
                 _wanderingTimer = new WanderingTimer(evilClownEntity: this);
 

@@ -65,8 +65,8 @@ namespace GameCore.Gameplay.Factories.Entities
             CreateEntity(entityPrefab, spawnParams, guid);
         }
 
-        private async void CreateEntity<TEntity>(TEntity entityPrefab, EntitySpawnParams<TEntity> spawnParams, string guid)
-            where TEntity : Entity
+        private async void CreateEntity<TEntity>(TEntity entityPrefab, EntitySpawnParams<TEntity> spawnParams,
+            string guid) where TEntity : Entity
         {
             NetworkObject prefabNetworkObject;
 
@@ -111,9 +111,6 @@ namespace GameCore.Gameplay.Factories.Entities
                 var dynamicPrefabsLoader = DynamicPrefabsLoader.Instance;
                 var result = await dynamicPrefabsLoader.TrySpawnDynamicPrefabSynchronously(guid, worldPosition, rotation);
                 return result.Obj;
-                
-                return _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, ownerID,
-                    destroyWithScene: true, position: worldPosition);
             }
         }
     }
