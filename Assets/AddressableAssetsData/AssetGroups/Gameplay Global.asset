@@ -17,28 +17,8 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 70c19b15aed939c468fc69ee57308ea9
   m_SerializeEntries:
-  - m_GUID: a77369042e11ddd49be3f82d556be8a1
-    m_Address: Player Entity
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 4282ea88a0f59e5439ffd10a9117092e
-    m_Address: Beetle
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 75e70588a6ef7314db23007815ec8aca
-    m_Address: Blind Creature
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 4664030f2032e1f4899213c342676280
-    m_Address: Evil Clown
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: ecba960fb87a70c44915348072ec812c
-    m_Address: Good Clown
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 9d92d756e707b5645a76aef3839f7029
-    m_Address: Siren Head
+  - m_GUID: 2cf2df4719a3abc4ab37b6e70cdf806a
+    m_Address: Entities
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

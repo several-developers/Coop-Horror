@@ -1,5 +1,7 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Text;
+using Cysharp.Threading.Tasks;
 using GameCore.Enums.Global;
+using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
 using GameCore.Infrastructure.Services.Global;
@@ -83,7 +85,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             NetworkManager.OnClientConnectedCallback -= OnClientConnectedCallback;
             NetworkManager.OnClientDisconnectCallback -= OnClientDisconnectCallback;
             NetworkManager.OnServerStarted -= OnServerStarted;
-            //NetworkManager.ConnectionApprovalCallback -= OnApprovalCheck;
+            NetworkManager.ConnectionApprovalCallback -= OnApprovalCheck;
             NetworkManager.OnTransportFailure -= OnTransportFailure;
         }
 
@@ -134,7 +136,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnectCallback;
             NetworkManager.OnServerStarted += OnServerStarted;
-            //NetworkManager.ConnectionApprovalCallback += OnApprovalCheck;
+            NetworkManager.ConnectionApprovalCallback += OnApprovalCheck;
             NetworkManager.OnTransportFailure += OnTransportFailure;
         }
 
@@ -194,7 +196,96 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private void OnApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
             NetworkManager.ConnectionApprovalResponse response)
         {
-            _currentState.ApprovalCheck(request, response);
+            Debug.Log(message: "Client is trying to connect " + request.ClientNetworkId);
+
+            byte[] connectionData = request.Payload;
+            ulong clientID = request.ClientNetworkId;
+
+            if (clientID == NetworkManager.LocalClientId)
+            {
+                // Allow the host to connect.
+                Approve();
+                return;
+            }
+
+            // A sample-specific denial on clients after k_MaxConnectedClientCount clients have been connected.
+            if (NetworkManager.ConnectedClientsList.Count >= 4)
+            {
+                ImmediateDeny();
+                return;
+            }
+
+            if (connectionData.Length > 1024)
+            {
+                // If connectionData is too big, deny immediately to avoid wasting time on the server. This is intended
+                // as a bit of light protection against DOS attacks that rely on sending silly big buffers of garbage.
+                ImmediateDeny();
+                return;
+            }
+
+            if (DynamicPrefabLoadingUtilities.LoadedPrefabCount == 0)
+            {
+                // Immediately approve the connection if we haven't loaded any prefabs yet.
+                Approve();
+                return;
+            }
+
+            string payload = Encoding.UTF8.GetString(connectionData);
+
+            // https://docs.unity3d.com/2020.2/Documentation/Manual/JSONSerialization.html
+            var connectionPayload = JsonUtility.FromJson<GameCore.Gameplay.Network.DynamicPrefabs.ConnectionPayload>(payload);
+
+            int clientPrefabHash = connectionPayload.hashOfDynamicPrefabGUIDs;
+            int serverPrefabHash = DynamicPrefabLoadingUtilities.HashOfDynamicPrefabGUIDs;
+
+            // If the client has the same prefabs as the server - approve the connection.
+            if (clientPrefabHash == serverPrefabHash)
+            {
+                Approve();
+                DynamicPrefabLoadingUtilities.RecordThatClientHasLoadedAllPrefabs(clientID);
+                return;
+            }
+
+            // In order for clients to not just get disconnected with no feedback, the server needs to tell the client
+            // why it disconnected it. This could happen after an auth check on a service or because of gameplay
+            // reasons (server full, wrong build version, etc).
+            // The server can do so via the DisconnectReason in the ConnectionApprovalResponse. The guids of the prefabs
+            // the client will need to load will be sent, such that the client loads the needed prefabs, and reconnects.
+
+            // A note: DisconnectReason will not be written to if the string is too large in size. This should be used
+            // only to tell the client "why" it failed -- the client should instead use services like UGS to fetch the
+            // relevant data it needs to fetch & download.
+
+            DynamicPrefabLoadingUtilities.RefreshLoadedPrefabGuids();
+
+            response.Reason = DynamicPrefabLoadingUtilities.GenerateDisconnectionPayload();
+
+            ImmediateDeny();
+
+            // LOCAL METHODS: -----------------------------
+
+            // A note: sending large strings through Netcode is not ideal -- you'd usually want to use REST services to
+            // accomplish this instead. UGS services like Lobby can be a useful alternative. Another route may be to
+            // set ConnectionApprovalResponse's Pending flag to true, and send a CustomMessage containing the array of 
+            // GUIDs to a client, which the client would load and reattempt a reconnection.
+
+            void Approve()
+            {
+                _currentState.ApprovalCheck(request, response);
+
+                Debug.Log(message: $"Client {clientID} approved");
+
+                response.Approved = true;
+                response.CreatePlayerObject = true; // We're not going to spawn a player object for this sample.
+            }
+
+            void ImmediateDeny()
+            {
+                Debug.Log(message: $"Client {clientID} denied connection");
+
+                response.Approved = false;
+                response.CreatePlayerObject = false;
+            }
         }
 
         private void OnTransportFailure() =>

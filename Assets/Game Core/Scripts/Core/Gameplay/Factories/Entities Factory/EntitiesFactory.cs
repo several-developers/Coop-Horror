@@ -2,6 +2,8 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Global.EntitiesList;
 using GameCore.Gameplay.Entities;
+using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
@@ -47,6 +49,9 @@ namespace GameCore.Gameplay.Factories.Entities
         private async UniTask LoadAndCreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams)
             where TEntity : Entity
         {
+            if (!TryGetAssetGUID<TEntity>(out string guid))
+                return;
+
             AssetReference assetReference = spawnParams.AssetReference;
             bool containsAssetReference = assetReference != null;
 
@@ -57,18 +62,18 @@ namespace GameCore.Gameplay.Factories.Entities
             else
                 entityPrefab = await LoadAsset<TEntity>();
 
-            CreateEntity(entityPrefab, spawnParams);
+            CreateEntity(entityPrefab, spawnParams, guid);
         }
 
-        private void CreateEntity<TEntity>(TEntity entityPrefab, EntitySpawnParams<TEntity> spawnParams)
+        private async void CreateEntity<TEntity>(TEntity entityPrefab, EntitySpawnParams<TEntity> spawnParams, string guid)
             where TEntity : Entity
         {
-            NetworkObject prefabNetworkObject = null;
+            NetworkObject prefabNetworkObject;
 
             if (!TryGetNetworkObject())
                 return;
 
-            NetworkObject networkObject = InstantiateNetworkObject();
+            NetworkObject networkObject = await InstantiateNetworkObject();
             var instance = networkObject.GetComponent<TEntity>();
 
             spawnParams.SendSuccessCallback(instance);
@@ -97,12 +102,16 @@ namespace GameCore.Gameplay.Factories.Entities
             void SendFailCallback(string reason) =>
                 spawnParams.SendFailCallback(reason);
 
-            NetworkObject InstantiateNetworkObject()
+            async UniTask<NetworkObject> InstantiateNetworkObject()
             {
                 Vector3 worldPosition = spawnParams.WorldPosition;
                 Quaternion rotation = spawnParams.Rotation;
                 ulong ownerID = spawnParams.OwnerID;
 
+                var dynamicPrefabsLoader = DynamicPrefabsLoader.Instance;
+                var result = await dynamicPrefabsLoader.TrySpawnDynamicPrefabSynchronously(guid, worldPosition, rotation);
+                return result.Obj;
+                
                 return _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, ownerID,
                     destroyWithScene: true, position: worldPosition);
             }

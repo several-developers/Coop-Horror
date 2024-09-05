@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using GameCore.Gameplay.Network.ConnectionManagement;
+using GameCore.Gameplay.Network.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using Zenject;
 
 namespace GameCore.Gameplay.Network.DynamicPrefabs
 {
@@ -45,12 +47,18 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         public static int LoadedPrefabCount => s_LoadedDynamicPrefabResourceHandles.Count;
 
         static NetworkManager s_NetworkManager;
+        private static DiContainer _diContainer;
 
         static DynamicPrefabLoadingUtilities() { }
 
         public static void Init(NetworkManager networkManager)
         {
             s_NetworkManager = networkManager;
+        }
+
+        public static void SetDiContainer(DiContainer diContainer)
+        {
+            _diContainer = diContainer;
         }
 
         /// <remarks>
@@ -133,6 +141,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 #endif
 
             s_NetworkManager.AddNetworkPrefab(prefab);
+            s_NetworkManager.PrefabHandler.AddHandler(prefab,
+                instanceHandler: new ZenjectNetCodeFactory(prefab, _diContainer));
             s_LoadedDynamicPrefabResourceHandles.Add(guid, op);
 
             if (recomputeHash)

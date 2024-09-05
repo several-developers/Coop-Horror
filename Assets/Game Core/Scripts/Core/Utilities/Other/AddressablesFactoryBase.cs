@@ -91,6 +91,18 @@ namespace GameCore.Utilities
             return instance;
         }
 
+        protected bool TryGetAssetGUID<T>(out string guid) where T : class
+        {
+            if (!TryGetAssetReference<T>(out AssetReference assetReference))
+            {
+                guid = string.Empty;
+                return false;
+            }
+
+            guid = assetReference.AssetGUID;
+            return true;
+        }
+        
         protected bool TryGetAssetReference(Type type, out AssetReference assetReference)
         {
             bool isAssetReferenceFound = _referencesDictionary.TryGetValue(type, out assetReference);

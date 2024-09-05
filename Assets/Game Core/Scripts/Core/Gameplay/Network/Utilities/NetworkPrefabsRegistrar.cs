@@ -4,6 +4,7 @@ using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Global.EntitiesList;
 using GameCore.Configs.Global.MonstersList;
 using GameCore.Gameplay.Items;
+using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
@@ -57,6 +58,7 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private void Awake()
         {
+            DynamicPrefabLoadingUtilities.SetDiContainer(_diContainer);
             RegisterPrefabs();
             RegisterAddressables();
         }

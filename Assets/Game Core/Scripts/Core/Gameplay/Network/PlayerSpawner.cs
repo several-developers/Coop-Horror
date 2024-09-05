@@ -66,6 +66,13 @@ namespace GameCore.Gameplay.Network
                     return;
             }
             
+            isCanceled = await UniTask
+                .Delay(millisecondsDelay: 5000, cancellationToken: this.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+            
             Vector3 spawnPosition = Vector3.zero; // TEMP ?
 
             var spawnParams = new EntitySpawnParams<PlayerEntity>.Builder()
