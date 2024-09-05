@@ -1,8 +1,9 @@
 ﻿using System;
+using GameCore.Infrastructure.Data;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Infrastructure.Data
+namespace GameCore.Data
 {
     [Serializable]
     public class GamesData : DataBase

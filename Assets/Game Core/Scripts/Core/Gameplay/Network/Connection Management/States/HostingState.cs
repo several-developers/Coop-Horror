@@ -4,7 +4,6 @@ using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.SessionManagement;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
-using GameCore.Infrastructure.StateMachine;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -13,24 +12,19 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     internal class HostingState : OnlineState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
-        
-        public HostingState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher,
-            IPublisher<ConnectionEventMessage> connectionEventPublisher, IGameStateMachine gameStateMachine,
-            LobbyServiceFacade lobbyServiceFacade) : base(connectionManager, connectStatusPublisher)
+
+        public HostingState(
+            ConnectionManager connectionManager,
+            IPublisher<ConnectionEventMessage> connectionEventPublisher
+        ) : base(connectionManager)
         {
             _connectionEventPublisher = connectionEventPublisher;
-            _gameStateMachine = gameStateMachine;
-            _lobbyServiceFacade = lobbyServiceFacade;
+            _lobbyServiceFacade = connectionManager.GetLobbyServiceFacade();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        // Used in ApprovalCheck. This is intended as a bit of light protection against DOS attacks
-        // that rely on sending silly big buffers of garbage.
-        private const int MaxConnectPayload = 1024;
-
         private readonly IPublisher<ConnectionEventMessage> _connectionEventPublisher;
-        private readonly IGameStateMachine _gameStateMachine;
         private readonly LobbyServiceFacade _lobbyServiceFacade;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -38,13 +32,13 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         public override void Enter()
         {
             //_gameStateMachine.ChangeState<LoadGameplayState>();
-            
+
             ConnectionManager.AddOnSceneEventCallback();
 
             //The "BossRoom" server always advances to CharSelect immediately on start. Different games
             //may do this differently.
             ConnectionManager.LoadScene(SceneName.Gameplay, isNetwork: true);
-            
+
             if (_lobbyServiceFacade.CurrentUnityLobby != null)
                 _lobbyServiceFacade.BeginTracking();
         }
@@ -59,7 +53,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                 ConnectStatus = ConnectStatus.Success,
                 PlayerName = SessionManager<SessionPlayerData>.Instance.GetPlayerData(clientId)?.PlayerName
             };
-            
+
             _connectionEventPublisher.Publish(message);
         }
 
@@ -75,9 +69,9 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
                 if (playerId == null)
                     return;
-                
+
                 var sessionData = SessionManager<SessionPlayerData>.Instance.GetPlayerData(playerId);
-                
+
                 if (sessionData.HasValue)
                 {
                     var message = new ConnectionEventMessage
@@ -85,29 +79,29 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
                         ConnectStatus = ConnectStatus.GenericDisconnect,
                         PlayerName = sessionData.Value.PlayerName
                     };
-                    
+
                     _connectionEventPublisher.Publish(message);
                 }
-                
+
                 SessionManager<SessionPlayerData>.Instance.DisconnectClient(clientId);
             }
         }
-        
+
         public override void OnUserRequestedShutdown()
         {
-            string reason = JsonUtility.ToJson(ConnectStatus.HostEndedSession);
-            
+            string reason = JsonUtility.ToJson(obj: ConnectStatus.HostEndedSession);
+
             for (int i = ConnectionManager.NetworkManager.ConnectedClientsIds.Count - 1; i >= 0; i--)
             {
                 ulong id = ConnectionManager.NetworkManager.ConnectedClientsIds[i];
-                
+
                 if (id != ConnectionManager.NetworkManager.LocalClientId)
                     ConnectionManager.NetworkManager.DisconnectClient(id, reason);
             }
-            
+
             ConnectionManager.ChangeState(ConnectionManager.OfflineState);
         }
-        
+
         /// <summary>
         /// This logic plugs into the "ConnectionApprovalResponse" exposed by Netcode.NetworkManager.
         /// It is run every time a client connects to us.
@@ -128,22 +122,22 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         /// which is a unique identifier for their install of the game that persists across app restarts.
         /// <param name="response"> Our response to the approval process.
         /// In case of connection refusal with custom return message, we delay using the Pending field.
-        public override void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
+        public override bool ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
             NetworkManager.ConnectionApprovalResponse response)
         {
             byte[] connectionData = request.Payload;
             ulong clientId = request.ClientNetworkId;
-            
-            if (connectionData.Length > MaxConnectPayload)
+
+            if (connectionData.Length > ConnectionManager.MaxConnectPayload)
             {
                 // If connectionData too high, deny immediately to avoid wasting time on the server. This is intended as
                 // a bit of light protection against DOS attacks that rely on sending silly big buffers of garbage.
                 response.Approved = false;
-                return;
+                return false;
             }
 
             string payload = Encoding.UTF8.GetString(connectionData);
-            
+
             // https://docs.unity3d.com/2020.2/Documentation/Manual/JSONSerialization.html
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
             ConnectStatus gameReturnStatus = GetConnectStatus(connectionPayload);
@@ -152,28 +146,25 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             {
                 SessionPlayerData sessionPlayerData = new(clientId, connectionPayload.playerName, new NetworkGuid(),
                     currentHitPoints: 0, isConnected: true);
-                
+
                 SessionManager<SessionPlayerData>.Instance.SetupConnectingPlayerSessionData(clientId,
                     connectionPayload.playerId, sessionPlayerData);
-
-                // connection approval will create a player object for you
-                response.Approved = true;
-                response.CreatePlayerObject = true;
-                response.Position = Vector3.zero;
-                response.Rotation = Quaternion.identity;
-                return;
+                
+                return true;
             }
 
             response.Approved = false;
             response.Reason = JsonUtility.ToJson(gameReturnStatus);
-            
+
             if (_lobbyServiceFacade.CurrentUnityLobby != null)
             {
                 _lobbyServiceFacade.RemovePlayerFromLobbyAsync(connectionPayload.playerId,
                     _lobbyServiceFacade.CurrentUnityLobby.Id);
             }
+
+            return false;
         }
-        
+
         private ConnectStatus GetConnectStatus(ConnectionPayload connectionPayload)
         {
             if (ConnectionManager.NetworkManager.ConnectedClientsIds.Count >= ConnectionManager.MaxConnectedPlayers)
@@ -182,8 +173,9 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             if (connectionPayload.isDebug != Debug.isDebugBuild)
                 return ConnectStatus.IncompatibleBuildType;
 
-            return SessionManager<SessionPlayerData>.Instance.IsDuplicateConnection(connectionPayload.playerId) ?
-                ConnectStatus.LoggedInAgain : ConnectStatus.Success;
+            return SessionManager<SessionPlayerData>.Instance.IsDuplicateConnection(connectionPayload.playerId)
+                ? ConnectStatus.LoggedInAgain
+                : ConnectStatus.Success;
         }
     }
 }

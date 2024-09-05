@@ -5,7 +5,7 @@ using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
 using GameCore.Infrastructure.Services.Global;
-using GameCore.Infrastructure.StateMachine;
+using GameCore.StateMachine;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -49,6 +49,10 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         internal ClientReconnectingState ClientReconnectingState;
         internal StartingHostState StartingHostState;
         internal HostingState HostingState;
+
+        // Used in ApprovalCheck. This is intended as a bit of light protection against DOS attacks
+        // that rely on sending silly big buffers of garbage.
+        public static readonly int MaxConnectPayload = 1024;
 
         private const int MaxReconnectAttempts = 0; // TEMP
 
@@ -112,6 +116,10 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         public static ConnectionManager Get() => _instance;
 
+        public IPublisher<ConnectStatus> GetConnectStatusPublisher() => _connectStatusPublisher;
+
+        public LobbyServiceFacade GetLobbyServiceFacade() => _lobbyServiceFacade;
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private async void GetNetworkManager()
@@ -142,22 +150,15 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         private void SetupStates()
         {
-            OfflineState = new OfflineState(connectionManager: this, _connectStatusPublisher, _profileManager,
-                _lobbyServiceFacade, _localLobby);
+            OfflineState = new OfflineState(connectionManager: this, _profileManager, _localLobby);
+            ClientConnectingState = new ClientConnectingState(connectionManager: this, _localLobby);
+            ClientConnectedState = new ClientConnectedState(connectionManager: this);
 
-            ClientConnectingState = new ClientConnectingState(connectionManager: this, _connectStatusPublisher,
-                _lobbyServiceFacade, _localLobby);
+            ClientReconnectingState = new ClientReconnectingState(connectionManager: this, _localLobby,
+                _reconnectMessagePublisher);
 
-            ClientConnectedState = new ClientConnectedState(connectionManager: this, _connectStatusPublisher,
-                _lobbyServiceFacade);
-
-            ClientReconnectingState = new ClientReconnectingState(connectionManager: this, _connectStatusPublisher,
-                _lobbyServiceFacade, _localLobby, _reconnectMessagePublisher);
-
-            StartingHostState = new StartingHostState(connectionManager: this, _connectStatusPublisher, _localLobby);
-
-            HostingState = new HostingState(connectionManager: this, _connectStatusPublisher, _connectionEventPublisher,
-                _gameStateMachine, _lobbyServiceFacade);
+            StartingHostState = new StartingHostState(connectionManager: this, _localLobby);
+            HostingState = new HostingState(connectionManager: this, _connectionEventPublisher);
 
             _currentState = OfflineState;
         }
@@ -200,7 +201,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             // If connectionData is too big, deny immediately to avoid wasting time on the server. This is intended
             // as a bit of light protection against DOS attacks that rely on sending silly big buffers of garbage.
-            if (connectionData.Length > 1024)
+            if (connectionData.Length > MaxConnectPayload)
                 return false;
 
             // Immediately approve the connection if we haven't loaded any prefabs yet.
@@ -211,7 +212,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             // https://docs.unity3d.com/2020.2/Documentation/Manual/JSONSerialization.html
             var connectionPayload =
-                JsonUtility.FromJson<GameCore.Gameplay.Network.DynamicPrefabs.ConnectionPayload>(payload);
+                JsonUtility.FromJson<DynamicPrefabs.ConnectionPayload>(payload);
 
             int clientPrefabHash = connectionPayload.hashOfDynamicPrefabGUIDs;
             int serverPrefabHash = DynamicPrefabLoadingUtilities.HashOfDynamicPrefabGUIDs;
@@ -219,7 +220,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             // If the client has the same prefabs as the server - approve the connection.
             if (clientPrefabHash == serverPrefabHash)
             {
-                Approve();
+                // Approve();
                 DynamicPrefabLoadingUtilities.RecordThatClientHasLoadedAllPrefabs(clientID);
                 return true;
             }
@@ -241,6 +242,12 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             return false;
         }
 
+        private bool SecondStepApproval(NetworkManager.ConnectionApprovalRequest request,
+            NetworkManager.ConnectionApprovalResponse response)
+        {
+            return _currentState.ApprovalCheck(request, response);
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnClientConnectedCallback(ulong clientId) =>
@@ -259,8 +266,10 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             ulong clientID = request.ClientNetworkId;
             bool isFirstStepApproved = FirstStepApproval(request, response);
+            bool isSecondStepApproved = SecondStepApproval(request, response);
+            bool isApproved = isFirstStepApproved && isSecondStepApproved;
 
-            if (isFirstStepApproved)
+            if (isApproved)
                 Approve();
             else
                 ImmediateDeny();

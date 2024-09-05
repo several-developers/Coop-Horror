@@ -1,7 +1,8 @@
 ﻿using System;
+using GameCore.Infrastructure.Data;
 using UnityEngine;
 
-namespace GameCore.Infrastructure.Data
+namespace GameCore.Data
 {
     [Serializable]
     public class GameSettingsData : DataBase

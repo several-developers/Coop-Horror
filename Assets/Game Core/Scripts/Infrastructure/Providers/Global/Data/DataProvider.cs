@@ -23,14 +23,8 @@ namespace GameCore.Infrastructure.Providers.Global.Data
             _dataManager.SaveLocalData();
 
         public DataManager GetDataManager() => _dataManager;
-
-        public GamesData GetGameData() => GetData<GamesData>();
-
-        public GameSettingsData GetGameSettingsData() => GetData<GameSettingsData>();
         
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-        
-        private T GetData<T>() where T : DataBase
+        public T GetData<T>() where T : DataBase
         {
             DataBase data = _dataManager.GetData<T>();
             return data as T;

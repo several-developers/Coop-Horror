@@ -7,8 +7,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        protected OnlineState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher)
-            : base(connectionManager, connectStatusPublisher)
+        protected OnlineState(ConnectionManager connectionManager) : base(connectionManager)
         {
         }
 

@@ -8,16 +8,15 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        protected ConnectionState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher)
+        protected ConnectionState(ConnectionManager connectionManager)
         {
             ConnectionManager = connectionManager;
-            ConnectStatusPublisher = connectStatusPublisher;
+            ConnectStatusPublisher = connectionManager.GetConnectStatusPublisher();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         protected readonly ConnectionManager ConnectionManager;
-
         protected readonly IPublisher<ConnectStatus> ConnectStatusPublisher;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -58,9 +57,10 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         {
         }
 
-        public virtual void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
+        public virtual bool ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
             NetworkManager.ConnectionApprovalResponse response)
         {
+            return true;
         }
 
 

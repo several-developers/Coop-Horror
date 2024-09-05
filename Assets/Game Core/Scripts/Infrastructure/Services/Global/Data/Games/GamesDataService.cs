@@ -1,4 +1,4 @@
-﻿using GameCore.Infrastructure.Data;
+﻿using GameCore.Data;
 using GameCore.Infrastructure.Providers.Global.Data;
 using UnityEngine;
 
@@ -10,7 +10,7 @@ namespace GameCore.Infrastructure.Services.Global.Data
 
         public GamesDataService(ISaveLoadService saveLoadService, IDataProvider dataProvider) : base(saveLoadService)
         {
-            _gamesData = dataProvider.GetGameData();
+            _gamesData = dataProvider.GetData<GamesData>();
 
             ValidateGamesData();
         }
@@ -35,7 +35,7 @@ namespace GameCore.Infrastructure.Services.Global.Data
                 if (isGameDataExists)
                 {
                     bool isSaveCellIndexMatches = gameData.SaveCellIndex == i;
-                    
+
                     if (isSaveCellIndexMatches)
                         continue;
 
@@ -47,7 +47,7 @@ namespace GameCore.Infrastructure.Services.Global.Data
                     Debug.LogError($"Game Data with index ({i}) not found!");
                 }
             }
-            
+
             SaveLocalData(saveData);
         }
     }

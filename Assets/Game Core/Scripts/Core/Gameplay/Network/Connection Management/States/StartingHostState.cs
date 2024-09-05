@@ -1,9 +1,9 @@
 using System;
+using System.Text;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Gameplay.Network.SessionManagement;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
-using GameCore.Gameplay.PubSub;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -17,8 +17,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public StartingHostState(ConnectionManager connectionManager, IPublisher<ConnectStatus> connectStatusPublisher,
-            LocalLobby localLobby) : base(connectionManager, connectStatusPublisher)
+        public StartingHostState(ConnectionManager connectionManager, LocalLobby localLobby) : base(connectionManager)
         {
             _localLobby = localLobby;
         }
@@ -49,7 +48,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             ConnectionManager.ChangeState(ConnectionManager.HostingState);
         }
 
-        public override void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
+        public override bool ApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
             NetworkManager.ConnectionApprovalResponse response)
         {
             byte[] connectionData = request.Payload;
@@ -57,23 +56,22 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             // This happens when starting as a host, before the end of the StartHost call.
             // In that case, we simply approve ourselves.
+            // Wrong commentary?? ^|^|^
             if (clientId != ConnectionManager.NetworkManager.LocalClientId)
-                return;
+                return false;
 
-            string payload = System.Text.Encoding.UTF8.GetString(connectionData);
+            string payload = Encoding.UTF8.GetString(connectionData);
 
             // https://docs.unity3d.com/2020.2/Documentation/Manual/JSONSerialization.html
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
 
             SessionPlayerData sessionPlayerData = new(clientId, connectionPayload.playerName, new NetworkGuid(),
                 currentHitPoints: 0, isConnected: true);
-            
+
             SessionManager<SessionPlayerData>.Instance
                 .SetupConnectingPlayerSessionData(clientId, connectionPayload.playerId, sessionPlayerData);
-
-            // connection approval will create a player object for you
-            response.Approved = true;
-            response.CreatePlayerObject = true;
+            
+            return true;
         }
 
         public StartingHostState Configure(ConnectionMethodBase baseConnectionMethod)

@@ -1,4 +1,5 @@
-﻿using GameCore.Infrastructure.Services.Global.Decorators.CollectionsService;
+﻿using GameCore.Gameplay.Network.DynamicPrefabs;
+using GameCore.Infrastructure.Services.Global.Decorators.CollectionsService;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Global
@@ -10,6 +11,7 @@ namespace GameCore.Infrastructure.Installers.Global
         public override void InstallBindings()
         {
             BindCollectionsServiceDecorator();
+            BindDynamicPrefabsLoaderDecorator();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -18,6 +20,13 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .BindInterfacesTo<CollectionsServiceDecorator>()
+                .AsSingle();
+        }
+        
+        private void BindDynamicPrefabsLoaderDecorator()
+        {
+            Container
+                .BindInterfacesTo<DynamicPrefabsLoaderDecorator>()
                 .AsSingle();
         }
     }

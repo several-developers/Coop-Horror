@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using Zenject;
+using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Network.DynamicPrefabs
 {
@@ -22,8 +23,14 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
     /// For more details on the API usage, see the in-project readme (which includes links to further resources,
     /// including the project's technical document).
     /// </remarks>
-    public sealed class DynamicPrefabsLoader : NetcodeBehaviour
+    public class DynamicPrefabsLoader : NetcodeBehaviour
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator) =>
+            _dynamicPrefabsLoaderDecorator = dynamicPrefabsLoaderDecorator;
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField]
@@ -34,15 +41,15 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         public static DynamicPrefabsLoader Instance;
 
         private const float NetworkSpawnTimeoutSeconds = 3000f;
-        private const int MaxConnectedClientCount = 4;
-        private const int MaxConnectPayload = 1024;
         private const int ArtificialDelayMilliseconds = 1000;
 
         // A storage where we keep association between prefab (hash of it's GUID)
         // and the spawned network objects that use it.
         private readonly Dictionary<int, HashSet<NetworkObject>> _prefabHashToNetworkObjectID = new();
 
+        private IDynamicPrefabsLoaderDecorator _dynamicPrefabsLoaderDecorator;
         private NetworkManager _networkManager;
+
         private float _synchronousSpawnTimeoutTimer;
         private int _synchronousSpawnAckCount;
 
@@ -55,9 +62,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             DontDestroyOnLoad(gameObject);
         }
 
-        protected override async void StartAll()
+        protected override void StartAll()
         {
-            await UniTask.Delay(1000);
             DynamicPrefabLoadingUtilities.Init(_networkManager);
 
             // In the use-cases where connection approval is implemented, the server can begin to validate a user's
@@ -70,107 +76,18 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             //_networkManager.ConnectionApprovalCallback += ConnectionApprovalCallback;
         }
 
-        protected override void OnDestroyAll()
-        {
-            //_networkManager.ConnectionApprovalCallback -= ConnectionApprovalCallback;
-
+        protected override void OnDestroyAll() =>
             DynamicPrefabLoadingUtilities.UnloadAndReleaseAllDynamicPrefabs();
-        }
+
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected override void InitOwner() =>
+            _dynamicPrefabsLoaderDecorator.OnTrySpawnPrefabEvent += OnTrySpawnPrefab;
+
+        protected override void DespawnOwner() =>
+            _dynamicPrefabsLoaderDecorator.OnTrySpawnPrefabEvent -= OnTrySpawnPrefab;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request,
-            NetworkManager.ConnectionApprovalResponse response)
-        {
-            Debug.Log(message: "Client is trying to connect " + request.ClientNetworkId);
-
-            byte[] connectionData = request.Payload;
-            ulong clientID = request.ClientNetworkId;
-
-            if (clientID == _networkManager.LocalClientId)
-            {
-                // Allow the host to connect.
-                Approve();
-                return;
-            }
-
-            // A sample-specific denial on clients after k_MaxConnectedClientCount clients have been connected.
-            if (_networkManager.ConnectedClientsList.Count >= MaxConnectedClientCount)
-            {
-                ImmediateDeny();
-                return;
-            }
-
-            if (connectionData.Length > MaxConnectPayload)
-            {
-                // If connectionData is too big, deny immediately to avoid wasting time on the server. This is intended
-                // as a bit of light protection against DOS attacks that rely on sending silly big buffers of garbage.
-                ImmediateDeny();
-                return;
-            }
-
-            if (DynamicPrefabLoadingUtilities.LoadedPrefabCount == 0)
-            {
-                // Immediately approve the connection if we haven't loaded any prefabs yet.
-                Approve();
-                return;
-            }
-
-            string payload = Encoding.UTF8.GetString(connectionData);
-
-            // https://docs.unity3d.com/2020.2/Documentation/Manual/JSONSerialization.html
-            var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
-
-            int clientPrefabHash = connectionPayload.hashOfDynamicPrefabGUIDs;
-            int serverPrefabHash = DynamicPrefabLoadingUtilities.HashOfDynamicPrefabGUIDs;
-
-            // If the client has the same prefabs as the server - approve the connection.
-            if (clientPrefabHash == serverPrefabHash)
-            {
-                Approve();
-                DynamicPrefabLoadingUtilities.RecordThatClientHasLoadedAllPrefabs(clientID);
-                return;
-            }
-
-            // In order for clients to not just get disconnected with no feedback, the server needs to tell the client
-            // why it disconnected it. This could happen after an auth check on a service or because of gameplay
-            // reasons (server full, wrong build version, etc).
-            // The server can do so via the DisconnectReason in the ConnectionApprovalResponse. The guids of the prefabs
-            // the client will need to load will be sent, such that the client loads the needed prefabs, and reconnects.
-
-            // A note: DisconnectReason will not be written to if the string is too large in size. This should be used
-            // only to tell the client "why" it failed -- the client should instead use services like UGS to fetch the
-            // relevant data it needs to fetch & download.
-
-            DynamicPrefabLoadingUtilities.RefreshLoadedPrefabGuids();
-
-            response.Reason = DynamicPrefabLoadingUtilities.GenerateDisconnectionPayload();
-
-            ImmediateDeny();
-
-            // LOCAL METHODS: -----------------------------
-
-            // A note: sending large strings through Netcode is not ideal -- you'd usually want to use REST services to
-            // accomplish this instead. UGS services like Lobby can be a useful alternative. Another route may be to
-            // set ConnectionApprovalResponse's Pending flag to true, and send a CustomMessage containing the array of 
-            // GUIDs to a client, which the client would load and reattempt a reconnection.
-
-            void Approve()
-            {
-                Debug.Log(message: $"Client {clientID} approved");
-
-                response.Approved = true;
-                response.CreatePlayerObject = false; // We're not going to spawn a player object for this sample.
-            }
-
-            void ImmediateDeny()
-            {
-                Debug.Log(message: $"Client {clientID} denied connection");
-
-                response.Approved = false;
-                response.CreatePlayerObject = false;
-            }
-        }
 
         private async void PreloadPrefabs()
         {
@@ -234,101 +151,91 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             }
         }
 
-        private async void TrySpawnSynchronously()
-        {
-            int referencesAmount = _dynamicPrefabsReferences.Count;
-            AssetReferenceGameObject randomPrefab = _dynamicPrefabsReferences[Random.Range(0, referencesAmount)];
-
-            await TrySpawnDynamicPrefabSynchronously(randomPrefab.AssetGUID, position: Random.insideUnitCircle * 5,
-                Quaternion.identity);
-        }
-
         /// <summary>
         /// This call attempts to spawn a prefab by it's addressable guid - it ensures that all the clients have
         /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
         /// the spawn will fail.
         /// </summary>
-        public async Task<(bool Success, NetworkObject Obj)> TrySpawnDynamicPrefabSynchronously(string guid,
-            Vector3 position, Quaternion rotation)
+        public async Task TryLoadAndSendDynamicPrefab(string guid, Action<GameObject> callback)
         {
-            if (IsServer)
+            if (!IsServer)
             {
-                var assetGuid = new AddressableGUID()
-                {
-                    Value = guid
-                };
-
-                if (DynamicPrefabLoadingUtilities.IsPrefabLoadedOnAllClients(assetGuid))
-                {
-                    Debug.Log(message: "Prefab is already loaded by all peers, we can spawn it immediately");
-                    NetworkObject obj = Spawn(assetGuid);
-                    return (true, obj);
-                }
-
-                _synchronousSpawnAckCount = 0;
-                _synchronousSpawnTimeoutTimer = 0;
-
-                Debug.Log(message: "Loading dynamic prefab on the clients...");
-                LoadAddressableClientRpc(assetGuid);
-
-                // Server is starting to load a prefab, update UI.
-                // m_InGameUI.ClientLoadedPrefabStatusChanged(NetworkManager.ServerClientId, assetGuid.GetHashCode(),
-                //     "Undefined", InGameUI.LoadStatus.Loading);
-
-                // Load the prefab on the server, so that any late-joiner will need to load that prefab also.
-                await DynamicPrefabLoadingUtilities.LoadDynamicPrefab(assetGuid, ArtificialDelayMilliseconds);
-
-                // Server loaded a prefab, update UI with the loaded asset's name.
-                DynamicPrefabLoadingUtilities.TryGetLoadedGameObjectFromGuid(assetGuid,
-                    out AsyncOperationHandle<GameObject> loadedGameObject);
-
-                // m_InGameUI.ClientLoadedPrefabStatusChanged(NetworkManager.ServerClientId, assetGuid.GetHashCode(),
-                //     loadedGameObject.Result.name, InGameUI.LoadStatus.Loaded);
-
-                int requiredAcknowledgementsCount = IsHost
-                    ? _networkManager.ConnectedClients.Count - 1
-                    : _networkManager.ConnectedClients.Count;
-
-                while (_synchronousSpawnTimeoutTimer < NetworkSpawnTimeoutSeconds)
-                {
-                    if (_synchronousSpawnAckCount >= requiredAcknowledgementsCount)
-                    {
-                        Debug.Log(message: $"All clients have loaded the prefab in {_synchronousSpawnTimeoutTimer}" +
-                                           "seconds, spawning the prefab on the server...");
-
-                        NetworkObject obj = Spawn(assetGuid);
-                        return (true, obj);
-                    }
-
-                    _synchronousSpawnTimeoutTimer += Time.deltaTime;
-                    await Task.Yield();
-                }
-
-                // Left to the reader: you'll need to be reactive to clients failing to load -- you should either have
-                // the offending client try again or disconnect it after a predetermined amount of failed attempts.
-                Debug.LogError(message: "Failed to spawn dynamic prefab - timeout");
-                return (false, null);
+                SendError();
+                return;
             }
 
-            return (false, null);
-
-            NetworkObject Spawn(AddressableGUID assetGuid)
+            var assetGuid = new AddressableGUID
             {
-                if (!DynamicPrefabLoadingUtilities.TryGetLoadedGameObjectFromGuid(assetGuid,
-                        out AsyncOperationHandle<GameObject> prefab))
+                Value = guid
+            };
+
+            if (DynamicPrefabLoadingUtilities.IsPrefabLoadedOnAllClients(assetGuid))
+            {
+                Debug.Log(message: "Prefab is already loaded by all peers, we can spawn it immediately");
+
+                LoadAndSendPrefab(assetGuid);
+                return;
+            }
+
+            _synchronousSpawnAckCount = 0;
+            _synchronousSpawnTimeoutTimer = 0;
+
+            Debug.Log(message: "Loading dynamic prefab on the clients...");
+            LoadAddressableClientRpc(assetGuid);
+
+            // Server is starting to load a prefab, update UI.
+            // m_InGameUI.ClientLoadedPrefabStatusChanged(NetworkManager.ServerClientId, assetGuid.GetHashCode(),
+            //     "Undefined", InGameUI.LoadStatus.Loading);
+
+            // Load the prefab on the server, so that any late-joiner will need to load that prefab also.
+            await DynamicPrefabLoadingUtilities.LoadDynamicPrefab(assetGuid, ArtificialDelayMilliseconds);
+
+            // Server loaded a prefab, update UI with the loaded asset's name.
+            DynamicPrefabLoadingUtilities.TryGetLoadedGameObjectFromGuid(assetGuid,
+                out AsyncOperationHandle<GameObject> loadedGameObject);
+
+            // m_InGameUI.ClientLoadedPrefabStatusChanged(NetworkManager.ServerClientId, assetGuid.GetHashCode(),
+            //     loadedGameObject.Result.name, InGameUI.LoadStatus.Loaded);
+
+            int requiredAcknowledgementsCount = IsHost
+                ? _networkManager.ConnectedClients.Count - 1
+                : _networkManager.ConnectedClients.Count;
+
+            while (_synchronousSpawnTimeoutTimer < NetworkSpawnTimeoutSeconds)
+            {
+                if (_synchronousSpawnAckCount >= requiredAcknowledgementsCount)
                 {
-                    Debug.LogWarning(message: $"GUID {assetGuid} is not a GUID of a previously loaded prefab. " +
-                                              "Failed to spawn a prefab.");
-                    return null;
+                    Debug.Log(message: $"All clients have loaded the prefab in {_synchronousSpawnTimeoutTimer}" +
+                                       "seconds, spawning the prefab on the server...");
+
+                    LoadAndSendPrefab(assetGuid);
+                    return;
                 }
 
-                // var obj = Instantiate(prefab.Result, position, rotation).GetComponent<NetworkObject>();
-                //obj.Spawn();
+                _synchronousSpawnTimeoutTimer += Time.deltaTime;
+                await Task.Yield();
+            }
 
-                prefab.Result.TryGetComponent(out NetworkObject networkPrefab);
-                var obj = _networkManager.SpawnManager.InstantiateAndSpawn(networkPrefab,
-                    NetworkHorror.ServerID, destroyWithScene: true, position: Vector3.zero);
-                
+            // Left to the reader: you'll need to be reactive to clients failing to load -- you should either have
+            // the offending client try again or disconnect it after a predetermined amount of failed attempts.
+            Debug.LogError(message: "Failed to spawn dynamic prefab - timeout");
+            
+            SendError();
+
+            // LOCAL METHODS: -----------------------------
+
+            void LoadAndSendPrefab(AddressableGUID localAssetGuid)
+            {
+                if (!DynamicPrefabLoadingUtilities.TryGetLoadedGameObjectFromGuid(localAssetGuid,
+                        out AsyncOperationHandle<GameObject> prefab))
+                {
+                    Debug.LogWarning(message: $"GUID {localAssetGuid} is not a GUID of a previously loaded prefab. " +
+                                              "Failed to spawn a prefab.");
+                    return;
+                }
+
+                SendSuccess(prefab.Result);
+
                 Debug.Log(message: "Spawned dynamic prefab");
 
                 // Every client loaded dynamic prefab, their respective ClientUIs in case they loaded first.
@@ -339,9 +246,13 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                     //     prefab.Result.name,
                     //     InGameUI.LoadStatus.Loaded);
                 }
-
-                return obj;
             }
+
+            void SendSuccess(GameObject prefab) =>
+                callback?.Invoke(prefab);
+
+            void SendError() =>
+                callback?.Invoke(obj: null);
         }
 
         private async void TrySpawnInvisible()
@@ -525,6 +436,11 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             }
         }
 
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnTrySpawnPrefab(string guid, Action<GameObject> callback) =>
+            TryLoadAndSendDynamicPrefab(guid, callback);
+
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
         [Button]
@@ -534,15 +450,6 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 return;
 
             PreloadPrefabs();
-        }
-
-        [Button]
-        private void OnClickedTrySpawnSynchronously()
-        {
-            if (!_networkManager.IsServer)
-                return;
-
-            TrySpawnSynchronously();
         }
 
         [Button]

@@ -1,4 +1,4 @@
-﻿using GameCore.Infrastructure.Data;
+﻿using GameCore.Data;
 using GameCore.Infrastructure.Providers.Global.Data;
 
 namespace GameCore.Infrastructure.Services.Global.Data
@@ -10,7 +10,7 @@ namespace GameCore.Infrastructure.Services.Global.Data
         public GameSettingsDataService(ISaveLoadService saveLoadService, IDataProvider dataProvider)
             : base(saveLoadService)
         {
-            _gameSettingsData = dataProvider.GetGameSettingsData();
+            _gameSettingsData = dataProvider.GetData<GameSettingsData>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------

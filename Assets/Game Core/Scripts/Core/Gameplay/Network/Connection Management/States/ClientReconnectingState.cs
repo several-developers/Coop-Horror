@@ -18,10 +18,11 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ClientReconnectingState(ConnectionManager connectionManager,
-            IPublisher<ConnectStatus> connectStatusPublisher, LobbyServiceFacade lobbyServiceFacade,
-            LocalLobby localLobby, IPublisher<ReconnectMessage> reconnectMessagePublisher)
-            : base(connectionManager, connectStatusPublisher, lobbyServiceFacade, localLobby)
+        public ClientReconnectingState(
+            ConnectionManager connectionManager,
+            LocalLobby localLobby,
+            IPublisher<ReconnectMessage> reconnectMessagePublisher
+        ) : base(connectionManager, localLobby)
         {
             _reconnectMessagePublisher = reconnectMessagePublisher;
         }
@@ -126,15 +127,15 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             Debug.Log("Lost connection to host, trying to reconnect...");
 
             ConnectionManager.NetworkManager.Shutdown();
-            
+
             // Wait until NetworkManager completes shutting down.
             yield return new WaitWhile(() => ConnectionManager.NetworkManager.ShutdownInProgress);
 
             Debug.Log($"Reconnecting attempt {_attempts + 1}/{ConnectionManager.ReconnectAttempts}...");
-            
+
             ReconnectMessage message = new(currentAttempt: _attempts,
                 maxAttempt: ConnectionManager.ReconnectAttempts);
-            
+
             _reconnectMessagePublisher.Publish(message);
 
             _attempts++;

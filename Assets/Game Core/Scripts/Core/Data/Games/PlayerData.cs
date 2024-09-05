@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace GameCore.Infrastructure.Data
+namespace GameCore.Data
 {
     [Serializable]
     public class PlayerData

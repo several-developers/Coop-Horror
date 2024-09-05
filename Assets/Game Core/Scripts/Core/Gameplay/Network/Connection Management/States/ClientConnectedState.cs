@@ -9,12 +9,8 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         
-        public ClientConnectedState(ConnectionManager connectionManager,
-            IPublisher<ConnectStatus> connectStatusPublisher, LobbyServiceFacade lobbyServiceFacade)
-            : base(connectionManager, connectStatusPublisher)
-        {
-            _lobbyServiceFacade = lobbyServiceFacade;
-        }
+        public ClientConnectedState(ConnectionManager connectionManager) : base(connectionManager) =>
+            _lobbyServiceFacade = connectionManager.GetLobbyServiceFacade();
 
         // FIELDS: --------------------------------------------------------------------------------
 

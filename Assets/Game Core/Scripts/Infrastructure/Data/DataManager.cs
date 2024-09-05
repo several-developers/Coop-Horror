@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,14 +16,9 @@ namespace GameCore.Infrastructure.Data
         public DataManager()
         {
             _allData = new List<DataBase>();
-
-            var gamesData = new GamesData();
-            var gameSettingsData = new GameSettingsData();
-
             _jsonUtility = new JsonUtilitySaveLoadData();
-
-            _allData.Add(gamesData);
-            _allData.Add(gameSettingsData);
+            
+            CreateData();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -88,6 +85,27 @@ namespace GameCore.Infrastructure.Data
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void CreateData()
+        {
+            IEnumerable<Type> allData = GetInheritedClasses(typeof(DataBase));
+
+            foreach (Type type in allData)
+            {
+                var data = Activator.CreateInstance(type) as DataBase;
+                _allData.Add(data);
+            }
+        }
+        
+        private static IEnumerable<Type> GetInheritedClasses(Type targetType)
+        {
+            // If you want the abstract classes drop the !TheType.IsAbstract
+            // but it is probably to instance so its a good idea to keep it.
+            return Assembly
+                .GetAssembly(targetType)
+                .GetTypes()
+                .Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(targetType));
+        }
+        
         private static void LogDataNotFound(Type dataType)
         {
             string errorLog = Log.HandleLog($"Data of type <gb>({dataType}</gb> <rb>not found</rb>!");
