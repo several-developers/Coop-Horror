@@ -1,24 +1,22 @@
 ﻿using GameCore.Configs.Gameplay.Entities;
-using GameCore.Infrastructure.Providers.Global;
-using GameCore.Utilities;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.EntitiesConfigs
 {
-    public sealed class EntitiesConfigsProvider : AssetsProviderBase, IEntitiesConfigsProvider
+    public class EntitiesConfigsProvider : IEntitiesConfigsProvider
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public EntitiesConfigsProvider()
-        {
-            _outdoorChestConfig = Load<OutdoorChestConfigMeta>(path: ConfigsPaths.OutdoorChestConfig);
-        }
+        public EntitiesConfigsProvider(IGameplayConfigsProvider gameplayConfigsProvider) =>
+            _gameplayConfigsProvider = gameplayConfigsProvider;
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly OutdoorChestConfigMeta _outdoorChestConfig;
+        private readonly IGameplayConfigsProvider _gameplayConfigsProvider;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
-        public OutdoorChestConfigMeta GetOutdoorChestConfig() => _outdoorChestConfig;
+
+        public TEntityConfigType GetConfig<TEntityConfigType>() where TEntityConfigType : EntityConfigMeta =>
+            _gameplayConfigsProvider.GetConfig<TEntityConfigType>();
     }
 }

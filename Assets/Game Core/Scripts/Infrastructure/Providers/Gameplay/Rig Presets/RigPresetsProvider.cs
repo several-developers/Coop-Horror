@@ -30,7 +30,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.RigPresets
 
         private void SetupPresetsDictionary(IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            RigPresetsConfigMeta rigPresetsConfig = gameplayConfigsProvider.GetRigPresetsConfig();
+            var rigPresetsConfig = gameplayConfigsProvider.GetConfig<RigPresetsConfigMeta>();
             IEnumerable<RigPresetReference> allPresetsReferences = rigPresetsConfig.GetAllPresetsReferences();
 
             foreach (RigPresetReference presetReference in allPresetsReferences)

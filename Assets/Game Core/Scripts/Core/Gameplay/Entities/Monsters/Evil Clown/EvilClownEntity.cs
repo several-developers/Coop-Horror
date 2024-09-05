@@ -36,7 +36,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
         private void Construct(ILevelProvider levelProvider, IMonstersAIConfigsProvider monstersAIConfigsProvider)
         {
             _levelProvider = levelProvider;
-            _evilClownAIConfig = monstersAIConfigsProvider.GetEvilClownAIConfig();
+            _evilClownAIConfig = monstersAIConfigsProvider.GetConfig<EvilClownAIConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

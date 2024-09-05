@@ -30,7 +30,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
         {
             _levelProvider = levelProvider;
             _monstersFactory = monstersFactory;
-            _goodClownAIConfig = monstersAIConfigsProvider.GetGoodClownAIConfig();
+            _goodClownAIConfig = monstersAIConfigsProvider.GetConfig<GoodClownAIConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

@@ -19,7 +19,7 @@ namespace GameCore.Gameplay.Systems.Noise
             ISubscriber<NoiseDataMessage> noiseDataMessageSubscriber,
             IPublisher<NoiseDataMessage> noiseDataMessagePublisher)
         {
-            _gameConfig = configsProvider.GetGameConfig();
+            _gameConfig = configsProvider.GetConfig<GameConfigMeta>();
             _noiseDataMessageSubscriber = noiseDataMessageSubscriber;
             _noiseDataMessagePublisher = noiseDataMessagePublisher;
         }

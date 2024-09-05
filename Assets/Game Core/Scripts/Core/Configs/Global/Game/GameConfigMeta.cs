@@ -1,11 +1,11 @@
-﻿using CustomEditors;
-using GameCore.Enums.Global;
+﻿using GameCore.Enums.Global;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Global.Game
 {
-    public class GameConfigMeta : EditorMeta
+    public class GameConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -36,5 +36,8 @@ namespace GameCore.Configs.Global.Game
         
         public override string GetMetaCategory() =>
             EditorConstants.GlobalConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.Global;
     }
 }

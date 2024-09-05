@@ -1,11 +1,13 @@
-﻿using GameCore.Configs.Global.Game;
+﻿using System;
 using GameCore.Gameplay.InputManagement;
+using GameCore.Infrastructure.Configs;
 
 namespace GameCore.Infrastructure.Providers.Global
 {
     public interface IConfigsProvider
     {
-        GameConfigMeta GetGameConfig();
+        T GetConfig<T>() where T : ConfigMeta;
+        T GetConfig<T>(Type type) where T : ConfigMeta;
         InputReader GetInputReader(); // TEMP
     }
 }

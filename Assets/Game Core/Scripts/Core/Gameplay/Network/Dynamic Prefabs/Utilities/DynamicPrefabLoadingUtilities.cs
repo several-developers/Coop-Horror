@@ -85,6 +85,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             Debug.Log(message: $"Loading dynamic prefab {guid.Value}");
 
             var asyncOperation = Addressables.LoadAssetAsync<GameObject>(key: guid.ToString());
+            LoadedDynamicPrefabResourceHandles.Add(guid, asyncOperation);
+            
             GameObject prefab = await asyncOperation.Task;
 
 #if ENABLE_ARTIFICIAL_DELAY
@@ -98,9 +100,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 networkPrefabAsset: prefab,
                 instanceHandler: new ZenjectNetCodeFactory(prefab, _diContainer)
             );
-
-            LoadedDynamicPrefabResourceHandles.Add(guid, asyncOperation);
-
+            
             if (recomputeHash)
                 CalculateDynamicPrefabArrayHash();
 

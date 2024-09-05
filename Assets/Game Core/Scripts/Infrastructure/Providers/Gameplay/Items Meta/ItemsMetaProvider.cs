@@ -33,7 +33,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.ItemsMeta
 
         private void SetupItemsDictionary(IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            ItemsListConfigMeta itemsListConfig = gameplayConfigsProvider.GetItemsListConfig();
+            var itemsListConfig = gameplayConfigsProvider.GetConfig<ItemsListConfigMeta>();
             IEnumerable<ItemMeta> allItems = itemsListConfig.GetAllItems();
 
             foreach (ItemMeta itemMeta in allItems)

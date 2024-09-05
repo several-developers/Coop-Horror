@@ -18,19 +18,18 @@ namespace GameCore.Gameplay.Factories.Entities
 
         public EntitiesFactory(
             IAssetsProvider assetsProvider,
+            IConfigsProvider configsProvider,
             IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator
         ) : base(assetsProvider)
         {
             _dynamicPrefabsLoaderDecorator = dynamicPrefabsLoaderDecorator;
-            _entitiesListConfig = assetsProvider.GetEntitiesListConfig();
-            _networkManager = NetworkManager.Singleton;
+            _entitiesListConfig = configsProvider.GetConfig<EntitiesListConfigMeta>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IDynamicPrefabsLoaderDecorator _dynamicPrefabsLoaderDecorator;
         private readonly EntitiesListConfigMeta _entitiesListConfig;
-        private readonly NetworkManager _networkManager;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -39,7 +38,6 @@ namespace GameCore.Gameplay.Factories.Entities
 
         public void CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
         {
-            Debug.Log("Trying create player");
             if (!TryGetAssetGUID<TEntity>(out string guid))
             {
                 spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TEntity)}' not found!");
@@ -70,25 +68,10 @@ namespace GameCore.Gameplay.Factories.Entities
                 return;
             }
 
-            Vector3 worldPosition = spawnParams.WorldPosition;
-            Quaternion rotation = spawnParams.Rotation;
-            ulong ownerID = spawnParams.OwnerID;
-
-            Debug.LogWarning("SPAWNING");
-
-            _networkManager.SpawnManager.InstantiateAndSpawn(
-                networkPrefab: prefabNetworkObject,
-                ownerClientId: ownerID,
-                destroyWithScene: true,
-                position: worldPosition,
-                rotation: rotation
-            );
-
-            return;
             NetworkObject instanceNetworkObject = InstantiateEntity();
-            var instance = instanceNetworkObject.GetComponent<TEntity>();
+            var entityInstance = instanceNetworkObject.GetComponent<TEntity>();
 
-            spawnParams.SendSuccessCallback(instance);
+            spawnParams.SendSuccessCallback(entityInstance);
 
             // LOCAL METHODS: -----------------------------
 
@@ -100,9 +83,10 @@ namespace GameCore.Gameplay.Factories.Entities
                 Vector3 worldPosition = spawnParams.WorldPosition;
                 Quaternion rotation = spawnParams.Rotation;
                 ulong ownerID = spawnParams.OwnerID;
+                
+                NetworkSpawnManager spawnManager = NetworkManager.Singleton.SpawnManager;
 
-                NetworkObject networkObject = _networkManager
-                    .SpawnManager.InstantiateAndSpawn(
+                NetworkObject networkObject = spawnManager.InstantiateAndSpawn(
                         networkPrefab: prefabNetworkObject,
                         ownerClientId: ownerID,
                         destroyWithScene: true,

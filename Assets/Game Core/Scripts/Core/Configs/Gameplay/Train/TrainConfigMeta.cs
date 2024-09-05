@@ -1,12 +1,12 @@
-﻿using CustomEditors;
-using DG.Tweening;
+﻿using DG.Tweening;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using Sonity;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Train
 {
-    public class TrainConfigMeta : EditorMeta
+    public class TrainConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -88,5 +88,8 @@ namespace GameCore.Configs.Gameplay.Train
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

@@ -1,18 +1,18 @@
-﻿using CustomEditors;
-using GameCore.Gameplay.ChatManagement;
+﻿using GameCore.Gameplay.ChatManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.Quests;
+using GameCore.Infrastructure.Configs;
 using GameCore.Observers.Gameplay.Game;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.PrefabsList
 {
-    public class PrefabsListConfigMeta : EditorMeta
+    public class PrefabsListConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -56,5 +56,8 @@ namespace GameCore.Configs.Gameplay.PrefabsList
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsListsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

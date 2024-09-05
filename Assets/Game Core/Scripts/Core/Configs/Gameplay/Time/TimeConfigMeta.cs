@@ -1,10 +1,10 @@
-﻿using CustomEditors;
+﻿using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Time
 {
-    public class TimeConfigMeta : EditorMeta
+    public class TimeConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
         
@@ -44,5 +44,8 @@ namespace GameCore.Configs.Gameplay.Time
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

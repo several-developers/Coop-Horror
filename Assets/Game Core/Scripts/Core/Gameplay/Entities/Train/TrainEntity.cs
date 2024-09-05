@@ -49,7 +49,7 @@ namespace GameCore.Gameplay.Entities.Train
         {
             GameManagerDecorator = gameManagerDecorator;
             QuestsManagerDecorator = questsManagerDecorator;
-            _trainConfig = gameplayConfigsProvider.GetTrainConfig();
+            _trainConfig = gameplayConfigsProvider.GetConfig<TrainConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

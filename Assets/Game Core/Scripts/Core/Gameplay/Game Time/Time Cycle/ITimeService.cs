@@ -1,6 +1,6 @@
 ﻿namespace GameCore.Gameplay.GameTimeManagement
 {
-    public interface ITimeCycle
+    public interface ITimeService
     {
         void Tick();
         void SetDateTime(int second, int dateTimeMinute, int dateTimeHour, int day);

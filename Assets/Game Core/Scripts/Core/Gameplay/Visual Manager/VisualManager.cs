@@ -130,7 +130,7 @@ namespace GameCore.Gameplay.VisualManagement
 
         private void SetupPresetsDictionary()
         {
-            VisualConfigMeta visualConfig = _gameplayConfigsProvider.GetVisualConfig();
+            var visualConfig = _gameplayConfigsProvider.GetConfig<VisualConfigMeta>();
             IEnumerable<VisualPresetMeta> allPresetsConfigs = visualConfig.GetAllPresetsConfigs();
 
             foreach (VisualPresetMeta presetConfig in allPresetsConfigs)

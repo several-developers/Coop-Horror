@@ -32,7 +32,7 @@ namespace GameCore.Gameplay.Level.Elevator
         )
         {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
-            _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
+            _elevatorConfig = gameplayConfigsProvider.GetConfig<ElevatorConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

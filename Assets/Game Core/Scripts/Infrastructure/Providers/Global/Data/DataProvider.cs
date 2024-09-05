@@ -24,10 +24,7 @@ namespace GameCore.Infrastructure.Providers.Global.Data
 
         public DataManager GetDataManager() => _dataManager;
         
-        public T GetData<T>() where T : DataBase
-        {
-            DataBase data = _dataManager.GetData<T>();
-            return data as T;
-        }
+        public T GetData<T>() where T : DataBase =>
+            _dataManager.GetData<T>();
     }
 }

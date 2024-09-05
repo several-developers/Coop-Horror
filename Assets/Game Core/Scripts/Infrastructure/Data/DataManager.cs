@@ -67,7 +67,7 @@ namespace GameCore.Infrastructure.Data
 
         public IEnumerable<DataBase> GetAllData() => _allData;
 
-        public DataBase GetData<T>() where T : DataBase
+        public T GetData<T>() where T : DataBase
         {
             Type type = typeof(T);
 
@@ -76,7 +76,7 @@ namespace GameCore.Infrastructure.Data
                 bool isMatches = data.GetType() == type;
 
                 if (isMatches)
-                    return data;
+                    return data as T;
             }
 
             LogDataNotFound(type);

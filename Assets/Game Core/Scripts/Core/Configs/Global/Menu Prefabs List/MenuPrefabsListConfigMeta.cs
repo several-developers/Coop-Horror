@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using GameCore.UI.Global.MenuView;
-using CustomEditors;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace GameCore.Configs.Global.MenuPrefabsList
 {
-    public class MenuPrefabsListConfigMeta : EditorMeta
+    public class MenuPrefabsListConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -27,5 +27,8 @@ namespace GameCore.Configs.Global.MenuPrefabsList
 
         public override string GetMetaCategory() =>
             EditorConstants.GlobalConfigsListsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.Global;
     }
 }

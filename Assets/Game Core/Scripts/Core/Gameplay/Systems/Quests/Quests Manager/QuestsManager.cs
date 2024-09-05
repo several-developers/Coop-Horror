@@ -21,9 +21,9 @@ namespace GameCore.Gameplay.Systems.Quests
             _questsManagerDecorator = questsManagerDecorator;
             _gameManagerDecorator = gameManagerDecorator;
             _uiObserver = uiObserver;
-            _questsConfig = gameplayConfigsProvider.GetQuestsConfig();
+            _questsConfig = gameplayConfigsProvider.GetConfig<QuestsConfigMeta>();
 
-            QuestsItemsConfigMeta questsItemsConfig = gameplayConfigsProvider.GetQuestsItemsConfig();
+            var questsItemsConfig = gameplayConfigsProvider.GetConfig<QuestsItemsConfigMeta>();
 
             _questsStorage = new QuestsStorage();
             _questsController = new QuestsController(_questsStorage);

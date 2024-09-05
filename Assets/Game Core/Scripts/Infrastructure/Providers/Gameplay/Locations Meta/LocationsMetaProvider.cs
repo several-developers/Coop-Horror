@@ -12,7 +12,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 
         public LocationsMetaProvider(IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            _locationsListConfig = gameplayConfigsProvider.GetLocationsListConfig();
+            _locationsListConfig = gameplayConfigsProvider.GetConfig<LocationsListConfigMeta>();
             _locationsMeta = new Dictionary<LocationName, LocationMeta>();
             
             SetupLocationsDictionary();

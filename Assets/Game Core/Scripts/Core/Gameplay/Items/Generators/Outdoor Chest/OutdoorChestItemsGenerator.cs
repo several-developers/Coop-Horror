@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
             _gameManagerDecorator = gameManagerDecorator;
             _entitiesFactory = entitiesFactory;
             _dungeonsObserver = dungeonsObserver;
-            _itemsSpawnConfig = gameplayConfigsProvider.GetItemsSpawnConfig();
+            _itemsSpawnConfig = gameplayConfigsProvider.GetConfig<ItemsSpawnConfigMeta>();
             _outdoorChestsItemsSpawnConfig = _itemsSpawnConfig.GetOutdoorChestsItemsSpawnConfig();
 
             _dungeonsObserver.OnDungeonsGenerationCompletedEvent += OnDungeonsGenerationCompleted;
@@ -68,12 +68,14 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SpawnChests()
+        private async void SpawnChests()
         {
             int chestsAmount = GetRandomChestsAmount();
 
             if (chestsAmount == 0)
                 return;
+
+            bool wait = true;
 
             for (int i = 0; i < chestsAmount; i++)
             {
@@ -87,6 +89,13 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
                 }
 
                 CastRayAndTrySpawnChest(worldPosition, radius);
+
+                if (!wait)
+                    continue;
+
+                wait = false;
+#warning DELETE
+                await UniTask.Delay(millisecondsDelay: 500);
             }
         }
 

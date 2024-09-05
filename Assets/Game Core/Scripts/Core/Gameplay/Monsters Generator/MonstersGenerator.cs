@@ -32,7 +32,7 @@ namespace GameCore.Gameplay.MonstersGeneration
 
         public MonstersGenerator(
             IGameManagerDecorator gameManagerDecorator,
-            IAssetsProvider assetsProvider,
+            IConfigsProvider configsProvider,
             IMonstersFactory monstersFactory,
             IRoundManager roundManager,
             ITimeObserver timeObserver,
@@ -44,7 +44,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             if (!NetworkHorror.IsTrueServer)
                 return;
 
-            BalanceConfigMeta balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
+            var balanceConfig = gameplayConfigsProvider.GetConfig<BalanceConfigMeta>();
 
             _gameManagerDecorator = gameManagerDecorator;
             _monstersFactory = monstersFactory;
@@ -52,8 +52,8 @@ namespace GameCore.Gameplay.MonstersGeneration
             _timeObserver = timeObserver;
             _locationsMetaProvider = locationsMetaProvider;
             _monstersAIConfigsProvider = monstersAIConfigsProvider;
-            _monstersGeneratorConfig = gameplayConfigsProvider.GetMonstersGeneratorConfig();
-            _monstersListConfig = assetsProvider.GetMonstersListConfig();
+            _monstersGeneratorConfig = gameplayConfigsProvider.GetConfig<MonstersGeneratorConfigMeta>();
+            _monstersListConfig = configsProvider.GetConfig<MonstersListConfigMeta>();
             _monstersDangerLevelConfig = balanceConfig.MonstersDangerLevelConfig;
 
             var cts = new CancellationTokenSource();
@@ -170,14 +170,7 @@ namespace GameCore.Gameplay.MonstersGeneration
 
             foreach (MonsterReference monsterReference in allReferences)
             {
-                MonsterType monsterType = monsterReference.MonsterType;
-
-                bool isMonsterAIConfigFound = _monstersAIConfigsProvider
-                    .TryGetMonsterAIConfig(monsterType, out MonsterAIConfigMeta monsterAIConfig);
-
-                if (!isMonsterAIConfigFound)
-                    continue;
-
+                MonsterAIConfigMeta monsterAIConfig = monsterReference.MonsterAIConfig;
                 MonsterSpawnType spawnType = monsterAIConfig.SpawnType;
 
                 if (spawnType == MonsterSpawnType.NonSpawnable)

@@ -4,6 +4,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.EntitiesConfigs
 {
     public interface IEntitiesConfigsProvider
     {
-        OutdoorChestConfigMeta GetOutdoorChestConfig();
+        TEntityConfigType GetConfig<TEntityConfigType>() where TEntityConfigType : EntityConfigMeta;
     }
 }

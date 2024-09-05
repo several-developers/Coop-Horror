@@ -15,40 +15,35 @@ MonoBehaviour:
   _metaName: Monsters List
   _references:
   - _monsterType: 1
-    _monsterPrefab: {fileID: 4870548347698269539, guid: 0fb27fc3f913e2d4aac7d5ac1fa23e46,
-      type: 3}
+    _monsterAIConfig: {fileID: 11400000, guid: 86871d3b64a14ac4ab9334f404f56428, type: 2}
     _assetReference:
       m_AssetGUID: 0fb27fc3f913e2d4aac7d5ac1fa23e46
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - _monsterType: 2
-    _monsterPrefab: {fileID: 9060489894689602524, guid: 3d7c090ddb94c48489036f7ab94708d5,
-      type: 3}
+    _monsterAIConfig: {fileID: 11400000, guid: cb72c3b118288314f8e0d1006d3f5e76, type: 2}
     _assetReference:
       m_AssetGUID: 3d7c090ddb94c48489036f7ab94708d5
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - _monsterType: 3
-    _monsterPrefab: {fileID: 8485105040675278888, guid: 96346420cfba9a34ba2e7051915fc1ff,
-      type: 3}
+    _monsterAIConfig: {fileID: 11400000, guid: 8339c1a74d0d6434da9036385743415b, type: 2}
     _assetReference:
       m_AssetGUID: 96346420cfba9a34ba2e7051915fc1ff
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - _monsterType: 4
-    _monsterPrefab: {fileID: 3369362229999467226, guid: 3b82e74c90ef580488cb185825be0310,
-      type: 3}
+    _monsterAIConfig: {fileID: 11400000, guid: 4c04279833bb29d4dab3a32192fc5844, type: 2}
     _assetReference:
       m_AssetGUID: 3b82e74c90ef580488cb185825be0310
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - _monsterType: 5
-    _monsterPrefab: {fileID: 8118117852902759924, guid: edcbf561b4b17b345afbb31ab5eeeccc,
-      type: 3}
+    _monsterAIConfig: {fileID: 11400000, guid: 3b482b29012c3784d90acb587e20d151, type: 2}
     _assetReference:
       m_AssetGUID: edcbf561b4b17b345afbb31ab5eeeccc
       m_SubObjectName: 

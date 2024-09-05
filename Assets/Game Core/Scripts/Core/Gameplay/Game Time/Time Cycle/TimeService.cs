@@ -8,14 +8,14 @@ using Zenject;
 
 namespace GameCore.Gameplay.GameTimeManagement
 {
-    public class TimeCycle : ITimeCycle, IInitializable, IDisposable
+    public class TimeService : ITimeService, IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public TimeCycle(ITimeObserver timeObserver, IGameplayConfigsProvider gameplayConfigsProvider)
+        public TimeService(ITimeObserver timeObserver, IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _timeObserver = timeObserver;
-            _timeConfig = gameplayConfigsProvider.GetTimeConfig();
+            _timeConfig = gameplayConfigsProvider.GetConfig<TimeConfigMeta>();
             _simulate = _timeConfig.Simulate;
             _stopAtNight = _timeConfig.StopAtNight;
 

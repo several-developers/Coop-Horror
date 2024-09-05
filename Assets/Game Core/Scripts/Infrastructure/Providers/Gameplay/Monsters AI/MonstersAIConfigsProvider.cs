@@ -1,74 +1,83 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Configs.Global.MonstersList;
 using GameCore.Enums.Gameplay;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
-using GameCore.Utilities;
+using Zenject;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.MonstersAI
 {
-    public class MonstersAIConfigsProvider : AssetsProviderBase, IMonstersAIConfigsProvider
+    public class MonstersAIConfigsProvider : IMonstersAIConfigsProvider, IInitializable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MonstersAIConfigsProvider()
+        public MonstersAIConfigsProvider(
+            IConfigsProvider configsProvider,
+            IGameplayConfigsProvider gameplayConfigsProvider
+        )
         {
-            _monsterAIConfigs = new Dictionary<MonsterType, MonsterAIConfigMeta>();
-            
-            _goodClownAIConfig = Load<GoodClownAIConfigMeta>(path: ConfigsPaths.GoodClownAIConfig);
-            _evilClownAIConfig = Load<EvilClownAIConfigMeta>(path: ConfigsPaths.EvilClownAIConfig);
-            _beetleAIConfig = Load<BeetleAIConfigMeta>(path: ConfigsPaths.BeetleAIConfig);
-            _blindCreatureAIConfig = Load<BlindCreatureAIConfigMeta>(path: ConfigsPaths.BlindCreatureAIConfig);
-            _sirenHeadAIConfig = Load<SirenHeadAIConfigMeta>(path: ConfigsPaths.SirenHeadAIConfig);
+            _gameplayConfigsProvider = gameplayConfigsProvider;
+            _monstersListConfig = configsProvider.GetConfig<MonstersListConfigMeta>();
+            _monsterAIConfigsKeys = new Dictionary<MonsterType, Type>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly Dictionary<MonsterType, MonsterAIConfigMeta> _monsterAIConfigs;
-        private readonly GoodClownAIConfigMeta _goodClownAIConfig;
-        private readonly EvilClownAIConfigMeta _evilClownAIConfig;
-        private readonly BeetleAIConfigMeta _beetleAIConfig;
-        private readonly BlindCreatureAIConfigMeta _blindCreatureAIConfig;
-        private readonly SirenHeadAIConfigMeta _sirenHeadAIConfig;
+        private readonly IGameplayConfigsProvider _gameplayConfigsProvider;
+        private readonly MonstersListConfigMeta _monstersListConfig;
+        private readonly Dictionary<MonsterType, Type> _monsterAIConfigsKeys;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void Initialize() => SetupMonstersAIDictionary();
+
+        public TMonsterConfigType GetConfig<TMonsterConfigType>() where TMonsterConfigType : MonsterAIConfigMeta =>
+            _gameplayConfigsProvider.GetConfig<TMonsterConfigType>();
+
         public bool TryGetMonsterAIConfig(MonsterType monsterType, out MonsterAIConfigMeta monsterAIConfig)
         {
-            bool isMonsterAIConfigFound = _monsterAIConfigs.TryGetValue(monsterType, out monsterAIConfig);
+            bool isKeyFound = _monsterAIConfigsKeys.TryGetValue(monsterType, out Type configType);
 
-            if (isMonsterAIConfigFound)
-                return true;
+            if (isKeyFound)
+                return TryGetMonsterConfig(configType, out monsterAIConfig);
 
-            Log.PrintError(log: $"Monster AI Config for <gb>{monsterType}</gb> <rb>not found</rb>!");
+            monsterAIConfig = null;
+            Log.PrintError(log: $"Monster Config Key of type monster '<gb>{monsterType}</gb>' <rb>not found</rb>!");
+
             return false;
-        }
-
-        public GoodClownAIConfigMeta GetGoodClownAIConfig() => _goodClownAIConfig;
-        public EvilClownAIConfigMeta GetEvilClownAIConfig() => _evilClownAIConfig;
-        public BeetleAIConfigMeta GetBeetleAIConfig() => _beetleAIConfig;
-        public BlindCreatureAIConfigMeta GetBlindCreatureAIConfig() => _blindCreatureAIConfig;
-        public SirenHeadAIConfigMeta GetSirenHeadAIConfig() => _sirenHeadAIConfig;
-
-        // PROTECTED METHODS: ---------------------------------------------------------------------
-
-        protected sealed override T Load<T>(string path)
-        {
-            var config = base.Load<T>(path);
-            
-            if (config is MonsterAIConfigMeta monsterConfig)
-                AddMonsterAIConfigToDictionary(monsterConfig);
-            else
-                Log.PrintError(log: $"Monster Config at path <gb>\"{path}\"</gb> <rb>not found</rb>!");
-            
-            return config;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void AddMonsterAIConfigToDictionary(MonsterAIConfigMeta monsterAIConfig)
+        private void SetupMonstersAIDictionary()
         {
-            MonsterType monsterType = monsterAIConfig.GetMonsterType();
-            _monsterAIConfigs.Add(monsterType, monsterAIConfig);
+            IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
+
+            foreach (MonsterReference monsterReference in allReferences)
+            {
+                MonsterType monsterType = monsterReference.MonsterType;
+                MonsterAIConfigMeta monsterAIConfig = monsterReference.MonsterAIConfig;
+                Type configType = monsterAIConfig.GetType();
+
+                _monsterAIConfigsKeys.TryAdd(monsterType, configType);
+
+                bool containsKey = _monsterAIConfigsKeys.TryAdd(monsterType, configType);
+
+                if (!containsKey)
+                    continue;
+
+                string errorLog = $"Dictionary <rb>already contains key</rb> '<gb>{configType}</gb>'!";
+                Log.PrintError(errorLog);
+            }
+        }
+
+        private bool TryGetMonsterConfig(Type configType, out MonsterAIConfigMeta monsterAIConfig)
+        {
+            monsterAIConfig = _gameplayConfigsProvider.GetConfig<MonsterAIConfigMeta>(configType);
+            bool isConfigFound = monsterAIConfig != null;
+            return isConfigFound;
         }
     }
 }

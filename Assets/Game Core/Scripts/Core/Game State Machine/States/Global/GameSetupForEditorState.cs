@@ -19,7 +19,7 @@ namespace GameCore.StateMachine
         {
             _gameStateMachine = gameStateMachine;
             _scenesLoaderService = scenesLoaderService;
-            _gameConfig = configsProvider.GetGameConfig();
+            _gameConfig = configsProvider.GetConfig<GameConfigMeta>();
 
             _gameStateMachine.AddState(this);
         }

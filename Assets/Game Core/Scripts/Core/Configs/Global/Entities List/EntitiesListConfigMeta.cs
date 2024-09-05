@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using CustomEditors;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace GameCore.Configs.Global.EntitiesList
 {
-    public class EntitiesListConfigMeta : EditorMeta
+    public class EntitiesListConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -20,5 +20,8 @@ namespace GameCore.Configs.Global.EntitiesList
 
         public override string GetMetaCategory() =>
             EditorConstants.GlobalConfigsListsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.Global;
     }
 }

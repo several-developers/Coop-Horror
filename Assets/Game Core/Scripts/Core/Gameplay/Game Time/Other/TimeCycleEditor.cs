@@ -10,9 +10,9 @@ namespace GameCore.Gameplay.GameTimeManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ITimeCycle timeCycle, ITimeObserver timeObserver)
+        private void Construct(ITimeService timeService, ITimeObserver timeObserver)
         {
-            _timeCycle = timeCycle;
+            _timeService = timeService;
             _timeObserver = timeObserver;
         }
 
@@ -55,7 +55,7 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private const string CycleInfo = "Cycle Info";
         
-        private ITimeCycle _timeCycle;
+        private ITimeService _timeService;
         private ITimeObserver _timeObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -65,8 +65,8 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void Start()
         {
-            MyDateTime dateTime = _timeCycle.GetDateTime();
-            _simulate = _timeCycle.GetSimulateState();
+            MyDateTime dateTime = _timeService.GetDateTime();
+            _simulate = _timeService.GetSimulateState();
 
             UpdateFields(dateTime);
         }
@@ -81,13 +81,13 @@ namespace GameCore.Gameplay.GameTimeManagement
             _cycleSecond = dateTime.Second;
             _cycleMinute = dateTime.Minute;
             _cycleHour = dateTime.Hour;
-            _normalized = _timeCycle.GetDateTimeNormalized();
+            _normalized = _timeService.GetDateTimeNormalized();
             
             UpdateSimulateField();
         }
 
         private void UpdateSimulateField() =>
-            _cycleSimulate = _timeCycle.GetSimulateState();
+            _cycleSimulate = _timeService.GetSimulateState();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -95,28 +95,28 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void OnSecondChanged()
         {
-            MyDateTime dateTime = _timeCycle.GetDateTime();
-            _timeCycle.SetDateTime(_second, dateTime.Minute, dateTime.Hour, dateTime.Day);
+            MyDateTime dateTime = _timeService.GetDateTime();
+            _timeService.SetDateTime(_second, dateTime.Minute, dateTime.Hour, dateTime.Day);
             UpdateFields(dateTime);
         }
 
         private void OnMinuteChanged()
         {
-            MyDateTime dateTime = _timeCycle.GetDateTime();
-            _timeCycle.SetDateTime(dateTime.Second, _minute, dateTime.Hour, dateTime.Day);
+            MyDateTime dateTime = _timeService.GetDateTime();
+            _timeService.SetDateTime(dateTime.Second, _minute, dateTime.Hour, dateTime.Day);
             UpdateFields(dateTime);
         }
 
         private void OnHourChanged()
         {
-            MyDateTime dateTime = _timeCycle.GetDateTime();
-            _timeCycle.SetDateTime(dateTime.Second, dateTime.Minute, _hour, dateTime.Day);
+            MyDateTime dateTime = _timeService.GetDateTime();
+            _timeService.SetDateTime(dateTime.Second, dateTime.Minute, _hour, dateTime.Day);
             UpdateFields(dateTime);
         }
 
         private void OnSimulateChanged()
         {
-            _timeCycle.ToggleSimulate(_simulate);
+            _timeService.ToggleSimulate(_simulate);
             UpdateSimulateField();
         }
     }

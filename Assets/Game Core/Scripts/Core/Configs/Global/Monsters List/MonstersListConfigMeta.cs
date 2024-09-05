@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using CustomEditors;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Global.MonstersList
 {
-    public class MonstersListConfigMeta : EditorMeta
+    public class MonstersListConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -20,5 +20,8 @@ namespace GameCore.Configs.Global.MonstersList
         
         public override string GetMetaCategory() =>
             EditorConstants.GlobalConfigsListsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.Global;
     }
 }

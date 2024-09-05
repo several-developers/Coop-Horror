@@ -18,7 +18,7 @@ namespace GameCore.Gameplay.Interactable.Train
         {
             _gameManagerDecorator = gameManagerDecorator;
             _questsManagerDecorator = questsManagerDecorator;
-            _questsConfig = gameplayConfigsProvider.GetQuestsConfig();
+            _questsConfig = gameplayConfigsProvider.GetConfig<QuestsConfigMeta>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------

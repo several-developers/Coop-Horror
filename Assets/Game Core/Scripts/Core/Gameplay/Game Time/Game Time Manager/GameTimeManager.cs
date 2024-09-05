@@ -13,12 +13,12 @@ namespace GameCore.Gameplay.GameTimeManagement
         [Inject]
         private void Construct(
             IGameTimeManagerDecorator gameTimeManagerDecorator,
-            ITimeCycle timeCycle,
+            ITimeService timeService,
             ITimeObserver timeObserver
         )
         {
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
-            _timeCycle = timeCycle;
+            _timeService = timeService;
             _timeObserver = timeObserver;
         }
 
@@ -27,7 +27,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         private readonly NetworkVariable<MyDateTime> _gameTimer = new();
 
         private IGameTimeManagerDecorator _gameTimeManagerDecorator;
-        private ITimeCycle _timeCycle;
+        private ITimeService _timeService;
         private ITimeObserver _timeObserver;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -59,7 +59,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             _gameTimer.OnValueChanged += OnGameTimerUpdated;
 
         protected override void TickAll() =>
-            _timeCycle.Tick(); // Check for optimization
+            _timeService.Tick(); // Check for optimization
 
         protected override void DespawnOwner() =>
             _timeObserver.OnMinutePassedEvent -= OnMinutePassed;
@@ -71,27 +71,27 @@ namespace GameCore.Gameplay.GameTimeManagement
 
         private void UpdateGameTimer()
         {
-            MyDateTime dateTime = _timeCycle.GetDateTime();
+            MyDateTime dateTime = _timeService.GetDateTime();
             _gameTimer.Value = dateTime;
         }
 
         private void IncreaseDay()
         {
-            _timeCycle.IncreaseDay();
+            _timeService.IncreaseDay();
             UpdateGameTimer();
         }
 
         private void SetSunrise() =>
-            _timeCycle.SetSunrise();
+            _timeService.SetSunrise();
 
         private void SetMidnight() =>
-            _timeCycle.SetMidnight();
+            _timeService.SetMidnight();
 
         private void ResetDay()
         {
-            MyDateTime dateTime = _timeCycle.GetDateTime();
+            MyDateTime dateTime = _timeService.GetDateTime();
             dateTime.ResetDay();
-            _timeCycle.SyncDateTime(dateTime);
+            _timeService.SyncDateTime(dateTime);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
@@ -99,7 +99,7 @@ namespace GameCore.Gameplay.GameTimeManagement
         private void OnMinutePassed() => UpdateGameTimer();
 
         private void OnGameTimerUpdated(MyDateTime previousDate, MyDateTime newDate) =>
-            _timeCycle.SyncDateTime(newDate);
+            _timeService.SyncDateTime(newDate);
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

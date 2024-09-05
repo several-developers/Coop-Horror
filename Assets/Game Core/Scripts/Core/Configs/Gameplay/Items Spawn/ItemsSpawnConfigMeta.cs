@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using CustomEditors;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Items.Generators.Dungeon;
 using GameCore.Gameplay.Items.Generators.OutdoorChest;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.ItemsSpawn
 {
-    public class ItemsSpawnConfigMeta : EditorMeta
+    public class ItemsSpawnConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -68,6 +68,9 @@ namespace GameCore.Configs.Gameplay.ItemsSpawn
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
 
         public bool TryGetItemsSpawnConfig(LocationName locationName, out LocationItemsSpawnConfigMeta result)
         {

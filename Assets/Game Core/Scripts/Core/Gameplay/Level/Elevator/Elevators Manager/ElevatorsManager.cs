@@ -27,7 +27,7 @@ namespace GameCore.Gameplay.Level.Elevator
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
             _visualManager = visualManager;
             _levelProvider = levelProvider;
-            _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
+            _elevatorConfig = gameplayConfigsProvider.GetConfig<ElevatorConfigMeta>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------

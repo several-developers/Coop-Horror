@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using CustomEditors;
 using GameCore.Enums.Gameplay;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Quests
 {
-    public class QuestsConfigMeta : EditorMeta
+    public class QuestsConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -46,5 +46,8 @@ namespace GameCore.Configs.Gameplay.Quests
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

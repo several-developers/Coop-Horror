@@ -65,7 +65,7 @@ namespace GameCore.Gameplay.Entities.Player
             _camerasManager = camerasManager;
             _trainEntity = trainEntity;
 
-            _playerConfig = gameplayConfigsProvider.GetPlayerConfig();
+            _playerConfig = gameplayConfigsProvider.GetConfig<PlayerConfigMeta>();
             InputReader = configsProvider.GetInputReader();
         }
 

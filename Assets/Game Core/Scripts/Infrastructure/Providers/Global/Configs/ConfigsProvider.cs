@@ -1,5 +1,6 @@
-﻿using GameCore.Configs.Global.Game;
+﻿using System;
 using GameCore.Gameplay.InputManagement;
+using GameCore.Infrastructure.Configs;
 using GameCore.Utilities;
 
 namespace GameCore.Infrastructure.Providers.Global
@@ -10,18 +11,22 @@ namespace GameCore.Infrastructure.Providers.Global
 
         public ConfigsProvider()
         {
-            _gameConfig = Load<GameConfigMeta>(path: ConfigsPaths.GameConfig);
+            _configsManager = new ConfigsManager(ConfigScope.Global);
             _inputReader = Load<InputReader>(path: ConfigsPaths.InputReader); // TEMP
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly GameConfigMeta _gameConfig;
+        private readonly ConfigsManager _configsManager;
         private readonly InputReader _inputReader; // TEMP
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public GameConfigMeta GetGameConfig() => _gameConfig;
+        public T GetConfig<T>() where T : ConfigMeta =>
+            _configsManager.GetConfigMeta<T>();
+        
+        public T GetConfig<T>(Type type) where T : ConfigMeta =>
+            _configsManager.GetConfigMeta<T>(type);
         
         // TEMP
         public InputReader GetInputReader() => _inputReader;

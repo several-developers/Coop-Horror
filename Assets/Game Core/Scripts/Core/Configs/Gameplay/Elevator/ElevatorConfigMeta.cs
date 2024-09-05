@@ -1,11 +1,11 @@
-﻿using CustomEditors;
+﻿using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using Sonity;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Elevator
 {
-    public class ElevatorConfigMeta : EditorMeta
+    public class ElevatorConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -51,5 +51,8 @@ namespace GameCore.Configs.Gameplay.Elevator
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

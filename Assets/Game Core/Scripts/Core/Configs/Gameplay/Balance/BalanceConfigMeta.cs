@@ -1,10 +1,10 @@
-﻿using CustomEditors;
+﻿using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Balance
 {
-    public class BalanceConfigMeta : EditorMeta
+    public class BalanceConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -32,5 +32,8 @@ namespace GameCore.Configs.Gameplay.Balance
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

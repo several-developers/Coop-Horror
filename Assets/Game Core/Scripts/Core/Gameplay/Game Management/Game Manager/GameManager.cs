@@ -43,7 +43,7 @@ namespace GameCore.Gameplay.GameManagement
             _dungeonsObserver = dungeonsObserver;
             _trainEntity = trainEntity;
             _networkSceneManager = NetworkManager.Singleton.SceneManager;
-            _balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
+            _balanceConfig = gameplayConfigsProvider.GetConfig<BalanceConfigMeta>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------

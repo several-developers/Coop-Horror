@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using CustomEditors;
 using GameCore.Enums.Gameplay;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Enemies
 {
-    public abstract class MonsterAIConfigMeta : EditorMeta
+    public abstract class MonsterAIConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -100,10 +100,13 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         public IEnumerable<MonsterType> GetRelatedMonstersToCount() => _relatedMonstersToCount;
 
-        public abstract MonsterType GetMonsterType();
-        
         public override string GetMetaCategory() =>
             EditorConstants.MonstersAICategory;
+
+        public abstract MonsterType GetMonsterType();
+
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
 
         public float GetFloorSpawnChanceMultiplier(Floor floor)
         {

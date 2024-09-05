@@ -23,7 +23,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
         private void Construct(ILevelProvider levelProvider, IMonstersAIConfigsProvider monstersAIConfigsProvider)
         {
             _levelProvider = levelProvider;
-            _beetleAIConfig = monstersAIConfigsProvider.GetBeetleAIConfig();
+            _beetleAIConfig = monstersAIConfigsProvider.GetConfig<BeetleAIConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using CustomEditors;
+using GameCore.Infrastructure.Configs;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.MonstersGenerator
 {
-    public class MonstersGeneratorConfigMeta : EditorMeta
+    public class MonstersGeneratorConfigMeta : ConfigMeta
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -27,6 +27,9 @@ namespace GameCore.Configs.Gameplay.MonstersGenerator
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
 
         public int GetRandomMonstersAmount(int playersAmount)
         {

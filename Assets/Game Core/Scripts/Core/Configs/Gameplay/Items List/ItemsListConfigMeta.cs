@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using GameCore.Gameplay.Items;
-using CustomEditors;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.ItemsList
 {
-    public class ItemsListConfigMeta : EditorMeta
+    public class ItemsListConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -20,5 +20,8 @@ namespace GameCore.Configs.Gameplay.ItemsList
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsListsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

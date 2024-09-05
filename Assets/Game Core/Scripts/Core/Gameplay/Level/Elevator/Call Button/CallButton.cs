@@ -22,7 +22,7 @@ namespace GameCore.Gameplay.Level.Elevator
             IGameplayConfigsProvider gameplayConfigsProvider)
         {
             _elevatorsManagerDecorator = elevatorsManagerDecorator;
-            _elevatorConfig = gameplayConfigsProvider.GetElevatorConfig();
+            _elevatorConfig = gameplayConfigsProvider.GetConfig<ElevatorConfigMeta>();
             _soundReproducer = new ElevatorSoundReproducer(soundProducer: this, _elevatorConfig);
         }
 

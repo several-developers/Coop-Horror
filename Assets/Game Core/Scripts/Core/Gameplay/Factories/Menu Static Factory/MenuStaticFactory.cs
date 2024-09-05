@@ -13,12 +13,16 @@ namespace GameCore.Gameplay.Factories
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MenuStaticFactory(DiContainer diContainer, IAssetsProvider assetsProvider)
+        public MenuStaticFactory(
+            DiContainer diContainer,
+            IAssetsProvider assetsProvider,
+            IConfigsProvider configsProvider
+        )
         {
             _diContainer = diContainer;
             _menusDictionary = new Dictionary<Type, MenuView>();
 
-            SetupMenuDictionary(assetsProvider);
+            SetupMenuDictionary(configsProvider);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -82,14 +86,14 @@ namespace GameCore.Gameplay.Factories
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static void SetupMenuDictionary(IAssetsProvider assetsProvider)
+        private static void SetupMenuDictionary(IConfigsProvider configsProvider)
         {
-            MenuPrefabsListConfigMeta menuPrefabsListConfigMeta = assetsProvider.GetMenuPrefabsListConfig();
+            var menuPrefabsListConfig = configsProvider.GetConfig<MenuPrefabsListConfigMeta>();
 
-            if (menuPrefabsListConfigMeta == null)
+            if (menuPrefabsListConfig == null)
                 return;
 
-            MenuView[] menuPrefabs = menuPrefabsListConfigMeta.GetMenuPrefabs();
+            MenuView[] menuPrefabs = menuPrefabsListConfig.GetMenuPrefabs();
 
             foreach (MenuView menuPrefab in menuPrefabs)
             {

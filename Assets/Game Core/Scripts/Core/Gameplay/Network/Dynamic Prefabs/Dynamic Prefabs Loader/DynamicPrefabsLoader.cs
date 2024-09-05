@@ -155,7 +155,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
         /// the spawn will fail.
         /// </summary>
-        public async Task TryLoadAndSendDynamicPrefab(string guid, Action<NetworkObject> loadCallback)
+        private async Task TryLoadAndSendDynamicPrefab(string guid, Action<NetworkObject> loadCallback)
         {
             if (!IsServer)
             {
@@ -234,11 +234,15 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 }
 
                 if (prefab.Result.TryGetComponent(out NetworkObject prefabNetworkObject))
+                {
                     SendSuccess(prefabNetworkObject);
+                }
                 else
+                {
                     SendError();
+                }
                 
-                // _networkManager.SpawnManager.InstantiateAndSpawn(networkObject, NetworkHorror.ServerID,
+                // _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, NetworkHorror.ServerID,
                 //     destroyWithScene: true, position: Vector3.zero);
                 
                 Debug.Log(message: "Spawned dynamic prefab");

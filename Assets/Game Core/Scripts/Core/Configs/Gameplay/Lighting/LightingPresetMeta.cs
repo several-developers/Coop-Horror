@@ -1,10 +1,11 @@
 ﻿using CustomEditors;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Lighting
 {
-    public class LightingPresetMeta : EditorMeta
+    public class LightingPresetMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -91,5 +92,8 @@ namespace GameCore.Configs.Gameplay.Lighting
         
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

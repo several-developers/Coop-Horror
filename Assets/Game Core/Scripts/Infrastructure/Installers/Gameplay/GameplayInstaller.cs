@@ -43,7 +43,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         public override void InstallBindings()
         {
             BindMobileHeadquartersEntity();
-            BindTimeCycle();
+            BindTimeService();
             BindLocationsLoader();
             BindLevelProvider();
             BindDungeonsManager();
@@ -72,10 +72,10 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle();
         }
 
-        private void BindTimeCycle()
+        private void BindTimeService()
         {
             Container
-                .BindInterfacesTo<TimeCycle>()
+                .BindInterfacesTo<TimeService>()
                 .AsSingle()
                 .NonLazy();
         }

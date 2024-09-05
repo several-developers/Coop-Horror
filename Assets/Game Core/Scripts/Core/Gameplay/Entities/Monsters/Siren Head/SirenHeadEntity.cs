@@ -30,7 +30,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
         private void Construct(ITimeObserver timeObserver, IMonstersAIConfigsProvider monstersAIConfigsProvider)
         {
             _timeObserver = timeObserver;
-            _sirenHeadAIConfig = monstersAIConfigsProvider.GetSirenHeadAIConfig();
+            _sirenHeadAIConfig = monstersAIConfigsProvider.GetConfig<SirenHeadAIConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

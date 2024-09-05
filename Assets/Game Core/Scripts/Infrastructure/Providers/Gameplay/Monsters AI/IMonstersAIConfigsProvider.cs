@@ -5,11 +5,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.MonstersAI
 {
     public interface IMonstersAIConfigsProvider
     {
+        TMonsterConfigType GetConfig<TMonsterConfigType>() where TMonsterConfigType : MonsterAIConfigMeta;
         bool TryGetMonsterAIConfig(MonsterType monsterType, out MonsterAIConfigMeta monsterAIConfig);
-        GoodClownAIConfigMeta GetGoodClownAIConfig();
-        EvilClownAIConfigMeta GetEvilClownAIConfig();
-        BeetleAIConfigMeta GetBeetleAIConfig();
-        BlindCreatureAIConfigMeta GetBlindCreatureAIConfig();
-        SirenHeadAIConfigMeta GetSirenHeadAIConfig();
     }
 }

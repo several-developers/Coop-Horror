@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using CustomEditors;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.RigPresets
 {
-    public class RigPresetsConfigMeta : EditorMeta
+    public class RigPresetsConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -20,5 +20,8 @@ namespace GameCore.Configs.Gameplay.RigPresets
 
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

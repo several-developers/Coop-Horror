@@ -17,10 +17,10 @@ namespace GameCore.Gameplay.Factories.Monsters
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MonstersFactory(IEntitiesFactory entitiesFactory, IAssetsProvider assetsProvider)
+        public MonstersFactory(IEntitiesFactory entitiesFactory, IConfigsProvider configsProvider)
         {
             _entitiesFactory = entitiesFactory;
-            _monstersListConfig = assetsProvider.GetMonstersListConfig();
+            _monstersListConfig = configsProvider.GetConfig<MonstersListConfigMeta>();
             _prefabsKeysDictionary = new Dictionary<MonsterType, AssetReferenceGameObject>();
         }
 

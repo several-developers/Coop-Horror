@@ -29,7 +29,7 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
         private void Construct(IItemsFactory itemsFactory, IEntitiesConfigsProvider entitiesConfigsProvider)
         {
             _itemsFactory = itemsFactory;
-            _outdoorChestConfig = entitiesConfigsProvider.GetOutdoorChestConfig();
+            _outdoorChestConfig = entitiesConfigsProvider.GetConfig<OutdoorChestConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

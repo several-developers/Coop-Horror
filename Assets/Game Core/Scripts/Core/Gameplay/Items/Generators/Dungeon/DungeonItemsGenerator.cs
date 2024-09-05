@@ -34,7 +34,7 @@ namespace GameCore.Gameplay.Items.Generators.Dungeon
             _gameManagerDecorator = gameManagerDecorator;
             _itemsFactory = itemsFactory;
             _dungeonsObserver = dungeonsObserver;
-            _itemsSpawnConfig = gameplayConfigsProvider.GetItemsSpawnConfig();
+            _itemsSpawnConfig = gameplayConfigsProvider.GetConfig<ItemsSpawnConfigMeta>();
             _rawItemsSpawners = new List<DungeonItemsSpawner>();
 
             _itemsSpawners = new Dictionary<Floor, List<DungeonItemsSpawner>>

@@ -23,15 +23,16 @@ namespace GameCore.Gameplay.Network.Utilities
         private void Construct(
             DiContainer diContainer,
             IAssetsProvider assetsProvider,
+            IConfigsProvider configsProvider,
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
             _diContainer = diContainer;
             _networkManager = NetworkManager.Singleton;
 
-            _entitiesListConfig = assetsProvider.GetEntitiesListConfig();
-            _itemsListConfig = gameplayConfigsProvider.GetItemsListConfig();
-            _monstersListConfig = assetsProvider.GetMonstersListConfig();
+            _entitiesListConfig = configsProvider.GetConfig<EntitiesListConfigMeta>();
+            _itemsListConfig = gameplayConfigsProvider.GetConfig<ItemsListConfigMeta>();
+            _monstersListConfig = configsProvider.GetConfig<MonstersListConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

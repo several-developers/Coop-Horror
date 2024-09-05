@@ -50,8 +50,8 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
-            _blindCreatureAIConfig = monstersAIConfigsProvider.GetBlindCreatureAIConfig();
-            _balanceConfig = gameplayConfigsProvider.GetBalanceConfig();
+            _blindCreatureAIConfig = monstersAIConfigsProvider.GetConfig<BlindCreatureAIConfigMeta>();
+            _balanceConfig = gameplayConfigsProvider.GetConfig<BalanceConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------

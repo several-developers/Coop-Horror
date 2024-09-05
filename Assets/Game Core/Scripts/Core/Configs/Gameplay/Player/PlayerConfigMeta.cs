@@ -1,11 +1,11 @@
-﻿using CustomEditors;
+﻿using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using Sonity;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Player
 {
-    public class PlayerConfigMeta : EditorMeta
+    public class PlayerConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -64,5 +64,8 @@ namespace GameCore.Configs.Gameplay.Player
         
         public override string GetMetaCategory() =>
             EditorConstants.GameplayConfigsCategory;
+        
+        public override ConfigScope GetConfigScope() =>
+            ConfigScope.GameplayScene;
     }
 }

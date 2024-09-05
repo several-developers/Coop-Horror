@@ -16,16 +16,17 @@ namespace GameCore.Gameplay.Factories.Menu
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MenuFactory(DiContainer diContainer, IAssetsProvider assetsProvider) : base(assetsProvider)
+        public MenuFactory(DiContainer diContainer, IAssetsProvider assetsProvider, IConfigsProvider configsProvider)
+            : base(assetsProvider)
         {
             _diContainer = diContainer;
-            _assetsProvider = assetsProvider;
+            _configsProvider = configsProvider;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly DiContainer _diContainer;
-        private readonly IAssetsProvider _assetsProvider;
+        private readonly IConfigsProvider _configsProvider;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -85,7 +86,7 @@ namespace GameCore.Gameplay.Factories.Menu
 
         private async UniTask SetupReferencesDictionary()
         {
-            MenuPrefabsListConfigMeta menuPrefabsListConfig = _assetsProvider.GetMenuPrefabsListConfig();
+            var menuPrefabsListConfig = _configsProvider.GetConfig<MenuPrefabsListConfigMeta>();
 
             if (menuPrefabsListConfig == null)
                 return;

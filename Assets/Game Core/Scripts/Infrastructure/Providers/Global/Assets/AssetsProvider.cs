@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Global.EntitiesList;
-using GameCore.Configs.Global.MenuPrefabsList;
-using GameCore.Configs.Global.MonstersList;
 using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -19,18 +16,12 @@ namespace GameCore.Infrastructure.Providers.Global
         public AssetsProvider()
         {
             _scenesLoaderPrefab = Load<GameObject>(path: AssetsPaths.ScenesLoaderPrefab);
-            _menuPrefabsListConfig = Load<MenuPrefabsListConfigMeta>(path: AssetsPaths.MenuPrefabsList);
-            _entitiesListConfig = Load<EntitiesListConfigMeta>(path: ConfigsPaths.EntitiesListConfig);
-            _monstersListConfig = Load<MonstersListConfigMeta>(path: ConfigsPaths.MonstersListConfig);
             _networkManager = Load<NetworkManager>(path: AssetsPaths.NetworkManager);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly GameObject _scenesLoaderPrefab;
-        private readonly MenuPrefabsListConfigMeta _menuPrefabsListConfig;
-        private readonly EntitiesListConfigMeta _entitiesListConfig;
-        private readonly MonstersListConfigMeta _monstersListConfig;
         private readonly NetworkManager _networkManager;
         
         private readonly Dictionary<string, AsyncOperationHandle> _completedCache = new();
@@ -83,9 +74,6 @@ namespace GameCore.Infrastructure.Providers.Global
         }
         
         public GameObject GetScenesLoaderPrefab() => _scenesLoaderPrefab;
-        public MenuPrefabsListConfigMeta GetMenuPrefabsListConfig() => _menuPrefabsListConfig;
-        public EntitiesListConfigMeta GetEntitiesListConfig() => _entitiesListConfig;
-        public MonstersListConfigMeta GetMonstersListConfig() => _monstersListConfig;
         public NetworkManager GetNetworkManager() => _networkManager;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

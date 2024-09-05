@@ -25,7 +25,7 @@ namespace GameCore.StateMachine
         {
             _gameStateMachine = gameStateMachine;
             _assetsProvider = assetsProvider;
-            _prefabsListConfig = gameplayConfigsProvider.GetPrefabsListConfig();
+            _prefabsListConfig = gameplayConfigsProvider.GetConfig<PrefabsListConfigMeta>();
 
             _gameStateMachine.AddState(this);
         }
