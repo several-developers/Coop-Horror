@@ -18,11 +18,17 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IPublisher<ConnectStatus> connectStatusPublisher,
+        private void Construct(
+            IPublisher<ConnectStatus> connectStatusPublisher,
             IPublisher<ReconnectMessage> reconnectMessagePublisher,
-            IPublisher<ConnectionEventMessage> connectionEventPublisher, LobbyServiceFacade lobbyServiceFacade,
-            ProfileManager profileManager, LocalLobby localLobby, LocalLobbyUser lobbyUser,
-            IScenesLoaderService scenesLoaderService, IGameStateMachine gameStateMachine)
+            IPublisher<ConnectionEventMessage> connectionEventPublisher,
+            LobbyServiceFacade lobbyServiceFacade,
+            ProfileManager profileManager,
+            LocalLobby localLobby,
+            LocalLobbyUser lobbyUser,
+            IScenesLoaderService scenesLoaderService,
+            IGameStateMachine gameStateMachine
+        )
         {
             _connectStatusPublisher = connectStatusPublisher;
             _reconnectMessagePublisher = reconnectMessagePublisher;
@@ -287,8 +293,6 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
                 response.Approved = true;
                 response.CreatePlayerObject = true; // We're not going to spawn a player object for this sample.
-
-                _currentState.ApprovalCheck(request, response);
             }
 
             void ImmediateDeny()

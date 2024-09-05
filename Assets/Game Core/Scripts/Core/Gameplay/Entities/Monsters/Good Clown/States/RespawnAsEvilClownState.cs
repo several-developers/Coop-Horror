@@ -11,7 +11,7 @@ using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 {
-    public class RespawnAsEvilClownState : IEnterStateAsync
+    public class RespawnAsEvilClownState : IEnterState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -28,12 +28,11 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public async UniTaskVoid Enter()
+        public void Enter()
         {
             DisableAgent();
             SetAgonizeAnimation();
-            await AwaitAndCreateEvilClown();
-            EnterDeathState();
+            AwaitAndCreateEvilClown();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -50,7 +49,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             clownUtilities.SetAgonizeAnimation();
         }
 
-        private async UniTask AwaitAndCreateEvilClown()
+        private async UniTaskVoid AwaitAndCreateEvilClown()
         {
             bool isCanceled = false;
             
@@ -59,7 +58,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             if (isCanceled)
                 return;
             
-            await LoadAndCreate();
+            Create();
             
             // LOCAL METHODS: -----------------------------
 
@@ -76,7 +75,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
                     .SuppressCancellationThrow();
             }
 
-            async UniTask LoadAndCreate()
+            void Create()
             {
                 Transform transform = _goodClownEntity.transform;
                 Vector3 position = transform.position;
@@ -85,10 +84,14 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
                 var spawnParams = new EntitySpawnParams<EvilClownEntity>.Builder()
                     .SetSpawnPosition(position)
                     .SetRotation(rotation)
-                    .SetSuccessCallback(EvilClownSpawned)
+                    .SetSuccessCallback(evilClownEntity =>
+                    {
+                        EvilClownSpawned(evilClownEntity);
+                        EnterDeathState();
+                    })
                     .Build();
 
-                await _monstersFactory.CreateMonster(MonsterType.EvilClown, spawnParams);
+                _monstersFactory.CreateMonster(MonsterType.EvilClown, spawnParams);
             }
         }
 

@@ -68,7 +68,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTaskVoid SpawnChests()
+        private void SpawnChests()
         {
             int chestsAmount = GetRandomChestsAmount();
 
@@ -86,11 +86,11 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
                     return;
                 }
 
-                await CastRayAndTrySpawnChest(worldPosition, radius);
+                CastRayAndTrySpawnChest(worldPosition, radius);
             }
         }
 
-        private async UniTask CastRayAndTrySpawnChest(Vector3 worldPosition, float radius)
+        private void CastRayAndTrySpawnChest(Vector3 worldPosition, float radius)
         {
             Vector2 randomInsideCircle = Random.insideUnitCircle * radius;
             Vector3 origin = worldPosition + new Vector3(x: randomInsideCircle.x, y: 0f, z: randomInsideCircle.y);
@@ -108,10 +108,10 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
             Vector3 spawnPoint = hitInfo.point;
             spawnPoint.y += SpawnOffsetY;
 
-            await TrySpawnChest(spawnPoint);
+            TrySpawnChest(spawnPoint);
         }
 
-        private async UniTask TrySpawnChest(Vector3 worldPosition)
+        private void TrySpawnChest(Vector3 worldPosition)
         {
             int itemsAmount = GetItemsRandomAmount();
 
@@ -128,7 +128,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
                 .SetSuccessCallback(entity => { ChestSpawned(entity, itemsList); })
                 .Build();
 
-            await _entitiesFactory.CreateEntity(spawnParams);
+            _entitiesFactory.CreateEntity(spawnParams);
         }
 
         private static void ChestSpawned(OutdoorChestEntity outdoorChestEntity, List<int> itemsList) =>

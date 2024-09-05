@@ -9,6 +9,6 @@ namespace GameCore.Gameplay.Factories.Entities
     {
         UniTask WarmUp();
         UniTask LoadAssetReference<T>(AssetReference assetReference) where T : class;
-        UniTask CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
+        void CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
     }
 }

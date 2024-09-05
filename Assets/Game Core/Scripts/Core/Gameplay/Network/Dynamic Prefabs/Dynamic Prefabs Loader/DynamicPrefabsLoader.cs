@@ -73,7 +73,6 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             // Here, we keep ForceSamePrefabs disabled. This will allow us to dynamically add network prefabs to
             // Netcode for GameObject after establishing a connection.
             _networkManager.NetworkConfig.ForceSamePrefabs = false;
-            //_networkManager.ConnectionApprovalCallback += ConnectionApprovalCallback;
         }
 
         protected override void OnDestroyAll() =>
@@ -156,7 +155,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
         /// the spawn will fail.
         /// </summary>
-        public async Task TryLoadAndSendDynamicPrefab(string guid, Action<GameObject> callback)
+        public async Task TryLoadAndSendDynamicPrefab(string guid, Action<NetworkObject> loadCallback)
         {
             if (!IsServer)
             {
@@ -219,7 +218,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             // Left to the reader: you'll need to be reactive to clients failing to load -- you should either have
             // the offending client try again or disconnect it after a predetermined amount of failed attempts.
             Debug.LogError(message: "Failed to spawn dynamic prefab - timeout");
-            
+
             SendError();
 
             // LOCAL METHODS: -----------------------------
@@ -234,8 +233,14 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                     return;
                 }
 
-                SendSuccess(prefab.Result);
-
+                if (prefab.Result.TryGetComponent(out NetworkObject prefabNetworkObject))
+                    SendSuccess(prefabNetworkObject);
+                else
+                    SendError();
+                
+                // _networkManager.SpawnManager.InstantiateAndSpawn(networkObject, NetworkHorror.ServerID,
+                //     destroyWithScene: true, position: Vector3.zero);
+                
                 Debug.Log(message: "Spawned dynamic prefab");
 
                 // Every client loaded dynamic prefab, their respective ClientUIs in case they loaded first.
@@ -248,11 +253,11 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 }
             }
 
-            void SendSuccess(GameObject prefab) =>
-                callback?.Invoke(prefab);
+            void SendSuccess(NetworkObject prefabNetworkObject) =>
+                loadCallback?.Invoke(prefabNetworkObject);
 
             void SendError() =>
-                callback?.Invoke(obj: null);
+                loadCallback?.Invoke(obj: null);
         }
 
         private async void TrySpawnInvisible()
@@ -438,7 +443,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnTrySpawnPrefab(string guid, Action<GameObject> callback) =>
+        private void OnTrySpawnPrefab(string guid, Action<NetworkObject> callback) =>
             TryLoadAndSendDynamicPrefab(guid, callback);
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

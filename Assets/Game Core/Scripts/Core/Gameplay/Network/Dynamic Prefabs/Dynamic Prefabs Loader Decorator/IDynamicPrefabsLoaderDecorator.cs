@@ -1,11 +1,11 @@
 ﻿using System;
-using UnityEngine;
+using Unity.Netcode;
 
 namespace GameCore.Gameplay.Network.DynamicPrefabs
 {
     public interface IDynamicPrefabsLoaderDecorator
     {
-        event Action<string, Action<GameObject>> OnTrySpawnPrefabEvent;
-        void LoadAndGetPrefab(string guid, Action<GameObject> callback);
+        event Action<string, Action<NetworkObject>> OnTrySpawnPrefabEvent;
+        void LoadAndGetPrefab(string guid, Action<NetworkObject> loadCallback);
     }
 }

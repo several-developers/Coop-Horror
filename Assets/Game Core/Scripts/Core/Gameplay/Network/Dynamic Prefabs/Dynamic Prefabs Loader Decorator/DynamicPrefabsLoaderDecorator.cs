@@ -1,5 +1,5 @@
 ﻿using System;
-using UnityEngine;
+using Unity.Netcode;
 
 namespace GameCore.Gameplay.Network.DynamicPrefabs
 {
@@ -7,11 +7,11 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
     {
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<string, Action<GameObject>> OnTrySpawnPrefabEvent = delegate { };
+        public event Action<string, Action<NetworkObject>> OnTrySpawnPrefabEvent = delegate { };
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
-        public void LoadAndGetPrefab(string guid, Action<GameObject> callback) =>
-            OnTrySpawnPrefabEvent.Invoke(guid, callback);
+        public void LoadAndGetPrefab(string guid, Action<NetworkObject> loadCallback) =>
+            OnTrySpawnPrefabEvent.Invoke(guid, loadCallback);
     }
 }

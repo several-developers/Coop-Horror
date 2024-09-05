@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using GameCore.Infrastructure.Providers.Global;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace GameCore.Utilities
 {

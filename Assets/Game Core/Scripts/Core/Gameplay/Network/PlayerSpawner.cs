@@ -66,13 +66,6 @@ namespace GameCore.Gameplay.Network
                     return;
             }
             
-            isCanceled = await UniTask
-                .Delay(millisecondsDelay: 5000, cancellationToken: this.GetCancellationTokenOnDestroy())
-                .SuppressCancellationThrow();
-
-            if (isCanceled)
-                return;
-            
             Vector3 spawnPosition = Vector3.zero; // TEMP ?
 
             var spawnParams = new EntitySpawnParams<PlayerEntity>.Builder()
@@ -81,7 +74,7 @@ namespace GameCore.Gameplay.Network
                 .SetSuccessCallback(playerEntity => { SetupPlayer(playerEntity, clientID, lateJoin); })
                 .Build();
 
-            await _entitiesFactory.CreateEntity(spawnParams);
+            _entitiesFactory.CreateEntity(spawnParams);
         }
 
         private void SetupPlayer(PlayerEntity playerEntity, ulong clientID, bool lateJoin)

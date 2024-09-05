@@ -35,7 +35,7 @@ namespace GameCore.Gameplay.Factories.Monsters
         public async UniTask WarmUp() =>
             await SetupReferencesDictionary();
         
-        public async UniTask CreateMonster<TMonsterEntity>(MonsterType monsterType,
+        public void CreateMonster<TMonsterEntity>(MonsterType monsterType,
             EntitySpawnParams<TMonsterEntity> spawnParams) where TMonsterEntity : MonsterEntityBase
         {
             if (!TryGetAssetReference(monsterType, out AssetReferenceGameObject assetReference))
@@ -45,7 +45,7 @@ namespace GameCore.Gameplay.Factories.Monsters
             }
             
             spawnParams.SetAssetReference(assetReference);
-            await _entitiesFactory.CreateEntity(spawnParams);
+            _entitiesFactory.CreateEntity(spawnParams);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Configs.Gameplay.MonstersGenerator;
@@ -300,7 +299,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             _monstersSpawnList.Add(monsterToSpawn);
         }
 
-        private async UniTaskVoid TrySpawnMonster()
+        private void TrySpawnMonster()
         {
             int monstersSpawnAmount = _monstersSpawnList.Count;
             float deltaTime = Time.deltaTime;
@@ -318,11 +317,11 @@ namespace GameCore.Gameplay.MonstersGeneration
                 MonsterType monsterType = monsterToSpawn.MonsterType;
 
                 _monstersSpawnList.RemoveAt(i);
-                await SpawnMonsterIndoor(monsterType);
+                SpawnMonsterIndoor(monsterType);
             }
         }
 
-        private async UniTask SpawnMonsterIndoor(MonsterType monsterType)
+        private void SpawnMonsterIndoor(MonsterType monsterType)
         {
             Floor floor = GetRandomFloor(monsterType);
             bool isSpawnPositionFound = TryGetIndoorMonsterSpawnPosition(floor, out Vector3 spawnPosition);
@@ -339,7 +338,7 @@ namespace GameCore.Gameplay.MonstersGeneration
                 .SetSuccessCallback(entity => { MonsterSpawned(entity, floor); })
                 .Build();
 
-            await _monstersFactory.CreateMonster(monsterType, spawnParams);
+            _monstersFactory.CreateMonster(monsterType, spawnParams);
         }
 
         private void SpawnMonsterOutdoor(MonsterType monsterType)
