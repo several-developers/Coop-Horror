@@ -2,9 +2,8 @@
 using CustomEditors;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
-namespace GameCore.Configs.Gameplay.MonstersList
+namespace GameCore.Configs.Global.MonstersList
 {
     public class MonstersListConfigMeta : EditorMeta
     {
@@ -20,6 +19,6 @@ namespace GameCore.Configs.Gameplay.MonstersList
         public IEnumerable<MonsterReference> GetAllReferences() => _references;
         
         public override string GetMetaCategory() =>
-            EditorConstants.GameplayConfigsListsCategory;
+            EditorConstants.GlobalConfigsListsCategory;
     }
 }

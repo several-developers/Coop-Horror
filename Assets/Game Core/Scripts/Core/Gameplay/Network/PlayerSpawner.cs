@@ -7,6 +7,7 @@ using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.Session_Manager;
+using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Utilities;
 using GameCore.Utilities;
 using Unity.Netcode;
@@ -54,6 +55,16 @@ namespace GameCore.Gameplay.Network
 
             if (isCanceled)
                 return;
+
+            while (!NetworkPrefabsRegistrar.IsPrefabsRegistered)
+            {
+                isCanceled = await UniTask
+                    .Delay(millisecondsDelay: 50, cancellationToken: this.GetCancellationTokenOnDestroy())
+                    .SuppressCancellationThrow();
+
+                if (isCanceled)
+                    return;
+            }
             
             Vector3 spawnPosition = Vector3.zero; // TEMP ?
 

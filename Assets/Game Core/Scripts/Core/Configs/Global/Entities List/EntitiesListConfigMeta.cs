@@ -4,7 +4,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Configs.Gameplay.EntitiesList
+namespace GameCore.Configs.Global.EntitiesList
 {
     public class EntitiesListConfigMeta : EditorMeta
     {
@@ -19,6 +19,6 @@ namespace GameCore.Configs.Gameplay.EntitiesList
         public IEnumerable<AssetReferenceGameObject> GetAllReferences() => _entitiesReferences;
 
         public override string GetMetaCategory() =>
-            EditorConstants.GameplayConfigsListsCategory;
+            EditorConstants.GlobalConfigsListsCategory;
     }
 }

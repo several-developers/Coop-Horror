@@ -3,7 +3,7 @@ using GameCore.Enums.Gameplay;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Configs.Gameplay.MonstersList
+namespace GameCore.Configs.Global.MonstersList
 {
     [Serializable]
     public class MonsterReference

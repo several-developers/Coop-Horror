@@ -1,11 +1,9 @@
 ﻿using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Elevator;
-using GameCore.Configs.Gameplay.EntitiesList;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Configs.Gameplay.MonstersGenerator;
-using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
 using GameCore.Configs.Gameplay.Quests;
@@ -32,8 +30,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         RigPresetsConfigMeta GetRigPresetsConfig();
         VisualConfigMeta GetVisualConfig();
         ItemsSpawnConfigMeta GetItemsSpawnConfig();
-        MonstersListConfigMeta GetMonstersListConfig();
         MonstersGeneratorConfigMeta GetMonstersGeneratorConfig();
-        EntitiesListConfigMeta GetEntitiesListConfig();
     }
 }

@@ -1,11 +1,9 @@
 ﻿using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Elevator;
-using GameCore.Configs.Gameplay.EntitiesList;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Configs.Gameplay.MonstersGenerator;
-using GameCore.Configs.Gameplay.MonstersList;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Configs.Gameplay.PrefabsList;
 using GameCore.Configs.Gameplay.Quests;
@@ -38,9 +36,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
             _rigPresetsConfig = Load<RigPresetsConfigMeta>(path: ConfigsPaths.RigPresetsConfig);
             _visualConfig = Load<VisualConfigMeta>(path: ConfigsPaths.VisualConfig);
             _itemsSpawnConfig = Load<ItemsSpawnConfigMeta>(path: ConfigsPaths.ItemsSpawnConfig);
-            _monstersListConfig = Load<MonstersListConfigMeta>(path: ConfigsPaths.MonstersListConfig);
             _monstersGeneratorConfig = Load<MonstersGeneratorConfigMeta>(path: ConfigsPaths.MonstersGeneratorConfig);
-            _entitiesListConfig = Load<EntitiesListConfigMeta>(path: ConfigsPaths.EntitiesListConfig);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -58,9 +54,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         private readonly RigPresetsConfigMeta _rigPresetsConfig;
         private readonly VisualConfigMeta _visualConfig;
         private readonly ItemsSpawnConfigMeta _itemsSpawnConfig;
-        private readonly MonstersListConfigMeta _monstersListConfig;
         private readonly MonstersGeneratorConfigMeta _monstersGeneratorConfig;
-        private readonly EntitiesListConfigMeta _entitiesListConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -77,8 +71,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
         public RigPresetsConfigMeta GetRigPresetsConfig() => _rigPresetsConfig;
         public VisualConfigMeta GetVisualConfig() => _visualConfig;
         public ItemsSpawnConfigMeta GetItemsSpawnConfig() => _itemsSpawnConfig;
-        public MonstersListConfigMeta GetMonstersListConfig() => _monstersListConfig;
         public MonstersGeneratorConfigMeta GetMonstersGeneratorConfig() => _monstersGeneratorConfig;
-        public EntitiesListConfigMeta GetEntitiesListConfig() => _entitiesListConfig;
     }
 }

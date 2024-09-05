@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.MonstersList;
+using GameCore.Configs.Global.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Utilities;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -17,10 +17,10 @@ namespace GameCore.Gameplay.Factories.Monsters
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MonstersFactory(IEntitiesFactory entitiesFactory, IGameplayConfigsProvider gameplayConfigsProvider)
+        public MonstersFactory(IEntitiesFactory entitiesFactory, IAssetsProvider assetsProvider)
         {
             _entitiesFactory = entitiesFactory;
-            _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
+            _monstersListConfig = assetsProvider.GetMonstersListConfig();
             _prefabsKeysDictionary = new Dictionary<MonsterType, AssetReferenceGameObject>();
         }
 

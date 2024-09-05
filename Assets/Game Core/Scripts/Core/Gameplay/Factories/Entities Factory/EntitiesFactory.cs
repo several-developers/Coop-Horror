@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.EntitiesList;
+using GameCore.Configs.Global.EntitiesList;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Utilities;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
 using Unity.Netcode;
@@ -16,10 +15,9 @@ namespace GameCore.Gameplay.Factories.Entities
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public EntitiesFactory(IAssetsProvider assetsProvider, IGameplayConfigsProvider gameplayConfigsProvider)
-            : base(assetsProvider)
+        public EntitiesFactory(IAssetsProvider assetsProvider) : base(assetsProvider)
         {
-            _entitiesListConfig = gameplayConfigsProvider.GetEntitiesListConfig();
+            _entitiesListConfig = assetsProvider.GetEntitiesListConfig();
             _networkManager = NetworkManager.Singleton;
         }
 
@@ -79,7 +77,7 @@ namespace GameCore.Gameplay.Factories.Entities
 
             bool TryGetNetworkObject()
             {
-                bool isPrefabFound = entityPrefab == null;
+                bool isPrefabFound = entityPrefab != null;
 
                 if (!isPrefabFound)
                 {

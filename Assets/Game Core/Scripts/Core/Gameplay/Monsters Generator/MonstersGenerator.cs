@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Configs.Gameplay.MonstersGenerator;
-using GameCore.Configs.Gameplay.MonstersList;
+using GameCore.Configs.Global.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Factories.Monsters;
@@ -18,6 +18,7 @@ using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
+using GameCore.Infrastructure.Providers.Global;
 using GameCore.Observers.Gameplay.Time;
 using GameCore.Utilities;
 using UnityEngine;
@@ -32,6 +33,7 @@ namespace GameCore.Gameplay.MonstersGeneration
 
         public MonstersGenerator(
             IGameManagerDecorator gameManagerDecorator,
+            IAssetsProvider assetsProvider,
             IMonstersFactory monstersFactory,
             IRoundManager roundManager,
             ITimeObserver timeObserver,
@@ -52,7 +54,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             _locationsMetaProvider = locationsMetaProvider;
             _monstersAIConfigsProvider = monstersAIConfigsProvider;
             _monstersGeneratorConfig = gameplayConfigsProvider.GetMonstersGeneratorConfig();
-            _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
+            _monstersListConfig = assetsProvider.GetMonstersListConfig();
             _monstersDangerLevelConfig = balanceConfig.MonstersDangerLevelConfig;
 
             var cts = new CancellationTokenSource();
@@ -298,7 +300,7 @@ namespace GameCore.Gameplay.MonstersGeneration
             _monstersSpawnList.Add(monsterToSpawn);
         }
 
-        private void TrySpawnMonster()
+        private async UniTaskVoid TrySpawnMonster()
         {
             int monstersSpawnAmount = _monstersSpawnList.Count;
             float deltaTime = Time.deltaTime;
@@ -316,7 +318,7 @@ namespace GameCore.Gameplay.MonstersGeneration
                 MonsterType monsterType = monsterToSpawn.MonsterType;
 
                 _monstersSpawnList.RemoveAt(i);
-                SpawnMonsterIndoor(monsterType);
+                await SpawnMonsterIndoor(monsterType);
             }
         }
 

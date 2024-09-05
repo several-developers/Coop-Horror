@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.EntitiesList;
 using GameCore.Configs.Gameplay.ItemsList;
-using GameCore.Configs.Gameplay.MonstersList;
+using GameCore.Configs.Global.EntitiesList;
+using GameCore.Configs.Global.MonstersList;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -18,13 +19,18 @@ namespace GameCore.Gameplay.Network.Utilities
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(DiContainer diContainer, IGameplayConfigsProvider gameplayConfigsProvider)
+        private void Construct(
+            DiContainer diContainer,
+            IAssetsProvider assetsProvider,
+            IGameplayConfigsProvider gameplayConfigsProvider
+        )
         {
             _diContainer = diContainer;
             _networkManager = NetworkManager.Singleton;
-            _entitiesListConfig = gameplayConfigsProvider.GetEntitiesListConfig();
+
+            _entitiesListConfig = assetsProvider.GetEntitiesListConfig();
             _itemsListConfig = gameplayConfigsProvider.GetItemsListConfig();
-            _monstersListConfig = gameplayConfigsProvider.GetMonstersListConfig();
+            _monstersListConfig = assetsProvider.GetMonstersListConfig();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -35,6 +41,9 @@ namespace GameCore.Gameplay.Network.Utilities
         private List<GameObject> _prefabs;
 
         // FIELDS: --------------------------------------------------------------------------------
+
+#warning КОСТЫЛЬ, УБРАТЬ СРОЧНО
+        public static bool IsPrefabsRegistered = false;
 
         private readonly List<GameObject> _prefabsToRegister = new();
 
@@ -52,7 +61,11 @@ namespace GameCore.Gameplay.Network.Utilities
             RegisterAddressables();
         }
 
-        private void OnDestroy() => RemovePrefabs();
+        private void OnDestroy()
+        {
+            RemovePrefabs();
+            IsPrefabsRegistered = false;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -60,8 +73,9 @@ namespace GameCore.Gameplay.Network.Utilities
         {
             await RegisterAllEntities();
             await RegisterMonsterEntities();
+            IsPrefabsRegistered = true;
         }
-        
+
         private async UniTask RegisterAllEntities()
         {
             IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
@@ -69,7 +83,7 @@ namespace GameCore.Gameplay.Network.Utilities
             foreach (AssetReferenceGameObject assetReference in allReferences)
                 await LoadAndRegisterAsset(assetReference);
         }
-        
+
         private async UniTask RegisterMonsterEntities()
         {
             IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
@@ -137,7 +151,7 @@ namespace GameCore.Gameplay.Network.Utilities
 
             if (networkManager == null)
                 return;
-
+            
             foreach (GameObject prefab in _prefabsToRegister)
             {
                 bool containsNetworkObject = prefab.GetComponent<NetworkObject>() != null;
