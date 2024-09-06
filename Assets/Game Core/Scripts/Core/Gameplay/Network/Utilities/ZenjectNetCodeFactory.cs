@@ -8,16 +8,19 @@ namespace GameCore.Gameplay.Network.Utilities
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ZenjectNetCodeFactory(GameObject prefab, DiContainer container)
+        public ZenjectNetCodeFactory(GameObject prefab, DiContainer diContainer)
         {
             _prefab = prefab;
-            _container = container;
+            _diContainer = diContainer;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+#warning ДИКИЙ КОСТЫЛЬ, НО ПО-ДРУГОМУ НЕ ЗНАЮ КАК СДЕЛАТЬ :(
+        public static DiContainer StaticDIContainer;
+
         private readonly GameObject _prefab;
-        private readonly DiContainer _container;
+        private readonly DiContainer _diContainer;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -29,8 +32,11 @@ namespace GameCore.Gameplay.Network.Utilities
                 Position = position,
                 Rotation = rotation
             };
-
-            return _container.InstantiateNetworkPrefab(_prefab, parameters);
+            
+            // return _diContainer.InstantiateNetworkPrefab(_prefab, parameters);
+            
+            // Костылик :(
+            return StaticDIContainer.InstantiateNetworkPrefab(_prefab, parameters);
         }
 
         public void Destroy(NetworkObject networkObject) =>
@@ -42,7 +48,7 @@ namespace GameCore.Gameplay.Network.Utilities
         // FIELDS: --------------------------------------------------------------------------------
 
         private static readonly GameObjectCreationParameters DefaultParameters = GameObjectCreationParameters.Default;
-        
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public static NetworkObject InstantiateNetworkPrefab(this DiContainer container, GameObject prefab,
@@ -50,12 +56,12 @@ namespace GameCore.Gameplay.Network.Utilities
         {
             //bool state = prefab.activeSelf;
             prefab.SetActive(false);
-            
+
             GameObject instance = container.InstantiatePrefab(prefab, creationParameters ?? DefaultParameters);
-            
+
             instance.SetActive(true);
             prefab.SetActive(true);
-            
+
             var networkObject = instance.GetComponent<NetworkObject>();
             return networkObject;
         }

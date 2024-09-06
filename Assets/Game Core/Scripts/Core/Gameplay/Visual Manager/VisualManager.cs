@@ -7,6 +7,8 @@ using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Locations;
+using GameCore.Gameplay.Network;
+using GameCore.Gameplay.PubSub;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.LocationsMeta;
 using GameCore.Observers.Gameplay.Time;
@@ -29,13 +31,17 @@ namespace GameCore.Gameplay.VisualManagement
             Sun sun,
             ITimeObserver timeObserver,
             IGameplayConfigsProvider gameplayConfigsProvider,
-            ILocationsMetaProvider locationsMetaProvider
+            ILocationsMetaProvider locationsMetaProvider,
+            IPublisher<VisualPresetMessage> visualPresetPublisher,
+            ISubscriber<VisualPresetMessage> visualPresetSubscriber
         )
         {
             _gameManagerDecorator = gameManagerDecorator;
             _timeObserver = timeObserver;
             _gameplayConfigsProvider = gameplayConfigsProvider;
             _locationsMetaProvider = locationsMetaProvider;
+            _visualPresetPublisher = visualPresetPublisher;
+            _visualPresetSubscriber = visualPresetSubscriber;
             _visualController = new VisualController(gameObject, playerCamera, sun, _volumeOne, _volumeTwo);
         }
 
@@ -56,6 +62,8 @@ namespace GameCore.Gameplay.VisualManagement
         private ITimeObserver _timeObserver;
         private IGameplayConfigsProvider _gameplayConfigsProvider;
         private ILocationsMetaProvider _locationsMetaProvider;
+        private IPublisher<VisualPresetMessage> _visualPresetPublisher;
+        private ISubscriber<VisualPresetMessage> _visualPresetSubscriber;
 
         private VisualController _visualController;
         private VisualPresetType _previousPresetType;
@@ -65,6 +73,8 @@ namespace GameCore.Gameplay.VisualManagement
         private void Awake()
         {
             SetupPresetsDictionary();
+
+            _visualPresetSubscriber.Subscribe(OnUpdateVisualPreset);
 
             _timeObserver.OnTimeUpdatedEvent += OnTimeUpdated;
 
@@ -86,6 +96,8 @@ namespace GameCore.Gameplay.VisualManagement
 
         private void OnDestroy()
         {
+            _visualPresetSubscriber.Unsubscribe(OnUpdateVisualPreset);
+
             _timeObserver.OnTimeUpdatedEvent -= OnTimeUpdated;
 
             PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
@@ -98,7 +110,8 @@ namespace GameCore.Gameplay.VisualManagement
         public void ChangePreset(VisualPresetType presetType, bool instant = false)
         {
             UpdateLightingPreset(); // TEMP
-            
+            UpdateLightingSettings(); // TEMP
+
             bool isPresetTypeValid = presetType != _previousPresetType;
 
             if (!isPresetTypeValid)
@@ -120,10 +133,31 @@ namespace GameCore.Gameplay.VisualManagement
             _visualController.UpdateVisual(presetConfig, instant);
         }
 
+        public void ChangePresetForAll(VisualPresetType presetType, bool instant = false)
+        {
+            if (!NetworkHorror.IsTrueServer)
+                return;
+
+            var message = new VisualPresetMessage
+            {
+                PresetType = presetType,
+                Instant = instant
+            };
+
+            _visualPresetPublisher.Publish(message);
+        }
+
         [Button(ButtonStyle.FoldoutButton), DisableInEditorMode]
         public void SetLocationPreset(bool instant = false)
         {
+#warning TEMP
             ChangePreset(VisualPresetType.ForestLocation, instant);
+        }
+
+        public void SetLocationPresetForAll(bool instant = false)
+        {
+#warning TEMP
+            ChangePresetForAll(VisualPresetType.ForestLocation, instant);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -147,7 +181,7 @@ namespace GameCore.Gameplay.VisualManagement
                 _visualPresets.Add(presetType, presetConfig);
             }
         }
-        
+
         private void UpdateLightingPreset()
         {
             LocationName currentLocation = _gameManagerDecorator.GetCurrentLocation();
@@ -162,16 +196,21 @@ namespace GameCore.Gameplay.VisualManagement
             _visualController.SetLightingPreset(lightingPreset);
         }
 
+        private void UpdateLightingSettings()
+        {
+            float timeOfDay = _timeObserver.GetDateTimeNormalized();
+            _visualController.UpdateLightingSettings(timeOfDay);
+        }
+
         private bool TryGetPresetConfig(VisualPresetType presetType, out VisualPresetMeta preset) =>
             _visualPresets.TryGetValue(presetType, out preset);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnTimeUpdated(MyDateTime dateTime)
-        {
-            float timeOfDay = _timeObserver.GetDateTimeNormalized();
-            _visualController.UpdateLightingSettings(timeOfDay);
-        }
+        private void OnUpdateVisualPreset(VisualPresetMessage message) =>
+            ChangePreset(message.PresetType, message.Instant);
+
+        private void OnTimeUpdated(MyDateTime dateTime) => UpdateLightingSettings();
 
         private void OnPlayerSpawned(PlayerEntity playerEntity)
         {

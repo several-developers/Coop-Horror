@@ -26,7 +26,6 @@ namespace GameCore.Data
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public override string DataKey => Constants.GameSettingsDataKey;
         public float SoundVolume => _soundVolume;
         public float MusicVolume => _musicVolume;
 

@@ -75,6 +75,7 @@ namespace GameCore.Gameplay.GameManagement
         private bool _isScenesSynchronized;
         private bool _isServerLocationLoaded;
 
+        #warning КОСТЫЛЬ, ПЕРЕДЕЛАТЬ СРОЧНО
         public static GameManager Instance;
 
         public bool IsPlayerLoaded(ulong clientID)
@@ -103,6 +104,7 @@ namespace GameCore.Gameplay.GameManagement
         private void Awake()
         {
             Instance = this;
+
             _gameManagerDecorator.OnChangeGameStateInnerEvent += ChangeGameState;
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent += ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnStartGameRestartTimerInnerEvent += StartGameRestartTimer;

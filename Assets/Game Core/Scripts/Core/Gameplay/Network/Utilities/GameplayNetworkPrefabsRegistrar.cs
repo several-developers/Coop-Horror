@@ -2,30 +2,20 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Global.EntitiesList;
-using GameCore.Configs.Global.MonstersList;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Network.DynamicPrefabs;
+using GameCore.Gameplay.Network.PrefabsRegistrar;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Zenject;
 
 namespace GameCore.Gameplay.Network.Utilities
 {
-    public class NetworkPrefabsService
-    {
-        // CONSTRUCTORS: --------------------------------------------------------------------------
-
-        public NetworkPrefabsService()
-        {
-            
-        }
-    }
-    public class NetworkPrefabsRegistrar : MonoBehaviour
+    public class GameplayNetworkPrefabsRegistrar : MonoBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -34,16 +24,16 @@ namespace GameCore.Gameplay.Network.Utilities
             DiContainer diContainer,
             IAssetsProvider assetsProvider,
             IConfigsProvider configsProvider,
-            IGameplayConfigsProvider gameplayConfigsProvider
+            IGameplayConfigsProvider gameplayConfigsProvider,
+            INetworkPrefabsRegistrar networkPrefabsRegistrar
         )
         {
             _diContainer = diContainer;
-            _networkManager = NetworkManager.Singleton;
             _assetsProvider = assetsProvider;
+            _networkPrefabsRegistrar = networkPrefabsRegistrar;
 
             _entitiesListConfig = configsProvider.GetConfig<EntitiesListConfigMeta>();
             _itemsListConfig = gameplayConfigsProvider.GetConfig<ItemsListConfigMeta>();
-            _monstersListConfig = configsProvider.GetConfig<MonstersListConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -58,11 +48,11 @@ namespace GameCore.Gameplay.Network.Utilities
         private readonly List<GameObject> _prefabsToRegister = new();
 
         private DiContainer _diContainer;
-        private NetworkManager _networkManager;
         private IAssetsProvider _assetsProvider;
+        private INetworkPrefabsRegistrar _networkPrefabsRegistrar;
+        
         private EntitiesListConfigMeta _entitiesListConfig;
         private ItemsListConfigMeta _itemsListConfig;
-        private MonstersListConfigMeta _monstersListConfig;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -70,8 +60,9 @@ namespace GameCore.Gameplay.Network.Utilities
         {
             DynamicPrefabLoadingUtilities.SetDiContainer(_diContainer);
             RegisterPrefabs();
-            RegisterAddressables();
         }
+
+        private void Start() => RegisterAddressables();
 
         private void OnDestroy() => RemovePrefabs();
 
@@ -80,7 +71,6 @@ namespace GameCore.Gameplay.Network.Utilities
         private async void RegisterAddressables()
         {
             await RegisterEntities();
-            await RegisterMonsterEntities();
             GameManager.Instance.SendPlayerLoadedServerRpc();
         }
 
@@ -92,18 +82,7 @@ namespace GameCore.Gameplay.Network.Utilities
                 await LoadAndRegisterAsset(assetReference);
         }
 
-        private async UniTask RegisterMonsterEntities()
-        {
-            IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
-
-            foreach (MonsterReference monsterReference in allReferences)
-            {
-                AssetReferenceGameObject assetReference = monsterReference.AssetReference;
-                await LoadAndRegisterAsset(assetReference);
-            }
-        }
-
-        private async UniTask LoadAndRegisterAsset(AssetReferenceGameObject assetReference)
+        private async UniTask LoadAndRegisterAsset(AssetReference assetReference)
         {
             var prefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
             RegisterPrefab(prefab);
@@ -112,11 +91,6 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private void RegisterPrefabs()
         {
-            NetworkManager networkManager = NetworkManager.Singleton;
-
-            if (networkManager == null)
-                return;
-
             AddLocalListPrefabs();
             AddItemsPrefabs();
 
@@ -124,21 +98,8 @@ namespace GameCore.Gameplay.Network.Utilities
                 RegisterPrefab(prefab);
         }
 
-        private void RegisterPrefab(GameObject prefab)
-        {
-            bool containsNetworkObject = prefab.GetComponent<NetworkObject>() != null;
-
-            if (!containsNetworkObject)
-            {
-                Log.PrintError(log: $"Prefab <gb>{prefab.name}</gb> <rb>doesn't contains</rb> Network Object!");
-                return;
-            }
-
-            _networkManager.AddNetworkPrefab(prefab);
-
-            _networkManager.PrefabHandler.AddHandler(prefab,
-                instanceHandler: new ZenjectNetCodeFactory(prefab, _diContainer));
-        }
+        private void RegisterPrefab(GameObject prefab) =>
+            _networkPrefabsRegistrar.Register(prefab);
 
         private void AddLocalListPrefabs() =>
             _prefabsToRegister.AddRange(_prefabs);
@@ -156,23 +117,8 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private void RemovePrefabs()
         {
-            NetworkManager networkManager = NetworkManager.Singleton;
-
-            if (networkManager == null)
-                return;
-
             foreach (GameObject prefab in _prefabsToRegister)
-            {
-                bool containsNetworkObject = prefab.GetComponent<NetworkObject>() != null;
-
-                if (!containsNetworkObject)
-                {
-                    Log.PrintError(log: $"Prefab <gb>{prefab.name}</gb> <rb>doesn't contains</rb> Network Object!");
-                    continue;
-                }
-
-                networkManager.RemoveNetworkPrefab(prefab);
-            }
+                _networkPrefabsRegistrar.Remove(prefab);
         }
     }
 }

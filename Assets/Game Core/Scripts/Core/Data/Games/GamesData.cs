@@ -19,10 +19,6 @@ namespace GameCore.Data
         [SerializeField]
         [ListDrawerSettings(ListElementLabelName = "Label")]
         private GameData[] _gamesData;
-        
-        // PROPERTIES: ----------------------------------------------------------------------------
-
-        public override string DataKey => Constants.GamesDataKey;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

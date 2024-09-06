@@ -155,7 +155,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
         /// the spawn will fail.
         /// </summary>
-        private async void TryLoadAndSendDynamicPrefab(string guid, Action<NetworkObject> loadCallback)
+        private async void TryLoadAndGetDynamicPrefab(string guid, Action<NetworkObject> loadCallback)
         {
             if (!IsServer)
             {
@@ -448,7 +448,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnTrySpawnPrefab(string guid, Action<NetworkObject> callback) =>
-            TryLoadAndSendDynamicPrefab(guid, callback);
+            TryLoadAndGetDynamicPrefab(guid, callback);
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

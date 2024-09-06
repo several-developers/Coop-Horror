@@ -73,9 +73,7 @@ namespace GameCore.Gameplay.Items
         private const string Row = ItemSettings + "/Row";
         private const string RowLeft = Row + "/Left";
         private const string RowRight = Row + "/Right";
-
-        private bool _canEditItemID;
-
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override string GetMetaCategory() =>
@@ -84,6 +82,8 @@ namespace GameCore.Gameplay.Items
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
 #if UNITY_EDITOR
+        private bool _canEditItemID;
+        
         [OnInspectorInit]
         private void ResetEditItemIDState() =>
             _canEditItemID = false;

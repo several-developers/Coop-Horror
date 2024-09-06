@@ -457,7 +457,12 @@ namespace GameCore.Gameplay.Entities.Train
 
             if (isCanceled)
                 return;
-            
+
+            bool isLocalPlayer = playerEntity.IsLocalPlayer();
+
+            if (!isLocalPlayer)
+                return;
+
             TeleportPlayerToRandomSeat(playerEntity);
         }
     }

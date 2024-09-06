@@ -8,9 +8,7 @@ using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.SessionManagement;
-using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.Utilities;
-using GameCore.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -19,7 +17,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Network
 {
-    public class PlayerSpawner : NetworkBehaviour
+    public class PlayerSpawner : NetcodeBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -46,9 +44,26 @@ namespace GameCore.Gameplay.Network
         private NetworkManager _networkManager;
         private bool _initialSpawnDone;
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
+        // PROTECTED METHODS: ---------------------------------------------------------------------
 
-#warning ВСЕГДА ВЫЗЫВАЕТСЯ НА СЕРВЕРЕ
+        protected override void InitServerOnly()
+        {
+            _networkManager = NetworkManager.Singleton;
+
+            _networkManager.SceneManager.OnLoadEventCompleted += OnLoadEventCompleted;
+            _networkManager.SceneManager.OnSynchronizeComplete += OnSynchronizeComplete;
+
+            SessionManager<SessionPlayerData>.Instance.OnSessionStarted();
+        }
+
+        protected override void DespawnServerOnly()
+        {
+            _networkManager.SceneManager.OnLoadEventCompleted -= OnLoadEventCompleted;
+            _networkManager.SceneManager.OnSynchronizeComplete -= OnSynchronizeComplete;
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+        
         private async void LoadAndCreatePlayer(ulong clientID, bool lateJoin)
         {
             bool isCanceled = await UniTask
@@ -68,22 +83,18 @@ namespace GameCore.Gameplay.Network
                     return;
             }
 
-            Vector3 spawnPosition = Vector3.zero; // TEMP ?
-
             var spawnParams = new EntitySpawnParams<PlayerEntity>.Builder()
-                .SetSpawnPosition(spawnPosition)
                 .SetOwnerID(clientID)
-                .SetSuccessCallback(playerEntity => { SetupPlayer(playerEntity, clientID, lateJoin); })
+                .SetSuccessCallback(playerEntity => { PlayerCreated(playerEntity, clientID, lateJoin); })
                 .Build();
 
             await _entitiesFactory.CreateEntity(spawnParams);
         }
 
-        private void SetupPlayer(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
+        private void PlayerCreated(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
         {
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
-            
-            bool persistentPlayerExists = playerNetworkObject.TryGetComponent(out PersistentPlayer _);
+            bool persistentPlayerExists = playerNetworkObject.TryGetComponent<PersistentPlayer>(out _);
 
             Assert.IsTrue(persistentPlayerExists,
                 $"Matching persistent PersistentPlayer for client {clientID} not found!");
@@ -108,60 +119,29 @@ namespace GameCore.Gameplay.Network
                 playerEntity.NetworkObject.TrySetParent(parent, worldPositionStays: false);
             }
 
-            SetCameraFirstPersonStatus(); // TEMP ?
-
-            // Spawn players characters with 'destroyWithScene = true'.
-            //playerInstance.NetworkObject.SpawnWithOwnership(clientId, destroyWithScene: true);
+            SetupPlayerServerRpc(clientID);
         }
 
         private void SetCameraFirstPersonStatus() =>
             _camerasManager.SetCameraStatus(CameraStatus.FirstPerson);
 
-        private Vector3 GetSpawnPosition()
+        // RPC: -----------------------------------------------------------------------------------
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SetupPlayerServerRpc(ulong clientID) => SetupPlayerClientRpc(clientID);
+
+        [ClientRpc]
+        private void SetupPlayerClientRpc(ulong clientID)
         {
-            bool isSpawnPointFound = VehicleSeatSpawnPoint.GetRandomSpawnPoint(out VehicleSeatSpawnPoint spawnPoint);
-            return isSpawnPointFound ? spawnPoint.GetSpawnPosition() : transform.GetRandomPosition();
-        }
+            bool isClientMatches = NetworkHorror.ClientID == clientID;
 
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            _networkManager = NetworkManager.Singleton;
-
-            _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
-            _networkManager.SceneManager.OnLoadEventCompleted += OnLoadEventCompleted;
-            _networkManager.SceneManager.OnSynchronizeComplete += OnSynchronizeComplete;
-
-            SessionManager<SessionPlayerData>.Instance.OnSessionStarted();
-        }
-
-        public override void OnNetworkDespawn()
-        {
-            base.OnNetworkDespawn();
-
-            _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
-            _networkManager.SceneManager.OnLoadEventCompleted -= OnLoadEventCompleted;
-            _networkManager.SceneManager.OnSynchronizeComplete -= OnSynchronizeComplete;
-        }
-
-        private void OnClientConnected(ulong clientId)
-        {
-            Debug.Log($"Client #{clientId} connected.");
-        }
-
-        private void OnClientDisconnect(ulong clientId)
-        {
-            Debug.Log($"Client #{clientId} disconnect.");
-
-            if (!NetworkHorror.IsTrueServer)
+            if (!isClientMatches)
                 return;
 
-            // If a client disconnects, check for game over in case all other players are already down.
-            //StartCoroutine(WaitToCheckForGameOver());
+            SetCameraFirstPersonStatus();
         }
+        
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
 #warning Перенести в отдельный скрипт
         private void OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted,

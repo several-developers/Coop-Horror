@@ -41,7 +41,15 @@ namespace GameCore.Gameplay.Factories.Entities
 
         public void DynamicCreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
         {
-            if (!TryGetDynamicAssetGUID<TEntity>(out string guid))
+            AssetReference assetReference = spawnParams.AssetReference;
+            bool containsAssetReference = assetReference != null;
+            string guid;
+
+            if (containsAssetReference)
+            {
+                guid = assetReference.AssetGUID;
+            }
+            else if (!TryGetDynamicAssetGUID<TEntity>(out guid))
             {
                 spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TEntity)}' not found!");
                 return;
@@ -59,8 +67,10 @@ namespace GameCore.Gameplay.Factories.Entities
         {
             IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
             IEnumerable<AssetReferenceGameObject> allDynamicReferences = _entitiesListConfig.GetAllDynamicReferences();
+            IEnumerable<AssetReferenceGameObject> allGlobalReferences = _entitiesListConfig.GetAllGlobalReferences();
 
             await SetupReferencesDictionary<Entity>(allReferences);
+            await SetupReferencesDictionary<Entity>(allGlobalReferences);
             await SetupDynamicReferencesDictionary<Entity>(allDynamicReferences);
         }
 

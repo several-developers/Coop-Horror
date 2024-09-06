@@ -20,12 +20,13 @@ namespace GameCore.Utilities
 
         public void TryLoadData<T>(ref T t) where T : DataBase
         {
-            string path = t.GetDataPath();
+            Type type = t.GetType();
+            string path = GetDataPath(type);
             bool isFileExists = File.Exists(path);
 
             if (!isFileExists)
             {
-                t = (T)Activator.CreateInstance(t.GetType());
+                t = (T)Activator.CreateInstance(type);
                 string json = JsonUtility.ToJson(t);
                 File.WriteAllText(path, json);
             }
@@ -39,7 +40,8 @@ namespace GameCore.Utilities
             if (t == null)
                 return;
 
-            string path = t.GetDataPath();
+            Type type = t.GetType();
+            string path = GetDataPath(type);
             string data = JsonUtility.ToJson(t);
 
             File.WriteAllText(path, data);
@@ -47,17 +49,26 @@ namespace GameCore.Utilities
 
         public void TryDeleteData<T>(ref T t) where T : DataBase
         {
-            t ??= (T)Activator.CreateInstance(t.GetType());
+            Type type = t.GetType();
+            t ??= (T)Activator.CreateInstance(type);
 
-            string path = t.GetDataPath();
+            string path = GetDataPath(type);
 
             if (File.Exists(path))
                 File.Delete(path);
             
-            var newT = (T)Activator.CreateInstance(t.GetType());
+            var newT = (T)Activator.CreateInstance(type);
             string data = JsonUtility.ToJson(newT);
             
             TrySetData(data, ref t);
+        }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private string GetDataPath(Type type)
+        {
+            string dataType = type.Name;
+            return $"{Application.persistentDataPath}/{dataType}.json";
         }
     }
 }

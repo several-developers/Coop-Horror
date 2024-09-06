@@ -40,11 +40,9 @@ namespace GameCore.Gameplay.Factories.Items
 
             NetworkObject networkObject = _networkManager.SpawnManager
                 .InstantiateAndSpawn(prefabNetworkObject, _serverID, destroyWithScene: true, position: worldPosition);
-
-            networkObject.transform.localScale *= itemMeta.ScaleMultiplier;
             
             itemObject = networkObject.GetComponent<ItemObjectBase>();
-            itemObject.Setup(itemID);
+            itemObject.Setup(itemID, itemMeta.ScaleMultiplier);
 
             return true;
         }

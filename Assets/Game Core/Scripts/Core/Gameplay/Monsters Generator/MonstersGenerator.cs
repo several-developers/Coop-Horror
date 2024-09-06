@@ -26,7 +26,7 @@ using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.MonstersGeneration
 {
-    public class MonstersGenerator : IMonstersGenerator, IInitializable, IDisposable
+    public class MonstersGenerator : IMonstersGenerator, IInitializable, ITickable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -122,8 +122,25 @@ namespace GameCore.Gameplay.MonstersGeneration
             _timeObserver.OnHourPassedEvent -= OnHourPassed;
         }
 
+        public void Tick()
+        {
+            if (!NetworkHorror.IsTrueServer)
+                return;
+            
+            int monstersSpawnAmount = _monstersSpawnList.Count;
+            float deltaTime = Time.deltaTime;
+
+            for (int i = monstersSpawnAmount - 1; i >= 0; i--)
+            {
+                MonsterToSpawn monsterToSpawn = _monstersSpawnList[i];
+                monsterToSpawn.Tick(deltaTime);
+            }
+        }
+
         public void Start() =>
             _isGeneratorEnabled = true;
+
+#warning ВРЕМЕННО, ЗАМЕНИТЬ НА ЗАРАНЕЕ ЗАПИСАННОЕ ВРЕМЯ И СВЕРЯТЬ С ТЕКУЩИМ ИГРОВЫМ
 
         public void Stop()
         {
@@ -295,13 +312,10 @@ namespace GameCore.Gameplay.MonstersGeneration
         private void TrySpawnMonster()
         {
             int monstersSpawnAmount = _monstersSpawnList.Count;
-            float deltaTime = Time.deltaTime;
 
             for (int i = monstersSpawnAmount - 1; i >= 0; i--)
             {
                 MonsterToSpawn monsterToSpawn = _monstersSpawnList[i];
-                monsterToSpawn.Tick(deltaTime);
-
                 bool canSpawn = monsterToSpawn.CanSpawn();
 
                 if (!canSpawn)
@@ -352,8 +366,9 @@ namespace GameCore.Gameplay.MonstersGeneration
         private static void MonsterSpawned(MonsterEntityBase monsterEntity, Floor floor)
         {
             MonsterType monsterType = monsterEntity.GetMonsterType();
-            
-            string monsterSpawnLog = Log.HandleLog($"Spawned Monster <gb>{monsterType.GetNiceName()}</gb>");
+
+            string monsterSpawnLog = Log.HandleLog($"Spawned Monster '<gb>{monsterType.GetNiceName()}</gb>' " +
+                                                   $"at the floor '<gb>{floor}</gb>'");
             Debug.LogWarning(monsterSpawnLog);
 
             monsterEntity.SetEntityLocation(EntityLocation.Dungeon);

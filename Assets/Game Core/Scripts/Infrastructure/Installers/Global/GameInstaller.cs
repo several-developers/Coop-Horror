@@ -1,4 +1,5 @@
 ﻿using GameCore.Gameplay.Factories;
+using GameCore.Gameplay.Network.Utilities;
 using GameCore.Observers.Global.StateMachine;
 using GameCore.StateMachine;
 using GameCore.Utilities;
@@ -18,6 +19,7 @@ namespace GameCore.Infrastructure.Installers.Global
             BindGameStateMachine();
             BindMenuFactory();
             BindGameStateMachineObserver();
+            BindGlobalNetworkPrefabsRegistrar();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -65,6 +67,13 @@ namespace GameCore.Infrastructure.Installers.Global
                 .BindInterfacesTo<GameStateMachineObserver>()
                 .AsSingle()
                 .NonLazy();
+        }
+
+        private void BindGlobalNetworkPrefabsRegistrar()
+        {
+            Container
+                .Bind<GlobalNetworkPrefabsRegistrar>()
+                .AsSingle();
         }
     }
 }

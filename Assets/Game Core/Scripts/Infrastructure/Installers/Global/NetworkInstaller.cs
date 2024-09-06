@@ -1,10 +1,10 @@
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.ConnectionManagement;
+using GameCore.Gameplay.Network.PrefabsRegistrar;
 using GameCore.Gameplay.Network.UnityServices.Auth;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
-using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Infrastructure.Lifecycle;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -26,6 +26,7 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             BindNetworkHorror();
             BindNetcodeHooks();
+            BindNetworkPrefabsRegistrar();
             
             
             Test();
@@ -49,7 +50,14 @@ namespace GameCore.Infrastructure.Installers.Global
                 .FromInstance(_netcodeHooks)
                 .AsSingle();
         }
-        
+
+        private void BindNetworkPrefabsRegistrar()
+        {
+            Container
+                .BindInterfacesTo<NetworkPrefabsRegistrar>()
+                .AsSingle();
+        }
+
         private void Test()
         {
             Container
@@ -110,7 +118,7 @@ namespace GameCore.Infrastructure.Installers.Global
             Container
                 .BindInterfacesTo<MessageChannel<QuitApplicationMessage>>()
                 .AsSingle();
-            
+
             // Buffered message channels hold the latest received message in buffer and pass to any new subscribers.
             Container
                 .BindInterfacesTo<BufferedMessageChannel<LobbyListFetchedMessage>>()

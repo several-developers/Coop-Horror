@@ -9,6 +9,7 @@ namespace GameCore.Gameplay.Factories.Entities
     {
         UniTask WarmUp();
         UniTask LoadAssetReference<T>(AssetReference assetReference) where T : class;
+        UniTask LoadAssetDynamicReference<T>(AssetReference assetReference) where T : class;
         UniTask CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
         void DynamicCreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
     }

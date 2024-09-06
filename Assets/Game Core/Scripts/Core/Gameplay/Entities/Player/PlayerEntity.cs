@@ -186,10 +186,10 @@ namespace GameCore.Gameplay.Entities.Player
 
         public void Kill(PlayerDeathReason deathReason)
         {
-            if (!IsOwner)
-                return;
-
-            EnterDeathState();
+            if (IsOwner)
+                KillClientRpc(deathReason);
+            else
+                KillServerRpc(deathReason);
         }
 
         public void ToggleDead(bool isDead)
@@ -528,6 +528,9 @@ namespace GameCore.Gameplay.Entities.Player
         // RPC: -----------------------------------------------------------------------------------
 
         [ServerRpc(RequireOwnership = false)]
+        private void KillServerRpc(PlayerDeathReason deathReason) => KillClientRpc(deathReason);
+
+        [ServerRpc(RequireOwnership = false)]
         private void ChangeSelectedSlotServerRpc(int slotIndex) =>
             _currentSelectedSlotIndex.Value = slotIndex;
 
@@ -568,6 +571,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         [ServerRpc(RequireOwnership = false)]
         private void RemoveParentServerRPC() => RemoveParentLocal();
+        
+        [ClientRpc]
+        private void KillClientRpc(PlayerDeathReason deathReason) => EnterDeathState();
 
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)

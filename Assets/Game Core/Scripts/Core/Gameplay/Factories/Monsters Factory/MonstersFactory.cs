@@ -70,7 +70,7 @@ namespace GameCore.Gameplay.Factories.Monsters
 
                 AssetReferenceGameObject assetReference = monsterReference.AssetReference;
 
-                await _entitiesFactory.LoadAssetReference<IEntity>(assetReference);
+                await _entitiesFactory.LoadAssetDynamicReference<IEntity>(assetReference);
                 _prefabsKeysDictionary.Add(monsterType, assetReference);
             }
         }

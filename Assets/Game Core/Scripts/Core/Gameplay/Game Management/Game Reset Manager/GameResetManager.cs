@@ -46,10 +46,9 @@ namespace GameCore.Gameplay.GameManagement
             bool isServer = NetworkHorror.IsTrueServer;
 
             // Common logic.
-            ChangeVisualPreset();
-
             if (isServer)
             {
+                ChangeVisualPresetForAll(VisualPresetType.Metro);
                 DestroyAllMonsters();
                 ResetGameTime();
                 ResetGold();
@@ -141,7 +140,7 @@ namespace GameCore.Gameplay.GameManagement
             MonsterEntityBase.ClearAllMonsters();
         }
 
-        private void ChangeVisualPreset() =>
-            _visualManager.ChangePreset(VisualPresetType.Metro, instant: true);
+        private void ChangeVisualPresetForAll(VisualPresetType presetType) =>
+            _visualManager.ChangePresetForAll(presetType, instant: true);
     }
 }

@@ -37,7 +37,7 @@ namespace GameCore.Utilities
 
         public async UniTask LoadAssetDynamicReference<T>(AssetReference assetReference) where T : class
         {
-            AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
+            var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
 
             await LoadAndSaveAssetReference<T>(_dynamicReferencesDictionary, handle, assetReference);
             Addressables.Release(handle);

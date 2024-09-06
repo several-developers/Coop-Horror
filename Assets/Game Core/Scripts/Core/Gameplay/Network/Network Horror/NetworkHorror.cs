@@ -21,10 +21,26 @@ namespace GameCore.Gameplay.Network
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public static ulong ServerID { get; private set; }
-        public static ulong ClientID { get; private set; }
+
+        public static ulong ClientID
+        {
+            get
+            {
+                if (_isClientIDSetup)
+                    return _clientID;
+                
+                _clientID = NetworkManager.Singleton.LocalClientId;
+                _isClientIDSetup = true;
+                return _clientID;
+            }
+        }
 
         public static bool IsTrueServer => ServerID == ClientID;
         public bool IsOwner => _netcodeHooks.IsOwner;
+
+        private static ulong _clientID;
+        private static bool _isClientIDSetup;
+        
         private ulong OwnerClientId => _netcodeHooks.OwnerClientId;
         
         // FIELDS: --------------------------------------------------------------------------------
@@ -51,7 +67,6 @@ namespace GameCore.Gameplay.Network
         {
             _networkManager = NetworkManager.Singleton;
             ServerID = OwnerClientId;
-            ClientID = _networkManager.LocalClientId;
             
             _networkManager.OnClientConnectedCallback += OnClientConnected;
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;

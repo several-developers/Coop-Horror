@@ -238,7 +238,7 @@ namespace GameCore.Gameplay.VisualManagement
             bool ignoreColorChange = false;
             bool ignoreDensityChange = false;
             
-            if (_isLightingPresetExists)
+            if (!_playerInDungeon && _isLightingPresetExists)
             {
                 ignoreColorChange = _lightingPreset.OverrideNativeFogColor;
                 ignoreDensityChange = _lightingPreset.OverrideNativeFogDensity;

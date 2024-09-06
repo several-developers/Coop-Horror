@@ -5,6 +5,7 @@ using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Systems.Quests;
+using GameCore.Gameplay.VisualManagement;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -68,6 +69,10 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             
             Container
                 .BindInterfacesTo<NetworkedMessageChannel<GenerateDungeonsMessage>>()
+                .AsSingle();
+            
+            Container
+                .BindInterfacesTo<NetworkedMessageChannel<VisualPresetMessage>>()
                 .AsSingle();
         }
     }

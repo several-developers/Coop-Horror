@@ -202,9 +202,9 @@ namespace GameCore.Gameplay.GameManagement
 
                 if (!arrivedFromMarket)
                     _questsManagerDecorator.DecreaseQuestsDays();
-            }
 
-            _visualManager.ChangePreset(VisualPresetType.Metro);
+                ChangeVisualPresetForAll(VisualPresetType.Metro);
+            }
         }
 
         private void TrainLeavingBase()
@@ -236,7 +236,7 @@ namespace GameCore.Gameplay.GameManagement
             }
 
             if (isGameplayLocation)
-                _visualManager.SetLocationPreset();
+                _visualManager.SetLocationPresetForAll();
         }
 
         private void TrainStoppedAtLocation()
@@ -319,6 +319,9 @@ namespace GameCore.Gameplay.GameManagement
             foreach (PlayerEntity playerEntity in allPlayers.Values)
                 playerEntity.SetEntityLocation(entityLocation);
         }
+        
+        private void ChangeVisualPresetForAll(VisualPresetType presetType) =>
+            _visualManager.ChangePresetForAll(presetType, instant: true);
 
         private static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() =>
             PlayerEntity.GetAllPlayers();

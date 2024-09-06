@@ -18,9 +18,6 @@ namespace GameCore
         public const string Events = "Events";
         public const string DebugInfo = "Debug Info";
 
-        public const string GamesDataKey = "GamesData";
-        public const string GameSettingsDataKey = "GameSettingsData";
-
         public const string UISoundBus = "UI";
 
         public const string PlayerTag = "Player";

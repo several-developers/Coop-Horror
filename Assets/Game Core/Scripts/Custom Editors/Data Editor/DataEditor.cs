@@ -155,13 +155,14 @@ namespace CustomEditors
         {
             foreach (DataBase data in _allData.Values)
             {
-                string dataKey = data.DataKey;
-                bool isKeyEmpty = string.IsNullOrEmpty(dataKey);
+                Type type = data.GetType();
+                string dataType = type.Name;
+                bool isKeyEmpty = string.IsNullOrEmpty(dataType);
 
                 if (isKeyEmpty)
                     continue;
 
-                string className = dataKey.GetNiceName();
+                string className = dataType.GetNiceName();
                 tree.Add(className, data);
             }
         }
