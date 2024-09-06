@@ -5,6 +5,7 @@ using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Factories.Entities;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network.ConnectionManagement;
 using GameCore.Gameplay.Network.SessionManagement;
 using GameCore.Gameplay.Network.Utilities;
@@ -47,6 +48,7 @@ namespace GameCore.Gameplay.Network
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+#warning ВСЕГДА ВЫЗЫВАЕТСЯ НА СЕРВЕРЕ
         private async void LoadAndCreatePlayer(ulong clientID, bool lateJoin)
         {
             bool isCanceled = await UniTask
@@ -56,7 +58,7 @@ namespace GameCore.Gameplay.Network
             if (isCanceled)
                 return;
 
-            while (!NetworkPrefabsRegistrar.IsPlayerRegistered)
+            while (!GameManager.Instance.IsPlayerLoaded(clientID))
             {
                 isCanceled = await UniTask
                     .Delay(millisecondsDelay: 100, cancellationToken: this.GetCancellationTokenOnDestroy())
@@ -65,7 +67,7 @@ namespace GameCore.Gameplay.Network
                 if (isCanceled)
                     return;
             }
-            
+
             Vector3 spawnPosition = Vector3.zero; // TEMP ?
 
             var spawnParams = new EntitySpawnParams<PlayerEntity>.Builder()
@@ -74,13 +76,14 @@ namespace GameCore.Gameplay.Network
                 .SetSuccessCallback(playerEntity => { SetupPlayer(playerEntity, clientID, lateJoin); })
                 .Build();
 
-            _entitiesFactory.CreateEntityOld(spawnParams);
+            await _entitiesFactory.CreateEntity(spawnParams);
         }
 
         private void SetupPlayer(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
         {
+            Debug.LogWarning("---------------- SETUP PLAYER _-------------");
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
-
+            
             bool persistentPlayerExists = playerNetworkObject.TryGetComponent(out PersistentPlayer _);
 
             Assert.IsTrue(persistentPlayerExists,
@@ -175,7 +178,6 @@ namespace GameCore.Gameplay.Network
                 foreach (var pair in connectedClients)
                 {
                     Debug.Log($"Player #{pair.Key} ready");
-
                     LoadAndCreatePlayer(pair.Key, lateJoin: false);
                 }
             }

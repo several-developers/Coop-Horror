@@ -43,7 +43,7 @@ namespace GameCore.StateMachine
 
         public void Enter()
         {
-            CleanUpAddressables();
+            //CleanUpAddressables();
             CreateNetworkPrefabs();
             EnterGameplaySceneState();
         }

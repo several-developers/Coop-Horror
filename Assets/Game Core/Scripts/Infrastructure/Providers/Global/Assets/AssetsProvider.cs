@@ -50,6 +50,17 @@ namespace GameCore.Infrastructure.Providers.Global
             return await RunWitchCacheOnComplete(handle, cacheKey: address);
         }
 
+        public void ReleaseAsset(AssetReference assetReference)
+        {
+            if (_completedCache.TryGetValue(assetReference.AssetGUID, out AsyncOperationHandle completedHandle))
+            {
+                Addressables.Release(completedHandle);
+                _completedCache.Remove(assetReference.AssetGUID);
+            }
+            else
+                Addressables.Release(assetReference);
+        }
+
         public async UniTask<GameObject> Instantiate(string address) =>
             await Addressables.InstantiateAsync(address).Task; // Skips 1 frame before instantiation.
 

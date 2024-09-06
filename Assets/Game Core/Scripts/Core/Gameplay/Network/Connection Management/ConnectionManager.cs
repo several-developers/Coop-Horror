@@ -268,15 +268,11 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private void OnApprovalCheck(NetworkManager.ConnectionApprovalRequest request,
             NetworkManager.ConnectionApprovalResponse response)
         {
-            Debug.Log(message: "Client is trying to connect " + request.ClientNetworkId);
-
             ulong clientID = request.ClientNetworkId;
             bool isFirstStepApproved = FirstStepApproval(request, response);
             bool isSecondStepApproved = SecondStepApproval(request, response);
             bool isApproved = isFirstStepApproved && isSecondStepApproved;
             
-            Debug.LogWarning($"First step: {isFirstStepApproved}, Second step: {isSecondStepApproved}");
-
             if (isApproved)
                 Approve();
             else

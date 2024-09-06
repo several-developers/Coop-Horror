@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Global.EntitiesList;
 using GameCore.Configs.Global.MonstersList;
+using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -15,6 +16,15 @@ using Zenject;
 
 namespace GameCore.Gameplay.Network.Utilities
 {
+    public class NetworkPrefabsService
+    {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        public NetworkPrefabsService()
+        {
+            
+        }
+    }
     public class NetworkPrefabsRegistrar : MonoBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -29,6 +39,7 @@ namespace GameCore.Gameplay.Network.Utilities
         {
             _diContainer = diContainer;
             _networkManager = NetworkManager.Singleton;
+            _assetsProvider = assetsProvider;
 
             _entitiesListConfig = configsProvider.GetConfig<EntitiesListConfigMeta>();
             _itemsListConfig = gameplayConfigsProvider.GetConfig<ItemsListConfigMeta>();
@@ -44,13 +55,11 @@ namespace GameCore.Gameplay.Network.Utilities
 
         // FIELDS: --------------------------------------------------------------------------------
 
-#warning ВРЕМЕННО, УДАЛИТЬ
-        public static bool IsPlayerRegistered;
-
         private readonly List<GameObject> _prefabsToRegister = new();
 
         private DiContainer _diContainer;
         private NetworkManager _networkManager;
+        private IAssetsProvider _assetsProvider;
         private EntitiesListConfigMeta _entitiesListConfig;
         private ItemsListConfigMeta _itemsListConfig;
         private MonstersListConfigMeta _monstersListConfig;
@@ -64,11 +73,7 @@ namespace GameCore.Gameplay.Network.Utilities
             RegisterAddressables();
         }
 
-        private void OnDestroy()
-        {
-            RemovePrefabs();
-            IsPlayerRegistered = false;
-        }
+        private void OnDestroy() => RemovePrefabs();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -76,16 +81,15 @@ namespace GameCore.Gameplay.Network.Utilities
         {
             await RegisterEntities();
             await RegisterMonsterEntities();
+            GameManager.Instance.SendPlayerLoadedServerRpc();
         }
 
         private async UniTask RegisterEntities()
         {
-            IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllNetworkReferences();
+            IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
 
             foreach (AssetReferenceGameObject assetReference in allReferences)
                 await LoadAndRegisterAsset(assetReference);
-
-            IsPlayerRegistered = true;
         }
 
         private async UniTask RegisterMonsterEntities()
@@ -101,8 +105,9 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private async UniTask LoadAndRegisterAsset(AssetReferenceGameObject assetReference)
         {
-            GameObject prefab = await assetReference.LoadAssetAsync().Task;
+            var prefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
             RegisterPrefab(prefab);
+            _assetsProvider.ReleaseAsset(assetReference);
         }
 
         private void RegisterPrefabs()

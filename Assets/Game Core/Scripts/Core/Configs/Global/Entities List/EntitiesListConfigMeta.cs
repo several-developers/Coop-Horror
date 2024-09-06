@@ -15,12 +15,12 @@ namespace GameCore.Configs.Global.EntitiesList
         private List<AssetReferenceGameObject> _entitiesReferences;
         
         [SerializeField, Required]
-        private List<AssetReferenceGameObject> _entitiesNetworkReferences;
+        private List<AssetReferenceGameObject> _entitiesDynamicReferences;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public IEnumerable<AssetReferenceGameObject> GetAllReferences() => _entitiesReferences;
-        public IEnumerable<AssetReferenceGameObject> GetAllNetworkReferences() => _entitiesNetworkReferences;
+        public IEnumerable<AssetReferenceGameObject> GetAllDynamicReferences() => _entitiesDynamicReferences;
 
         public override string GetMetaCategory() =>
             EditorConstants.GlobalConfigsListsCategory;

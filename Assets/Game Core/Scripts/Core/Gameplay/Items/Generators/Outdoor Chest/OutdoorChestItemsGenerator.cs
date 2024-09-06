@@ -137,7 +137,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
                 .SetSuccessCallback(entity => { ChestSpawned(entity, itemsList); })
                 .Build();
 
-            _entitiesFactory.CreateEntity(spawnParams);
+            _entitiesFactory.DynamicCreateEntity(spawnParams);
         }
 
         private static void ChestSpawned(OutdoorChestEntity outdoorChestEntity, List<int> itemsList) =>

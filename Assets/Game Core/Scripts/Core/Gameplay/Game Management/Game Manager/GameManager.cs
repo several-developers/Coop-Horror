@@ -57,6 +57,7 @@ namespace GameCore.Gameplay.GameManagement
         private readonly NetworkVariable<GameState> _gameState = new(DefaultGameState);
         private readonly NetworkVariable<int> _playersGold = new();
 
+        private readonly Dictionary<ulong, bool> _playersLoadStates = new(capacity: 8); // Server only.
         private readonly Dictionary<ulong, GameState> _playersStates = new(capacity: 8); // Server only.
         private readonly Dictionary<ulong, bool> _playersLoadingStates = new(capacity: 8); // Server only.
 
@@ -74,10 +75,34 @@ namespace GameCore.Gameplay.GameManagement
         private bool _isScenesSynchronized;
         private bool _isServerLocationLoaded;
 
+        public static GameManager Instance;
+
+        public bool IsPlayerLoaded(ulong clientID)
+        {
+            if (!_playersLoadStates.ContainsKey(clientID))
+            {
+                _playersLoadStates.Add(clientID, false);
+            }
+
+            return _playersLoadStates[clientID];
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void SendPlayerLoadedServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+            
+            if (!_playersLoadStates.ContainsKey(senderClientID))
+                _playersLoadStates.Add(senderClientID, true);
+
+            _playersLoadStates[senderClientID] = true;
+        }
+        
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake()
         {
+            Instance = this;
             _gameManagerDecorator.OnChangeGameStateInnerEvent += ChangeGameState;
             _gameManagerDecorator.OnChangeGameStateWhenAllPlayersReadyInnerEvent += ChangeGameStateWhenAllPlayersReady;
             _gameManagerDecorator.OnStartGameRestartTimerInnerEvent += StartGameRestartTimer;
@@ -95,13 +120,8 @@ namespace GameCore.Gameplay.GameManagement
             PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
         }
 
-        private void Start()
-        {
-            if (!IsServerOnly)
-                return;
-
+        protected override void StartServerOnly() =>
             _gameObserver.TrainArrivedAtBase(LocationName.Base);
-        }
 
         public override void OnDestroy()
         {

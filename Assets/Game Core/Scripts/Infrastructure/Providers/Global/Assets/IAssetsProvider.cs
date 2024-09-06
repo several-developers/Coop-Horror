@@ -9,6 +9,7 @@ namespace GameCore.Infrastructure.Providers.Global
     {
         UniTask<T> LoadAsset<T>(AssetReference assetReference) where T : class;
         UniTask<T> LoadAsset<T>(string address) where T : class;
+        void ReleaseAsset(AssetReference assetReference);
         UniTask<GameObject> Instantiate(string address);
         UniTask<GameObject> Instantiate(string address, Vector3 at);
         UniTask<GameObject> Instantiate(string address, Transform parent);

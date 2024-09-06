@@ -557,7 +557,11 @@ namespace GameCore.Gameplay.Entities.Player
             _currentFloor.Value = floor;
 
         [ServerRpc(RequireOwnership = false)]
-        private void TeleportToTrainSeatServerRPC(int seatIndex) => TeleportToTrainSeatClientRPC(seatIndex);
+        private void TeleportToTrainSeatServerRPC(int seatIndex, ServerRpcParams serverRpcParams = default)
+        {
+            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+            TeleportToTrainSeatClientRPC(senderClientID, seatIndex);
+        }
 
         [ServerRpc(RequireOwnership = false)]
         private void SetTrainAsParentServerRPC() => SetTrainAsParentLocal();
@@ -607,7 +611,15 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         [ClientRpc]
-        private void TeleportToTrainSeatClientRPC(int seatIndex) => TeleportToTrainSeatLocal(seatIndex);
+        private void TeleportToTrainSeatClientRPC(ulong senderClientID, int seatIndex)
+        {
+            bool isMatches = senderClientID == NetworkHorror.ClientID;
+
+            if (isMatches)
+                return;
+            
+            TeleportToTrainSeatLocal(seatIndex);
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

@@ -36,9 +36,12 @@ namespace GameCore.Gameplay.Factories.Entities
         public async UniTask WarmUp() =>
             await SetupReferencesDictionary();
 
-        public void CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
+        public async UniTask CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity =>
+            await LoadAndCreateEntity(spawnParams);
+
+        public void DynamicCreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
         {
-            if (!TryGetAssetGUID<TEntity>(out string guid))
+            if (!TryGetDynamicAssetGUID<TEntity>(out string guid))
             {
                 spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TEntity)}' not found!");
                 return;
@@ -50,18 +53,15 @@ namespace GameCore.Gameplay.Factories.Entities
             );
         }
 
-        public void CreateEntityOld<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
-        {
-            throw new System.NotImplementedException();
-        }
-
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private async UniTask SetupReferencesDictionary()
         {
-            IEnumerable<AssetReferenceGameObject> allEntitiesReferences = _entitiesListConfig.GetAllReferences();
+            IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
+            IEnumerable<AssetReferenceGameObject> allDynamicReferences = _entitiesListConfig.GetAllDynamicReferences();
 
-            await SetupReferencesDictionary<IEntity>(allEntitiesReferences);
+            await SetupReferencesDictionary<Entity>(allReferences);
+            await SetupDynamicReferencesDictionary<Entity>(allDynamicReferences);
         }
 
         private void EntityPrefabLoaded<TEntity>(NetworkObject prefabNetworkObject,
@@ -88,19 +88,95 @@ namespace GameCore.Gameplay.Factories.Entities
                 Vector3 worldPosition = spawnParams.WorldPosition;
                 Quaternion rotation = spawnParams.Rotation;
                 ulong ownerID = spawnParams.OwnerID;
-                
-                NetworkSpawnManager spawnManager = NetworkManager.Singleton.SpawnManager;
+
+                NetworkSpawnManager spawnManager = GetNetworkSpawnManager();
 
                 NetworkObject networkObject = spawnManager.InstantiateAndSpawn(
-                        networkPrefab: prefabNetworkObject,
-                        ownerClientId: ownerID,
-                        destroyWithScene: true,
-                        position: worldPosition,
-                        rotation: rotation
-                    );
+                    networkPrefab: prefabNetworkObject,
+                    ownerClientId: ownerID,
+                    destroyWithScene: true,
+                    position: worldPosition,
+                    rotation: rotation
+                );
 
                 return networkObject;
             }
         }
+
+        private async UniTask LoadAndCreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams)
+            where TEntity : Entity
+        {
+            AssetReference assetReference = spawnParams.AssetReference;
+            bool containsAssetReference = assetReference != null;
+
+            TEntity entityPrefab;
+
+            if (containsAssetReference)
+                entityPrefab = await LoadAsset<TEntity>(assetReference);
+            else
+                entityPrefab = await LoadAsset<TEntity>();
+
+            CreateEntity(entityPrefab, spawnParams);
+        }
+
+        private void CreateEntity<TEntity>(TEntity entityPrefab, EntitySpawnParams<TEntity> spawnParams)
+            where TEntity : Entity
+        {
+            NetworkObject prefabNetworkObject = null;
+
+            if (!TryGetNetworkObject())
+                return;
+
+            NetworkObject instanceNetworkObject = InstantiateNetworkObject();
+            var instance = instanceNetworkObject.GetComponent<TEntity>();
+
+            spawnParams.SendSuccessCallback(instance);
+
+            // LOCAL METHODS: -----------------------------
+
+            bool TryGetNetworkObject()
+            {
+                bool isPrefabFound = entityPrefab != null;
+
+                if (!isPrefabFound)
+                {
+                    SendFailCallback(reason: "Entity prefab not found!");
+                    return false;
+                }
+
+                bool isNetworkObjectFound = entityPrefab.TryGetComponent(out prefabNetworkObject);
+
+                if (isNetworkObjectFound)
+                    return true;
+
+                SendFailCallback(reason: "Network Object not found!");
+                return false;
+            }
+
+            void SendFailCallback(string reason) =>
+                spawnParams.SendFailCallback(reason);
+
+            NetworkObject InstantiateNetworkObject()
+            {
+                Vector3 worldPosition = spawnParams.WorldPosition;
+                Quaternion rotation = spawnParams.Rotation;
+                ulong ownerID = spawnParams.OwnerID;
+
+                NetworkSpawnManager spawnManager = GetNetworkSpawnManager();
+
+                NetworkObject networkObject = spawnManager.InstantiateAndSpawn(
+                    networkPrefab: prefabNetworkObject,
+                    ownerClientId: ownerID,
+                    destroyWithScene: true,
+                    position: worldPosition,
+                    rotation: rotation
+                );
+
+                return networkObject;
+            }
+        }
+
+        private static NetworkSpawnManager GetNetworkSpawnManager() =>
+            NetworkManager.Singleton.SpawnManager;
     }
 }

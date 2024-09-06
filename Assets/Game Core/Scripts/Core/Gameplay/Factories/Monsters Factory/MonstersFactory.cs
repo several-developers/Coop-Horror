@@ -45,7 +45,7 @@ namespace GameCore.Gameplay.Factories.Monsters
             }
             
             spawnParams.SetAssetReference(assetReference);
-            _entitiesFactory.CreateEntity(spawnParams);
+            _entitiesFactory.DynamicCreateEntity(spawnParams);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

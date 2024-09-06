@@ -69,10 +69,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .BindInterfacesTo<NetworkedMessageChannel<GenerateDungeonsMessage>>()
                 .AsSingle();
-            
-            Container
-                .BindInterfacesTo<NetworkedMessageChannel<NoiseDataMessage>>()
-                .AsSingle();
         }
     }
 }

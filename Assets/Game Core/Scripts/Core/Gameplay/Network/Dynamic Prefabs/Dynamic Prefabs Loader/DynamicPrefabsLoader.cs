@@ -110,7 +110,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         {
             if (_networkManager.IsServer)
             {
-                var assetGuid = new AddressableGUID()
+                var assetGuid = new AddressableGUID
                 {
                     Value = guid
                 };

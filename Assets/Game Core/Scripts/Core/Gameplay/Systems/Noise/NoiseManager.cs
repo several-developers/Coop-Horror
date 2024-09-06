@@ -1,9 +1,9 @@
 ﻿using GameCore.Configs.Global.Game;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
@@ -14,14 +14,9 @@ namespace GameCore.Gameplay.Systems.Noise
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(
-            IConfigsProvider configsProvider,
-            ISubscriber<NoiseDataMessage> noiseDataMessageSubscriber,
-            IPublisher<NoiseDataMessage> noiseDataMessagePublisher)
+        private void Construct(IConfigsProvider configsProvider)
         {
             _gameConfig = configsProvider.GetConfig<GameConfigMeta>();
-            _noiseDataMessageSubscriber = noiseDataMessageSubscriber;
-            _noiseDataMessagePublisher = noiseDataMessagePublisher;
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -32,8 +27,7 @@ namespace GameCore.Gameplay.Systems.Noise
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private static ISubscriber<NoiseDataMessage> _noiseDataMessageSubscriber;
-        private static IPublisher<NoiseDataMessage> _noiseDataMessagePublisher;
+        private static NoiseManager _noiseManager;
 
         private readonly Collider[] _collidersPull = new Collider[32];
 
@@ -42,18 +36,14 @@ namespace GameCore.Gameplay.Systems.Noise
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         private void Awake() =>
-            _noiseDataMessageSubscriber.Subscribe(DetectNoise);
-
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-            _noiseDataMessageSubscriber.Unsubscribe(DetectNoise);
-        }
+            _noiseManager = this;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public static void MakeNoise(Vector3 noisePosition, float noiseRange, float noiseLoudness)
         {
+            bool isServer = _noiseManager.IsServerOnly;
+
             NoiseDataMessage message = new()
             {
                 noisePosition = noisePosition,
@@ -61,23 +51,23 @@ namespace GameCore.Gameplay.Systems.Noise
                 noiseLoudness = noiseLoudness
             };
 
-            _noiseDataMessagePublisher.Publish(message);
+            if (isServer)
+                _noiseManager.DetectNoise(message);
+            else
+                _noiseManager.MakeNoiseServerRpc(message);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void DetectNoise(NoiseDataMessage message)
         {
-            if (!NetworkHorror.IsTrueServer)
-                return;
-            
             Vector3 noisePosition = message.noisePosition;
             float noiseLoudness = message.noiseLoudness;
             float noiseRange = message.noiseRange;
 
             LayerMask noiseLayers = _gameConfig.NoiseLayers;
             int hits = Physics.OverlapSphereNonAlloc(noisePosition, noiseRange, _collidersPull, noiseLayers);
-            
+
             for (int i = 0; i < hits; i++)
             {
                 bool isNoiseListenerFound = _collidersPull[i].TryGetComponent(out INoiseListener noiseListener);
@@ -92,5 +82,10 @@ namespace GameCore.Gameplay.Systems.Noise
             _noiseDrawer.Draw(noisePosition, noiseRange);
 #endif
         }
+
+        // RPC: -----------------------------------------------------------------------------------
+
+        [ServerRpc(RequireOwnership = false)]
+        private void MakeNoiseServerRpc(NoiseDataMessage message) => DetectNoise(message);
     }
 }
