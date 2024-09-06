@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Network.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -56,24 +56,24 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         public static void SetDiContainer(DiContainer diContainer) =>
             _diContainer = diContainer;
 
-        public static async Task<IList<GameObject>> LoadDynamicPrefabs(AddressableGUID[] guids,
+        public static async UniTask<IList<GameObject>> LoadDynamicPrefabs(AddressableGUID[] guids,
             int artificialDelaySeconds = 0)
         {
-            var tasks = new List<Task<GameObject>>();
+            var tasks = new List<UniTask<GameObject>>();
 
             foreach (AddressableGUID guid in guids)
             {
-                Task<GameObject> prefab = LoadDynamicPrefab(guid, artificialDelaySeconds, recomputeHash: false);
+                UniTask<GameObject> prefab = LoadDynamicPrefab(guid, artificialDelaySeconds, recomputeHash: false);
                 tasks.Add(prefab);
             }
 
-            GameObject[] prefabs = await Task.WhenAll(tasks);
+            GameObject[] prefabs = await UniTask.WhenAll(tasks);
             CalculateDynamicPrefabArrayHash();
 
             return prefabs;
         }
         
-        public static async Task<GameObject> LoadDynamicPrefab(AddressableGUID guid,
+        public static async UniTask<GameObject> LoadDynamicPrefab(AddressableGUID guid,
             int artificialDelayMilliseconds = 0, bool recomputeHash = true)
         {
             if (LoadedDynamicPrefabResourceHandles.ContainsKey(guid))
@@ -91,7 +91,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
 #if ENABLE_ARTIFICIAL_DELAY
             // THIS IS FOR EDUCATIONAL PURPOSES AND SHOULDN'T BE INCLUDED IN YOUR PROJECT
-            await Task.Delay(artificialDelayMilliseconds);
+            await UniTask.Delay(artificialDelayMilliseconds);
 #endif
 
             _networkManager.AddNetworkPrefab(prefab);

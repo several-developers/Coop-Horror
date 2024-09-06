@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -90,15 +90,15 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         private async void PreloadPrefabs()
         {
-            var tasks = new List<Task>();
+            var tasks = new List<UniTask>();
 
             foreach (AssetReferenceGameObject asset in _dynamicPrefabsReferences)
             {
-                Task task = PreloadDynamicPrefabOnServerAndStartLoadingOnAllClients(asset.AssetGUID);
+                UniTask task = PreloadDynamicPrefabOnServerAndStartLoadingOnAllClients(asset.AssetGUID);
                 tasks.Add(task);
             }
 
-            await Task.WhenAll(tasks);
+            await UniTask.WhenAll(tasks);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         /// to do the same.
         /// </summary>
         /// <param name="guid"></param>
-        private async Task PreloadDynamicPrefabOnServerAndStartLoadingOnAllClients(string guid)
+        private async UniTask PreloadDynamicPrefabOnServerAndStartLoadingOnAllClients(string guid)
         {
             if (_networkManager.IsServer)
             {
@@ -155,7 +155,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
         /// the spawn will fail.
         /// </summary>
-        private async Task TryLoadAndSendDynamicPrefab(string guid, Action<NetworkObject> loadCallback)
+        private async void TryLoadAndSendDynamicPrefab(string guid, Action<NetworkObject> loadCallback)
         {
             if (!IsServer)
             {
@@ -212,7 +212,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 }
 
                 _synchronousSpawnTimeoutTimer += Time.deltaTime;
-                await Task.Yield();
+                await UniTask.Yield();
             }
 
             // Left to the reader: you'll need to be reactive to clients failing to load -- you should either have
@@ -283,7 +283,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         /// loaded it, and then the server makes the object network-visible to that client.
         /// </summary>
         /// <returns></returns>
-        private async Task<NetworkObject> SpawnImmediatelyAndHideUntilPrefabIsLoadedOnClient(string guid,
+        private async UniTask<NetworkObject> SpawnImmediatelyAndHideUntilPrefabIsLoadedOnClient(string guid,
             Vector3 position, Quaternion rotation)
         {
             if (IsServer)
@@ -298,7 +298,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
             return null;
 
-            async Task<NetworkObject> Spawn(AddressableGUID assetGuid)
+            async UniTask<NetworkObject> Spawn(AddressableGUID assetGuid)
             {
                 // Server is starting to load a prefab, update UI.
                 // m_InGameUI.ClientLoadedPrefabStatusChanged(NetworkManager.ServerClientId, assetGuid.GetHashCode(),

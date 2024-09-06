@@ -44,7 +44,7 @@ namespace GameCore.StateMachine
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTask CreateRelayLobbyMenu()
+        private async void CreateRelayLobbyMenu()
         {
             // _relayLobbyMenu = MenuFactory.Create<RelayLobbyMenuView>();
             _relayLobbyMenu = await _menuFactory.Create<RelayLobbyMenuView>();

@@ -274,6 +274,8 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             bool isFirstStepApproved = FirstStepApproval(request, response);
             bool isSecondStepApproved = SecondStepApproval(request, response);
             bool isApproved = isFirstStepApproved && isSecondStepApproved;
+            
+            Debug.LogWarning($"First step: {isFirstStepApproved}, Second step: {isSecondStepApproved}");
 
             if (isApproved)
                 Approve();

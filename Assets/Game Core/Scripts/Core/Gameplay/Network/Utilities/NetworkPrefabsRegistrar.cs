@@ -44,8 +44,8 @@ namespace GameCore.Gameplay.Network.Utilities
 
         // FIELDS: --------------------------------------------------------------------------------
 
-#warning КОСТЫЛЬ, УБРАТЬ СРОЧНО
-        public static bool IsPrefabsRegistered = false;
+#warning ВРЕМЕННО, УДАЛИТЬ
+        public static bool IsPlayerRegistered;
 
         private readonly List<GameObject> _prefabsToRegister = new();
 
@@ -67,24 +67,25 @@ namespace GameCore.Gameplay.Network.Utilities
         private void OnDestroy()
         {
             RemovePrefabs();
-            IsPrefabsRegistered = false;
+            IsPlayerRegistered = false;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTaskVoid RegisterAddressables()
+        private async void RegisterAddressables()
         {
-            //await RegisterAllEntities();
+            await RegisterEntities();
             await RegisterMonsterEntities();
-            IsPrefabsRegistered = true;
         }
 
-        private async UniTask RegisterAllEntities()
+        private async UniTask RegisterEntities()
         {
-            IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
+            IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllNetworkReferences();
 
             foreach (AssetReferenceGameObject assetReference in allReferences)
                 await LoadAndRegisterAsset(assetReference);
+
+            IsPlayerRegistered = true;
         }
 
         private async UniTask RegisterMonsterEntities()
@@ -154,7 +155,7 @@ namespace GameCore.Gameplay.Network.Utilities
 
             if (networkManager == null)
                 return;
-            
+
             foreach (GameObject prefab in _prefabsToRegister)
             {
                 bool containsNetworkObject = prefab.GetComponent<NetworkObject>() != null;

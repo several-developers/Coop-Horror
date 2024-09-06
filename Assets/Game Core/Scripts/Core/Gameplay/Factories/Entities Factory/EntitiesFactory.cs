@@ -50,6 +50,11 @@ namespace GameCore.Gameplay.Factories.Entities
             );
         }
 
+        public void CreateEntityOld<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
+        {
+            throw new System.NotImplementedException();
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private async UniTask SetupReferencesDictionary()

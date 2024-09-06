@@ -33,7 +33,7 @@ namespace GameCore.StateMachine
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTask CreateSelectLobbyMenu()
+        private async void CreateSelectLobbyMenu()
         {
             _selectLobbyMenu = await _menuFactory.Create<SelectLobbyMenuView>();
 

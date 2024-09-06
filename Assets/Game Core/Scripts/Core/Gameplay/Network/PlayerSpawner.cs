@@ -47,7 +47,7 @@ namespace GameCore.Gameplay.Network
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTaskVoid LoadAndCreatePlayer(ulong clientID, bool lateJoin)
+        private async void LoadAndCreatePlayer(ulong clientID, bool lateJoin)
         {
             bool isCanceled = await UniTask
                 .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
@@ -56,10 +56,10 @@ namespace GameCore.Gameplay.Network
             if (isCanceled)
                 return;
 
-            while (!NetworkPrefabsRegistrar.IsPrefabsRegistered)
+            while (!NetworkPrefabsRegistrar.IsPlayerRegistered)
             {
                 isCanceled = await UniTask
-                    .Delay(millisecondsDelay: 50, cancellationToken: this.GetCancellationTokenOnDestroy())
+                    .Delay(millisecondsDelay: 100, cancellationToken: this.GetCancellationTokenOnDestroy())
                     .SuppressCancellationThrow();
 
                 if (isCanceled)
@@ -74,7 +74,7 @@ namespace GameCore.Gameplay.Network
                 .SetSuccessCallback(playerEntity => { SetupPlayer(playerEntity, clientID, lateJoin); })
                 .Build();
 
-            _entitiesFactory.CreateEntity(spawnParams);
+            _entitiesFactory.CreateEntityOld(spawnParams);
         }
 
         private void SetupPlayer(PlayerEntity playerEntity, ulong clientID, bool lateJoin)

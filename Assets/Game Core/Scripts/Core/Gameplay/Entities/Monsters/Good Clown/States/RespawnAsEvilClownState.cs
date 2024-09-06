@@ -49,7 +49,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             clownUtilities.SetAgonizeAnimation();
         }
 
-        private async UniTaskVoid AwaitAndCreateEvilClown()
+        private async void AwaitAndCreateEvilClown()
         {
             bool isCanceled = false;
             
