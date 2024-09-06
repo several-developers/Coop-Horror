@@ -144,7 +144,7 @@ namespace GameCore.Infrastructure.Services.Global
             }
 
             // Wait until the asynchronous scene fully loads
-            while (!asyncOperation.isDone)
+            while (asyncOperation is { isDone: false })
                 yield return null;
 
             callback?.Invoke();
@@ -189,21 +189,25 @@ namespace GameCore.Infrastructure.Services.Global
             {
                 // Server told client to load a scene
                 case SceneEventType.Load:
+                    Debug.LogWarning("---------> Load");
                     Load();
                     break;
 
                 // Server told client that all clients finished loading a scene
                 case SceneEventType.LoadEventCompleted:
+                    Debug.LogWarning("---------> Load Completed");
                     LoadEventCompleted();
                     break;
 
                 // Server told client to start synchronizing scenes
                 case SceneEventType.Synchronize:
+                    Debug.LogWarning("---------> Synchronize");
                     Synchronize();
                     break;
 
                 // Client told server that they finished synchronizing
                 case SceneEventType.SynchronizeComplete:
+                    Debug.LogWarning("---------> Synchronize Completed");
                     SynchronizeComplete();
                     break;
             }

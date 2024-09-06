@@ -81,7 +81,6 @@ namespace GameCore.Gameplay.Network
 
         private void SetupPlayer(PlayerEntity playerEntity, ulong clientID, bool lateJoin)
         {
-            Debug.LogWarning("---------------- SETUP PLAYER _-------------");
             NetworkObject playerNetworkObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientID);
             
             bool persistentPlayerExists = playerNetworkObject.TryGetComponent(out PersistentPlayer _);
