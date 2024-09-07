@@ -4,7 +4,9 @@ using GameCore.Configs.Gameplay.Entities;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.Interactable;
+using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Systems.SoundReproducer;
+using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.EntitiesConfigs;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -22,7 +24,7 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
             //_ = 0,
             Open = 1
         }
-        
+
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
@@ -45,20 +47,19 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
         private List<Transform> _itemsSpawnPoints;
 
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         public event Action OnInteractionStateChangedEvent = delegate { };
 
         private readonly NetworkVariable<bool> _isOpen = new(writePerm: Constants.OwnerPermission);
-        
+
         private IItemsFactory _itemsFactory;
         private OutdoorChestConfigMeta _outdoorChestConfig;
-        private OutdoorChestSoundReproducer _soundReproducer;
 
         private List<int> _itemsList;
         private bool _canInteract = true;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
         public void InteractionStarted(IEntity entity = null)
         {
         }
@@ -73,7 +74,7 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
                 OpenChestLocal();
             else
                 OpenChestServerRpc();
-            
+
             PlaySound(SFXType.Open);
         }
 
@@ -81,7 +82,7 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
         {
             _canInteract = canInteract;
             _triggerCollider.enabled = canInteract;
-            
+
             OnInteractionStateChangedEvent.Invoke();
         }
 
@@ -98,8 +99,8 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
 
         protected override void InitAll()
         {
-            _soundReproducer = new OutdoorChestSoundReproducer(soundProducer: this, _outdoorChestConfig);
-            
+            SoundReproducer = new OutdoorChestSoundReproducer(soundProducer: this, _outdoorChestConfig);
+
             _isOpen.OnValueChanged += OnChestOpenStateChanged;
         }
 
@@ -112,7 +113,7 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
         {
             _isOpen.Value = true;
             _animator.SetBool(id: AnimatorHashes.IsOpen, value: true);
-            
+
             SpawnItems();
         }
 
@@ -138,9 +139,14 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
                 }
 
                 Vector3 worldPosition = itemSpawnPoint.position;
-                _itemsFactory.CreateItem(itemID, worldPosition, out _);
+
+                var spawnParams = new ItemSpawnParams<ItemObjectBase>.Builder()
+                    .SetSpawnPosition(worldPosition)
+                    .Build();
+                
+                _itemsFactory.CreateItemDynamic(itemID, spawnParams);
             }
-            
+
             _itemsList.Clear();
             _itemsList = null;
         }
@@ -164,7 +170,7 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
 
             if (!isOpen)
                 return;
-            
+
             ToggleInteract(canInteract: false);
         }
     }

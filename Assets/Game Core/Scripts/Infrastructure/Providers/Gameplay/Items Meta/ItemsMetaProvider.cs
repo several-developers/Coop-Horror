@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.ItemsList;
+using GameCore.Configs.Global.ItemsList;
 using GameCore.Gameplay.Items;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using UnityEngine;
 
-namespace GameCore.Infrastructure.Providers.Gameplay.ItemsMeta
+namespace GameCore.Infrastructure.Providers.Global.ItemsMeta
 {
     public class ItemsMetaProvider : IItemsMetaProvider
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ItemsMetaProvider(IGameplayConfigsProvider gameplayConfigsProvider)
+        public ItemsMetaProvider(IConfigsProvider gameplayConfigsProvider)
         {
             _itemsDictionary = new Dictionary<int, ItemMeta>();
-            
+
             SetupItemsDictionary(gameplayConfigsProvider);
         }
 
@@ -31,28 +30,29 @@ namespace GameCore.Infrastructure.Providers.Gameplay.ItemsMeta
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SetupItemsDictionary(IGameplayConfigsProvider gameplayConfigsProvider)
+        private void SetupItemsDictionary(IConfigsProvider gameplayConfigsProvider)
         {
             var itemsListConfig = gameplayConfigsProvider.GetConfig<ItemsListConfigMeta>();
-            IEnumerable<ItemMeta> allItems = itemsListConfig.GetAllItems();
+            IEnumerable<ItemsListConfigMeta.ItemReference> allItemsReferences = itemsListConfig.GetAllItemsReferences();
 
-            foreach (ItemMeta itemMeta in allItems)
+            foreach (ItemsListConfigMeta.ItemReference itemReference in allItemsReferences)
             {
+                ItemMeta itemMeta = itemReference.ItemMeta;
                 int itemID = itemMeta.ItemID;
 
                 if (IsItemExistsWithErrorCheck(itemID))
                     continue;
-                
+
                 _itemsDictionary.Add(itemID, itemMeta);
             }
-            
+
             // LOCAL METHODS: -----------------------------
 
             bool IsItemExistsWithErrorCheck(int itemID)
             {
                 if (!_itemsDictionary.ContainsKey(itemID))
                     return false;
-                
+
                 string errorLog = Log.HandleLog($"Item with ID <gb>({itemID})</gb> <rb>already exists</rb>!");
                 Debug.LogError(errorLog);
 

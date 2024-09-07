@@ -1,10 +1,10 @@
 ﻿using DG.Tweening;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Systems.Inventory;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
-using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Gameplay.Systems.Inventory;
 using GameCore.Infrastructure.Providers.Gameplay.RigPresets;
+using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -17,8 +17,11 @@ namespace GameCore.Gameplay.Items.Rigging
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsMetaProvider itemsMetaProvider, IRigPresetsProvider rigPresetsProvider,
-            PlayerCamera playerCamera)
+        private void Construct(
+            IItemsMetaProvider itemsMetaProvider,
+            IRigPresetsProvider rigPresetsProvider,
+            PlayerCamera playerCamera
+        )
         {
             _itemsMetaProvider = itemsMetaProvider;
             _rigPresetsProvider = rigPresetsProvider;
@@ -152,14 +155,14 @@ namespace GameCore.Gameplay.Items.Rigging
                         rightHandTargetPose = defaultRigPresetMeta.FPSRightHandTargetPose;
                         rightHandHintPose = defaultRigPresetMeta.FPSRightHandHintPose;
                         break;
-                    
+
                     case RigType.RightHand:
                         leftHandTargetPose = defaultRigPresetMeta.FPSLeftHandTargetPose;
                         leftHandHintPose = defaultRigPresetMeta.FPSLeftHandHintPose;
                         rightHandTargetPose = rigPresetMeta.FPSRightHandTargetPose;
                         rightHandHintPose = rigPresetMeta.FPSRightHandHintPose;
                         break;
-                    
+
                     default:
                         leftHandTargetPose = rigPresetMeta.FPSLeftHandTargetPose;
                         rightHandTargetPose = rigPresetMeta.FPSRightHandTargetPose;
@@ -178,14 +181,14 @@ namespace GameCore.Gameplay.Items.Rigging
                         rightHandTargetPose = defaultRigPresetMeta.TPSRightHandTargetPose;
                         rightHandHintPose = defaultRigPresetMeta.TPSRightHandHintPose;
                         break;
-                    
+
                     case RigType.RightHand:
                         leftHandTargetPose = defaultRigPresetMeta.TPSLeftHandTargetPose;
                         leftHandHintPose = defaultRigPresetMeta.TPSLeftHandHintPose;
                         rightHandTargetPose = rigPresetMeta.TPSRightHandTargetPose;
                         rightHandHintPose = rigPresetMeta.TPSRightHandHintPose;
                         break;
-                    
+
                     default:
                         leftHandTargetPose = rigPresetMeta.TPSLeftHandTargetPose;
                         rightHandTargetPose = rigPresetMeta.TPSRightHandTargetPose;

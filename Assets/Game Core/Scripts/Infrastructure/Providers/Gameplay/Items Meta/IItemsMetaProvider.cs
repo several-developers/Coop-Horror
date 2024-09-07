@@ -1,6 +1,6 @@
 ﻿using GameCore.Gameplay.Items;
 
-namespace GameCore.Infrastructure.Providers.Gameplay.ItemsMeta
+namespace GameCore.Infrastructure.Providers.Global.ItemsMeta
 {
     public interface IItemsMetaProvider
     {

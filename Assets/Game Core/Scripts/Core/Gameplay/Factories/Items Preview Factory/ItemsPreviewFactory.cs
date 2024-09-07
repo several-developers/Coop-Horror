@@ -2,7 +2,7 @@
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Items;
-using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Factories.ItemsPreview

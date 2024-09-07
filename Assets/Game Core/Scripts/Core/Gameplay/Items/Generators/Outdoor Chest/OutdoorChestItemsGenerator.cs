@@ -16,11 +16,12 @@ using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Utilities;
 using UnityEngine;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Items.Generators.OutdoorChest
 {
-    public class OutdoorChestItemsGenerator : IDisposable
+    public class OutdoorChestItemsGenerator : IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -32,7 +33,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
-            if (!NetworkHorror.IsTrueServer)
+            if (!IsServer)
                 return;
 
             _questsManagerDecorator = questsManagerDecorator;
@@ -41,10 +42,12 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
             _dungeonsObserver = dungeonsObserver;
             _itemsSpawnConfig = gameplayConfigsProvider.GetConfig<ItemsSpawnConfigMeta>();
             _outdoorChestsItemsSpawnConfig = _itemsSpawnConfig.GetOutdoorChestsItemsSpawnConfig();
-
-            _dungeonsObserver.OnDungeonsGenerationCompletedEvent += OnDungeonsGenerationCompleted;
         }
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        private static bool IsServer => NetworkHorror.IsTrueServer;
+        
         // FIELDS: --------------------------------------------------------------------------------
 
         private const float SpawnOffsetY = 1f;
@@ -58,9 +61,17 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void Initialize()
+        {
+            if (!IsServer)
+                return;
+            
+            _dungeonsObserver.OnDungeonsGenerationCompletedEvent += OnDungeonsGenerationCompleted;
+        }
+        
         public void Dispose()
         {
-            if (!NetworkHorror.IsTrueServer)
+            if (!IsServer)
                 return;
 
             _dungeonsObserver.OnDungeonsGenerationCompletedEvent -= OnDungeonsGenerationCompleted;
@@ -137,7 +148,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
                 .SetSuccessCallback(entity => { ChestSpawned(entity, itemsList); })
                 .Build();
 
-            _entitiesFactory.DynamicCreateEntity(spawnParams);
+            _entitiesFactory.CreateEntityDynamic(spawnParams);
         }
 
         private static void ChestSpawned(OutdoorChestEntity outdoorChestEntity, List<int> itemsList) =>

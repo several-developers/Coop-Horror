@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.Factories.Entities
         public async UniTask CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity =>
             await LoadAndCreateEntity(spawnParams);
 
-        public void DynamicCreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
+        public void CreateEntityDynamic<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
         {
             AssetReference assetReference = spawnParams.AssetReference;
             bool containsAssetReference = assetReference != null;
@@ -74,7 +74,7 @@ namespace GameCore.Gameplay.Factories.Entities
             await SetupDynamicReferencesDictionary<Entity>(allDynamicReferences);
         }
 
-        private void EntityPrefabLoaded<TEntity>(NetworkObject prefabNetworkObject,
+        private static void EntityPrefabLoaded<TEntity>(NetworkObject prefabNetworkObject,
             EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity
         {
             if (prefabNetworkObject == null)
@@ -129,7 +129,7 @@ namespace GameCore.Gameplay.Factories.Entities
             CreateEntity(entityPrefab, spawnParams);
         }
 
-        private void CreateEntity<TEntity>(TEntity entityPrefab, EntitySpawnParams<TEntity> spawnParams)
+        private static void CreateEntity<TEntity>(TEntity entityPrefab, EntitySpawnParams<TEntity> spawnParams)
             where TEntity : Entity
         {
             NetworkObject prefabNetworkObject = null;

@@ -1,5 +1,4 @@
-﻿using GameCore.Gameplay.Factories.Items;
-using GameCore.Gameplay.Factories.ItemsPreview;
+﻿using GameCore.Gameplay.Factories.ItemsPreview;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay
@@ -11,7 +10,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         public override void InstallBindings()
         {
             BindItemsPreviewFactory();
-            BindItemsFactory();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -20,13 +18,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesTo<ItemsPreviewFactory>()
-                .AsSingle();
-        }
-
-        private void BindItemsFactory()
-        {
-            Container
-                .BindInterfacesTo<ItemsFactory>()
                 .AsSingle();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using GameCore.Infrastructure.Providers.Global;
 using GameCore.Infrastructure.Providers.Global.Data;
+using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Global
@@ -13,6 +14,7 @@ namespace GameCore.Infrastructure.Installers.Global
             BindDataProvider();
             BindAssetsProvider();
             BindConfigsProvider();
+            BindItemsMetaProvider();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -37,6 +39,14 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .BindInterfacesTo<ConfigsProvider>()
+                .AsSingle()
+                .NonLazy();
+        }
+        
+        private void BindItemsMetaProvider()
+        {
+            Container
+                .BindInterfacesTo<ItemsMetaProvider>()
                 .AsSingle()
                 .NonLazy();
         }

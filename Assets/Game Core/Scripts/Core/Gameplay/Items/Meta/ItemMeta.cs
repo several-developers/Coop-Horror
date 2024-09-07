@@ -4,7 +4,7 @@ using CustomEditors;
 using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
 using UnityEngine;
-
+using UnityEngine.AddressableAssets;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -44,13 +44,6 @@ namespace GameCore.Gameplay.Items
         [SerializeField]
         private ItemPose _tpsItemPreview;
 
-        [Title(Constants.References)]
-        [SerializeField, Required]
-        private ItemObjectBase _itemPrefab;
-
-        [SerializeField, Required]
-        private ItemPreviewObject _itemPreviewPrefab;
-
         //[VerticalGroup(RowRight), SerializeField, Range(0.25f, 2f)]
         //private float _iconScale = 1;
 
@@ -64,8 +57,7 @@ namespace GameCore.Gameplay.Items
         public int ItemID => _itemID;
         public ItemPose FpsItemPreview => _fpsItemPreview;
         public ItemPose TpsItemPreview => _tpsItemPreview;
-        public ItemObjectBase ItemPrefab => _itemPrefab;
-        public ItemPreviewObject ItemPreviewPrefab => _itemPreviewPrefab;
+        public ItemPreviewObject ItemPreviewPrefab => null;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -74,6 +66,8 @@ namespace GameCore.Gameplay.Items
         private const string RowLeft = Row + "/Left";
         private const string RowRight = Row + "/Right";
         
+        private bool _canEditItemID;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override string GetMetaCategory() =>
@@ -82,8 +76,6 @@ namespace GameCore.Gameplay.Items
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
 #if UNITY_EDITOR
-        private bool _canEditItemID;
-        
         [OnInspectorInit]
         private void ResetEditItemIDState() =>
             _canEditItemID = false;

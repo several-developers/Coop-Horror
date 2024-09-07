@@ -45,7 +45,7 @@ namespace GameCore.Gameplay.Factories.Monsters
             }
             
             spawnParams.SetAssetReference(assetReference);
-            _entitiesFactory.DynamicCreateEntity(spawnParams);
+            _entitiesFactory.CreateEntityDynamic(spawnParams);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -70,7 +70,7 @@ namespace GameCore.Gameplay.Factories.Monsters
 
                 AssetReferenceGameObject assetReference = monsterReference.AssetReference;
 
-                await _entitiesFactory.LoadAssetDynamicReference<IEntity>(assetReference);
+                await _entitiesFactory.LoadAndSaveAssetDynamic<IEntity>(assetReference);
                 _prefabsKeysDictionary.Add(monsterType, assetReference);
             }
         }

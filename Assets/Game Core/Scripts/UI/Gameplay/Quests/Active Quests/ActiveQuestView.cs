@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Systems.Quests;
-using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;

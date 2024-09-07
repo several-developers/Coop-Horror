@@ -1,12 +1,9 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.ItemsList;
 using GameCore.Configs.Global.EntitiesList;
 using GameCore.Gameplay.GameManagement;
-using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Network.PrefabsRegistrar;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -24,7 +21,6 @@ namespace GameCore.Gameplay.Network.Utilities
             DiContainer diContainer,
             IAssetsProvider assetsProvider,
             IConfigsProvider configsProvider,
-            IGameplayConfigsProvider gameplayConfigsProvider,
             INetworkPrefabsRegistrar networkPrefabsRegistrar
         )
         {
@@ -33,7 +29,6 @@ namespace GameCore.Gameplay.Network.Utilities
             _networkPrefabsRegistrar = networkPrefabsRegistrar;
 
             _entitiesListConfig = configsProvider.GetConfig<EntitiesListConfigMeta>();
-            _itemsListConfig = gameplayConfigsProvider.GetConfig<ItemsListConfigMeta>();
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -52,7 +47,6 @@ namespace GameCore.Gameplay.Network.Utilities
         private INetworkPrefabsRegistrar _networkPrefabsRegistrar;
         
         private EntitiesListConfigMeta _entitiesListConfig;
-        private ItemsListConfigMeta _itemsListConfig;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -92,7 +86,6 @@ namespace GameCore.Gameplay.Network.Utilities
         private void RegisterPrefabs()
         {
             AddLocalListPrefabs();
-            AddItemsPrefabs();
 
             foreach (GameObject prefab in _prefabsToRegister)
                 RegisterPrefab(prefab);
@@ -103,17 +96,6 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private void AddLocalListPrefabs() =>
             _prefabsToRegister.AddRange(_prefabs);
-
-        private void AddItemsPrefabs()
-        {
-            IEnumerable<ItemMeta> allItems = _itemsListConfig.GetAllItems();
-
-            foreach (ItemMeta itemMeta in allItems)
-            {
-                GameObject prefab = itemMeta.ItemPrefab.gameObject;
-                _prefabsToRegister.Add(prefab);
-            }
-        }
 
         private void RemovePrefabs()
         {

@@ -27,7 +27,7 @@ namespace GameCore.Utilities
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public async UniTask LoadAssetReference<T>(AssetReference assetReference) where T : class
+        public async UniTask LoadAndSaveAsset<T>(AssetReference assetReference) where T : class
         {
             var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
 
@@ -35,7 +35,7 @@ namespace GameCore.Utilities
             Addressables.Release(handle);
         }
 
-        public async UniTask LoadAssetDynamicReference<T>(AssetReference assetReference) where T : class
+        public async UniTask LoadAndSaveAssetDynamic<T>(AssetReference assetReference) where T : class
         {
             var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
 
@@ -49,14 +49,14 @@ namespace GameCore.Utilities
             where T : class
         {
             foreach (AssetReference assetReference in assetReferences)
-                await LoadAssetReference<T>(assetReference);
+                await LoadAndSaveAsset<T>(assetReference);
         }
 
         protected async UniTask SetupDynamicReferencesDictionary<T>(IEnumerable<AssetReference> assetReferences)
             where T : class
         {
             foreach (AssetReference assetReference in assetReferences)
-                await LoadAssetDynamicReference<T>(assetReference);
+                await LoadAndSaveAssetDynamic<T>(assetReference);
         }
 
         protected async UniTask<T> LoadAsset<T>() where T : class

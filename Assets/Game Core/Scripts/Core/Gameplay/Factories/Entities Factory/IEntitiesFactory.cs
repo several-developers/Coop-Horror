@@ -8,9 +8,9 @@ namespace GameCore.Gameplay.Factories.Entities
     public interface IEntitiesFactory
     {
         UniTask WarmUp();
-        UniTask LoadAssetReference<T>(AssetReference assetReference) where T : class;
-        UniTask LoadAssetDynamicReference<T>(AssetReference assetReference) where T : class;
+        UniTask LoadAndSaveAsset<T>(AssetReference assetReference) where T : class;
+        UniTask LoadAndSaveAssetDynamic<T>(AssetReference assetReference) where T : class;
         UniTask CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
-        void DynamicCreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
+        void CreateEntityDynamic<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
     }
 }

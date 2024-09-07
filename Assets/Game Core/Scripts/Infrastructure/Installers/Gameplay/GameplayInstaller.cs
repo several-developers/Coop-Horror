@@ -172,9 +172,8 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             Container
                 .BindInterfacesAndSelfTo<DungeonItemsGenerator>()
-                .AsSingle()
-                .NonLazy();
-            
+                .AsSingle();
+
         }
         
         private void BindOutdoorChestItemsGenerator()
@@ -188,7 +187,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private void BindGameEventsHandler()
         {
             Container
-                .BindInterfacesTo<GameController>()
+                .BindInterfacesTo<GameFlowController>()
                 .AsSingle()
                 .NonLazy();
         }

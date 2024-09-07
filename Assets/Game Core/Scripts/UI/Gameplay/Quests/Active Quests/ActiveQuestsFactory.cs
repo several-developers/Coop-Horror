@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameCore.Gameplay.Systems.Quests;
-using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using UnityEngine;
 
 namespace GameCore.UI.Gameplay.Quests.ActiveQuests
@@ -9,8 +9,12 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ActiveQuestsFactory(IQuestsManagerDecorator questsManagerDecorator, IItemsMetaProvider itemsMetaProvider,
-            ActiveQuestView activeQuestViewPrefab, Transform container)
+        public ActiveQuestsFactory(
+            IQuestsManagerDecorator questsManagerDecorator,
+            IItemsMetaProvider itemsMetaProvider,
+            ActiveQuestView activeQuestViewPrefab,
+            Transform container
+        )
         {
             _questsManagerDecorator = questsManagerDecorator;
             _itemsMetaProvider = itemsMetaProvider;

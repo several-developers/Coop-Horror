@@ -1,7 +1,7 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Systems.Quests;
-using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
@@ -16,8 +16,11 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IQuestsManagerDecorator questsManagerDecorator,
-            IGameManagerDecorator gameManagerDecorator, IItemsMetaProvider itemsMetaProvider)
+        private void Construct(
+            IQuestsManagerDecorator questsManagerDecorator,
+            IGameManagerDecorator gameManagerDecorator,
+            IItemsMetaProvider itemsMetaProvider
+        )
         {
             _questsManagerDecorator = questsManagerDecorator;
             _gameManagerDecorator = gameManagerDecorator;
@@ -53,7 +56,7 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         protected override void Awake()
         {
             base.Awake();
-            
+
             _layoutFixHelper =
                 new LayoutFixHelper(coroutineRunner: this, _activeQuestsLayoutGroup, _activeQuestsSizeFitter);
 
@@ -66,10 +69,10 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            
+
             _questsManagerDecorator.OnActiveQuestsDataReceivedEvent -= OnActiveQuestsDataReceived;
             _questsManagerDecorator.OnUpdateQuestsProgressEvent -= OnUpdateQuestsProgress;
-            
+
             _gameManagerDecorator.OnGameStateChangedEvent -= OnGameStateChanged;
         }
 
@@ -88,7 +91,7 @@ namespace GameCore.UI.Gameplay.Quests.ActiveQuests
                 case GameState.KillPlayersByMetroMonster:
                     Hide();
                     break;
-                
+
                 case GameState.RestartGame:
                     Show();
                     break;

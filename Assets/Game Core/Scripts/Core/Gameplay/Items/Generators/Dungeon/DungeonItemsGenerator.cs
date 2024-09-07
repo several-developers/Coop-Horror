@@ -7,15 +7,17 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items.Spawners;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Quests;
+using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Dungeons;
 using GameCore.Utilities;
 using UnityEngine;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Items.Generators.Dungeon
 {
-    public class DungeonItemsGenerator : IDisposable
+    public class DungeonItemsGenerator : IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -27,7 +29,7 @@ namespace GameCore.Gameplay.Items.Generators.Dungeon
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
-            if (!NetworkHorror.IsTrueServer)
+            if (!IsServer)
                 return;
 
             _questsManagerDecorator = questsManagerDecorator;
@@ -43,11 +45,11 @@ namespace GameCore.Gameplay.Items.Generators.Dungeon
                 { Floor.Two, new List<DungeonItemsSpawner>() },
                 { Floor.Three, new List<DungeonItemsSpawner>() }
             };
-
-            DungeonItemsSpawner.OnRegisterItemsSpawnerEvent += OnRegisterItemsSpawner;
-
-            _dungeonsObserver.OnDungeonsGenerationCompletedEvent += OnDungeonsGenerationCompleted;
         }
+
+        // PROPERTIES: ----------------------------------------------------------------------------
+        
+        private static bool IsServer => NetworkHorror.IsTrueServer;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -63,9 +65,19 @@ namespace GameCore.Gameplay.Items.Generators.Dungeon
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public void Initialize()
+        {
+            if (!IsServer)
+                return;
+
+            DungeonItemsSpawner.OnRegisterItemsSpawnerEvent += OnRegisterItemsSpawner;
+
+            _dungeonsObserver.OnDungeonsGenerationCompletedEvent += OnDungeonsGenerationCompleted;
+        }
+        
         public void Dispose()
         {
-            if (!NetworkHorror.IsTrueServer)
+            if (!IsServer)
                 return;
 
             DungeonItemsSpawner.OnRegisterItemsSpawnerEvent -= OnRegisterItemsSpawner;
@@ -221,8 +233,12 @@ namespace GameCore.Gameplay.Items.Generators.Dungeon
         {
             Vector3 worldPosition = itemsSpawner.GetRandomSpawnWorldPosition();
             worldPosition.y += 1f;
+            
+            var spawnParams = new ItemSpawnParams<ItemObjectBase>.Builder()
+                .SetSpawnPosition(worldPosition)
+                .Build();
 
-            _itemsFactory.CreateItem(itemID, worldPosition, out ItemObjectBase itemObject);
+            _itemsFactory.CreateItemDynamic(itemID, spawnParams);
         }
 
         private void ClearItemsSpawners()

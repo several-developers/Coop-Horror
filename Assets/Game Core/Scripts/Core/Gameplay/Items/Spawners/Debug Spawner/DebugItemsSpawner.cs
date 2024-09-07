@@ -1,5 +1,6 @@
 ﻿using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Utilities;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -81,13 +82,16 @@ namespace GameCore.Gameplay.Items.Spawners
             position.y += 0.25f;
             position = position.GetRandomPosition(radius: 0.25f);
 
-            bool isItemCreated = _itemsFactory.CreateItem(_itemMeta.ItemID, position, out ItemObjectBase itemObject);
+            var spawnParams = new ItemSpawnParams<ItemObjectBase>.Builder()
+                .SetSpawnPosition(position)
+                .SetSuccessCallback(ItemCreated)
+                .Build();
             
-            if (!isItemCreated)
-                return;
-            
-            itemObject.ToggleDestroyOnSceneUnload(_markDestroyOnUnloadScene);
+            _itemsFactory.CreateItemDynamic(_itemMeta.ItemID, spawnParams);
         }
+
+        private void ItemCreated(ItemObjectBase itemObject) =>
+            itemObject.ToggleDestroyOnSceneUnload(_markDestroyOnUnloadScene);
 
         private bool IsItemMetaValid()
         {

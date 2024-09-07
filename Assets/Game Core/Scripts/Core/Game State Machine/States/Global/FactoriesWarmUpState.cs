@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Factories.Entities;
+using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.Factories.Menu;
 using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.Network.Utilities;
@@ -15,6 +16,7 @@ namespace GameCore.StateMachine
             IMenuFactory menuFactory,
             IEntitiesFactory entitiesFactory,
             IMonstersFactory monstersFactory,
+            IItemsFactory itemsFactory,
             GlobalNetworkPrefabsRegistrar globalNetworkPrefabsRegistrar
         )
         {
@@ -22,6 +24,7 @@ namespace GameCore.StateMachine
             _menuFactory = menuFactory;
             _entitiesFactory = entitiesFactory;
             _monstersFactory = monstersFactory;
+            _itemsFactory = itemsFactory;
             _globalNetworkPrefabsRegistrar = globalNetworkPrefabsRegistrar;
 
             _gameStateMachine.AddState(this);
@@ -33,6 +36,7 @@ namespace GameCore.StateMachine
         private readonly IMenuFactory _menuFactory;
         private readonly IEntitiesFactory _entitiesFactory;
         private readonly IMonstersFactory _monstersFactory;
+        private readonly IItemsFactory _itemsFactory;
         private readonly GlobalNetworkPrefabsRegistrar _globalNetworkPrefabsRegistrar;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -51,6 +55,7 @@ namespace GameCore.StateMachine
             await _menuFactory.WarmUp();
             await _entitiesFactory.WarmUp();
             await _monstersFactory.WarmUp();
+            await _itemsFactory.WarmUp();
         }
         
         private void EnterLoadMainMenuState() =>

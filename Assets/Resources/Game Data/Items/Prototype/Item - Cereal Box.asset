@@ -31,3 +31,13 @@ MonoBehaviour:
     type: 3}
   _itemPreviewPrefab: {fileID: 1063181044141629135, guid: 756441a77eece624e91dbac490465154,
     type: 3}
+  _itemPrefabAsset:
+    m_AssetGUID: aa036a376b2ad994d9e66857c0303664
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  _itemPreviewPrefabAsset:
+    m_AssetGUID: 756441a77eece624e91dbac490465154
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0

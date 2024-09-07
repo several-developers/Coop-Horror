@@ -1,9 +1,9 @@
 ﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Systems.Inventory;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items;
-using GameCore.Infrastructure.Providers.Gameplay.ItemsMeta;
+using GameCore.Gameplay.Systems.Inventory;
+using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
 using Sirenix.OdinInspector;

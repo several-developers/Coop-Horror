@@ -14,14 +14,15 @@ using GameCore.Gameplay.Systems.Quests;
 using GameCore.Gameplay.VisualManagement;
 using GameCore.Observers.Gameplay.Game;
 using UnityEngine;
+using Zenject;
 
 namespace GameCore.Gameplay.GameManagement
 {
-    public class GameController : IDisposable
+    public class GameFlowController : IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public GameController(
+        public GameFlowController(
             IGameManagerDecorator gameManagerDecorator,
             IGameTimeManagerDecorator gameTimeManagerDecorator,
             IQuestsManagerDecorator questsManagerDecorator,
@@ -32,7 +33,8 @@ namespace GameCore.Gameplay.GameManagement
             IDungeonsManager dungeonsManager,
             IVisualManager visualManager,
             ITrainEntity trainEntity,
-            IPublisher<UIEventMessage> uiEventMessagePublisher)
+            IPublisher<UIEventMessage> uiEventMessagePublisher
+            )
         {
             _gameManagerDecorator = gameManagerDecorator;
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
@@ -45,7 +47,30 @@ namespace GameCore.Gameplay.GameManagement
             _visualManager = visualManager;
             _trainEntity = trainEntity;
             _uiEventMessagePublisher = uiEventMessagePublisher;
+        }
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        private static bool IsServer => NetworkHorror.IsTrueServer;
+
+        // FIELDS: --------------------------------------------------------------------------------
+
+        private readonly IGameManagerDecorator _gameManagerDecorator;
+        private readonly IGameTimeManagerDecorator _gameTimeManagerDecorator;
+        private readonly IQuestsManagerDecorator _questsManagerDecorator;
+        private readonly IGameObserver _gameObserver;
+        private readonly ICamerasManager _camerasManager;
+        private readonly IGameResetManager _gameResetManager;
+        private readonly IMonstersGenerator _monstersGenerator;
+        private readonly IDungeonsManager _dungeonsManager;
+        private readonly IVisualManager _visualManager;
+        private readonly ITrainEntity _trainEntity;
+        private readonly IPublisher<UIEventMessage> _uiEventMessagePublisher;
+
+        // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void Initialize()
+        {
             _gameManagerDecorator.OnGameStateChangedEvent += HandleGameState;
 
             SubscribeToLogs();
@@ -89,26 +114,6 @@ namespace GameCore.Gameplay.GameManagement
                 _gameObserver.OnTrainLeavingLocationEvent += () => { Debug.Log("--> Train Leaving location."); };
             }
         }
-
-        // PROPERTIES: ----------------------------------------------------------------------------
-
-        private static bool IsServer => NetworkHorror.IsTrueServer;
-
-        // FIELDS: --------------------------------------------------------------------------------
-
-        private readonly IGameManagerDecorator _gameManagerDecorator;
-        private readonly IGameTimeManagerDecorator _gameTimeManagerDecorator;
-        private readonly IQuestsManagerDecorator _questsManagerDecorator;
-        private readonly IGameObserver _gameObserver;
-        private readonly ICamerasManager _camerasManager;
-        private readonly IGameResetManager _gameResetManager;
-        private readonly IMonstersGenerator _monstersGenerator;
-        private readonly IDungeonsManager _dungeonsManager;
-        private readonly IVisualManager _visualManager;
-        private readonly ITrainEntity _trainEntity;
-        private readonly IPublisher<UIEventMessage> _uiEventMessagePublisher;
-
-        // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Dispose()
         {
