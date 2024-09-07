@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Factories.Items;
+using GameCore.Gameplay.Factories.Locations;
 using GameCore.Gameplay.Factories.Menu;
 using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.Network.Utilities;
@@ -17,6 +18,7 @@ namespace GameCore.StateMachine
             IEntitiesFactory entitiesFactory,
             IMonstersFactory monstersFactory,
             IItemsFactory itemsFactory,
+            ILocationsFactory locationsFactory,
             GlobalNetworkPrefabsRegistrar globalNetworkPrefabsRegistrar
         )
         {
@@ -25,6 +27,7 @@ namespace GameCore.StateMachine
             _entitiesFactory = entitiesFactory;
             _monstersFactory = monstersFactory;
             _itemsFactory = itemsFactory;
+            _locationsFactory = locationsFactory;
             _globalNetworkPrefabsRegistrar = globalNetworkPrefabsRegistrar;
 
             _gameStateMachine.AddState(this);
@@ -37,6 +40,7 @@ namespace GameCore.StateMachine
         private readonly IEntitiesFactory _entitiesFactory;
         private readonly IMonstersFactory _monstersFactory;
         private readonly IItemsFactory _itemsFactory;
+        private readonly ILocationsFactory _locationsFactory;
         private readonly GlobalNetworkPrefabsRegistrar _globalNetworkPrefabsRegistrar;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -56,6 +60,7 @@ namespace GameCore.StateMachine
             await _entitiesFactory.WarmUp();
             await _monstersFactory.WarmUp();
             await _itemsFactory.WarmUp();
+            await _locationsFactory.WarmUp();
         }
 
         private async UniTask WarmUpNetworkPrefabs() =>

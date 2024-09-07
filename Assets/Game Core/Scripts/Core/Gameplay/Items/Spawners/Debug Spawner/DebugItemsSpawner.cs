@@ -82,7 +82,7 @@ namespace GameCore.Gameplay.Items.Spawners
             position.y += 0.25f;
             position = position.GetRandomPosition(radius: 0.25f);
 
-            var spawnParams = new ItemSpawnParams<ItemObjectBase>.Builder()
+            var spawnParams = new SpawnParams<ItemObjectBase>.Builder()
                 .SetSpawnPosition(position)
                 .SetSuccessCallback(ItemCreated)
                 .Build();

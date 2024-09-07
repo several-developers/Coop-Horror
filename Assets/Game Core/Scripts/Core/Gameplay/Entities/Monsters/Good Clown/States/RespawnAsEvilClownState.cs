@@ -81,7 +81,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
                 Vector3 position = transform.position;
                 Quaternion rotation = transform.rotation;
 
-                var spawnParams = new EntitySpawnParams<EvilClownEntity>.Builder()
+                var spawnParams = new SpawnParams<EvilClownEntity>.Builder()
                     .SetSpawnPosition(position)
                     .SetRotation(rotation)
                     .SetSuccessCallback(evilClownEntity =>
@@ -91,7 +91,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
                     })
                     .Build();
 
-                _monstersFactory.CreateMonster(MonsterType.EvilClown, spawnParams);
+                _monstersFactory.CreateMonsterDynamic(MonsterType.EvilClown, spawnParams);
             }
         }
 

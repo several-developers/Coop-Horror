@@ -1,16 +1,20 @@
 using System;
-using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Network;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Utilities
 {
-    public class EntitySpawnParams<TEntity> where TEntity : Entity
+    public class SpawnParams
+    {
+        
+    }
+    
+    public class SpawnParams<T> where T : class
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        private EntitySpawnParams()
+        private SpawnParams()
         {
         }
 
@@ -24,7 +28,7 @@ namespace GameCore.Gameplay.Utilities
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<string> FailCallbackEvent;
-        public event Action<TEntity> SuccessCallbackEvent;
+        public event Action<T> SuccessCallbackEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -37,7 +41,7 @@ namespace GameCore.Gameplay.Utilities
             FailCallbackEvent?.Invoke(reason);
         }
 
-        public void SendSuccessCallback(TEntity entity) =>
+        public void SendSuccessCallback(T entity) =>
             SuccessCallbackEvent?.Invoke(entity);
 
         // INNER CLASSES: -------------------------------------------------------------------------
@@ -48,7 +52,7 @@ namespace GameCore.Gameplay.Utilities
 
             public Builder()
             {
-                _spawnParams = new EntitySpawnParams<TEntity>
+                _spawnParams = new SpawnParams<T>
                 {
                     Rotation = Quaternion.identity,
                     OwnerID = NetworkHorror.ServerID
@@ -57,7 +61,7 @@ namespace GameCore.Gameplay.Utilities
 
             // FIELDS: --------------------------------------------------------------------------------
 
-            private readonly EntitySpawnParams<TEntity> _spawnParams;
+            private readonly SpawnParams<T> _spawnParams;
 
             // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -91,13 +95,13 @@ namespace GameCore.Gameplay.Utilities
                 return this;
             }
 
-            public Builder SetSuccessCallback(Action<TEntity> successCallback)
+            public Builder SetSuccessCallback(Action<T> successCallback)
             {
                 _spawnParams.SuccessCallbackEvent += successCallback;
                 return this;
             }
 
-            public EntitySpawnParams<TEntity> Build() => _spawnParams;
+            public SpawnParams<T> Build() => _spawnParams;
         }
     }
 }

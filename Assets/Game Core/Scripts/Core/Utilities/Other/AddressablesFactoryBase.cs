@@ -28,6 +28,8 @@ namespace GameCore.Utilities
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public abstract UniTask WarmUp();
+
         public void AddAsset(TKey key, AssetReference assetReference)
         {
             bool success = AddAsset(key, assetReference, _referencesDictionary);

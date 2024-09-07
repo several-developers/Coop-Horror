@@ -9,7 +9,7 @@ namespace GameCore.Gameplay.Factories.Monsters
     {
         UniTask WarmUp();
 
-        void CreateMonster<TMonsterEntity>(MonsterType monsterType, EntitySpawnParams<TMonsterEntity> spawnParams)
+        void CreateMonsterDynamic<TMonsterEntity>(MonsterType monsterType, SpawnParams<TMonsterEntity> spawnParams)
             where TMonsterEntity : MonsterEntityBase;
     }
 }

@@ -30,8 +30,8 @@ namespace GameCore.Gameplay.Factories.Menu
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public async UniTask WarmUp() =>
-            await SetupReferencesDictionary();
+        public override async UniTask WarmUp() =>
+            await SetupAssetsReferences();
 
         public async UniTask<GameObject> Create(Type menuType) =>
             await InstantiatePrefab(menuType, MainCanvas.Transform, _diContainer);
@@ -84,7 +84,7 @@ namespace GameCore.Gameplay.Factories.Menu
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTask SetupReferencesDictionary()
+        private async UniTask SetupAssetsReferences()
         {
             var menuPrefabsListConfig = _configsProvider.GetConfig<MenuPrefabsListConfigMeta>();
 

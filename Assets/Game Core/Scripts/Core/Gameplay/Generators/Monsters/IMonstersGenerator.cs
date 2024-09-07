@@ -1,4 +1,4 @@
-﻿namespace GameCore.Gameplay.MonstersGeneration
+﻿namespace GameCore.Gameplay.Generators.Monsters
 {
     public interface IMonstersGenerator
     {

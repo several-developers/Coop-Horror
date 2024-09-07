@@ -234,11 +234,11 @@ namespace GameCore.Gameplay.Items.Generators.Dungeon
             Vector3 worldPosition = itemsSpawner.GetRandomSpawnWorldPosition();
             worldPosition.y += 1f;
             
-            var spawnParams = new ItemSpawnParams<ItemObjectBase>.Builder()
+            var spawnParams = new SpawnParams<ItemObjectBase>.Builder()
                 .SetSpawnPosition(worldPosition)
                 .Build();
 
-            _itemsFactory.CreateItemDynamic(itemID, spawnParams);
+            //_itemsFactory.CreateItemDynamic(itemID, spawnParams);
         }
 
         private void ClearItemsSpawners()

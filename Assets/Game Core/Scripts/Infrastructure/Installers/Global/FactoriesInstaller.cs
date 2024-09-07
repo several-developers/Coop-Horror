@@ -1,5 +1,6 @@
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Factories.Items;
+using GameCore.Gameplay.Factories.Locations;
 using GameCore.Gameplay.Factories.Menu;
 using GameCore.Gameplay.Factories.Monsters;
 using Zenject;
@@ -16,6 +17,7 @@ namespace GameCore.Infrastructure.Installers.Global
             BindEntitiesFactory();
             BindMonstersFactory();
             BindItemsFactory();
+            BindLocationsFactory();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -45,6 +47,13 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .BindInterfacesTo<ItemsFactory>()
+                .AsSingle();
+        }
+        
+        private void BindLocationsFactory()
+        {
+            Container
+                .BindInterfacesTo<LocationsFactory>()
                 .AsSingle();
         }
     }

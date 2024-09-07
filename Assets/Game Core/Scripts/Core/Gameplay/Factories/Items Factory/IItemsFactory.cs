@@ -7,12 +7,10 @@ namespace GameCore.Gameplay.Factories.Items
 {
     public interface IItemsFactory : IAddressablesFactory<int>
     {
-        UniTask WarmUp();
-
-        UniTask CreateItem<TItemObject>(int itemID, ItemSpawnParams<TItemObject> spawnParams)
+        UniTask CreateItem<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase;
 
-        void CreateItemDynamic<TItemObject>(int itemID, ItemSpawnParams<TItemObject> spawnParams)
+        void CreateItemDynamic<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase;
     }
 }

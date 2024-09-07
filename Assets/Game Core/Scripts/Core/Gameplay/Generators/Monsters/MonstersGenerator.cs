@@ -24,7 +24,7 @@ using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
 
-namespace GameCore.Gameplay.MonstersGeneration
+namespace GameCore.Gameplay.Generators.Monsters
 {
     public class MonstersGenerator : IMonstersGenerator, IInitializable, ITickable, IDisposable
     {
@@ -126,7 +126,7 @@ namespace GameCore.Gameplay.MonstersGeneration
         {
             if (!NetworkHorror.IsTrueServer)
                 return;
-            
+
             int monstersSpawnAmount = _monstersSpawnList.Count;
             float deltaTime = Time.deltaTime;
 
@@ -183,9 +183,10 @@ namespace GameCore.Gameplay.MonstersGeneration
         {
             _validMonstersList.Clear();
 
-            IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
+            IEnumerable<MonstersListConfigMeta.MonsterReference> allMonstersReferences =
+                _monstersListConfig.GetAllMonstersReferences();
 
-            foreach (MonsterReference monsterReference in allReferences)
+            foreach (MonstersListConfigMeta.MonsterReference monsterReference in allMonstersReferences)
             {
                 MonsterAIConfigMeta monsterAIConfig = monsterReference.MonsterAIConfig;
                 MonsterSpawnType spawnType = monsterAIConfig.SpawnType;
@@ -340,12 +341,12 @@ namespace GameCore.Gameplay.MonstersGeneration
                 return;
             }
 
-            var spawnParams = new EntitySpawnParams<MonsterEntityBase>.Builder()
+            var spawnParams = new SpawnParams<MonsterEntityBase>.Builder()
                 .SetSpawnPosition(spawnPosition)
                 .SetSuccessCallback(entity => { MonsterSpawned(entity, floor); })
                 .Build();
 
-            _monstersFactory.CreateMonster(monsterType, spawnParams);
+            _monstersFactory.CreateMonsterDynamic(monsterType, spawnParams);
         }
 
         private void SpawnMonsterOutdoor(MonsterType monsterType)

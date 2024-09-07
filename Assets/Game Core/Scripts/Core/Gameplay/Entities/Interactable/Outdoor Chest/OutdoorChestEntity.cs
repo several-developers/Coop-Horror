@@ -140,7 +140,7 @@ namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
 
                 Vector3 worldPosition = itemSpawnPoint.position;
 
-                var spawnParams = new ItemSpawnParams<ItemObjectBase>.Builder()
+                var spawnParams = new SpawnParams<ItemObjectBase>.Builder()
                     .SetSpawnPosition(worldPosition)
                     .Build();
                 

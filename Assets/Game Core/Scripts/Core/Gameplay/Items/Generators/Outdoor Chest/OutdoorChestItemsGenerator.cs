@@ -143,7 +143,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
             if (!isItemsListCreated)
                 return;
 
-            var spawnParams = new EntitySpawnParams<OutdoorChestEntity>.Builder()
+            var spawnParams = new SpawnParams<OutdoorChestEntity>.Builder()
                 .SetSpawnPosition(worldPosition)
                 .SetSuccessCallback(entity => { ChestSpawned(entity, itemsList); })
                 .Build();

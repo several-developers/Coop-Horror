@@ -83,7 +83,7 @@ namespace GameCore.Gameplay.Network
                     return;
             }
 
-            var spawnParams = new EntitySpawnParams<PlayerEntity>.Builder()
+            var spawnParams = new SpawnParams<PlayerEntity>.Builder()
                 .SetOwnerID(clientID)
                 .SetSuccessCallback(playerEntity => { PlayerCreated(playerEntity, clientID, lateJoin); })
                 .Build();

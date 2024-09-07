@@ -53,9 +53,10 @@ namespace GameCore.Infrastructure.Providers.Gameplay.MonstersAI
 
         private void SetupMonstersAIDictionary()
         {
-            IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
+            IEnumerable<MonstersListConfigMeta.MonsterReference> allMonstersReferences =
+                _monstersListConfig.GetAllMonstersReferences();
 
-            foreach (MonsterReference monsterReference in allReferences)
+            foreach (MonstersListConfigMeta.MonsterReference monsterReference in allMonstersReferences)
             {
                 MonsterType monsterType = monsterReference.MonsterType;
                 MonsterAIConfigMeta monsterAIConfig = monsterReference.MonsterAIConfig;

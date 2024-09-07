@@ -8,8 +8,7 @@ namespace GameCore.Gameplay.Factories.Entities
 {
     public interface IEntitiesFactory : IAddressablesFactory<Type>
     {
-        UniTask WarmUp();
-        UniTask CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
-        void CreateEntityDynamic<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
+        UniTask CreateEntity<TEntity>(SpawnParams<TEntity> spawnParams) where TEntity : Entity;
+        void CreateEntityDynamic<TEntity>(SpawnParams<TEntity> spawnParams) where TEntity : Entity;
     }
 }

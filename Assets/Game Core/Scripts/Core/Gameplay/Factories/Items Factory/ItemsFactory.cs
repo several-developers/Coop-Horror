@@ -39,24 +39,24 @@ namespace GameCore.Gameplay.Factories.Items
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public async UniTask WarmUp() =>
+        public override async UniTask WarmUp() =>
             await SetupReferencesDictionary();
 
-        public async UniTask CreateItem<TItemObject>(int itemID, ItemSpawnParams<TItemObject> spawnParams)
+        public async UniTask CreateItem<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
             if (!TrySetupItemParams(itemID, spawnParams))
                 return;
-            
+
             await LoadAndCreateItem(spawnParams, itemID);
         }
 
-        public void CreateItemDynamic<TItemObject>(int itemID, ItemSpawnParams<TItemObject> spawnParams)
+        public void CreateItemDynamic<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
             if (!TrySetupItemParams(itemID, spawnParams))
                 return;
-            
+
             InstantiateItemDynamic(spawnParams, itemID);
         }
 
@@ -84,7 +84,7 @@ namespace GameCore.Gameplay.Factories.Items
             }
         }
 
-        private bool TrySetupItemParams<TItemObject>(int itemID, ItemSpawnParams<TItemObject> spawnParams)
+        private bool TrySetupItemParams<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
             if (!TryGetItemAsset(itemID, out AssetReferenceGameObject assetReference))
@@ -97,7 +97,7 @@ namespace GameCore.Gameplay.Factories.Items
             return true;
         }
 
-        private void InstantiateItemDynamic<TItemObject>(ItemSpawnParams<TItemObject> spawnParams, int itemID)
+        private void InstantiateItemDynamic<TItemObject>(SpawnParams<TItemObject> spawnParams, int itemID)
             where TItemObject : ItemObjectBase
         {
             AssetReference assetReference = spawnParams.AssetReference;
@@ -120,7 +120,7 @@ namespace GameCore.Gameplay.Factories.Items
             );
         }
 
-        private async UniTask LoadAndCreateItem<TItemObject>(ItemSpawnParams<TItemObject> spawnParams, int itemID)
+        private async UniTask LoadAndCreateItem<TItemObject>(SpawnParams<TItemObject> spawnParams, int itemID)
             where TItemObject : ItemObjectBase
         {
             AssetReference assetReference = spawnParams.AssetReference;
@@ -136,8 +136,8 @@ namespace GameCore.Gameplay.Factories.Items
             CreateItem(entityPrefab, itemID, spawnParams);
         }
 
-        private void CreateItem<TItemObject>(TItemObject itemPrefab, int itemID,
-            ItemSpawnParams<TItemObject> spawnParams) where TItemObject : ItemObjectBase
+        private void CreateItem<TItemObject>(TItemObject itemPrefab, int itemID, SpawnParams<TItemObject> spawnParams)
+            where TItemObject : ItemObjectBase
         {
             NetworkObject prefabNetworkObject = null;
 
@@ -172,7 +172,7 @@ namespace GameCore.Gameplay.Factories.Items
         }
 
         private void CreateItem<TItemObject>(NetworkObject prefabNetworkObject, int itemID,
-            ItemSpawnParams<TItemObject> spawnParams) where TItemObject : ItemObjectBase
+            SpawnParams<TItemObject> spawnParams) where TItemObject : ItemObjectBase
         {
             bool isItemMetaFound = TryGetItemMeta(itemID, out ItemMeta itemMeta);
 

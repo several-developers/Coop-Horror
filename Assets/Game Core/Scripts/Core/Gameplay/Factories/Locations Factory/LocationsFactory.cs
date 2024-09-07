@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Global.EntitiesList;
-using GameCore.Gameplay.Entities;
+using GameCore.Configs.Global.LocationsList;
+using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Global;
@@ -11,36 +11,40 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Gameplay.Factories.Entities
+namespace GameCore.Gameplay.Factories.Locations
 {
-    public class EntitiesFactory : AddressablesFactoryBase<Type>, IEntitiesFactory
+    public class LocationsFactory : AddressablesFactoryBase<LocationName>, ILocationsFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public EntitiesFactory(
+        public LocationsFactory(
             IAssetsProvider assetsProvider,
             IConfigsProvider configsProvider,
             IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator
         ) : base(assetsProvider)
         {
+            _locationsListConfig = configsProvider.GetConfig<LocationsListConfigMeta>();
             _dynamicPrefabsLoaderDecorator = dynamicPrefabsLoaderDecorator;
-            _entitiesListConfig = configsProvider.GetConfig<EntitiesListConfigMeta>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private readonly LocationsListConfigMeta _locationsListConfig;
         private readonly IDynamicPrefabsLoaderDecorator _dynamicPrefabsLoaderDecorator;
-        private readonly EntitiesListConfigMeta _entitiesListConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override async UniTask WarmUp() =>
             await SetupAssetsReferences();
 
-        public async UniTask CreateEntity<TEntity>(SpawnParams<TEntity> spawnParams) where TEntity : Entity =>
-            await LoadAndCreateEntity(spawnParams);
+        public async UniTask CreateLocation<TLocation>(LocationName locationName, SpawnParams<TLocation> spawnParams)
+            where TLocation : LocationManager
+        {
+            await LoadAndCreateLocation(locationName, spawnParams);
+        }
 
-        public void CreateEntityDynamic<TEntity>(SpawnParams<TEntity> spawnParams) where TEntity : Entity
+        public void CreateEntityDynamic<TLocation>(LocationName locationName, SpawnParams<TLocation> spawnParams)
+            where TLocation : LocationManager
         {
             AssetReference assetReference = spawnParams.AssetReference;
             bool containsAssetReference = assetReference != null;
@@ -52,18 +56,16 @@ namespace GameCore.Gameplay.Factories.Entities
             }
             else
             {
-                Type entityType = typeof(TEntity);
-                
-                if (!TryGetDynamicAssetGUID(entityType, out guid))
+                if (!TryGetDynamicAssetGUID(locationName, out guid))
                 {
-                    spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TEntity)}' not found!");
+                    spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TLocation)}' not found!");
                     return;
                 }
             }
 
             _dynamicPrefabsLoaderDecorator.LoadAndGetPrefab(
                 guid: guid,
-                loadCallback: prefabNetworkObject => EntityPrefabLoaded(prefabNetworkObject, spawnParams)
+                loadCallback: prefabNetworkObject => LocationPrefabLoaded(prefabNetworkObject, spawnParams)
             );
         }
 
@@ -71,40 +73,22 @@ namespace GameCore.Gameplay.Factories.Entities
 
         private async UniTask SetupAssetsReferences()
         {
-            IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
-            IEnumerable<AssetReferenceGameObject> allGlobalReferences = _entitiesListConfig.GetAllGlobalReferences();
-            IEnumerable<AssetReferenceGameObject> allDynamicReferences = _entitiesListConfig.GetAllDynamicReferences();
+            IEnumerable<LocationsListConfigMeta.LocationReference> allLocationsReferences =
+                _locationsListConfig.GetAllLocationsReferences();
 
-            foreach (AssetReferenceGameObject assetReference in allReferences)
+            foreach (LocationsListConfigMeta.LocationReference locationReference in allLocationsReferences)
             {
-                Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
-                AddAsset(entityType, assetReference);
-            }
-            
-            foreach (AssetReferenceGameObject assetReference in allGlobalReferences)
-            {
-                Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
-                AddAsset(entityType, assetReference);
-            }
-            
-            foreach (AssetReferenceGameObject assetReference in allDynamicReferences)
-            {
-                Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
-                AddDynamicAsset(entityType, assetReference);
-            }
+                AssetReferenceGameObject locationPrefabAsset = locationReference.LocationPrefabAsset;
 
-            // LOCAL METHODS: -----------------------------
-
-            async UniTask<Type> GetAssetTypeAfterLoadAndRelease(AssetReference assetReference)
-            {
-                var entity = await LoadAndReleaseAsset<Entity>(assetReference);
-                Type entityType = entity.GetType();
-                return entityType;
+                await LoadAndReleaseAsset<GameObject>(locationPrefabAsset);
+                
+                LocationName locationName = locationReference.LocationMeta.LocationName;
+                AddDynamicAsset(locationName, locationPrefabAsset);
             }
         }
 
-        private static void EntityPrefabLoaded<TEntity>(NetworkObject prefabNetworkObject,
-            SpawnParams<TEntity> spawnParams) where TEntity : Entity
+        private static void LocationPrefabLoaded<TLocation>(NetworkObject prefabNetworkObject,
+            SpawnParams<TLocation> spawnParams) where TLocation : LocationManager
         {
             if (prefabNetworkObject == null)
             {
@@ -113,7 +97,7 @@ namespace GameCore.Gameplay.Factories.Entities
             }
 
             NetworkObject instanceNetworkObject = InstantiateEntity();
-            var entityInstance = instanceNetworkObject.GetComponent<TEntity>();
+            var entityInstance = instanceNetworkObject.GetComponent<TLocation>();
 
             spawnParams.SendSuccessCallback(entityInstance);
 
@@ -142,29 +126,24 @@ namespace GameCore.Gameplay.Factories.Entities
             }
         }
 
-        private async UniTask LoadAndCreateEntity<TEntity>(SpawnParams<TEntity> spawnParams)
-            where TEntity : Entity
+        private async UniTask LoadAndCreateLocation<TLocation>(LocationName locationName,
+            SpawnParams<TLocation> spawnParams) where TLocation : LocationManager
         {
             AssetReference assetReference = spawnParams.AssetReference;
             bool containsAssetReference = assetReference != null;
 
-            TEntity prefab;
+            TLocation prefab;
 
             if (containsAssetReference)
-            {
-                prefab = await LoadAsset<TEntity>(assetReference);
-            }
+                prefab = await LoadAsset<TLocation>(assetReference);
             else
-            {
-                Type key = typeof(TEntity);
-                prefab = await LoadAsset<TEntity>(key);
-            }
+                prefab = await LoadAsset<TLocation>(locationName);
 
-            CreateEntity(prefab, spawnParams);
+            CreateLocation(prefab, spawnParams);
         }
 
-        private static void CreateEntity<TEntity>(TEntity entityPrefab, SpawnParams<TEntity> spawnParams)
-            where TEntity : Entity
+        private static void CreateLocation<TLocation>(TLocation entityPrefab, SpawnParams<TLocation> spawnParams)
+            where TLocation : LocationManager
         {
             NetworkObject prefabNetworkObject = null;
 
@@ -172,7 +151,7 @@ namespace GameCore.Gameplay.Factories.Entities
                 return;
 
             NetworkObject instanceNetworkObject = InstantiateNetworkObject();
-            var instance = instanceNetworkObject.GetComponent<TEntity>();
+            var instance = instanceNetworkObject.GetComponent<TLocation>();
 
             spawnParams.SendSuccessCallback(instance);
 
@@ -219,7 +198,7 @@ namespace GameCore.Gameplay.Factories.Entities
                 return networkObject;
             }
         }
-
+        
         private static NetworkSpawnManager GetNetworkSpawnManager() =>
             NetworkManager.Singleton.SpawnManager;
     }

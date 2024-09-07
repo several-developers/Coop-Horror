@@ -6,7 +6,7 @@ using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.GameTimeManagement;
-using GameCore.Gameplay.MonstersGeneration;
+using GameCore.Gameplay.Generators.Monsters;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;

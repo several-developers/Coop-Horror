@@ -1,56 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Enemies;
-using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Level.Locations;
 using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Configs.Global.MonstersList
+namespace GameCore.Configs.Global.LocationsList
 {
-    public class MonstersListConfigMeta : ConfigMeta
+    public class LocationsListConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
-        [SerializeField, LabelText("List")]
+        [SerializeField]
         [ListDrawerSettings(ListElementLabelName = "Label")]
-        private List<MonsterReference> _references;
+        private List<LocationReference> _locationsReferences;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public IEnumerable<MonsterReference> GetAllMonstersReferences() => _references;
-        
+        public IEnumerable<LocationReference> GetAllLocationsReferences() => _locationsReferences;
+
         public override string GetMetaCategory() =>
             EditorConstants.GlobalConfigsListsCategory;
-        
+
         public override ConfigScope GetConfigScope() =>
             ConfigScope.Global;
 
         // INNER CLASSES: -------------------------------------------------------------------------
-        
+
         [Serializable]
-        public class MonsterReference
+        public class LocationReference
         {
             // MEMBERS: -------------------------------------------------------------------------------
 
             [SerializeField]
-            private MonsterType _monsterType;
+            private LocationMeta _locationMeta;
 
             [SerializeField]
-            private MonsterAIConfigMeta _monsterAIConfig;
-        
-            [SerializeField]
-            private AssetReferenceGameObject _assetReference;
+            private AssetReferenceGameObject _locationPrefabAsset;
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
-            public MonsterType MonsterType => _monsterType;
-            public MonsterAIConfigMeta MonsterAIConfig => _monsterAIConfig;
-            public AssetReferenceGameObject AssetReference => _assetReference;
+            public LocationMeta LocationMeta => _locationMeta;
+            public AssetReferenceGameObject LocationPrefabAsset => _locationPrefabAsset;
 
-            private string Label => $"'Monster: {_monsterType}'";
+            private string Label => $"'Location: {(_locationMeta == null ? "none" : _locationMeta.LocationNameText)}'";
         }
     }
 }

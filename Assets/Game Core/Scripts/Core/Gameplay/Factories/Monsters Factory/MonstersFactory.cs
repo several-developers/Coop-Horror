@@ -34,17 +34,17 @@ namespace GameCore.Gameplay.Factories.Monsters
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public async UniTask WarmUp() =>
-            await SetupReferencesDictionary();
-        
-        public void CreateMonster<TMonsterEntity>(MonsterType monsterType,
-            EntitySpawnParams<TMonsterEntity> spawnParams) where TMonsterEntity : MonsterEntityBase
+            await SetupAssetsReferences();
+
+        public void CreateMonsterDynamic<TMonsterEntity>(MonsterType monsterType,
+            SpawnParams<TMonsterEntity> spawnParams) where TMonsterEntity : MonsterEntityBase
         {
             if (!TryGetAssetReference(monsterType, out AssetReferenceGameObject assetReference))
             {
                 spawnParams.FailCallbackEvent += _ => AssetReferenceNotFoundError(monsterType);
                 return;
             }
-            
+
             spawnParams.SetAssetReference(assetReference);
             _entitiesFactory.CreateEntityDynamic(spawnParams);
         }
@@ -52,13 +52,14 @@ namespace GameCore.Gameplay.Factories.Monsters
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private static void AssetReferenceNotFoundError(MonsterType monsterType) =>
-            Debug.LogError($"Asset Reference not found for '{monsterType.GetNiceName()}'!");
+            Debug.LogError(message: $"Asset Reference not found for '{monsterType.GetNiceName()}'!");
 
-        private async UniTask SetupReferencesDictionary()
+        private async UniTask SetupAssetsReferences()
         {
-            IEnumerable<MonsterReference> allReferences = _monstersListConfig.GetAllReferences();
+            IEnumerable<MonstersListConfigMeta.MonsterReference> allMonstersReferences =
+                _monstersListConfig.GetAllMonstersReferences();
 
-            foreach (MonsterReference monsterReference in allReferences)
+            foreach (MonstersListConfigMeta.MonsterReference monsterReference in allMonstersReferences)
             {
                 MonsterType monsterType = monsterReference.MonsterType;
                 bool containsKey = _prefabsKeysDictionary.ContainsKey(monsterType);
@@ -69,13 +70,13 @@ namespace GameCore.Gameplay.Factories.Monsters
                     continue;
                 }
 
-                AssetReferenceGameObject assetReference = monsterReference.AssetReference;
+                AssetReferenceGameObject monsterPrefabAsset = monsterReference.AssetReference;
 
-                var entity = await _entitiesFactory.LoadAndReleaseAsset<IEntity>(assetReference);
+                var entity = await _entitiesFactory.LoadAndReleaseAsset<IEntity>(monsterPrefabAsset);
                 Type entityType = entity.GetType();
-                
-                _entitiesFactory.AddDynamicAsset(entityType, assetReference);
-                _prefabsKeysDictionary.Add(monsterType, assetReference);
+
+                _entitiesFactory.AddDynamicAsset(entityType, monsterPrefabAsset);
+                _prefabsKeysDictionary.Add(monsterType, monsterPrefabAsset);
             }
         }
 
