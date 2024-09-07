@@ -1,67 +1,72 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Infrastructure.Providers.Global;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace GameCore.Utilities
 {
-    public abstract class AddressablesFactoryBase
+    public abstract class AddressablesFactoryBase<TKey> : IAddressablesFactory<TKey>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         protected AddressablesFactoryBase(IAssetsProvider assetsProvider)
         {
             _assetsProvider = assetsProvider;
-            _referencesDictionary = new Dictionary<Type, AssetReference>();
-            _dynamicReferencesDictionary = new Dictionary<Type, AssetReference>();
+            _referencesDictionary = new Dictionary<TKey, AssetReference>();
+            _dynamicReferencesDictionary = new Dictionary<TKey, AssetReference>();
         }
+
+        // PROPERTIES: ----------------------------------------------------------------------------
+
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IAssetsProvider _assetsProvider;
-        private readonly Dictionary<Type, AssetReference> _referencesDictionary;
-        private readonly Dictionary<Type, AssetReference> _dynamicReferencesDictionary;
+        private readonly Dictionary<TKey, AssetReference> _referencesDictionary;
+        private readonly Dictionary<TKey, AssetReference> _dynamicReferencesDictionary;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public async UniTask LoadAndSaveAsset<T>(AssetReference assetReference) where T : class
+        public void AddAsset(TKey key, AssetReference assetReference)
         {
-            var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
+            bool success = AddAsset(key, assetReference, _referencesDictionary);
 
-            await LoadAndSaveAssetReference<T>(_referencesDictionary, handle, assetReference);
-            Addressables.Release(handle);
+            if (!success)
+                return;
+
+            string log = Log.HandleLog($"Added Asset with key '<gb>{key}</gb>'");
+            Debug.Log(log);
         }
 
-        public async UniTask LoadAndSaveAssetDynamic<T>(AssetReference assetReference) where T : class
+        public void AddDynamicAsset(TKey key, AssetReference assetReference)
         {
-            var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
+            bool success = AddAsset(key, assetReference, _dynamicReferencesDictionary);
 
-            await LoadAndSaveAssetReference<T>(_dynamicReferencesDictionary, handle, assetReference);
-            Addressables.Release(handle);
+            if (!success)
+                return;
+
+            string log = Log.HandleLog($"Added Dynamic Asset with key '<gb>{key}</gb>'");
+            Debug.Log(log);
+        }
+
+        public async UniTask<T> LoadAndReleaseAsset<T>(AssetReference assetReference) where T : class
+        {
+            var handle = await _assetsProvider.LoadAsset<GameObject>(assetReference);
+            _assetsProvider.ReleaseAsset(assetReference);
+
+            if (handle.TryGetComponent(out T result))
+                return result;
+
+            Log.PrintError(log: $"Component of type '<gb>{typeof(T)}</gb>' <rb>not found</rb>!");
+            return null;
         }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected async UniTask SetupReferencesDictionary<T>(IEnumerable<AssetReference> assetReferences)
-            where T : class
+        protected async UniTask<T> LoadAsset<T>(TKey key) where T : class
         {
-            foreach (AssetReference assetReference in assetReferences)
-                await LoadAndSaveAsset<T>(assetReference);
-        }
-
-        protected async UniTask SetupDynamicReferencesDictionary<T>(IEnumerable<AssetReference> assetReferences)
-            where T : class
-        {
-            foreach (AssetReference assetReference in assetReferences)
-                await LoadAndSaveAssetDynamic<T>(assetReference);
-        }
-
-        protected async UniTask<T> LoadAsset<T>() where T : class
-        {
-            bool isAssetReferenceFound = TryGetAssetReference<T>(out AssetReference assetReference);
+            bool isAssetReferenceFound = TryGetAssetReference(key, out AssetReference assetReference);
 
             if (!isAssetReferenceFound)
                 return null;
@@ -86,9 +91,12 @@ namespace GameCore.Utilities
             return instance;
         }
 
-        protected bool TryGetAssetGUID<T>(out string guid) where T : class
+        protected void ReleaseAsset(AssetReference assetReference) =>
+            Addressables.Release(assetReference);
+
+        protected bool TryGetAssetGUID<T>(TKey key, out string guid) where T : class
         {
-            if (!TryGetAssetReference<T>(out AssetReference assetReference))
+            if (!TryGetAssetReference(key, out AssetReference assetReference))
             {
                 guid = string.Empty;
                 return false;
@@ -98,9 +106,9 @@ namespace GameCore.Utilities
             return true;
         }
 
-        protected bool TryGetDynamicAssetGUID<T>(out string guid) where T : class
+        protected bool TryGetDynamicAssetGUID(TKey key, out string guid)
         {
-            if (!TryGetDynamicAssetReference<T>(out AssetReference assetReference))
+            if (!TryGetDynamicAssetReference(key, out AssetReference assetReference))
             {
                 guid = string.Empty;
                 return false;
@@ -110,59 +118,38 @@ namespace GameCore.Utilities
             return true;
         }
 
-        protected bool TryGetAssetReference(Type type, out AssetReference assetReference)
+        protected bool TryGetAssetReference(TKey key, out AssetReference assetReference)
         {
-            bool isAssetReferenceFound = _referencesDictionary.TryGetValue(type, out assetReference);
+            bool isAssetReferenceFound = _referencesDictionary.TryGetValue(key, out assetReference);
 
             if (!isAssetReferenceFound)
-                Log.PrintError(log: $"<gb>Asset Reference '<gb>{type.Name}</gb>' <rb>not found</rb>!");
+                Log.PrintError(log: $"<gb>Asset Reference with key '<gb>{key}</gb>' <rb>not found</rb>!");
 
             return isAssetReferenceFound;
         }
 
-        protected bool TryGetDynamicAssetReference(Type type, out AssetReference assetReference)
+        protected bool TryGetDynamicAssetReference(TKey key, out AssetReference assetReference)
         {
-            bool isAssetReferenceFound = _dynamicReferencesDictionary.TryGetValue(type, out assetReference);
+            bool isAssetReferenceFound = _dynamicReferencesDictionary.TryGetValue(key, out assetReference);
 
             if (!isAssetReferenceFound)
-                Log.PrintError(log: $"<gb>Asset Reference '<gb>{type.Name}</gb>' <rb>not found</rb>!");
+                Log.PrintError(log: $"<gb>Asset Reference with key '<gb>{key}</gb>' <rb>not found</rb>!");
 
             return isAssetReferenceFound;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static async UniTask LoadAndSaveAssetReference<T>(Dictionary<Type, AssetReference> dictionary,
-            AsyncOperationHandle<GameObject> handle, AssetReference assetReference) where T : class
+        private static bool AddAsset(TKey key, AssetReference assetReference,
+            Dictionary<TKey, AssetReference> dictionary)
         {
-            GameObject menuPrefab = await handle.Task;
-
-            if (!menuPrefab.TryGetComponent(out T menuView))
-            {
-                Log.PrintError(log: $"<gb>Asset Reference '{assetReference.AssetGUID}'</gb> " +
-                                    "was <rb>not found</rb>!");
-                return;
-            }
-
-            Type type = menuView.GetType();
-            bool success = dictionary.TryAdd(type, assetReference);
+            bool success = dictionary.TryAdd(key, assetReference);
 
             if (success)
-                return;
+                return true;
 
-            Log.PrintError(log: $"Key '<gb>{type.Name}</gb>' <rb>already exists</rb>!");
-        }
-        
-        private bool TryGetAssetReference<T>(out AssetReference assetReference) where T : class
-        {
-            Type key = typeof(T);
-            return TryGetAssetReference(key, out assetReference);
-        }
-
-        private bool TryGetDynamicAssetReference<T>(out AssetReference assetReference) where T : class
-        {
-            Type key = typeof(T);
-            return TryGetDynamicAssetReference(key, out assetReference);
+            Log.PrintError(log: $"Dictionary <rb>already contains</rb> key '<gb>{key}</gb>'");
+            return false;
         }
     }
 }

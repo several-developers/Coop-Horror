@@ -12,7 +12,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Factories.Menu
 {
-    public class MenuFactory : AddressablesFactoryBase, IMenuFactory
+    public class MenuFactory : AddressablesFactoryBase<Type>, IMenuFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -92,7 +92,14 @@ namespace GameCore.Gameplay.Factories.Menu
                 return;
 
             IEnumerable<AssetReferenceGameObject> allMenuReferences = menuPrefabsListConfig.GetAllMenuReferences();
-            await SetupReferencesDictionary<MenuView>(allMenuReferences);
+
+            foreach (AssetReferenceGameObject assetReference in allMenuReferences)
+            {
+                var entity = await LoadAndReleaseAsset<MenuView>(assetReference);
+                Type key = entity.GetType();
+                
+                AddAsset(key, assetReference);
+            }
         }
 
 #warning Maybe working not correctly with Zenject, need to be checked.
@@ -111,7 +118,8 @@ namespace GameCore.Gameplay.Factories.Menu
         private async UniTask<TMenu> InstantiatePrefabForComponent<TMenu>(Transform container, DiContainer diContainer)
             where TMenu : MenuView
         {
-            var menuPrefab = await LoadAsset<TMenu>();
+            Type menuType = typeof(TMenu);
+            var menuPrefab = await LoadAsset<TMenu>(menuType);
             return diContainer.InstantiatePrefabForComponent<TMenu>(menuPrefab, container);
         }
     }

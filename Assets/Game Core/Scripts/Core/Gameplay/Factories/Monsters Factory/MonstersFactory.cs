@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Global.MonstersList;
 using GameCore.Enums.Gameplay;
@@ -70,7 +71,10 @@ namespace GameCore.Gameplay.Factories.Monsters
 
                 AssetReferenceGameObject assetReference = monsterReference.AssetReference;
 
-                await _entitiesFactory.LoadAndSaveAssetDynamic<IEntity>(assetReference);
+                var entity = await _entitiesFactory.LoadAndReleaseAsset<IEntity>(assetReference);
+                Type entityType = entity.GetType();
+                
+                _entitiesFactory.AddDynamicAsset(entityType, assetReference);
                 _prefabsKeysDictionary.Add(monsterType, assetReference);
             }
         }

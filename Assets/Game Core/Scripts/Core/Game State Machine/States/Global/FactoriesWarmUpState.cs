@@ -44,7 +44,7 @@ namespace GameCore.StateMachine
         public async UniTaskVoid Enter()
         {
             await WarmUpFactories();
-            await _globalNetworkPrefabsRegistrar.RegisterPrefabs();
+            await WarmUpNetworkPrefabs();
             EnterLoadMainMenuState();
         }
 
@@ -57,7 +57,10 @@ namespace GameCore.StateMachine
             await _monstersFactory.WarmUp();
             await _itemsFactory.WarmUp();
         }
-        
+
+        private async UniTask WarmUpNetworkPrefabs() =>
+            await _globalNetworkPrefabsRegistrar.RegisterPrefabs();
+
         private void EnterLoadMainMenuState() =>
             _gameStateMachine.ChangeState<LoadMainMenuState>();
     }

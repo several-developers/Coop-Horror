@@ -1,15 +1,14 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Utilities;
-using UnityEngine.AddressableAssets;
+using GameCore.Utilities;
 
 namespace GameCore.Gameplay.Factories.Entities
 {
-    public interface IEntitiesFactory
+    public interface IEntitiesFactory : IAddressablesFactory<Type>
     {
         UniTask WarmUp();
-        UniTask LoadAndSaveAsset<T>(AssetReference assetReference) where T : class;
-        UniTask LoadAndSaveAssetDynamic<T>(AssetReference assetReference) where T : class;
         UniTask CreateEntity<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
         void CreateEntityDynamic<TEntity>(EntitySpawnParams<TEntity> spawnParams) where TEntity : Entity;
     }

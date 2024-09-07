@@ -13,28 +13,28 @@ using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Factories.Items
 {
-    public class ItemsFactory : AddressablesFactoryBase, IItemsFactory
+    public class ItemsFactory : AddressablesFactoryBase<int>, IItemsFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
-
         public ItemsFactory(
             IAssetsProvider assetsProvider,
             IConfigsProvider configsProvider,
-            IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
-            IItemsMetaProvider itemsMetaProvider
+            IItemsMetaProvider itemsMetaProvider,
+            IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator
         ) : base(assetsProvider)
         {
             _dynamicPrefabsLoaderDecorator = dynamicPrefabsLoaderDecorator;
-            _itemsListConfig = configsProvider.GetConfig<ItemsListConfigMeta>();
             _itemsMetaProvider = itemsMetaProvider;
+            _itemsListConfig = configsProvider.GetConfig<ItemsListConfigMeta>();
             _itemsPrefabsAssets = new Dictionary<int, AssetReferenceGameObject>();
         }
+
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IDynamicPrefabsLoaderDecorator _dynamicPrefabsLoaderDecorator;
-        private readonly ItemsListConfigMeta _itemsListConfig;
         private readonly IItemsMetaProvider _itemsMetaProvider;
+        private readonly ItemsListConfigMeta _itemsListConfig;
         private readonly Dictionary<int, AssetReferenceGameObject> _itemsPrefabsAssets;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -45,26 +45,18 @@ namespace GameCore.Gameplay.Factories.Items
         public async UniTask CreateItem<TItemObject>(int itemID, ItemSpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
-            if (!TryGetItemAsset(itemID, out AssetReferenceGameObject assetReference))
-            {
-                spawnParams.FailCallbackEvent += _ => AssetReferenceNotFoundError(itemID);
+            if (!TrySetupItemParams(itemID, spawnParams))
                 return;
-            }
-
-            spawnParams.SetAssetReference(assetReference);
+            
             await LoadAndCreateItem(spawnParams, itemID);
         }
 
         public void CreateItemDynamic<TItemObject>(int itemID, ItemSpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
-            if (!TryGetItemAsset(itemID, out AssetReferenceGameObject assetReference))
-            {
-                spawnParams.FailCallbackEvent += _ => AssetReferenceNotFoundError(itemID);
+            if (!TrySetupItemParams(itemID, spawnParams))
                 return;
-            }
-
-            spawnParams.SetAssetReference(assetReference);
+            
             InstantiateItemDynamic(spawnParams, itemID);
         }
 
@@ -87,8 +79,22 @@ namespace GameCore.Gameplay.Factories.Items
                     continue;
                 }
 
-                await LoadAndSaveAssetDynamic<ItemObjectBase>(itemPrefabAsset);
+                await LoadAndReleaseAsset<ItemObjectBase>(itemPrefabAsset);
+                AddDynamicAsset(itemID, itemPrefabAsset);
             }
+        }
+
+        private bool TrySetupItemParams<TItemObject>(int itemID, ItemSpawnParams<TItemObject> spawnParams)
+            where TItemObject : ItemObjectBase
+        {
+            if (!TryGetItemAsset(itemID, out AssetReferenceGameObject assetReference))
+            {
+                spawnParams.FailCallbackEvent += _ => AssetReferenceNotFoundError(itemID);
+                return false;
+            }
+
+            spawnParams.SetAssetReference(assetReference);
+            return true;
         }
 
         private void InstantiateItemDynamic<TItemObject>(ItemSpawnParams<TItemObject> spawnParams, int itemID)
@@ -102,7 +108,7 @@ namespace GameCore.Gameplay.Factories.Items
             {
                 guid = assetReference.AssetGUID;
             }
-            else if (!TryGetDynamicAssetGUID<TItemObject>(out guid))
+            else if (!TryGetDynamicAssetGUID(itemID, out guid))
             {
                 spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TItemObject)}' not found!");
                 return;
@@ -125,7 +131,7 @@ namespace GameCore.Gameplay.Factories.Items
             if (containsAssetReference)
                 entityPrefab = await LoadAsset<TItemObject>(assetReference);
             else
-                entityPrefab = await LoadAsset<TItemObject>();
+                entityPrefab = await LoadAsset<TItemObject>(itemID);
 
             CreateItem(entityPrefab, itemID, spawnParams);
         }
@@ -178,10 +184,10 @@ namespace GameCore.Gameplay.Factories.Items
                 SendFailCallback(reason: "Network Object not found!");
                 return;
             }
-            
+
             NetworkObject instanceNetworkObject = InstantiateEntity();
             var itemInstance = instanceNetworkObject.GetComponent<TItemObject>();
-            
+
             itemInstance.Setup(itemID, itemMeta.ScaleMultiplier);
             spawnParams.SendSuccessCallback(itemInstance);
 
@@ -211,7 +217,7 @@ namespace GameCore.Gameplay.Factories.Items
         }
 
         private static void AssetReferenceNotFoundError(int itemID) =>
-            Debug.LogError($"Asset Reference not found for item ID '{itemID}'!");
+            Debug.LogError(message: $"Asset Reference not found for item ID '{itemID}'!");
 
         private bool TryGetItemAsset(int itemID, out AssetReferenceGameObject assetReference)
         {

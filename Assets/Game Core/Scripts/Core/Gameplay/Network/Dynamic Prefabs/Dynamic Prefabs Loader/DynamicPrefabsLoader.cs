@@ -23,6 +23,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
     /// For more details on the API usage, see the in-project readme (which includes links to further resources,
     /// including the project's technical document).
     /// </remarks>
+#warning НАЗВАТЬ Dynamic Prefabs Factory или Network Prefabs Factory
     public class DynamicPrefabsLoader : NetcodeBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -241,10 +242,10 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 {
                     SendError();
                 }
-                
+
                 // _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, NetworkHorror.ServerID,
                 //     destroyWithScene: true, position: Vector3.zero);
-                
+
                 Debug.Log(message: "Spawned dynamic prefab");
 
                 // Every client loaded dynamic prefab, their respective ClientUIs in case they loaded first.

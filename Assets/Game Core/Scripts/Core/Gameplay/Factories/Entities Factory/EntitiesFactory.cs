@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Global.EntitiesList;
 using GameCore.Gameplay.Entities;
@@ -12,7 +13,7 @@ using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Factories.Entities
 {
-    public class EntitiesFactory : AddressablesFactoryBase, IEntitiesFactory
+    public class EntitiesFactory : AddressablesFactoryBase<Type>, IEntitiesFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -49,10 +50,15 @@ namespace GameCore.Gameplay.Factories.Entities
             {
                 guid = assetReference.AssetGUID;
             }
-            else if (!TryGetDynamicAssetGUID<TEntity>(out guid))
+            else
             {
-                spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TEntity)}' not found!");
-                return;
+                Type entityType = typeof(TEntity);
+                
+                if (!TryGetDynamicAssetGUID(entityType, out guid))
+                {
+                    spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TEntity)}' not found!");
+                    return;
+                }
             }
 
             _dynamicPrefabsLoaderDecorator.LoadAndGetPrefab(
@@ -66,12 +72,35 @@ namespace GameCore.Gameplay.Factories.Entities
         private async UniTask SetupReferencesDictionary()
         {
             IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
-            IEnumerable<AssetReferenceGameObject> allDynamicReferences = _entitiesListConfig.GetAllDynamicReferences();
             IEnumerable<AssetReferenceGameObject> allGlobalReferences = _entitiesListConfig.GetAllGlobalReferences();
+            IEnumerable<AssetReferenceGameObject> allDynamicReferences = _entitiesListConfig.GetAllDynamicReferences();
 
-            await SetupReferencesDictionary<Entity>(allReferences);
-            await SetupReferencesDictionary<Entity>(allGlobalReferences);
-            await SetupDynamicReferencesDictionary<Entity>(allDynamicReferences);
+            foreach (AssetReferenceGameObject assetReference in allReferences)
+            {
+                Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
+                AddAsset(entityType, assetReference);
+            }
+            
+            foreach (AssetReferenceGameObject assetReference in allGlobalReferences)
+            {
+                Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
+                AddAsset(entityType, assetReference);
+            }
+            
+            foreach (AssetReferenceGameObject assetReference in allDynamicReferences)
+            {
+                Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
+                AddDynamicAsset(entityType, assetReference);
+            }
+
+            // LOCAL METHODS: -----------------------------
+
+            async UniTask<Type> GetAssetTypeAfterLoadAndRelease(AssetReference assetReference)
+            {
+                var entity = await LoadAndReleaseAsset<Entity>(assetReference);
+                Type entityType = entity.GetType();
+                return entityType;
+            }
         }
 
         private static void EntityPrefabLoaded<TEntity>(NetworkObject prefabNetworkObject,
@@ -122,9 +151,14 @@ namespace GameCore.Gameplay.Factories.Entities
             TEntity entityPrefab;
 
             if (containsAssetReference)
+            {
                 entityPrefab = await LoadAsset<TEntity>(assetReference);
+            }
             else
-                entityPrefab = await LoadAsset<TEntity>();
+            {
+                Type key = typeof(TEntity);
+                entityPrefab = await LoadAsset<TEntity>(key);
+            }
 
             CreateEntity(entityPrefab, spawnParams);
         }

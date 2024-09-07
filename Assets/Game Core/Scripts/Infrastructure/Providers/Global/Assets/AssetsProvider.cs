@@ -17,16 +17,18 @@ namespace GameCore.Infrastructure.Providers.Global
         {
             _scenesLoaderPrefab = Load<GameObject>(path: AssetsPaths.ScenesLoaderPrefab);
             _networkManager = Load<NetworkManager>(path: AssetsPaths.NetworkManager);
+            _completedCache = new Dictionary<string, AsyncOperationHandle>();
+            _handles = new Dictionary<string, List<AsyncOperationHandle>>();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly GameObject _scenesLoaderPrefab;
         private readonly NetworkManager _networkManager;
-        
-        private readonly Dictionary<string, AsyncOperationHandle> _completedCache = new();
-        private readonly Dictionary<string, List<AsyncOperationHandle>> _handles = new();
-        
+
+        private readonly Dictionary<string, AsyncOperationHandle> _completedCache;
+        private readonly Dictionary<string, List<AsyncOperationHandle>> _handles;
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Initialize() =>
@@ -50,22 +52,43 @@ namespace GameCore.Infrastructure.Providers.Global
             return await RunWitchCacheOnComplete(handle, cacheKey: address);
         }
 
+#warning НЕ УВЕРЕН ЧТО ПРАВИЛЬНО СДЕЛАНО
         public void ReleaseAsset(AssetReference assetReference)
         {
-            if (_completedCache.TryGetValue(assetReference.AssetGUID, out AsyncOperationHandle completedHandle))
+            bool containsCache =
+                _completedCache.TryGetValue(assetReference.AssetGUID, out AsyncOperationHandle cachedHandle);
+            
+            bool containsHandle =
+                _handles.TryGetValue(assetReference.AssetGUID, out List<AsyncOperationHandle> handles);
+            
+            if (containsCache)
             {
-                Addressables.Release(completedHandle);
+                if (cachedHandle.IsValid())
+                    Addressables.Release(cachedHandle);
+                
                 _completedCache.Remove(assetReference.AssetGUID);
             }
             else
                 Addressables.Release(assetReference);
+
+            if (!containsHandle)
+                return;
+            
+            foreach (AsyncOperationHandle handle in handles)
+            {
+                if (!handle.IsValid())
+                    continue;
+                    
+                Addressables.Release(handle);
+            }
         }
 
         public async UniTask<GameObject> Instantiate(string address) =>
             await Addressables.InstantiateAsync(address).Task; // Skips 1 frame before instantiation.
 
         public async UniTask<GameObject> Instantiate(string address, Vector3 at) =>
-            await Addressables.InstantiateAsync(address, at, Quaternion.identity).Task; // Skips 1 frame before instantiation.
+            await Addressables.InstantiateAsync(address, at, Quaternion.identity)
+                .Task; // Skips 1 frame before instantiation.
 
         public async UniTask<GameObject> Instantiate(string address, Transform parent) =>
             await Addressables.InstantiateAsync(address, parent).Task; // Skips 1 frame before instantiation.
@@ -76,14 +99,17 @@ namespace GameCore.Infrastructure.Providers.Global
             {
                 foreach (AsyncOperationHandle handle in resourceHandles)
                 {
+                    if (!handle.IsValid())
+                        continue;
+                    
                     Addressables.Release(handle);
                 }
             }
-            
+
             _completedCache.Clear();
             _handles.Clear();
         }
-        
+
         public GameObject GetScenesLoaderPrefab() => _scenesLoaderPrefab;
         public NetworkManager GetNetworkManager() => _networkManager;
 
@@ -92,10 +118,7 @@ namespace GameCore.Infrastructure.Providers.Global
         private async UniTask<T> RunWitchCacheOnComplete<T>(AsyncOperationHandle<T> handle, string cacheKey)
             where T : class
         {
-            handle.Completed += operationHandle =>
-            {
-                _completedCache[cacheKey] = operationHandle;
-            };
+            handle.Completed += operationHandle => { _completedCache[cacheKey] = operationHandle; };
 
             AddHandle(cacheKey, handle);
 
