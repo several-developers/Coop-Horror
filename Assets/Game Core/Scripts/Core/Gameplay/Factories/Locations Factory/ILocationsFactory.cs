@@ -11,7 +11,7 @@ namespace GameCore.Gameplay.Factories.Locations
         UniTask CreateLocation<TLocation>(LocationName locationName, SpawnParams<TLocation> spawnParams)
             where TLocation : LocationManager;
 
-        void CreateEntityDynamic<TLocation>(LocationName locationName, SpawnParams<TLocation> spawnParams)
+        void CreateLocationDynamic<TLocation>(LocationName locationName, SpawnParams<TLocation> spawnParams)
             where TLocation : LocationManager;
     }
 }

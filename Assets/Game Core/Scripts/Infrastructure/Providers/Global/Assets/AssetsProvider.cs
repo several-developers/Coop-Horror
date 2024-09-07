@@ -43,6 +43,13 @@ namespace GameCore.Infrastructure.Providers.Global
             return await RunWitchCacheOnComplete(handle, cacheKey: assetReference.AssetGUID);
         }
 
+        public async UniTask<T> LoadAndForgetAsset<T>(AssetReference assetReference) where T : class
+        {
+            var asset = await LoadAsset<T>(assetReference);
+            ReleaseAsset(assetReference);
+            return asset;
+        }
+
         public async UniTask<T> LoadAsset<T>(string address) where T : class
         {
             if (_completedCache.TryGetValue(address, out AsyncOperationHandle completedHandle))

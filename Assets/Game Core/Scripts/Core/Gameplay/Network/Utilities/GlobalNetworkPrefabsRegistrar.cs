@@ -65,9 +65,8 @@ namespace GameCore.Gameplay.Network.Utilities
 
         private async UniTask LoadAndRegisterAsset(AssetReferenceGameObject assetReference)
         {
-            var prefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
+            var prefab = await _assetsProvider.LoadAndForgetAsset<GameObject>(assetReference);
             _networkPrefabsRegistrar.Register(prefab);
-            //_assetsProvider.ReleaseAsset(assetReference);
         }
     }
 }

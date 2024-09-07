@@ -40,7 +40,7 @@ namespace GameCore.Infrastructure.Providers.Global.ItemsMeta
                 ItemMeta itemMeta = itemReference.ItemMeta;
                 int itemID = itemMeta.ItemID;
 
-                if (IsItemExistsWithErrorCheck(itemID))
+                if (IsItemExists(itemID))
                     continue;
 
                 _itemsDictionary.Add(itemID, itemMeta);
@@ -48,7 +48,7 @@ namespace GameCore.Infrastructure.Providers.Global.ItemsMeta
 
             // LOCAL METHODS: -----------------------------
 
-            bool IsItemExistsWithErrorCheck(int itemID)
+            bool IsItemExists(int itemID)
             {
                 if (!_itemsDictionary.ContainsKey(itemID))
                     return false;

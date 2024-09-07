@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.LocationsList;
+using GameCore.Configs.Global.LocationsList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Level.Locations;
-using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Global;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 {
@@ -10,11 +10,11 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LocationsMetaProvider(IGameplayConfigsProvider gameplayConfigsProvider)
+        public LocationsMetaProvider(IConfigsProvider configsProvider)
         {
-            _locationsListConfig = gameplayConfigsProvider.GetConfig<LocationsListConfigMeta>();
+            _locationsListConfig = configsProvider.GetConfig<LocationsListConfigMeta>();
             _locationsMeta = new Dictionary<LocationName, LocationMeta>();
-            
+
             SetupLocationsDictionary();
         }
 
@@ -25,8 +25,6 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public IEnumerable<LocationMeta> GetAllLocationsMeta() =>
-            _locationsListConfig.GetAllLocationsMeta();
 
         public bool TryGetLocationMeta(LocationName locationName, out LocationMeta locationMeta) =>
             _locationsMeta.TryGetValue(locationName, out locationMeta);
@@ -35,10 +33,12 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 
         private void SetupLocationsDictionary()
         {
-            IEnumerable<LocationMeta> allLocationsMeta = _locationsListConfig.GetAllLocationsMeta();
+            IEnumerable<LocationsListConfigMeta.LocationReference> allLocationsReferences =
+                _locationsListConfig.GetAllLocationsReferences();
 
-            foreach (LocationMeta locationMeta in allLocationsMeta)
+            foreach (LocationsListConfigMeta.LocationReference locationReference in allLocationsReferences)
             {
+                LocationMeta locationMeta = locationReference.LocationMeta;
                 LocationName locationName = locationMeta.LocationName;
                 bool isAdded = _locationsMeta.TryAdd(locationName, locationMeta);
 

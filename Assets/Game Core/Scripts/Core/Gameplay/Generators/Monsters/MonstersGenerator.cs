@@ -41,7 +41,7 @@ namespace GameCore.Gameplay.Generators.Monsters
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
-            if (!NetworkHorror.IsTrueServer)
+            if (!IsServer)
                 return;
 
             var balanceConfig = gameplayConfigsProvider.GetConfig<BalanceConfigMeta>();
@@ -71,6 +71,10 @@ namespace GameCore.Gameplay.Generators.Monsters
             };
         }
 
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        private bool IsServer => NetworkHorror.IsTrueServer;
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private const float MonstersSpawnTickInterval = 1f;
@@ -98,7 +102,7 @@ namespace GameCore.Gameplay.Generators.Monsters
 
         public void Initialize()
         {
-            if (!NetworkHorror.IsTrueServer)
+            if (!IsServer)
                 return;
 
             _monstersSpawnCycle.OnActionEvent += MonstersSpawnTick;
@@ -112,7 +116,10 @@ namespace GameCore.Gameplay.Generators.Monsters
 
         public void Dispose()
         {
-            if (!NetworkHorror.IsTrueServer)
+            Debug.LogWarning("Dispose: " + IsServer);
+            
+#warning ВОЗМОЖНО ВО ВРЕМЯ DISPOSE СТАНОВИТСЯ FALSE ДАЖЕ У СЕРВЕРА
+            if (!IsServer)
                 return;
 
             _monstersSpawnCycle.FullStop();

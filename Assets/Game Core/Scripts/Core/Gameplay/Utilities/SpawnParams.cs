@@ -5,11 +5,6 @@ using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Utilities
 {
-    public class SpawnParams
-    {
-        
-    }
-    
     public class SpawnParams<T> where T : class
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------

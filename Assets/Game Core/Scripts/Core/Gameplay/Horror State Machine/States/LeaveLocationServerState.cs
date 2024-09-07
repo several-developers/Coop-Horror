@@ -123,8 +123,8 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 _levelProvider.TryGetElevator(floor, out result);
         }
 
-        private void UnloadLastLocation() =>
-            _locationsLoader.UnloadLastScene();
+        private void UnloadLastLocation() => 
+            _locationsLoader.UnloadLastLocation();
 
         private void EnterLeaveLocationClientState() =>
             _horrorStateMachine.ChangeState<LeaveLocationClientState>();

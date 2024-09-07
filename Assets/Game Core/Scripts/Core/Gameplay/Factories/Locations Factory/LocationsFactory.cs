@@ -43,7 +43,7 @@ namespace GameCore.Gameplay.Factories.Locations
             await LoadAndCreateLocation(locationName, spawnParams);
         }
 
-        public void CreateEntityDynamic<TLocation>(LocationName locationName, SpawnParams<TLocation> spawnParams)
+        public void CreateLocationDynamic<TLocation>(LocationName locationName, SpawnParams<TLocation> spawnParams)
             where TLocation : LocationManager
         {
             AssetReference assetReference = spawnParams.AssetReference;
@@ -80,21 +80,24 @@ namespace GameCore.Gameplay.Factories.Locations
             {
                 AssetReferenceGameObject locationPrefabAsset = locationReference.LocationPrefabAsset;
 
-                await LoadAndReleaseAsset<GameObject>(locationPrefabAsset);
-                
+                await LoadAndReleaseAsset<LocationManager>(locationPrefabAsset);
+
                 LocationName locationName = locationReference.LocationMeta.LocationName;
-                AddDynamicAsset(locationName, locationPrefabAsset);
+                AddAsset(locationName, locationPrefabAsset);
             }
         }
 
-        private static void LocationPrefabLoaded<TLocation>(NetworkObject prefabNetworkObject,
-            SpawnParams<TLocation> spawnParams) where TLocation : LocationManager
+        private static void LocationPrefabLoaded<TLocation>(GameObject prefab, SpawnParams<TLocation> spawnParams)
+            where TLocation : LocationManager
         {
-            if (prefabNetworkObject == null)
+            if (prefab == null)
             {
-                SendFailCallback(reason: "Network Object not found!");
+                SendFailCallback(reason: "Prefab not found!");
                 return;
             }
+
+            if (!prefab.TryGetComponent(out NetworkObject prefabNetworkObject))
+                return;
 
             NetworkObject instanceNetworkObject = InstantiateEntity();
             var entityInstance = instanceNetworkObject.GetComponent<TLocation>();
@@ -139,10 +142,46 @@ namespace GameCore.Gameplay.Factories.Locations
             else
                 prefab = await LoadAsset<TLocation>(locationName);
 
-            CreateLocation(prefab, spawnParams);
+            CreateLocationDefault(prefab, spawnParams);
         }
 
-        private static void CreateLocation<TLocation>(TLocation entityPrefab, SpawnParams<TLocation> spawnParams)
+        private static void CreateLocationDefault<TLocation>(TLocation entityPrefab, SpawnParams<TLocation> spawnParams)
+            where TLocation : LocationManager
+        {
+            if (!TryGetNetworkObject())
+                return;
+
+            TLocation locationInstance = InstantiateLocation();
+            spawnParams.SendSuccessCallback(locationInstance);
+
+            // LOCAL METHODS: -----------------------------
+
+            bool TryGetNetworkObject()
+            {
+                bool isPrefabFound = entityPrefab != null;
+
+                if (!isPrefabFound)
+                {
+                    SendFailCallback(reason: "Entity prefab not found!");
+                    return false;
+                }
+                
+                return false;
+            }
+
+            void SendFailCallback(string reason) =>
+                spawnParams.SendFailCallback(reason);
+
+            TLocation InstantiateLocation()
+            {
+                Vector3 worldPosition = spawnParams.WorldPosition;
+                Quaternion rotation = spawnParams.Rotation;
+
+                return Object.Instantiate(entityPrefab, worldPosition, rotation);
+            }
+        }
+        
+        private static void CreateLocationNetwork<TLocation>(TLocation entityPrefab, SpawnParams<TLocation> spawnParams)
             where TLocation : LocationManager
         {
             NetworkObject prefabNetworkObject = null;
@@ -198,7 +237,7 @@ namespace GameCore.Gameplay.Factories.Locations
                 return networkObject;
             }
         }
-        
+
         private static NetworkSpawnManager GetNetworkSpawnManager() =>
             NetworkManager.Singleton.SpawnManager;
     }

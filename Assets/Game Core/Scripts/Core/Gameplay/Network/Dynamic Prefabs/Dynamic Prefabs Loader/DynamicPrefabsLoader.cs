@@ -156,7 +156,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
         /// the spawn will fail.
         /// </summary>
-        private async void TryLoadAndGetDynamicPrefab(string guid, Action<NetworkObject> loadCallback)
+        private async void TryLoadAndGetDynamicPrefab(string guid, Action<GameObject> loadCallback)
         {
             if (!IsServer)
             {
@@ -234,14 +234,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                     return;
                 }
 
-                if (prefab.Result.TryGetComponent(out NetworkObject prefabNetworkObject))
-                {
-                    SendSuccess(prefabNetworkObject);
-                }
-                else
-                {
-                    SendError();
-                }
+                SendSuccess(prefab.Result);
 
                 // _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, NetworkHorror.ServerID,
                 //     destroyWithScene: true, position: Vector3.zero);
@@ -258,8 +251,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 }
             }
 
-            void SendSuccess(NetworkObject prefabNetworkObject) =>
-                loadCallback?.Invoke(prefabNetworkObject);
+            void SendSuccess(GameObject prefab) =>
+                loadCallback?.Invoke(prefab);
 
             void SendError() =>
                 loadCallback?.Invoke(obj: null);
@@ -448,7 +441,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnTrySpawnPrefab(string guid, Action<NetworkObject> callback) =>
+        private void OnTrySpawnPrefab(string guid, Action<GameObject> callback) =>
             TryLoadAndGetDynamicPrefab(guid, callback);
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

@@ -3,7 +3,7 @@ using GameCore.Gameplay.Level.Locations;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
 {
-    #warning УБРАТЬ?
+#warning УБРАТЬ?
     public class LoadLocationState : IEnterState<LocationName>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -32,8 +32,8 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void LoadLocation(LocationName locationName) =>
-            _locationsLoader.LoadLocationNetwork(locationName);
-        
+            _locationsLoader.LoadLocation(locationName);
+
         private void EnterGameLoopState() =>
             _horrorStateMachine.ChangeState<GameLoopState>();
     }

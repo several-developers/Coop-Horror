@@ -53,7 +53,7 @@ namespace GameCore.Gameplay.Factories.Entities
             else
             {
                 Type entityType = typeof(TEntity);
-                
+
                 if (!TryGetDynamicAssetGUID(entityType, out guid))
                 {
                     spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TEntity)}' not found!");
@@ -80,13 +80,13 @@ namespace GameCore.Gameplay.Factories.Entities
                 Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
                 AddAsset(entityType, assetReference);
             }
-            
+
             foreach (AssetReferenceGameObject assetReference in allGlobalReferences)
             {
                 Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
                 AddAsset(entityType, assetReference);
             }
-            
+
             foreach (AssetReferenceGameObject assetReference in allDynamicReferences)
             {
                 Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
@@ -103,14 +103,17 @@ namespace GameCore.Gameplay.Factories.Entities
             }
         }
 
-        private static void EntityPrefabLoaded<TEntity>(NetworkObject prefabNetworkObject,
-            SpawnParams<TEntity> spawnParams) where TEntity : Entity
+        private static void EntityPrefabLoaded<TEntity>(GameObject prefab, SpawnParams<TEntity> spawnParams)
+            where TEntity : Entity
         {
-            if (prefabNetworkObject == null)
+            if (prefab == null)
             {
-                SendFailCallback(reason: "Network Object not found!");
+                SendFailCallback(reason: "Prefab not found!");
                 return;
             }
+
+            if (!prefab.TryGetComponent(out NetworkObject prefabNetworkObject))
+                return;
 
             NetworkObject instanceNetworkObject = InstantiateEntity();
             var entityInstance = instanceNetworkObject.GetComponent<TEntity>();

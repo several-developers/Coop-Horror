@@ -139,51 +139,25 @@ namespace GameCore.Gameplay.Factories.Items
         private void CreateItem<TItemObject>(TItemObject itemPrefab, int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
-            NetworkObject prefabNetworkObject = null;
-
-            if (!TryGetPrefabNetworkObject())
-                return;
-
-            CreateItem(prefabNetworkObject, itemID, spawnParams);
-
-            // LOCAL METHODS: -----------------------------
-
-            bool TryGetPrefabNetworkObject()
-            {
-                bool isPrefabFound = itemPrefab != null;
-
-                if (!isPrefabFound)
-                {
-                    SendFailCallback(reason: "Item prefab not found!");
-                    return false;
-                }
-
-                bool isNetworkObjectFound = itemPrefab.TryGetComponent(out prefabNetworkObject);
-
-                if (isNetworkObjectFound)
-                    return true;
-
-                SendFailCallback(reason: "Network Object not found!");
-                return false;
-            }
-
-            void SendFailCallback(string reason) =>
-                spawnParams.SendFailCallback(reason);
+            CreateItem(itemPrefab.gameObject, itemID, spawnParams);
         }
 
-        private void CreateItem<TItemObject>(NetworkObject prefabNetworkObject, int itemID,
-            SpawnParams<TItemObject> spawnParams) where TItemObject : ItemObjectBase
+        private void CreateItem<TItemObject>(GameObject prefab, int itemID, SpawnParams<TItemObject> spawnParams)
+            where TItemObject : ItemObjectBase
         {
             bool isItemMetaFound = TryGetItemMeta(itemID, out ItemMeta itemMeta);
 
             if (!isItemMetaFound)
                 return;
 
-            if (prefabNetworkObject == null)
+            if (prefab == null)
             {
-                SendFailCallback(reason: "Network Object not found!");
+                SendFailCallback(reason: "Prefab not found!");
                 return;
             }
+
+            if (!prefab.TryGetComponent(out NetworkObject prefabNetworkObject))
+                return;
 
             NetworkObject instanceNetworkObject = InstantiateEntity();
             var itemInstance = instanceNetworkObject.GetComponent<TItemObject>();

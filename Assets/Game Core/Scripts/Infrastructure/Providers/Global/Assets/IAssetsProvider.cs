@@ -8,6 +8,7 @@ namespace GameCore.Infrastructure.Providers.Global
     public interface IAssetsProvider
     {
         UniTask<T> LoadAsset<T>(AssetReference assetReference) where T : class;
+        UniTask<T> LoadAndForgetAsset<T>(AssetReference assetReference) where T : class;
         UniTask<T> LoadAsset<T>(string address) where T : class;
         void ReleaseAsset(AssetReference assetReference);
         UniTask<GameObject> Instantiate(string address);
