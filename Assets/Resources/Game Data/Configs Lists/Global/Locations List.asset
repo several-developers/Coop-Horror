@@ -16,25 +16,25 @@ MonoBehaviour:
   _locationsReferences:
   - _locationMeta: {fileID: 11400000, guid: c2ac7d4c412f0c34d8c9ca87da127f1a, type: 2}
     _locationPrefabAsset:
-      m_AssetGUID: 
+      m_AssetGUID: 624272141ebde2b4c8e9df50f9b9eaaf
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - _locationMeta: {fileID: 11400000, guid: ac247ec3b56417346b5f377661bec869, type: 2}
     _locationPrefabAsset:
-      m_AssetGUID: 
+      m_AssetGUID: cdc7d9d15017d034bb8b083f488dd98c
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - _locationMeta: {fileID: 11400000, guid: 1322bc351cbd0a04e8e0158327a1e9c0, type: 2}
     _locationPrefabAsset:
-      m_AssetGUID: 
+      m_AssetGUID: 84061b0edd54ac54baf182bdbff01755
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - _locationMeta: {fileID: 11400000, guid: 8c4967bd17843be4f8d3a817067b012e, type: 2}
     _locationPrefabAsset:
-      m_AssetGUID: 
+      m_AssetGUID: ccdf2918245b2424b92a227c57d2a278
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
