@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Utilities
 {
+#warning КРИВАЯ ХУЙНЯ, НЕ УМИРАЮТ АСИНКИ
     public class SimpleRoutine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -19,7 +20,7 @@ namespace GameCore.Gameplay.Utilities
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnActionEvent = delegate { };
-        
+
         private readonly CancellationTokenSource _cts;
         private readonly float _interval = 0.25f;
 
@@ -35,10 +36,10 @@ namespace GameCore.Gameplay.Utilities
                 Debug.LogError(message: "Routine is active!");
                 return;
             }
-            
+
             _isActive = true;
             _forceStop = false;
-            
+
             Cycle();
         }
 
@@ -47,11 +48,10 @@ namespace GameCore.Gameplay.Utilities
             _forceStop = true;
             _cts.Cancel();
         }
-        
+
         public void FullStop()
         {
-            _forceStop = true;
-            _cts.Cancel();
+            Stop();
             _cts?.Dispose();
         }
 
@@ -62,7 +62,7 @@ namespace GameCore.Gameplay.Utilities
             while (!_forceStop)
             {
                 int delay = _interval.ConvertToMilliseconds();
-                
+
                 bool isCanceled = await UniTask
                     .Delay(delay, cancellationToken: _cts.Token)
                     .SuppressCancellationThrow();
@@ -72,7 +72,7 @@ namespace GameCore.Gameplay.Utilities
 
                 if (_forceStop)
                     break;
-                
+
                 OnActionEvent.Invoke();
             }
 

@@ -23,6 +23,7 @@ namespace GameCore.Gameplay.Utilities
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<string> FailCallbackEvent;
+        public event Action<T> SetupInstanceEvent;
         public event Action<T> SuccessCallbackEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -38,6 +39,9 @@ namespace GameCore.Gameplay.Utilities
 
         public void SendSuccessCallback(T entity) =>
             SuccessCallbackEvent?.Invoke(entity);
+        
+        public void SendSetupInstance(T entity) =>
+            SetupInstanceEvent?.Invoke(entity);
 
         // INNER CLASSES: -------------------------------------------------------------------------
 

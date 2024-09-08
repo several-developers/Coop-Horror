@@ -81,11 +81,17 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitOwner() =>
-            _dynamicPrefabsLoaderDecorator.OnTrySpawnPrefabEvent += OnTrySpawnPrefab;
+        protected override void InitOwner()
+        {
+            _dynamicPrefabsLoaderDecorator.OnTrySpawnGameObjectPrefabEvent += OnTrySpawnGameObjectPrefab;
+            _dynamicPrefabsLoaderDecorator.OnTrySpawnNetworkObjectPrefabEvent += OnTrySpawnNetworkObjectPrefab;
+        }
 
-        protected override void DespawnOwner() =>
-            _dynamicPrefabsLoaderDecorator.OnTrySpawnPrefabEvent -= OnTrySpawnPrefab;
+        protected override void DespawnOwner()
+        {
+            _dynamicPrefabsLoaderDecorator.OnTrySpawnGameObjectPrefabEvent -= OnTrySpawnGameObjectPrefab;
+            _dynamicPrefabsLoaderDecorator.OnTrySpawnNetworkObjectPrefabEvent -= OnTrySpawnNetworkObjectPrefab;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -156,12 +162,59 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
         /// the spawn will fail.
         /// </summary>
-        private async void TryLoadAndGetDynamicPrefab(string guid, Action<GameObject> loadCallback)
+        private async void TryLoadAndGetDynamicGameObjectPrefab(string guid, Action<GameObject> loadCallback)
+        {
+            GameObject prefab = await TryLoadAndGetDynamicPrefab(guid, registerAtNetwork: false);
+
+            if (prefab == null)
+                SendError();
+            else
+                SendSuccess();
+
+            // LOCAL METHODS: -----------------------------
+            
+            void SendSuccess() =>
+                loadCallback?.Invoke(prefab);
+
+            void SendError() =>
+                loadCallback?.Invoke(obj: null);
+        }
+        
+        /// <summary>
+        /// This call attempts to spawn a prefab by it's addressable guid - it ensures that all the clients have
+        /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
+        /// the spawn will fail.
+        /// </summary>
+        private async void TryLoadAndGetDynamicNetworkObjectPrefab(string guid, Action<NetworkObject> loadCallback)
+        {
+            GameObject prefab = await TryLoadAndGetDynamicPrefab(guid, registerAtNetwork: true);
+
+            if (prefab == null)
+            {
+                SendError();
+                return;
+            }
+
+            if (prefab.TryGetComponent(out NetworkObject prefabNetworkObject))
+                SendSuccess();
+            else
+                SendError();
+
+            // LOCAL METHODS: -----------------------------
+            
+            void SendSuccess() =>
+                loadCallback?.Invoke(prefabNetworkObject);
+
+            void SendError() =>
+                loadCallback?.Invoke(obj: null);
+        }
+
+        private async UniTask<GameObject> TryLoadAndGetDynamicPrefab(string guid, bool registerAtNetwork)
         {
             if (!IsServer)
             {
                 SendError();
-                return;
+                return null;
             }
 
             var assetGuid = new AddressableGUID
@@ -174,7 +227,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 Debug.Log(message: "Prefab is already loaded by all peers, we can spawn it immediately");
 
                 LoadAndSendPrefab(assetGuid);
-                return;
+                return null;
             }
 
             _synchronousSpawnAckCount = 0;
@@ -188,7 +241,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             //     "Undefined", InGameUI.LoadStatus.Loading);
 
             // Load the prefab on the server, so that any late-joiner will need to load that prefab also.
-            await DynamicPrefabLoadingUtilities.LoadDynamicPrefab(assetGuid, ArtificialDelayMilliseconds);
+            await DynamicPrefabLoadingUtilities.LoadDynamicPrefab(assetGuid, ArtificialDelayMilliseconds,
+                registerAtNetwork);
 
             // Server loaded a prefab, update UI with the loaded asset's name.
             DynamicPrefabLoadingUtilities.TryGetLoadedGameObjectFromGuid(assetGuid,
@@ -208,8 +262,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                     Debug.Log(message: $"All clients have loaded the prefab in {_synchronousSpawnTimeoutTimer}" +
                                        "seconds, spawning the prefab on the server...");
 
-                    LoadAndSendPrefab(assetGuid);
-                    return;
+                    return LoadAndSendPrefab(assetGuid);
                 }
 
                 _synchronousSpawnTimeoutTimer += Time.deltaTime;
@@ -221,20 +274,19 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             Debug.LogError(message: "Failed to spawn dynamic prefab - timeout");
 
             SendError();
+            return null;
 
             // LOCAL METHODS: -----------------------------
 
-            void LoadAndSendPrefab(AddressableGUID localAssetGuid)
+            GameObject LoadAndSendPrefab(AddressableGUID localAssetGuid)
             {
                 if (!DynamicPrefabLoadingUtilities.TryGetLoadedGameObjectFromGuid(localAssetGuid,
                         out AsyncOperationHandle<GameObject> prefab))
                 {
                     Debug.LogWarning(message: $"GUID {localAssetGuid} is not a GUID of a previously loaded prefab. " +
                                               "Failed to spawn a prefab.");
-                    return;
+                    return null;
                 }
-
-                SendSuccess(prefab.Result);
 
                 // _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, NetworkHorror.ServerID,
                 //     destroyWithScene: true, position: Vector3.zero);
@@ -249,13 +301,11 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                     //     prefab.Result.name,
                     //     InGameUI.LoadStatus.Loaded);
                 }
+
+                return prefab.Result;
             }
 
-            void SendSuccess(GameObject prefab) =>
-                loadCallback?.Invoke(prefab);
-
-            void SendError() =>
-                loadCallback?.Invoke(obj: null);
+            void SendError() => Log.PrintError(log: "Error");
         }
 
         private async void TrySpawnInvisible()
@@ -441,8 +491,11 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnTrySpawnPrefab(string guid, Action<GameObject> callback) =>
-            TryLoadAndGetDynamicPrefab(guid, callback);
+        private void OnTrySpawnGameObjectPrefab(string guid, Action<GameObject> callback) =>
+            TryLoadAndGetDynamicGameObjectPrefab(guid, callback);
+        
+        private void OnTrySpawnNetworkObjectPrefab(string guid, Action<NetworkObject> callback) =>
+            TryLoadAndGetDynamicNetworkObjectPrefab(guid, callback);
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

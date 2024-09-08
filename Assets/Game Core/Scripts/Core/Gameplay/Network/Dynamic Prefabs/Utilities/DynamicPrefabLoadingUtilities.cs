@@ -72,9 +72,9 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
             return prefabs;
         }
-        
+
         public static async UniTask<GameObject> LoadDynamicPrefab(AddressableGUID guid,
-            int artificialDelayMilliseconds = 0, bool recomputeHash = true)
+            int artificialDelayMilliseconds = 0, bool recomputeHash = true, bool registerAtNetwork = true)
         {
             if (LoadedDynamicPrefabResourceHandles.ContainsKey(guid))
             {
@@ -86,7 +86,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
             var asyncOperation = Addressables.LoadAssetAsync<GameObject>(key: guid.ToString());
             LoadedDynamicPrefabResourceHandles.Add(guid, asyncOperation);
-            
+
             GameObject prefab = await asyncOperation.Task;
 
 #if ENABLE_ARTIFICIAL_DELAY
@@ -94,19 +94,22 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             await UniTask.Delay(artificialDelayMilliseconds);
 #endif
 
-            _networkManager.AddNetworkPrefab(prefab);
+            if (registerAtNetwork)
+            {
+                _networkManager.AddNetworkPrefab(prefab);
 
-            _networkManager.PrefabHandler.AddHandler(
-                networkPrefabAsset: prefab,
-                instanceHandler: new ZenjectNetCodeFactory(prefab, _diContainer)
-            );
-            
+                _networkManager.PrefabHandler.AddHandler(
+                    networkPrefabAsset: prefab,
+                    instanceHandler: new ZenjectNetCodeFactory(prefab, _diContainer)
+                );
+            }
+
             if (recomputeHash)
                 CalculateDynamicPrefabArrayHash();
 
             return prefab;
         }
-        
+
         public static bool TryGetLoadedGameObjectFromGuid(AddressableGUID assetGuid,
             out AsyncOperationHandle<GameObject> loadedGameObject)
         {
@@ -134,7 +137,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             else
                 PrefabHashToClientIds.Add(assetGuidHash, new HashSet<ulong> { clientId });
         }
-        
+
         public static void RefreshLoadedPrefabGuids()
         {
             DynamicPrefabGUIDs.Clear();
@@ -166,8 +169,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         public static string GenerateDisconnectionPayload()
         {
             var dynamicPrefabGuidStrings = new List<string>();
-            
-            foreach (AddressableGUID dynamicPrefabGuid in DynamicPrefabGUIDs) 
+
+            foreach (AddressableGUID dynamicPrefabGuid in DynamicPrefabGUIDs)
                 dynamicPrefabGuidStrings.Add(item: dynamicPrefabGuid.ToString());
 
             var rejectionPayload = new DisconnectionPayload

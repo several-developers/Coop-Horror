@@ -3,12 +3,11 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Global.ItemsList;
 using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Network.DynamicPrefabs;
+using GameCore.Gameplay.Network.PrefabsRegistrar;
 using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using GameCore.Utilities;
-using Unity.Netcode;
-using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Factories.Items
@@ -18,24 +17,23 @@ namespace GameCore.Gameplay.Factories.Items
         // CONSTRUCTORS: --------------------------------------------------------------------------
         public ItemsFactory(
             IAssetsProvider assetsProvider,
-            IConfigsProvider configsProvider,
+            IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
+            INetworkPrefabsRegistrar networkPrefabsRegistrar,
             IItemsMetaProvider itemsMetaProvider,
-            IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator
-        ) : base(assetsProvider)
+            IConfigsProvider configsProvider
+        ) : base(assetsProvider, dynamicPrefabsLoaderDecorator)
         {
-            _dynamicPrefabsLoaderDecorator = dynamicPrefabsLoaderDecorator;
+            _networkPrefabsRegistrar = networkPrefabsRegistrar;
             _itemsMetaProvider = itemsMetaProvider;
             _itemsListConfig = configsProvider.GetConfig<ItemsListConfigMeta>();
-            _itemsPrefabsAssets = new Dictionary<int, AssetReferenceGameObject>();
         }
 
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly IDynamicPrefabsLoaderDecorator _dynamicPrefabsLoaderDecorator;
+        private readonly INetworkPrefabsRegistrar _networkPrefabsRegistrar;
         private readonly IItemsMetaProvider _itemsMetaProvider;
         private readonly ItemsListConfigMeta _itemsListConfig;
-        private readonly Dictionary<int, AssetReferenceGameObject> _itemsPrefabsAssets;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -45,19 +43,29 @@ namespace GameCore.Gameplay.Factories.Items
         public async UniTask CreateItem<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
-            if (!TrySetupItemParams(itemID, spawnParams))
+            if (!TryGetItemMeta(itemID, out ItemMeta itemMeta))
                 return;
-
-            await LoadAndCreateItem(spawnParams, itemID);
+            
+            spawnParams.SetupInstanceEvent += itemObjectInstance =>
+            {
+                itemObjectInstance.Setup(itemID, itemMeta.ScaleMultiplier);
+            };
+            
+            await LoadAndCreateNetworkObject(itemID, spawnParams);
         }
 
         public void CreateItemDynamic<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
-            if (!TrySetupItemParams(itemID, spawnParams))
+            if (!TryGetItemMeta(itemID, out ItemMeta itemMeta))
                 return;
-
-            InstantiateItemDynamic(spawnParams, itemID);
+            
+            spawnParams.SetupInstanceEvent += itemObjectInstance =>
+            {
+                itemObjectInstance.Setup(itemID, itemMeta.ScaleMultiplier);
+            };
+            
+            LoadAndCreateDynamicNetworkObject(itemID, spawnParams);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -71,137 +79,12 @@ namespace GameCore.Gameplay.Factories.Items
             {
                 AssetReferenceGameObject itemPrefabAsset = itemReference.ItemPrefabAsset;
                 int itemID = itemReference.ItemMeta.ItemID;
-                bool success = _itemsPrefabsAssets.TryAdd(itemID, itemPrefabAsset);
+                
+                var itemObject = await LoadAndReleaseAsset<ItemObjectBase>(itemPrefabAsset);
 
-                if (!success)
-                {
-                    Log.PrintError(log: $"Dictionary <rb>already contains</rb> item ID '<gb>{itemID}</gb>'!");
-                    continue;
-                }
-
-                await LoadAndReleaseAsset<ItemObjectBase>(itemPrefabAsset);
                 AddDynamicAsset(itemID, itemPrefabAsset);
+                _networkPrefabsRegistrar.Register(itemObject.gameObject);
             }
-        }
-
-        private bool TrySetupItemParams<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
-            where TItemObject : ItemObjectBase
-        {
-            if (!TryGetItemAsset(itemID, out AssetReferenceGameObject assetReference))
-            {
-                spawnParams.FailCallbackEvent += _ => AssetReferenceNotFoundError(itemID);
-                return false;
-            }
-
-            spawnParams.SetAssetReference(assetReference);
-            return true;
-        }
-
-        private void InstantiateItemDynamic<TItemObject>(SpawnParams<TItemObject> spawnParams, int itemID)
-            where TItemObject : ItemObjectBase
-        {
-            AssetReference assetReference = spawnParams.AssetReference;
-            bool containsAssetReference = assetReference != null;
-            string guid;
-
-            if (containsAssetReference)
-            {
-                guid = assetReference.AssetGUID;
-            }
-            else if (!TryGetDynamicAssetGUID(itemID, out guid))
-            {
-                spawnParams.SendFailCallback(reason: $"Asset GUID for '{typeof(TItemObject)}' not found!");
-                return;
-            }
-
-            _dynamicPrefabsLoaderDecorator.LoadAndGetPrefab(
-                guid: guid,
-                loadCallback: prefabNetworkObject => CreateItem(prefabNetworkObject, itemID, spawnParams)
-            );
-        }
-
-        private async UniTask LoadAndCreateItem<TItemObject>(SpawnParams<TItemObject> spawnParams, int itemID)
-            where TItemObject : ItemObjectBase
-        {
-            AssetReference assetReference = spawnParams.AssetReference;
-            bool containsAssetReference = assetReference != null;
-
-            TItemObject entityPrefab;
-
-            if (containsAssetReference)
-                entityPrefab = await LoadAsset<TItemObject>(assetReference);
-            else
-                entityPrefab = await LoadAsset<TItemObject>(itemID);
-
-            CreateItem(entityPrefab, itemID, spawnParams);
-        }
-
-        private void CreateItem<TItemObject>(TItemObject itemPrefab, int itemID, SpawnParams<TItemObject> spawnParams)
-            where TItemObject : ItemObjectBase
-        {
-            CreateItem(itemPrefab.gameObject, itemID, spawnParams);
-        }
-
-        private void CreateItem<TItemObject>(GameObject prefab, int itemID, SpawnParams<TItemObject> spawnParams)
-            where TItemObject : ItemObjectBase
-        {
-            bool isItemMetaFound = TryGetItemMeta(itemID, out ItemMeta itemMeta);
-
-            if (!isItemMetaFound)
-                return;
-
-            if (prefab == null)
-            {
-                SendFailCallback(reason: "Prefab not found!");
-                return;
-            }
-
-            if (!prefab.TryGetComponent(out NetworkObject prefabNetworkObject))
-                return;
-
-            NetworkObject instanceNetworkObject = InstantiateEntity();
-            var itemInstance = instanceNetworkObject.GetComponent<TItemObject>();
-
-            itemInstance.Setup(itemID, itemMeta.ScaleMultiplier);
-            spawnParams.SendSuccessCallback(itemInstance);
-
-            // LOCAL METHODS: -----------------------------
-
-            void SendFailCallback(string reason) =>
-                spawnParams.SendFailCallback(reason);
-
-            NetworkObject InstantiateEntity()
-            {
-                Vector3 worldPosition = spawnParams.WorldPosition;
-                Quaternion rotation = spawnParams.Rotation;
-                ulong ownerID = spawnParams.OwnerID;
-
-                NetworkSpawnManager spawnManager = NetworkManager.Singleton.SpawnManager;
-
-                NetworkObject networkObject = spawnManager.InstantiateAndSpawn(
-                    networkPrefab: prefabNetworkObject,
-                    ownerClientId: ownerID,
-                    destroyWithScene: true,
-                    position: worldPosition,
-                    rotation: rotation
-                );
-
-                return networkObject;
-            }
-        }
-
-        private static void AssetReferenceNotFoundError(int itemID) =>
-            Debug.LogError(message: $"Asset Reference not found for item ID '{itemID}'!");
-
-        private bool TryGetItemAsset(int itemID, out AssetReferenceGameObject assetReference)
-        {
-            bool isAssetFound = _itemsPrefabsAssets.TryGetValue(itemID, out assetReference);
-
-            if (isAssetFound)
-                return true;
-
-            Log.PrintError(log: $"Item Asset Reference with Item ID <gb>({itemID})</gb> <rb>not found</rb>!");
-            return false;
         }
 
         private bool TryGetItemMeta(int itemID, out ItemMeta itemMeta)

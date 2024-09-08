@@ -37,8 +37,8 @@ namespace GameCore.Gameplay.Network.Utilities
 
         public async UniTask RegisterPrefabs()
         {
-            await RegisterEntities();
-            await RegisterItems();
+            // await RegisterEntities();
+            // await RegisterItems();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

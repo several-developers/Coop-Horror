@@ -1,8 +1,13 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using GameCore.Gameplay.Network.DynamicPrefabs;
+using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Global;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using Object = UnityEngine.Object;
 
 namespace GameCore.Utilities
 {
@@ -10,19 +15,21 @@ namespace GameCore.Utilities
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        protected AddressablesFactoryBase(IAssetsProvider assetsProvider)
+        protected AddressablesFactoryBase(
+            IAssetsProvider assetsProvider,
+            IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator
+        )
         {
             _assetsProvider = assetsProvider;
+            _dynamicPrefabsLoaderDecorator = dynamicPrefabsLoaderDecorator;
             _referencesDictionary = new Dictionary<TKey, AssetReference>();
             _dynamicReferencesDictionary = new Dictionary<TKey, AssetReference>();
         }
 
-        // PROPERTIES: ----------------------------------------------------------------------------
-
-
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IAssetsProvider _assetsProvider;
+        private readonly IDynamicPrefabsLoaderDecorator _dynamicPrefabsLoaderDecorator;
         private readonly Dictionary<TKey, AssetReference> _referencesDictionary;
         private readonly Dictionary<TKey, AssetReference> _dynamicReferencesDictionary;
 
@@ -32,7 +39,7 @@ namespace GameCore.Utilities
 
         public void AddAsset(TKey key, AssetReference assetReference)
         {
-            bool success = AddAsset(key, assetReference, _referencesDictionary);
+            bool success = TryAddAsset(key, assetReference, _referencesDictionary);
 
             if (!success)
                 return;
@@ -43,7 +50,7 @@ namespace GameCore.Utilities
 
         public void AddDynamicAsset(TKey key, AssetReference assetReference)
         {
-            bool success = AddAsset(key, assetReference, _dynamicReferencesDictionary);
+            bool success = TryAddAsset(key, assetReference, _dynamicReferencesDictionary);
 
             if (!success)
                 return;
@@ -65,6 +72,137 @@ namespace GameCore.Utilities
         }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected async UniTask<GameObject> LoadAndCreateGameObject<TObject>(TKey key, SpawnParams<TObject> spawnParams)
+            where TObject : class
+        {
+            AssetReference assetReference = spawnParams.AssetReference;
+            bool containsAssetReference = assetReference != null;
+
+            TObject prefab;
+
+            if (containsAssetReference)
+                prefab = await LoadAsset<TObject>(assetReference);
+            else
+                prefab = await LoadAsset<TObject>(key);
+
+            if (prefab == null)
+            {
+                Log.PrintError(log: $"Prefab with key '<gb>{key}</gb>' <rb>not found</rb>!");
+                return null;
+            }
+
+            Type prefabType = prefab.GetType();
+
+            if (prefab is not GameObject prefabGameObject)
+            {
+                Log.PrintError(log: $"Prefab of type '<gb>{prefabType}</gb>' <rb>is not</rb> GameObject!");
+                return null;
+            }
+
+            Vector3 worldPosition = spawnParams.WorldPosition;
+            Quaternion rotation = spawnParams.Rotation;
+
+            GameObject instance = Object.Instantiate(prefabGameObject, worldPosition, rotation);
+            
+            spawnParams.SendSetupInstance(prefab);
+            spawnParams.SendSuccessCallback(prefab);
+
+            return instance;
+        }
+
+        protected async UniTask<NetworkObject> LoadAndCreateNetworkObject<TObject>(TKey key,
+            SpawnParams<TObject> spawnParams) where TObject : class
+        {
+            AssetReference assetReference = spawnParams.AssetReference;
+            bool containsAssetReference = assetReference != null;
+
+            TObject prefab;
+
+            if (containsAssetReference)
+                prefab = await LoadAsset<TObject>(assetReference);
+            else
+                prefab = await LoadAsset<TObject>(key);
+
+            if (prefab == null)
+            {
+                Log.PrintError(log: $"Prefab with key '<gb>{key}</gb>' <rb>not found</rb>!");
+                return null;
+            }
+
+            Type prefabType = prefab.GetType();
+
+            if (prefab is not NetworkObject prefabNetworkObject)
+            {
+                Log.PrintError(log: $"Prefab of type '<gb>{prefabType}</gb>' <rb>is not</rb> NetworkObject!");
+                return null;
+            }
+
+            Vector3 worldPosition = spawnParams.WorldPosition;
+            Quaternion rotation = spawnParams.Rotation;
+            ulong ownerID = spawnParams.OwnerID;
+
+            NetworkSpawnManager spawnManager = NetworkManager.Singleton.SpawnManager;
+
+            NetworkObject instance = spawnManager.InstantiateAndSpawn(
+                networkPrefab: prefabNetworkObject,
+                ownerClientId: ownerID,
+                destroyWithScene: true,
+                position: worldPosition,
+                rotation: rotation
+            );
+            
+            spawnParams.SendSetupInstance(prefab);
+            spawnParams.SendSuccessCallback(prefab);
+
+            return instance;
+        }
+
+        protected void LoadAndCreateDynamicGameObject<TObject>(TKey key, SpawnParams<TObject> spawnParams)
+            where TObject : class
+        {
+            AssetReference assetReference = spawnParams.AssetReference;
+            bool containsAssetReference = assetReference != null;
+            string guid;
+
+            if (containsAssetReference)
+            {
+                guid = assetReference.AssetGUID;
+            }
+            else if (!TryGetDynamicAssetGUID(key, out guid))
+            {
+                spawnParams.SendFailCallback(reason: $"Asset GUID for key '{key}' not found!");
+                return;
+            }
+
+            _dynamicPrefabsLoaderDecorator.LoadAndGetGameObjectPrefab(
+                guid: guid,
+                loadCallback: prefabNetworkObject => DynamicGameObjectLoaded(prefabNetworkObject, spawnParams)
+            );
+        }
+
+        protected void LoadAndCreateDynamicNetworkObject<TObject>(TKey key, SpawnParams<TObject> spawnParams)
+            where TObject : class
+        {
+            AssetReference assetReference = spawnParams.AssetReference;
+            bool containsAssetReference = assetReference != null;
+            string guid;
+
+            if (containsAssetReference)
+            {
+                guid = assetReference.AssetGUID;
+            }
+            else if (!TryGetDynamicAssetGUID(key, out guid))
+            {
+                spawnParams.SendFailCallback(reason: $"Asset GUID for key '{key}' not found!");
+                return;
+            }
+
+            _dynamicPrefabsLoaderDecorator.LoadAndGetNetworkObjectPrefab(
+                guid: guid,
+                loadCallback: prefabNetworkObject => DynamicNetworkObjectLoaded(prefabNetworkObject, spawnParams)
+            );
+        }
 
         protected async UniTask<T> LoadAsset<T>(TKey key) where T : class
         {
@@ -142,7 +280,50 @@ namespace GameCore.Utilities
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private static bool AddAsset(TKey key, AssetReference assetReference,
+        private static void DynamicGameObjectLoaded<TObject>(GameObject prefab, SpawnParams<TObject> spawnParams)
+            where TObject : class
+        {
+            Vector3 worldPosition = spawnParams.WorldPosition;
+            Quaternion rotation = spawnParams.Rotation;
+
+            GameObject instance = Object.Instantiate(prefab, worldPosition, rotation);
+
+            if (instance is TObject result)
+                spawnParams.SendSuccessCallback(result);
+            else
+                Log.PrintError(log: "Wrong prefab type!");
+        }
+
+        private static void DynamicNetworkObjectLoaded<TObject>(NetworkObject prefab, SpawnParams<TObject> spawnParams)
+            where TObject : class
+        {
+            Vector3 worldPosition = spawnParams.WorldPosition;
+            Quaternion rotation = spawnParams.Rotation;
+            ulong ownerID = spawnParams.OwnerID;
+
+            NetworkSpawnManager spawnManager = GetNetworkSpawnManager();
+
+            NetworkObject instance = spawnManager.InstantiateAndSpawn(
+                networkPrefab: prefab,
+                ownerClientId: ownerID,
+                destroyWithScene: true,
+                position: worldPosition,
+                rotation: rotation
+            );
+
+            if (instance is TObject result)
+            {
+                spawnParams.SendSetupInstance(result);
+                spawnParams.SendSuccessCallback(result);
+            }
+            else
+                Log.PrintError(log: "Wrong prefab type!");
+        }
+
+        private static NetworkSpawnManager GetNetworkSpawnManager() =>
+            NetworkManager.Singleton.SpawnManager;
+
+        private static bool TryAddAsset(TKey key, AssetReference assetReference,
             Dictionary<TKey, AssetReference> dictionary)
         {
             bool success = dictionary.TryAdd(key, assetReference);

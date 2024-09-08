@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Global.MenuPrefabsList;
+using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Global.MenuView;
 using GameCore.UI.Global.Other;
@@ -16,17 +17,21 @@ namespace GameCore.Gameplay.Factories.Menu
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MenuFactory(DiContainer diContainer, IAssetsProvider assetsProvider, IConfigsProvider configsProvider)
-            : base(assetsProvider)
+        public MenuFactory(
+            IAssetsProvider assetsProvider, 
+            IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
+            IConfigsProvider configsProvider,
+            DiContainer diContainer
+            ) : base(assetsProvider, dynamicPrefabsLoaderDecorator)
         {
-            _diContainer = diContainer;
             _configsProvider = configsProvider;
+            _diContainer = diContainer;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly DiContainer _diContainer;
         private readonly IConfigsProvider _configsProvider;
+        private readonly DiContainer _diContainer;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
