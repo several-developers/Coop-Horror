@@ -62,38 +62,33 @@ namespace GameCore.Gameplay.Factories.Entities
 
             foreach (AssetReferenceGameObject assetReference in allReferences)
             {
-                Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
-                AddAsset(entityType, assetReference);
+                (Type type, GameObject gameObject) result = await GetAssetAfterLoadAndRelease(assetReference);
+                
+                AddAsset(result.type, assetReference);
             }
 
             foreach (AssetReferenceGameObject assetReference in allGlobalReferences)
             {
-                GameObject entityGameObject = await GetAssetGameObjectAfterLoadAndRelease(assetReference);
-                Type entityType = entityGameObject.GetType();
+                (Type type, GameObject gameObject) result = await GetAssetAfterLoadAndRelease(assetReference);
 
-                AddAsset(entityType, assetReference);
-                _networkPrefabsRegistrar.Register(entityGameObject);
+                AddAsset(result.type, assetReference);
+                _networkPrefabsRegistrar.Register(result.gameObject);
             }
 
             foreach (AssetReferenceGameObject assetReference in allDynamicReferences)
             {
-                Type entityType = await GetAssetTypeAfterLoadAndRelease(assetReference);
-                AddDynamicAsset(entityType, assetReference);
+                (Type type, GameObject gameObject) result = await GetAssetAfterLoadAndRelease(assetReference);
+                
+                AddDynamicAsset(result.type, assetReference);
             }
 
             // LOCAL METHODS: -----------------------------
 
-            async UniTask<Type> GetAssetTypeAfterLoadAndRelease(AssetReference assetReference)
+            async UniTask<(Type type, GameObject gameObject)> GetAssetAfterLoadAndRelease(AssetReference assetReference)
             {
                 var entity = await LoadAndReleaseAsset<Entity>(assetReference);
                 Type entityType = entity.GetType();
-                return entityType;
-            }
-
-            async UniTask<GameObject> GetAssetGameObjectAfterLoadAndRelease(AssetReference assetReference)
-            {
-                var entity = await LoadAndReleaseAsset<Entity>(assetReference);
-                return entity.gameObject;
+                return (entityType, entity.gameObject);
             }
         }
     }

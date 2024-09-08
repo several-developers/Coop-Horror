@@ -104,7 +104,7 @@ namespace GameCore.Utilities
             Quaternion rotation = spawnParams.Rotation;
 
             GameObject instance = Object.Instantiate(prefabGameObject, worldPosition, rotation);
-            
+
             spawnParams.SendSetupInstance(prefab);
             spawnParams.SendSuccessCallback(prefab);
 
@@ -117,12 +117,12 @@ namespace GameCore.Utilities
             AssetReference assetReference = spawnParams.AssetReference;
             bool containsAssetReference = assetReference != null;
 
-            TObject prefab;
+            GameObject prefab;
 
             if (containsAssetReference)
-                prefab = await LoadAsset<TObject>(assetReference);
+                prefab = await LoadAsset<GameObject>(assetReference);
             else
-                prefab = await LoadAsset<TObject>(key);
+                prefab = await LoadAsset<GameObject>(key);
 
             if (prefab == null)
             {
@@ -130,11 +130,9 @@ namespace GameCore.Utilities
                 return null;
             }
 
-            Type prefabType = prefab.GetType();
-
-            if (prefab is not NetworkObject prefabNetworkObject)
+            if (!prefab.TryGetComponent(out NetworkObject prefabNetworkObject))
             {
-                Log.PrintError(log: $"Prefab of type '<gb>{prefabType}</gb>' <rb>is not</rb> NetworkObject!");
+                Log.PrintError(log: "Component of type '<gb>NetworkObject</gb>' <rb>not found</rb>!");
                 return null;
             }
 
@@ -144,7 +142,7 @@ namespace GameCore.Utilities
 
             NetworkSpawnManager spawnManager = NetworkManager.Singleton.SpawnManager;
 
-            NetworkObject instance = spawnManager.InstantiateAndSpawn(
+            NetworkObject instanceNetworkObject = spawnManager.InstantiateAndSpawn(
                 networkPrefab: prefabNetworkObject,
                 ownerClientId: ownerID,
                 destroyWithScene: true,
@@ -152,10 +150,15 @@ namespace GameCore.Utilities
                 rotation: rotation
             );
             
-            spawnParams.SendSetupInstance(prefab);
-            spawnParams.SendSuccessCallback(prefab);
+            if (instanceNetworkObject.TryGetComponent(out TObject objectInstance))
+            {
+                spawnParams.SendSetupInstance(objectInstance);
+                spawnParams.SendSuccessCallback(objectInstance);
+                return instanceNetworkObject;
+            }
 
-            return instance;
+            Log.PrintError(log: $"Component of type '<gb>{typeof(TObject)}</gb>' <rb>not found</rb>!");
+            return null;
         }
 
         protected void LoadAndCreateDynamicGameObject<TObject>(TKey key, SpawnParams<TObject> spawnParams)
@@ -211,24 +214,29 @@ namespace GameCore.Utilities
             if (!isAssetReferenceFound)
                 return null;
 
-            var prefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
-            bool isComponentFound = prefab.TryGetComponent(out T instance);
+            var gameObjectPrefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
 
-            if (!isComponentFound)
-                Log.PrintError(log: $"Component '<gb>{typeof(T)}</gb> <rb>not found</rb>!'");
+            if (gameObjectPrefab is T component)
+                return component;
+            
+            if (gameObjectPrefab.TryGetComponent(out T component2))
+                return component2;
 
-            return instance;
+            Log.PrintError(log: $"Component of type '<gb>{typeof(T)}</gb>' for key '<gb>{key}</gb>' " +
+                                "<rb>not found</rb>!");
+
+            return null;
         }
 
         protected async UniTask<T> LoadAsset<T>(AssetReference assetReference) where T : class
         {
-            var prefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
-            bool isComponentFound = prefab.TryGetComponent(out T instance);
-
-            if (!isComponentFound)
-                Log.PrintError(log: $"Component '<gb>{typeof(T)}</gb> <rb>not found</rb>!'");
-
-            return instance;
+            var gameObjectPrefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
+            
+            if (gameObjectPrefab is T component)
+                return component;
+            
+            Log.PrintError(log: $"Component of type '<gb>{typeof(T)}</gb>; <rb>not found</rb>!");
+            return null;
         }
 
         protected void ReleaseAsset(AssetReference assetReference) =>

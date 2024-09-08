@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.ItemsSpawn;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Interactable.Outdoor_Chest;
+using GameCore.Gameplay.Entities.Interactable.OutdoorChest;
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items.Generators.Dungeon;

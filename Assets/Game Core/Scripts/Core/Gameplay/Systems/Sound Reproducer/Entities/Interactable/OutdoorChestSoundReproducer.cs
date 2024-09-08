@@ -1,5 +1,5 @@
 ﻿using GameCore.Configs.Gameplay.Entities;
-using GameCore.Gameplay.Entities.Interactable.Outdoor_Chest;
+using GameCore.Gameplay.Entities.Interactable.OutdoorChest;
 using Sonity;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer

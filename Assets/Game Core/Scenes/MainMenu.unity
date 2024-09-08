@@ -1308,11 +1308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90245bbb1d034c30bd73f7fd58adda70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dynamicPrefabsReferences:
-  - m_AssetGUID: a77369042e11ddd49be3f82d556be8a1
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
+  _dynamicPrefabsReferences: []
 --- !u!4 &1260190627
 Transform:
   m_ObjectHideFlags: 0

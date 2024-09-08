@@ -14,7 +14,7 @@ using UnityEngine;
 using Zenject;
 using Random = UnityEngine.Random;
 
-namespace GameCore.Gameplay.Entities.Interactable.Outdoor_Chest
+namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
 {
     [GenerateSerializationForType(typeof(SFXType))]
     public class OutdoorChestEntity : SoundProducerEntity<OutdoorChestEntity.SFXType>, IInteractable
