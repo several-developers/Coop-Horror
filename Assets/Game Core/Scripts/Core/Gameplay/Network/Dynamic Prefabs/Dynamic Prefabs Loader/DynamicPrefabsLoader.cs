@@ -95,7 +95,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async void PreloadPrefabs()
+        private async UniTaskVoid PreloadPrefabs()
         {
             var tasks = new List<UniTask>();
 
@@ -505,7 +505,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             if (!_networkManager.IsServer)
                 return;
 
-            PreloadPrefabs();
+            PreloadPrefabs().Forget();
         }
 
         [Button]

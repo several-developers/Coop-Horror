@@ -9,6 +9,7 @@ using GameCore.Infrastructure.Providers.Global;
 using GameCore.Infrastructure.Providers.Global.ItemsMeta;
 using GameCore.Utilities;
 using UnityEngine.AddressableAssets;
+using Zenject;
 
 namespace GameCore.Gameplay.Factories.Items
 {
@@ -16,12 +17,13 @@ namespace GameCore.Gameplay.Factories.Items
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         public ItemsFactory(
+            DiContainer diContainer,
             IAssetsProvider assetsProvider,
             IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
             INetworkPrefabsRegistrar networkPrefabsRegistrar,
             IItemsMetaProvider itemsMetaProvider,
             IConfigsProvider configsProvider
-        ) : base(assetsProvider, dynamicPrefabsLoaderDecorator)
+        ) : base(diContainer, assetsProvider, dynamicPrefabsLoaderDecorator)
         {
             _networkPrefabsRegistrar = networkPrefabsRegistrar;
             _itemsMetaProvider = itemsMetaProvider;

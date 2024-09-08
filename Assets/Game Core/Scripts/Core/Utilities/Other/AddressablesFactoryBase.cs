@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Network.DynamicPrefabs;
@@ -7,19 +6,25 @@ using GameCore.Infrastructure.Providers.Global;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using Object = UnityEngine.Object;
+using Zenject;
 
 namespace GameCore.Utilities
 {
+    public static class CurrentSceneDiContainer
+    {
+        public static DiContainer DiContainer;
+    }
     public abstract class AddressablesFactoryBase<TKey> : IAddressablesFactory<TKey>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         protected AddressablesFactoryBase(
+            DiContainer diContainer,
             IAssetsProvider assetsProvider,
             IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator
         )
         {
+            CurrentSceneDiContainer.DiContainer = diContainer;
             _assetsProvider = assetsProvider;
             _dynamicPrefabsLoaderDecorator = dynamicPrefabsLoaderDecorator;
             _referencesDictionary = new Dictionary<TKey, AssetReference>();
@@ -79,12 +84,12 @@ namespace GameCore.Utilities
             AssetReference assetReference = spawnParams.AssetReference;
             bool containsAssetReference = assetReference != null;
 
-            TObject prefab;
+            GameObject prefab;
 
             if (containsAssetReference)
-                prefab = await LoadAsset<TObject>(assetReference);
+                prefab = await LoadAsset<GameObject>(assetReference);
             else
-                prefab = await LoadAsset<TObject>(key);
+                prefab = await LoadAsset<GameObject>(key);
 
             if (prefab == null)
             {
@@ -92,23 +97,17 @@ namespace GameCore.Utilities
                 return null;
             }
 
-            Type prefabType = prefab.GetType();
-
-            if (prefab is not GameObject prefabGameObject)
-            {
-                Log.PrintError(log: $"Prefab of type '<gb>{prefabType}</gb>' <rb>is not</rb> GameObject!");
-                return null;
-            }
-
             Vector3 worldPosition = spawnParams.WorldPosition;
             Quaternion rotation = spawnParams.Rotation;
+            Transform parent = spawnParams.Parent;
+            
+            var instance = CurrentSceneDiContainer.DiContainer
+                .InstantiatePrefabForComponent<TObject>(prefab, worldPosition, rotation, parent);
+            
+            spawnParams.SendSetupInstance(instance);
+            spawnParams.SendSuccessCallback(instance);
 
-            GameObject instance = Object.Instantiate(prefabGameObject, worldPosition, rotation);
-
-            spawnParams.SendSetupInstance(prefab);
-            spawnParams.SendSuccessCallback(prefab);
-
-            return instance;
+            return instance as GameObject;
         }
 
         protected async UniTask<NetworkObject> LoadAndCreateNetworkObject<TObject>(TKey key,
@@ -140,7 +139,7 @@ namespace GameCore.Utilities
             Quaternion rotation = spawnParams.Rotation;
             ulong ownerID = spawnParams.OwnerID;
 
-            NetworkSpawnManager spawnManager = NetworkManager.Singleton.SpawnManager;
+            NetworkSpawnManager spawnManager = GetNetworkSpawnManager();
 
             NetworkObject instanceNetworkObject = spawnManager.InstantiateAndSpawn(
                 networkPrefab: prefabNetworkObject,
@@ -149,7 +148,7 @@ namespace GameCore.Utilities
                 position: worldPosition,
                 rotation: rotation
             );
-            
+
             if (instanceNetworkObject.TryGetComponent(out TObject objectInstance))
             {
                 spawnParams.SendSetupInstance(objectInstance);
@@ -216,11 +215,11 @@ namespace GameCore.Utilities
 
             var gameObjectPrefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
 
+            if (gameObjectPrefab.TryGetComponent(out T result))
+                return result;
+
             if (gameObjectPrefab is T component)
                 return component;
-            
-            if (gameObjectPrefab.TryGetComponent(out T component2))
-                return component2;
 
             Log.PrintError(log: $"Component of type '<gb>{typeof(T)}</gb>' for key '<gb>{key}</gb>' " +
                                 "<rb>not found</rb>!");
@@ -232,39 +231,18 @@ namespace GameCore.Utilities
         {
             var gameObjectPrefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
             
+            if (gameObjectPrefab.TryGetComponent(out T result))
+                return result;
+
             if (gameObjectPrefab is T component)
                 return component;
-            
+
             Log.PrintError(log: $"Component of type '<gb>{typeof(T)}</gb>; <rb>not found</rb>!");
             return null;
         }
 
         protected void ReleaseAsset(AssetReference assetReference) =>
             Addressables.Release(assetReference);
-
-        protected bool TryGetAssetGUID<T>(TKey key, out string guid) where T : class
-        {
-            if (!TryGetAssetReference(key, out AssetReference assetReference))
-            {
-                guid = string.Empty;
-                return false;
-            }
-
-            guid = assetReference.AssetGUID;
-            return true;
-        }
-
-        protected bool TryGetDynamicAssetGUID(TKey key, out string guid)
-        {
-            if (!TryGetDynamicAssetReference(key, out AssetReference assetReference))
-            {
-                guid = string.Empty;
-                return false;
-            }
-
-            guid = assetReference.AssetGUID;
-            return true;
-        }
 
         protected bool TryGetAssetReference(TKey key, out AssetReference assetReference)
         {
@@ -341,6 +319,18 @@ namespace GameCore.Utilities
 
             Log.PrintError(log: $"Dictionary <rb>already contains</rb> key '<gb>{key}</gb>'");
             return false;
+        }
+        
+        private bool TryGetDynamicAssetGUID(TKey key, out string guid)
+        {
+            if (!TryGetDynamicAssetReference(key, out AssetReference assetReference))
+            {
+                guid = string.Empty;
+                return false;
+            }
+
+            guid = assetReference.AssetGUID;
+            return true;
         }
     }
 }

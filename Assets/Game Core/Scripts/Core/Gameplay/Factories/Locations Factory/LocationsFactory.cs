@@ -8,6 +8,7 @@ using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
 using UnityEngine.AddressableAssets;
+using Zenject;
 
 namespace GameCore.Gameplay.Factories.Locations
 {
@@ -16,10 +17,11 @@ namespace GameCore.Gameplay.Factories.Locations
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public LocationsFactory(
+            DiContainer diContainer,
             IAssetsProvider assetsProvider,
             IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
             IConfigsProvider configsProvider
-        ) : base(assetsProvider, dynamicPrefabsLoaderDecorator)
+        ) : base(diContainer, assetsProvider, dynamicPrefabsLoaderDecorator)
         {
             _locationsListConfig = configsProvider.GetConfig<LocationsListConfigMeta>();
         }

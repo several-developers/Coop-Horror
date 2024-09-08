@@ -79,7 +79,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async void SpawnChests()
+        private async UniTaskVoid SpawnChests()
         {
             int chestsAmount = GetRandomChestsAmount();
 
@@ -273,6 +273,7 @@ namespace GameCore.Gameplay.Items.Generators.OutdoorChest
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnDungeonsGenerationCompleted() => SpawnChests();
+        private void OnDungeonsGenerationCompleted() =>
+            SpawnChests().Forget();
     }
 }

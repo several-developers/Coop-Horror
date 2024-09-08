@@ -21,7 +21,7 @@ namespace GameCore.Gameplay.Level.Elevator
         
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Start()
+        protected override void StartAll()
         {
             RegisterDungeon();
             TrySpawnNetworkObject();
@@ -31,9 +31,6 @@ namespace GameCore.Gameplay.Level.Elevator
 
         private void TrySpawnNetworkObject()
         {
-            if (!NetworkHorror.IsTrueServer)
-                return;
-
             if (IsSpawned)
                 return;
             

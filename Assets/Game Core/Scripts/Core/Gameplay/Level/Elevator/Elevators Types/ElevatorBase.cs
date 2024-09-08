@@ -85,7 +85,7 @@ namespace GameCore.Gameplay.Level.Elevator
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async void OpenElevator()
+        private async UniTaskVoid OpenElevator()
         {
             if (_isOpen)
                 return;
@@ -152,7 +152,7 @@ namespace GameCore.Gameplay.Level.Elevator
             if (IsServerOnly)
                 PlaySound(SFXType.DoorOpening);
 
-            OpenElevator();
+            OpenElevator().Forget();
         }
 
         private void OnElevatorOpened(Floor floor)
@@ -168,7 +168,7 @@ namespace GameCore.Gameplay.Level.Elevator
             if (IsServerOnly)
                 PlaySound(SFXType.DoorOpening);
             
-            OpenElevator();
+            OpenElevator().Forget();
         }
     }
 }

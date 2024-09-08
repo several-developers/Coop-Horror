@@ -32,7 +32,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         {
             DisableAgent();
             SetAgonizeAnimation();
-            AwaitAndCreateEvilClown();
+            AwaitAndCreateEvilClown().Forget();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -49,7 +49,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             clownUtilities.SetAgonizeAnimation();
         }
 
-        private async void AwaitAndCreateEvilClown()
+        private async UniTaskVoid AwaitAndCreateEvilClown()
         {
             bool isCanceled = false;
             

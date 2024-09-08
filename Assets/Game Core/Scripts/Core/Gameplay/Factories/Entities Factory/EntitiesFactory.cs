@@ -10,6 +10,7 @@ using GameCore.Infrastructure.Providers.Global;
 using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using Zenject;
 
 namespace GameCore.Gameplay.Factories.Entities
 {
@@ -18,11 +19,12 @@ namespace GameCore.Gameplay.Factories.Entities
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public EntitiesFactory(
+            DiContainer diContainer,
             IAssetsProvider assetsProvider,
             IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
             INetworkPrefabsRegistrar networkPrefabsRegistrar,
             IConfigsProvider configsProvider
-        ) : base(assetsProvider, dynamicPrefabsLoaderDecorator)
+        ) : base(diContainer, assetsProvider, dynamicPrefabsLoaderDecorator)
         {
             _networkPrefabsRegistrar = networkPrefabsRegistrar;
             _entitiesListConfig = configsProvider.GetConfig<EntitiesListConfigMeta>();

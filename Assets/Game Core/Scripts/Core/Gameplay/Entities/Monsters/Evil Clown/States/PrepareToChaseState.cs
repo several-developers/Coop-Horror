@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             PlayRoarSFX();
             EnableRig();
             StopWanderingTimer();
-            EnterChaseStateWithDelay();
+            EnterChaseStateWithDelay().Forget();
             StopBrainwashSFXLoop();
         }
 
@@ -79,7 +79,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _evilClownEntity.StopCoroutine(_brainwashSFXLoopCO);
         }
 
-        private async void EnterChaseStateWithDelay()
+        private async UniTaskVoid EnterChaseStateWithDelay()
         {
             float delayInSeconds = _evilClownAIConfig.ChaseDelay;
             int delay = delayInSeconds.ConvertToMilliseconds();

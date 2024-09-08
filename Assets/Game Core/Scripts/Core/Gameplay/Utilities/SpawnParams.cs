@@ -16,6 +16,7 @@ namespace GameCore.Gameplay.Utilities
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public AssetReference AssetReference { get; private set; }
+        public Transform Parent { get; private set; }
         public Vector3 WorldPosition { get; private set; }
         public Quaternion Rotation { get; private set; }
         public ulong OwnerID { get; private set; }
@@ -67,6 +68,11 @@ namespace GameCore.Gameplay.Utilities
             public Builder SetAssetReference(AssetReference assetReference)
             {
                 _spawnParams.AssetReference = assetReference;
+                return this;
+            }
+            public Builder SetParent(Transform parent)
+            {
+                _spawnParams.Parent = parent;
                 return this;
             }
 

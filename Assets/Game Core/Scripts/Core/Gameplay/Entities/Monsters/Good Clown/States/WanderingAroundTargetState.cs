@@ -82,7 +82,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private void UpdateAnimationMoveSpeed() =>
             _clownUtilities.UpdateAnimationMoveSpeed();
 
-        private async void SetNewDestinationPointWithDelay()
+        private async UniTaskVoid SetNewDestinationPointWithDelay()
         {
             float minDelay = _wanderingConfig.MinDelay;
             float maxDelay = _wanderingConfig.MaxDelay;
@@ -170,6 +170,7 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private void OnStuck() =>
             _wanderingMovementLogic.TrySetDestinationPoint();
 
-        private void OnArrived() => SetNewDestinationPointWithDelay();
+        private void OnArrived() =>
+            SetNewDestinationPointWithDelay().Forget();
     }
 }

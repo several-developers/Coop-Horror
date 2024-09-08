@@ -18,14 +18,14 @@ namespace GameCore.Gameplay.Factories.Menu
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public MenuFactory(
+            DiContainer diContainer,
             IAssetsProvider assetsProvider, 
             IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
-            IConfigsProvider configsProvider,
-            DiContainer diContainer
-            ) : base(assetsProvider, dynamicPrefabsLoaderDecorator)
+            IConfigsProvider configsProvider
+            ) : base(diContainer, assetsProvider, dynamicPrefabsLoaderDecorator)
         {
-            _configsProvider = configsProvider;
             _diContainer = diContainer;
+            _configsProvider = configsProvider;
         }
 
         // FIELDS: --------------------------------------------------------------------------------

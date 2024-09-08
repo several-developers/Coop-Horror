@@ -87,7 +87,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private void Start()
         {
             SetupStates();
-            GetNetworkManager();
+            GetNetworkManager().Forget();
         }
 
         private void OnDestroy()
@@ -128,7 +128,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async void GetNetworkManager()
+        private async UniTaskVoid GetNetworkManager()
         {
             int iterations = 0;
 

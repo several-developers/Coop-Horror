@@ -64,7 +64,7 @@ namespace GameCore.Gameplay.Network
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
-        private async void LoadAndCreatePlayer(ulong clientID, bool lateJoin)
+        private async UniTaskVoid LoadAndCreatePlayer(ulong clientID, bool lateJoin)
         {
             bool isCanceled = await UniTask
                 .DelayFrame(delayFrameCount: 1, cancellationToken: this.GetCancellationTokenOnDestroy())
@@ -157,7 +157,7 @@ namespace GameCore.Gameplay.Network
                 foreach (var pair in connectedClients)
                 {
                     Debug.Log($"Player #{pair.Key} ready");
-                    LoadAndCreatePlayer(pair.Key, lateJoin: false);
+                    LoadAndCreatePlayer(pair.Key, lateJoin: false).Forget();
                 }
             }
         }
@@ -175,7 +175,7 @@ namespace GameCore.Gameplay.Network
             // (either because multiple people are late-joining at once, or because some dynamic entities are
             // getting spawned while joining. But that's not something we can fully address by changes in
             // this script.
-            LoadAndCreatePlayer(clientId, lateJoin: true);
+            LoadAndCreatePlayer(clientId, lateJoin: true).Forget();
         }
     }
 }
