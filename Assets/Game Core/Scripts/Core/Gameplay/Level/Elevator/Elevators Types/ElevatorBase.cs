@@ -57,10 +57,12 @@ namespace GameCore.Gameplay.Level.Elevator
 
         private void Awake()
         {
-            _elevatorsManagerDecorator.OnElevatorStartedEvent += OnElevatorsStarted;
-            _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
-            _elevatorsManagerDecorator.OnElevatorOpenedEvent += OnElevatorOpened;
+            // _elevatorsManagerDecorator.OnElevatorStartedEvent += OnElevatorsStarted;
+            // _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
+            // _elevatorsManagerDecorator.OnElevatorOpenedEvent += OnElevatorOpened;
         }
+
+        protected override void StartServerOnly() => TrySpawnNetworkObject();
 
         public override void OnDestroy()
         {
@@ -85,6 +87,14 @@ namespace GameCore.Gameplay.Level.Elevator
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private void TrySpawnNetworkObject()
+        {
+            if (IsSpawned)
+                return;
+            
+            NetworkObject.Spawn();
+        }
+        
         private async UniTaskVoid OpenElevator()
         {
             if (_isOpen)

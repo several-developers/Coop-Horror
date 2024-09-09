@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Global.LocationsList;
+using GameCore.Configs.Gameplay.LocationsList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Level.Locations;
-using GameCore.Infrastructure.Providers.Global;
+using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 {
@@ -10,9 +10,9 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LocationsMetaProvider(IConfigsProvider configsProvider)
+        public LocationsMetaProvider(IGameplayConfigsProvider gameplayConfigsProvider)
         {
-            _locationsListConfig = configsProvider.GetConfig<LocationsListConfigMeta>();
+            _locationsListConfig = gameplayConfigsProvider.GetConfig<LocationsListConfigMeta>();
             _locationsMeta = new Dictionary<LocationName, LocationMeta>();
 
             SetupLocationsDictionary();
@@ -33,12 +33,10 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 
         private void SetupLocationsDictionary()
         {
-            IEnumerable<LocationsListConfigMeta.LocationReference> allLocationsReferences =
-                _locationsListConfig.GetAllLocationsReferences();
+            IEnumerable<LocationMeta> allAvailableLocationsMeta = _locationsListConfig.GetAllAvailableLocationsMeta();
 
-            foreach (LocationsListConfigMeta.LocationReference locationReference in allLocationsReferences)
+            foreach (LocationMeta locationMeta in allAvailableLocationsMeta)
             {
-                LocationMeta locationMeta = locationReference.LocationMeta;
                 LocationName locationName = locationMeta.LocationName;
                 bool isAdded = _locationsMeta.TryAdd(locationName, locationMeta);
 

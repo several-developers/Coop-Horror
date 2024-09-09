@@ -24,7 +24,7 @@ namespace GameCore.Gameplay.Utilities
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action<string> FailCallbackEvent;
-        public event Action<T> SetupInstanceEvent;
+        public event Action<T> SetupInstanceCallbackEvent;
         public event Action<T> SuccessCallbackEvent;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -38,11 +38,11 @@ namespace GameCore.Gameplay.Utilities
             FailCallbackEvent?.Invoke(reason);
         }
 
+        public void SendSetupInstance(T entity) =>
+            SetupInstanceCallbackEvent?.Invoke(entity);
+
         public void SendSuccessCallback(T entity) =>
             SuccessCallbackEvent?.Invoke(entity);
-        
-        public void SendSetupInstance(T entity) =>
-            SetupInstanceEvent?.Invoke(entity);
 
         // INNER CLASSES: -------------------------------------------------------------------------
 
@@ -97,6 +97,12 @@ namespace GameCore.Gameplay.Utilities
             public Builder SetFailCallback(Action<string> failCallback)
             {
                 _spawnParams.FailCallbackEvent += failCallback;
+                return this;
+            }
+
+            public Builder SetSetupInstanceCallback(Action<T> setupInstanceCallback)
+            {
+                _spawnParams.SetupInstanceCallbackEvent += setupInstanceCallback;
                 return this;
             }
 

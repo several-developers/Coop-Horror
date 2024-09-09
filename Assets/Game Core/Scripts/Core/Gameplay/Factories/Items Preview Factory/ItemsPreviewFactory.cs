@@ -1,97 +1,150 @@
-﻿using GameCore.Enums.Gameplay;
+﻿using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using GameCore.Configs.Global.ItemsList;
+using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Items;
+using GameCore.Gameplay.Network.DynamicPrefabs;
+using GameCore.Gameplay.Utilities;
+using GameCore.Infrastructure.Providers.Global;
 using GameCore.Infrastructure.Providers.Global.ItemsMeta;
+using GameCore.Utilities;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using Zenject;
 
 namespace GameCore.Gameplay.Factories.ItemsPreview
 {
-    public class ItemsPreviewFactory : IItemsPreviewFactory
+    public class ItemsPreviewFactory : AddressablesFactoryBase<int>, IItemsPreviewFactory, IInitializable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ItemsPreviewFactory(IItemsMetaProvider itemsMetaProvider, PlayerCamera playerCamera)
+        public ItemsPreviewFactory(
+            DiContainer diContainer,
+            IAssetsProvider assetsProvider,
+            IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
+            IConfigsProvider configsProvider,
+            IItemsMetaProvider itemsMetaProvider,
+            PlayerCamera playerCamera
+        ) : base(diContainer, assetsProvider, dynamicPrefabsLoaderDecorator)
         {
+            _itemsListConfig = configsProvider.GetConfig<ItemsListConfigMeta>();
             _itemsMetaProvider = itemsMetaProvider;
             _cameraReferences = playerCamera.CameraReferences;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        private readonly ItemsListConfigMeta _itemsListConfig;
         private readonly IItemsMetaProvider _itemsMetaProvider;
         private readonly CameraReferences _cameraReferences;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public bool Create(ulong clientID, int itemID, bool isFirstPerson, out ItemPreviewObject itemPreviewObject)
+        public void Initialize()
         {
-            itemPreviewObject = null;
+            WarmUp().Forget();
+        }
+        
+        public override async UniTask WarmUp() =>
+            await SetupAssetsReferences();
+
+        public async UniTaskVoid Create(ulong clientID, int itemID, bool isFirstPerson,
+            Action<ItemPreviewObject> callbackEvent)
+        {
             bool isItemMetaExists = _itemsMetaProvider.TryGetItemMeta(itemID, out ItemMeta itemMeta);
 
             if (!isItemMetaExists)
             {
                 LogItemNotFound(itemID);
-                return false;
+                return;
             }
 
-            ItemPreviewObject itemPreviewPrefab = itemMeta.ItemPreviewPrefab;
+            bool isParentFound = TryGetItemParent(out Transform parent);
 
-            if (itemPreviewPrefab == null)
+            if (!isParentFound)
+                return;
+
+            var spawnParams = new SpawnParams<ItemPreviewObject>.Builder()
+                .SetParent(parent)
+                .SetSetupInstanceCallback(SetupItemInstance)
+                .SetSuccessCallback(SendSuccessCallback)
+                .Build();
+
+            await LoadAndCreateGameObject(itemID, spawnParams);
+
+            // LOCAL METHODS: -----------------------------
+
+            bool TryGetItemParent(out Transform result)
             {
-                LogItemPrefabNotFound(itemID);
-                return false;
+                ItemHandPlacement itemHandPlacement = itemMeta.ItemHandPlacement;
+
+                if (isFirstPerson)
+                {
+                    result = itemHandPlacement == ItemHandPlacement.Left
+                        ? _cameraReferences.LeftHandItemsHolder
+                        : _cameraReferences.RightHandItemsHolder;
+                }
+                else
+                {
+                    bool isPlayerFound = PlayerEntity.TryGetPlayer(clientID, out PlayerEntity playerEntity);
+
+                    if (!isPlayerFound)
+                    {
+                        result = null;
+                        return false;
+                    }
+
+                    PlayerReferences playerReferences = playerEntity.References;
+
+                    result = itemHandPlacement == ItemHandPlacement.Left
+                        ? playerReferences.LeftHandItemsHolder
+                        : playerReferences.RightHandItemsHolder;
+                }
+
+                return true;
             }
 
-            ItemHandPlacement itemHandPlacement = itemMeta.ItemHandPlacement;
-            Transform parent = null;
-
-            if (isFirstPerson)
+            void SetupItemInstance(ItemPreviewObject instance)
             {
-                parent = itemHandPlacement == ItemHandPlacement.Left
-                    ? _cameraReferences.LeftHandItemsHolder
-                    : _cameraReferences.RightHandItemsHolder;
-            }
-            else
-            {
-                bool isPlayerFound = PlayerEntity.TryGetPlayer(clientID, out PlayerEntity playerEntity);
+                ItemMeta.ItemPose itemPose = isFirstPerson ? itemMeta.FpsItemPreview : itemMeta.TpsItemPreview;
+                Vector3 position = itemPose.Position;
+                Vector3 eulerRotation = itemPose.EulerRotation;
+                Vector3 scale = itemPose.Scale;
 
-                if (!isPlayerFound)
-                    return false;
-
-                PlayerReferences playerReferences = playerEntity.References;
-
-                parent = itemHandPlacement == ItemHandPlacement.Left
-                    ? playerReferences.LeftHandItemsHolder
-                    : playerReferences.RightHandItemsHolder;
+                Transform itemTransform = instance.transform;
+                itemTransform.localPosition = position;
+                itemTransform.localRotation = Quaternion.Euler(eulerRotation);
+                itemTransform.localScale = scale;
             }
 
-            itemPreviewObject = Object.Instantiate(itemPreviewPrefab, parent);
-
-            ItemMeta.ItemPose itemPose = isFirstPerson ? itemMeta.FpsItemPreview : itemMeta.TpsItemPreview;
-            Vector3 position = itemPose.Position;
-            Vector3 eulerRotation = itemPose.EulerRotation;
-            Vector3 scale = itemPose.Scale;
-
-            Transform itemTransform = itemPreviewObject.transform;
-            itemTransform.localPosition = position;
-            itemTransform.localRotation = Quaternion.Euler(eulerRotation);
-            itemTransform.localScale = scale;
-
-            return true;
+            void SendSuccessCallback(ItemPreviewObject instance) =>
+                callbackEvent?.Invoke(instance);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
+        private async UniTask SetupAssetsReferences()
+        {
+            IEnumerable<ItemsListConfigMeta.ItemReference>
+                allItemsReferences = _itemsListConfig.GetAllItemsReferences();
+
+            foreach (ItemsListConfigMeta.ItemReference itemReference in allItemsReferences)
+            {
+                AssetReferenceGameObject itemPreviewPrefabAsset = itemReference.ItemPreviewPrefabAsset;
+                ItemMeta itemMeta = itemReference.ItemMeta;
+                int itemID = itemMeta.ItemID;
+
+                await LoadAndReleaseAsset<ItemPreviewObject>(itemPreviewPrefabAsset);
+                AddAsset(itemID, itemPreviewPrefabAsset);
+            }
+        }
+
         private static void LogItemNotFound(int itemID)
         {
             string log = Log.HandleLog($"Item with ID <gb>({itemID})</gb> <rb>not found</rb>!");
-            Debug.Log(log);
-        }
-
-        private static void LogItemPrefabNotFound(int itemID)
-        {
-            string log = Log.HandleLog($"Item Prefab with ID <gb>({itemID})</gb> <rb>not found</rb>!");
             Debug.Log(log);
         }
     }

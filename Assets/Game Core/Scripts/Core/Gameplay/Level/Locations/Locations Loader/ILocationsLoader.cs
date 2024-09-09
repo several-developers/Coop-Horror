@@ -1,10 +1,12 @@
 ﻿using GameCore.Enums.Gameplay;
+using GameCore.Enums.Global;
 
 namespace GameCore.Gameplay.Level.Locations
 {
     public interface ILocationsLoader
     {
-        void LoadLocation(LocationName locationName);
-        void UnloadLastLocation();
+        void LoadSceneNetwork(SceneName sceneName);
+        void LoadLocationNetwork(LocationName locationName);
+        void UnloadLastScene();
     }
 }

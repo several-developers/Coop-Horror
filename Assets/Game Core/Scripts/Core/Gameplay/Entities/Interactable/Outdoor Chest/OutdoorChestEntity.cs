@@ -76,6 +76,7 @@ namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
                 OpenChestServerRpc();
 
             PlaySound(SFXType.Open);
+            
         }
 
         public void ToggleInteract(bool canInteract)
@@ -83,7 +84,7 @@ namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
             _canInteract = canInteract;
             _triggerCollider.enabled = canInteract;
 
-            OnInteractionStateChangedEvent.Invoke();
+            SendInteractionStateChanged();
         }
 
         public void SetupItemsList(List<int> itemsList) =>
@@ -115,6 +116,7 @@ namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
             _animator.SetBool(id: AnimatorHashes.IsOpen, value: true);
 
             SpawnItems();
+            SendInteractionStateChanged();
         }
 
         private void SpawnItems()
@@ -150,6 +152,9 @@ namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
             _itemsList.Clear();
             _itemsList = null;
         }
+
+        private void SendInteractionStateChanged() =>
+            OnInteractionStateChangedEvent.Invoke();
 
         private Transform GetRandomItemSpawnPoint()
         {

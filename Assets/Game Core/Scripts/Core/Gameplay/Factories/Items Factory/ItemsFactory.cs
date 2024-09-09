@@ -3,7 +3,6 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Global.ItemsList;
 using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Network.DynamicPrefabs;
-using GameCore.Gameplay.Network.PrefabsRegistrar;
 using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.Infrastructure.Providers.Global.ItemsMeta;
@@ -20,12 +19,10 @@ namespace GameCore.Gameplay.Factories.Items
             DiContainer diContainer,
             IAssetsProvider assetsProvider,
             IDynamicPrefabsLoaderDecorator dynamicPrefabsLoaderDecorator,
-            INetworkPrefabsRegistrar networkPrefabsRegistrar,
             IItemsMetaProvider itemsMetaProvider,
             IConfigsProvider configsProvider
         ) : base(diContainer, assetsProvider, dynamicPrefabsLoaderDecorator)
         {
-            _networkPrefabsRegistrar = networkPrefabsRegistrar;
             _itemsMetaProvider = itemsMetaProvider;
             _itemsListConfig = configsProvider.GetConfig<ItemsListConfigMeta>();
         }
@@ -33,46 +30,35 @@ namespace GameCore.Gameplay.Factories.Items
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly INetworkPrefabsRegistrar _networkPrefabsRegistrar;
         private readonly IItemsMetaProvider _itemsMetaProvider;
         private readonly ItemsListConfigMeta _itemsListConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public override async UniTask WarmUp() =>
-            await SetupReferencesDictionary();
+            await SetupAssetsReferences();
 
         public async UniTask CreateItem<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
-            if (!TryGetItemMeta(itemID, out ItemMeta itemMeta))
+            if (!TryPrepareItem(itemID, spawnParams))
                 return;
-            
-            spawnParams.SetupInstanceEvent += itemObjectInstance =>
-            {
-                itemObjectInstance.Setup(itemID, itemMeta.ScaleMultiplier);
-            };
-            
+
             await LoadAndCreateNetworkObject(itemID, spawnParams);
         }
 
         public void CreateItemDynamic<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
             where TItemObject : ItemObjectBase
         {
-            if (!TryGetItemMeta(itemID, out ItemMeta itemMeta))
+            if (!TryPrepareItem(itemID, spawnParams))
                 return;
-            
-            spawnParams.SetupInstanceEvent += itemObjectInstance =>
-            {
-                itemObjectInstance.Setup(itemID, itemMeta.ScaleMultiplier);
-            };
-            
+
             LoadAndCreateDynamicNetworkObject(itemID, spawnParams);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTask SetupReferencesDictionary()
+        private async UniTask SetupAssetsReferences()
         {
             IEnumerable<ItemsListConfigMeta.ItemReference>
                 allItemsReferences = _itemsListConfig.GetAllItemsReferences();
@@ -81,12 +67,24 @@ namespace GameCore.Gameplay.Factories.Items
             {
                 AssetReferenceGameObject itemPrefabAsset = itemReference.ItemPrefabAsset;
                 int itemID = itemReference.ItemMeta.ItemID;
-                
-                var itemObject = await LoadAndReleaseAsset<ItemObjectBase>(itemPrefabAsset);
 
+                await LoadAndReleaseAsset<ItemObjectBase>(itemPrefabAsset);
                 AddDynamicAsset(itemID, itemPrefabAsset);
-                _networkPrefabsRegistrar.Register(itemObject.gameObject);
             }
+        }
+
+        private bool TryPrepareItem<TItemObject>(int itemID, SpawnParams<TItemObject> spawnParams)
+            where TItemObject : ItemObjectBase
+        {
+            if (!TryGetItemMeta(itemID, out ItemMeta itemMeta))
+                return false;
+
+            spawnParams.SetupInstanceCallbackEvent += itemObjectInstance =>
+            {
+                itemObjectInstance.Setup(itemID, itemMeta.ScaleMultiplier);
+            };
+
+            return true;
         }
 
         private bool TryGetItemMeta(int itemID, out ItemMeta itemMeta)

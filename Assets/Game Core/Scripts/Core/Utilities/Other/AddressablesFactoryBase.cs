@@ -14,6 +14,7 @@ namespace GameCore.Utilities
     {
         public static DiContainer DiContainer;
     }
+
     public abstract class AddressablesFactoryBase<TKey> : IAddressablesFactory<TKey>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
@@ -100,14 +101,19 @@ namespace GameCore.Utilities
             Vector3 worldPosition = spawnParams.WorldPosition;
             Quaternion rotation = spawnParams.Rotation;
             Transform parent = spawnParams.Parent;
-            
-            var instance = CurrentSceneDiContainer.DiContainer
-                .InstantiatePrefabForComponent<TObject>(prefab, worldPosition, rotation, parent);
-            
-            spawnParams.SendSetupInstance(instance);
-            spawnParams.SendSuccessCallback(instance);
 
-            return instance as GameObject;
+            GameObject objectInstance = CurrentSceneDiContainer.DiContainer
+                .InstantiatePrefab(prefab, worldPosition, rotation, parent);
+
+            if (objectInstance.TryGetComponent(out TObject componentInstance))
+            {
+                spawnParams.SendSetupInstance(componentInstance);
+                spawnParams.SendSuccessCallback(componentInstance);
+                return objectInstance;
+            }
+            
+            Log.PrintError(log: "Component of type '<gb>NetworkObject</gb>' <rb>not found</rb>!");
+            return null;
         }
 
         protected async UniTask<NetworkObject> LoadAndCreateNetworkObject<TObject>(TKey key,
@@ -230,7 +236,7 @@ namespace GameCore.Utilities
         protected async UniTask<T> LoadAsset<T>(AssetReference assetReference) where T : class
         {
             var gameObjectPrefab = await _assetsProvider.LoadAsset<GameObject>(assetReference);
-            
+
             if (gameObjectPrefab.TryGetComponent(out T result))
                 return result;
 
@@ -288,7 +294,7 @@ namespace GameCore.Utilities
             ulong ownerID = spawnParams.OwnerID;
 
             NetworkSpawnManager spawnManager = GetNetworkSpawnManager();
-
+            
             NetworkObject instance = spawnManager.InstantiateAndSpawn(
                 networkPrefab: prefab,
                 ownerClientId: ownerID,
@@ -297,10 +303,10 @@ namespace GameCore.Utilities
                 rotation: rotation
             );
 
-            if (instance is TObject result)
+            if (instance.TryGetComponent(out TObject component))
             {
-                spawnParams.SendSetupInstance(result);
-                spawnParams.SendSuccessCallback(result);
+                spawnParams.SendSetupInstance(component);
+                spawnParams.SendSuccessCallback(component);
             }
             else
                 Log.PrintError(log: "Wrong prefab type!");
@@ -320,7 +326,7 @@ namespace GameCore.Utilities
             Log.PrintError(log: $"Dictionary <rb>already contains</rb> key '<gb>{key}</gb>'");
             return false;
         }
-        
+
         private bool TryGetDynamicAssetGUID(TKey key, out string guid)
         {
             if (!TryGetDynamicAssetReference(key, out AssetReference assetReference))

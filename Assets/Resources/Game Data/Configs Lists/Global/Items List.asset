@@ -113,6 +113,17 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+  - _itemMeta: {fileID: 11400000, guid: 94f749dc942a4914ba5cf023ccf40861, type: 2}
+    _itemPrefabAsset:
+      m_AssetGUID: 9672416c2dd38a14b8c16a56b689f00e
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+    _itemPreviewPrefabAsset:
+      m_AssetGUID: 751bd8e07284a0c49afeb8bde5d05b1f
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
   - _itemMeta: {fileID: 11400000, guid: d29431f01d487ed45b607a1ab1d4638f, type: 2}
     _itemPrefabAsset:
       m_AssetGUID: b9715ba1c2defc74093991e70ec901e0

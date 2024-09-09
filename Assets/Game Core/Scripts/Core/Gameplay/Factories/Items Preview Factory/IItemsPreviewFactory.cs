@@ -1,10 +1,12 @@
-﻿using GameCore.Gameplay.Items;
-using UnityEngine;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using GameCore.Gameplay.Items;
+using GameCore.Utilities;
 
 namespace GameCore.Gameplay.Factories.ItemsPreview
 {
-    public interface IItemsPreviewFactory
+    public interface IItemsPreviewFactory : IAddressablesFactory<int>
     {
-        bool Create(ulong clientID, int itemID, bool isFirstPerson, out ItemPreviewObject itemPreviewObject);
+        UniTaskVoid Create(ulong clientID, int itemID, bool isFirstPerson, Action<ItemPreviewObject> callbackEvent);
     }
 }

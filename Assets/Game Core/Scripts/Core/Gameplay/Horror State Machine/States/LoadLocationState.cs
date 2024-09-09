@@ -32,8 +32,8 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void LoadLocation(LocationName locationName) =>
-            _locationsLoader.LoadLocation(locationName);
-
+            _locationsLoader.LoadLocationNetwork(locationName);
+        
         private void EnterGameLoopState() =>
             _horrorStateMachine.ChangeState<GameLoopState>();
     }

@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97b3d40f10b3486cb980964da827dba5, type: 3}
-  m_Name: Item - Watter Bottle
+  m_Name: Item - Water Bottle
   m_EditorClassIdentifier: 
-  _metaName: Item - Watter Bottle
+  _metaName: Item - Water Bottle
   _icon: {fileID: 21300000, guid: 32d780aa53e2a214481b39c4f1e4c66b, type: 3}
-  _itemName: Watter Bottle
+  _itemName: Water Bottle
   _itemID: 6
   _scaleMultiplier: 2
   _rigPresetType: 1
@@ -27,17 +27,3 @@ MonoBehaviour:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _scale: {x: 1, y: 1, z: 1}
-  _itemPrefab: {fileID: -7839826539893047543, guid: 9672416c2dd38a14b8c16a56b689f00e,
-    type: 3}
-  _itemPreviewPrefab: {fileID: 1063181044141629135, guid: 751bd8e07284a0c49afeb8bde5d05b1f,
-    type: 3}
-  _itemPrefabAsset:
-    m_AssetGUID: 9672416c2dd38a14b8c16a56b689f00e
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  _itemPreviewPrefabAsset:
-    m_AssetGUID: 751bd8e07284a0c49afeb8bde5d05b1f
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0

@@ -4,7 +4,6 @@ using CustomEditors;
 using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -57,7 +56,6 @@ namespace GameCore.Gameplay.Items
         public int ItemID => _itemID;
         public ItemPose FpsItemPreview => _fpsItemPreview;
         public ItemPose TpsItemPreview => _tpsItemPreview;
-        public ItemPreviewObject ItemPreviewPrefab => null;
 
         // FIELDS: --------------------------------------------------------------------------------
 

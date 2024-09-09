@@ -92,13 +92,17 @@ namespace GameCore.Gameplay.Systems.Inventory
                 return;
 
             ulong clientID = _playerEntity.OwnerClientId;
-            
-            bool isItemCreated =
-                _itemsPreviewFactory.Create(clientID, itemID, isFirstPerson, out ItemPreviewObject itemPreview);
 
-            if (!isItemCreated)
-                return;
+            _itemsPreviewFactory.Create(
+                clientID: clientID,
+                itemID: itemID,
+                isFirstPerson: isFirstPerson,
+                callbackEvent: itemPreviewObject => { ItemPreviewCreated(itemPreviewObject, slotIndex); }
+            );
+        }
 
+        private void ItemPreviewCreated(ItemPreviewObject itemPreview, int slotIndex)
+        {
             bool isSelected = _playerInventory.GetSelectedSlotIndex() == slotIndex;
 
             if (!isSelected)

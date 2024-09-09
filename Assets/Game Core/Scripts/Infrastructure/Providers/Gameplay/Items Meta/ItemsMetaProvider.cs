@@ -30,9 +30,9 @@ namespace GameCore.Infrastructure.Providers.Global.ItemsMeta
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SetupItemsDictionary(IConfigsProvider gameplayConfigsProvider)
+        private void SetupItemsDictionary(IConfigsProvider configsProvider)
         {
-            var itemsListConfig = gameplayConfigsProvider.GetConfig<ItemsListConfigMeta>();
+            var itemsListConfig = configsProvider.GetConfig<ItemsListConfigMeta>();
             IEnumerable<ItemsListConfigMeta.ItemReference> allItemsReferences = itemsListConfig.GetAllItemsReferences();
 
             foreach (ItemsListConfigMeta.ItemReference itemReference in allItemsReferences)
@@ -50,7 +50,7 @@ namespace GameCore.Infrastructure.Providers.Global.ItemsMeta
 
             bool IsItemExists(int itemID)
             {
-                if (!_itemsDictionary.ContainsKey(itemID))
+                if (!IsItemMetaExists(itemID))
                     return false;
 
                 string errorLog = Log.HandleLog($"Item with ID <gb>({itemID})</gb> <rb>already exists</rb>!");

@@ -226,8 +226,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             {
                 Debug.Log(message: "Prefab is already loaded by all peers, we can spawn it immediately");
 
-                LoadAndSendPrefab(assetGuid);
-                return null;
+                return LoadAndSendPrefab(assetGuid);
             }
 
             _synchronousSpawnAckCount = 0;
