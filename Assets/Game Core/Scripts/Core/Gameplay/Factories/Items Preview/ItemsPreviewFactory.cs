@@ -14,7 +14,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Factories.ItemsPreview
 {
-    public class ItemsPreviewFactory : AddressablesFactoryBase<int>, IItemsPreviewFactory
+    public class ItemsPreviewFactory : AddressablesFactory<int>, IItemsPreviewFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 

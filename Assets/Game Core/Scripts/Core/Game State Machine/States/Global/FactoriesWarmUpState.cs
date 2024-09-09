@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.AssetsStorages;
 
@@ -47,11 +48,16 @@ namespace GameCore.StateMachine
 
         private async UniTask WarmUpFactories()
         {
-            await _menusAssetsStorage.WarmUp();
-            await _entitiesAssetsStorage.WarmUp();
-            await _monstersAssetsStorage.WarmUp();
-            await _itemsAssetsStorage.WarmUp();
-            await _itemsPreviewAssetsStorage.WarmUp();
+            var tasks = new List<UniTask>
+            {
+                _menusAssetsStorage.WarmUp(),
+                _entitiesAssetsStorage.WarmUp(),
+                _monstersAssetsStorage.WarmUp(),
+                _itemsAssetsStorage.WarmUp(),
+                _itemsPreviewAssetsStorage.WarmUp()
+            };
+
+            await UniTask.WhenAll(tasks);
         }
 
         private void EnterLoadMainMenuState() =>

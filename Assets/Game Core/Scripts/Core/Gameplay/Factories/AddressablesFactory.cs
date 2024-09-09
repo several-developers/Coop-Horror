@@ -10,11 +10,12 @@ using Zenject;
 
 namespace GameCore.Gameplay.Factories
 {
-    public abstract class AddressablesFactoryBase<TKey>
+#warning РЕФАКТОРИНГ КОДА
+    public abstract class AddressablesFactory<TKey>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        protected AddressablesFactoryBase(
+        protected AddressablesFactory(
             DiContainer diContainer,
             IAssetsProvider assetsProvider,
             IAssetsStorage<TKey> assetsStorage,
@@ -25,6 +26,7 @@ namespace GameCore.Gameplay.Factories
             _assetsProvider = assetsProvider;
             _assetsStorage = assetsStorage;
             _dynamicPrefabsLoaderDecorator = dynamicPrefabsLoaderDecorator;
+            _networkManager = NetworkManager.Singleton;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -33,6 +35,7 @@ namespace GameCore.Gameplay.Factories
         private readonly IAssetsProvider _assetsProvider;
         private readonly IAssetsStorage<TKey> _assetsStorage;
         private readonly IDynamicPrefabsLoaderDecorator _dynamicPrefabsLoaderDecorator;
+        private readonly NetworkManager _networkManager;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -66,7 +69,7 @@ namespace GameCore.Gameplay.Factories
             Quaternion rotation = spawnParams.Rotation;
             Transform parent = spawnParams.Parent;
 
-            GameObject objectInstance = isUI 
+            GameObject objectInstance = isUI
                 ? diContainer.InstantiatePrefab(prefab, parent)
                 : diContainer.InstantiatePrefab(prefab, worldPosition, rotation, parent);
 
@@ -110,7 +113,7 @@ namespace GameCore.Gameplay.Factories
             Quaternion rotation = spawnParams.Rotation;
             ulong ownerID = spawnParams.OwnerID;
 
-            NetworkSpawnManager spawnManager = GetNetworkSpawnManager();
+            NetworkSpawnManager spawnManager = _networkManager.SpawnManager;
 
             NetworkObject instanceNetworkObject = spawnManager.InstantiateAndSpawn(
                 networkPrefab: prefabNetworkObject,
@@ -196,14 +199,14 @@ namespace GameCore.Gameplay.Factories
                 Log.PrintError(log: "Wrong prefab type!");
         }
 
-        private static void DynamicNetworkObjectLoaded<TObject>(NetworkObject prefab, SpawnParams<TObject> spawnParams)
+        private void DynamicNetworkObjectLoaded<TObject>(NetworkObject prefab, SpawnParams<TObject> spawnParams)
             where TObject : class
         {
             Vector3 worldPosition = spawnParams.WorldPosition;
             Quaternion rotation = spawnParams.Rotation;
             ulong ownerID = spawnParams.OwnerID;
 
-            NetworkSpawnManager spawnManager = GetNetworkSpawnManager();
+            NetworkSpawnManager spawnManager = _networkManager.SpawnManager;
 
             NetworkObject instance = spawnManager.InstantiateAndSpawn(
                 networkPrefab: prefab,
@@ -222,9 +225,6 @@ namespace GameCore.Gameplay.Factories
                 Log.PrintError(log: "Wrong prefab type!");
         }
 
-        private static NetworkSpawnManager GetNetworkSpawnManager() =>
-            NetworkManager.Singleton.SpawnManager;
-        
         private async UniTask<T> LoadAsset<T>(TKey key) where T : class
         {
             bool isAssetReferenceFound = TryGetAssetReference(key, out AssetReference assetReference);
@@ -271,7 +271,7 @@ namespace GameCore.Gameplay.Factories
             guid = assetReference.AssetGUID;
             return true;
         }
-        
+
         private bool TryGetAssetReference(TKey key, out AssetReference assetReference) =>
             _assetsStorage.TryGetAssetReference(key, out assetReference);
 

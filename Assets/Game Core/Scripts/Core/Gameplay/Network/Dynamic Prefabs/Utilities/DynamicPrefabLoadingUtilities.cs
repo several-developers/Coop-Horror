@@ -38,6 +38,9 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         private static readonly Dictionary<AddressableGUID, AsyncOperationHandle<GameObject>>
             LoadedDynamicPrefabResourceHandles = new(new AddressableGUIDEqualityComparer());
 
+        private static readonly Dictionary<string, AsyncOperationHandle> _completedCache = new();
+        private static readonly Dictionary<string, List<AsyncOperationHandle>> _handles = new();
+
         // A storage where we keep the association between the dynamic prefab (hash of it's GUID)
         // and the clients that have it loaded.
         private static readonly Dictionary<int, HashSet<ulong>> PrefabHashToClientIds = new();

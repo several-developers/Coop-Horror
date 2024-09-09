@@ -9,7 +9,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Factories.Items
 {
-    public class ItemsFactory : AddressablesFactoryBase<int>, IItemsFactory
+    public class ItemsFactory : AddressablesFactory<int>, IItemsFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
         public ItemsFactory(

@@ -60,7 +60,6 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         {
             Instance = this;
             _networkManager = NetworkManager.Singleton;
-            DontDestroyOnLoad(gameObject);
         }
 
         protected override void StartAll()

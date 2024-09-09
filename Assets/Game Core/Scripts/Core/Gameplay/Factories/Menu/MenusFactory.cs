@@ -11,7 +11,7 @@ using Zenject;
 
 namespace GameCore.Gameplay.Factories.Menu
 {
-    public class MenusFactory : AddressablesFactoryBase<Type>, IMenusFactory
+    public class MenusFactory : AddressablesFactory<Type>, IMenusFactory
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
