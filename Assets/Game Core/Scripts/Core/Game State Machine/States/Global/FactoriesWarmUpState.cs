@@ -1,8 +1,5 @@
 using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.Factories.Entities;
-using GameCore.Gameplay.Factories.Items;
-using GameCore.Gameplay.Factories.Menu;
-using GameCore.Gameplay.Factories.Monsters;
+using GameCore.Gameplay.AssetsStorages;
 
 namespace GameCore.StateMachine
 {
@@ -12,17 +9,19 @@ namespace GameCore.StateMachine
 
         public FactoriesWarmUpState(
             IGameStateMachine gameStateMachine,
-            IMenuFactory menuFactory,
-            IEntitiesFactory entitiesFactory,
-            IMonstersFactory monstersFactory,
-            IItemsFactory itemsFactory
+            IMenusAssetsStorage menusAssetsStorage,
+            IEntitiesAssetsStorage entitiesAssetsStorage,
+            IMonstersAssetsStorage monstersAssetsStorage,
+            IItemsAssetsStorage itemsAssetsStorage,
+            IItemsPreviewAssetsStorage itemsPreviewAssetsStorage
         )
         {
             _gameStateMachine = gameStateMachine;
-            _menuFactory = menuFactory;
-            _entitiesFactory = entitiesFactory;
-            _monstersFactory = monstersFactory;
-            _itemsFactory = itemsFactory;
+            _menusAssetsStorage = menusAssetsStorage;
+            _entitiesAssetsStorage = entitiesAssetsStorage;
+            _monstersAssetsStorage = monstersAssetsStorage;
+            _itemsAssetsStorage = itemsAssetsStorage;
+            _itemsPreviewAssetsStorage = itemsPreviewAssetsStorage;
 
             _gameStateMachine.AddState(this);
         }
@@ -30,10 +29,11 @@ namespace GameCore.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IMenuFactory _menuFactory;
-        private readonly IEntitiesFactory _entitiesFactory;
-        private readonly IMonstersFactory _monstersFactory;
-        private readonly IItemsFactory _itemsFactory;
+        private readonly IMenusAssetsStorage _menusAssetsStorage;
+        private readonly IEntitiesAssetsStorage _entitiesAssetsStorage;
+        private readonly IMonstersAssetsStorage _monstersAssetsStorage;
+        private readonly IItemsAssetsStorage _itemsAssetsStorage;
+        private readonly IItemsPreviewAssetsStorage _itemsPreviewAssetsStorage;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -47,10 +47,11 @@ namespace GameCore.StateMachine
 
         private async UniTask WarmUpFactories()
         {
-            await _menuFactory.WarmUp();
-            await _entitiesFactory.WarmUp();
-            await _monstersFactory.WarmUp();
-            await _itemsFactory.WarmUp();
+            await _menusAssetsStorage.WarmUp();
+            await _entitiesAssetsStorage.WarmUp();
+            await _monstersAssetsStorage.WarmUp();
+            await _itemsAssetsStorage.WarmUp();
+            await _itemsPreviewAssetsStorage.WarmUp();
         }
 
         private void EnterLoadMainMenuState() =>

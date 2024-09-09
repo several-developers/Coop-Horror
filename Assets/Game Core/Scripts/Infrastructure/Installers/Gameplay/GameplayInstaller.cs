@@ -13,7 +13,6 @@ using GameCore.Gameplay.Network.Utilities;
 using GameCore.Gameplay.RoundManagement;
 using GameCore.Gameplay.UIManagement;
 using GameCore.Gameplay.VisualManagement;
-using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
@@ -46,8 +45,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         {
             // Костылик :(
             ZenjectNetCodeFactory.StaticDIContainer = Container;
-            // Костылик :(
-            CurrentSceneDiContainer.DiContainer = Container;
 
             BindMobileHeadquartersEntity();
             BindTimeService();

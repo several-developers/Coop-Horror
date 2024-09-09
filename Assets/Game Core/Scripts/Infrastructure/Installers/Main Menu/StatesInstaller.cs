@@ -1,5 +1,4 @@
 ﻿using GameCore.StateMachine;
-using GameCore.Utilities;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.MainMenu
@@ -10,9 +9,6 @@ namespace GameCore.Infrastructure.Installers.MainMenu
 
         public override void InstallBindings()
         {
-            // КОСТЫЛИК :(
-            CurrentSceneDiContainer.DiContainer = Container;
-            
             BindPrepareMainMenuState();
             BindMainMenuState();
             BindSignInState();

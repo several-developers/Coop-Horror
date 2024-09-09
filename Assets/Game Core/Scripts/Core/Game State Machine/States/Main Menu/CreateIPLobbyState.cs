@@ -8,10 +8,10 @@ namespace GameCore.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CreateIPLobbyState(IGameStateMachine gameStateMachine, IMenuFactory menuFactory)
+        public CreateIPLobbyState(IGameStateMachine gameStateMachine, IMenusFactory menusFactory)
         {
             _gameStateMachine = gameStateMachine;
-            _menuFactory = menuFactory;
+            _menusFactory = menusFactory;
 
             _gameStateMachine.AddState(this);
         }
@@ -19,7 +19,7 @@ namespace GameCore.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IMenuFactory _menuFactory;
+        private readonly IMenusFactory _menusFactory;
 
         private IPLobbyMenuView _ipLobbyMenu;
         
@@ -32,7 +32,7 @@ namespace GameCore.StateMachine
         
         private async UniTask CreateIPLobbyMenu()
         {
-            _ipLobbyMenu = await _menuFactory.Create<IPLobbyMenuView>();
+            _ipLobbyMenu = await _menusFactory.Create<IPLobbyMenuView>();
 
             _ipLobbyMenu.OnCloseClickedEvent += OnCloseClicked;
         }

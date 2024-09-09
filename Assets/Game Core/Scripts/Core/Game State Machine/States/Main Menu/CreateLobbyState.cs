@@ -8,17 +8,17 @@ namespace GameCore.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CreateLobbyState(IGameStateMachine gameStateMachine, IMenuFactory menuFactory)
+        public CreateLobbyState(IGameStateMachine gameStateMachine, IMenusFactory menusFactory)
         {
             _gameStateMachine = gameStateMachine;
-            _menuFactory = menuFactory;
+            _menusFactory = menusFactory;
             _gameStateMachine.AddState(this);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IMenuFactory _menuFactory;
+        private readonly IMenusFactory _menusFactory;
 
         private SaveSelectionMenuView _saveSelectionMenuView;
 
@@ -36,6 +36,6 @@ namespace GameCore.StateMachine
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private async UniTask CreateSaveSelectionMenuView() =>
-            _saveSelectionMenuView = await _menuFactory.Create<SaveSelectionMenuView>();
+            _saveSelectionMenuView = await _menusFactory.Create<SaveSelectionMenuView>();
     }
 }

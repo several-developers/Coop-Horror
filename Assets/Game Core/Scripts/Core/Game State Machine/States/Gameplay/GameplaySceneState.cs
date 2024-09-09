@@ -26,7 +26,7 @@ namespace GameCore.StateMachine
         public GameplaySceneState(
             IGameStateMachine gameStateMachine,
             IHorrorStateMachine horrorStateMachine,
-            IMenuFactory menuFactory,
+            IMenusFactory menusFactory,
             ITrainEntity trainEntity,
             IConfigsProvider configsProvider,
             IGameManagerDecorator gameManagerDecorator,
@@ -35,7 +35,7 @@ namespace GameCore.StateMachine
         {
             _gameStateMachine = gameStateMachine;
             _horrorStateMachine = horrorStateMachine;
-            _menuFactory = menuFactory;
+            _menusFactory = menusFactory;
             _trainEntity = trainEntity;
             _gameManagerDecorator = gameManagerDecorator;
             _diContainer = diContainer;
@@ -48,7 +48,7 @@ namespace GameCore.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IHorrorStateMachine _horrorStateMachine;
-        private readonly IMenuFactory _menuFactory;
+        private readonly IMenusFactory _menusFactory;
         private readonly ITrainEntity _trainEntity;
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly DiContainer _diContainer;
@@ -133,31 +133,31 @@ namespace GameCore.StateMachine
             _inputReader.EnableGameplayInput();
 
         private async UniTask CreateChatMenu() =>
-            _chatMenuUI = await _menuFactory.Create<ChatMenuUI>(_diContainer);
+            _chatMenuUI = await _menusFactory.Create<ChatMenuUI>(_diContainer);
 
         private async UniTask CreateActiveQuestsView() =>
-            await _menuFactory.Create<ActiveQuestsView>(_diContainer);
+            await _menusFactory.Create<ActiveQuestsView>(_diContainer);
 
         private async UniTask CreateQuestsSelectionMenuView() =>
-            _questsSelectionMenuView = await _menuFactory.Create<QuestsSelectionMenuView>(_diContainer);
+            _questsSelectionMenuView = await _menusFactory.Create<QuestsSelectionMenuView>(_diContainer);
 
         private async UniTask CreateGameMapMenu() =>
-            _gameMapUI = await _menuFactory.Create<GameMapUI>(_diContainer);
+            _gameMapUI = await _menusFactory.Create<GameMapUI>(_diContainer);
 
         private async UniTask CreateGameOverMenu() =>
-            _gameOverMenuView = await _menuFactory.Create<GameOverMenuView>(_diContainer);
+            _gameOverMenuView = await _menusFactory.Create<GameOverMenuView>(_diContainer);
 
         private async UniTask CreateRewardMenu() =>
-            await _menuFactory.Create<RewardMenuView>(_diContainer);
+            await _menusFactory.Create<RewardMenuView>(_diContainer);
 
         private async UniTask CreateGameOverWarningMenuView() =>
-            _gameOverWarningMenuView = await _menuFactory.Create<GameOverWarningMenuView>(_diContainer);
+            _gameOverWarningMenuView = await _menusFactory.Create<GameOverWarningMenuView>(_diContainer);
 
         private async UniTask CreatePauseMenu() =>
-            _pauseMenuView = await _menuFactory.Create<PauseMenuView>(_diContainer);
+            _pauseMenuView = await _menusFactory.Create<PauseMenuView>(_diContainer);
 
         private async UniTask CreateQuitConfirmMenuView() =>
-            _quitConfirmMenuView = await _menuFactory.Create<QuitConfirmMenuView>(_diContainer);
+            _quitConfirmMenuView = await _menusFactory.Create<QuitConfirmMenuView>(_diContainer);
 
         private void ShowQuitConfirmMenu() =>
             _quitConfirmMenuView.Show();

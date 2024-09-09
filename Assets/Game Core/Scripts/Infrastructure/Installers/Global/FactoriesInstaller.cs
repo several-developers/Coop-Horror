@@ -1,7 +1,4 @@
-using GameCore.Gameplay.Factories.Entities;
-using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.Factories.Menu;
-using GameCore.Gameplay.Factories.Monsters;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Global
@@ -12,39 +9,15 @@ namespace GameCore.Infrastructure.Installers.Global
 
         public override void InstallBindings()
         {
-            BindMenuFactory();
-            BindEntitiesFactory();
-            BindMonstersFactory();
-            BindItemsFactory();
+            BindMenusFactory();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
-        private void BindMenuFactory()
+        private void BindMenusFactory()
         {
             Container
-                .BindInterfacesTo<MenuFactory>()
-                .AsSingle();
-        }
-        
-        private void BindEntitiesFactory()
-        {
-            Container
-                .BindInterfacesTo<EntitiesFactory>()
-                .AsSingle();
-        }
-        
-        private void BindMonstersFactory()
-        {
-            Container
-                .BindInterfacesTo<MonstersFactory>()
-                .AsSingle();
-        }
-        
-        private void BindItemsFactory()
-        {
-            Container
-                .BindInterfacesTo<ItemsFactory>()
+                .BindInterfacesTo<MenusFactory>()
                 .AsSingle();
         }
     }

@@ -10,10 +10,10 @@ namespace GameCore.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public JoinGameState(IGameStateMachine gameStateMachine, IMenuFactory menuFactory)
+        public JoinGameState(IGameStateMachine gameStateMachine, IMenusFactory menusFactory)
         {
             _gameStateMachine = gameStateMachine;
-            _menuFactory = menuFactory;
+            _menusFactory = menusFactory;
 
             _gameStateMachine.AddState(this);
         }
@@ -21,7 +21,7 @@ namespace GameCore.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IMenuFactory _menuFactory;
+        private readonly IMenusFactory _menusFactory;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

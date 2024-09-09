@@ -12,12 +12,12 @@ namespace GameCore.StateMachine
         public CreateRelayLobbyState(
             IGameStateMachine gameStateMachine,
             IScenesLoaderService scenesLoaderService,
-            IMenuFactory menuFactory
+            IMenusFactory menusFactory
         )
         {
             _gameStateMachine = gameStateMachine;
             _scenesLoaderService = scenesLoaderService;
-            _menuFactory = menuFactory;
+            _menusFactory = menusFactory;
 
             _gameStateMachine.AddState(this);
         }
@@ -26,7 +26,7 @@ namespace GameCore.StateMachine
 
         private readonly IGameStateMachine _gameStateMachine;
         private readonly IScenesLoaderService _scenesLoaderService;
-        private readonly IMenuFactory _menuFactory;
+        private readonly IMenusFactory _menusFactory;
 
         private RelayLobbyMenuView _relayLobbyMenu;
 
@@ -47,7 +47,7 @@ namespace GameCore.StateMachine
         private async void CreateRelayLobbyMenu()
         {
             // _relayLobbyMenu = MenuFactory.Create<RelayLobbyMenuView>();
-            _relayLobbyMenu = await _menuFactory.Create<RelayLobbyMenuView>();
+            _relayLobbyMenu = await _menusFactory.Create<RelayLobbyMenuView>();
 
             _relayLobbyMenu.OnCloseClickedEvent += OnCloseClicked;
         }

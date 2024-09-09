@@ -8,10 +8,10 @@ namespace GameCore.StateMachine
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public MainMenuState(IGameStateMachine gameStateMachine, IMenuFactory menuFactory)
+        public MainMenuState(IGameStateMachine gameStateMachine, IMenusFactory menusFactory)
         {
             _gameStateMachine = gameStateMachine;
-            _menuFactory = menuFactory;
+            _menusFactory = menusFactory;
 
             _gameStateMachine.AddState(this);
         }
@@ -19,7 +19,7 @@ namespace GameCore.StateMachine
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly IGameStateMachine _gameStateMachine;
-        private readonly IMenuFactory _menuFactory;
+        private readonly IMenusFactory _menusFactory;
 
         private SelectLobbyMenuView _selectLobbyMenu;
 
@@ -35,7 +35,7 @@ namespace GameCore.StateMachine
 
         private async void CreateSelectLobbyMenu()
         {
-            _selectLobbyMenu = await _menuFactory.Create<SelectLobbyMenuView>();
+            _selectLobbyMenu = await _menusFactory.Create<SelectLobbyMenuView>();
 
             _selectLobbyMenu.OnStartWithLobbyClickedEvent += OnStartWithLobbyClicked;
             _selectLobbyMenu.OnStartWithDirectIPClickedEvent += OnStartWithDirectIPClicked;
