@@ -20,6 +20,7 @@ namespace GameCore.Gameplay.Utilities
         public Vector3 WorldPosition { get; private set; }
         public Quaternion Rotation { get; private set; }
         public ulong OwnerID { get; private set; }
+        public bool IsUI { get; private set; }
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -91,6 +92,12 @@ namespace GameCore.Gameplay.Utilities
             public Builder SetOwnerID(ulong ownerID)
             {
                 _spawnParams.OwnerID = ownerID;
+                return this;
+            }
+
+            public Builder SetIsUI(bool isUI)
+            {
+                _spawnParams.IsUI = isUI;
                 return this;
             }
 

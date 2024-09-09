@@ -61,11 +61,14 @@ namespace GameCore.Gameplay.Factories
                 return null;
             }
 
+            bool isUI = spawnParams.IsUI;
             Vector3 worldPosition = spawnParams.WorldPosition;
             Quaternion rotation = spawnParams.Rotation;
             Transform parent = spawnParams.Parent;
 
-            GameObject objectInstance = diContainer.InstantiatePrefab(prefab, worldPosition, rotation, parent);
+            GameObject objectInstance = isUI 
+                ? diContainer.InstantiatePrefab(prefab, parent)
+                : diContainer.InstantiatePrefab(prefab, worldPosition, rotation, parent);
 
             if (objectInstance.TryGetComponent(out TObject componentInstance))
             {
