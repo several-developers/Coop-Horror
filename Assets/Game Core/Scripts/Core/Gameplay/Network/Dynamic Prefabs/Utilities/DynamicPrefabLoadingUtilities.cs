@@ -29,17 +29,21 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public static int HashOfDynamicPrefabGUIDs { get; private set; } = EmptyDynamicPrefabHash;
-        public static int LoadedPrefabCount => LoadedDynamicPrefabResourceHandles.Count;
+        public static int LoadedPrefabCount => CompletedCache.Count;
+        //public static int LoadedPrefabCount => LoadedDynamicPrefabResourceHandles.Count;
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private const int EmptyDynamicPrefabHash = -1;
 
-        private static readonly Dictionary<AddressableGUID, AsyncOperationHandle<GameObject>>
-            LoadedDynamicPrefabResourceHandles = new(new AddressableGUIDEqualityComparer());
+        //private static readonly Dictionary<AddressableGUID, AsyncOperationHandle<GameObject>>
+            //LoadedDynamicPrefabResourceHandles = new(new AddressableGUIDEqualityComparer());
 
-        private static readonly Dictionary<string, AsyncOperationHandle> _completedCache = new();
-        private static readonly Dictionary<string, List<AsyncOperationHandle>> _handles = new();
+        private static readonly Dictionary<AddressableGUID, AsyncOperationHandle<GameObject>> CompletedCache =
+            new(new AddressableGUIDEqualityComparer());
+
+        private static readonly Dictionary<AddressableGUID, List<AsyncOperationHandle>> Handles =
+            new(new AddressableGUIDEqualityComparer());
 
         // A storage where we keep the association between the dynamic prefab (hash of it's GUID)
         // and the clients that have it loaded.
@@ -50,6 +54,37 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         private static NetworkManager _networkManager;
         private static DiContainer _diContainer;
+        
+        public static async UniTask<GameObject> LoadAsset(AddressableGUID addressableGUID)
+        {
+            if (CompletedCache.TryGetValue(addressableGUID, out var completedHandle))
+                return completedHandle.Result;
+
+            var handle = Addressables.LoadAssetAsync<GameObject>(key: addressableGUID.ToString());
+            return await RunWitchCacheOnComplete(handle, addressableGUID);
+        }
+        
+        private static async UniTask<GameObject> RunWitchCacheOnComplete(AsyncOperationHandle<GameObject> handle,
+            AddressableGUID addressableGUID)
+        {
+            handle.Completed += operationHandle => { CompletedCache[addressableGUID] = operationHandle; };
+
+            AddHandle(addressableGUID, handle);
+
+            return await handle.Task;
+        }
+        
+        private static void AddHandle<T>(AddressableGUID addressableGUID, AsyncOperationHandle<T> handle)
+            where T : class
+        {
+            if (!Handles.TryGetValue(addressableGUID, out List<AsyncOperationHandle> resourceHandles))
+            {
+                resourceHandles = new List<AsyncOperationHandle>();
+                Handles[addressableGUID] = resourceHandles;
+            }
+
+            resourceHandles.Add(handle);
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -79,25 +114,29 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         public static async UniTask<GameObject> LoadDynamicPrefab(AddressableGUID guid,
             int artificialDelayMilliseconds = 0, bool recomputeHash = true, bool registerAtNetwork = true)
         {
-            if (LoadedDynamicPrefabResourceHandles.ContainsKey(guid))
-            {
-                Debug.Log(message: $"Prefab has already been loaded, skipping loading this time | {guid}");
-                return LoadedDynamicPrefabResourceHandles[guid].Result;
-            }
+            // if (LoadedDynamicPrefabResourceHandles.ContainsKey(guid))
+            // {
+            //     Debug.Log(message: $"Prefab has already been loaded, skipping loading this time | {guid}");
+            //     return LoadedDynamicPrefabResourceHandles[guid].Result;
+            // }
+            //
+            // Debug.Log(message: $"Loading dynamic prefab {guid.Value}");
+            //
+            // var asyncOperation = Addressables.LoadAssetAsync<GameObject>(key: guid.ToString());
+            // LoadedDynamicPrefabResourceHandles.Add(guid, asyncOperation);
 
-            Debug.Log(message: $"Loading dynamic prefab {guid.Value}");
-
-            var asyncOperation = Addressables.LoadAssetAsync<GameObject>(key: guid.ToString());
-            LoadedDynamicPrefabResourceHandles.Add(guid, asyncOperation);
-
-            GameObject prefab = await asyncOperation.Task;
+            bool containsInCache = CompletedCache.ContainsKey(guid);
+            bool containsInHandles = Handles.ContainsKey(guid);
+            bool register = !containsInCache && !containsInHandles;
+            
+            GameObject prefab =  await LoadAsset(guid);
 
 #if ENABLE_ARTIFICIAL_DELAY
             // THIS IS FOR EDUCATIONAL PURPOSES AND SHOULDN'T BE INCLUDED IN YOUR PROJECT
             await UniTask.Delay(artificialDelayMilliseconds);
 #endif
 
-            if (registerAtNetwork)
+            if (registerAtNetwork && register)
             {
                 _networkManager.AddNetworkPrefab(prefab);
 
@@ -116,7 +155,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         public static bool TryGetLoadedGameObjectFromGuid(AddressableGUID assetGuid,
             out AsyncOperationHandle<GameObject> loadedGameObject)
         {
-            return LoadedDynamicPrefabResourceHandles.TryGetValue(assetGuid, out loadedGameObject);
+            return CompletedCache.TryGetValue(assetGuid, out loadedGameObject);
+            // return LoadedDynamicPrefabResourceHandles.TryGetValue(assetGuid, out loadedGameObject);
         }
 
         /// <remarks>
@@ -144,20 +184,21 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         public static void RefreshLoadedPrefabGuids()
         {
             DynamicPrefabGUIDs.Clear();
-            DynamicPrefabGUIDs.AddRange(LoadedDynamicPrefabResourceHandles.Keys);
+            DynamicPrefabGUIDs.AddRange(CompletedCache.Keys);
+            //DynamicPrefabGUIDs.AddRange(LoadedDynamicPrefabResourceHandles.Keys);
         }
 
         public static void UnloadAndReleaseAllDynamicPrefabs()
         {
             HashOfDynamicPrefabGUIDs = EmptyDynamicPrefabHash;
 
-            foreach (var handle in LoadedDynamicPrefabResourceHandles.Values)
+            foreach (var handle in CompletedCache.Values)
             {
                 _networkManager.RemoveNetworkPrefab(handle.Result);
                 Addressables.Release(handle);
             }
 
-            LoadedDynamicPrefabResourceHandles.Clear();
+            CompletedCache.Clear();
         }
 
         /// <remarks>
@@ -198,14 +239,15 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         public static bool TryGetLoadedDynamicPrefabResourceHandle(AddressableGUID addressableGUID,
             out AsyncOperationHandle<GameObject> result)
         {
-            return LoadedDynamicPrefabResourceHandles.TryGetValue(addressableGUID, out result);
+            return CompletedCache.TryGetValue(addressableGUID, out result);
+            //return LoadedDynamicPrefabResourceHandles.TryGetValue(addressableGUID, out result);
         }
 
         public static bool HasClientLoadedPrefab(ulong clientId, int prefabHash) =>
             PrefabHashToClientIds.TryGetValue(prefabHash, out HashSet<ulong> clientIds) && clientIds.Contains(clientId);
 
         public static bool IsPrefabLoadedOnAllClients(AddressableGUID assetGuid) =>
-            LoadedDynamicPrefabResourceHandles.ContainsKey(assetGuid);
+            CompletedCache.ContainsKey(assetGuid);
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

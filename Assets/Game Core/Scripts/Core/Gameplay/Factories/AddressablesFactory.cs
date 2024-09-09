@@ -205,7 +205,7 @@ namespace GameCore.Gameplay.Factories
             Vector3 worldPosition = spawnParams.WorldPosition;
             Quaternion rotation = spawnParams.Rotation;
             ulong ownerID = spawnParams.OwnerID;
-
+            
             NetworkSpawnManager spawnManager = _networkManager.SpawnManager;
 
             NetworkObject instance = spawnManager.InstantiateAndSpawn(

@@ -60,6 +60,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         {
             Instance = this;
             _networkManager = NetworkManager.Singleton;
+            DontDestroyOnLoad(gameObject);
         }
 
         protected override void StartAll()
@@ -171,14 +172,14 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 SendSuccess();
 
             // LOCAL METHODS: -----------------------------
-            
+
             void SendSuccess() =>
                 loadCallback?.Invoke(prefab);
 
             void SendError() =>
                 loadCallback?.Invoke(obj: null);
         }
-        
+
         /// <summary>
         /// This call attempts to spawn a prefab by it's addressable guid - it ensures that all the clients have
         /// loaded the prefab before spawning it, and if the clients fail to acknowledge that they've loaded a prefab -
@@ -200,7 +201,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 SendError();
 
             // LOCAL METHODS: -----------------------------
-            
+
             void SendSuccess() =>
                 loadCallback?.Invoke(prefabNetworkObject);
 
@@ -225,7 +226,12 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             {
                 Debug.Log(message: "Prefab is already loaded by all peers, we can spawn it immediately");
 
-                return LoadAndSendPrefab(assetGuid);
+                GameObject prefab = LoadAndSendPrefab(assetGuid);
+
+                if (prefab == null)
+                    SendError();
+
+                return prefab;
             }
 
             _synchronousSpawnAckCount = 0;
@@ -491,7 +497,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         private void OnTrySpawnGameObjectPrefab(string guid, Action<GameObject> callback) =>
             TryLoadAndGetDynamicGameObjectPrefab(guid, callback);
-        
+
         private void OnTrySpawnNetworkObjectPrefab(string guid, Action<NetworkObject> callback) =>
             TryLoadAndGetDynamicNetworkObjectPrefab(guid, callback);
 
