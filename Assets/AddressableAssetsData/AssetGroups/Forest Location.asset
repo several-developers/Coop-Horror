@@ -10,28 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Global UI
+  m_Name: Forest Location
   m_EditorClassIdentifier: 
-  m_GroupName: Global UI
+  m_GroupName: Forest Location
   m_Data:
     m_SerializedData: []
-  m_GUID: e6f9295b66bcc0c49a18273b2b799d9a
+  m_GUID: 7e68ad6af37ac90459275c6c69a70a49
   m_SerializeEntries:
-  - m_GUID: 6d58f232604d1a54ea188908c9035f21
-    m_Address: Assets/Game Core/Sprites/Compression/UI/Global/Box.png
+  - m_GUID: f8fda8db8c913fd4587e67441a589c69
+    m_Address: Forest
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: a13aec664e0d0254897caead8459b01a
-    m_Address: Assets/Game Core/Sprites/Compression/UI/Global/Round button.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 80155b022bcb05641a2534f1faeadb8a
-    m_Address: Assets/Game Core/Sprites/Compression/UI/Global/Box outline.png
+  - m_GUID: 94125c3d369b50348960125d36938ef5
+    m_Address: Forest
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 75fa75dd9a346a04eb1c4dc9bcb6f9ca, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 2f69f6f1ab3240144b70193cdb1baca8, type: 2}
-    - {fileID: 11400000, guid: fea104c1650d63049922afdece835f2a, type: 2}
+    - {fileID: 11400000, guid: 9e15571c9c48e4f4798d08a9b2d05f94, type: 2}
+    - {fileID: 11400000, guid: 4d3ecdeaca7f7f541845efcf136e8efc, type: 2}
