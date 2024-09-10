@@ -27,17 +27,3 @@ MonoBehaviour:
     _position: {x: 0, y: 0, z: 0}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _scale: {x: 1, y: 1, z: 1}
-  _itemPrefab: {fileID: 928934607214742596, guid: c0a6a5a3108b3094e864920c7448dc98,
-    type: 3}
-  _itemPreviewPrefab: {fileID: 1063181044141629135, guid: 9564af36299873a41994666bc933fe17,
-    type: 3}
-  _itemPrefabAsset:
-    m_AssetGUID: c0a6a5a3108b3094e864920c7448dc98
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  _itemPreviewPrefabAsset:
-    m_AssetGUID: 9564af36299873a41994666bc933fe17
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0

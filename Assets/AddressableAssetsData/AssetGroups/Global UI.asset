@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Global UI
+  m_EditorClassIdentifier: 
+  m_GroupName: Global UI
+  m_Data:
+    m_SerializedData: []
+  m_GUID: e6f9295b66bcc0c49a18273b2b799d9a
+  m_SerializeEntries:
+  - m_GUID: 6d58f232604d1a54ea188908c9035f21
+    m_Address: Assets/Game Core/Sprites/Compression/UI/Global/Box.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: a13aec664e0d0254897caead8459b01a
+    m_Address: Assets/Game Core/Sprites/Compression/UI/Global/Round button.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75fa75dd9a346a04eb1c4dc9bcb6f9ca, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 2f69f6f1ab3240144b70193cdb1baca8, type: 2}
+    - {fileID: 11400000, guid: fea104c1650d63049922afdece835f2a, type: 2}
