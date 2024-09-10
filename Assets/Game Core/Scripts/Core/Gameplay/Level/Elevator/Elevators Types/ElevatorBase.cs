@@ -57,9 +57,9 @@ namespace GameCore.Gameplay.Level.Elevator
 
         private void Awake()
         {
-            // _elevatorsManagerDecorator.OnElevatorStartedEvent += OnElevatorsStarted;
-            // _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
-            // _elevatorsManagerDecorator.OnElevatorOpenedEvent += OnElevatorOpened;
+            _elevatorsManagerDecorator.OnElevatorStartedEvent += OnElevatorsStarted;
+            _elevatorsManagerDecorator.OnFloorChangedEvent += OnFloorChanged;
+            _elevatorsManagerDecorator.OnElevatorOpenedEvent += OnElevatorOpened;
         }
 
         protected override void StartServerOnly() => TrySpawnNetworkObject();
