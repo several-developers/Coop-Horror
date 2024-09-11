@@ -2,6 +2,7 @@
 using DG.Tweening;
 using GameCore.Enums.Gameplay;
 using Sirenix.OdinInspector;
+using Sonity;
 using UnityEngine;
 
 namespace GameCore.Configs.Gameplay.Enemies
@@ -11,42 +12,54 @@ namespace GameCore.Configs.Gameplay.Enemies
         // MEMBERS: -------------------------------------------------------------------------------
 
         [TitleGroup(title: WanderingSettings)]
-        [BoxGroup(WanderingGroup, showLabel: false), SerializeField]
+        [BoxGroup(WanderingGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private WanderingConfig _wanderingConfig;
         
+        [TitleGroup(title: SuspicionSystemSettings)]
+        [BoxGroup(SuspicionSystemGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
+        private SuspicionSystemConfig _suspicionSystemConfig;
+        
+        [TitleGroup(title: MoveToInterestTargetSettings)]
+        [BoxGroup(MoveToInterestTargetGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
+        private MoveToInterestTargetConfig _moveToInterestTargetConfig;
+        
         [TitleGroup(title: AnimationSettings)]
-        [BoxGroup(AnimationGroup, showLabel: false), SerializeField]
+        [BoxGroup(AnimationGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private AnimationConfig _animationConfig;
+        
+        [TitleGroup(SFXTitle)]
+        [BoxGroup(SFXGroup, showLabel: false), SerializeField, Required]
+        private SoundEvent _whisperingSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _whispersSE;
         
         // FIELDS: --------------------------------------------------------------------------------
 
         private const string DebugSettings = "Debug Settings";
-        private const string ConfigTitle = "Config";
         private const string SFXTitle = "SFX";
         private const string CommonSettings = "Common Settings";
         private const string WanderingSettings = "Wandering Config";
-        private const string LookAroundSettings = "Look Around Config";
         private const string SuspicionSystemSettings = "Suspicion System Config";
-        private const string SuspicionStateSettings = "Suspicion State Config";
+        private const string MoveToInterestTargetSettings = "Move to Interest Target Config";
         private const string AnimationSettings = "Animation Config";
-        private const string CombatSettings = "Combat Config";
-        private const string CageBirdSettings = "Cage Bird Config";
         
         private const string SFXGroup = SFXTitle + "/Group";
         private const string DebugGroup = DebugSettings + "/Group";
         private const string CommonGroup = CommonSettings + "/Group";
         private const string WanderingGroup = WanderingSettings + "/Group";
-        private const string LookAroundGroup = LookAroundSettings + "/Group";
         private const string SuspicionSystemGroup = SuspicionSystemSettings + "/Group";
-        private const string SuspicionStateGroup = SuspicionStateSettings + "/Group";
+        private const string MoveToInterestTargetGroup = MoveToInterestTargetSettings + "/Group";
         private const string AnimationGroup = AnimationSettings + "/Group";
-        private const string CombatGroup = CombatSettings + "/Group";
-        private const string CageBirdGroup = CageBirdSettings + "/Group";
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public WanderingConfig GetWanderingConfig() => _wanderingConfig;
 
+        public SuspicionSystemConfig GetSuspicionSystemConfig() => _suspicionSystemConfig;
+
+        public MoveToInterestTargetConfig GetMoveToInterestTargetConfig() => _moveToInterestTargetConfig;
+        
         public AnimationConfig GetAnimationConfig() => _animationConfig;
         
         public override MonsterType GetMonsterType() =>
@@ -92,50 +105,112 @@ namespace GameCore.Configs.Gameplay.Enemies
         }
 
         [Serializable]
+        public class SuspicionSystemConfig
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, Min(0f)]
+            private float _checkForNearbyPlayersInterval = 0.2f;
+
+            [SerializeField, Min(0f), SuffixLabel("meters", overlay: true)]
+            private float _visionRange = 10f;
+
+            [SerializeField, Min(0f)]
+            private float _minLoudnessToReact;
+
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
+            [Tooltip("Проявлять интерес если игрок не двигался указанное время.")]
+            private float _interestAfterPlayerAfk = 3f;
+
+            [SerializeField, Min(0f)]
+            [Tooltip("Кол-во времени для побега от игрока после испуга.")]
+            private float _retreatingTime = 3f;
+
+            [SerializeField, Min(0f)]
+            private float _distanceToHide = 5f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float CheckForNearbyPlayersInterval => _checkForNearbyPlayersInterval;
+            public float VisionRange => _visionRange;
+            public float MinLoudnessToReact => _minLoudnessToReact;
+            public float InterestAfterPlayerAfk => _interestAfterPlayerAfk;
+            public float RetreatingTime => _retreatingTime;
+            public float DistanceToHide => _distanceToHide;
+        }
+
+        [Serializable]
+        public class MoveToInterestTargetConfig
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, MinMaxSlider(minValue: 0f, maxValue: 10f, showFields: true)]
+            private Vector2 _moveSpeed;
+
+            [SerializeField, Min(0f)]
+            private float _positionCheckInterval = 0.2f;
+
+            [SerializeField, Min(0f)]
+            private float _distanceCheckInterval = 0.2f;
+
+            [SerializeField, Min(0f)]
+            private float _targetReachDistance = 2f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+            
+            public Vector2 MoveSpeed => _moveSpeed;
+            public float PositionCheckInterval => _positionCheckInterval;
+            public float DistanceCheckInterval => _distanceCheckInterval;
+            public float TargetReachDistance => _targetReachDistance;
+        }
+
+        [Serializable]
         public class AnimationConfig
         {
             // MEMBERS: -------------------------------------------------------------------------------
 
-            [SerializeField, Range(0f, 1f)]
+            [BoxGroup(CommonGroup), SerializeField, Range(0f, 1f)]
             private float _dampTime = 0.15f;
 
-            [SerializeField, Space(height: 10)]
+            
+            [BoxGroup(HidingGroup),SerializeField]
             private float _modelSittingY = -0.36f;
 
-            [SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
             private float _modelSitDownDuration = 0.35f;
             
-            [SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
             private float _modelStandUpDuration = 0.35f;
 
-            [SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
             private float _modelSitDownDelay = 0.2f;
             
-            [SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
             private float _modelStandUpDelay;
             
-            [SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
             private float _sitDownAnimationMultiplier = 1f;
             
-            [SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
             private float _standUpAnimationMultiplier = 1f;
 
-            [SerializeField]
+            [BoxGroup(HidingGroup), SerializeField]
             private Ease _modelSitDownEase = Ease.InOutQuad;
             
-            [SerializeField]
+            [BoxGroup(HidingGroup), SerializeField]
             private Ease _modelStandUpEase = Ease.InOutQuad;
             
-            [SerializeField, Min(0f), Space(height: 10)]
+            
+            [BoxGroup(ExplosionGroup), SerializeField, Min(0f)]
             private float _hatExplosionDuration = 0.35f;
 
-            [SerializeField, Min(0f)]
+            [BoxGroup(ExplosionGroup), SerializeField, Min(0f)]
             private float _hatRegenerationDuration = 1f;
 
-            [SerializeField]
+            [BoxGroup(ExplosionGroup), SerializeField]
             private Ease _hatExplosionEase = Ease.InOutQuad;
             
-            [SerializeField]
+            [BoxGroup(ExplosionGroup), SerializeField]
             private Ease _hatRegenerationEase = Ease.InOutQuad;
 
             // PROPERTIES: ----------------------------------------------------------------------------
@@ -156,6 +231,12 @@ namespace GameCore.Configs.Gameplay.Enemies
             public float HatRegenerationDuration => _hatRegenerationDuration;
             public Ease HatExplosionEase => _hatExplosionEase;
             public Ease HatRegenerationEase => _hatRegenerationEase;
+
+            // FIELDS: --------------------------------------------------------------------------------
+
+            private const string CommonGroup = "Common";
+            private const string HidingGroup = "Hiding";
+            private const string ExplosionGroup = "Hat Explosion";
         }
     }
 }

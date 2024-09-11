@@ -57,7 +57,7 @@ namespace GameCore.UI.Gameplay.HUD.PlayerHealth
             
             healthSystem.OnHealthChangedEvent += OnHealthChanged;
 
-            playerEntity.OnDiedEvent += OnPlayerDied;
+            playerEntity.OnDeathEvent += OnPlayerDeath;
             playerEntity.OnRevivedEvent += OnPlayerRevived;
         }
 
@@ -71,13 +71,13 @@ namespace GameCore.UI.Gameplay.HUD.PlayerHealth
             HealthSystem healthSystem = playerEntity.References.HealthSystem;
             healthSystem.OnHealthChangedEvent -= OnHealthChanged;
             
-            playerEntity.OnDiedEvent -= OnPlayerDied;
+            playerEntity.OnDeathEvent -= OnPlayerDeath;
             playerEntity.OnRevivedEvent -= OnPlayerRevived;
         }
 
         private void OnHealthChanged(HealthData healthData) => UpdateHealthText(healthData);
         
-        private void OnPlayerDied() => Hide();
+        private void OnPlayerDeath() => Hide();
 
         private void OnPlayerRevived() => Show();
     }

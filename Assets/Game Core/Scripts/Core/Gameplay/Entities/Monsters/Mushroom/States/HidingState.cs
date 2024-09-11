@@ -1,6 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Enemies;
-
-namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
+﻿namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 {
     public class HidingState : IEnterState, IExitState
     {
@@ -8,8 +6,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         
         public HidingState(MushroomEntity mushroomEntity)
         {
-            MushroomAIConfigMeta mushroomAIConfig = mushroomEntity.GetAIConfig();
-        
             _mushroomEntity = mushroomEntity;
             _animationController = mushroomEntity.GetAnimationController();
         }
@@ -23,18 +19,33 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         
         public void Enter()
         {
+            _animationController.OnHideCompletedEvent += OnHideCompleted;
+
             _mushroomEntity.DisableAgent();
             ChangeAnimationHidingState(isHiding: true);
         }
 
         public void Exit()
         {
+            _animationController.OnHideCompletedEvent -= OnHideCompleted;
+            
             ChangeAnimationHidingState(isHiding: false);
+            ChangeHatTriggerState(isHiding: false);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void ChangeAnimationHidingState(bool isHiding) =>
-            _animationController.ChangeHidingState(isHiding);
+            _animationController.SetHidingState(isHiding);
+
+        private void ChangeHatTriggerState(bool isHiding)
+        {
+            MushroomReferences references = _mushroomEntity.GetReferences();
+            references.PlayerTrigger.ChangeTriggerState(isHiding);
+        }
+
+        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+
+        private void OnHideCompleted() => ChangeHatTriggerState(isHiding: true);
     }
 }

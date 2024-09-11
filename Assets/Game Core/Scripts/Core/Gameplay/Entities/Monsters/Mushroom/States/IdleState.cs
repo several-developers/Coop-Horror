@@ -42,6 +42,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+        
+        private void EnterWanderingState() =>
+            _mushroomEntity.EnterWanderingState();
 
         private IEnumerator WanderingTimerCO()
         {
@@ -51,10 +54,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 
             yield return new WaitForSeconds(timeBeforeWandering);
 
-            _mushroomEntity.EnterWanderingState();
+            EnterWanderingState();
         }
-
-        private void EnterWanderingState() =>
-            _mushroomEntity.EnterWanderingState();
     }
 }

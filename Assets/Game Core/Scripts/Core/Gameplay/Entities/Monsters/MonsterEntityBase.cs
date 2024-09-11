@@ -47,22 +47,7 @@ namespace GameCore.Gameplay.Entities.Monsters
 #warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
             FindEntityLocation();
         }
-
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-            OnDestroyServerOnly();
-            OnDestroyClientOnly();
-        }
-
-        protected virtual void OnDestroyServerOnly()
-        {
-        }
-
-        protected virtual void OnDestroyClientOnly()
-        {
-        }
-
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public virtual void Teleport(Vector3 position, Quaternion rotation, bool resetVelocity = false)

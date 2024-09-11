@@ -2,6 +2,7 @@
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.Mushroom.States;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Infrastructure.StateMachine;
@@ -40,20 +41,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
-
-        [Title(Constants.Settings)]
-        [SerializeField, Range(0, 1)]
-        private int _happiness = 1;
         
-        [SerializeField, Range(0, 1)]
-        private int _isSneaking;
-
-        public int Happiness => _happiness;
-        public int IsSneaking => _isSneaking;
-
         [BoxGroup(Constants.References, showLabel: false), SerializeField]
         private MushroomReferences _references;
-        
+
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public bool IsHatDamaged => _isHatDamaged.Value;
+        public bool IsSneaking { get; private set; }
+
         // FIELDS: --------------------------------------------------------------------------------
 
         private static readonly List<MushroomEntity> AllMushrooms = new();
@@ -65,6 +61,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         private StateMachineBase _mushroomStateMachine;
         private AnimationController _animationController;
+        private SuspicionSystem _suspicionSystem;
+
+        private PlayerEntity _interestTarget;
+        private PlayerEntity _playerAbuser;
+        private bool _isVirgin = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
@@ -72,12 +73,20 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void DamageHat() => ChangeHatStateRpc(isHatDamaged: true);
+        public void DamageHat() => SetHatStateRpc(isHatDamaged: true);
 
-        public void RegenerateHat() => ChangeHatStateRpc(isHatDamaged: false);
+        public void RegenerateHat() => SetHatStateRpc(isHatDamaged: false);
 
         public void ToggleHidingState(bool isHiding) => ToggleHidingStateRpc(isHiding);
 
+        public void SetEmotion(Emotion emotion) => SetEmotionRpc(emotion);
+
+        public void SetInterestTarget(PlayerEntity interestTarget) =>
+            _interestTarget = interestTarget;
+
+        public void SetSneakingState(bool isSneaking) =>
+            IsSneaking = isSneaking;
+        
         [Button]
         public void EnterIdleState() => ChangeState<IdleState>();
         
@@ -87,11 +96,24 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         [Button]
         public void EnterHidingState() => ChangeState<HidingState>();
         
+        [Button]
+        public void EnterMoveToInterestTargetState() => ChangeState<MoveToInterestTargetState>();
+        
+        [Button]
+        public void EnterLookAtInterestTargetState() => ChangeState<LookAtInterestTargetState>();
+        
         public MushroomAIConfigMeta GetAIConfig() => _mushroomAIConfig;
 
         public MushroomReferences GetReferences() => _references;
 
         public AnimationController GetAnimationController() => _animationController;
+
+        public SuspicionSystem GetSuspicionSystem() => _suspicionSystem;
+
+        public PlayerEntity GetInterestTarget() => _interestTarget;
+
+        public bool TryGetCurrentState(out IState state) =>
+            _mushroomStateMachine.TryGetCurrentState(out state);
 
         public override MonsterType GetMonsterType() =>
             MonsterType.Mushroom;
@@ -102,7 +124,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         {
             _animationController = new AnimationController(mushroomEntity: this);
 
-            _isHatDamaged.OnValueChanged += OnHatStateChanged;
+            _isHatDamaged.OnValueChanged += OnHatDamageStateChanged;
             _isHiding.OnValueChanged += OnHidingStateChanged;
         }
 
@@ -113,15 +135,20 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             InitSystems();
             SetupStates();
 
+            _references.PlayerTrigger.OnPlayerEnterEvent += OnPlayerSteppedOnHat;
+
             // LOCAL METHODS: -----------------------------
 
             void InitSystems()
             {
                 _mushroomStateMachine = new StateMachineBase();
+                _suspicionSystem = new SuspicionSystem(mushroomEntity: this);
+                
+                _suspicionSystem.Start();
 
                 _mushroomStateMachine.OnStateChangedEvent += state =>
                 {
-                    string log = Log.HandleLog($"New state '<gb>{state}</gb>'");
+                    string log = Log.HandleLog($"New state '<gb>{state.GetType().Name}</gb>'");
                     Debug.Log(log);
                 };
             }
@@ -131,10 +158,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 IdleState idleState = new(mushroomEntity: this);
                 WanderingState wanderingState = new(mushroomEntity: this);
                 HidingState hidingState = new(mushroomEntity: this);
+                MoveToInterestTargetState moveToInterestTargetState = new(mushroomEntity: this);
+                LookAtInterestTargetState lookAtInterestTargetState = new(mushroomEntity: this);
                 
                 _mushroomStateMachine.AddState(idleState);
                 _mushroomStateMachine.AddState(wanderingState);
                 _mushroomStateMachine.AddState(hidingState);
+                _mushroomStateMachine.AddState(moveToInterestTargetState);
+                _mushroomStateMachine.AddState(lookAtInterestTargetState);
             }
         }
 
@@ -146,12 +177,19 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         protected override void DespawnAll()
         {
-            _isHatDamaged.OnValueChanged -= OnHatStateChanged;
+            _isHatDamaged.OnValueChanged -= OnHatDamageStateChanged;
             _isHiding.OnValueChanged -= OnHidingStateChanged;
+            
+            _references.PlayerTrigger.OnPlayerEnterEvent -= OnPlayerSteppedOnHat;
         }
 
-        protected override void DespawnServerOnly() =>
+        protected override void DespawnServerOnly()
+        {
             AllMushrooms.Remove(item: this);
+            
+            if (_playerAbuser != null)
+                _playerAbuser.OnDeathEvent -= OnAbuserDeath;
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
         
@@ -161,17 +199,26 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         // RPC: -----------------------------------------------------------------------------------
 
         [Rpc(target: SendTo.Owner)]
-        private void ChangeHatStateRpc(bool isHatDamaged) =>
+        private void SetHatStateRpc(bool isHatDamaged) =>
             _isHatDamaged.Value = isHatDamaged;
 
         [Rpc(target: SendTo.Owner)]
         private void ToggleHidingStateRpc(bool isHiding) =>
             _isHiding.Value = isHiding;
 
+        [Rpc(target: SendTo.Everyone)]
+        private void SetEmotionRpc(Emotion emotion) =>
+            _animationController.SetEmotion(emotion);
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnHatStateChanged(bool previousValue, bool newValue) =>
-            _animationController.ChangeHatState(newValue);
+        private void OnHatDamageStateChanged(bool previousValue, bool newValue)
+        {
+            _animationController.SetHatState(newValue);
+
+            Emotion emotion = newValue ? Emotion.Angry : Emotion.Happy;
+            SetEmotion(emotion);
+        }
 
         private void OnHidingStateChanged(bool previousValue, bool newValue)
         {
@@ -179,6 +226,28 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 EnterHidingState();
             else
                 EnterIdleState(); // TEMP
+        }
+
+        private void OnPlayerSteppedOnHat(PlayerEntity playerEntity)
+        {
+            if (_isHatDamaged.Value)
+                return;
+
+            DamageHat();
+
+            if (!_isVirgin)
+                return;
+
+            _isVirgin = false;
+            _playerAbuser = playerEntity;
+            
+            _playerAbuser.OnDeathEvent += OnAbuserDeath;
+        }
+
+        private void OnAbuserDeath()
+        {
+            Debug.Log("------------ ABUSER DIED MUHAHAHAHAH --------------");
+            SetEmotion(Emotion.Sigma);
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

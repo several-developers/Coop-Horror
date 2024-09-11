@@ -64,7 +64,7 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
             if (!isLocalPlayer)
                 return;
 
-            playerEntity.OnDiedEvent += OnPlayerDied;
+            playerEntity.OnDeathEvent += OnPlayerDeath;
             playerEntity.OnRevivedEvent += OnPlayerRevived;
         }
 
@@ -75,11 +75,11 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
             if (!isLocalPlayer)
                 return;
             
-            playerEntity.OnDiedEvent -= OnPlayerDied;
+            playerEntity.OnDeathEvent -= OnPlayerDeath;
             playerEntity.OnRevivedEvent -= OnPlayerRevived;
         }
         
-        private void OnPlayerDied() => Hide();
+        private void OnPlayerDeath() => Hide();
 
         private void OnPlayerRevived() => Show();
     }

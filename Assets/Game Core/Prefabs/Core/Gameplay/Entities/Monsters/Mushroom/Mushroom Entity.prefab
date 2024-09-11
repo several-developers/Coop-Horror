@@ -1,5 +1,64 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5675220406750052093
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4229580829454646775}
+  - component: {fileID: 3826611983079366299}
+  - component: {fileID: 2396806133800445472}
+  m_Layer: 10
+  m_Name: Player Hat Trigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4229580829454646775
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5675220406750052093}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.413, z: 0.138}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 31952651886002207}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3826611983079366299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5675220406750052093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17c63cd366394a8289c7f0b5b2e48799, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _collider: {fileID: 2396806133800445472}
+--- !u!135 &2396806133800445472
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5675220406750052093}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Radius: 0.35
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9187521529072507736
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,21 +187,21 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2834602112618593329}
   m_PrefabAsset: {fileID: 0}
---- !u!137 &690963068632833553 stripped
+--- !u!137 &1060960747081660574 stripped
 SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 3368777022086439456, guid: 2d0632b00af572a40a6820ed87a9cb49,
+  m_CorrespondingSourceObject: {fileID: 3021860064078890159, guid: 2d0632b00af572a40a6820ed87a9cb49,
     type: 3}
   m_PrefabInstance: {fileID: 2834602112618593329}
   m_PrefabAsset: {fileID: 0}
---- !u!137 &2704398989463932973 stripped
+--- !u!137 &1548778248666195601 stripped
 SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 203070001029032988, guid: 2d0632b00af572a40a6820ed87a9cb49,
+  m_CorrespondingSourceObject: {fileID: 3614378424055519904, guid: 2d0632b00af572a40a6820ed87a9cb49,
     type: 3}
   m_PrefabInstance: {fileID: 2834602112618593329}
   m_PrefabAsset: {fileID: 0}
---- !u!137 &6091846944688738818 stripped
+--- !u!137 &2497375601686820514 stripped
 SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 8348566635389087283, guid: 2d0632b00af572a40a6820ed87a9cb49,
+  m_CorrespondingSourceObject: {fileID: 432049222950767251, guid: 2d0632b00af572a40a6820ed87a9cb49,
     type: 3}
   m_PrefabInstance: {fileID: 2834602112618593329}
   m_PrefabAsset: {fileID: 0}
@@ -291,14 +350,14 @@ MonoBehaviour:
   _networkTransform: {fileID: 7240275214382155244}
   _agent: {fileID: 2431354977503247257}
   _happiness: 1
-  _isSneaking: 0
   _references:
     _animator: {fileID: 178035314800252582}
     _hatSpores: {fileID: 333261761698791978}
     _modelTransform: {fileID: 6253267766018308303}
-    _hat: {fileID: 6091846944688738818}
-    _eyes: {fileID: 2704398989463932973}
-    _mouth: {fileID: 690963068632833553}
+    _playerTrigger: {fileID: 3826611983079366299}
+    _hat: {fileID: 1548778248666195601}
+    _eyes: {fileID: 2497375601686820514}
+    _mouth: {fileID: 1060960747081660574}
     _stateTMP: {fileID: 0}
 --- !u!114 &7240275214382155244
 MonoBehaviour:

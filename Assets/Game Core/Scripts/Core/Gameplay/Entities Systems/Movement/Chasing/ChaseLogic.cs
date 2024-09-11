@@ -39,7 +39,7 @@ namespace GameCore.Gameplay.Systems.Movement
         public event Func<float> GetChasePositionCheckIntervalEvent = () => 0.25f;
         public event Func<float> GetChaseDistanceCheckIntervalEvent = () => 0.25f;
         public event Func<float> GetChaseEndDelayEvent = () => 3f;
-        public event Func<float> GetMaxChaseDistanceEvent = () => 1f;
+        public event Func<float> GetMaxChaseDistanceEvent = () => 1000f;
         public event Func<float> GetTargetReachDistanceEvent = () => 0.5f;
 
         private readonly CoroutineHelper _chaseRoutine;

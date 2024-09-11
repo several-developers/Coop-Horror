@@ -79,6 +79,18 @@ MonoBehaviour:
     _minDelay: 1
     _maxDelay: 5
     _acceleration: 2
+  _suspicionSystemConfig:
+    _checkForNearbyPlayersInterval: 0.2
+    _visionRange: 10
+    _minLoudnessToReact: 0
+    _interestAfterPlayerAfk: 5
+    _retreatingTime: 3
+    _distanceToHide: 4
+  _moveToInterestTargetConfig:
+    _moveSpeed: {x: 0.2, y: 0.5}
+    _positionCheckInterval: 0.2
+    _distanceCheckInterval: 0.2
+    _targetReachDistance: 2
   _animationConfig:
     _dampTime: 0.15
     _modelSittingY: -0.36
@@ -94,3 +106,5 @@ MonoBehaviour:
     _hatRegenerationDuration: 2.25
     _hatExplosionEase: 9
     _hatRegenerationEase: 5
+  _whisperingSE: {fileID: 0}
+  _whispersSE: {fileID: 0}

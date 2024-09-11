@@ -77,7 +77,6 @@ namespace GameCore.Configs.Gameplay.Enemies
         // FIELDS: --------------------------------------------------------------------------------
 
         private const string DebugSettings = "Debug Settings";
-        private const string ConfigTitle = "Config";
         private const string SFXTitle = "SFX";
         private const string CommonSettings = "Common Settings";
         private const string WanderingSettings = "Wandering Config";

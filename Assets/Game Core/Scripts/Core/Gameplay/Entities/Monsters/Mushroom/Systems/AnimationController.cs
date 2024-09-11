@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
@@ -24,6 +25,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnHideCompletedEvent = delegate { }; 
+
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomAIConfigMeta.AnimationConfig _animationConfig;
         private readonly MushroomReferences _references;
@@ -40,8 +43,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         public void Tick()
         {
             float deltaTime = Time.deltaTime;
-            float happiness = _mushroomEntity.Happiness;
-            float isSneaking = _mushroomEntity.IsSneaking;
+            float happiness = _mushroomEntity.IsHatDamaged ? 0f : 1f;
+            float isSneaking = _mushroomEntity.IsSneaking ? 1f : 0f;
             float dampTime = _animationConfig.DampTime;
 
             _animator.SetFloat(id: AnimatorHashes.Happiness, value: happiness, dampTime, deltaTime);
@@ -51,17 +54,24 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             UpdateAnimationMultipliers();
         }
 
-        public void ChangeEmotion(MushroomEntity.Emotion emotion)
+        public void SetEmotion(MushroomEntity.Emotion emotion)
         {
+            SkinnedMeshRenderer eyes = _references.Eyes;
+            SkinnedMeshRenderer mouth = _references.Mouth;
+            
             switch (emotion)
             {
                 case MushroomEntity.Emotion.Regular:
                     break;
                 
                 case MushroomEntity.Emotion.Happy:
+                    eyes.SetBlendShapeWeight(index: 0, value: 0);
+                    mouth.SetBlendShapeWeight(index: 0, value: 0);
                     break;
                 
                 case MushroomEntity.Emotion.Angry:
+                    eyes.SetBlendShapeWeight(index: 0, value: 100);
+                    mouth.SetBlendShapeWeight(index: 0, value: 100);
                     break;
                 
                 case MushroomEntity.Emotion.Scared:
@@ -78,7 +88,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             }
         }
 
-        public void ChangeHatState(bool isHatDamaged)
+        public void SetHatState(bool isHatDamaged)
         {
             GameObject hatSpores = _references.HatSpores;
             SkinnedMeshRenderer hat = _references.Hat;
@@ -97,7 +107,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 ? _animationConfig.HatExplosionEase
                 : _animationConfig.HatRegenerationEase;
 
-
             _hatTN.Kill();
 
             _hatTN = DOVirtual
@@ -109,7 +118,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 .SetEase(ease);
         }
 
-        public void ChangeHidingState(bool isHiding)
+        public void SetHidingState(bool isHiding)
         {
             _isHiding = isHiding;
             _animator.SetBool(id: AnimatorHashes.IsHiding, isHiding);
@@ -150,7 +159,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 .DOLocalMoveY(endValue, duration)
                 .SetEase(ease)
                 .SetDelay(delay)
-                .SetLink(_mushroomEntity.gameObject);
+                .SetLink(_mushroomEntity.gameObject)
+                .OnStepComplete(() =>
+                {
+                    OnHideCompletedEvent.Invoke();
+                });
         }
     }
 }

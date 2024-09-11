@@ -9,7 +9,6 @@ using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Factories.ItemsPreview;
-using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.InputManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Footsteps;
@@ -52,7 +51,6 @@ namespace GameCore.Gameplay.Entities.Player
         private void Construct(
             IItemsPreviewFactory itemsPreviewFactory,
             IPlayerInteractionObserver playerInteractionObserver,
-            IGameManagerDecorator gameManagerDecorator,
             ICamerasManager camerasManager,
             ITrainEntity trainEntity,
             IGameplayConfigsProvider gameplayConfigsProvider,
@@ -61,7 +59,6 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _itemsPreviewFactory = itemsPreviewFactory;
             _playerInteractionObserver = playerInteractionObserver;
-            _gameManagerDecorator = gameManagerDecorator;
             _camerasManager = camerasManager;
             _trainEntity = trainEntity;
 
@@ -91,6 +88,7 @@ namespace GameCore.Gameplay.Entities.Player
         public InputReader InputReader { get; private set; }
         public EntityLocation EntityLocation => _entityLocation.Value;
         public Floor CurrentFloor => _currentFloor.Value;
+        public float TimeSinceAfk { get; private set; }
         public bool IsInsideTrain { get; private set; } = true;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -101,12 +99,14 @@ namespace GameCore.Gameplay.Entities.Player
         public event Action<EntityLocation> OnPlayerLocationChangedEvent = delegate { };
         public event Action<float> OnSanityChangedEvent = delegate { };
         public event Action OnLeftMobileHQSeat = delegate { };
-        public event Action OnDiedEvent = delegate { };
+        public event Action OnDeathEvent = delegate { };
         public event Action OnRevivedEvent = delegate { };
         public event Action<bool> OnParentChangedEvent = delegate { };
 
         public event Func<bool> IsCrouching = () => false;
         public event Func<bool> IsSprinting = () => false;
+
+        private const float MinVelocityForNonAfk = 0.25f;
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
@@ -120,7 +120,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         private IItemsPreviewFactory _itemsPreviewFactory;
         private IPlayerInteractionObserver _playerInteractionObserver;
-        private IGameManagerDecorator _gameManagerDecorator;
         private ICamerasManager _camerasManager;
         private ITrainEntity _trainEntity;
 
@@ -131,6 +130,8 @@ namespace GameCore.Gameplay.Entities.Player
         private InteractionChecker _interactionChecker;
         private InteractionHandler _interactionHandler;
         private HealthSystem _healthSystem;
+
+        private Vector3 _lastFramePosition;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -391,6 +392,8 @@ namespace GameCore.Gameplay.Entities.Player
             }
         }
 
+        protected override void TickAll() => CheckForAfk();
+
         protected override void TickOwner() =>
             _interactionChecker.Check();
 
@@ -469,6 +472,23 @@ namespace GameCore.Gameplay.Entities.Player
             EnterDeathState();
         }
 
+        private void CheckForAfk()
+        {
+            Vector3 currentPosition = transform.position;
+            float distanceFromLastFrame = Vector3.Distance(a: currentPosition, b: _lastFramePosition);
+
+            _lastFramePosition = currentPosition;
+            
+            //return;
+            float moveSpeed = _references.Character.GetSpeed();
+            bool isMoving = moveSpeed > MinVelocityForNonAfk;
+
+            if (isMoving)
+                TimeSinceAfk = 0f;
+            else
+                TimeSinceAfk += Time.deltaTime;
+        }
+
         private void MakeFootstepsNoise()
         {
             float noiseRange = 17f;
@@ -490,6 +510,7 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
 #warning REPLACE
+
         private void MakeLandingNoise(float velocity)
         {
             const float quiteLandingVelocity = 6;
@@ -709,7 +730,7 @@ namespace GameCore.Gameplay.Entities.Player
         private void OnDead(bool previousValue, bool newValue)
         {
             if (newValue)
-                OnDiedEvent.Invoke();
+                OnDeathEvent.Invoke();
             else
                 OnRevivedEvent.Invoke();
         }

@@ -82,6 +82,8 @@ namespace GameCore.Configs.Gameplay.Enemies
         public Vector2Int SpawnTime => _spawnTime;
 
         // FIELDS: --------------------------------------------------------------------------------
+
+        protected const string ConfigTitle = "Config";
         
         private const string BaseSettings = "Base Settings";
         private const string SpawnSettings = "Spawn Settings";

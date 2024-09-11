@@ -50,7 +50,7 @@ namespace GameCore.UI.Gameplay.HUD.PlayerSanity
             UpdateSanityText(sanity);
 
             playerEntity.OnSanityChangedEvent += OnSanityChanged;
-            playerEntity.OnDiedEvent += OnPlayerDied;
+            playerEntity.OnDeathEvent += OnPlayerDeath;
             playerEntity.OnRevivedEvent += OnPlayerRevived;
         }
 
@@ -62,13 +62,13 @@ namespace GameCore.UI.Gameplay.HUD.PlayerSanity
                 return;
 
             playerEntity.OnSanityChangedEvent -= OnSanityChanged;
-            playerEntity.OnDiedEvent -= OnPlayerDied;
+            playerEntity.OnDeathEvent -= OnPlayerDeath;
             playerEntity.OnRevivedEvent -= OnPlayerRevived;
         }
 
         private void OnSanityChanged(float sanity) => UpdateSanityText(sanity);
 
-        private void OnPlayerDied() => Hide();
+        private void OnPlayerDeath() => Hide();
 
         private void OnPlayerRevived() => Show();
     }

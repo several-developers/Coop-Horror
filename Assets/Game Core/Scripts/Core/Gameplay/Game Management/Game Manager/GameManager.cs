@@ -512,14 +512,14 @@ namespace GameCore.Gameplay.GameManagement
         }
 
         private void OnPlayerSpawned(PlayerEntity playerEntity) =>
-            playerEntity.OnDiedEvent += OnPlayerDied;
+            playerEntity.OnDeathEvent += OnPlayerDied;
 
         private void OnPlayerDespawned(PlayerEntity playerEntity)
         {
             if (!playerEntity.IsServerOnly)
                 CheckGameOverOnServer();
 
-            playerEntity.OnDiedEvent -= OnPlayerDied;
+            playerEntity.OnDeathEvent -= OnPlayerDied;
         }
 
         private void OnPlayerDied() => CheckGameOverOnServer();
