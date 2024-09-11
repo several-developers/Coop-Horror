@@ -6,6 +6,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.Level.Locations
 {
@@ -34,6 +35,9 @@ namespace GameCore.Gameplay.Level.Locations
 
         [Title(Constants.References)]
         [SerializeField, Required]
+        private AssetReference _sceneAsset;
+        
+        [SerializeField, Required]
         private LightingPresetMeta _lightingPreset;
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -43,6 +47,7 @@ namespace GameCore.Gameplay.Level.Locations
         public SceneName SceneName => _sceneName;
         public int MaxIndoorDangerValue => _maxIndoorDangerValue;
         public int MaxOutdoorDangerValue => _maxOutdoorDangerValue;
+        public AssetReference SceneAsset => _sceneAsset;
         public LightingPresetMeta LightingPreset => _lightingPreset;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

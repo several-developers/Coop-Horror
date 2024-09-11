@@ -35,7 +35,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
             
             _wanderingTimerRoutine.GetRoutineEvent += WanderingTimerCO;
             
-            DisableAgent();
+            _blindCreatureEntity.DisableAgent();
             _wanderingTimerRoutine.Start();
         }
 
@@ -49,12 +49,6 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void DisableAgent()
-        {
-            NavMeshAgent agent = _blindCreatureEntity.GetAgent();
-            agent.enabled = false;
-        }
 
         private IEnumerator WanderingTimerCO()
         {

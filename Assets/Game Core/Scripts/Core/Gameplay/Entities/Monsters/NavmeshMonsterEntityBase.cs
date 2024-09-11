@@ -33,6 +33,12 @@ namespace GameCore.Gameplay.Entities.Monsters
 
             SendEntityTeleportedEvent();
         }
+
+        public void EnableAgent() =>
+            _agent.enabled = true;
+        
+        public void DisableAgent() =>
+            _agent.enabled = false;
         
         public NavMeshAgent GetAgent() => _agent;
 

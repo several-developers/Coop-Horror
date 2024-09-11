@@ -443,7 +443,7 @@ PrefabInstance:
     - target: {fileID: 1882233667025307755, guid: fdb92a40875cba64185ed42b227882a3,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1321165559
+      value: 941700081
       objectReference: {fileID: 0}
     - target: {fileID: 1882233667025307755, guid: fdb92a40875cba64185ed42b227882a3,
         type: 3}
@@ -1572,8 +1572,8 @@ MonoBehaviour:
   m_IgnoreNavMeshObstacle: 1
   m_OverrideTileSize: 0
   m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.083333336
+  m_OverrideVoxelSize: 1
+  m_VoxelSize: 0.032
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 941dffb8415e90f4b834cc0134168037, type: 2}
   m_BuildHeightMesh: 0

@@ -20,6 +20,7 @@ namespace GameCore
         public static readonly int Close = Animator.StringToHash(name: "Close");
         public static readonly int Trigger = Animator.StringToHash(name: "Trigger");
         public static readonly int Aggressiveness = Animator.StringToHash(name: "Aggressiveness");
+        public static readonly int Happiness = Animator.StringToHash(name: "Happiness");
         public static readonly int Suspicion = Animator.StringToHash(name: "Suspicion");
         public static readonly int IdleType = Animator.StringToHash(name: "IdleType");
         public static readonly int RunningType = Animator.StringToHash(name: "RunningType");
@@ -28,6 +29,7 @@ namespace GameCore
         public static readonly int IsWalking = Animator.StringToHash(name: "IsWalking");
         public static readonly int IsSprinting = Animator.StringToHash(name: "IsSprinting");
         public static readonly int IsScreaming = Animator.StringToHash(name: "IsScreaming");
+        public static readonly int IsSneaking = Animator.StringToHash(name: "IsSneaking");
         public static readonly int IsCrawling = Animator.StringToHash(name: "IsCrawling");
         public static readonly int IsAgonizing = Animator.StringToHash(name: "IsAgonizing");
         public static readonly int IsSitting = Animator.StringToHash(name: "IsSitting");

@@ -15,14 +15,16 @@ namespace GameCore.Gameplay.Utilities
             _cts = cts;
 
         public SimpleRoutine(CancellationTokenSource cts, float interval) : this(cts) =>
-            _interval = interval;
+            GetTickIntervalEvent = () => interval;
 
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnActionEvent = delegate { };
+        public event Func<float> GetTickIntervalEvent = () => BasicInterval;
 
+        private const float BasicInterval = 0.25f;
+        
         private readonly CancellationTokenSource _cts;
-        private readonly float _interval = 0.25f;
 
         private bool _isActive;
         private bool _forceStop;
@@ -31,6 +33,8 @@ namespace GameCore.Gameplay.Utilities
 
         public void Start()
         {
+            Stop();
+            
             if (_isActive)
             {
                 Debug.LogError(message: "Routine is active!");
@@ -46,6 +50,7 @@ namespace GameCore.Gameplay.Utilities
         public void Stop()
         {
             _forceStop = true;
+            _isActive = false;
             _cts.Cancel();
         }
 
@@ -61,7 +66,8 @@ namespace GameCore.Gameplay.Utilities
         {
             while (!_forceStop)
             {
-                int delay = _interval.ConvertToMilliseconds();
+                float interval = GetTickIntervalEvent.Invoke();
+                int delay = interval.ConvertToMilliseconds();
 
                 bool isCanceled = await UniTask
                     .Delay(delay, cancellationToken: _cts.Token)

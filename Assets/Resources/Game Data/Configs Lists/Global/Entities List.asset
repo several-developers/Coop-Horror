@@ -19,6 +19,10 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  - m_AssetGUID: f1d5a5d34aefb744f8f2bb474d55010f
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
   _globalEntitiesReferences:
   - m_AssetGUID: a77369042e11ddd49be3f82d556be8a1
     m_SubObjectName: 

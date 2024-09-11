@@ -7,6 +7,7 @@
         EvilClown = 2,
         Beetle = 3,
         BlindCreature = 4,
-        SirenHead = 5
+        SirenHead = 5,
+        Mushroom = 6,
     }
 }
