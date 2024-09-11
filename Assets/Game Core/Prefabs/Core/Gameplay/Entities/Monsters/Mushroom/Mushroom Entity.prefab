@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 457133240
+  GlobalObjectIdHash: 1118760791
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -291,10 +291,11 @@ MonoBehaviour:
   _networkTransform: {fileID: 7240275214382155244}
   _agent: {fileID: 2431354977503247257}
   _happiness: 1
-  damp: 0.15
+  _isSneaking: 0
   _references:
     _animator: {fileID: 178035314800252582}
     _hatSpores: {fileID: 333261761698791978}
+    _modelTransform: {fileID: 6253267766018308303}
     _hat: {fileID: 6091846944688738818}
     _eyes: {fileID: 2704398989463932973}
     _mouth: {fileID: 690963068632833553}

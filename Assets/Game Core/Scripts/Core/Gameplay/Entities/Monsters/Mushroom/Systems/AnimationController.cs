@@ -17,8 +17,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _mushroomEntity = mushroomEntity;
             _animationConfig = mushroomAIConfig.GetAnimationConfig();
             _references = mushroomEntity.GetReferences();
-            _animator = mushroomEntity.GetAnimator();
             _agent = mushroomEntity.GetAgent();
+            _animator = _references.Animator;
+            _modelTransform = _references.ModelTransform;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -26,10 +27,13 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomAIConfigMeta.AnimationConfig _animationConfig;
         private readonly MushroomReferences _references;
-        private readonly Animator _animator;
         private readonly NavMeshAgent _agent;
+        private readonly Animator _animator;
+        private readonly Transform _modelTransform;
 
         private Tweener _hatTN;
+        private Tweener _sittingTN;
+        private bool _isHiding;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -44,10 +48,34 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _animator.SetFloat(id: AnimatorHashes.IsSneaking, value: isSneaking, dampTime, deltaTime);
             
             UpdateAnimationMoveSpeed();
+            UpdateAnimationMultipliers();
         }
 
         public void ChangeEmotion(MushroomEntity.Emotion emotion)
         {
+            switch (emotion)
+            {
+                case MushroomEntity.Emotion.Regular:
+                    break;
+                
+                case MushroomEntity.Emotion.Happy:
+                    break;
+                
+                case MushroomEntity.Emotion.Angry:
+                    break;
+                
+                case MushroomEntity.Emotion.Scared:
+                    break;
+                
+                case MushroomEntity.Emotion.Interested:
+                    break;
+                
+                case MushroomEntity.Emotion.Sigma:
+                    break;
+                
+                case MushroomEntity.Emotion.Dead:
+                    break;
+            }
         }
 
         public void ChangeHatState(bool isHatDamaged)
@@ -81,12 +109,48 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 .SetEase(ease);
         }
 
+        public void ChangeHidingState(bool isHiding)
+        {
+            _isHiding = isHiding;
+            _animator.SetBool(id: AnimatorHashes.IsHiding, isHiding);
+
+            ChangeModelHidingState(isHiding);
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void UpdateAnimationMoveSpeed()
         {
-            float value = MonstersUtilities.GetAgentClampedSpeed(_agent);
+            float value = _isHiding 
+                ? 0f
+                : MonstersUtilities.GetAgentClampedSpeed(_agent);
+            
             _animator.SetFloat(id: AnimatorHashes.MoveSpeed, value);
+        }
+
+        private void UpdateAnimationMultipliers()
+        {
+            float sitDownMultiplier = _animationConfig.SitDownAnimationMultiplier;
+            float standUpMultiplier = _animationConfig.StandUpAnimationMultiplier;
+            
+            _animator.SetFloat(id: AnimatorHashes.SitDownSpeedMultiplier, sitDownMultiplier);
+            _animator.SetFloat(id: AnimatorHashes.StandUpSpeedMultiplier, standUpMultiplier);
+        }
+
+        private void ChangeModelHidingState(bool isHiding)
+        {
+            float endValue = isHiding ? _animationConfig.ModelSittingY : 0f;
+            float duration = isHiding ? _animationConfig.ModelSitDownDuration : _animationConfig.ModelStandUpDuration;
+            float delay = isHiding ? _animationConfig.ModelSitDownDelay : _animationConfig.ModelStandUpDelay;
+            Ease ease = isHiding ? _animationConfig.ModelSitDownEase : _animationConfig.ModelStandUpEase;
+            
+            _sittingTN.Kill();
+
+            _sittingTN = _modelTransform
+                .DOLocalMoveY(endValue, duration)
+                .SetEase(ease)
+                .SetDelay(delay)
+                .SetLink(_mushroomEntity.gameObject);
         }
     }
 }

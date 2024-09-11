@@ -24,7 +24,6 @@ namespace GameCore
         public static readonly int Suspicion = Animator.StringToHash(name: "Suspicion");
         public static readonly int IdleType = Animator.StringToHash(name: "IdleType");
         public static readonly int RunningType = Animator.StringToHash(name: "RunningType");
-        public static readonly int MoveSpeedMultiplier = Animator.StringToHash(name: "MoveSpeedMultiplier");
         
         public static readonly int IsWalking = Animator.StringToHash(name: "IsWalking");
         public static readonly int IsSprinting = Animator.StringToHash(name: "IsSprinting");
@@ -33,9 +32,14 @@ namespace GameCore
         public static readonly int IsCrawling = Animator.StringToHash(name: "IsCrawling");
         public static readonly int IsAgonizing = Animator.StringToHash(name: "IsAgonizing");
         public static readonly int IsSitting = Animator.StringToHash(name: "IsSitting");
+        public static readonly int IsHiding = Animator.StringToHash(name: "IsHiding");
         public static readonly int IsOn = Animator.StringToHash(name: "IsOn");
         public static readonly int IsOpen = Animator.StringToHash(name: "IsOpen");
         
+        public static readonly int MoveSpeedMultiplier = Animator.StringToHash(name: "MoveSpeedMultiplier");
+        public static readonly int SitDownSpeedMultiplier = Animator.StringToHash(name: "SitDownSpeedMultiplier");
+        public static readonly int StandUpSpeedMultiplier = Animator.StringToHash(name: "StandUpSpeedMultiplier");
+
         public const string ReloadingAnimation = "Reloading";
     }
 }

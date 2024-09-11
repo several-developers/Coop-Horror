@@ -17,6 +17,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private GameObject _hatSpores;
 
         [SerializeField, Required]
+        private Transform _modelTransform;
+
+        [SerializeField, Required]
         private SkinnedMeshRenderer _hat;
         
         [SerializeField, Required]
@@ -32,6 +35,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         public Animator Animator => _animator;
         public GameObject HatSpores => _hatSpores;
+        public Transform ModelTransform => _modelTransform;
         public SkinnedMeshRenderer Hat => _hat;
         public SkinnedMeshRenderer Eyes => _eyes;
         public SkinnedMeshRenderer Mouth => _mouth;

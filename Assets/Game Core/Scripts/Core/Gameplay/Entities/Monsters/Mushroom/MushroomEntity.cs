@@ -59,6 +59,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private static readonly List<MushroomEntity> AllMushrooms = new();
 
         private readonly NetworkVariable<bool> _isHatDamaged = new(writePerm: Constants.OwnerPermission);
+        private readonly NetworkVariable<bool> _isHiding = new(writePerm: Constants.OwnerPermission);
 
         private MushroomAIConfigMeta _mushroomAIConfig;
 
@@ -71,11 +72,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void DamageHat() =>
-            ChangeHatStateRpc(isHatDamaged: true);
+        public void DamageHat() => ChangeHatStateRpc(isHatDamaged: true);
 
-        public void RegenerateHat() =>
-            ChangeHatStateRpc(isHatDamaged: false);
+        public void RegenerateHat() => ChangeHatStateRpc(isHatDamaged: false);
+
+        public void ToggleHidingState(bool isHiding) => ToggleHidingStateRpc(isHiding);
 
         [Button]
         public void EnterIdleState() => ChangeState<IdleState>();
@@ -83,13 +84,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         [Button]
         public void EnterWanderingState() => ChangeState<WanderingState>();
         
+        [Button]
+        public void EnterHidingState() => ChangeState<HidingState>();
+        
         public MushroomAIConfigMeta GetAIConfig() => _mushroomAIConfig;
 
         public MushroomReferences GetReferences() => _references;
-        
-        public Animator GetAnimator() =>
-            _references.Animator;
-        
+
+        public AnimationController GetAnimationController() => _animationController;
+
         public override MonsterType GetMonsterType() =>
             MonsterType.Mushroom;
 
@@ -100,6 +103,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _animationController = new AnimationController(mushroomEntity: this);
 
             _isHatDamaged.OnValueChanged += OnHatStateChanged;
+            _isHiding.OnValueChanged += OnHidingStateChanged;
         }
 
         protected override void InitServerOnly()
@@ -126,9 +130,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             {
                 IdleState idleState = new(mushroomEntity: this);
                 WanderingState wanderingState = new(mushroomEntity: this);
+                HidingState hidingState = new(mushroomEntity: this);
                 
                 _mushroomStateMachine.AddState(idleState);
                 _mushroomStateMachine.AddState(wanderingState);
+                _mushroomStateMachine.AddState(hidingState);
             }
         }
 
@@ -141,6 +147,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         protected override void DespawnAll()
         {
             _isHatDamaged.OnValueChanged -= OnHatStateChanged;
+            _isHiding.OnValueChanged -= OnHidingStateChanged;
         }
 
         protected override void DespawnServerOnly() =>
@@ -157,18 +164,33 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private void ChangeHatStateRpc(bool isHatDamaged) =>
             _isHatDamaged.Value = isHatDamaged;
 
+        [Rpc(target: SendTo.Owner)]
+        private void ToggleHidingStateRpc(bool isHiding) =>
+            _isHiding.Value = isHiding;
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnHatStateChanged(bool previousValue, bool newValue) =>
             _animationController.ChangeHatState(newValue);
 
+        private void OnHidingStateChanged(bool previousValue, bool newValue)
+        {
+            if (newValue)
+                EnterHidingState();
+            else
+                EnterIdleState(); // TEMP
+        }
+
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
         [Title(Constants.DebugButtons)]
-        [Button, DisableInEditorMode]
+        [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugDamageHat() => DamageHat();
         
-        [Button, DisableInEditorMode]
+        [Button(buttonSize: 30), DisableInEditorMode]
         private void DebugRegenerateHat() => RegenerateHat();
+
+        [Button(buttonSize: 30, ButtonStyle.FoldoutButton), DisableInEditorMode]
+        private void DebugToggleHidingState(bool isHiding) => ToggleHidingState(isHiding);
     }
 }

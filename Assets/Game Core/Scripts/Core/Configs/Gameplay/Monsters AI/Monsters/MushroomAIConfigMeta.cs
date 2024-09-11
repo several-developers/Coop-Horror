@@ -98,11 +98,38 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             [SerializeField, Range(0f, 1f)]
             private float _dampTime = 0.15f;
+
+            [SerializeField, Space(height: 10)]
+            private float _modelSittingY = -0.36f;
+
+            [SerializeField, Min(0f)]
+            private float _modelSitDownDuration = 0.35f;
             
-            [SerializeField]
-            private float _hatExplosionDuration = 0.35f;
+            [SerializeField, Min(0f)]
+            private float _modelStandUpDuration = 0.35f;
+
+            [SerializeField, Min(0f)]
+            private float _modelSitDownDelay = 0.2f;
+            
+            [SerializeField, Min(0f)]
+            private float _modelStandUpDelay;
+            
+            [SerializeField, Min(0f)]
+            private float _sitDownAnimationMultiplier = 1f;
+            
+            [SerializeField, Min(0f)]
+            private float _standUpAnimationMultiplier = 1f;
 
             [SerializeField]
+            private Ease _modelSitDownEase = Ease.InOutQuad;
+            
+            [SerializeField]
+            private Ease _modelStandUpEase = Ease.InOutQuad;
+            
+            [SerializeField, Min(0f), Space(height: 10)]
+            private float _hatExplosionDuration = 0.35f;
+
+            [SerializeField, Min(0f)]
             private float _hatRegenerationDuration = 1f;
 
             [SerializeField]
@@ -114,6 +141,17 @@ namespace GameCore.Configs.Gameplay.Enemies
             // PROPERTIES: ----------------------------------------------------------------------------
 
             public float DampTime => _dampTime;
+            
+            public float ModelSittingY => _modelSittingY;
+            public float ModelSitDownDuration => _modelSitDownDuration;
+            public float ModelStandUpDuration => _modelStandUpDuration;
+            public float ModelSitDownDelay => _modelSitDownDelay;
+            public float ModelStandUpDelay => _modelStandUpDelay;
+            public float SitDownAnimationMultiplier => _sitDownAnimationMultiplier;
+            public float StandUpAnimationMultiplier => _standUpAnimationMultiplier;
+            public Ease ModelSitDownEase => _modelSitDownEase;
+            public Ease ModelStandUpEase => _modelStandUpEase;
+            
             public float HatExplosionDuration => _hatExplosionDuration;
             public float HatRegenerationDuration => _hatRegenerationDuration;
             public Ease HatExplosionEase => _hatExplosionEase;
