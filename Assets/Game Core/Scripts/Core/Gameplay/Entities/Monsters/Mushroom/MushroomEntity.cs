@@ -3,6 +3,7 @@ using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.Mushroom.States;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Infrastructure.StateMachine;
@@ -14,7 +15,7 @@ using Zenject;
 namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 {
     [GenerateSerializationForType(typeof(SFXType))]
-    public class MushroomEntity : SoundProducerNavmeshMonsterEntity<MushroomEntity.SFXType>
+    public class MushroomEntity : SoundProducerNavmeshMonsterEntity<MushroomEntity.SFXType>, INoiseListener
     {
         public enum SFXType
         {
@@ -62,16 +63,20 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private StateMachineBase _mushroomStateMachine;
         private AnimationController _animationController;
         private SuspicionSystem _suspicionSystem;
+        private HatHealingTimer _hatHealingTimer;
 
         private PlayerEntity _interestTarget;
         private PlayerEntity _playerAbuser;
-        private bool _isVirgin = true;
+        private bool _isHatNew = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
         protected override void StartServerOnly() => EnterIdleState();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void DetectNoise(Vector3 noisePosition, float noiseLoudness) =>
+            _suspicionSystem.DetectNoise(noisePosition, noiseLoudness);
 
         public void DamageHat() => SetHatStateRpc(isHatDamaged: true);
 
@@ -95,6 +100,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         
         [Button]
         public void EnterHidingState() => ChangeState<HidingState>();
+        
+        [Button]
+        public void EnterRunawayState() => ChangeState<RunawayState>();
         
         [Button]
         public void EnterMoveToInterestTargetState() => ChangeState<MoveToInterestTargetState>();
@@ -137,12 +145,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             _references.PlayerTrigger.OnPlayerEnterEvent += OnPlayerSteppedOnHat;
 
+            _hatHealingTimer.OnTimerEndedEvent += OnHatHealed;
+
             // LOCAL METHODS: -----------------------------
 
             void InitSystems()
             {
                 _mushroomStateMachine = new StateMachineBase();
                 _suspicionSystem = new SuspicionSystem(mushroomEntity: this);
+                _hatHealingTimer = new HatHealingTimer(mushroomEntity: this);
                 
                 _suspicionSystem.Start();
 
@@ -158,12 +169,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 IdleState idleState = new(mushroomEntity: this);
                 WanderingState wanderingState = new(mushroomEntity: this);
                 HidingState hidingState = new(mushroomEntity: this);
+                RunawayState runawayState = new(mushroomEntity: this);
                 MoveToInterestTargetState moveToInterestTargetState = new(mushroomEntity: this);
                 LookAtInterestTargetState lookAtInterestTargetState = new(mushroomEntity: this);
                 
                 _mushroomStateMachine.AddState(idleState);
                 _mushroomStateMachine.AddState(wanderingState);
                 _mushroomStateMachine.AddState(hidingState);
+                _mushroomStateMachine.AddState(runawayState);
                 _mushroomStateMachine.AddState(moveToInterestTargetState);
                 _mushroomStateMachine.AddState(lookAtInterestTargetState);
             }
@@ -171,6 +184,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         protected override void TickServerOnly()
         {
+            _suspicionSystem.Tick();
             _animationController.Tick();
             _mushroomStateMachine.Tick();
         }
@@ -186,9 +200,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         protected override void DespawnServerOnly()
         {
             AllMushrooms.Remove(item: this);
+            _hatHealingTimer.StopTimer();
             
             if (_playerAbuser != null)
                 _playerAbuser.OnDeathEvent -= OnAbuserDeath;
+            
+            _hatHealingTimer.OnTimerEndedEvent -= OnHatHealed;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -232,13 +249,18 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         {
             if (_isHatDamaged.Value)
                 return;
-
+            
             DamageHat();
-
-            if (!_isVirgin)
+            
+            if (!_isHatNew)
+            {
+                // Death
                 return;
+            }
 
-            _isVirgin = false;
+            _hatHealingTimer.StartTimer();
+            
+            _isHatNew = false;
             _playerAbuser = playerEntity;
             
             _playerAbuser.OnDeathEvent += OnAbuserDeath;
@@ -249,6 +271,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             Debug.Log("------------ ABUSER DIED MUHAHAHAHAH --------------");
             SetEmotion(Emotion.Sigma);
         }
+
+        private void OnHatHealed() => RegenerateHat();
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

@@ -10,6 +10,13 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 {
     public class SuspicionSystem
     {
+        private enum Behaviour
+        {
+            None = 0,
+            Hide = 1,
+            Runaway = 2
+        }
+
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public SuspicionSystem(MushroomEntity mushroomEntity)
@@ -35,7 +42,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private bool _isRetreating;
         private bool _isCheckEnabled;
         private bool _isPlayersNearby;
-        private bool _shouldHide;
+        private Behaviour _behaviour;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -50,6 +57,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _playersCheckRoutine.Start();
         }
 
+        public void Tick()
+        {
+            _retreatingTimeLeft -= Time.deltaTime;
+
+            if (_retreatingTimeLeft < 0f)
+                _isRetreating = false;
+        }
+
         public void Stop()
         {
             _playersCheckRoutine.GetRoutineEvent -= CheckForNearbyPlayersCO;
@@ -58,13 +73,21 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _playersCheckRoutine.Stop();
         }
 
+        public void DetectNoise(Vector3 noisePosition, float noiseLoudness)
+        {
+            if (!IsLoudEnough(noiseLoudness))
+                return;
+
+            Debug.Log("Detected noise");
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void FindInterestTargets()
         {
             _interestTargets.Clear();
             _isPlayersNearby = false;
-            _shouldHide = false;
+            _behaviour = Behaviour.None;
 
             IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
             float visionRange = _suspicionSystemConfig.VisionRange;
@@ -73,15 +96,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             foreach (PlayerEntity playerEntity in allPlayers.Values)
             {
-                bool isValid = playerEntity != null && !playerEntity.IsDead();
-
-                if (!isValid)
-                    continue;
-
-                float distanceToPlayer = Vector3.Distance(a: _transform.position, b: playerEntity.transform.position);
-                bool isDistanceValid = distanceToPlayer <= visionRange;
-
-                if (!isDistanceValid)
+                if (!IsPlayerEntityValid(playerEntity, out float distanceToPlayer))
                     continue;
 
                 _isPlayersNearby = true;
@@ -90,13 +105,26 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
                 if (!isAfkTimeValid)
                 {
-                    if (distanceToPlayer <= distanceToHide)
-                        _shouldHide = true;
-                    
+                    _behaviour = distanceToPlayer <= distanceToHide ? Behaviour.Hide : Behaviour.Runaway;
                     continue;
                 }
 
                 _interestTargets.Add(playerEntity);
+            }
+
+            // LOCAL METHODS: -----------------------------
+
+            bool IsPlayerEntityValid(PlayerEntity playerEntity, out float distance)
+            {
+                bool isValid = playerEntity != null && !playerEntity.IsDead();
+                distance = 0f;
+
+                if (!isValid)
+                    return false;
+
+                distance = Vector3.Distance(a: _transform.position, b: playerEntity.transform.position);
+                bool isDistanceValid = distance <= visionRange;
+                return isDistanceValid;
             }
         }
 
@@ -108,8 +136,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             if (CheckHiding())
                 return;
 
+            if (CheckRunaway())
+                return;
+
             int targetsAmount = _interestTargets.Count;
-            bool isStateMoveToInterestTarget = state is MoveToInterestTargetState;
 
             if (targetsAmount == 0)
                 ZeroTargetsLogic();
@@ -123,7 +153,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             bool CheckHiding()
             {
-                if (!_shouldHide)
+                if (_behaviour != Behaviour.Hide)
                     return false;
 
                 if (state is not HidingState)
@@ -132,9 +162,23 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 return true;
             }
 
+            bool CheckRunaway()
+            {
+                if (_behaviour != Behaviour.Runaway)
+                    return false;
+
+                if (state is not RunawayState)
+                {
+                    StartRetreatingTimer();
+                    EnterRunawayState();
+                }
+
+                return true;
+            }
+
             void ZeroTargetsLogic()
             {
-                if (!_isPlayersNearby)
+                if (_isPlayersNearby)
                     return;
 
                 if (state is HidingState)
@@ -142,8 +186,14 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                     EnterIdleState();
                     return;
                 }
-                
-                if (isStateMoveToInterestTarget)
+
+                if (state is RunawayState && !_isRetreating)
+                {
+                    EnterIdleState();
+                    return;
+                }
+
+                if (state is MoveToInterestTargetState)
                     EnterIdleState();
             }
 
@@ -154,7 +204,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
                 _mushroomEntity.SetInterestTarget(interestTarget);
 
-                if (isStateMoveToInterestTarget)
+                if (state is MoveToInterestTargetState)
                     return;
 
                 if (state is LookAtInterestTargetState)
@@ -162,11 +212,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
                 EnterMoveToInterestTargetState();
             }
+        }
 
-            void HideOrRunaway()
-            {
-                
-            }
+        private void StartRetreatingTimer()
+        {
+            _isRetreating = true;
+            _retreatingTimeLeft = _suspicionSystemConfig.RetreatingTime;
         }
 
         private void EnterIdleState() =>
@@ -175,17 +226,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private void EnterHidingState() =>
             _mushroomEntity.EnterHidingState();
 
-        private void EnterRunawayState()
-        {
-            // EnterIdleState();
-        }
+        private void EnterRunawayState() =>
+            _mushroomEntity.EnterRunawayState();
 
         private void EnterMoveToInterestTargetState() =>
             _mushroomEntity.EnterMoveToInterestTargetState();
 
         private IEnumerator CheckForNearbyPlayersCO()
         {
-            float interval = _suspicionSystemConfig.CheckForNearbyPlayersInterval;
+            float interval = _suspicionSystemConfig.CheckNearbyPlayersInterval;
             var waitForSeconds = new WaitForSeconds(interval);
 
             while (true)
@@ -198,6 +247,13 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
                 yield return waitForSeconds;
             }
+        }
+
+        private bool IsLoudEnough(float noiseLoudness)
+        {
+            float minLoudnessToReact = _suspicionSystemConfig.MinLoudnessToReact;
+            bool isValid = noiseLoudness >= minLoudnessToReact;
+            return isValid;
         }
     }
 }

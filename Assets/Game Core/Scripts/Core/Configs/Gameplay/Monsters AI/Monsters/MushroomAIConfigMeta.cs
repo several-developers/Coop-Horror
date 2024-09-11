@@ -11,6 +11,10 @@ namespace GameCore.Configs.Gameplay.Enemies
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
+        [TitleGroup(title: CommonSettings)]
+        [BoxGroup(CommonGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
+        private CommonConfig _commonConfig;
+        
         [TitleGroup(title: WanderingSettings)]
         [BoxGroup(WanderingGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private WanderingConfig _wanderingConfig;
@@ -54,12 +58,10 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
+        public CommonConfig GetCommonConfig() => _commonConfig;
         public WanderingConfig GetWanderingConfig() => _wanderingConfig;
-
         public SuspicionSystemConfig GetSuspicionSystemConfig() => _suspicionSystemConfig;
-
         public MoveToInterestTargetConfig GetMoveToInterestTargetConfig() => _moveToInterestTargetConfig;
-        
         public AnimationConfig GetAnimationConfig() => _animationConfig;
         
         public override MonsterType GetMonsterType() =>
@@ -67,6 +69,23 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         // INNER CLASSES: -------------------------------------------------------------------------
 
+        [Serializable]
+        public class CommonConfig
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, Min(0f)]
+            private float _hatRegenerationDelay = 10f;
+
+            [SerializeField, Min(0f)]
+            private float _runawaySpeed = 3f;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float HatRegenerationDelay => _hatRegenerationDelay;
+            public float RunawaySpeed => _runawaySpeed;
+        }
+        
         [Serializable]
         public class WanderingConfig
         {
@@ -110,7 +129,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             // MEMBERS: -------------------------------------------------------------------------------
 
             [SerializeField, Min(0f)]
-            private float _checkForNearbyPlayersInterval = 0.2f;
+            private float _checkNearbyPlayersInterval = 0.2f;
 
             [SerializeField, Min(0f), SuffixLabel("meters", overlay: true)]
             private float _visionRange = 10f;
@@ -131,7 +150,7 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
-            public float CheckForNearbyPlayersInterval => _checkForNearbyPlayersInterval;
+            public float CheckNearbyPlayersInterval => _checkNearbyPlayersInterval;
             public float VisionRange => _visionRange;
             public float MinLoudnessToReact => _minLoudnessToReact;
             public float InterestAfterPlayerAfk => _interestAfterPlayerAfk;

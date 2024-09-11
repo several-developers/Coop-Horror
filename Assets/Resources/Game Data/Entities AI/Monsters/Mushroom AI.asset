@@ -71,21 +71,24 @@ MonoBehaviour:
   _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
+  _commonConfig:
+    _hatRegenerationDelay: 10
+    _runawaySpeed: 2
   _wanderingConfig:
     _minSpeed: 0.25
     _maxSpeed: 1
     _minDistance: 1
     _maxDistance: 10
-    _minDelay: 1
-    _maxDelay: 5
+    _minDelay: 2
+    _maxDelay: 7
     _acceleration: 2
   _suspicionSystemConfig:
-    _checkForNearbyPlayersInterval: 0.2
+    _checkNearbyPlayersInterval: 0.2
     _visionRange: 10
     _minLoudnessToReact: 0
     _interestAfterPlayerAfk: 5
-    _retreatingTime: 3
-    _distanceToHide: 4
+    _retreatingTime: 5
+    _distanceToHide: 5
   _moveToInterestTargetConfig:
     _moveSpeed: {x: 0.2, y: 0.5}
     _positionCheckInterval: 0.2
