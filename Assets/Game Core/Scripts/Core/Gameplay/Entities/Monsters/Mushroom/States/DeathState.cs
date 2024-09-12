@@ -25,6 +25,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             DisableAgent();
             DisableSuspicionSystem();
             EnableRagdoll();
+            ShowFromGround();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -45,6 +46,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         {
             RagdollController ragdollController = _references.RagdollController;
             ragdollController.EnableRagdoll();
+        }
+
+        private void ShowFromGround()
+        {
+            AnimationController animationController = _mushroomEntity.GetAnimationController();
+            animationController.SetHidingState(isHiding: false, instant: true);
         }
     }
 }

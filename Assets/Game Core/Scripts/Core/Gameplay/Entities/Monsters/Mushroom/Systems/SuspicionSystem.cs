@@ -84,6 +84,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             if (!isStateFound)
                 return;
 
+            if (state is DeathState)
+                return;
+
             if (state is RunawayState or HidingState)
                 return;
                 
@@ -249,9 +252,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             while (true)
             {
-                if (!_isRetreating)
+                FindInterestTargets();
+                
+                if (!_isRetreating || _isRetreating && _behaviour == Behaviour.Hide)
                 {
-                    FindInterestTargets();
                     CheckInterestTarget();
                 }
 

@@ -116,8 +116,6 @@ namespace GameCore.Gameplay.Generators.Monsters
 
         public void Dispose()
         {
-            Debug.LogWarning("Dispose: " + IsServer);
-            
 #warning ВОЗМОЖНО ВО ВРЕМЯ DISPOSE СТАНОВИТСЯ FALSE ДАЖЕ У СЕРВЕРА
             if (!IsServer)
                 return;

@@ -25,7 +25,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action OnHideCompletedEvent = delegate { }; 
+        public event Action OnHideCompletedEvent = delegate { };
+
+        private const int AngryIndex = 0;
+        private const int FearIndex = 1;
+        private const int DeathIndex = 3;
 
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomAIConfigMeta.AnimationConfig _animationConfig;
@@ -59,33 +63,56 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             SkinnedMeshRenderer eyes = _references.Eyes;
             SkinnedMeshRenderer mouth = _references.Mouth;
             
+            float angryEyesValue = 0f;
+            float angryMouthValue = 0f;
+            float fearEyesValue = 0f;
+            float fearMouthValue = 0f;
+            float deathEyesValue = 0f;
+            float deathMouthValue = 0f;
+            
+            bool changeBlendShape = true;
+            
             switch (emotion)
             {
                 case MushroomEntity.Emotion.Regular:
                     break;
                 
                 case MushroomEntity.Emotion.Happy:
-                    eyes.SetBlendShapeWeight(index: 0, value: 0);
-                    mouth.SetBlendShapeWeight(index: 0, value: 0);
                     break;
                 
                 case MushroomEntity.Emotion.Angry:
-                    eyes.SetBlendShapeWeight(index: 0, value: 100);
-                    mouth.SetBlendShapeWeight(index: 0, value: 100);
+                    angryEyesValue = 100f;
+                    angryMouthValue = 100f;
                     break;
                 
                 case MushroomEntity.Emotion.Scared:
+                    fearEyesValue = 100f;
+                    fearMouthValue = 60f;
                     break;
                 
                 case MushroomEntity.Emotion.Interested:
                     break;
                 
                 case MushroomEntity.Emotion.Sigma:
+                    changeBlendShape = false;
                     break;
                 
                 case MushroomEntity.Emotion.Dead:
+                    deathEyesValue = 100f;
+                    deathMouthValue = 100f;
                     break;
             }
+
+            if (!changeBlendShape)
+                return;
+            
+            eyes.SetBlendShapeWeight(AngryIndex, angryEyesValue);
+            eyes.SetBlendShapeWeight(FearIndex, fearEyesValue);
+            eyes.SetBlendShapeWeight(DeathIndex, deathEyesValue);
+            
+            mouth.SetBlendShapeWeight(AngryIndex, angryMouthValue);
+            mouth.SetBlendShapeWeight(FearIndex, fearMouthValue);
+            mouth.SetBlendShapeWeight(DeathIndex, deathMouthValue);
         }
 
         public void SetHatState(bool isHatDamaged)
@@ -118,12 +145,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 .SetEase(ease);
         }
 
-        public void SetHidingState(bool isHiding)
+        public void SetHidingState(bool isHiding, bool instant = false)
         {
             _isHiding = isHiding;
             _animator.SetBool(id: AnimatorHashes.IsHiding, isHiding);
 
-            ChangeModelHidingState(isHiding);
+            ChangeModelHidingState(isHiding, instant);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -146,12 +173,18 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _animator.SetFloat(id: AnimatorHashes.StandUpSpeedMultiplier, standUpMultiplier);
         }
 
-        private void ChangeModelHidingState(bool isHiding)
+        private void ChangeModelHidingState(bool isHiding, bool instant = false)
         {
             float endValue = isHiding ? _animationConfig.ModelSittingY : 0f;
             float duration = isHiding ? _animationConfig.ModelSitDownDuration : _animationConfig.ModelStandUpDuration;
             float delay = isHiding ? _animationConfig.ModelSitDownDelay : _animationConfig.ModelStandUpDelay;
             Ease ease = isHiding ? _animationConfig.ModelSitDownEase : _animationConfig.ModelStandUpEase;
+
+            if (instant)
+            {
+                duration = 0f;
+                delay = 0f;
+            }
             
             _sittingTN.Kill();
 
