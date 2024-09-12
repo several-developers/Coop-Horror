@@ -69,6 +69,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             animator.SetFloat(id: AnimatorHashes.IsSprinting, value);
         }
 
+        private void EnterHidingState() =>
+            _mushroomEntity.EnterHidingState();
+
         private Vector3 GetTargetPosition()
         {
             Vector3 currentPosition = _transform.position;
@@ -102,6 +105,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 
         private void OnArrived() => TryUpdateTargetPoint();
 
-        private void OnStuck() => TryUpdateTargetPoint();
+        private void OnStuck() => EnterHidingState();
     }
 }

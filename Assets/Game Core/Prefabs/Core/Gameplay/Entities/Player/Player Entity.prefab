@@ -2215,7 +2215,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4628898490251457778}
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 5
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 0
@@ -2391,7 +2391,7 @@ MonoBehaviour:
   _enablePhysicsInteraction: 1
   _applyPushForceToCharacters: 0
   _applyStandingDownwardForce: 0
-  _mass: 1
+  _mass: 5
   _pushForceScale: 1
   _standingDownwardForceScale: 1
   _camera: {fileID: 0}

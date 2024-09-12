@@ -19,7 +19,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
     {
         public enum SFXType
         {
-            
         }
 
         public enum Emotion
@@ -42,7 +41,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
-        
+
         [BoxGroup(Constants.References, showLabel: false), SerializeField]
         private MushroomReferences _references;
 
@@ -91,25 +90,20 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         public void SetSneakingState(bool isSneaking) =>
             IsSneaking = isSneaking;
-        
-        [Button]
+
         public void EnterIdleState() => ChangeState<IdleState>();
-        
-        [Button]
+
         public void EnterWanderingState() => ChangeState<WanderingState>();
-        
-        [Button]
+
         public void EnterHidingState() => ChangeState<HidingState>();
-        
-        [Button]
+
         public void EnterRunawayState() => ChangeState<RunawayState>();
-        
-        [Button]
+
         public void EnterMoveToInterestTargetState() => ChangeState<MoveToInterestTargetState>();
-        
+
         [Button]
         public void EnterLookAtInterestTargetState() => ChangeState<LookAtInterestTargetState>();
-        
+
         public MushroomAIConfigMeta GetAIConfig() => _mushroomAIConfig;
 
         public MushroomReferences GetReferences() => _references;
@@ -139,7 +133,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         protected override void InitServerOnly()
         {
             AllMushrooms.Add(item: this);
-            
+
             InitSystems();
             SetupStates();
 
@@ -154,7 +148,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 _mushroomStateMachine = new StateMachineBase();
                 _suspicionSystem = new SuspicionSystem(mushroomEntity: this);
                 _hatHealingTimer = new HatHealingTimer(mushroomEntity: this);
-                
+
                 _suspicionSystem.Start();
 
                 _mushroomStateMachine.OnStateChangedEvent += state =>
@@ -170,13 +164,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 WanderingState wanderingState = new(mushroomEntity: this);
                 HidingState hidingState = new(mushroomEntity: this);
                 RunawayState runawayState = new(mushroomEntity: this);
+                DeathState deathState = new(mushroomEntity: this);
                 MoveToInterestTargetState moveToInterestTargetState = new(mushroomEntity: this);
                 LookAtInterestTargetState lookAtInterestTargetState = new(mushroomEntity: this);
-                
+
                 _mushroomStateMachine.AddState(idleState);
                 _mushroomStateMachine.AddState(wanderingState);
                 _mushroomStateMachine.AddState(hidingState);
                 _mushroomStateMachine.AddState(runawayState);
+                _mushroomStateMachine.AddState(deathState);
                 _mushroomStateMachine.AddState(moveToInterestTargetState);
                 _mushroomStateMachine.AddState(lookAtInterestTargetState);
             }
@@ -193,7 +189,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         {
             _isHatDamaged.OnValueChanged -= OnHatDamageStateChanged;
             _isHiding.OnValueChanged -= OnHidingStateChanged;
-            
+
             _references.PlayerTrigger.OnPlayerEnterEvent -= OnPlayerSteppedOnHat;
         }
 
@@ -201,14 +197,64 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         {
             AllMushrooms.Remove(item: this);
             _hatHealingTimer.StopTimer();
-            
+
             if (_playerAbuser != null)
                 _playerAbuser.OnDeathEvent -= OnAbuserDeath;
-            
+
             _hatHealingTimer.OnTimerEndedEvent -= OnHatHealed;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void HandleHatDamageState(bool isDamaged)
+        {
+            _animationController.SetHatState(isDamaged);
+
+            Emotion emotion = isDamaged ? Emotion.Angry : Emotion.Happy;
+            SetEmotion(emotion);
+
+            ParticleSystem sporesPS = _references.SporesPS;
+
+            if (isDamaged)
+            {
+                sporesPS.Stop();
+            }
+            else
+            {
+                sporesPS.Play();
+            }
+        }
+
+        private void HandleHidingState(bool isHiding)
+        {
+            if (isHiding)
+                EnterHidingState();
+            else
+                EnterIdleState(); // TEMP
+        }
+
+        private void HandlePlayerSteppedOnHat(PlayerEntity playerEntity)
+        {
+            if (_isHatDamaged.Value)
+                return;
+
+            DamageHat();
+
+            if (!_isHatNew)
+            {
+                EnterDeathState();
+                return;
+            }
+
+            _hatHealingTimer.StartTimer();
+
+            _isHatNew = false;
+            _playerAbuser = playerEntity;
+
+            _playerAbuser.OnDeathEvent += OnAbuserDeath;
+        }
+        
+        private void EnterDeathState() => ChangeState<DeathState>();
         
         private void ChangeState<TState>() where TState : IState =>
             _mushroomStateMachine.ChangeState<TState>();
@@ -229,42 +275,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnHatDamageStateChanged(bool previousValue, bool newValue)
-        {
-            _animationController.SetHatState(newValue);
+        private void OnHatDamageStateChanged(bool previousValue, bool newValue) => HandleHatDamageState(newValue);
 
-            Emotion emotion = newValue ? Emotion.Angry : Emotion.Happy;
-            SetEmotion(emotion);
-        }
+        private void OnHidingStateChanged(bool previousValue, bool newValue) => HandleHidingState(newValue);
 
-        private void OnHidingStateChanged(bool previousValue, bool newValue)
-        {
-            if (newValue)
-                EnterHidingState();
-            else
-                EnterIdleState(); // TEMP
-        }
-
-        private void OnPlayerSteppedOnHat(PlayerEntity playerEntity)
-        {
-            if (_isHatDamaged.Value)
-                return;
-            
-            DamageHat();
-            
-            if (!_isHatNew)
-            {
-                // Death
-                return;
-            }
-
-            _hatHealingTimer.StartTimer();
-            
-            _isHatNew = false;
-            _playerAbuser = playerEntity;
-            
-            _playerAbuser.OnDeathEvent += OnAbuserDeath;
-        }
+        private void OnPlayerSteppedOnHat(PlayerEntity playerEntity) => HandlePlayerSteppedOnHat(playerEntity);
 
         private void OnAbuserDeath()
         {
@@ -277,13 +292,34 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
         [Title(Constants.DebugButtons)]
-        [Button(buttonSize: 30), DisableInEditorMode]
+        [Button(buttonSize: 25), DisableInEditorMode]
         private void DebugDamageHat() => DamageHat();
-        
-        [Button(buttonSize: 30), DisableInEditorMode]
+
+        [Button(buttonSize: 25), DisableInEditorMode]
         private void DebugRegenerateHat() => RegenerateHat();
 
-        [Button(buttonSize: 30, ButtonStyle.FoldoutButton), DisableInEditorMode]
+        [Button(buttonSize: 25, ButtonStyle.FoldoutButton), DisableInEditorMode]
         private void DebugToggleHidingState(bool isHiding) => ToggleHidingState(isHiding);
+        
+        [Button(buttonSize: 25), DisableInEditorMode, PropertySpace(spaceBefore: 10)]
+        public void DebugEnterIdleState() => EnterIdleState();
+
+        [Button(buttonSize: 25), DisableInEditorMode]
+        public void DebugEnterWanderingState() => EnterWanderingState();
+
+        [Button(buttonSize: 25), DisableInEditorMode]
+        public void DebugEnterHidingState() => EnterHidingState();
+
+        [Button(buttonSize: 25), DisableInEditorMode]
+        public void DebugEnterRunawayState() => EnterRunawayState();
+
+        [Button(buttonSize: 25), DisableInEditorMode]
+        public void DebugEnterDeathState() => EnterDeathState();
+
+        [Button(buttonSize: 25), DisableInEditorMode]
+        public void DebugEnterMoveToInterestTargetState() => EnterMoveToInterestTargetState();
+
+        [Button(buttonSize: 25), DisableInEditorMode]
+        public void DebugEnterLookAtInterestTargetState() => EnterLookAtInterestTargetState();
     }
 }

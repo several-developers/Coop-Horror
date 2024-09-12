@@ -38,11 +38,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private readonly CoroutineHelper _playersCheckRoutine;
         private readonly List<PlayerEntity> _interestTargets;
 
+        private Behaviour _behaviour;
+        private Vector3 _lastNoisePosition;
         private float _retreatingTimeLeft;
         private bool _isRetreating;
         private bool _isCheckEnabled;
         private bool _isPlayersNearby;
-        private Behaviour _behaviour;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -78,7 +79,16 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             if (!IsLoudEnough(noiseLoudness))
                 return;
 
-            Debug.Log("Detected noise");
+            bool isStateFound = _mushroomEntity.TryGetCurrentState(out IState state);
+
+            if (!isStateFound)
+                return;
+
+            if (state is RunawayState or HidingState)
+                return;
+                
+            StartRetreatingTimer();
+            EnterRunawayState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
