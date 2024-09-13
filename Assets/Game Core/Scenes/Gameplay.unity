@@ -4689,6 +4689,23 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  scenesReferences:
+  - m_AssetGUID: 5eeb4c2879517e14bbbe756e35a28386
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 94125c3d369b50348960125d36938ef5
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 7bb0b14dc8183a74699c123d29eadaaa
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  - m_AssetGUID: 6358488ffdf90fe4f8686a7e89ad9671
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
 --- !u!4 &748009161
 Transform:
   m_ObjectHideFlags: 0

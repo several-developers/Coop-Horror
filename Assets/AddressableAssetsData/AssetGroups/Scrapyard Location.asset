@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Scrapyard Location
+  m_EditorClassIdentifier: 
+  m_GroupName: Scrapyard Location
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 16e6f98fe2cc5a942b5f2180f73d2150
+  m_SerializeEntries:
+  - m_GUID: 6358488ffdf90fe4f8686a7e89ad9671
+    m_Address: Scrapyard
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 75fa75dd9a346a04eb1c4dc9bcb6f9ca, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: b132b0e91114ad0419798680146f5f95, type: 2}
+    - {fileID: 11400000, guid: b20aca4ed3a3cd64ca6c2104ee002099, type: 2}
