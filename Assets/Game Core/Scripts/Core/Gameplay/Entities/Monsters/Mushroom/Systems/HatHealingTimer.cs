@@ -31,8 +31,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _timerRoutine.Start();
         }
 
-        public void StopTimer() =>
+        public void StopTimer()
+        {
+            _timerRoutine.GetRoutineEvent -= TimerCO;
             _timerRoutine.Stop();
+        }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 

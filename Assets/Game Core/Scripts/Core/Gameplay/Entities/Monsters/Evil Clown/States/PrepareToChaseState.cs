@@ -36,7 +36,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         
         public void Enter()
         {
-            PlayRoarSFX();
+            PlaySound(EvilClownEntity.SFXType.Roar);
             EnableRig();
             StopWanderingTimer();
             EnterChaseStateWithDelay().Forget();
@@ -46,9 +46,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
         public void Exit() => StartBrainwashSFXLoop();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void PlayRoarSFX() =>
-            _evilClownEntity.PlaySound(EvilClownEntity.SFXType.Roar);
 
         private void EnableRig()
         {
@@ -79,6 +76,9 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _evilClownEntity.StopCoroutine(_brainwashSFXLoopCO);
         }
 
+        private void PlaySound(EvilClownEntity.SFXType sfxType) =>
+            _evilClownEntity.PlaySound(sfxType).Forget();
+
         private async UniTaskVoid EnterChaseStateWithDelay()
         {
             float delayInSeconds = _evilClownAIConfig.ChaseDelay;
@@ -105,7 +105,7 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
 
                 yield return new WaitForSeconds(delay);
                 
-                _evilClownEntity.PlaySound(EvilClownEntity.SFXType.Brainwash);
+                PlaySound(EvilClownEntity.SFXType.Brainwash);
             }
         }
     }

@@ -15,6 +15,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 
             _mushroomEntity = mushroomEntity;
             _wanderingConfig = mushroomAIConfig.GetWanderingConfig();
+            _whisperingSystem = mushroomEntity.GetWhisperingSystem();
             _wanderingTimerRoutine = new CoroutineHelper(mushroomEntity);
         }
 
@@ -22,6 +23,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomAIConfigMeta.WanderingConfig _wanderingConfig;
+        private readonly WhisperingSystem _whisperingSystem;
         private readonly CoroutineHelper _wanderingTimerRoutine;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -30,6 +32,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         {
             _wanderingTimerRoutine.GetRoutineEvent += WanderingTimerCO;
 
+            UnpauseWhisperingSystem();
             _mushroomEntity.DisableAgent();
             _wanderingTimerRoutine.Start();
         }
@@ -42,7 +45,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-        
+
+        private void UnpauseWhisperingSystem() =>
+            _whisperingSystem.Unpause();
+
         private void EnterWanderingState() =>
             _mushroomEntity.EnterWanderingState();
 

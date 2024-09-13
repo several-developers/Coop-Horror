@@ -17,6 +17,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             
             _mushroomEntity = mushroomEntity;
             _commonConfig = mushroomAIConfig.GetCommonConfig();
+            _whisperingSystem = mushroomEntity.GetWhisperingSystem();
             _agent = mushroomEntity.GetAgent();
             _transform = mushroomEntity.transform;
             _movementLogic = new FollowPositionMovementLogic(_transform, _agent);
@@ -26,6 +27,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomAIConfigMeta.CommonConfig _commonConfig;
+        private readonly WhisperingSystem _whisperingSystem;
         private readonly NavMeshAgent _agent;
         private readonly Transform _transform;
         private readonly FollowPositionMovementLogic _movementLogic;
@@ -40,6 +42,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 
             EnableAgent();
             SetSprintingState(isSprinting: true);
+            PauseWhisperingSystem();
             TryUpdateTargetPoint();
         }
 
@@ -72,6 +75,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             animator.SetFloat(id: AnimatorHashes.IsSprinting, value);
         }
 
+        private void PauseWhisperingSystem() =>
+            _whisperingSystem.Pause();
+        
         private void EnterHidingState() =>
             _mushroomEntity.EnterHidingState();
 

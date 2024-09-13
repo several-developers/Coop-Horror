@@ -22,6 +22,13 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
     {
         public enum SFXType
         {
+            // None = 0,
+            Footsteps = 1,
+            HatExplosion = 2,
+            HatRegeneration = 3,
+            Whispering = 4,
+            SitDown = 5,
+            StandUp = 6
         }
 
         public enum Emotion
@@ -68,6 +75,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private AnimationController _animationController;
         private SuspicionSystem _suspicionSystem;
         private HatHealingTimer _hatHealingTimer;
+        private WhisperingSystem _whisperingSystem;
 
         private PlayerEntity _interestTarget;
         private PlayerEntity _playerAbuser;
@@ -112,6 +120,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         public SuspicionSystem GetSuspicionSystem() => _suspicionSystem;
 
+        public WhisperingSystem GetWhisperingSystem() => _whisperingSystem;
+
         public PlayerEntity GetInterestTarget() => _interestTarget;
 
         public bool TryGetCurrentState(out IState state) =>
@@ -124,6 +134,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         protected override void InitAll()
         {
+            SoundReproducer = new MushroomSoundReproducer(this, _mushroomAIConfig);
             _animationController = new AnimationController(mushroomEntity: this);
 
             _isHatDamaged.OnValueChanged += OnHatDamageStateChanged;
@@ -141,6 +152,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             _references.PlayerTrigger.OnPlayerEnterEvent += OnPlayerSteppedOnHat;
 
+            _references.FootstepsSystem.OnFootstepPerformedEvent += OnFootstepPerformed;
+
             _hatHealingTimer.OnTimerEndedEvent += OnHatHealed;
 
             // LOCAL METHODS: -----------------------------
@@ -150,9 +163,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 _mushroomStateMachine = new StateMachineBase();
                 _suspicionSystem = new SuspicionSystem(mushroomEntity: this);
                 _hatHealingTimer = new HatHealingTimer(mushroomEntity: this);
+                _whisperingSystem = new WhisperingSystem(mushroomEntity: this);
 
                 _suspicionSystem.Start();
-
+                _whisperingSystem.Start();
+                _whisperingSystem.Pause();
+                
                 _mushroomStateMachine.OnStateChangedEvent += state =>
                 {
                     string log = Log.HandleLog($"New state '<gb>{state.GetType().Name}</gb>'");
@@ -204,7 +220,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             if (_playerAbuser != null)
                 _playerAbuser.OnDeathEvent -= OnAbuserDeath;
-
+                
+            _references.PlayerTrigger.OnPlayerEnterEvent -= OnPlayerSteppedOnHat;
+                
+            _references.FootstepsSystem.OnFootstepPerformedEvent -= OnFootstepPerformed;
+            
             _hatHealingTimer.OnTimerEndedEvent -= OnHatHealed;
         }
 
@@ -239,10 +259,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             if (isDamaged)
             {
+                PlaySound(SFXType.HatExplosion).Forget();
                 sporesPS.Stop();
             }
             else
             {
+                PlaySound(SFXType.HatRegeneration).Forget();
                 sporesPS.Play();
             }
         }
@@ -280,7 +302,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         {
             if (EntityLocation == EntityLocation.Dungeon)
                 return;
-            
+
             MushroomAIConfigMeta.CommonConfig commonConfig = _mushroomAIConfig.GetCommonConfig();
             TimePeriod sporesGlowingTime = commonConfig.SporesGlowTimePeriod;
             int currentTimeInMinutes = _timeObserver.GetCurrentTimeInMinutes();
@@ -338,6 +360,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             Debug.Log("------------ ABUSER DIED MUHAHAHAHAH --------------");
             SetEmotion(Emotion.Sigma);
         }
+
+        private void OnFootstepPerformed(string colliderTag) => PlaySound(SFXType.Footsteps).Forget();
 
         private void OnHatHealed() => RegenerateHat();
 

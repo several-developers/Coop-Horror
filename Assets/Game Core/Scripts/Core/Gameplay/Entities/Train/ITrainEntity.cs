@@ -1,5 +1,6 @@
 ﻿using System;
 using Cinemachine;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Train
@@ -22,7 +23,7 @@ namespace GameCore.Gameplay.Entities.Train
         void ToggleMainLeverState(bool isEnabled);
         void ToggleDoorState(bool isOpened);
         void ToggleStoppedAtSectorState(bool isStoppedAtSector);
-        void PlaySound(TrainEntity.SFXType sfxType, bool onlyLocal = false);
+        UniTaskVoid PlaySound(TrainEntity.SFXType sfxType, bool onlyLocal = false, float delay = 0f);
         void StopSound(TrainEntity.SFXType sfxType);
         void SendLeaveLocation();
         Camera GetOutsideCamera();

@@ -77,7 +77,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             if (!IsServer())
                 return;
 
-            _blindCreatureEntity.PlaySound(sfxType);
+            _blindCreatureEntity.PlaySound(sfxType).Forget();
         }
         
         private void StopSound(BlindCreatureEntity.SFXType sfxType)

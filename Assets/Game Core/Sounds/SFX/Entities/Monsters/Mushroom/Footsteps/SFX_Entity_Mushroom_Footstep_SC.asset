@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e444e5f947e2a7409a1eaa10f9fa16e, type: 3}
-  m_Name: SFX_Entity_Player_Footstep_Temp_SC
+  m_Name: SFX_Entity_Mushroom_Footstep_SC
   m_EditorClassIdentifier: 
   internals:
     data:
@@ -18,15 +18,15 @@ MonoBehaviour:
       previewAudioMixerGroup: {fileID: 0}
       expandPreview: 0
       expandAudioClips: 1
-      expandSettings: 0
+      expandSettings: 1
       previewCurves: 1
       audioMixerGroup: {fileID: 0}
       priority: 0.5
       distanceEnabled: 1
-      distanceScale: 50
+      distanceScale: 25
       preventEndClicks: 1
       loopEnabled: 0
-      followPosition: 1
+      followPosition: 0
       stopIfTransformIsNull: 0
       randomStartPosition: 0
       randomStartPositionMin: 0
@@ -43,9 +43,9 @@ MonoBehaviour:
       bypassReverbZones: 0
       bypassVoiceEffects: 0
       bypassListenerEffects: 0
-      volumeExpand: 1
-      volumeDecibel: -10.5
-      volumeRatio: 0.29853827
+      volumeExpand: 0
+      volumeDecibel: -12
+      volumeRatio: 0.25118864
       volumeRandomEnable: 0
       volumeRandomRangeDecibel: -3
       volumeDistanceRolloff: -2
@@ -103,8 +103,8 @@ MonoBehaviour:
       volumeDistanceCrossfadeEnable: 0
       volumeDistanceCrossfadeTotalLayersOneBased: 2
       volumeDistanceCrossfadeTotalLayers: 1
-      volumeDistanceCrossfadeLayerOneBased: 2
-      volumeDistanceCrossfadeLayer: 1
+      volumeDistanceCrossfadeLayerOneBased: 1
+      volumeDistanceCrossfadeLayer: 0
       volumeDistanceCrossfadeRolloff: -2
       volumeDistanceCrossfadeCurve:
         serializedVersion: 2
@@ -160,9 +160,9 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      pitchExpand: 0
-      pitchSemitone: 0
-      pitchRatio: 1
+      pitchExpand: 1
+      pitchSemitone: 8
+      pitchRatio: 1.5874016
       pitchRandomEnable: 1
       pitchRandomRangeSemitoneBipolar: 0.25
       pitchIntensityEnable: 0
@@ -254,9 +254,9 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      spatialSpreadExpand: 0
-      spatialSpreadDegrees: 180
-      spatialSpreadRatio: 0.5
+      spatialSpreadExpand: 1
+      spatialSpreadDegrees: 90
+      spatialSpreadRatio: 0.25
       spatialSpreadDistanceRolloff: -4
       spatialSpreadDistanceCurve:
         serializedVersion: 2
@@ -647,8 +647,8 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     audioClips:
-    - {fileID: 8300000, guid: a2dd53fe7fc203341afb305e9e023c8a, type: 3}
-    - {fileID: 8300000, guid: 32fd52981c7679947999ea588bc47a0f, type: 3}
-    - {fileID: 8300000, guid: 221154bdca0d19b4988e8a0a91c63f80, type: 3}
-    - {fileID: 8300000, guid: c89f3df23de89fc4786be1765691a448, type: 3}
-    - {fileID: 8300000, guid: e76d38c8f623feb4cb565130b0258d19, type: 3}
+    - {fileID: 8300000, guid: e1fbbb406d96232428a18d02ad648227, type: 3}
+    - {fileID: 8300000, guid: afd4efc2eb351954fb4f63a96af8a341, type: 3}
+    - {fileID: 8300000, guid: 36a7815a8ceddfd4cbefe106bbbd8bbe, type: 3}
+    - {fileID: 8300000, guid: 4725979f80ad3a340b2c42ac24dac54a, type: 3}
+    - {fileID: 8300000, guid: 92c676b42d07310429f686f3b380c45a, type: 3}

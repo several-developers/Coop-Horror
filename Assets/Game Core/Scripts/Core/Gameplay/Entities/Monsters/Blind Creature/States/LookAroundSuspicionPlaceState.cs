@@ -92,7 +92,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature.States
             if (_isWhispersOnCooldown)
                 return;
             
-            _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.Whispers);
+            _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.Whispers).Forget();
             _whispersTimerRoutine.Start();
         }
 

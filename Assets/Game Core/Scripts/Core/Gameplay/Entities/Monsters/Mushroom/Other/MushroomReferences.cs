@@ -1,4 +1,5 @@
 ﻿using System;
+using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.Ragdoll;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -19,6 +20,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         [SerializeField, Required]
         private RagdollController _ragdollController;
+
+        [SerializeField, Required]
+        private MonsterFootstepsSystem _footstepsSystem;
 
         [SerializeField, Required]
         private Animator _animator;
@@ -49,6 +53,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         public MushroomSporesTrigger SporesTriggerPrefab => _sporesTriggerPrefab;
         public PlayerTrigger PlayerTrigger => _playerTrigger;
         public RagdollController RagdollController => _ragdollController;
+        public MonsterFootstepsSystem FootstepsSystem => _footstepsSystem;
         public Animator Animator => _animator;
         public GameObject HatSpores => _hatSpores;
         public Transform ModelTransform => _modelTransform;

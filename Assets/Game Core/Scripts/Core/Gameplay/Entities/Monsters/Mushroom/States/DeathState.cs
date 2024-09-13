@@ -5,15 +5,15 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
     public class DeathState : IEnterState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
-        
+
         public DeathState(MushroomEntity mushroomEntity)
         {
             _mushroomEntity = mushroomEntity;
             _references = mushroomEntity.GetReferences();
         }
-        
+
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomReferences _references;
 
@@ -24,6 +24,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             SetDeadEmotion();
             DisableAgent();
             DisableSuspicionSystem();
+            DisableWhisperingSystem();
             EnableRagdoll();
             ShowFromGround();
         }
@@ -31,7 +32,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void SetDeadEmotion() =>
-        _mushroomEntity.SetEmotion(MushroomEntity.Emotion.Dead);
+            _mushroomEntity.SetEmotion(MushroomEntity.Emotion.Dead);
 
         private void DisableAgent() =>
             _mushroomEntity.DisableAgent();
@@ -40,6 +41,12 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         {
             SuspicionSystem suspicionSystem = _mushroomEntity.GetSuspicionSystem();
             suspicionSystem.Stop();
+        }
+
+        private void DisableWhisperingSystem()
+        {
+            WhisperingSystem whisperingSystem = _mushroomEntity.GetWhisperingSystem();
+            whisperingSystem.Stop();
         }
 
         private void EnableRagdoll()

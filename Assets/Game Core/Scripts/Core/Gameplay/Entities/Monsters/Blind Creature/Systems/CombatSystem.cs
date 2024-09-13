@@ -61,7 +61,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             _isAttackOnCooldown = true;
             _animationController.PlayAttackAnimation();
-            _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.Swing);
+            PlaySound(BlindCreatureEntity.SFXType.Swing);
         }
 
         public void CheckAttackTrigger(Collider collider)
@@ -130,7 +130,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
         }
 
         private void PlaySound(BlindCreatureEntity.SFXType sfxType) =>
-            _blindCreatureEntity.PlaySound(sfxType);
+            _blindCreatureEntity.PlaySound(sfxType).Forget();
 
         private IEnumerator AttackCooldownCO()
         {

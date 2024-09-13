@@ -57,7 +57,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
 
             OnNoiseDetectedEvent.Invoke();
             StartDecreaseTimer();
-            _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.BirdScream);
+            PlaySound(BlindCreatureEntity.SFXType.BirdScream);
         }
 
         public void InstantAggro(Vector3 noisePosition)
@@ -72,8 +72,11 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
             
             OnNoiseDetectedEvent.Invoke();
             StartDecreaseTimer();
-            _blindCreatureEntity.PlaySound(BlindCreatureEntity.SFXType.BirdScream);
+            PlaySound(BlindCreatureEntity.SFXType.BirdScream);
         }
+
+        private void PlaySound(BlindCreatureEntity.SFXType sfxType) =>
+            _blindCreatureEntity.PlaySound(sfxType).Forget();
 
         public Vector3 GetLastNoisePosition() =>
             _lastNoisePosition;

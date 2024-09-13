@@ -257,6 +257,6 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
             
         }
         
-        private void OnFootstepPerformed(string colliderTag) => PlaySound(SFXType.Footsteps);
+        private void OnFootstepPerformed(string colliderTag) => PlaySound(SFXType.Footsteps).Forget();
     }
 }

@@ -74,6 +74,7 @@ MonoBehaviour:
   _commonConfig:
     _hatRegenerationDelay: 10
     _runawaySpeed: 2
+    _whisperingInterval: {x: 5, y: 12}
     _sporesGlowTimePeriod:
       _time: {x: 1140, y: 1440}
       _timeText: 19:00 - 24:00
@@ -112,8 +113,12 @@ MonoBehaviour:
     _modelSitDownEase: 6
     _modelStandUpEase: 5
     _hatExplosionDuration: 0.225
-    _hatRegenerationDuration: 2.25
+    _hatRegenerationDuration: 2.75
     _hatExplosionEase: 9
     _hatRegenerationEase: 5
-  _whisperingSE: {fileID: 0}
-  _whispersSE: {fileID: 0}
+  _footstepsSE: {fileID: 11400000, guid: c8451e4440eb2fc48969747cda6eafb2, type: 2}
+  _hatExplosionSE: {fileID: 11400000, guid: 0aecff5dc7177434ead69bc0109ceb91, type: 2}
+  _hatRegenerationSE: {fileID: 11400000, guid: 144cebb77273e4944aa9085c5989cc96, type: 2}
+  _whisperingSE: {fileID: 11400000, guid: b4afa15ca2f53704e8dc9db15d75f4b0, type: 2}
+  _sitDownSE: {fileID: 11400000, guid: 16d46318322e23b4b8408aa9c79ebb34, type: 2}
+  _standUpSE: {fileID: 0}

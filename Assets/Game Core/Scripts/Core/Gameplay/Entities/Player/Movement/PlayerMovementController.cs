@@ -256,9 +256,6 @@ namespace GameCore.Gameplay.Entities.Player
             _cameraTarget.localRotation = Quaternion.Euler(-_cameraTargetPitch, 0.0f, 0.0f);
         }
 
-        private void PlaySound(PlayerEntity.SFXType sfxType) =>
-            _playerEntity.PlaySound(sfxType);
-
         private bool IsCrouching() =>
             _character.IsCrouched();
 

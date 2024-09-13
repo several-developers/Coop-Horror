@@ -16,6 +16,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             
             _mushroomEntity = mushroomEntity;
             _moveToInterestTargetConfig = mushroomAIConfig.GetMoveToInterestTargetConfig();
+            _whisperingSystem = mushroomEntity.GetWhisperingSystem();
             _agent = mushroomEntity.GetAgent();
             _chaseLogic = new ChaseLogic(mushroomEntity, _agent);
         }
@@ -24,6 +25,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomAIConfigMeta.MoveToInterestTargetConfig _moveToInterestTargetConfig;
+        private readonly WhisperingSystem _whisperingSystem;
         private readonly NavMeshAgent _agent;
         private readonly ChaseLogic _chaseLogic;
 
@@ -41,6 +43,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             
             EnableAgent();
             SetSneakingState(isSneaking: true);
+            PauseWhisperingSystem();
             _chaseLogic.Start();
         }
 
@@ -71,6 +74,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 
         private void SetSneakingState(bool isSneaking) =>
             _mushroomEntity.SetSneakingState(isSneaking);
+        
+        private void PauseWhisperingSystem() =>
+            _whisperingSystem.Pause();
 
         private void EnterIdleState() =>
             _mushroomEntity.EnterIdleState();

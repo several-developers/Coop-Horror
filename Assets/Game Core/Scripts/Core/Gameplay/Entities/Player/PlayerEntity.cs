@@ -182,7 +182,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (!isItemDropped)
                 return;
 
-            PlaySound(SFXType.ItemDrop, onlyLocal: true);
+            PlaySound(SFXType.ItemDrop, onlyLocal: true).Forget();
         }
 
         public void Kill(PlayerDeathReason deathReason)
@@ -699,7 +699,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         private void OnDropItem() => DropItem();
 
-        private void OnItemEquipped(EquippedItemStaticData data) => PlaySound(SFXType.ItemPickup);
+        private void OnItemEquipped(EquippedItemStaticData data) => PlaySound(SFXType.ItemPickup).Forget();
 
         private void OnOwnerSelectedSlotChanged(ChangedSlotStaticData data)
         {
@@ -710,7 +710,7 @@ namespace GameCore.Gameplay.Entities.Player
             else
                 ChangeSelectedSlotServerRpc(slotIndex);
 
-            PlaySound(SFXType.ItemSwitch, onlyLocal: true);
+            PlaySound(SFXType.ItemSwitch, onlyLocal: true).Forget();
         }
 
         private void OnNotOwnerSelectedSlotChanged(int previousValue, int newValue)
@@ -740,10 +740,10 @@ namespace GameCore.Gameplay.Entities.Player
             MakeFootstepsNoise();
 
             if (!IsCrouching.Invoke())
-                PlaySound(SFXType.Footsteps);
+                PlaySound(SFXType.Footsteps).Forget();
         }
 
-        private void OnJumped() => PlaySound(SFXType.Jump);
+        private void OnJumped() => PlaySound(SFXType.Jump).Forget();
 
         private void OnLanded(Vector3 landingVelocity)
         {
@@ -754,7 +754,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (ignore)
                 return;
 
-            PlaySound(SFXType.Land);
+            PlaySound(SFXType.Land).Forget();
             MakeLandingNoise(velocity);
         }
 

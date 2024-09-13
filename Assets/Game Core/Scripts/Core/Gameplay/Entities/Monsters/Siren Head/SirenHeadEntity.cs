@@ -158,7 +158,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnFootstepPerformed(string colliderTag) => PlaySound(SFXType.Footsteps);
+        private void OnFootstepPerformed(string colliderTag) => PlaySound(SFXType.Footsteps).Forget();
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 

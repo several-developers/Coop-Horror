@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1118760791
+  GlobalObjectIdHash: 457133240
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -233,6 +233,20 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &4469660263280583780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4092217948007582267}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c81ec3b55371412dbbf08e8f3bbbecd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ignoreRaycastCheck: 0
+  _animationObserver: {fileID: 6951701382996997648}
 --- !u!114 &6062373142020690083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,6 +266,7 @@ MonoBehaviour:
       type: 3}
     _playerTrigger: {fileID: 3826611983079366299}
     _ragdollController: {fileID: 8017406389767168598}
+    _footstepsSystem: {fileID: 4469660263280583780}
     _animator: {fileID: 5538396511550043943}
     _hatSpores: {fileID: 5348921389947560875}
     _modelTransform: {fileID: 6253267766018308303}
@@ -411,6 +426,18 @@ SkinnedMeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 6658926571706241951}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6951701382996997648 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4328001009484129679, guid: 8ffa4daf9a3a5de42b631499f66be0ff,
+    type: 3}
+  m_PrefabInstance: {fileID: 6658926571706241951}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 470eebc1c90c4e7bb1c2ebb048f836f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!137 &7785775446831011619 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 3487444085372339388, guid: 8ffa4daf9a3a5de42b631499f66be0ff,

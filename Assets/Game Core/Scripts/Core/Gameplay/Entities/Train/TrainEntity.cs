@@ -84,7 +84,6 @@ namespace GameCore.Gameplay.Entities.Train
 
         private TrainConfigMeta _trainConfig;
         private TrainController _trainController;
-        private TrainSoundReproducer _soundReproducer;
         private MoveSpeedController _moveSpeedController;
         private PathMovement _pathMovement;
 
@@ -176,7 +175,7 @@ namespace GameCore.Gameplay.Entities.Train
                 ToggleDoorStateServerRpc(isOpened);
             
             SFXType sfxType = isOpened ? SFXType.DoorOpen : SFXType.DoorClose;
-            PlaySound(sfxType);
+            PlaySound(sfxType).Forget();
         }
 
         public void ToggleStoppedAtSectorState(bool isStoppedAtSector)
@@ -207,8 +206,8 @@ namespace GameCore.Gameplay.Entities.Train
         {
             _trainController.InitAll();
 
-            _soundReproducer = new TrainSoundReproducer(this, _trainConfig);
-            PlaySound(SFXType.MovementLoop, onlyLocal: true);
+            SoundReproducer = new TrainSoundReproducer(this, _trainConfig);
+            PlaySound(SFXType.MovementLoop, onlyLocal: true).Forget();
 
             IReadOnlyList<TrainSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
 

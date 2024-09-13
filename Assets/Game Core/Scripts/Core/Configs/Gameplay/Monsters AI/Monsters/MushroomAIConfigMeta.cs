@@ -38,10 +38,31 @@ namespace GameCore.Configs.Gameplay.Enemies
         
         [TitleGroup(SFXTitle)]
         [BoxGroup(SFXGroup, showLabel: false), SerializeField, Required]
-        private SoundEvent _whisperingSE;
+        private SoundEvent _footstepsSE;
         
         [BoxGroup(SFXGroup), SerializeField, Required]
-        private SoundEvent _whispersSE;
+        private SoundEvent _hatExplosionSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _hatRegenerationSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _whisperingSE;
+
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _sitDownSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _standUpSE;
+
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public SoundEvent FootstepsSE => _footstepsSE;
+        public SoundEvent HatExplosionSE => _hatExplosionSE;
+        public SoundEvent HatRegenerationSE => _hatRegenerationSE;
+        public SoundEvent WhisperingSE => _whisperingSE;
+        public SoundEvent SitDownSE => _sitDownSE;
+        public SoundEvent StandUpSE => _standUpSE;
         
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -97,6 +118,15 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             [SerializeField, Min(0f)]
             private float _runawaySpeed = 3f;
+
+            [SerializeField, Min(0f)]
+            private float _sitDownSoundDelay;
+            
+            [SerializeField, Min(0f)]
+            private float _standUpSoundDelay;
+
+            [SerializeField, MinMaxSlider(minValue: 0f, maxValue: 12f, showFields: true)]
+            private Vector2 _whisperingInterval;
             
             [SerializeField]
             private TimePeriod _sporesGlowTimePeriod;
@@ -105,6 +135,9 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             public float HatRegenerationDelay => _hatRegenerationDelay;
             public float RunawaySpeed => _runawaySpeed;
+            public float SitDownSoundDelay => _sitDownSoundDelay;
+            public float StandUpSoundDelay => _standUpSoundDelay;
+            public Vector2 WhisperingInterval => _whisperingInterval;
             public TimePeriod SporesGlowTimePeriod => _sporesGlowTimePeriod;
 
             // PUBLIC METHODS: ------------------------------------------------------------------------

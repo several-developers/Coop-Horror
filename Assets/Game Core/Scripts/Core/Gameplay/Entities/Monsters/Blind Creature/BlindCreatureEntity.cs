@@ -89,7 +89,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
                 NetworkObject.Spawn();
 
             EnterIdleState();
-            PlaySound(SFXType.Whispering);
+            PlaySound(SFXType.Whispering).Forget();
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

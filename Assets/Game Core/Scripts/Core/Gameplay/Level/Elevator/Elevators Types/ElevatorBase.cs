@@ -50,7 +50,6 @@ namespace GameCore.Gameplay.Level.Elevator
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private ElevatorConfigMeta _elevatorConfig;
 
-        private ElevatorSoundReproducer _soundReproducer;
         private bool _isOpen;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -80,7 +79,7 @@ namespace GameCore.Gameplay.Level.Elevator
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void InitAll() =>
-            _soundReproducer = new ElevatorSoundReproducer(soundProducer: this, _elevatorConfig);
+            SoundReproducer = new ElevatorSoundReproducer(soundProducer: this, _elevatorConfig);
 
         protected void SetElevatorFloor(Floor floor) =>
             _floor = floor;
@@ -133,7 +132,7 @@ namespace GameCore.Gameplay.Level.Elevator
                 return;
             
             if (IsServerOnly)
-                PlaySound(SFXType.DoorClosing);
+                PlaySound(SFXType.DoorClosing).Forget();
 
             CloseElevator();
         }
@@ -145,7 +144,7 @@ namespace GameCore.Gameplay.Level.Elevator
             if (!isTargetFloor)
             {
                 if (IsServerOnly && data.CurrentFloor == _floor)
-                    PlaySound(SFXType.FloorChange);
+                    PlaySound(SFXType.FloorChange).Forget();
                 
                 return;
             }
@@ -160,7 +159,7 @@ namespace GameCore.Gameplay.Level.Elevator
                 return;
             
             if (IsServerOnly)
-                PlaySound(SFXType.DoorOpening);
+                PlaySound(SFXType.DoorOpening).Forget();
 
             OpenElevator().Forget();
         }
@@ -176,7 +175,7 @@ namespace GameCore.Gameplay.Level.Elevator
                 return;
 
             if (IsServerOnly)
-                PlaySound(SFXType.DoorOpening);
+                PlaySound(SFXType.DoorOpening).Forget();
             
             OpenElevator().Forget();
         }

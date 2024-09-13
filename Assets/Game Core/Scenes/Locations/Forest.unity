@@ -885,7 +885,7 @@ PrefabInstance:
     - target: {fileID: 4092217948007582267, guid: f1d5a5d34aefb744f8f2bb474d55010f,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4185453843499061711, guid: f1d5a5d34aefb744f8f2bb474d55010f,
         type: 3}
@@ -4865,16 +4865,6 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.078313015
       objectReference: {fileID: 0}
-    - target: {fileID: 4620022832518682911, guid: f1d5a5d34aefb744f8f2bb474d55010f,
-        type: 3}
-      propertyPath: m_BlendShapeWeights.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 4620022832518682911, guid: f1d5a5d34aefb744f8f2bb474d55010f,
-        type: 3}
-      propertyPath: m_BlendShapeWeights.Array.data[0]
-      value: 30
-      objectReference: {fileID: 0}
     - target: {fileID: 4693198009189899348, guid: f1d5a5d34aefb744f8f2bb474d55010f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6347,7 +6337,7 @@ PrefabInstance:
     - target: {fileID: 4092217948007582267, guid: f1d5a5d34aefb744f8f2bb474d55010f,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4185453843499061711, guid: f1d5a5d34aefb744f8f2bb474d55010f,
         type: 3}

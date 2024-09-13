@@ -70,13 +70,8 @@ namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
 
         public void Interact(IEntity entity = null)
         {
-            if (IsOwner)
-                OpenChestLocal();
-            else
-                OpenChestServerRpc();
-
-            PlaySound(SFXType.Open);
-            
+            OpenChestRpc();
+            PlaySound(SFXType.Open).Forget();
         }
 
         public void ToggleInteract(bool canInteract)
@@ -163,6 +158,9 @@ namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
         }
 
         // RPC: -----------------------------------------------------------------------------------
+
+        [Rpc(target: SendTo.Owner)]
+        private void OpenChestRpc() => OpenChestLocal();
 
         [ServerRpc(RequireOwnership = false)]
         private void OpenChestServerRpc() => OpenChestLocal();
