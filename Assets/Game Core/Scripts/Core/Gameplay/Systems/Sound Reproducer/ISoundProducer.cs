@@ -41,7 +41,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
                 int delayInMilliseconds = delay.ConvertToMilliseconds();
 
                 bool isCanceled = await UniTask
-                    .DelayFrame(delayInMilliseconds, cancellationToken: this.GetCancellationTokenOnDestroy())
+                    .Delay(delayInMilliseconds, cancellationToken: this.GetCancellationTokenOnDestroy())
                     .SuppressCancellationThrow();
 
                 if (isCanceled)
@@ -112,7 +112,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
                 int delayInMilliseconds = delay.ConvertToMilliseconds();
 
                 bool isCanceled = await UniTask
-                    .DelayFrame(delayInMilliseconds, cancellationToken: this.GetCancellationTokenOnDestroy())
+                    .Delay(delayInMilliseconds, cancellationToken: this.GetCancellationTokenOnDestroy())
                     .SuppressCancellationThrow();
 
                 if (isCanceled)
@@ -161,7 +161,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
                 int delayInMilliseconds = delay.ConvertToMilliseconds();
 
                 bool isCanceled = await UniTask
-                    .DelayFrame(delayInMilliseconds, cancellationToken: this.GetCancellationTokenOnDestroy())
+                    .Delay(delayInMilliseconds, cancellationToken: this.GetCancellationTokenOnDestroy())
                     .SuppressCancellationThrow();
 
                 if (isCanceled)
@@ -209,7 +209,7 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
                 int delayInMilliseconds = delay.ConvertToMilliseconds();
 
                 bool isCanceled = await UniTask
-                    .DelayFrame(delayInMilliseconds, cancellationToken: this.GetCancellationTokenOnDestroy())
+                    .Delay(delayInMilliseconds, cancellationToken: this.GetCancellationTokenOnDestroy())
                     .SuppressCancellationThrow();
 
                 if (isCanceled)

@@ -17,7 +17,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         }
         
         // FIELDS: --------------------------------------------------------------------------------
-        
+
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomAIConfigMeta.CommonConfig _commonConfig;
         private readonly WhisperingSystem _whisperingSystem;
@@ -41,6 +41,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             
             ChangeAnimationHidingState(isHiding: false);
             ChangeHatTriggerState(isHiding: false);
+            PlayStandUpSound();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -60,8 +61,17 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         private void PlaySitDownSound()
         {
             float delay = _commonConfig.SitDownSoundDelay;
-            _mushroomEntity.PlaySound(MushroomEntity.SFXType.SitDown, delay).Forget();
+            PlaySound(MushroomEntity.SFXType.SitDown, delay);
         }
+        
+        private void PlayStandUpSound()
+        {
+            float delay = _commonConfig.StandUpSoundDelay;
+            PlaySound(MushroomEntity.SFXType.StandUp, delay);
+        }
+
+        private void PlaySound(MushroomEntity.SFXType sfxType, float delay = 0f) =>
+            _mushroomEntity.PlaySound(sfxType, delay).Forget();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

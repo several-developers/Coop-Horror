@@ -74,6 +74,8 @@ MonoBehaviour:
   _commonConfig:
     _hatRegenerationDelay: 10
     _runawaySpeed: 2
+    _sitDownSoundDelay: 0.75
+    _standUpSoundDelay: 0
     _whisperingInterval: {x: 5, y: 12}
     _sporesGlowTimePeriod:
       _time: {x: 1140, y: 1440}
@@ -121,4 +123,4 @@ MonoBehaviour:
   _hatRegenerationSE: {fileID: 11400000, guid: 144cebb77273e4944aa9085c5989cc96, type: 2}
   _whisperingSE: {fileID: 11400000, guid: b4afa15ca2f53704e8dc9db15d75f4b0, type: 2}
   _sitDownSE: {fileID: 11400000, guid: 16d46318322e23b4b8408aa9c79ebb34, type: 2}
-  _standUpSE: {fileID: 0}
+  _standUpSE: {fileID: 11400000, guid: 5462f500fc01a1e4e93959f8ee2c4c84, type: 2}

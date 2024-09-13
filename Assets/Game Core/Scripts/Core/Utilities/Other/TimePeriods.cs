@@ -8,6 +8,11 @@ namespace GameCore.Utilities
     [Serializable]
     public class TimePeriods
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        public TimePeriods() =>
+            _timePeriods = new List<TimePeriod>();
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField]

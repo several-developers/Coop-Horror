@@ -168,12 +168,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                 _suspicionSystem.Start();
                 _whisperingSystem.Start();
                 _whisperingSystem.Pause();
-                
-                _mushroomStateMachine.OnStateChangedEvent += state =>
-                {
-                    string log = Log.HandleLog($"New state '<gb>{state.GetType().Name}</gb>'");
-                    Debug.Log(log);
-                };
             }
 
             void SetupStates()
