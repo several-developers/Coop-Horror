@@ -95,12 +95,6 @@ namespace GameCore.Gameplay.Utilities
                 return this;
             }
 
-            public Builder SetIsUI(bool isUI)
-            {
-                _spawnParams.IsUI = isUI;
-                return this;
-            }
-
             public Builder SetFailCallback(Action<string> failCallback)
             {
                 _spawnParams.FailCallbackEvent += failCallback;
@@ -116,6 +110,12 @@ namespace GameCore.Gameplay.Utilities
             public Builder SetSuccessCallback(Action<T> successCallback)
             {
                 _spawnParams.SuccessCallbackEvent += successCallback;
+                return this;
+            }
+
+            public Builder MarkIsUI(bool isUI)
+            {
+                _spawnParams.IsUI = isUI;
                 return this;
             }
 

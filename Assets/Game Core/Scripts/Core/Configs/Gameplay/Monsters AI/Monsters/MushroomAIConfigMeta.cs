@@ -122,9 +122,6 @@ namespace GameCore.Configs.Gameplay.Enemies
             [SerializeField, Min(0f)]
             private float _sitDownSoundDelay;
             
-            [SerializeField, Min(0f)]
-            private float _standUpSoundDelay;
-
             [SerializeField, MinMaxSlider(minValue: 0f, maxValue: 12f, showFields: true)]
             private Vector2 _whisperingInterval;
             
@@ -136,7 +133,6 @@ namespace GameCore.Configs.Gameplay.Enemies
             public float HatRegenerationDelay => _hatRegenerationDelay;
             public float RunawaySpeed => _runawaySpeed;
             public float SitDownSoundDelay => _sitDownSoundDelay;
-            public float StandUpSoundDelay => _standUpSoundDelay;
             public Vector2 WhisperingInterval => _whisperingInterval;
             public TimePeriod SporesGlowTimePeriod => _sporesGlowTimePeriod;
 
@@ -267,7 +263,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         {
             // MEMBERS: -------------------------------------------------------------------------------
 
-            [BoxGroup(CommonSettings), SerializeField, Range(0f, 1f), SuffixLabel("seconds", overlay: true)]
+            [BoxGroup(CommonSettings), SerializeField, Range(0f, 1f)]
             private float _dampTime = 0.15f;
 
             

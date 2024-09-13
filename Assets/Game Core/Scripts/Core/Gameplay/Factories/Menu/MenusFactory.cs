@@ -86,7 +86,7 @@ namespace GameCore.Gameplay.Factories.Menu
         {
             var spawnParams = new SpawnParams<MenuView>.Builder()
                 .SetParent(parent)
-                .SetIsUI(isUI: true)
+                .MarkIsUI(isUI: true)
                 .Build();
 
             return await LoadAndCreateGameObject(menuType, spawnParams, diContainer);

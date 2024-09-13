@@ -44,8 +44,8 @@ MonoBehaviour:
       bypassVoiceEffects: 0
       bypassListenerEffects: 0
       volumeExpand: 1
-      volumeDecibel: -4
-      volumeRatio: 0.63095737
+      volumeDecibel: -10
+      volumeRatio: 0.31622776
       volumeRandomEnable: 0
       volumeRandomRangeDecibel: -3
       volumeDistanceRolloff: -2
@@ -160,9 +160,9 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      pitchExpand: 0
-      pitchSemitone: 0
-      pitchRatio: 1
+      pitchExpand: 1
+      pitchSemitone: 6
+      pitchRatio: 1.4142139
       pitchRandomEnable: 1
       pitchRandomRangeSemitoneBipolar: 0.25
       pitchIntensityEnable: 0

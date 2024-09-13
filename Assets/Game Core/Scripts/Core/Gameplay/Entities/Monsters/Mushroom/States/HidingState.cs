@@ -64,11 +64,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             PlaySound(MushroomEntity.SFXType.SitDown, delay);
         }
         
-        private void PlayStandUpSound()
-        {
-            float delay = _commonConfig.StandUpSoundDelay;
-            PlaySound(MushroomEntity.SFXType.StandUp, delay);
-        }
+        private void PlayStandUpSound() =>
+            PlaySound(MushroomEntity.SFXType.StandUp);
 
         private void PlaySound(MushroomEntity.SFXType sfxType, float delay = 0f) =>
             _mushroomEntity.PlaySound(sfxType, delay).Forget();

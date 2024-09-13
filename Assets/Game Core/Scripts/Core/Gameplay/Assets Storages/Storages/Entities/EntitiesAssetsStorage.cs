@@ -5,7 +5,6 @@ using GameCore.Configs.Global.EntitiesList;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Network.PrefabsRegistrar;
 using GameCore.Infrastructure.Providers.Global;
-using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace GameCore.Gameplay.AssetsStorages
@@ -38,39 +37,28 @@ namespace GameCore.Gameplay.AssetsStorages
 
         private async UniTask SetupAssetsReferences()
         {
-            IEnumerable<AssetReferenceGameObject> allReferences = _entitiesListConfig.GetAllReferences();
-            IEnumerable<AssetReferenceGameObject> allGlobalReferences = _entitiesListConfig.GetAllGlobalReferences();
             IEnumerable<AssetReferenceGameObject> allDynamicReferences = _entitiesListConfig.GetAllDynamicReferences();
+            IEnumerable<AssetReferenceGameObject> allGlobalReferences = _entitiesListConfig.GetAllGlobalReferences();
 
-            foreach (AssetReferenceGameObject assetReference in allReferences)
+            foreach (AssetReferenceGameObject assetReference in allDynamicReferences)
             {
-                (Type type, GameObject gameObject) result = await GetAssetAfterLoadAndRelease(assetReference);
+                var entity = await LoadAndReleaseAsset<Entity>(assetReference);
+                Type entityType = entity.GetType();
 
-                AddAsset(result.type, assetReference);
+                AddDynamicAsset(entityType, assetReference);
             }
 
             foreach (AssetReferenceGameObject assetReference in allGlobalReferences)
             {
-                (Type type, GameObject gameObject) result = await GetAssetAfterLoadAndRelease(assetReference);
-
-                AddAsset(result.type, assetReference);
-                _networkPrefabsRegistrar.Register(result.gameObject);
-            }
-
-            foreach (AssetReferenceGameObject assetReference in allDynamicReferences)
-            {
-                (Type type, GameObject gameObject) result = await GetAssetAfterLoadAndRelease(assetReference);
-
-                AddDynamicAsset(result.type, assetReference);
-            }
-
-            // LOCAL METHODS: -----------------------------
-
-            async UniTask<(Type type, GameObject gameObject)> GetAssetAfterLoadAndRelease(AssetReference assetReference)
-            {
-                var entity = await LoadAndReleaseAsset<Entity>(assetReference);
+                // (Type type, GameObject gameObject) result = await GetAssetAfterLoadAndRelease(assetReference);
+                // AddAsset(result.type, assetReference);
+                // _networkPrefabsRegistrar.Register(result.gameObject);
+                
+                var entity = await LoadAsset<Entity>(assetReference);
                 Type entityType = entity.GetType();
-                return (entityType, entity.gameObject);
+                
+                AddAsset(entityType, assetReference);
+                _networkPrefabsRegistrar.Register(entity.gameObject);
             }
         }
     }

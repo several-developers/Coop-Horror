@@ -74,7 +74,7 @@ MonoBehaviour:
   _commonConfig:
     _hatRegenerationDelay: 10
     _runawaySpeed: 2
-    _sitDownSoundDelay: 0.75
+    _sitDownSoundDelay: 0.55
     _standUpSoundDelay: 0
     _whisperingInterval: {x: 5, y: 12}
     _sporesGlowTimePeriod:

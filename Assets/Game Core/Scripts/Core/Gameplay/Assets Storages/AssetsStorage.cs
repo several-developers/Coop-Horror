@@ -30,13 +30,32 @@ namespace GameCore.Gameplay.AssetsStorages
         public async UniTask<T> LoadAndReleaseAsset<T>(AssetReference assetReference) where T : class
         {
             var handle = await _assetsProvider.LoadAsset<GameObject>(assetReference);
+
+            if (handle == null)
+            {
+                Debug.LogError($"Object is null: {typeof(T)}");
+                return null;
+            }
+            
+            if (!handle.TryGetComponent(out T t))
+                Log.PrintError(log: $"Component of type '<gb>{typeof(T)}</gb>' <rb>not found</rb>!");
+            
             _assetsProvider.ReleaseAsset(assetReference);
+            
+            if (t == null)
+                Debug.LogWarning("Null!!!");
+            
+            return t;
+        }
+        
+        public async UniTask<T> LoadAsset<T>(AssetReference assetReference) where T : class
+        {
+            var handle = await _assetsProvider.LoadAsset<GameObject>(assetReference);
 
-            if (handle.TryGetComponent(out T result))
-                return result;
-
-            Log.PrintError(log: $"Component of type '<gb>{typeof(T)}</gb>' <rb>not found</rb>!");
-            return null;
+            if (!handle.TryGetComponent(out T t))
+                Log.PrintError(log: $"Component of type '<gb>{typeof(T)}</gb>' <rb>not found</rb>!");
+            
+            return t;
         }
         
         public void AddAsset(TKey key, AssetReference assetReference)
