@@ -67,6 +67,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _spawnTimePeriods:
+    _timePeriods:
+    - _time: {x: 0, y: 1440}
+      _timeText: 00:00 - 24:00
   _spawnTime: {x: 0, y: 1440}
   _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 

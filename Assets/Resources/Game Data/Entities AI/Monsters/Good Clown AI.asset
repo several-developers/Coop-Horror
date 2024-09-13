@@ -67,10 +67,12 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _spawnTime: {x: 0, y: 1440}
-  _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 02000000
   _floorChanceMultiplierConfigs: []
+  _spawnTimePeriods:
+    _timePeriods:
+    - _time: {x: 0, y: 1440}
+      _timeText: 00:00 - 24:00
   _commonConfig:
     _fireExitInteractionDistance: 0.5
     _fireExitInteractionDuration: 0.5

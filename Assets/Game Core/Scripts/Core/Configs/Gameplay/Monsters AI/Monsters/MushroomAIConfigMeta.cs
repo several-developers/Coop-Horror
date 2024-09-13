@@ -1,6 +1,7 @@
 ﻿using System;
 using DG.Tweening;
 using GameCore.Enums.Gameplay;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using Sonity;
 using UnityEngine;
@@ -14,6 +15,10 @@ namespace GameCore.Configs.Gameplay.Enemies
         [TitleGroup(title: CommonSettings)]
         [BoxGroup(CommonGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private CommonConfig _commonConfig;
+        
+        [TitleGroup(title: SporesSettings)]
+        [BoxGroup(SporesGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
+        private SporesConfig _sporesConfig;
         
         [TitleGroup(title: WanderingSettings)]
         [BoxGroup(WanderingGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
@@ -43,6 +48,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string DebugSettings = "Debug Settings";
         private const string SFXTitle = "SFX";
         private const string CommonSettings = "Common Settings";
+        private const string SporesSettings = "Spores Settings";
         private const string WanderingSettings = "Wandering Config";
         private const string SuspicionSystemSettings = "Suspicion System Config";
         private const string MoveToInterestTargetSettings = "Move to Interest Target Config";
@@ -51,14 +57,24 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string SFXGroup = SFXTitle + "/Group";
         private const string DebugGroup = DebugSettings + "/Group";
         private const string CommonGroup = CommonSettings + "/Group";
+        private const string SporesGroup = SporesSettings + "/Group";
         private const string WanderingGroup = WanderingSettings + "/Group";
         private const string SuspicionSystemGroup = SuspicionSystemSettings + "/Group";
         private const string MoveToInterestTargetGroup = MoveToInterestTargetSettings + "/Group";
         private const string AnimationGroup = AnimationSettings + "/Group";
 
+        // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _commonConfig.UpdateSporesGlowTimeText();
+        }
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public CommonConfig GetCommonConfig() => _commonConfig;
+        public SporesConfig GetSporesConfig() => _sporesConfig;
         public WanderingConfig GetWanderingConfig() => _wanderingConfig;
         public SuspicionSystemConfig GetSuspicionSystemConfig() => _suspicionSystemConfig;
         public MoveToInterestTargetConfig GetMoveToInterestTargetConfig() => _moveToInterestTargetConfig;
@@ -67,6 +83,8 @@ namespace GameCore.Configs.Gameplay.Enemies
         public override MonsterType GetMonsterType() =>
             MonsterType.Mushroom;
 
+        #region Inner Classes
+
         // INNER CLASSES: -------------------------------------------------------------------------
 
         [Serializable]
@@ -74,16 +92,44 @@ namespace GameCore.Configs.Gameplay.Enemies
         {
             // MEMBERS: -------------------------------------------------------------------------------
 
-            [SerializeField, Min(0f)]
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _hatRegenerationDelay = 10f;
 
             [SerializeField, Min(0f)]
             private float _runawaySpeed = 3f;
+            
+            [SerializeField]
+            private TimePeriod _sporesGlowTimePeriod;
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
             public float HatRegenerationDelay => _hatRegenerationDelay;
             public float RunawaySpeed => _runawaySpeed;
+            public TimePeriod SporesGlowTimePeriod => _sporesGlowTimePeriod;
+
+            // PUBLIC METHODS: ------------------------------------------------------------------------
+
+            public void UpdateSporesGlowTimeText() =>
+                _sporesGlowTimePeriod.UpdateTimeText();
+        }
+
+        [Serializable]
+        public class SporesConfig
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
+            [Tooltip("Длительность спор, второй раз дляться в 2 раза меньше.")]
+            private float _sporesDuration = 10f;
+
+            [SerializeField]
+            [Tooltip("Отступ по Y при создании облака спор.")]
+            private float _sporesOffsetY;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public float SporesDuration => _sporesDuration;
+            public float SporesOffsetY => _sporesOffsetY;
         }
         
         [Serializable]
@@ -103,10 +149,10 @@ namespace GameCore.Configs.Gameplay.Enemies
             [SerializeField, Min(0f)]
             private float _maxDistance = 15f;
         
-            [SerializeField, Min(0f)]
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _minDelay = 0.5f;
         
-            [SerializeField, Min(0f)]
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _maxDelay = 5f;
 
             [SerializeField, Min(0f)]
@@ -128,7 +174,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         {
             // MEMBERS: -------------------------------------------------------------------------------
 
-            [SerializeField, Min(0f)]
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _checkNearbyPlayersInterval = 0.2f;
 
             [SerializeField, Min(0f), SuffixLabel("meters", overlay: true)]
@@ -141,7 +187,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             [Tooltip("Проявлять интерес если игрок не двигался указанное время.")]
             private float _interestAfterPlayerAfk = 3f;
 
-            [SerializeField, Min(0f)]
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             [Tooltip("Кол-во времени для побега от игрока после испуга.")]
             private float _retreatingTime = 3f;
 
@@ -166,13 +212,13 @@ namespace GameCore.Configs.Gameplay.Enemies
             [SerializeField, MinMaxSlider(minValue: 0f, maxValue: 10f, showFields: true)]
             private Vector2 _moveSpeed;
 
-            [SerializeField, Min(0f)]
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _positionCheckInterval = 0.2f;
 
-            [SerializeField, Min(0f)]
+            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _distanceCheckInterval = 0.2f;
 
-            [SerializeField, Min(0f)]
+            [SerializeField, Min(0f), SuffixLabel("meters", overlay: true)]
             private float _targetReachDistance = 2f;
 
             // PROPERTIES: ----------------------------------------------------------------------------
@@ -188,23 +234,23 @@ namespace GameCore.Configs.Gameplay.Enemies
         {
             // MEMBERS: -------------------------------------------------------------------------------
 
-            [BoxGroup(CommonGroup), SerializeField, Range(0f, 1f)]
+            [BoxGroup(CommonSettings), SerializeField, Range(0f, 1f), SuffixLabel("seconds", overlay: true)]
             private float _dampTime = 0.15f;
 
             
             [BoxGroup(HidingGroup),SerializeField]
             private float _modelSittingY = -0.36f;
 
-            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _modelSitDownDuration = 0.35f;
             
-            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _modelStandUpDuration = 0.35f;
 
-            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _modelSitDownDelay = 0.2f;
             
-            [BoxGroup(HidingGroup), SerializeField, Min(0f)]
+            [BoxGroup(HidingGroup), SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _modelStandUpDelay;
             
             [BoxGroup(HidingGroup), SerializeField, Min(0f)]
@@ -220,10 +266,10 @@ namespace GameCore.Configs.Gameplay.Enemies
             private Ease _modelStandUpEase = Ease.InOutQuad;
             
             
-            [BoxGroup(ExplosionGroup), SerializeField, Min(0f)]
+            [BoxGroup(ExplosionGroup), SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _hatExplosionDuration = 0.35f;
 
-            [BoxGroup(ExplosionGroup), SerializeField, Min(0f)]
+            [BoxGroup(ExplosionGroup), SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
             private float _hatRegenerationDuration = 1f;
 
             [BoxGroup(ExplosionGroup), SerializeField]
@@ -253,9 +299,10 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             // FIELDS: --------------------------------------------------------------------------------
 
-            private const string CommonGroup = "Common";
             private const string HidingGroup = "Hiding";
             private const string ExplosionGroup = "Hat Explosion";
         }
+        
+        #endregion
     }
 }

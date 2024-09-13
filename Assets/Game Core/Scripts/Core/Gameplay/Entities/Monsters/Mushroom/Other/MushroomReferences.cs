@@ -12,6 +12,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField, Required]
+        private MushroomSporesTrigger _sporesTriggerPrefab;
+        
+        [SerializeField, Required]
         private PlayerTrigger _playerTrigger;
 
         [SerializeField, Required]
@@ -43,6 +46,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public MushroomSporesTrigger SporesTriggerPrefab => _sporesTriggerPrefab;
         public PlayerTrigger PlayerTrigger => _playerTrigger;
         public RagdollController RagdollController => _ragdollController;
         public Animator Animator => _animator;

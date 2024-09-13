@@ -75,9 +75,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             switch (emotion)
             {
                 case MushroomEntity.Emotion.Regular:
+                    angryMouthValue = 30f;
                     break;
                 
                 case MushroomEntity.Emotion.Happy:
+                    // Default values.
                     break;
                 
                 case MushroomEntity.Emotion.Angry:

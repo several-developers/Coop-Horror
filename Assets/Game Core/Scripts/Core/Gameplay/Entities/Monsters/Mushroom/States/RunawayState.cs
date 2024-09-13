@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 {
-    public class RunawayState : IEnterState, IExitState
+    public class RunawayState : IEnterState, ITickableState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -42,6 +42,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             SetSprintingState(isSprinting: true);
             TryUpdateTargetPoint();
         }
+
+        public void Tick() =>
+            _movementLogic.Tick();
 
         public void Exit()
         {
@@ -105,6 +108,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 
         private void OnArrived() => TryUpdateTargetPoint();
 
-        private void OnStuck() => EnterHidingState();
+        private void OnStuck() => TryUpdateTargetPoint();
     }
 }

@@ -7,10 +7,13 @@ using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Infrastructure.StateMachine;
+using GameCore.Observers.Gameplay.Time;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
 using Zenject;
+using Random = System.Random;
 
 namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 {
@@ -35,8 +38,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IMonstersAIConfigsProvider monstersAIConfigsProvider)
+        private void Construct(IMonstersAIConfigsProvider monstersAIConfigsProvider, ITimeObserver timeObserver)
         {
+            _timeObserver = timeObserver;
             _mushroomAIConfig = monstersAIConfigsProvider.GetConfig<MushroomAIConfigMeta>();
         }
 
@@ -57,6 +61,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private readonly NetworkVariable<bool> _isHatDamaged = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<bool> _isHiding = new(writePerm: Constants.OwnerPermission);
 
+        private ITimeObserver _timeObserver;
         private MushroomAIConfigMeta _mushroomAIConfig;
 
         private StateMachineBase _mushroomStateMachine;
@@ -77,12 +82,6 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         public void DetectNoise(Vector3 noisePosition, float noiseLoudness) =>
             _suspicionSystem.DetectNoise(noisePosition, noiseLoudness);
 
-        public void DamageHat() => SetHatStateRpc(isHatDamaged: true);
-
-        public void RegenerateHat() => SetHatStateRpc(isHatDamaged: false);
-
-        public void ToggleHidingState(bool isHiding) => ToggleHidingStateRpc(isHiding);
-
         public void SetEmotion(Emotion emotion) => SetEmotionRpc(emotion);
 
         public void SetInterestTarget(PlayerEntity interestTarget) =>
@@ -101,8 +100,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         public void EnterMoveToInterestTargetState() => ChangeState<MoveToInterestTargetState>();
 
-        [Button]
         public void EnterLookAtInterestTargetState() => ChangeState<LookAtInterestTargetState>();
+
+        public static IReadOnlyList<MushroomEntity> GetAllMushrooms() => AllMushrooms;
 
         public MushroomAIConfigMeta GetAIConfig() => _mushroomAIConfig;
 
@@ -128,6 +128,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             _isHatDamaged.OnValueChanged += OnHatDamageStateChanged;
             _isHiding.OnValueChanged += OnHidingStateChanged;
+
+            _timeObserver.OnMinutePassedEvent += OnMinutePassed;
         }
 
         protected override void InitServerOnly()
@@ -191,6 +193,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _isHiding.OnValueChanged -= OnHidingStateChanged;
 
             _references.PlayerTrigger.OnPlayerEnterEvent -= OnPlayerSteppedOnHat;
+
+            _timeObserver.OnMinutePassedEvent -= OnMinutePassed;
         }
 
         protected override void DespawnServerOnly()
@@ -205,6 +209,24 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void DamageHat()
+        {
+            CreateSporesTrigger();
+            SetHatStateRpc(isHatDamaged: true);
+        }
+
+        private void RegenerateHat() => SetHatStateRpc(isHatDamaged: false);
+
+        private void ToggleHidingState(bool isHiding) => ToggleHidingStateRpc(isHiding);
+
+        private void CreateSporesTrigger()
+        {
+            var random = new Random();
+            uint randomSeed = (uint)random.Next(0, int.MaxValue);
+
+            CreateSporesTriggerRpc(randomSeed, _isHatNew);
+        }
 
         private void HandleHatDamageState(bool isDamaged)
         {
@@ -253,9 +275,24 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             _playerAbuser.OnDeathEvent += OnAbuserDeath;
         }
-        
+
+        private void CheckSporesLighting()
+        {
+            if (EntityLocation == EntityLocation.Dungeon)
+                return;
+            
+            MushroomAIConfigMeta.CommonConfig commonConfig = _mushroomAIConfig.GetCommonConfig();
+            TimePeriod sporesGlowingTime = commonConfig.SporesGlowTimePeriod;
+            int currentTimeInMinutes = _timeObserver.GetCurrentTimeInMinutes();
+            bool isSporesGlowingTimeValid = sporesGlowingTime.IsTimeValid(currentTimeInMinutes);
+
+            ParticleSystem sporesPS = _references.SporesPS;
+            ParticleSystem.LightsModule lightsModule = sporesPS.lights;
+            lightsModule.enabled = isSporesGlowingTimeValid;
+        }
+
         private void EnterDeathState() => ChangeState<DeathState>();
-        
+
         private void ChangeState<TState>() where TState : IState =>
             _mushroomStateMachine.ChangeState<TState>();
 
@@ -273,6 +310,21 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private void SetEmotionRpc(Emotion emotion) =>
             _animationController.SetEmotion(emotion);
 
+        [Rpc(target: SendTo.Everyone)]
+        private void CreateSporesTriggerRpc(uint seed, bool isHatNew)
+        {
+            MushroomAIConfigMeta.SporesConfig sporesConfig = _mushroomAIConfig.GetSporesConfig();
+            MushroomSporesTrigger sporesTriggerPrefab = _references.SporesTriggerPrefab;
+            Vector3 spawnPosition = transform.position;
+            spawnPosition.y += sporesConfig.SporesOffsetY;
+
+            MushroomSporesTrigger mushroomSporesTrigger =
+                Instantiate(sporesTriggerPrefab, spawnPosition, Quaternion.identity);
+
+            mushroomSporesTrigger.Setup(sporesConfig, seed, isHatNew);
+            mushroomSporesTrigger.Start();
+        }
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnHatDamageStateChanged(bool previousValue, bool newValue) => HandleHatDamageState(newValue);
@@ -289,6 +341,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         private void OnHatHealed() => RegenerateHat();
 
+        private void OnMinutePassed() => CheckSporesLighting();
+
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
         [Title(Constants.DebugButtons)]
@@ -300,7 +354,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         [Button(buttonSize: 25, ButtonStyle.FoldoutButton), DisableInEditorMode]
         private void DebugToggleHidingState(bool isHiding) => ToggleHidingState(isHiding);
-        
+
         [Button(buttonSize: 25), DisableInEditorMode, PropertySpace(spaceBefore: 10)]
         public void DebugEnterIdleState() => EnterIdleState();
 

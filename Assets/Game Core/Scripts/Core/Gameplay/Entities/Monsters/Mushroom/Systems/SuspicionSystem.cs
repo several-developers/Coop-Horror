@@ -152,6 +152,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             if (CheckRunaway())
                 return;
 
+            if (_isRetreating)
+                return;
+
             int targetsAmount = _interestTargets.Count;
 
             if (targetsAmount == 0)
@@ -253,11 +256,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             while (true)
             {
                 FindInterestTargets();
-                
-                if (!_isRetreating || _isRetreating && _behaviour == Behaviour.Hide)
-                {
-                    CheckInterestTarget();
-                }
+                CheckInterestTarget();
 
                 yield return waitForSeconds;
             }

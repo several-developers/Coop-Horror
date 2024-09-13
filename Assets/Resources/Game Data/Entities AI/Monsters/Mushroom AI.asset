@@ -67,13 +67,19 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _spawnTime: {x: 0, y: 1440}
-  _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
+  _spawnTimePeriods:
+    _timePeriods: []
   _commonConfig:
     _hatRegenerationDelay: 10
     _runawaySpeed: 2
+    _sporesGlowTimePeriod:
+      _time: {x: 1140, y: 1440}
+      _timeText: 19:00 - 24:00
+  _sporesConfig:
+    _sporesDuration: 10
+    _sporesOffsetY: 0
   _wanderingConfig:
     _minSpeed: 0.25
     _maxSpeed: 1
@@ -84,11 +90,11 @@ MonoBehaviour:
     _acceleration: 2
   _suspicionSystemConfig:
     _checkNearbyPlayersInterval: 0.2
-    _visionRange: 10
+    _visionRange: 20
     _minLoudnessToReact: 0
-    _interestAfterPlayerAfk: 5
-    _retreatingTime: 5
-    _distanceToHide: 5
+    _interestAfterPlayerAfk: 6
+    _retreatingTime: 6
+    _distanceToHide: 10
   _moveToInterestTargetConfig:
     _moveSpeed: {x: 0.2, y: 0.5}
     _positionCheckInterval: 0.2

@@ -89,6 +89,9 @@ namespace GameCore.Gameplay.GameTimeManagement
         private void UpdateSimulateField() =>
             _cycleSimulate = _timeService.GetSimulateState();
 
+        private void SendTimeUpdated(MyDateTime dateTime) =>
+            _timeObserver.TimeUpdated(dateTime);
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnTimeUpdated(MyDateTime dateTime) => UpdateFields(dateTime);
@@ -98,6 +101,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             MyDateTime dateTime = _timeService.GetDateTime();
             _timeService.SetDateTime(_second, dateTime.Minute, dateTime.Hour, dateTime.Day);
             UpdateFields(dateTime);
+            SendTimeUpdated(dateTime);
         }
 
         private void OnMinuteChanged()
@@ -105,6 +109,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             MyDateTime dateTime = _timeService.GetDateTime();
             _timeService.SetDateTime(dateTime.Second, _minute, dateTime.Hour, dateTime.Day);
             UpdateFields(dateTime);
+            SendTimeUpdated(dateTime);
         }
 
         private void OnHourChanged()
@@ -112,6 +117,7 @@ namespace GameCore.Gameplay.GameTimeManagement
             MyDateTime dateTime = _timeService.GetDateTime();
             _timeService.SetDateTime(dateTime.Second, dateTime.Minute, _hour, dateTime.Day);
             UpdateFields(dateTime);
+            SendTimeUpdated(dateTime);
         }
 
         private void OnSimulateChanged()

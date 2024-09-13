@@ -28,6 +28,7 @@ namespace GameCore
         public const int HoursInDay = 24;
         public const int MinutesInDay = 1440;
         public const int SecondsInDay = 86400;
+        public const int MinutesInHour = 60;
         public const int SecondsInHour = 3600;
         public const int SecondsInMinute = 60;
 

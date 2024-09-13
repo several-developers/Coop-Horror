@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 457133240
+  GlobalObjectIdHash: 1118760791
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -248,6 +248,8 @@ MonoBehaviour:
   _networkTransform: {fileID: 7240275214382155244}
   _agent: {fileID: 2431354977503247257}
   _references:
+    _sporesTriggerPrefab: {fileID: 5189268010878397664, guid: a213187a7ea1f9246b5af172a6f815b5,
+      type: 3}
     _playerTrigger: {fileID: 3826611983079366299}
     _ragdollController: {fileID: 8017406389767168598}
     _animator: {fileID: 5538396511550043943}

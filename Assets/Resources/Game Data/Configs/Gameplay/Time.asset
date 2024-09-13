@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Time
   m_EditorClassIdentifier: 
   _metaName: Time
-  _cycleDurationInMinutes: 10
+  _cycleDurationInMinutes: 20
   _cycleLengthModifier: 1
   _startAtSecond: 0
   _startAtMinute: 0

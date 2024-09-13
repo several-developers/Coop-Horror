@@ -226,9 +226,9 @@ namespace GameCore.Gameplay.Generators.Monsters
                     continue;
                 }
 
+                TimePeriods spawnTimePeriods = monsterAIConfig.SpawnTimePeriods;
                 int currentTimeInMinutes = _timeObserver.GetCurrentTimeInMinutes();
-                Vector2Int spawnTime = monsterAIConfig.SpawnTime;
-                bool isTimeValid = currentTimeInMinutes >= spawnTime.x && currentTimeInMinutes <= spawnTime.y;
+                bool isTimeValid = spawnTimePeriods.IsTimeValid(currentTimeInMinutes);
 
                 if (!isTimeValid)
                 {

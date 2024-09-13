@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Infrastructure.Configs;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -45,17 +46,6 @@ namespace GameCore.Configs.Gameplay.Enemies
         [LabelText("Multiplier by Monsters Count")]
         private AnimationCurve _spawnChanceMultiplierByMonstersCount = new(keys: DefaultCurve);
 
-        [BoxGroup(SpawnSettingsGroup), SerializeField]
-        [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
-        [MinMaxSlider(minValue: 0, maxValue: 1440, showFields: true)]
-        [OnValueChanged(nameof(UpdateSpawnTimeText))]
-        private Vector2Int _spawnTime = new(x: 0, y: 1440); // 1440 minutes in a day.
-
-        [BoxGroup(SpawnSettingsGroup), SerializeField, ReadOnly]
-        [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
-        [LabelText("Converted Time")]
-        private string _spawnTimeText;
-
         [BoxGroup(SpawnSettingsGroup), SerializeField, Space(height: 5)]
         [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
         [Tooltip("Другие монстры, которых стоит учитывать при подсчёте кол-ва этого монстра в игре.")]
@@ -65,6 +55,10 @@ namespace GameCore.Configs.Gameplay.Enemies
         [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
         [ListDrawerSettings(ListElementLabelName = "Label")]
         private List<FloorChanceMultiplierConfig> _floorChanceMultiplierConfigs = new();
+        
+        [BoxGroup(SpawnSettingsGroup + "/Spawn Time", showLabel: false), SerializeField]
+        [HideIf(condition: nameof(_spawnType), optionalValue: MonsterSpawnType.NonSpawnable)]
+        private TimePeriods _spawnTimePeriods;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -79,7 +73,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         public float SpawnChance => _spawnChance;
         public AnimationCurve SpawnChanceMultiplierByGameTime => _spawnChanceMultiplierByGameTime;
         public AnimationCurve SpawnChanceMultiplierByMonstersCount => _spawnChanceMultiplierByMonstersCount;
-        public Vector2Int SpawnTime => _spawnTime;
+        public TimePeriods SpawnTimePeriods => _spawnTimePeriods;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -97,7 +91,7 @@ namespace GameCore.Configs.Gameplay.Enemies
         protected override void OnEnable()
         {
             base.OnEnable();
-            UpdateSpawnTimeText();
+            UpdateSpawnTimePeriodTexts();
         }
 
         public IEnumerable<MonsterType> GetRelatedMonstersToCount() => _relatedMonstersToCount;
@@ -125,18 +119,8 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void UpdateSpawnTimeText()
-        {
-            float minHourF = _spawnTime.x / 60f;
-            int minHour = Mathf.FloorToInt(minHourF);
-            int minMinute = _spawnTime.x - minHour * 60;
-            
-            float maxHourF = _spawnTime.y / 60f;
-            int maxHour = Mathf.FloorToInt(maxHourF);
-            int maxMinute = _spawnTime.y - maxHour * 60;
-
-            _spawnTimeText = $"{minHour:D2}:{minMinute:D2} - {maxHour:D2}:{maxMinute:D2}";
-        }
+        private void UpdateSpawnTimePeriodTexts() =>
+            _spawnTimePeriods.UpdateTimeTexts();
 
         // INNER CLASSES: -------------------------------------------------------------------------
 
