@@ -44,6 +44,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         
         [SerializeField, Required]
         private SkinnedMeshRenderer _mouth;
+        
+        [SerializeField, Required]
+        private SkinnedMeshRenderer _sigmaFace;
 
         [SerializeField, Required]
         private TextMeshPro _stateTMP;
@@ -61,6 +64,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         public SkinnedMeshRenderer Hat => _hat;
         public SkinnedMeshRenderer Eyes => _eyes;
         public SkinnedMeshRenderer Mouth => _mouth;
+        public SkinnedMeshRenderer SigmaFace => _sigmaFace;
         public TextMeshPro StateTMP => _stateTMP;
     }
 }

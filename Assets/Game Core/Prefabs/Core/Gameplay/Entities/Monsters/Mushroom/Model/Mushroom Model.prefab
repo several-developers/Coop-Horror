@@ -67,11 +67,26 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 4b393875ed475564d8aba4cbd3a61c14, type: 2}
+    - target: {fileID: -5568371526223589888, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Name
+      value: Hat Top
+      objectReference: {fileID: 0}
+    - target: {fileID: -2914413575082383075, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Name
+      value: Spores
+      objectReference: {fileID: 0}
     - target: {fileID: -2473780591329602647, guid: e605f22ba58565d4b96672862631af11,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: e54befa8a4dc4734f818b71334751197, type: 2}
+      objectReference: {fileID: 2100000, guid: 7b2ec31db5fe51a4685099b2d9ab085a, type: 2}
+    - target: {fileID: -2181743766629440291, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Name
+      value: Mouth
+      objectReference: {fileID: 0}
     - target: {fileID: -1028401375704162923, guid: e605f22ba58565d4b96672862631af11,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -81,6 +96,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mushroom Model
+      objectReference: {fileID: 0}
+    - target: {fileID: 1050902552516334510, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Name
+      value: Sigma Face
+      objectReference: {fileID: 0}
+    - target: {fileID: 1502877291743220047, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Name
+      value: Body
       objectReference: {fileID: 0}
     - target: {fileID: 1635590890561492327, guid: e605f22ba58565d4b96672862631af11,
         type: 3}
@@ -92,11 +117,31 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: e54befa8a4dc4734f818b71334751197, type: 2}
+    - target: {fileID: 5209781612157447603, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5209781612157447603, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 7b2ec31db5fe51a4685099b2d9ab085a, type: 2}
+    - target: {fileID: 5252682845850649624, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Name
+      value: Eyes
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: e605f22ba58565d4b96672862631af11,
         type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: a94649cb5df3bbc43bee4479ad70df04, type: 2}
+    - target: {fileID: 6512510688612296998, guid: e605f22ba58565d4b96672862631af11,
+        type: 3}
+      propertyPath: m_Name
+      value: Hat Bottom
+      objectReference: {fileID: 0}
     - target: {fileID: 7831909060113432234, guid: e605f22ba58565d4b96672862631af11,
         type: 3}
       propertyPath: m_Materials.Array.data[0]

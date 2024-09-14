@@ -36,7 +36,7 @@ Transform:
   - {fileID: 6972798339474167483}
   - {fileID: 5918890624024923562}
   m_Father: {fileID: 8344652660840526061}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3783656148136088647
 MonoBehaviour:
@@ -312,7 +312,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8344652660840526061}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!108 &6040073831022916733
 Light:
@@ -6416,15 +6416,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1875911212502841885, guid: 58ff9afe36c827f46abca88068c0c743,
-        type: 3}
-      propertyPath: m_Name
-      value: Hat Top
-      objectReference: {fileID: 0}
     - target: {fileID: 2625828413392374092, guid: 58ff9afe36c827f46abca88068c0c743,
         type: 3}
       propertyPath: m_Name
-      value: Mushroom Final Model
+      value: Mushroom Rigged Model
       objectReference: {fileID: 0}
     - target: {fileID: 3403315777490719734, guid: 58ff9afe36c827f46abca88068c0c743,
         type: 3}
@@ -6480,31 +6475,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5262838025801257152, guid: 58ff9afe36c827f46abca88068c0c743,
-        type: 3}
-      propertyPath: m_Name
-      value: Mouth
-      objectReference: {fileID: 0}
-    - target: {fileID: 6941454269964562437, guid: 58ff9afe36c827f46abca88068c0c743,
-        type: 3}
-      propertyPath: m_Name
-      value: Eyes
-      objectReference: {fileID: 0}
-    - target: {fileID: 8273302873124101435, guid: 58ff9afe36c827f46abca88068c0c743,
-        type: 3}
-      propertyPath: m_Name
-      value: Hat Bottom
-      objectReference: {fileID: 0}
-    - target: {fileID: 8438309184665511860, guid: 58ff9afe36c827f46abca88068c0c743,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 7b2ec31db5fe51a4685099b2d9ab085a, type: 2}
-    - target: {fileID: 9168295974870654208, guid: 58ff9afe36c827f46abca88068c0c743,
-        type: 3}
-      propertyPath: m_Name
-      value: Spores
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 58ff9afe36c827f46abca88068c0c743, type: 3}

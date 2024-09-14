@@ -1,7 +1,9 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Systems.Utilities;
+using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -30,6 +32,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         private const int AngryIndex = 0;
         private const int FearIndex = 1;
         private const int DeathIndex = 3;
+        private const int SurpriseIndex = 4;
 
         private readonly MushroomEntity _mushroomEntity;
         private readonly MushroomAIConfigMeta.AnimationConfig _animationConfig;
@@ -62,13 +65,19 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         {
             SkinnedMeshRenderer eyes = _references.Eyes;
             SkinnedMeshRenderer mouth = _references.Mouth;
-            
+            SkinnedMeshRenderer sigmaFace = _references.SigmaFace;
+
+            bool showSigmaFace = false;
+
             float angryEyesValue = 0f;
             float angryMouthValue = 0f;
             float fearEyesValue = 0f;
+            float surpriseEyesValue = 0f;
+            
             float fearMouthValue = 0f;
             float deathEyesValue = 0f;
             float deathMouthValue = 0f;
+            float surpriseMouthValue = 0f;
             
             bool changeBlendShape = true;
             
@@ -93,10 +102,13 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                     break;
                 
                 case MushroomEntity.Emotion.Interested:
+                    surpriseEyesValue = 70f;
+                    surpriseMouthValue = 50f;
                     break;
                 
                 case MushroomEntity.Emotion.Sigma:
                     changeBlendShape = false;
+                    showSigmaFace = true;
                     break;
                 
                 case MushroomEntity.Emotion.Dead:
@@ -105,16 +117,22 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
                     break;
             }
 
+            eyes.enabled = !showSigmaFace;
+            mouth.enabled = !showSigmaFace;
+            sigmaFace.enabled = showSigmaFace;
+
             if (!changeBlendShape)
                 return;
             
             eyes.SetBlendShapeWeight(AngryIndex, angryEyesValue);
             eyes.SetBlendShapeWeight(FearIndex, fearEyesValue);
             eyes.SetBlendShapeWeight(DeathIndex, deathEyesValue);
+            eyes.SetBlendShapeWeight(SurpriseIndex, surpriseEyesValue);
             
             mouth.SetBlendShapeWeight(AngryIndex, angryMouthValue);
             mouth.SetBlendShapeWeight(FearIndex, fearMouthValue);
             mouth.SetBlendShapeWeight(DeathIndex, deathMouthValue);
+            mouth.SetBlendShapeWeight(SurpriseIndex, surpriseMouthValue);
         }
 
         public void SetHatState(bool isHatDamaged)
@@ -153,6 +171,25 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             _animator.SetBool(id: AnimatorHashes.IsHiding, isHiding);
 
             ChangeModelHidingState(isHiding, instant);
+        }
+
+        public async UniTaskVoid ResetSigmaFaceAfterDelay()
+        {
+            float delayInSeconds = _animationConfig.SigmaFaceResetDelay;
+            int delay = delayInSeconds.ConvertToMilliseconds();
+            
+            bool isCanceled = await UniTask
+                .Delay(delay, cancellationToken: _mushroomEntity.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+
+            MushroomEntity.Emotion emotion = _mushroomEntity.IsHatDamaged
+                ? MushroomEntity.Emotion.Angry
+                : MushroomEntity.Emotion.Happy;
+            
+            _mushroomEntity.SetEmotion(emotion);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

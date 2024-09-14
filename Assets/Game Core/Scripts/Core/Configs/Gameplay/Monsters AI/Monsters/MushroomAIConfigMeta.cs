@@ -265,6 +265,9 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             [BoxGroup(CommonSettings), SerializeField, Range(0f, 1f)]
             private float _dampTime = 0.15f;
+            
+            [BoxGroup(CommonSettings), SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
+            private float _sigmaFaceResetDelay = 20f;
 
             
             [BoxGroup(HidingGroup),SerializeField]
@@ -310,6 +313,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             // PROPERTIES: ----------------------------------------------------------------------------
 
             public float DampTime => _dampTime;
+            public float SigmaFaceResetDelay => _sigmaFaceResetDelay;
             
             public float ModelSittingY => _modelSittingY;
             public float ModelSitDownDuration => _modelSitDownDuration;

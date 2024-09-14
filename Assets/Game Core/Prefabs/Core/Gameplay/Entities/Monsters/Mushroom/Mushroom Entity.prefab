@@ -274,6 +274,7 @@ MonoBehaviour:
     _hat: {fileID: 6618754304571246352}
     _eyes: {fileID: 7785775446831011619}
     _mouth: {fileID: 4620022832518682911}
+    _sigmaFace: {fileID: 6195298491610359557}
     _stateTMP: {fileID: 0}
 --- !u!114 &7240275214382155244
 MonoBehaviour:
@@ -417,6 +418,12 @@ GameObject:
 --- !u!95 &5538396511550043943 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 1203890633727943864, guid: 8ffa4daf9a3a5de42b631499f66be0ff,
+    type: 3}
+  m_PrefabInstance: {fileID: 6658926571706241951}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &6195298491610359557 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 689997735327642778, guid: 8ffa4daf9a3a5de42b631499f66be0ff,
     type: 3}
   m_PrefabInstance: {fileID: 6658926571706241951}
   m_PrefabAsset: {fileID: 0}

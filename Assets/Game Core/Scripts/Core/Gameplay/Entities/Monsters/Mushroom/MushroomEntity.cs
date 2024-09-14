@@ -124,11 +124,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         public PlayerEntity GetInterestTarget() => _interestTarget;
 
-        public bool TryGetCurrentState(out IState state) =>
-            _mushroomStateMachine.TryGetCurrentState(out state);
-
         public override MonsterType GetMonsterType() =>
             MonsterType.Mushroom;
+
+        public bool TryGetCurrentState(out IState state) =>
+            _mushroomStateMachine.TryGetCurrentState(out state);
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
@@ -214,11 +214,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
             if (_playerAbuser != null)
                 _playerAbuser.OnDeathEvent -= OnAbuserDeath;
-                
+
             _references.PlayerTrigger.OnPlayerEnterEvent -= OnPlayerSteppedOnHat;
-                
+
             _references.FootstepsSystem.OnFootstepPerformedEvent -= OnFootstepPerformed;
-            
+
             _hatHealingTimer.OnTimerEndedEvent -= OnHatHealed;
         }
 
@@ -351,8 +351,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         private void OnAbuserDeath()
         {
-            Debug.Log("------------ ABUSER DIED MUHAHAHAHAH --------------");
             SetEmotion(Emotion.Sigma);
+            _animationController.ResetSigmaFaceAfterDelay().Forget();
         }
 
         private void OnFootstepPerformed(string colliderTag) => PlaySound(SFXType.Footsteps).Forget();

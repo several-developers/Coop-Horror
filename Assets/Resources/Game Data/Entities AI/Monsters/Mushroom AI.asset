@@ -72,10 +72,9 @@ MonoBehaviour:
   _spawnTimePeriods:
     _timePeriods: []
   _commonConfig:
-    _hatRegenerationDelay: 10
+    _hatRegenerationDelay: 15
     _runawaySpeed: 2
     _sitDownSoundDelay: 0.55
-    _standUpSoundDelay: 0
     _whisperingInterval: {x: 5, y: 12}
     _sporesGlowTimePeriod:
       _time: {x: 1140, y: 1440}
