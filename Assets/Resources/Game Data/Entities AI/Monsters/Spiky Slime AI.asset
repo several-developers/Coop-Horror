@@ -94,9 +94,14 @@ MonoBehaviour:
     _acceleration: 4
   _animationConfig:
     _calmMultiplier: 0.001
-    _angryMultiplier: 0.00125
+    _angryMultiplier: 0.0012
     _calmAnimationSpeed: 2
-    _angryAnimationSpeed: 10
+    _angryAnimationSpeed: 8
     _animationDuration: 0.15
     _animationEase: 7
-  _footstepsSE: {fileID: 0}
+  _calmMovementSE: {fileID: 11400000, guid: cf36ee8b56bdc5a40aa8d5f8203dc732, type: 2}
+  _angryMovementSE: {fileID: 11400000, guid: acec679ff2f6e2b4d9f32194faed8566, type: 2}
+  _calmingSE: {fileID: 11400000, guid: 58289ee243333f54ebe0c0096249c375, type: 2}
+  _angrySE: {fileID: 11400000, guid: dcf8ea44d74da7a4e952ccb222e51cc3, type: 2}
+  _attackSE: {fileID: 11400000, guid: 07a2312c9e051094780fc06e03e92e02, type: 2}
+  _stabSE: {fileID: 11400000, guid: d2e6e2729fc1bf34d9dc97bd237dc46c, type: 2}

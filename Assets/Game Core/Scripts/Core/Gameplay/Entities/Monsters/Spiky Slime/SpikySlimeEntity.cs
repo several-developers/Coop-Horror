@@ -9,17 +9,26 @@ using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Infrastructure.StateMachine;
 using Sirenix.OdinInspector;
+using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
 namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 {
+    [GenerateSerializationForType(typeof(SFXType))]
     public class SpikySlimeEntity : SoundProducerNavmeshMonsterEntity<SpikySlimeEntity.SFXType>, INoiseListener
     {
         public enum SFXType
         {
+            // None = 0,
+            CalmMovement = 1,
+            AngryMovement = 2,
+            Calming = 3,
+            Angry = 4,
+            Attack = 5,
+            Stab = 6
         }
-
+        
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
@@ -69,6 +78,9 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
+        protected override void InitAll() =>
+            SoundReproducer = new SpikySlimeSoundReproducer(soundProducer: this, _spikySlimeAIConfig);
+
         protected override void InitServerOnly()
         {
             AllSpikySlimes.Add(item: this);
@@ -89,7 +101,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             {
                 _spikySlimeStateMachine = new StateMachineBase();
                 _aggressionSystem = new AggressionSystem(spikySlimeEntity: this, _balanceConfig);
-                _attackSystem = new AttackSystem(spikySlimeEntity: this, _aggressionSystem);
+                _attackSystem = new AttackSystem(spikySlimeEntity: this);
                 _animationController = new AnimationController(spikySlimeEntity: this);
             }
 

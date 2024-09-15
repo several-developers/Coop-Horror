@@ -644,6 +644,22 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 1.1
   m_Center: {x: 0, y: 0.45, z: 0}
+--- !u!114 &100147132244154926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2218276461112224794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 157b31954c7d494ab0dfe592cdd47d2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _duration: 1
+  _vibrato: 5
+  _strength: {x: 0.07, y: 0.07, z: 0.07}
+  _target: {fileID: 7545332532351165036}
 --- !u!114 &2394163321486143111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -656,7 +672,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 392447415
+  GlobalObjectIdHash: 3993832844
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -710,10 +726,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _networkTransform: {fileID: 3905845266259680439}
   _agent: {fileID: 7680065875224977214}
+  model: {fileID: 0}
+  strength: {x: 0, y: 0, z: 0}
+  duration: 0.15
+  vibrato: 10
   _references:
     _attackTrigger: {fileID: 8913414976614173558}
     _skinnedMeshSine: {fileID: 137633741190630234}
     _slimeRenderer: {fileID: 8394560259977118561}
+    _shakeAnimation: {fileID: 100147132244154926}
     _infoTMP: {fileID: 2253318690519103359}
     _springJoints:
     - {fileID: 3258159162443599392}

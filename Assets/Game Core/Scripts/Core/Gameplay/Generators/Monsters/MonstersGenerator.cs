@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Configs.Gameplay.MonstersGenerator;
@@ -38,7 +38,8 @@ namespace GameCore.Gameplay.Generators.Monsters
             ITimeObserver timeObserver,
             ILocationsMetaProvider locationsMetaProvider,
             IMonstersAIConfigsProvider monstersAIConfigsProvider,
-            IGameplayConfigsProvider gameplayConfigsProvider
+            IGameplayConfigsProvider gameplayConfigsProvider,
+            ICoroutineRunner coroutineRunner
         )
         {
             if (!IsServer)
@@ -52,12 +53,10 @@ namespace GameCore.Gameplay.Generators.Monsters
             _timeObserver = timeObserver;
             _locationsMetaProvider = locationsMetaProvider;
             _monstersAIConfigsProvider = monstersAIConfigsProvider;
+            _coroutineRunner = coroutineRunner;
             _monstersGeneratorConfig = gameplayConfigsProvider.GetConfig<MonstersGeneratorConfigMeta>();
             _monstersListConfig = configsProvider.GetConfig<MonstersListConfigMeta>();
             _monstersDangerLevelConfig = balanceConfig.MonstersDangerLevelConfig;
-
-            var cts = new CancellationTokenSource();
-            _monstersSpawnCycle = new SimpleRoutine(cts, MonstersSpawnTickInterval);
 
             _validMonstersList = new List<ValidMonster>();
             _monstersSpawnChancesList = new List<MonsterSpawnChance>();
@@ -73,7 +72,7 @@ namespace GameCore.Gameplay.Generators.Monsters
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        private bool IsServer => NetworkHorror.IsTrueServer;
+        private static bool IsServer => NetworkHorror.IsTrueServer;
 
         // FIELDS: --------------------------------------------------------------------------------
 
@@ -85,17 +84,20 @@ namespace GameCore.Gameplay.Generators.Monsters
         private readonly ITimeObserver _timeObserver;
         private readonly ILocationsMetaProvider _locationsMetaProvider;
         private readonly IMonstersAIConfigsProvider _monstersAIConfigsProvider;
+
+#warning TEMP
+        private readonly ICoroutineRunner _coroutineRunner;
+
         private readonly MonstersGeneratorConfigMeta _monstersGeneratorConfig;
         private readonly MonstersListConfigMeta _monstersListConfig;
         private readonly MonstersDangerLevelConfig _monstersDangerLevelConfig;
-
-        private readonly SimpleRoutine _monstersSpawnCycle;
 
         private readonly List<ValidMonster> _validMonstersList;
         private readonly List<MonsterSpawnChance> _monstersSpawnChancesList;
         private readonly List<MonsterToSpawn> _monstersSpawnList;
         private readonly Dictionary<Floor, List<DungeonMonstersSpawner>> _monstersSpawners;
 
+        private Coroutine _monstersSpawnCycleCO;
         private bool _isGeneratorEnabled;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -105,13 +107,12 @@ namespace GameCore.Gameplay.Generators.Monsters
             if (!IsServer)
                 return;
 
-            _monstersSpawnCycle.OnActionEvent += MonstersSpawnTick;
+            IEnumerator routine = MonstersSpawnCycleCO();
+            _monstersSpawnCycleCO = _coroutineRunner.StartCoroutine(routine);
 
             DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent += OnRegisterMonstersSpawner;
 
             _timeObserver.OnHourPassedEvent += OnHourPassed;
-
-            _monstersSpawnCycle.Start();
         }
 
         public void Dispose()
@@ -120,7 +121,7 @@ namespace GameCore.Gameplay.Generators.Monsters
             if (!IsServer)
                 return;
 
-            _monstersSpawnCycle.FullStop();
+            _coroutineRunner.StopCoroutine(_monstersSpawnCycleCO);
 
             DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent -= OnRegisterMonstersSpawner;
 
@@ -161,12 +162,19 @@ namespace GameCore.Gameplay.Generators.Monsters
 
         #region Main Methods
 
-        private void MonstersSpawnTick()
+        private IEnumerator MonstersSpawnCycleCO()
         {
-            if (!_isGeneratorEnabled)
-                return;
+            var waitForSeconds = new WaitForSeconds(MonstersSpawnTickInterval);
 
-            TrySpawnMonster();
+            while (true)
+            {
+                yield return waitForSeconds;
+
+                if (!_isGeneratorEnabled)
+                    continue;
+
+                TrySpawnMonster();
+            }
         }
 
         private void TryAddMonsterToSpawnList()

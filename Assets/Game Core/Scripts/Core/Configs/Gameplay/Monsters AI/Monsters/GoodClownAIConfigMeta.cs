@@ -52,10 +52,8 @@ namespace GameCore.Configs.Gameplay.Enemies
         private const string HuntingChaseSettingsTitle = "Hunting Chase State Settings";
         private const string SleepingSettingsTitle = "Sleeping State Settings";
 
-        private const string CommonGroup = CommonSettingsTitle + "/Group";
         private const string HunterSystemGroup = HunterSystemSettingsTitle + "/Group";
         private const string FollowTargetGroup = FollowTargetSettingsTitle + "/Group";
-        private const string WanderingGroup = WanderingSettingsTitle + "/Group";
         private const string HuntingIdleGroup = HuntingIdleSettingsTitle + "/Group";
         private const string HuntingChaseGroup = HuntingChaseSettingsTitle + "/Group";
         private const string SleepingGroup = SleepingSettingsTitle + "/Group";

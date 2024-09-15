@@ -34,7 +34,8 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime.States
             _movementLogic.OnArrivedEvent += OnArrived;
             _movementLogic.GetWanderingMinDistanceEvent += GetWanderingMinDistance;
             _movementLogic.GetWanderingMaxDistanceEvent += GetWanderingMaxDistance;
-            
+
+            _spikySlimeEntity.PlaySound(SpikySlimeEntity.SFXType.CalmMovement).Forget();
             _spikySlimeEntity.EnableAgent();
             UpdateMovementSpeed();
             SetDestinationPoint();

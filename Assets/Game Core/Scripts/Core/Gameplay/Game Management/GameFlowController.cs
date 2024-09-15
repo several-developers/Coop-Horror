@@ -135,7 +135,7 @@ namespace GameCore.Gameplay.GameManagement
             switch (gameState)
             {
                 case GameState.GameOver:
-                    // HandleGameOver();
+                    HandleGameOver();
                     break;
 
                 case GameState.RestartGame:

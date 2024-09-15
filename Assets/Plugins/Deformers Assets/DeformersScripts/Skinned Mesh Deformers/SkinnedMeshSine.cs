@@ -62,7 +62,9 @@ public class SkinnedMeshSine : MonoBehaviour
     private AnimationCurve ERefinecurve;
     private float EnormalizedCurve, EcurveValue;
 
-    void Start()
+    // GAME ENGINE METHODS: -------------------------------------------------------------------
+
+    private void Start()
     {
         if (UseEffector != false)
         {
@@ -90,7 +92,42 @@ public class SkinnedMeshSine : MonoBehaviour
                 Refinecurve = new AnimationCurve(new Keyframe(0, 1), new Keyframe(1, 1));
             }
 
-            deformingMesh = GetComponent<SkinnedMeshRenderer>().sharedMesh;
+            // deformingMesh = GetComponent<SkinnedMeshRenderer>().sharedMesh;
+
+            CopyMesh();
+
+            void CopyMesh()
+            {
+                var meshRenderer = GetComponent<SkinnedMeshRenderer>();
+                Mesh sourceMesh = meshRenderer.sharedMesh;
+                deformingMesh = new Mesh();
+                meshRenderer.BakeMesh(deformingMesh);
+
+                Vector3[] deltaVertices = new Vector3[sourceMesh.vertexCount];
+                Vector3[] deltaNormals = new Vector3[sourceMesh.vertexCount];
+                Vector3[] deltaTangents = new Vector3[sourceMesh.vertexCount];
+
+                for (int shapeIndex = 0; shapeIndex < sourceMesh.blendShapeCount; shapeIndex++)
+                {
+                    string shapeName = sourceMesh.GetBlendShapeName(shapeIndex);
+
+                    // Don't copy if target already has a blend shape with this name. (It throws an exception.)
+                    if (deformingMesh.GetBlendShapeIndex(shapeName) < 0)
+                    {
+                        // Copy across the keyframes in the blendshape (most have 1 keyframe).
+                        int frameCount = sourceMesh.GetBlendShapeFrameCount(shapeIndex);
+                        for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+                        {
+                            float frameWeight = sourceMesh.GetBlendShapeFrameWeight(shapeIndex, frameIndex);
+                            sourceMesh.GetBlendShapeFrameVertices(shapeIndex, frameIndex, deltaVertices, deltaNormals, deltaTangents);
+                            deformingMesh.AddBlendShapeFrame(shapeName, frameWeight, deltaVertices, deltaNormals, deltaTangents);
+                        }
+                    }
+                }
+                
+                meshRenderer.sharedMesh = deformingMesh;
+            }
+
             originalVertices = deformingMesh.vertices;
             displacedVertices = new Vector3[originalVertices.Length];
             for (int i = 0; i < originalVertices.Length; i++)
@@ -141,27 +178,33 @@ public class SkinnedMeshSine : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        if (!IsStatic)
-        {
-            if (!UseEffector)
-            {
-                SineWave();
-            }
-            else
-            {
-                SineWaveEffector();
-            }
+        if (IsStatic)
+            return;
 
-            if (AnimatePhaze)
-            {
-                animateSine();
-            }
-        }
+        if (!UseEffector)
+            SineWave();
+        else
+            SineWaveEffector();
+
+        if (AnimatePhaze)
+            AnimateSine();
     }
 
-    void SineWave()
+    private void OnApplicationQuit()
+    {
+        PeakMultiplier = 0;
+
+        if (deformingMesh == null)
+            return;
+
+        SineWave();
+    }
+
+    // PRIVATE METHODS: -----------------------------------------------------------------------
+
+    private void SineWave()
     {
         switch (CurveInfluence)
         {
@@ -268,21 +311,10 @@ public class SkinnedMeshSine : MonoBehaviour
         deformingMesh.vertices = displacedVertices;
     }
 
-    public void animateSine()
-    {
+    private void AnimateSine() =>
         Phaze += Time.deltaTime * AnimationSpeed;
-    }
 
-    void OnApplicationQuit()
-    {
-        PeakMultiplier = 0;
-        if (deformingMesh != null)
-        {
-            SineWave();
-        }
-    }
-
-    void SineWaveEffector()
+    private void SineWaveEffector()
     {
         InvertedEffector = theEffector.Inverted;
         ERefinecurve = theEffector.FallOffCurve;

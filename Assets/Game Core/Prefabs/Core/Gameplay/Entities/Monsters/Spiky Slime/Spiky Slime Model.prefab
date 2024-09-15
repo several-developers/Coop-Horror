@@ -64,6 +64,36 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3887185075125053422, guid: 148c62c2c94ccf541b4b7d1878539c01,
         type: 3}
+      propertyPath: m_DirtyAABB
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3887185075125053422, guid: 148c62c2c94ccf541b4b7d1878539c01,
+        type: 3}
+      propertyPath: m_AABB.m_Center.y
+      value: -0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: -3887185075125053422, guid: 148c62c2c94ccf541b4b7d1878539c01,
+        type: 3}
+      propertyPath: m_AABB.m_Center.z
+      value: 0.007
+      objectReference: {fileID: 0}
+    - target: {fileID: -3887185075125053422, guid: 148c62c2c94ccf541b4b7d1878539c01,
+        type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: -3887185075125053422, guid: 148c62c2c94ccf541b4b7d1878539c01,
+        type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: -3887185075125053422, guid: 148c62c2c94ccf541b4b7d1878539c01,
+        type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: -3887185075125053422, guid: 148c62c2c94ccf541b4b7d1878539c01,
+        type: 3}
       propertyPath: m_UpdateWhenOffscreen
       value: 0
       objectReference: {fileID: 0}

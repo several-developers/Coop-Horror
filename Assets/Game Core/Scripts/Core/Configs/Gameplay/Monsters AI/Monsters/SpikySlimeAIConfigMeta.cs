@@ -29,7 +29,31 @@ namespace GameCore.Configs.Gameplay.Enemies
         
         [TitleGroup(SFXTitle)]
         [BoxGroup(SFXGroup, showLabel: false), SerializeField, Required]
-        private SoundEvent _footstepsSE;
+        private SoundEvent _calmMovementSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _angryMovementSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _calmingSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _angrySE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _attackSE;
+        
+        [BoxGroup(SFXGroup), SerializeField, Required]
+        private SoundEvent _stabSE;
+
+        // PROPERTIES: ----------------------------------------------------------------------------
+
+        public SoundEvent CalmMovementSE => _calmMovementSE;
+        public SoundEvent AngryMovementSE => _angryMovementSE;
+        public SoundEvent CalmingSE => _calmingSE;
+        public SoundEvent AngrySE => _angrySE;
+        public SoundEvent AttackSE => _attackSE;
+        public SoundEvent StabSE => _stabSE;
 
         // FIELDS: --------------------------------------------------------------------------------
 

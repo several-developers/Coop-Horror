@@ -13,11 +13,14 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         
         public AggressionSystem(SpikySlimeEntity spikySlimeEntity, BalanceConfigMeta balanceConfig)
         {
+            SpikySlimeReferences references = spikySlimeEntity.GetReferences();
             SpikySlimeAIConfigMeta spikySlimeAIConfig = spikySlimeEntity.GetAIConfig();
             
+            _spikySlimeEntity = spikySlimeEntity;
             _aggressionSystemConfig = spikySlimeAIConfig.GetAggressionSystemConfig();
             _balanceConfig = balanceConfig;
             _transform = spikySlimeEntity.transform;
+            _shakeAnimation = references.ShakeAnimation;
             _decreaseTimerRoutine = new CoroutineHelper(spikySlimeEntity);
 
             _decreaseTimerRoutine.GetRoutineEvent += DecreaseTimerCO;
@@ -28,9 +31,11 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         public event Action<int> OnAggressionMeterChangedEvent = delegate { };
         public event Action OnStartAttackEvent = delegate { };
         
+        private readonly SpikySlimeEntity _spikySlimeEntity;
         private readonly SpikySlimeAIConfigMeta.AggressionSystemConfig _aggressionSystemConfig;
         private readonly BalanceConfigMeta _balanceConfig;
         private readonly Transform _transform;
+        private readonly ShakeAnimation _shakeAnimation;
         private readonly CoroutineHelper _decreaseTimerRoutine;
         
         private int _aggressionMeter;
@@ -49,13 +54,17 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             if (instantAggro)
                 increaseValue += 1;
 
+            _shakeAnimation.PlayAnimation();
             IncreaseAggressionMeter(increaseValue);
+            PlaySound(SpikySlimeEntity.SFXType.Angry);
         }
 
         public void StartDecreaseTimer()
         {
             _isAggressive = false;
+            
             _decreaseTimerRoutine.Start();
+            PlaySound(SpikySlimeEntity.SFXType.Calming);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -91,7 +100,10 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
             OnAggressionMeterChangedEvent.Invoke(_aggressionMeter);
         }
-        
+
+        private void PlaySound(SpikySlimeEntity.SFXType sfxType) =>
+            _spikySlimeEntity.PlaySound(sfxType).Forget();
+
         private IEnumerator DecreaseTimerCO()
         {
             while (_aggressionMeter > 0)

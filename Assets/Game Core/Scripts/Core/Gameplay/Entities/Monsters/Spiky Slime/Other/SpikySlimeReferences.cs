@@ -21,6 +21,9 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         private SkinnedMeshRenderer _slimeRenderer;
 
         [SerializeField, Required]
+        private ShakeAnimation _shakeAnimation;
+
+        [SerializeField, Required]
         private TextMeshPro _infoTMP;
 
         [SerializeField, Required, Space(height: 5)]
@@ -31,6 +34,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         public SpikySlimeAttackTrigger AttackTrigger => _attackTrigger;
         public SkinnedMeshSine SkinnedMeshSine => _skinnedMeshSine;
         public SkinnedMeshRenderer SlimeRenderer => _slimeRenderer;
+        public ShakeAnimation ShakeAnimation => _shakeAnimation;
         public TextMeshPro InfoTMP => _infoTMP;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
