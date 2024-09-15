@@ -134,23 +134,14 @@ namespace GameCore.Configs.Gameplay.Enemies
         
         // FIELDS: --------------------------------------------------------------------------------
         
-        private const string DebugSettings = "Debug Settings";
-        private const string CommonSettings = "Common Settings";
-        private const string IdleStateSettings = "Idle State Settings";
         private const string WanderingStateSettings = "Wandering State Settings";
         private const string ChaseStateSettings = "Chase State Settings";
         private const string AttackStateSettings = "Attack State Settings";
         private const string AnimationSettingsTitle = "Animation Settings";
         
-        private const string DebugGroup = DebugSettings + "/Group";
-        private const string CommonGroup = CommonSettings + "/Group";
-        private const string IdleStateGroup = IdleStateSettings + "/Group";
         private const string WanderingStateGroup = WanderingStateSettings + "/Group";
         private const string ChaseStateGroup = ChaseStateSettings + "/Group";
         private const string AttackStateGroup = AttackStateSettings + "/Group";
-        private const string AnimationGroup = AnimationSettingsTitle + "/Group";
-
-        private const string SFXTitle = "SFX";
 
         private const string DisableAttackWarning = "Warning! This must be disabled for the release.";
 

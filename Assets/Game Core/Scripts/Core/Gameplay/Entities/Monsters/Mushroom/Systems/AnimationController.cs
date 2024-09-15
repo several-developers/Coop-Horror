@@ -43,6 +43,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         private Tweener _hatTN;
         private Tweener _sittingTN;
+        private MushroomEntity.Emotion _lastEmotion;
         private bool _isHiding;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -63,6 +64,11 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         public void SetEmotion(MushroomEntity.Emotion emotion)
         {
+            if (emotion != MushroomEntity.Emotion.Dead && _lastEmotion == MushroomEntity.Emotion.Dead)
+                return;
+            
+            _lastEmotion = emotion;
+            
             SkinnedMeshRenderer eyes = _references.Eyes;
             SkinnedMeshRenderer mouth = _references.Mouth;
             SkinnedMeshRenderer sigmaFace = _references.SigmaFace;

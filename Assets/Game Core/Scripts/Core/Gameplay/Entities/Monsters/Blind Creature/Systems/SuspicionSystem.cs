@@ -2,6 +2,7 @@
 using System.Collections;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Monsters.BlindCreature

@@ -76,25 +76,15 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const string DebugSettings = "Debug Settings";
-        private const string SFXTitle = "SFX";
-        private const string CommonSettings = "Common Settings";
-        private const string WanderingSettings = "Wandering Config";
         private const string LookAroundSettings = "Look Around Config";
         private const string SuspicionSystemSettings = "Suspicion System Config";
         private const string SuspicionStateSettings = "Suspicion State Config";
-        private const string AnimationSettings = "Animation Config";
         private const string CombatSettings = "Combat Config";
         private const string CageBirdSettings = "Cage Bird Config";
         
-        private const string SFXGroup = SFXTitle + "/Group";
-        private const string DebugGroup = DebugSettings + "/Group";
-        private const string CommonGroup = CommonSettings + "/Group";
-        private const string WanderingGroup = WanderingSettings + "/Group";
         private const string LookAroundGroup = LookAroundSettings + "/Group";
         private const string SuspicionSystemGroup = SuspicionSystemSettings + "/Group";
         private const string SuspicionStateGroup = SuspicionStateSettings + "/Group";
-        private const string AnimationGroup = AnimationSettings + "/Group";
         private const string CombatGroup = CombatSettings + "/Group";
         private const string CageBirdGroup = CageBirdSettings + "/Group";
 
@@ -136,7 +126,7 @@ namespace GameCore.Configs.Gameplay.Enemies
             [Tooltip("Значение Шкалы Подозрения после моментального перехода в агрессивное состояние.")]
             private int _suspicionMeterAfterInstantAggro = 11;
 
-            [SerializeField, Min(0f), SuffixLabel("seconds", overlay: true)]
+            [SerializeField, Min(0f), SuffixLabel(Seconds, overlay: true)]
             private float _suspicionMeterDecreaseTime = 3f;
 
             // PROPERTIES: ----------------------------------------------------------------------------

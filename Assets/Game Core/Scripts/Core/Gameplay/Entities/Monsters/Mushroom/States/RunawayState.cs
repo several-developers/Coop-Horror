@@ -40,6 +40,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             _movementLogic.OnStuckEvent += OnStuck;
             _movementLogic.GetTargetPositionEvent += GetTargetPosition;
 
+            _mushroomEntity.SetEmotion(MushroomEntity.Emotion.Scared);
             EnableAgent();
             SetSprintingState(isSprinting: true);
             PauseWhisperingSystem();

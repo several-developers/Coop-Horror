@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mushroom AI
   m_EditorClassIdentifier: 
   _metaName: Mushroom AI
-  _dangerLevel: 0
+  _dangerLevel: 1
   _isDamageable: 1
   _health: 100
   _spawnType: 3
@@ -104,6 +104,7 @@ MonoBehaviour:
     _targetReachDistance: 2
   _animationConfig:
     _dampTime: 0.15
+    _sigmaFaceResetDelay: 20
     _modelSittingY: -0.36
     _modelSitDownDuration: 1
     _modelStandUpDuration: 0.5

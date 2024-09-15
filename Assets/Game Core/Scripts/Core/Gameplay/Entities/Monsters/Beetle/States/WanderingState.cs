@@ -14,7 +14,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
             _beetleEntity = beetleEntity;
             _beetleAIConfig = beetleEntity.GetAIConfig();
             _agent = beetleEntity.GetAgent();
-            _wanderingMovementLogic = new WanderingMovementLogic(beetleEntity.transform, _agent);
+            _movementLogic = new WanderingMovementLogic(beetleEntity.transform, _agent);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
         private readonly BeetleEntity _beetleEntity;
         private readonly BeetleAIConfigMeta _beetleAIConfig;
         private readonly NavMeshAgent _agent;
-        private readonly WanderingMovementLogic _wanderingMovementLogic;
+        private readonly WanderingMovementLogic _movementLogic;
 
         private Vector3 _targetPoint;
 
@@ -30,26 +30,26 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle.States
 
         public void Enter()
         {
-            _wanderingMovementLogic.OnStuckEvent += OnStuck;
-            _wanderingMovementLogic.OnArrivedEvent += OnArrived;
-            _wanderingMovementLogic.GetWanderingMinDistanceEvent += GetWanderingMinDistance;
-            _wanderingMovementLogic.GetWanderingMaxDistanceEvent += GetWanderingMaxDistance;
+            _movementLogic.OnStuckEvent += OnStuck;
+            _movementLogic.OnArrivedEvent += OnArrived;
+            _movementLogic.GetWanderingMinDistanceEvent += GetWanderingMinDistance;
+            _movementLogic.GetWanderingMaxDistanceEvent += GetWanderingMaxDistance;
             
             EnableAgent();
 
-            if (!_wanderingMovementLogic.TrySetDestinationPoint())
+            if (!_movementLogic.TrySetDestinationPoint())
                 EnterIdleState();
         }
 
         public void Tick() =>
-            _wanderingMovementLogic.Tick();
+            _movementLogic.Tick();
 
         public void Exit()
         {
-            _wanderingMovementLogic.OnStuckEvent -= OnStuck;
-            _wanderingMovementLogic.OnArrivedEvent -= OnArrived;
-            _wanderingMovementLogic.GetWanderingMinDistanceEvent -= GetWanderingMinDistance;
-            _wanderingMovementLogic.GetWanderingMaxDistanceEvent -= GetWanderingMaxDistance;
+            _movementLogic.OnStuckEvent -= OnStuck;
+            _movementLogic.OnArrivedEvent -= OnArrived;
+            _movementLogic.GetWanderingMinDistanceEvent -= GetWanderingMinDistance;
+            _movementLogic.GetWanderingMaxDistanceEvent -= GetWanderingMaxDistance;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------

@@ -77,6 +77,18 @@ namespace GameCore.Configs.Gameplay.Enemies
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        protected const string DebugSettings = "Debug Settings";
+        protected const string SFXTitle = "SFX";
+        protected const string CommonSettings = "Common Settings";
+        protected const string WanderingSettings = "Wandering Config";
+        protected const string AnimationSettings = "Animation Config";
+        
+        protected const string SFXGroup = SFXTitle + "/Group";
+        protected const string DebugGroup = DebugSettings + "/Group";
+        protected const string CommonGroup = CommonSettings + "/Group";
+        protected const string WanderingGroup = WanderingSettings + "/Group";
+        protected const string AnimationGroup = AnimationSettings + "/Group";
+        
         protected const string ConfigTitle = "Config";
         
         private const string BaseSettings = "Base Settings";

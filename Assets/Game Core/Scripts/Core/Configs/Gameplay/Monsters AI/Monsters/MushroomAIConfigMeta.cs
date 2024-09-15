@@ -66,23 +66,13 @@ namespace GameCore.Configs.Gameplay.Enemies
         
         // FIELDS: --------------------------------------------------------------------------------
 
-        private const string DebugSettings = "Debug Settings";
-        private const string SFXTitle = "SFX";
-        private const string CommonSettings = "Common Settings";
         private const string SporesSettings = "Spores Settings";
-        private const string WanderingSettings = "Wandering Config";
         private const string SuspicionSystemSettings = "Suspicion System Config";
         private const string MoveToInterestTargetSettings = "Move to Interest Target Config";
-        private const string AnimationSettings = "Animation Config";
         
-        private const string SFXGroup = SFXTitle + "/Group";
-        private const string DebugGroup = DebugSettings + "/Group";
-        private const string CommonGroup = CommonSettings + "/Group";
         private const string SporesGroup = SporesSettings + "/Group";
-        private const string WanderingGroup = WanderingSettings + "/Group";
         private const string SuspicionSystemGroup = SuspicionSystemSettings + "/Group";
         private const string MoveToInterestTargetGroup = MoveToInterestTargetSettings + "/Group";
-        private const string AnimationGroup = AnimationSettings + "/Group";
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 

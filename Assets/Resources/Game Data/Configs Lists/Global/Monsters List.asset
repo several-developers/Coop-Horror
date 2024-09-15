@@ -56,3 +56,10 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+  - _monsterType: 7
+    _monsterAIConfig: {fileID: 11400000, guid: 099354ce342e2624aba1c4168cf9bf0b, type: 2}
+    _assetReference:
+      m_AssetGUID: 07bc37badf6ef144ba3e1f8b6d4669f5
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0

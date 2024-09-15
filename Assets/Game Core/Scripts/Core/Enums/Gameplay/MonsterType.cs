@@ -9,5 +9,6 @@
         BlindCreature = 4,
         SirenHead = 5,
         Mushroom = 6,
+        SpikySlime = 7
     }
 }

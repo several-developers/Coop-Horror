@@ -32,6 +32,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         {
             _wanderingTimerRoutine.GetRoutineEvent += WanderingTimerCO;
 
+            bool isHatDamaged = _mushroomEntity.IsHatDamaged;
+            MushroomEntity.Emotion emotion = isHatDamaged ? MushroomEntity.Emotion.Angry : MushroomEntity.Emotion.Happy;
+            _mushroomEntity.SetEmotion(emotion);
+            
             UnpauseWhisperingSystem();
             _mushroomEntity.DisableAgent();
             _wanderingTimerRoutine.Start();

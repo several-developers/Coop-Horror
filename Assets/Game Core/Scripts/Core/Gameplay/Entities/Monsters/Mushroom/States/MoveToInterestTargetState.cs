@@ -41,6 +41,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             _chaseLogic.GetChaseDistanceCheckIntervalEvent += GetChaseDistanceCheckInterval;
             _chaseLogic.GetTargetReachDistanceEvent += GetTargetReachDistance;
             
+            _mushroomEntity.SetEmotion(MushroomEntity.Emotion.Interested);
             EnableAgent();
             SetSneakingState(isSneaking: true);
             PauseWhisperingSystem();
