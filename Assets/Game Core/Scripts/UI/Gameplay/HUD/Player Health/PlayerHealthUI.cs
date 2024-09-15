@@ -51,7 +51,8 @@ namespace GameCore.UI.Gameplay.HUD.PlayerHealth
             if (!isLocalPlayer)
                 return;
 
-            HealthSystem healthSystem = playerEntity.References.HealthSystem;
+            PlayerReferences playerReferences = playerEntity.GetReferences();
+            HealthSystem healthSystem = playerReferences.HealthSystem;
             HealthData healthData = healthSystem.GetHealthData();
             UpdateHealthText(healthData);
             
@@ -68,7 +69,8 @@ namespace GameCore.UI.Gameplay.HUD.PlayerHealth
             if (!isLocalPlayer)
                 return;
             
-            HealthSystem healthSystem = playerEntity.References.HealthSystem;
+            PlayerReferences playerReferences = playerEntity.GetReferences();
+            HealthSystem healthSystem = playerReferences.HealthSystem;
             healthSystem.OnHealthChangedEvent -= OnHealthChanged;
             
             playerEntity.OnDeathEvent -= OnPlayerDeath;

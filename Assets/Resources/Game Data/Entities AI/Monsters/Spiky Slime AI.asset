@@ -74,12 +74,12 @@ MonoBehaviour:
   _aggressionSystemConfig:
     _minLoudnessToReact: 0.1
     _aggressionMeterToAggro: 10
-    _aggressionMeterDecreaseTime: 2
+    _aggressionMeterDecreaseTime: 3
   _attackSystemConfig:
     _spikesDamage: 20
     _spikesDamageInterval: 0.5
     _instantKillDuration: 0.5
-    _spikesDuration: 5
+    _spikesDuration: 15
     _showSpikesAnimationDuration: 0.15
     _hideSpikesAnimationDuration: 2
     _showSpikesAnimationEase: 11
@@ -94,7 +94,7 @@ MonoBehaviour:
     _acceleration: 4
   _animationConfig:
     _calmMultiplier: 0.001
-    _angryMultiplier: 0.0015
+    _angryMultiplier: 0.00125
     _calmAnimationSpeed: 2
     _angryAnimationSpeed: 10
     _animationDuration: 0.15

@@ -119,6 +119,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             if (_instantKill)
             {
                 playerEntity.Kill(PlayerDeathReason._);
+                AttachPlayerToFreeJoint(playerEntity);
             }
             else
             {
@@ -127,9 +128,37 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             }
         }
 
+        private void AttachPlayerToFreeJoint(PlayerEntity playerEntity)
+        {
+            IReadOnlyList<SpringJoint> allSpringJoints = _references.GetAllSpringJoints();
+
+            foreach (SpringJoint springJoint in allSpringJoints)
+            {
+                bool isFree = springJoint.connectedBody == null;
+                
+                if (!isFree)
+                    continue;
+
+                PlayerReferences playerReferences = playerEntity.GetReferences();
+                Rigidbody spineRigidbody = playerReferences.SpineRigidbody;
+                springJoint.connectedBody = spineRigidbody;
+                
+                break;
+            }
+        }
+
+        private void FreeAllFromSpringJoints()
+        {
+            IReadOnlyList<SpringJoint> allSpringJoints = _references.GetAllSpringJoints();
+
+            foreach (SpringJoint springJoint in allSpringJoints)
+                springJoint.connectedBody = null;
+        }
+        
         private IEnumerator AttackCO()
         {
             _instantKill = true;
+            
             EnableAttackTrigger();
 
             float instantKillDuration = _attackSystemConfig.InstantKillDuration;
@@ -151,8 +180,10 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         private void OnSpikesHidden()
         {
             _attackInProgress = false;
+            
             _aggressionSystem.StartDecreaseTimer();
             DisableAttackTrigger();
+            FreeAllFromSpringJoints();
         }
 
         private void OnPlayerEnterAttackTrigger(PlayerEntity playerEntity)

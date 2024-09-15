@@ -2062,6 +2062,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85cd6ebf0f54f254bb040b072787ce41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &4029325016841874640 stripped
+Rigidbody:
+  m_CorrespondingSourceObject: {fileID: 3098731526639919373, guid: 488b74f8770b1e643b27b3be5c19a5a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 2084021103639481821}
+  m_PrefabAsset: {fileID: 0}
 --- !u!137 &4305800580117640514 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 2822253892917295263, guid: 488b74f8770b1e643b27b3be5c19a5a5,
@@ -2533,6 +2539,7 @@ MonoBehaviour:
     _networkAnimator: {fileID: 3824883174733861349}
     _animator: {fileID: 8350890957917597247}
     _rigidbody: {fileID: 7127189264355523618}
+    _spineRigidbody: {fileID: 4029325016841874640}
     _collider: {fileID: 1967799250354909116}
     _spectatorCameraTarget: {fileID: 8717597456961597742}
     _leftHandItemsHolder: {fileID: 7841224976178631010}

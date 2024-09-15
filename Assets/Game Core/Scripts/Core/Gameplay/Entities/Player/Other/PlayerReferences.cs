@@ -25,6 +25,9 @@ namespace GameCore.Gameplay.Entities.Player
 
         [SerializeField, Required]
         private Rigidbody _rigidbody;
+        
+        [SerializeField, Required]
+        private Rigidbody _spineRigidbody;
 
         [SerializeField, Required]
         private CapsuleCollider _collider;
@@ -77,6 +80,7 @@ namespace GameCore.Gameplay.Entities.Player
         public OwnerNetworkAnimator NetworkAnimator => _networkAnimator;
         public Animator Animator => _animator;
         public Rigidbody Rigidbody => _rigidbody;
+        public Rigidbody SpineRigidbody => _spineRigidbody;
         public CapsuleCollider Collider => _collider;
         public Transform SpectatorCameraTarget => _spectatorCameraTarget;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;

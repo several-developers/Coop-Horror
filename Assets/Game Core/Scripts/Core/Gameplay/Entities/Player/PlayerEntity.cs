@@ -78,8 +78,7 @@ namespace GameCore.Gameplay.Entities.Player
         [SerializeField]
         private LayerMask _interactionObstaclesLM;
 
-        [Title(Constants.References)]
-        [SerializeField]
+        [BoxGroup(Constants.References, showLabel: false), SerializeField]
         private PlayerReferences _references;
 
         // PROPERTIES: ----------------------------------------------------------------------------
@@ -236,6 +235,8 @@ namespace GameCore.Gameplay.Entities.Player
 
             return alivePlayersAmount;
         }
+
+        public PlayerReferences GetReferences() => _references;
 
         public PlayerInventory GetInventory() => _inventory;
 

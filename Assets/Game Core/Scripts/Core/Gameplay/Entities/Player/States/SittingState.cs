@@ -1,5 +1,4 @@
-﻿using DG.Tweening;
-using GameCore.Enums.Gameplay;
+﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
 using UnityEngine;
 
@@ -11,18 +10,19 @@ namespace GameCore.Gameplay.Entities.Player.States
 
         public SittingState(PlayerEntity playerEntity, ICamerasManager camerasManager)
         {
+            
             _playerEntity = playerEntity;
+            _references = playerEntity.GetReferences();
             _camerasManager = camerasManager;
-
-            PlayerReferences references = playerEntity.References;
-            _animator = references.Animator;
-            _playerMovementController = references.PlayerMovementController;
-            _sittingCameraController = references.SittingCameraController;
+            _animator = _references.Animator;
+            _playerMovementController = _references.PlayerMovementController;
+            _sittingCameraController = _references.SittingCameraController;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
         private readonly PlayerEntity _playerEntity;
+        private readonly PlayerReferences _references;
         private readonly ICamerasManager _camerasManager;
         private readonly Animator _animator;
         private readonly PlayerMovementController _playerMovementController;
@@ -32,7 +32,7 @@ namespace GameCore.Gameplay.Entities.Player.States
 
         public void Enter()
         {
-            Rigidbody rigidbody = _playerEntity.References.Rigidbody;
+            Rigidbody rigidbody = _references.Rigidbody;
             rigidbody.velocity = Vector3.zero;
 
             SetCameraFirstPersonStatus();

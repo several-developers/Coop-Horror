@@ -9,7 +9,6 @@ using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Gameplay.MonstersAI;
 using GameCore.Infrastructure.StateMachine;
 using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine;
 using Zenject;
 
