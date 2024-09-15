@@ -1,6 +1,9 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 
@@ -18,9 +21,13 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             _attackSystemConfig = spikySlimeAIConfig.GetAttackSystemConfig();
             _references = spikySlimeEntity.GetReferences();
             _aggressionSystem = aggressionSystem;
+            _attackTrigger = _references.AttackTrigger;
             _attackRoutine = new CoroutineHelper(spikySlimeEntity);
+            _playersQueues = new List<PlayerQueue>();
 
             _attackRoutine.GetRoutineEvent += AttackCO;
+
+            _attackTrigger.OnTriggerEvent += OnPlayerEnterAttackTrigger;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -29,12 +36,23 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         private readonly SpikySlimeAIConfigMeta.AttackSystemConfig _attackSystemConfig;
         private readonly SpikySlimeReferences _references;
         private readonly AggressionSystem _aggressionSystem;
+        private readonly SpikySlimeAttackTrigger _attackTrigger;
         private readonly CoroutineHelper _attackRoutine;
+        private readonly List<PlayerQueue> _playersQueues;
 
         private Tweener _spikesTN;
         private bool _attackInProgress;
+        private bool _instantKill;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
+
+        public void Tick()
+        {
+            float deltaTime = Time.deltaTime;
+
+            foreach (PlayerQueue playerQueue in _playersQueues)
+                playerQueue.Tick(deltaTime);
+        }
 
         public void StartAttack()
         {
@@ -82,18 +100,43 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 })
                 .SetEase(ease)
                 .SetLink(_spikySlimeEntity.gameObject)
-                .OnComplete(OnAttackFinished);
+                .OnComplete(OnSpikesHidden);
         }
 
-        private void KillAllAround()
+        private void EnableAttackTrigger() =>
+            _attackTrigger.ToggleCollider(isEnabled: true);
+
+        private void DisableAttackTrigger() =>
+            _attackTrigger.ToggleCollider(isEnabled: false);
+
+        private void DoDamage(ulong clientID)
         {
-            
+            bool isPlayerFound = PlayerEntity.TryGetPlayer(clientID, out PlayerEntity playerEntity);
+
+            if (!isPlayerFound)
+                return;
+
+            if (_instantKill)
+            {
+                playerEntity.Kill(PlayerDeathReason._);
+            }
+            else
+            {
+                float spikesDamage = _attackSystemConfig.SpikesDamage;
+                playerEntity.TakeDamage(spikesDamage, _spikySlimeEntity);
+            }
         }
 
         private IEnumerator AttackCO()
         {
-            KillAllAround();
-            
+            _instantKill = true;
+            EnableAttackTrigger();
+
+            float instantKillDuration = _attackSystemConfig.InstantKillDuration;
+            yield return new WaitForSeconds(instantKillDuration);
+
+            _instantKill = false;
+
             float spikesDuration = _attackSystemConfig.SpikesDuration;
             yield return new WaitForSeconds(spikesDuration);
 
@@ -105,10 +148,78 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         private void OnAttack() =>
             _attackRoutine.Start();
 
-        private void OnAttackFinished()
+        private void OnSpikesHidden()
         {
             _attackInProgress = false;
             _aggressionSystem.StartDecreaseTimer();
+            DisableAttackTrigger();
+        }
+
+        private void OnPlayerEnterAttackTrigger(PlayerEntity playerEntity)
+        {
+            ulong clientID = playerEntity.OwnerClientId;
+            bool isPlayerFound = false;
+
+            foreach (PlayerQueue playerQueue in _playersQueues)
+            {
+                bool isPlayerMatches = playerQueue.IsPlayerMatches(clientID);
+
+                if (!isPlayerMatches)
+                    continue;
+
+                isPlayerFound = true;
+
+                bool isTimeOver = playerQueue.IsTimeOver();
+
+                if (!isTimeOver)
+                    return;
+
+                playerQueue.ResetTimer();
+            }
+
+            if (!isPlayerFound)
+            {
+                float damageInterval = _attackSystemConfig.SpikesDamageInterval;
+                PlayerQueue playerQueue = new(clientID, damageInterval);
+                _playersQueues.Add(playerQueue);
+            }
+
+            DoDamage(clientID);
+        }
+
+        // INNER CLASSES: -------------------------------------------------------------------------
+
+        private class PlayerQueue
+        {
+            // CONSTRUCTORS: --------------------------------------------------------------------------
+
+            public PlayerQueue(ulong clientID, float timeLeft)
+            {
+                _clientID = clientID;
+                _timeLeft = timeLeft;
+                _startTime = timeLeft;
+            }
+
+            // FIELDS: --------------------------------------------------------------------------------
+
+            private readonly ulong _clientID;
+            private readonly float _startTime;
+
+            private float _timeLeft;
+
+            // PUBLIC METHODS: ------------------------------------------------------------------------
+
+            public void Tick(float deltaTime) =>
+                _timeLeft -= deltaTime;
+
+            public void ResetTimer() =>
+                _timeLeft = _startTime;
+
+            public bool IsPlayerMatches(ulong clientID) =>
+                _clientID == clientID;
+
+            public bool IsTimeOver() =>
+                _timeLeft <= 0.0f;
         }
     }
 }

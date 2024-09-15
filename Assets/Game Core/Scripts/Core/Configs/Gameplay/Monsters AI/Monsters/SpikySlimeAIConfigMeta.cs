@@ -79,8 +79,14 @@ namespace GameCore.Configs.Gameplay.Enemies
             // MEMBERS: -------------------------------------------------------------------------------
 
             [SerializeField, Min(0f)]
-            private float _damageFromSpikes = 20f;
+            private float _spikesDamage = 20f;
 
+            [SerializeField, Min(0f)]
+            private float _spikesDamageInterval = 0.2f;
+            
+            [SerializeField, Min(0f)]
+            private float _instantKillDuration = 0.5f;
+            
             [SerializeField, Min(0f)]
             private float _spikesDuration = 5f;
 
@@ -98,7 +104,9 @@ namespace GameCore.Configs.Gameplay.Enemies
 
             // PROPERTIES: ----------------------------------------------------------------------------
 
-            public float DamageFromSpikes => _damageFromSpikes;
+            public float SpikesDamage => _spikesDamage;
+            public float SpikesDamageInterval => _spikesDamageInterval;
+            public float InstantKillDuration => _instantKillDuration;
             public float SpikesDuration => _spikesDuration;
             public float ShowSpikesAnimationDuration => _showSpikesAnimationDuration;
             public float HideSpikesAnimationDuration => _hideSpikesAnimationDuration;

@@ -76,7 +76,9 @@ MonoBehaviour:
     _aggressionMeterToAggro: 10
     _aggressionMeterDecreaseTime: 2
   _attackSystemConfig:
-    _damageFromSpikes: 20
+    _spikesDamage: 20
+    _spikesDamageInterval: 0.5
+    _instantKillDuration: 0.5
     _spikesDuration: 5
     _showSpikesAnimationDuration: 0.15
     _hideSpikesAnimationDuration: 2

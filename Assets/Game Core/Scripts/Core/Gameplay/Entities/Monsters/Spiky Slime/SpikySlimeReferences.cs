@@ -11,6 +11,9 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField, Required]
+        private SpikySlimeAttackTrigger _attackTrigger;
+        
+        [SerializeField, Required]
         private SkinnedMeshSine _skinnedMeshSine;
 
         [SerializeField, Required]
@@ -21,6 +24,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public SpikySlimeAttackTrigger AttackTrigger => _attackTrigger;
         public SkinnedMeshSine SkinnedMeshSine => _skinnedMeshSine;
         public SkinnedMeshRenderer SlimeRenderer => _slimeRenderer;
         public TextMeshPro InfoTMP => _infoTMP;

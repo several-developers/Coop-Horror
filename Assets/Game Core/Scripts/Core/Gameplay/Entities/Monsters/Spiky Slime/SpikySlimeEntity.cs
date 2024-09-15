@@ -102,8 +102,11 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             }
         }
 
-        protected override void TickServerOnly() =>
+        protected override void TickServerOnly()
+        {
+            _attackSystem.Tick();
             _spikySlimeStateMachine.Tick();
+        }
 
         protected override void DespawnServerOnly()
         {
