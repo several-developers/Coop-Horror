@@ -9,7 +9,7 @@ using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Gameplay.AssetsStorages
+namespace GameCore.Gameplay.Storages.Assets
 {
     public class MonstersAssetsStorage : IMonstersAssetsStorage
     {

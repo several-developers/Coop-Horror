@@ -3,15 +3,23 @@ using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Storages.Entities;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace GameCore.Gameplay.Entities.Monsters
 {
     public abstract class MonsterEntityBase : Entity, ITeleportableEntity
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        [Inject]
+        private void Construct(IEntitiesStorage entitiesStorage) =>
+            entitiesStorage.AddEntity(gameObject);
+
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]

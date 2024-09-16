@@ -8,8 +8,10 @@ using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Level.Locations;
+using GameCore.Gameplay.Storages.Entities;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
 using GameCore.Observers.Gameplay.Game;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace
@@ -23,6 +25,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             ILocationsLoader locationsLoader,
             ILevelProvider levelProvider,
             IItemsProvider itemsProvider,
+            IEntitiesStorage entitiesStorage,
             IGameManagerDecorator gameManagerDecorator,
             IGameObserver gameObserver
         )
@@ -31,6 +34,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             _locationsLoader = locationsLoader;
             _levelProvider = levelProvider;
             _itemsProvider = itemsProvider;
+            _entitiesStorage = entitiesStorage;
             _gameManagerDecorator = gameManagerDecorator;
             _gameObserver = gameObserver;
             _cancellationTokenSource = new CancellationTokenSource();
@@ -44,6 +48,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         private readonly ILocationsLoader _locationsLoader;
         private readonly ILevelProvider _levelProvider;
         private readonly IItemsProvider _itemsProvider;
+        private readonly IEntitiesStorage _entitiesStorage;
         private readonly IGameManagerDecorator _gameManagerDecorator;
         private readonly IGameObserver _gameObserver;
         private readonly CancellationTokenSource _cancellationTokenSource;
@@ -67,7 +72,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 return;
 
             DestroyAllItems();
-            KillAllMonsters();
+            KillAllEntities();
             ClearDungeonElevators();
             UnloadLastLocation();
             EnterLeaveLocationClientState();
@@ -84,8 +89,10 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             {
                 ItemObjectBase itemObject = pair.Value;
                 bool destroyOnSceneUnload = itemObject.DestroyOnSceneUnload;
+                bool isPickedUp = itemObject.IsPickedUp();
+                bool skipDestruction = !destroyOnSceneUnload || isPickedUp;
 
-                if (!destroyOnSceneUnload)
+                if (skipDestruction)
                 {
                     int key = pair.Key;
                     allKeys.Remove(key);
@@ -99,8 +106,19 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
                 _itemsProvider.RemoveItem(uniqueItemID);
         }
 
-        private void KillAllMonsters()
+        private void KillAllEntities()
         {
+            IEnumerable<GameObject> allEntities = _entitiesStorage.GetAllEntities();
+
+            foreach (GameObject entityGameObject in allEntities)
+            {
+                if (entityGameObject == null)
+                    continue;
+                
+                Object.Destroy(entityGameObject);
+            }
+            
+            _entitiesStorage.Clear();
         }
 
         private void ClearDungeonElevators()

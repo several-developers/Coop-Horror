@@ -5,6 +5,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Items;
+using GameCore.Gameplay.Storages.Entities;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.EntitiesConfigs;
@@ -28,10 +29,15 @@ namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IItemsFactory itemsFactory, IEntitiesConfigsProvider entitiesConfigsProvider)
+        private void Construct(
+            IItemsFactory itemsFactory,
+            IEntitiesConfigsProvider entitiesConfigsProvider,
+            IEntitiesStorage entitiesStorage
+        )
         {
             _itemsFactory = itemsFactory;
             _outdoorChestConfig = entitiesConfigsProvider.GetConfig<OutdoorChestConfigMeta>();
+            entitiesStorage.AddEntity(gameObject);
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
@@ -140,7 +146,7 @@ namespace GameCore.Gameplay.Entities.Interactable.OutdoorChest
                 var spawnParams = new SpawnParams<ItemObjectBase>.Builder()
                     .SetSpawnPosition(worldPosition)
                     .Build();
-                
+
                 _itemsFactory.CreateItemDynamic(itemID, spawnParams);
             }
 

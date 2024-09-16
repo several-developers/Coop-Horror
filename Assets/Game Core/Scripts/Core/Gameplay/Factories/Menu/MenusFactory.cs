@@ -1,6 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.AssetsStorages;
+using GameCore.Gameplay.Storages.Assets;
 using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Global;

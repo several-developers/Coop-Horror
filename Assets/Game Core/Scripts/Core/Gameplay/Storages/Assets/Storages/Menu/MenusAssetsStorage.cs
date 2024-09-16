@@ -6,7 +6,7 @@ using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Global.MenuView;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Gameplay.AssetsStorages
+namespace GameCore.Gameplay.Storages.Assets
 {
     public class MenusAssetsStorage : AssetsStorage<Type>, IMenusAssetsStorage
     {

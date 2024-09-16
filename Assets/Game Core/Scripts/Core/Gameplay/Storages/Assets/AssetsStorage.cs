@@ -4,7 +4,7 @@ using GameCore.Infrastructure.Providers.Global;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Gameplay.AssetsStorages
+namespace GameCore.Gameplay.Storages.Assets
 {
     public abstract class AssetsStorage<TKey> : IAssetsStorage<TKey>
     {

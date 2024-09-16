@@ -113,7 +113,7 @@ MonoBehaviour:
     _chance: 10
     _onlySurface: 0
   - _scale: {x: 2.5, y: 3.2}
-    _chance: 5
+    _chance: 100
     _onlySurface: 1
   _calmMovementSE: {fileID: 11400000, guid: cf36ee8b56bdc5a40aa8d5f8203dc732, type: 2}
   _angryMovementSE: {fileID: 11400000, guid: acec679ff2f6e2b4d9f32194faed8566, type: 2}

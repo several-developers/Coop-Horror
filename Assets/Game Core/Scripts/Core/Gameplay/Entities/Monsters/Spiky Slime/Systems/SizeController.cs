@@ -1,4 +1,5 @@
 ﻿using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Enums.Gameplay;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
@@ -9,12 +10,14 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         public SizeController(SpikySlimeEntity spikySlimeEntity)
         {
+            _spikySlimeEntity = spikySlimeEntity;
             _spikySlimeAIConfig = spikySlimeEntity.GetAIConfig();
             _references = spikySlimeEntity.GetReferences();
         }
 
         // FIELDS: --------------------------------------------------------------------------------
         
+        private readonly SpikySlimeEntity _spikySlimeEntity;
         private readonly SpikySlimeAIConfigMeta _spikySlimeAIConfig;
         private readonly SpikySlimeReferences _references;
         
@@ -37,7 +40,8 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         public float GetRandomSlimeScale()
         {
-            SpikySlimeAIConfigMeta.SizeConfig sizeConfig = _spikySlimeAIConfig.GetRandomSizeConfig();
+            EntityLocation entityLocation = _spikySlimeEntity.EntityLocation;
+            SpikySlimeAIConfigMeta.SizeConfig sizeConfig = _spikySlimeAIConfig.GetRandomSizeConfig(entityLocation);
             Vector2 scaleRange = sizeConfig.Scale;
             float scale = Random.Range(scaleRange.x, scaleRange.y);
             return scale;

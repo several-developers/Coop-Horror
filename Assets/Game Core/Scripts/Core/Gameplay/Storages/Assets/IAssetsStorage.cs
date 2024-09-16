@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Gameplay.AssetsStorages
+namespace GameCore.Gameplay.Storages.Assets
 {
     public interface IAssetsStorage<in TKey> : IWarmUp
     {

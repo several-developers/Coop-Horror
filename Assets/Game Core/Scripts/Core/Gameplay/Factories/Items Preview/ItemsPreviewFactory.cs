@@ -1,7 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.AssetsStorages;
+using GameCore.Gameplay.Storages.Assets;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Items;

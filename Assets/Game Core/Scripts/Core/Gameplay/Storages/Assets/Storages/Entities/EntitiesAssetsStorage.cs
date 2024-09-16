@@ -7,7 +7,7 @@ using GameCore.Gameplay.Network.PrefabsRegistrar;
 using GameCore.Infrastructure.Providers.Global;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Gameplay.AssetsStorages
+namespace GameCore.Gameplay.Storages.Assets
 {
     public class EntitiesAssetsStorage : AssetsStorage<Type>, IEntitiesAssetsStorage
     {

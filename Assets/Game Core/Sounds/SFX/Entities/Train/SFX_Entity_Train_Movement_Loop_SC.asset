@@ -44,8 +44,8 @@ MonoBehaviour:
       bypassVoiceEffects: 0
       bypassListenerEffects: 0
       volumeExpand: 1
-      volumeDecibel: -20
-      volumeRatio: 0.1
+      volumeDecibel: -22
+      volumeRatio: 0.07943282
       volumeRandomEnable: 0
       volumeRandomRangeDecibel: -3
       volumeDistanceRolloff: -2

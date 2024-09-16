@@ -121,6 +121,11 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             if (!isPlayerFound)
                 return;
 
+            bool isPlayerDead = playerEntity.IsDead();
+            
+            if (isPlayerDead)
+                return;
+
             PlaySound(SpikySlimeEntity.SFXType.Stab);
 
             if (_instantKill)

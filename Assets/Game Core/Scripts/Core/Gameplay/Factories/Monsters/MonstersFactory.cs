@@ -1,5 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.AssetsStorages;
+using GameCore.Gameplay.Storages.Assets;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.Utilities;

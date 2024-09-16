@@ -5,7 +5,7 @@ using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Global;
 using UnityEngine.AddressableAssets;
 
-namespace GameCore.Gameplay.AssetsStorages
+namespace GameCore.Gameplay.Storages.Assets
 {
     public class ItemsPreviewAssetsStorage : AssetsStorage<int>, IItemsPreviewAssetsStorage
     {

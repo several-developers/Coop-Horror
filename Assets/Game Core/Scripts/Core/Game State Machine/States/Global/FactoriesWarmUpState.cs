@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Gameplay.AssetsStorages;
+using GameCore.Gameplay.Storages.Assets;
 
 namespace GameCore.StateMachine
 {

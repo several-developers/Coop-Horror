@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.AssetsStorages;
+﻿using GameCore.Gameplay.Storages.Assets;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Global

@@ -135,7 +135,7 @@ namespace GameCore.Gameplay.Items
                 DropClientLogic();
             }
 
-            DropServerRpc(destroy);
+            DropRpc(destroy);
         }
 
         public void ShowServer() => ShowServerRpc();
@@ -143,7 +143,7 @@ namespace GameCore.Gameplay.Items
         public void ShowClient() =>
             _child.SetActive(true);
 
-        public void HideServer() => HideServerRpc();
+        public void HideServer() => HideRpc();
 
         public void HideClient() =>
             _child.SetActive(false);
@@ -153,6 +153,9 @@ namespace GameCore.Gameplay.Items
 
         public bool CanInteract() =>
             !_isPickedUp.Value;
+
+        public bool IsPickedUp() =>
+            _isPickedUp.Value;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -220,7 +223,9 @@ namespace GameCore.Gameplay.Items
                 return;
 
             _isPickedUp.Value = true;
-            DestroyOnSceneUnload = false;
+
+#warning TEMP
+            // DestroyOnSceneUnload = false;
 
             ulong senderClientID = serverRpcParams.Receive.SenderClientId;
             bool changeOwnership = itemNetworkObject.OwnerClientId != senderClientID;
@@ -231,19 +236,22 @@ namespace GameCore.Gameplay.Items
             PickUpClientRpc();
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void DropServerRpc(bool destroy)
+        [Rpc(target: SendTo.Everyone)]
+        private void DropRpc(bool destroy)
         {
-            if (destroy)
+            if (IsOwner)
             {
-                _itemsProvider.RemoveItem(UniqueItemID);
-                Destroy(gameObject);
-                return;
+                if (destroy)
+                {
+                    _itemsProvider.RemoveItem(UniqueItemID);
+                    Destroy(gameObject);
+                    return;
+                }
+
+                _isPickedUp.Value = false;
             }
 
-            _isPickedUp.Value = false;
-
-            DropClientRpc();
+            DropClientLogic();
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -253,8 +261,8 @@ namespace GameCore.Gameplay.Items
             ShowClientRpc(senderClientId);
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void HideServerRpc() => HideClientRpc();
+        [Rpc(target: SendTo.Everyone)]
+        private void HideRpc() => HideClient();
 
         [ClientRpc]
         private void SetupClientRpc(int itemID, float itemScale)
@@ -262,12 +270,9 @@ namespace GameCore.Gameplay.Items
             ItemID = itemID;
             transform.localScale *= itemScale;
         }
-        
-        [ClientRpc]
-        private void PickUpClientRpc() => PickUpClientLogic();
 
         [ClientRpc]
-        private void DropClientRpc() => DropClientLogic();
+        private void PickUpClientRpc() => PickUpClientLogic();
 
         [ClientRpc]
         private void ShowClientRpc(ulong senderClientID)
@@ -279,8 +284,5 @@ namespace GameCore.Gameplay.Items
 
             ShowClient();
         }
-
-        [ClientRpc]
-        private void HideClientRpc() => HideClient();
     }
 }
