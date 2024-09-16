@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.CamerasManagement
 {
-    public class SpectatorCamera : MonoBehaviour
+    public class DeathCamera : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -32,11 +32,11 @@ namespace GameCore.Gameplay.CamerasManagement
         public void UpdateTarget(PlayerEntity playerEntity)
         {
             PlayerReferences playerReferences = playerEntity.GetReferences();
-            Transform spectatorTarget = playerReferences.SpectatorCameraTarget;
-            Transform playerTransform = playerEntity.transform;
+            Transform hips = playerReferences.HipsRigidbody.transform;
+            Transform spine = playerReferences.SpineRigidbody.transform;
             
-            _cinemachineFreeLook.m_Follow = playerTransform;
-            _cinemachineFreeLook.m_LookAt = spectatorTarget;
+            _cinemachineFreeLook.m_Follow = spine;
+            _cinemachineFreeLook.m_LookAt = hips;
         }
 
         public void ToggleCameraState(bool isEnabled)

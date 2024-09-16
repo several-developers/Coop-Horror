@@ -1,7 +1,6 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
-using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.Other;
 using GameCore.Infrastructure.Providers.Gameplay.Items;

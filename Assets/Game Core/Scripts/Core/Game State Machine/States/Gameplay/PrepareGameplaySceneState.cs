@@ -4,6 +4,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -69,6 +70,7 @@ namespace GameCore.StateMachine
             CreateGameTimeManager();
             CreateChatManager();
             CreateNoiseManager();
+            CreateDynamicPrefabsLoader();
             //CreateGameObserver();
         }
 
@@ -112,6 +114,12 @@ namespace GameCore.StateMachine
         {
             NoiseManager noiseManagerPrefab = _prefabsListConfig.NoiseManager;
             CreateNetworkPrefab(noiseManagerPrefab.gameObject);
+        }
+
+        private void CreateDynamicPrefabsLoader()
+        {
+            DynamicPrefabsLoader dynamicPrefabsLoader = _prefabsListConfig.DynamicPrefabsLoader;
+            CreateNetworkPrefab(dynamicPrefabsLoader.gameObject);
         }
 
         // private void CreateGameObserver()

@@ -18,7 +18,7 @@ namespace GameCore.Gameplay.Entities.Train
         void SetMovementBehaviour(TrainEntity.MovementBehaviour movementBehaviour);
         void TeleportToTheRoad();
         void TeleportToTheMetroPlatform();
-        void TeleportAllPlayersToRandomSeats(bool ignoreChecks = false);
+        void TeleportLocalPlayerToRandomSeat(bool ignoreChecks = false);
         void TeleportLocalPlayerToTrainSeat(int seatIndex);
         void ToggleMainLeverState(bool isEnabled);
         void ToggleDoorState(bool isOpened);

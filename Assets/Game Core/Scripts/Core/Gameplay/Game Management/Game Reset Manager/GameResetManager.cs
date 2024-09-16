@@ -55,7 +55,6 @@ namespace GameCore.Gameplay.GameManagement
                 TeleportTrainToTheRoad();
                 ResetTrain();
                 RespawnPlayersAtTrain();
-                TeleportAllPlayersToRandomSeats();
                 ResetQuests();
                 _gameManagerDecorator.SelectLocation(LocationName.Base);
                 _trainEntity.SendLeaveLocation();
@@ -63,6 +62,8 @@ namespace GameCore.Gameplay.GameManagement
 
             // Common logic.
             RevivePlayer();
+
+            _trainEntity.TeleportLocalPlayerToRandomSeat(ignoreChecks: true);
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -117,9 +118,6 @@ namespace GameCore.Gameplay.GameManagement
                 return isSpawnPointFound ? spawnPoint.GetSpawnPosition() : Vector3.zero;
             }
         }
-
-        private void TeleportAllPlayersToRandomSeats() =>
-            _trainEntity.TeleportAllPlayersToRandomSeats(ignoreChecks: true);
 
         private void ResetQuests() =>
             _questsManagerDecorator.ResetQuests();

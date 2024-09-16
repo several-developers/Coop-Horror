@@ -12,6 +12,9 @@ namespace GameCore.Configs.Gameplay.Player
         [Title(Constants.Settings)]
         [SerializeField, Min(0f)]
         private float _health = 100f;
+        
+        [SerializeField, Min(0), SuffixLabel(Seconds, overlay: true)]
+        private float _deathCameraDuration = 3f;
 
         // [SerializeField, Min(0f)]
         // private float _defaultHeight = 1.7f;
@@ -47,6 +50,7 @@ namespace GameCore.Configs.Gameplay.Player
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public float Health => _health;
+        public float DeathCameraDuration => _deathCameraDuration;
         
         // SFX
         public SoundEvent FootstepsSE => _footstepsSE;

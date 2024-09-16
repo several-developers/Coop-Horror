@@ -11,11 +11,17 @@ namespace GameCore.Gameplay.CamerasManagement
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public CamerasManager(ITrainEntity trainEntity, PlayerCamera playerCamera, SpectatorCamera spectatorCamera)
+        public CamerasManager(
+            ITrainEntity trainEntity,
+            PlayerCamera playerCamera,
+            SpectatorCamera spectatorCamera,
+            DeathCamera deathCamera
+        )
         {
             _trainEntity = trainEntity;
             _playerCamera = playerCamera;
             _spectatorCamera = spectatorCamera;
+            _deathCamera = deathCamera;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -23,6 +29,7 @@ namespace GameCore.Gameplay.CamerasManagement
         private readonly ITrainEntity _trainEntity;
         private readonly PlayerCamera _playerCamera;
         private readonly SpectatorCamera _spectatorCamera;
+        private readonly DeathCamera _deathCamera;
 
         private CameraStatus _cameraStatus;
         private int _lastSpectateIndex;
@@ -101,6 +108,7 @@ namespace GameCore.Gameplay.CamerasManagement
             CheckMobileHQCamera(cameraStatus);
             CheckPlayerCamera(cameraStatus);
             CheckSpectatorCamera(cameraStatus);
+            CheckDeathCamera(cameraStatus);
         }
 
         private void CheckMobileHQCamera(CameraStatus cameraStatus)
@@ -125,6 +133,15 @@ namespace GameCore.Gameplay.CamerasManagement
             PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
             PlayerReferences playerReferences = localPlayer.References;
             playerReferences.PlayerMovementController.ToggleCameraState(!isEnabled);
+        }
+
+        private void CheckDeathCamera(CameraStatus cameraStatus)
+        {
+            bool isEnabled = cameraStatus == CameraStatus.DeathCamera;
+            _deathCamera.ToggleCameraState(isEnabled);
+            
+            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+            _deathCamera.UpdateTarget(localPlayer);
         }
 
         private static bool IsAnyAlivePlayersLeft()

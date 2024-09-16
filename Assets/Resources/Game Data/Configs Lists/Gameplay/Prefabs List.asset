@@ -29,3 +29,5 @@ MonoBehaviour:
     type: 3}
   _noiseManager: {fileID: 4978374440362832137, guid: 8305819a5cde1cf488dadff3441fb04d,
     type: 3}
+  _dynamicPrefabsLoader: {fileID: 141980803026349834, guid: 5e976f099aa81fd41a6c6275f089c693,
+    type: 3}

@@ -199,6 +199,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             }
 
             CompletedCache.Clear();
+            Handles.Clear();
         }
 
         /// <remarks>

@@ -43,7 +43,7 @@ namespace GameCore.Gameplay.Entities.Player.States
         }
 
         private void DisableRagdoll() =>
-            _playerEntity.ToggleRagdollServerRpc(enable: false);
+            _playerEntity.ToggleRagdollRpc(enable: false);
 
         private void ToggleNotDead() =>
             _playerEntity.ToggleDead(isDead: false);

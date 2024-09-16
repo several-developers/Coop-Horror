@@ -19,8 +19,8 @@ MonoBehaviour:
   _leavingMainRoadSpeedMultiplier: 0.7
   _startPositionAtRoadLocation: 0.5
   _movementSpeed: 15
-  _slowDownDuration: 10
-  _speedUpDuration: 8
+  _slowDownDuration: 8
+  _speedUpDuration: 6
   _slowDownEase: 6
   _speedUpEase: 5
   _doorOpenSE: {fileID: 11400000, guid: 636bab7bd2954e64da787a0659397eb5, type: 2}

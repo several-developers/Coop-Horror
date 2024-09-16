@@ -67,6 +67,7 @@ namespace GameCore.Gameplay.Systems.Ragdoll
 
             foreach (Rigidbody rbody in _rigidbodies)
             {
+                rbody.velocity = Vector3.zero;
                 rbody.detectCollisions = false;
                 rbody.useGravity = false;
             }

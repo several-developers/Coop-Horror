@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Balance
   m_EditorClassIdentifier: 
   _metaName: Balance
-  _gameRestartDelay: 4
+  _gameRestartDelay: 8
   _noiseLoudnessMultiplier: 18
   _noiseObstacleMultiplier: 0.5
   _monstersDangerLevelConfig:

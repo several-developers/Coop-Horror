@@ -31,8 +31,11 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         private PlayerCamera _playerCamera;
 
         [SerializeField, Required]
+        private DeathCamera _deathCamera;
+
+        [SerializeField, Required]
         private SpectatorCamera _spectatorCamera;
-        
+
         [SerializeField, Required]
         private VisualManager _visualManager;
 
@@ -56,6 +59,7 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             BindVisualManager();
             BindSun();
             BindPlayerCamera();
+            BindDeathCamera();
             BindSpectatorCamera();
             BindCamerasManager();
             BindGameResetManager();
@@ -143,6 +147,14 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .Bind<PlayerCamera>()
                 .FromInstance(_playerCamera)
+                .AsSingle();
+        }
+
+        private void BindDeathCamera()
+        {
+            Container
+                .Bind<DeathCamera>()
+                .FromInstance(_deathCamera)
                 .AsSingle();
         }
 

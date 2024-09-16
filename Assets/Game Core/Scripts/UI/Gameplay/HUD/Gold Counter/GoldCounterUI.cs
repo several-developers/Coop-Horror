@@ -81,6 +81,6 @@ namespace GameCore.UI.Gameplay.HUD.GoldCounter
         
         private void OnPlayerDeath() => Hide();
 
-        private void OnPlayerRevived() => Show();
+        private void OnPlayerRevived(PlayerEntity _) => Show();
     }
 }

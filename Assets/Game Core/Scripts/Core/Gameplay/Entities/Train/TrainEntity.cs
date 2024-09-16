@@ -136,9 +136,12 @@ namespace GameCore.Gameplay.Entities.Train
             IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
 
             foreach (PlayerEntity playerEntity in allPlayers.Values)
-                TeleportPlayerToRandomSeat(playerEntity);
+                TeleportPlayerToRandomSeat(playerEntity, ignoreChecks);
         }
-        
+
+        public void TeleportLocalPlayerToRandomSeat(bool ignoreChecks = false) =>
+            TeleportLocalPlayerToRandomSeatRpc(ignoreChecks);
+
         public void TeleportLocalPlayerToTrainSeat(int seatIndex)
         {
             IReadOnlyList<TrainSeat> allMobileHQSeats = _references.GetAllMobileHQSeats();
@@ -351,14 +354,19 @@ namespace GameCore.Gameplay.Entities.Train
 
         // RPC: -----------------------------------------------------------------------------------
 
+        [Rpc(target: SendTo.Owner)]
+        private void TeleportLocalPlayerToRandomSeatRpc(bool ignoreChecks)
+        {
+            PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
+            TeleportPlayerToRandomSeat(localPlayer, ignoreChecks);
+        }
+        
 #warning TEMP
         [ServerRpc(RequireOwnership = false)]
         public void StartLeavingLocationServerRpc()
         {
             OnMovementStartedEvent.Invoke();
-
-            //TeleportLocalPlayerToRandomSeat();
-            TeleportAllPlayersToRandomSeats();
+            
             _pathMovement.ToggleArrived(isArrived: false);
             
             LocationManager locationManager = LocationManager.Get();

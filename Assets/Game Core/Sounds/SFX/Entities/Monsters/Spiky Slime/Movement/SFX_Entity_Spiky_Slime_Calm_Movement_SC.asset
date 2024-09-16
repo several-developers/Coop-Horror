@@ -23,14 +23,14 @@ MonoBehaviour:
       audioMixerGroup: {fileID: 0}
       priority: 0.5
       distanceEnabled: 1
-      distanceScale: 50
+      distanceScale: 40
       preventEndClicks: 1
       loopEnabled: 1
       followPosition: 1
       stopIfTransformIsNull: 1
       randomStartPosition: 1
       randomStartPositionMin: 0
-      randomStartPositionMax: 0.077077806
+      randomStartPositionMax: 0.1173142
       startPosition: 0
       reverse: 0
       neverStealVoice: 0
@@ -43,9 +43,9 @@ MonoBehaviour:
       bypassReverbZones: 0
       bypassVoiceEffects: 0
       bypassListenerEffects: 0
-      volumeExpand: 0
-      volumeDecibel: 0
-      volumeRatio: 1
+      volumeExpand: 1
+      volumeDecibel: -4
+      volumeRatio: 0.63095737
       volumeRandomEnable: 0
       volumeRandomRangeDecibel: -3
       volumeDistanceRolloff: -2

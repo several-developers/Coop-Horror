@@ -36,7 +36,8 @@ namespace GameCore.Gameplay.Entities.Player.States
             rigidbody.velocity = Vector3.zero;
 
             SetCameraFirstPersonStatus();
-            TogglePlayerController(isEnabled: false);
+            // TogglePlayerController(isEnabled: false);
+            _playerMovementController.ToggleCameraState(isEnabled: false);
             ToggleSittingCameraController(isEnabled: true);
             ToggleSittingAnimation(isSitting: true);
 
@@ -46,7 +47,8 @@ namespace GameCore.Gameplay.Entities.Player.States
 
         public void Exit()
         {
-            TogglePlayerController(isEnabled: true);
+            // TogglePlayerController(isEnabled: true);
+            _playerMovementController.ToggleCameraState(isEnabled: true);
             ToggleSittingCameraController(isEnabled: false);
             ToggleSittingAnimation(isSitting: false);
 

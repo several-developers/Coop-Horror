@@ -81,6 +81,6 @@ namespace GameCore.UI.Gameplay.HUD.PlayerHealth
         
         private void OnPlayerDeath() => Hide();
 
-        private void OnPlayerRevived() => Show();
+        private void OnPlayerRevived(PlayerEntity _) => Show();
     }
 }

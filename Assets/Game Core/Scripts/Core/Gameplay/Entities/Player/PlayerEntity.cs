@@ -99,7 +99,7 @@ namespace GameCore.Gameplay.Entities.Player
         public event Action<float> OnSanityChangedEvent = delegate { };
         public event Action OnLeftMobileHQSeat = delegate { };
         public event Action OnDeathEvent = delegate { };
-        public event Action OnRevivedEvent = delegate { };
+        public event Action<PlayerEntity> OnRevivedEvent = delegate { };
         public event Action<bool> OnParentChangedEvent = delegate { };
 
         public event Func<bool> IsCrouching = () => false;
@@ -236,8 +236,8 @@ namespace GameCore.Gameplay.Entities.Player
             return alivePlayersAmount;
         }
 
+        public PlayerConfigMeta GetConfig() => _playerConfig;
         public PlayerReferences GetReferences() => _references;
-
         public PlayerInventory GetInventory() => _inventory;
 
         public float GetSanity() =>
@@ -570,9 +570,16 @@ namespace GameCore.Gameplay.Entities.Player
             DestroyItemPreviewClientRpc(senderClientID, slotIndex);
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void ToggleRagdollServerRpc(bool enable) => ToggleRagdollClientRpc(enable);
+        [Rpc(target: SendTo.Everyone)]
+        public void ToggleRagdollRpc(bool enable)
+        {
+            CapsuleCollider capsuleCollider = _references.Collider;
+            capsuleCollider.isTrigger = enable;
 
+            RagdollController ragdollController = _references.RagdollController;
+            ragdollController.ToggleRagdoll(enable);
+        }
+        
         [ServerRpc(RequireOwnership = false)]
         private void SetPlayerLocationServerRpc(EntityLocation entityLocation) =>
             SetPlayerLocationClientRpc(entityLocation);
@@ -617,16 +624,6 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             _inventoryManager.DestroyItemPreview(slotIndex);
-        }
-
-        [ClientRpc]
-        private void ToggleRagdollClientRpc(bool enable)
-        {
-            CapsuleCollider capsuleCollider = _references.Collider;
-            capsuleCollider.isTrigger = enable;
-
-            RagdollController ragdollController = _references.RagdollController;
-            ragdollController.ToggleRagdoll(enable);
         }
 
         [ClientRpc]
@@ -733,7 +730,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (newValue)
                 OnDeathEvent.Invoke();
             else
-                OnRevivedEvent.Invoke();
+                OnRevivedEvent.Invoke(this);
         }
 
         private void OnFootstepPerformed(string colliderTag)

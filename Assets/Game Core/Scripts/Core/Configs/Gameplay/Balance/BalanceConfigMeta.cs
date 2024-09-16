@@ -9,8 +9,8 @@ namespace GameCore.Configs.Gameplay.Balance
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
-        [SerializeField, Min(0), SuffixLabel("seconds", overlay: true)]
-        private float _gameRestartDelay = 5f;
+        [SerializeField, Min(0), SuffixLabel(Seconds, overlay: true)]
+        private float _gameRestartDelay = 10f;
 
         [SerializeField, Min(0f)]
         private float _noiseLoudnessMultiplier = 18f;

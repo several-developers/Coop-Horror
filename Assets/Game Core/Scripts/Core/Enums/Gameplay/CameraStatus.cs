@@ -6,6 +6,7 @@
         PitchBlack = 1,
         OutsideTrain = 2,
         FirstPerson = 3,
-        Spectator = 4
+        Spectator = 4,
+        DeathCamera = 5
     }
 }

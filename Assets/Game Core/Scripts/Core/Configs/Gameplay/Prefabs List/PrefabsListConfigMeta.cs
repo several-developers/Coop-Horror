@@ -3,6 +3,7 @@ using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Systems.Noise;
 using GameCore.Gameplay.Systems.Quests;
 using GameCore.Infrastructure.Configs;
@@ -40,6 +41,9 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         
         [SerializeField, Required]
         private NoiseManager _noiseManager;
+        
+        [SerializeField, Required]
+        private DynamicPrefabsLoader _dynamicPrefabsLoader;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
@@ -51,6 +55,7 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         public ChatManager ChatManager => _chatManager;
         public GameObserverNetwork GameObserver => _gameObserver;
         public NoiseManager NoiseManager => _noiseManager;
+        public DynamicPrefabsLoader DynamicPrefabsLoader => _dynamicPrefabsLoader;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

@@ -39,8 +39,6 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        public static DynamicPrefabsLoader Instance;
-
         private const float NetworkSpawnTimeoutSeconds = 3000f;
         private const int ArtificialDelayMilliseconds = 1000;
 
@@ -56,12 +54,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
-        {
-            Instance = this;
+        private void Awake() =>
             _networkManager = NetworkManager.Singleton;
-            DontDestroyOnLoad(gameObject);
-        }
 
         protected override void StartAll()
         {
