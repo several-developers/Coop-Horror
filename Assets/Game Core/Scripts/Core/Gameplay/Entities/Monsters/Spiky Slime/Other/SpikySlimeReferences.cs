@@ -24,6 +24,15 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         private ShakeAnimation _shakeAnimation;
 
         [SerializeField, Required]
+        private Transform _modelPivot;
+        
+        [SerializeField, Required]
+        private Transform _anchorPoints;
+        
+        [SerializeField, Required]
+        private SphereCollider _slimeTrigger;
+        
+        [SerializeField, Required]
         private TextMeshPro _infoTMP;
 
         [SerializeField, Required, Space(height: 5)]
@@ -35,6 +44,9 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         public SkinnedMeshSine SkinnedMeshSine => _skinnedMeshSine;
         public SkinnedMeshRenderer SlimeRenderer => _slimeRenderer;
         public ShakeAnimation ShakeAnimation => _shakeAnimation;
+        public Transform ModelPivot => _modelPivot;
+        public Transform AnchorPoints => _anchorPoints;
+        public SphereCollider SlimeTrigger => _slimeTrigger;
         public TextMeshPro InfoTMP => _infoTMP;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

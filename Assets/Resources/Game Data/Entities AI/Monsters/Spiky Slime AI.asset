@@ -99,6 +99,22 @@ MonoBehaviour:
     _angryAnimationSpeed: 8
     _animationDuration: 0.15
     _animationEase: 7
+  _sizeConfigs:
+  - _scale: {x: 0.8, y: 0.9}
+    _chance: 25
+    _onlySurface: 0
+  - _scale: {x: 1, y: 1}
+    _chance: 40
+    _onlySurface: 0
+  - _scale: {x: 1.3, y: 1.5}
+    _chance: 20
+    _onlySurface: 0
+  - _scale: {x: 1.6, y: 1.85}
+    _chance: 10
+    _onlySurface: 0
+  - _scale: {x: 2.5, y: 3.2}
+    _chance: 5
+    _onlySurface: 1
   _calmMovementSE: {fileID: 11400000, guid: cf36ee8b56bdc5a40aa8d5f8203dc732, type: 2}
   _angryMovementSE: {fileID: 11400000, guid: acec679ff2f6e2b4d9f32194faed8566, type: 2}
   _calmingSE: {fileID: 11400000, guid: 58289ee243333f54ebe0c0096249c375, type: 2}

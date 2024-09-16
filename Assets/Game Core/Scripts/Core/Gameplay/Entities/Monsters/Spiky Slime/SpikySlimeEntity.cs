@@ -57,11 +57,11 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         private AggressionSystem _aggressionSystem;
         private AttackSystem _attackSystem;
         private AnimationController _animationController;
+        private SizeController _sizeController;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        protected override void StartServerOnly() =>
-            EnterWanderingState();
+        protected override void StartServerOnly() => EnterWanderingState();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -78,8 +78,11 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override void InitAll() =>
+        protected override void InitAll()
+        {
             SoundReproducer = new SpikySlimeSoundReproducer(soundProducer: this, _spikySlimeAIConfig);
+            _sizeController = new SizeController(spikySlimeEntity: this);
+        }
 
         protected override void InitServerOnly()
         {
@@ -87,6 +90,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
             SetupSystems();
             SetupStates();
+            ChangeSlimeSize();
 
             _aggressionSystem.OnAggressionMeterChangedEvent += aggressionMeter =>
             {
@@ -110,6 +114,12 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 WanderingState wanderingState = new(spikySlimeEntity: this);
 
                 _spikySlimeStateMachine.AddState(wanderingState);
+            }
+
+            void ChangeSlimeSize()
+            {
+                float slimeScale = _sizeController.GetRandomSlimeScale();
+                ChangeSlimeSizeRpc(slimeScale);
             }
         }
 
@@ -135,6 +145,12 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         private void ChangeState<TState>() where TState : IState =>
             _spikySlimeStateMachine.ChangeState<TState>();
+
+        // RPC: -----------------------------------------------------------------------------------
+
+        [Rpc(target: SendTo.Everyone)]
+        private void ChangeSlimeSizeRpc(float slimeScale) =>
+            _sizeController.ChangeSize(slimeScale);
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
         

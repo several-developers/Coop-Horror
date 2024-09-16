@@ -1,14 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using DG.Tweening;
 using GameCore.Enums.Gameplay;
+using GameCore.Utilities;
 using Sirenix.OdinInspector;
 using Sonity;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace GameCore.Configs.Gameplay.Enemies
 {
     public class SpikySlimeAIConfigMeta : MonsterAIConfigMeta
     {
+        // CONSTRUCTORS: --------------------------------------------------------------------------
+
+        public SpikySlimeAIConfigMeta() =>
+            _sizeConfigs = new List<SizeConfig>();
+
         // MEMBERS: -------------------------------------------------------------------------------
         
         [TitleGroup(title: AggressionSystemSettings)]
@@ -27,6 +35,10 @@ namespace GameCore.Configs.Gameplay.Enemies
         [BoxGroup(AnimationGroup, showLabel: false), SerializeField, LabelText(ConfigTitle)]
         private AnimationConfig _animationConfig;
         
+        [SerializeField, Space(height: 10)]
+        [ListDrawerSettings(ListElementLabelName = "Label")]
+        private List<SizeConfig> _sizeConfigs;
+
         [TitleGroup(SFXTitle)]
         [BoxGroup(SFXGroup, showLabel: false), SerializeField, Required]
         private SoundEvent _calmMovementSE;
@@ -73,7 +85,28 @@ namespace GameCore.Configs.Gameplay.Enemies
         public override MonsterType GetMonsterType() =>
             MonsterType.SpikySlime;
 
+        public SizeConfig GetRandomSizeConfig()
+        {
+            int sizeConfigsAmount = _sizeConfigs.Count;
+
+            if (sizeConfigsAmount == 0)
+            {
+                Debug.LogError(message: "Size Config list is empty!");
+                return null;
+            }
+            
+            var chances = new double[sizeConfigsAmount];
+            
+            for (int i = 0; i < sizeConfigsAmount; i++)
+                chances[i] = _sizeConfigs[i].Chance;
+
+            int randomIndex = GlobalUtilities.GetRandomIndex(chances);
+            return _sizeConfigs[randomIndex];
+        }
+
         // INNER CLASSES: -------------------------------------------------------------------------
+        
+        #region Inner Classes
 
         [Serializable]
         public class AggressionSystemConfig
@@ -207,5 +240,30 @@ namespace GameCore.Configs.Gameplay.Enemies
             public float AnimationDuration => _animationDuration;
             public Ease AnimationEase => _animationEase;
         }
+
+        [Serializable]
+        public class SizeConfig
+        {
+            // MEMBERS: -------------------------------------------------------------------------------
+
+            [SerializeField, MinMaxSlider(minValue: 0.1f, maxValue: 5f, showFields: true)]
+            private Vector2 _scale;
+
+            [SerializeField, Range(0, 100)]
+            private int _chance;
+
+            [SerializeField]
+            private bool _onlySurface;
+
+            // PROPERTIES: ----------------------------------------------------------------------------
+
+            public Vector2 Scale => _scale;
+            public int Chance => _chance;
+            public bool OnlySurface => _onlySurface;
+
+            private string Label => $"'Scale: {_scale}',   'Percent: {_chance}%',   'Only Surface: {_onlySurface}'";
+        }
+        
+        #endregion
     }
 }

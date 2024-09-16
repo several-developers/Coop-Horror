@@ -726,15 +726,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _networkTransform: {fileID: 3905845266259680439}
   _agent: {fileID: 7680065875224977214}
-  model: {fileID: 0}
-  strength: {x: 0, y: 0, z: 0}
-  duration: 0.15
-  vibrato: 10
   _references:
     _attackTrigger: {fileID: 8913414976614173558}
     _skinnedMeshSine: {fileID: 137633741190630234}
     _slimeRenderer: {fileID: 8394560259977118561}
     _shakeAnimation: {fileID: 100147132244154926}
+    _modelPivot: {fileID: 7545332532351165036}
+    _anchorPoints: {fileID: 8868700281596121598}
+    _slimeTrigger: {fileID: 6966308474117409072}
     _infoTMP: {fileID: 2253318690519103359}
     _springJoints:
     - {fileID: 3258159162443599392}

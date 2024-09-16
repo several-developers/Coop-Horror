@@ -94,9 +94,9 @@ namespace GameCore.Configs.Gameplay.Enemies
         public override MonsterType GetMonsterType() =>
             MonsterType.Mushroom;
 
-        #region Inner Classes
-
         // INNER CLASSES: -------------------------------------------------------------------------
+
+        #region Inner Classes
 
         [Serializable]
         public class CommonConfig
