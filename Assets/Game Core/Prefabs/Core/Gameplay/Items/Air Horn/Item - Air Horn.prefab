@@ -115,7 +115,7 @@ MonoBehaviour:
   _changeItemIDAtAwake: 0
   _startItemID: 0
   _itemIDDebug: 0
-  _uniqueItemIDInfo: 0
+  _uniqueItemIDDebug: 0
 --- !u!1001 &8295071552191954741
 PrefabInstance:
   m_ObjectHideFlags: 0

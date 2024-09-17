@@ -15,7 +15,7 @@ MonoBehaviour:
   _metaName: Quests
   _maxQuestsAmount: 5
   _maxActiveQuests: 3
-  _ignoreTrainQuestsCheck: 0
+  _ignoreTrainQuestsCheck: 1
   _questsLookUpList: 0000000000000000010000000100000003000000
   _questsPresets:
   - _difficulty: 0

@@ -24,6 +24,6 @@ MonoBehaviour:
     _eulerRotation: {x: 25, y: -75, z: -6}
     _scale: {x: 2.3, y: 2.3, z: 2.3}
   _tpsItemPreview:
-    _position: {x: 0, y: 0, z: 0}
-    _eulerRotation: {x: 0, y: 0, z: 0}
-    _scale: {x: 1, y: 1, z: 1}
+    _position: {x: 0.039, y: 0.205, z: 0.028}
+    _eulerRotation: {x: 25, y: 285, z: 354}
+    _scale: {x: 2.564, y: 2.564, z: 2.564}

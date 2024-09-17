@@ -16,7 +16,7 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: b4d6c9f56fed4ed418cc7af36f34a02b, type: 3}
   _itemName: Battery
   _itemID: 1
-  _scaleMultiplier: 2.5
+  _scaleMultiplier: 1.5
   _rigPresetType: 1
   _itemHandPlacement: 1
   _fpsItemPreview:
@@ -24,6 +24,6 @@ MonoBehaviour:
     _eulerRotation: {x: -15.3, y: -100, z: -120}
     _scale: {x: 2.5, y: 2.5, z: 2.5}
   _tpsItemPreview:
-    _position: {x: 0, y: 0, z: 0}
-    _eulerRotation: {x: 0, y: 0, z: 0}
-    _scale: {x: 1, y: 1, z: 1}
+    _position: {x: -0.033, y: 0.227, z: 0.019}
+    _eulerRotation: {x: 344, y: 260, z: 240}
+    _scale: {x: 2.809, y: 2.809, z: 2.809}

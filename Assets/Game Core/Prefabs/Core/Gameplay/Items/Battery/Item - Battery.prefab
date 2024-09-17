@@ -108,7 +108,7 @@ MonoBehaviour:
   _changeItemIDAtAwake: 0
   _startItemID: 0
   _itemIDDebug: 0
-  _uniqueItemIDInfo: 0
+  _uniqueItemIDDebug: 0
 --- !u!4 &8854616741207458709 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4032370298921219629, guid: 9a4e2523f6834bf418c688f91493518e,

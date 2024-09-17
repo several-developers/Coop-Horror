@@ -120,14 +120,7 @@ namespace GameCore.Gameplay.Systems.Inventory
             if (!hasItemInSelectedSlot)
                 return false;
 
-            //LogItemDrop(itemData.ItemID);
-
-            const bool randomPosition = false;
-
-            ulong clientID = GetClientID();
-            DroppedItemStaticData data = new(clientID, slotIndex, randomPosition, destroy);
-            OnItemDroppedEvent.Invoke(data);
-            
+            _inventory.DropItem(slotIndex);
             return true;
         }
         

@@ -364,7 +364,7 @@ namespace GameCore.Gameplay.Entities.Train
             TeleportPlayerToRandomSeat(localPlayer, ignoreChecks);
         }
 
-        [Rpc(target: SendTo.Owner)]
+        [Rpc(target: SendTo.Owner, RequireOwnership = false)]
         public void StartTrainRpc()
         {
             OnMovementStartedEvent.Invoke();
