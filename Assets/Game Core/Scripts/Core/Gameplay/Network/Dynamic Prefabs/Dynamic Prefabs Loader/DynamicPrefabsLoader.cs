@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using GameCore.Infrastructure.Providers.Global;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;
@@ -70,8 +71,10 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             _networkManager.NetworkConfig.ForceSamePrefabs = false;
         }
 
-        protected override void OnDestroyAll() =>
+        protected override void OnDestroyAll()
+        {
             DynamicPrefabLoadingUtilities.UnloadAndReleaseAllDynamicPrefabs();
+        }
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 

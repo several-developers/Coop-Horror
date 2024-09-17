@@ -147,13 +147,7 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         [Button(ButtonStyle.FoldoutButton)]
-        public void TeleportToTrainSeat(int seatIndex)
-        {
-            if (IsOwner)
-                TeleportToTrainSeatLocal(seatIndex);
-            else
-                TeleportToTrainSeatServerRPC(seatIndex);
-        }
+        public void TeleportToTrainSeat(int seatIndex) => TeleportToTrainSeatRpc(seatIndex);
 
         public void SetEntityLocation(EntityLocation entityLocation)
         {
@@ -203,6 +197,12 @@ namespace GameCore.Gameplay.Entities.Player
         public void ToggleInsideTrainState(bool isInsideTrain) =>
             IsInsideTrain = isInsideTrain;
 
+        [Button]
+        public void SetTrainAsParent() => SetTrainAsParentRpc();
+
+        [Button]
+        public void RemoveParent() => RemoveParentRpc();
+
         public void SendLeftMobileHQSeat() =>
             OnLeftMobileHQSeat.Invoke();
 
@@ -237,7 +237,9 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         public PlayerConfigMeta GetConfig() => _playerConfig;
+
         public PlayerReferences GetReferences() => _references;
+
         public PlayerInventory GetInventory() => _inventory;
 
         public float GetSanity() =>
@@ -245,24 +247,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         public static bool TryGetPlayer(ulong clientID, out PlayerEntity playerEntity) =>
             AllPlayers.TryGetValue(clientID, out playerEntity);
-
-        [Button]
-        public void SetTrainAsParent()
-        {
-            if (IsServerOnly)
-                SetTrainAsParentLocal();
-            else
-                SetTrainAsParentServerRPC();
-        }
-
-        [Button]
-        public void RemoveParent()
-        {
-            if (IsServerOnly)
-                RemoveParentLocal();
-            else
-                RemoveParentServerRPC();
-        }
 
         public bool IsDead() =>
             _isDead.Value;
@@ -273,12 +257,19 @@ namespace GameCore.Gameplay.Entities.Player
         {
             AllPlayers.TryAdd(OwnerClientId, this);
 
-            SoundReproducer = new PlayerSoundReproducer(soundProducer: this, _playerConfig);
-            _inventory = new PlayerInventory();
-            _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
+            InitSystems();
 
             _sanity.OnValueChanged += OnSanityChanged;
             _isDead.OnValueChanged += OnDead;
+
+            // LOCAL METHODS: -----------------------------
+
+            void InitSystems()
+            {
+                SoundReproducer = new PlayerSoundReproducer(soundProducer: this, _playerConfig);
+                _inventory = new PlayerInventory();
+                _inventoryManager = new PlayerInventoryManager(playerEntity: this, _itemsPreviewFactory);
+            }
         }
 
         protected override void InitOwner()
@@ -434,25 +425,7 @@ namespace GameCore.Gameplay.Entities.Player
             _currentSelectedSlotIndex.OnValueChanged -= OnNotOwnerSelectedSlotChanged;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void TeleportToTrainSeatLocal(int seatIndex) =>
-            _trainEntity.TeleportLocalPlayerToTrainSeat(seatIndex);
-
-        private void SetTrainAsParentLocal()
-        {
-            Transform newParent = _trainEntity.GetTransform();
-            Transform parent = transform.parent;
-            bool alreadyParented = parent != null && parent == newParent;
-
-            if (alreadyParented)
-                return;
-
-            NetworkObject.TrySetParent(newParent);
-        }
-
-        private void RemoveParentLocal() =>
-            NetworkObject.TryRemoveParent();
-
+        
         private void CheckDeadStatus(HealthData healthData)
         {
             if (IsDead())
@@ -588,19 +561,27 @@ namespace GameCore.Gameplay.Entities.Player
         private void SetFloorServerRpc(Floor floor) =>
             _currentFloor.Value = floor;
 
-        [ServerRpc(RequireOwnership = false)]
-        private void TeleportToTrainSeatServerRPC(int seatIndex, ServerRpcParams serverRpcParams = default)
+        [Rpc(target: SendTo.Owner)]
+        private void TeleportToTrainSeatRpc(int seatIndex) =>
+            _trainEntity.TeleportLocalPlayerToTrainSeat(seatIndex);
+
+        [Rpc(target: SendTo.Server)]
+        private void SetTrainAsParentRpc()
         {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-            TeleportToTrainSeatClientRPC(senderClientID, seatIndex);
+            Transform newParent = _trainEntity.GetTransform();
+            Transform parent = transform.parent;
+            bool alreadyParented = parent != null && parent == newParent;
+
+            if (alreadyParented)
+                return;
+
+            NetworkObject.TrySetParent(newParent);
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void SetTrainAsParentServerRPC() => SetTrainAsParentLocal();
+        [Rpc(target: SendTo.Server)]
+        private void RemoveParentRpc() =>
+            NetworkObject.TryRemoveParent();
 
-        [ServerRpc(RequireOwnership = false)]
-        private void RemoveParentServerRPC() => RemoveParentLocal();
-        
         [ClientRpc]
         private void KillClientRpc(PlayerDeathReason deathReason) => EnterDeathState();
 
@@ -633,17 +614,6 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             _entityLocation.Value = entityLocation;
-        }
-
-        [ClientRpc]
-        private void TeleportToTrainSeatClientRPC(ulong senderClientID, int seatIndex)
-        {
-            bool isMatches = senderClientID == NetworkHorror.ClientID;
-
-            if (isMatches)
-                return;
-            
-            TeleportToTrainSeatLocal(seatIndex);
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

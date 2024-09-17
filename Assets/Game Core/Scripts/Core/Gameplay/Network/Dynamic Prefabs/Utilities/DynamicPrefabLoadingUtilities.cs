@@ -2,6 +2,7 @@
 using System.Text;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Network.Utilities;
+using GameCore.Infrastructure.Providers.Global;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -42,7 +43,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         private static readonly Dictionary<AddressableGUID, AsyncOperationHandle<GameObject>> CompletedCache =
             new(new AddressableGUIDEqualityComparer());
 
-        private static readonly Dictionary<AddressableGUID, List<AsyncOperationHandle>> Handles =
+        private static readonly Dictionary<AddressableGUID, List<AsyncOperationHandle<GameObject>>> Handles =
             new(new AddressableGUIDEqualityComparer());
 
         // A storage where we keep the association between the dynamic prefab (hash of it's GUID)
@@ -74,12 +75,11 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             return await handle.Task;
         }
         
-        private static void AddHandle<T>(AddressableGUID addressableGUID, AsyncOperationHandle<T> handle)
-            where T : class
+        private static void AddHandle(AddressableGUID addressableGUID, AsyncOperationHandle<GameObject> handle)
         {
-            if (!Handles.TryGetValue(addressableGUID, out List<AsyncOperationHandle> resourceHandles))
+            if (!Handles.TryGetValue(addressableGUID, out List<AsyncOperationHandle<GameObject>> resourceHandles))
             {
-                resourceHandles = new List<AsyncOperationHandle>();
+                resourceHandles = new List<AsyncOperationHandle<GameObject>>();
                 Handles[addressableGUID] = resourceHandles;
             }
 
@@ -190,12 +190,18 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
         public static void UnloadAndReleaseAllDynamicPrefabs()
         {
+            if (_networkManager == null)
+                return;
+            
             HashOfDynamicPrefabGUIDs = EmptyDynamicPrefabHash;
 
-            foreach (var handle in CompletedCache.Values)
+            foreach (var pair in Handles)
             {
-                _networkManager.RemoveNetworkPrefab(handle.Result);
-                Addressables.Release(handle);
+                foreach (var handle in pair.Value)
+                {
+                    _networkManager.RemoveNetworkPrefab(handle.Result);
+                    Addressables.Release(handle);
+                }
             }
 
             CompletedCache.Clear();

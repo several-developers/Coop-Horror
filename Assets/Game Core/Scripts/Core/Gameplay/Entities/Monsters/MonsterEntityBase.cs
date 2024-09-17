@@ -17,8 +17,11 @@ namespace GameCore.Gameplay.Entities.Monsters
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(IEntitiesStorage entitiesStorage) =>
+        private void Construct(IEntitiesStorage entitiesStorage)
+        {
             entitiesStorage.AddEntity(gameObject);
+            Debug.Log("Added " + gameObject.name);
+        }
 
         // MEMBERS: -------------------------------------------------------------------------------
 

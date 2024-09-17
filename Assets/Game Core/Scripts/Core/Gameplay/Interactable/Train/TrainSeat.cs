@@ -98,6 +98,11 @@ namespace GameCore.Gameplay.Interactable.Train
 
         private void InteractLogic()
         {
+            if (_lastPlayerEntity == null)
+            {
+                _lastPlayerEntity = PlayerEntity.GetLocalPlayer();
+            }
+            
             Transform playerTransform = _lastPlayerEntity.transform;
             Vector3 endPosition = _teleportPoint.localPosition + transform.localPosition;
             endPosition.y = _spawnPositionY;

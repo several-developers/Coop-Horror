@@ -52,7 +52,7 @@ namespace GameCore.Gameplay.Items
 
         private static int maxUniqueItemID;
 
-        private readonly NetworkVariable<bool> _isPickedUp = new();
+        private readonly NetworkVariable<bool> _isPickedUp = new(writePerm: Constants.OwnerPermission);
 
         private IItemsProvider _itemsProvider;
         private FollowParent _followParent;
@@ -235,7 +235,7 @@ namespace GameCore.Gameplay.Items
             PickUpClientRpc();
         }
 
-        [Rpc(target: SendTo.Everyone)]
+        [Rpc(target: SendTo.Everyone, RequireOwnership = false)]
         private void DropRpc(bool destroy)
         {
             if (IsOwner)

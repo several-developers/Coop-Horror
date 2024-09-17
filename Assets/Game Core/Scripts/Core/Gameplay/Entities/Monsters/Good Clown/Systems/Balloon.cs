@@ -58,6 +58,12 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown
 
             if (_lineRenderer == null)
                 return;
+
+            if (_pointOne == null)
+                return;
+
+            if (_pointTwo == null)
+                return;
             
             _lineRenderer.SetPosition(index: 0, _pointOne.position);
             _lineRenderer.SetPosition(index: 1, _pointTwo.position);

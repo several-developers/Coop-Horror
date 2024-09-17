@@ -37,6 +37,9 @@ namespace GameCore.Infrastructure.Providers.Gameplay.Items
             _allItems.Remove(uniqueItemID);
         }
 
+        public void Clear() =>
+            _allItems.Clear();
+
         public IReadOnlyDictionary<int, ItemObjectBase> GetAllItems() => _allItems;
 
         public bool TryGetItem(int uniqueItemID, out ItemObjectBase item) =>
