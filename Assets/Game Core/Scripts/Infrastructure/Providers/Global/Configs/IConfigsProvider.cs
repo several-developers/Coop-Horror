@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Gameplay.InputManagement;
+using GameCore.Gameplay.Systems.InputManagement;
 using GameCore.Infrastructure.Configs;
 
 namespace GameCore.Infrastructure.Providers.Global

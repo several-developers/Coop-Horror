@@ -13,14 +13,10 @@ namespace GameCore.Configs.Global.EntitiesList
         [Title(Constants.References)]
         [SerializeField, Required]
         private List<AssetReferenceGameObject> _entitiesDynamicReferences;
-        
-        [SerializeField, Required]
-        private List<AssetReferenceGameObject> _globalEntitiesReferences;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public IEnumerable<AssetReferenceGameObject> GetAllDynamicReferences() => _entitiesDynamicReferences;
-        public IEnumerable<AssetReferenceGameObject> GetAllGlobalReferences() => _globalEntitiesReferences;
 
         public override string GetMetaCategory() =>
             EditorConstants.GlobalConfigsListsCategory;

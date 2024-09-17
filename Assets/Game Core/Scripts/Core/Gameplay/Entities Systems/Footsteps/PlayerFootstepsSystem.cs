@@ -1,6 +1,6 @@
 ﻿using ECM2;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.InputManagement;
+using GameCore.Gameplay.Systems.InputManagement;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Systems.Footsteps

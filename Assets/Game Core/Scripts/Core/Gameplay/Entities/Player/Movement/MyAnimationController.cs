@@ -1,6 +1,6 @@
 ﻿using ECM2;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
-using GameCore.Gameplay.InputManagement;
+using GameCore.Gameplay.Systems.InputManagement;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

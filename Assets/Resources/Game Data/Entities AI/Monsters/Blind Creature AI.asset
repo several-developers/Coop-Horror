@@ -101,8 +101,8 @@ MonoBehaviour:
     _maxDelay: 4
     _acceleration: 8
   _combatConfig:
-    _damage: 1
-    _attackCooldown: 0.6
+    _damage: 50
+    _attackCooldown: 2
     _attackDistance: 1.5
     _triggerRadius: 2.5
     _layerMask:

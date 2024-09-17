@@ -58,6 +58,7 @@ namespace GameCore.Gameplay.GameManagement
                 ResetQuests();
                 _gameManagerDecorator.SelectLocation(LocationName.Base);
                 _trainEntity.SendLeaveLocation();
+                // Reset elevator
             }
 
             // Common logic.

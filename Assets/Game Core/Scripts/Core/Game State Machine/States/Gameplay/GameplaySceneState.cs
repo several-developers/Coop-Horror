@@ -4,7 +4,7 @@ using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Factories.Menu;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.HorrorStateMachineSpace;
-using GameCore.Gameplay.InputManagement;
+using GameCore.Gameplay.Systems.InputManagement;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Gameplay.Chat;
 using GameCore.UI.Gameplay.GameMap;

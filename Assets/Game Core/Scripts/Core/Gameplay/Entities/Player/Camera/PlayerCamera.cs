@@ -37,9 +37,11 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         {
             Camera mainCamera = _cameraReferences.MainCamera;
             CinemachineBrain cinemachineBrain = _cameraReferences.CinemachineBrain;
+            GameObject modelPivot = _cameraReferences.ModelPivot;
 
             mainCamera.enabled = isEnabled;
             cinemachineBrain.enabled = isEnabled;
+            modelPivot.SetActive(isEnabled);
         }
     }
 }

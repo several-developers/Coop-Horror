@@ -6,12 +6,12 @@
 
         public QuitState(IHorrorStateMachine horrorStateMachine)
         {
-
             horrorStateMachine.AddState(this);
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Enter()

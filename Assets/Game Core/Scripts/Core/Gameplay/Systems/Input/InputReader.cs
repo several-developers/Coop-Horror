@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace GameCore.Gameplay.InputManagement
+namespace GameCore.Gameplay.Systems.InputManagement
 {
     [CreateAssetMenu(menuName = "Input Reader")]
     public class InputReader : ScriptableObject, GameInput.IGameplayActions, GameInput.IMenusActions

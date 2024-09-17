@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9036817173154356121}
   m_Layer: 11
-  m_Name: PlayerFirstPersonItems
+  m_Name: Model Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -210,6 +210,7 @@ MonoBehaviour:
   _cameraReferences:
     _mainCamera: {fileID: 9036817173485120049}
     _cinemachineBrain: {fileID: 5875149446594489196}
+    _modelPivot: {fileID: 9036817173154356122}
     _leftHandItemsHolder: {fileID: 875171220624664058}
     _rightHandItemsHolder: {fileID: 4044904638685934641}
     _playerArmsAnimator: {fileID: 1373817859394050727}

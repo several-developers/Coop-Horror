@@ -13,14 +13,12 @@ MonoBehaviour:
   m_Name: Entities List
   m_EditorClassIdentifier: 
   _metaName: Entities List
-  _entitiesReferences: []
   _entitiesDynamicReferences:
-  - m_AssetGUID: ec23a3f571f681f458b3709772925419
+  - m_AssetGUID: a77369042e11ddd49be3f82d556be8a1
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-  _globalEntitiesReferences:
-  - m_AssetGUID: a77369042e11ddd49be3f82d556be8a1
+  - m_AssetGUID: ec23a3f571f681f458b3709772925419
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0

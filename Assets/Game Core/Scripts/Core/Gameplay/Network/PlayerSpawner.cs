@@ -88,7 +88,7 @@ namespace GameCore.Gameplay.Network
                 .SetSuccessCallback(playerEntity => { PlayerCreated(playerEntity, clientID, lateJoin); })
                 .Build();
 
-            await _entitiesFactory.CreateEntity(spawnParams);
+            _entitiesFactory.CreateEntityDynamic(spawnParams);
         }
 
         private void PlayerCreated(PlayerEntity playerEntity, ulong clientID, bool lateJoin)

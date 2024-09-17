@@ -15,6 +15,9 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
         
         [SerializeField, Required]
         private CinemachineBrain _cinemachineBrain;
+
+        [SerializeField, Required]
+        private GameObject _modelPivot;
         
         [SerializeField, Required]
         private Transform _leftHandItemsHolder;
@@ -29,6 +32,7 @@ namespace GameCore.Gameplay.Entities.Player.CameraManagement
 
         public Camera MainCamera => _mainCamera;
         public CinemachineBrain CinemachineBrain => _cinemachineBrain;
+        public GameObject ModelPivot => _modelPivot;
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public Animator PlayerArmsAnimator => _playerArmsAnimator;

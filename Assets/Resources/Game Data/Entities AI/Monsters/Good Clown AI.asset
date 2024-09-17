@@ -79,7 +79,7 @@ MonoBehaviour:
     _transformationDelay: 5
   _hunterSystemConfig:
     _disableHunting: 0
-    _huntingDuration: 3
+    _huntingDuration: 15
     _huntingCheckInterval: 0.5
     _transformationCheckInterval: 0.1
     _targetDistanceForHunt: 20
