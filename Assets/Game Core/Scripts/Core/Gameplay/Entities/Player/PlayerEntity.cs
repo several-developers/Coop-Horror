@@ -145,16 +145,9 @@ namespace GameCore.Gameplay.Entities.Player
             _references.NetworkTransform.Teleport(position, rotation, transform.localScale);
         }
 
-        [Button(ButtonStyle.FoldoutButton)]
         public void TeleportToTrainSeat(int seatIndex) => TeleportToTrainSeatRpc(seatIndex);
 
-        public void SetEntityLocation(EntityLocation entityLocation)
-        {
-            if (IsOwner)
-                _entityLocation.Value = entityLocation;
-            else
-                SetPlayerLocationServerRpc(entityLocation);
-        }
+        public void SetEntityLocation(EntityLocation entityLocation) => SetEntityLocationRpc(entityLocation);
 
         public void SetFloor(Floor floor)
         {
@@ -200,14 +193,21 @@ namespace GameCore.Gameplay.Entities.Player
             OnLeftMobileHQSeat.Invoke();
 
         public void EnterAliveState() => ChangeState<AliveState>();
-
         public void EnterReviveState() => ChangeState<ReviveState>();
-
         public void EnterSittingState() => ChangeState<SittingState>();
 
         public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
 
         public static PlayerEntity GetLocalPlayer() => _localPlayer;
+
+        public PlayerConfigMeta GetConfig() => _playerConfig;
+
+        public PlayerReferences GetReferences() => _references;
+
+        public PlayerInventory GetInventory() => _inventory;
+
+        public float GetSanity() =>
+            _sanity.Value;
 
         public static int GetPlayersAmount() =>
             AllPlayers.Count;
@@ -228,15 +228,6 @@ namespace GameCore.Gameplay.Entities.Player
 
             return alivePlayersAmount;
         }
-
-        public PlayerConfigMeta GetConfig() => _playerConfig;
-
-        public PlayerReferences GetReferences() => _references;
-
-        public PlayerInventory GetInventory() => _inventory;
-
-        public float GetSanity() =>
-            _sanity.Value;
 
         public static bool TryGetPlayer(ulong clientID, out PlayerEntity playerEntity) =>
             AllPlayers.TryGetValue(clientID, out playerEntity);
@@ -546,10 +537,10 @@ namespace GameCore.Gameplay.Entities.Player
             RagdollController ragdollController = _references.RagdollController;
             ragdollController.ToggleRagdoll(enable);
         }
-        
-        [ServerRpc(RequireOwnership = false)]
-        private void SetPlayerLocationServerRpc(EntityLocation entityLocation) =>
-            SetPlayerLocationClientRpc(entityLocation);
+
+        [Rpc(target: SendTo.Owner)]
+        private void SetEntityLocationRpc(EntityLocation entityLocation) =>
+            _entityLocation.Value = entityLocation;
 
         [ServerRpc(RequireOwnership = false)]
         private void SetFloorServerRpc(Floor floor) =>
@@ -596,15 +587,6 @@ namespace GameCore.Gameplay.Entities.Player
                 return;
 
             _inventoryManager.DestroyItemPreview(slotIndex);
-        }
-
-        [ClientRpc]
-        private void SetPlayerLocationClientRpc(EntityLocation entityLocation)
-        {
-            if (!IsOwner)
-                return;
-
-            _entityLocation.Value = entityLocation;
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

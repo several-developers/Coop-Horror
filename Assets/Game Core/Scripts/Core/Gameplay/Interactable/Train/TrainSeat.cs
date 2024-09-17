@@ -39,41 +39,38 @@ namespace GameCore.Gameplay.Interactable.Train
         public event Func<int, bool> IsSeatBusyEvent = _ => true;
         public event Func<bool> ShouldRemovePlayerParentEvent = () => false;
 
-        private PlayerEntity _lastPlayerEntity;
         private Tweener _playerPositionTN;
         private Tweener _playerRotationTN;
+
+        private PlayerEntity _lastPlayerEntity;
         private bool _isInteractionEnabled = true;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void InteractionStarted(IEntity entity = null)
         {
-            if (entity is not PlayerEntity playerEntity)
-                return;
-
-            playerEntity.OnParentChangedEvent += OnPlayerParentChanged;
         }
 
         public void InteractionEnded(IEntity entity = null)
         {
-            if (entity is not PlayerEntity playerEntity)
-                return;
-
-            playerEntity.OnParentChangedEvent -= OnPlayerParentChanged;
         }
 
         public void Interact(IEntity entity = null)
         {
-            if (entity is not PlayerEntity playerEntity)
+            if (entity is not PlayerEntity)
                 return;
 
-            _lastPlayerEntity = playerEntity;
-            bool hasParent = _lastPlayerEntity.transform.parent != null;
+            PlayerEntity playerEntity = GetLocalPlayer();
+            bool hasParent = playerEntity.transform.parent != null;
 
             if (hasParent)
+            {
                 InteractLogic();
-            else
-                _lastPlayerEntity.SetTrainAsParent();
+                return;
+            }
+
+            playerEntity.OnParentChangedEvent += OnPlayerParentChanged;
+            playerEntity.SetTrainAsParent();
         }
 
         public void ToggleInteract(bool canInteract)
@@ -98,12 +95,8 @@ namespace GameCore.Gameplay.Interactable.Train
 
         private void InteractLogic()
         {
-            if (_lastPlayerEntity == null)
-            {
-                _lastPlayerEntity = PlayerEntity.GetLocalPlayer();
-            }
-            
-            Transform playerTransform = _lastPlayerEntity.transform;
+            PlayerEntity playerEntity = GetLocalPlayer();
+            Transform playerTransform = playerEntity.transform;
             Vector3 endPosition = _teleportPoint.localPosition + transform.localPosition;
             endPosition.y = _spawnPositionY;
 
@@ -118,8 +111,8 @@ namespace GameCore.Gameplay.Interactable.Train
                 .DOLocalRotate(transform.localRotation.eulerAngles, PlayerRotationDuration)
                 .SetEase(PlayerAnimationEase);
 
-            _lastPlayerEntity.EnterSittingState();
-            _lastPlayerEntity.OnLeftMobileHQSeat += OnLeftMobileHQSeat;
+            playerEntity.EnterSittingState();
+            playerEntity.OnLeftMobileHQSeat += OnLeftMobileHQSeat;
 
             OnTakeSeatEvent.Invoke(SeatIndex);
         }
@@ -127,21 +120,30 @@ namespace GameCore.Gameplay.Interactable.Train
         private void SendInteractionStateChangedEvent() =>
             OnInteractionStateChangedEvent?.Invoke();
 
+        private static PlayerEntity GetLocalPlayer() =>
+            PlayerEntity.GetLocalPlayer();
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnPlayerParentChanged(bool hasParent) => InteractLogic();
+        private void OnPlayerParentChanged(bool hasParent)
+        {
+            PlayerEntity playerEntity = GetLocalPlayer();
+            playerEntity.OnParentChangedEvent -= OnPlayerParentChanged;
+            InteractLogic();
+        }
 
         private void OnLeftMobileHQSeat()
         {
             _playerPositionTN.Kill();
             _playerRotationTN.Kill();
 
+            PlayerEntity playerEntity = GetLocalPlayer();
             bool shouldRemovePlayerParent = ShouldRemovePlayerParentEvent.Invoke();
             
             if (shouldRemovePlayerParent)
-                _lastPlayerEntity.RemoveParent();
+                playerEntity.RemoveParent();
 
-            _lastPlayerEntity.OnLeftMobileHQSeat -= OnLeftMobileHQSeat;
+            playerEntity.OnLeftMobileHQSeat -= OnLeftMobileHQSeat;
 
             OnLeftSeatEvent.Invoke(SeatIndex);
         }

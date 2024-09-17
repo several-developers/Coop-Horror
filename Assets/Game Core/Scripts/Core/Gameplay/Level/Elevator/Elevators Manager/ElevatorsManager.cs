@@ -225,7 +225,7 @@ namespace GameCore.Gameplay.Level.Elevator
                 : EntityLocation.Dungeon;
             
             VisualPresetType presetType = currentFloor == Floor.Surface
-                ? VisualPresetType.DefaultLocation
+                ? VisualPresetType.ForestLocation
                 : VisualPresetType.Dungeon;
             
             playerEntity.SetEntityLocation(playerLocation);

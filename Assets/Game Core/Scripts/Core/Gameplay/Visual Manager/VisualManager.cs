@@ -237,6 +237,7 @@ namespace GameCore.Gameplay.VisualManagement
             bool changeAmbientSkyColor = location switch
             {
                 EntityLocation.Dungeon => true,
+                EntityLocation.Stairs => true,
                 _ => false
             };
 

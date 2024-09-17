@@ -75,7 +75,7 @@ namespace GameCore.Gameplay.Entities.Train
 
             if (leaveLocation)
             {
-                _trainEntity.StartLeavingLocationServerRpc();
+                _trainEntity.StartTrainRpc();
                 _trainEntity.ToggleMainLeverState(isEnabled: false);
             }
             else
@@ -114,7 +114,7 @@ namespace GameCore.Gameplay.Entities.Train
             TrainMainLever mainLever = _references.MainLever;
             mainLever.InteractLogic();
 
-            _trainEntity.MainLeverAnimationServerRpc();
+            _trainEntity.PlayMainLeverPullAnimationRpc();
         }
 
         private void OnMainLeverPulled() => MainLeverLogic();

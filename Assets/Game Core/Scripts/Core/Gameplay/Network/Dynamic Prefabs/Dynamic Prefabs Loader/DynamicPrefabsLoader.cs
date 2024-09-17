@@ -221,7 +221,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
 
             if (DynamicPrefabLoadingUtilities.IsPrefabLoadedOnAllClients(assetGuid))
             {
-                Debug.Log(message: "Prefab is already loaded by all peers, we can spawn it immediately");
+                // Debug.Log(message: "Prefab is already loaded by all peers, we can spawn it immediately");
 
                 GameObject prefab = LoadAndSendPrefab(assetGuid);
 
@@ -292,7 +292,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 // _networkManager.SpawnManager.InstantiateAndSpawn(prefabNetworkObject, NetworkHorror.ServerID,
                 //     destroyWithScene: true, position: Vector3.zero);
 
-                Debug.Log(message: "Spawned dynamic prefab");
+                // Debug.Log(message: "Spawned dynamic prefab");
 
                 // Every client loaded dynamic prefab, their respective ClientUIs in case they loaded first.
                 foreach (ulong client in _networkManager.ConnectedClients.Keys)

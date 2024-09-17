@@ -360,10 +360,9 @@ namespace GameCore.Gameplay.Entities.Train
             PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
             TeleportPlayerToRandomSeat(localPlayer, ignoreChecks);
         }
-        
-#warning TEMP
-        [ServerRpc(RequireOwnership = false)]
-        public void StartLeavingLocationServerRpc()
+
+        [Rpc(target: SendTo.Server)]
+        public void StartTrainRpc()
         {
             OnMovementStartedEvent.Invoke();
             
@@ -375,13 +374,27 @@ namespace GameCore.Gameplay.Entities.Train
             
             _pathMovement.SetMovementType(PathMovement.MovementType.SpeedingUp);
             _pathMovement.SpeedUpTrain();
+
+            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
+
+            foreach (PlayerEntity playerEntity in allPlayers.Values)
+            {
+                bool isDead = playerEntity.IsDead();
+                bool isInsideTrain = playerEntity.IsInsideTrain;
+                bool isPlayerValid = !isDead && isInsideTrain;
+
+                if (!isPlayerValid)
+                    continue;
+                
+                playerEntity.SetTrainAsParent();
+            }
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void MainLeverAnimationServerRpc(ServerRpcParams serverRpcParams = default)
+        [Rpc(target: SendTo.NotOwner)]
+        public void PlayMainLeverPullAnimationRpc()
         {
-            ulong senderClientId = serverRpcParams.Receive.SenderClientId;
-            MainLeverAnimationClientRpc(senderClientId);
+            TrainMainLever mainLever = _references.MainLever;
+            mainLever.InteractWithoutEvents(isLeverPulled: true);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -403,18 +416,6 @@ namespace GameCore.Gameplay.Entities.Train
         [ServerRpc(RequireOwnership = false)]
         private void ToggleStoppedAtSectorStateServerRPC(bool isStoppedAtSector) =>
             _isStoppedAtSector.Value = isStoppedAtSector;
-
-        [ClientRpc]
-        private void MainLeverAnimationClientRpc(ulong senderClientID)
-        {
-            bool isCurrentPlayer = NetworkHorror.ClientID == senderClientID;
-            
-            if (isCurrentPlayer)
-                return;
-
-            TrainMainLever mainLever = _references.MainLever;
-            mainLever.InteractWithoutEvents(isLeverPulled: true);
-        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

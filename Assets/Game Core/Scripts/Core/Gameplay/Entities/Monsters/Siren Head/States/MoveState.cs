@@ -63,6 +63,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SirenHead.States
             _movementTN = transform
                 .DOMove(targetPosition, duration)
                 .SetEase(Ease.Linear)
+                .SetLink(_sirenHeadEntity.gameObject)
                 .OnComplete(EnterIdleState);
         }
 
