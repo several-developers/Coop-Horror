@@ -260,10 +260,8 @@ namespace GameCore.StateMachine
         private void OnGameOverWarningConfirmClicked() =>
             _gameManagerDecorator.ChangeGameState(GameState.KillPlayersByMetroMonster);
 
-        private void OnGameOverWarningCancelClicked()
-        {
-            //_trainEntity.EnableMainLever();
-        }
+        private void OnGameOverWarningCancelClicked() =>
+            _trainEntity.EnableMainLever();
 
         private void OnQuitConfirmClicked() => EnterQuitGameplayState();
 

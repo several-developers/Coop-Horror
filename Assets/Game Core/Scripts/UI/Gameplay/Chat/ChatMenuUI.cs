@@ -135,7 +135,6 @@ namespace GameCore.UI.Gameplay.Chat
             base.Hide();
             ToggleChatMenuState(isEnabled: false);
             ToggleTimerHintState(isEnabled: false);
-            StopHideTimer();
             StartHideTimer();
             
             _chatManagerDecorator.OnTimerTickEvent -= OnTimerTick;
@@ -201,6 +200,8 @@ namespace GameCore.UI.Gameplay.Chat
 
         private void StartHideTimer()
         {
+            StopHideTimer();
+            
             IEnumerator routine = HideTimerCO();
             _hideTimerCO = StartCoroutine(routine);
         }
@@ -244,6 +245,8 @@ namespace GameCore.UI.Gameplay.Chat
         {
             CreateChatMessage(message);
             ScrollChatToBottom();
+            VisibilityState(show: true);
+            StartHideTimer();
         }
 
         private void OnTimerTick(float timeLeft)

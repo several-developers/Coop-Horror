@@ -54,6 +54,24 @@ namespace GameCore.Gameplay.Systems.Inventory
             SendSelectedSlotChangedEvent(newSlotIndex);
         }
 
+        public bool AddItem(InventoryItemData inventoryItemData, int slotIndex)
+        {
+            bool isItemExists = _inventory.IsItemExists(slotIndex);
+
+            //LogPickUpItem(itemData.ItemID);
+
+            if (isItemExists)
+                return false;
+                
+            _inventory.AddItem(inventoryItemData, slotIndex);
+
+            ulong clientID = GetClientID();
+            EquippedItemStaticData data = new(inventoryItemData, clientID, slotIndex);
+            OnItemEquippedEvent.Invoke(data);
+
+            return true;
+        }
+
         public bool AddItem(InventoryItemData inventoryItemData, out int slotIndex)
         {
             bool isItemInSelectedSlotExists = _inventory.HasItemInSelectedSlot();
@@ -86,6 +104,24 @@ namespace GameCore.Gameplay.Systems.Inventory
             //LogItemDrop(itemData.ItemID);
 
             int slotIndex = _inventory.DropSelectedItem();
+            const bool randomPosition = false;
+
+            ulong clientID = GetClientID();
+            DroppedItemStaticData data = new(clientID, slotIndex, randomPosition, destroy);
+            OnItemDroppedEvent.Invoke(data);
+            
+            return true;
+        }
+        
+        public bool DropItem(int slotIndex, bool destroy = false)
+        {
+            bool hasItemInSelectedSlot = _inventory.IsItemExists(slotIndex);
+
+            if (!hasItemInSelectedSlot)
+                return false;
+
+            //LogItemDrop(itemData.ItemID);
+
             const bool randomPosition = false;
 
             ulong clientID = GetClientID();

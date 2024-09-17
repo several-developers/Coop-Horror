@@ -44,6 +44,9 @@
 
             return slotIndex;
         }
+        
+        public void AddItem(TItem item, int slotIndex) =>
+            _items[slotIndex] = item;
 
         public int AddItemInSelectedSlot(TItem item)
         {

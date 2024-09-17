@@ -23,6 +23,7 @@ namespace GameCore.Gameplay.Entities.Train
         void ToggleMainLeverState(bool isEnabled);
         void ToggleDoorState(bool isOpened);
         void ToggleStoppedAtSectorState(bool isStoppedAtSector);
+        void EnableMainLever();
         UniTaskVoid PlaySound(TrainEntity.SFXType sfxType, bool onlyLocal = false, float delay = 0f);
         void StopSound(TrainEntity.SFXType sfxType);
         void SendLeaveLocation();

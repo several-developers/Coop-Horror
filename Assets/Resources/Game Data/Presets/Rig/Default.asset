@@ -41,10 +41,10 @@ MonoBehaviour:
     _eulerRotation: {x: 0, y: 0, z: 0}
     _duration: 0.3
   _tpsRightHandTargetPose:
-    _position: {x: 0.833, y: 2.505, z: 0.327}
-    _eulerRotation: {x: 0, y: 0, z: 0}
+    _position: {x: 0.749, y: 2.505, z: -0.357}
+    _eulerRotation: {x: -90, y: -90, z: 0}
     _duration: 0.3
   _tpsRightHandHintPose:
-    _position: {x: 1.301, y: 2.665, z: 0.059}
+    _position: {x: 0.706, y: 3.138, z: -0.656}
     _eulerRotation: {x: 0, y: 0, z: 0}
     _duration: 0.3

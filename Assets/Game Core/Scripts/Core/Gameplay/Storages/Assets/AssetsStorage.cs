@@ -86,7 +86,7 @@ namespace GameCore.Gameplay.Storages.Assets
             bool isAssetReferenceFound = _dynamicReferencesDictionary.TryGetValue(key, out assetReference);
 
             if (!isAssetReferenceFound)
-                Log.PrintError(log: $"<gb>Asset Reference with key '<gb>{key}</gb>' <rb>not found</rb>!");
+                Log.PrintError(log: $"Dynamic Asset Reference with key '<gb>{key}</gb>' <rb>not found</rb>!");
 
             return isAssetReferenceFound;
         }

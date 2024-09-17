@@ -189,6 +189,9 @@ namespace GameCore.Gameplay.Entities.Train
                 ToggleStoppedAtSectorStateServerRPC(isStoppedAtSector);
         }
 
+        public void EnableMainLever() =>
+            _trainController.ToggleMainLeverState(isEnabled: true);
+
         public void SendOpenQuestsSelectionMenu() =>
             OnOpenQuestsSelectionMenuEvent.Invoke();
 
@@ -361,7 +364,7 @@ namespace GameCore.Gameplay.Entities.Train
             TeleportPlayerToRandomSeat(localPlayer, ignoreChecks);
         }
 
-        [Rpc(target: SendTo.Server)]
+        [Rpc(target: SendTo.Owner)]
         public void StartTrainRpc()
         {
             OnMovementStartedEvent.Invoke();

@@ -2,7 +2,6 @@
 using System.Text;
 using Cysharp.Threading.Tasks;
 using GameCore.Gameplay.Network.Utilities;
-using GameCore.Infrastructure.Providers.Global;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -279,7 +278,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 HashOfDynamicPrefabGUIDs = hash;
             }
 
-            Debug.Log(message: $"Calculated hash of dynamic prefabs: {HashOfDynamicPrefabGUIDs}");
+            // Debug.Log(message: $"Calculated hash of dynamic prefabs: {HashOfDynamicPrefabGUIDs}");
         }
     }
 }

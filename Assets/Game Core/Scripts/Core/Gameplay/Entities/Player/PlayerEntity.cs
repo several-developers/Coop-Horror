@@ -354,6 +354,8 @@ namespace GameCore.Gameplay.Entities.Player
         protected override void InitNotOwner()
         {
             FixInvisiblePlayerBug(); // TEMP
+            
+            _references.RigController.SetAnimator(_references.Animator);
 
             _currentSelectedSlotIndex.OnValueChanged += OnNotOwnerSelectedSlotChanged;
 
@@ -658,6 +660,8 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _inventory.SetSelectedSlotIndex(newValue);
             _inventoryManager.ToggleItemsState();
+            
+            _references.RigController.TryUpdateRig(OwnerClientId);
         }
 
         private void OnPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue) =>

@@ -1,5 +1,6 @@
 ﻿using System;
 using ECM2;
+using GameCore.Gameplay.Items.Rigging;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.Health;
 using GameCore.Gameplay.Systems.Ragdoll;
@@ -48,6 +49,9 @@ namespace GameCore.Gameplay.Entities.Player
         private RagdollController _ragdollController;
 
         [SerializeField, Required]
+        private ThirdPersonRigController _rigController;
+        
+        [SerializeField, Required]
         private Character _character;
 
         [SerializeField, Required]
@@ -90,6 +94,7 @@ namespace GameCore.Gameplay.Entities.Player
         public Transform LeftHandItemsHolder => _leftHandItemsHolder;
         public Transform RightHandItemsHolder => _rightHandItemsHolder;
         public RagdollController RagdollController => _ragdollController;
+        public ThirdPersonRigController RigController => _rigController;
         public Character Character => _character;
         public PlayerFootstepsSystem FootstepsSystem => _footstepsSystem;
         public SittingCameraController SittingCameraController => _sittingCameraController;

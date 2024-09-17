@@ -1,7 +1,7 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Systems.Inventory;
 using GameCore.Infrastructure.Providers.Gameplay.RigPresets;
 using GameCore.Infrastructure.Providers.Global.ItemsMeta;
@@ -12,29 +12,19 @@ using Zenject;
 
 namespace GameCore.Gameplay.Items.Rigging
 {
-    public class RigController : MonoBehaviour
+    public class RigControllerBase : MonoBehaviour
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(
-            IItemsMetaProvider itemsMetaProvider,
-            IRigPresetsProvider rigPresetsProvider,
-            PlayerCamera playerCamera
-        )
+        private void Construct(IItemsMetaProvider itemsMetaProvider, IRigPresetsProvider rigPresetsProvider)
         {
             _itemsMetaProvider = itemsMetaProvider;
             _rigPresetsProvider = rigPresetsProvider;
-
-            CameraReferences cameraReferences = playerCamera.CameraReferences;
-            _playersArmsAnimator = cameraReferences.PlayerArmsAnimator;
-
-            _leftHandLayerIndex = _playersArmsAnimator.GetLayerIndex("Left Hand");
-            _rightHandLayerIndex = _playersArmsAnimator.GetLayerIndex("Right Hand");
         }
 
         // MEMBERS: -------------------------------------------------------------------------------
-
+        
         [Title(Constants.References)]
         [SerializeField, Required]
         private TwoBoneIKConstraint _leftHandRig;
@@ -58,28 +48,23 @@ namespace GameCore.Gameplay.Items.Rigging
 
         private IItemsMetaProvider _itemsMetaProvider;
         private IRigPresetsProvider _rigPresetsProvider;
-        private Animator _playersArmsAnimator;
+        
+        private Animator _animator;
         private Sequence _sequence;
         private int _leftHandLayerIndex;
         private int _rightHandLayerIndex;
 
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
+        // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        private void Awake()
+        public void SetAnimator(Animator animator)
         {
-            PlayerEntity.OnPlayerSpawnedEvent += OnPlayerSpawned;
-            PlayerEntity.OnPlayerDespawnedEvent += OnPlayerDespawned;
+            _animator = animator;
+
+            _leftHandLayerIndex = _animator.GetLayerIndex("Left Hand");
+            _rightHandLayerIndex = _animator.GetLayerIndex("Right Hand");
         }
 
-        private void OnDestroy()
-        {
-            PlayerEntity.OnPlayerSpawnedEvent -= OnPlayerSpawned;
-            PlayerEntity.OnPlayerDespawnedEvent -= OnPlayerDespawned;
-        }
-
-        // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void TryUpdateRig(ulong clientID)
+        public void TryUpdateRig(ulong clientID)
         {
             bool isPlayerFound = PlayerEntity.TryGetPlayer(clientID, out PlayerEntity playerEntity);
 
@@ -91,7 +76,7 @@ namespace GameCore.Gameplay.Items.Rigging
 
             bool isItemInSelectedSlotExists =
                 playerInventory.TryGetSelectedItemData(out InventoryItemData inventoryItemData);
-
+            
             if (!isItemInSelectedSlotExists)
             {
                 ResetRig(isLocalPlayer);
@@ -110,6 +95,12 @@ namespace GameCore.Gameplay.Items.Rigging
             RigPresetType presetType = itemMeta.RigPresetType;
             UpdateRig(presetType, isLocalPlayer);
         }
+        
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected void ResetRig(bool isLocalPlayer) => UpdateRig(RigPresetType.Default, isLocalPlayer);
+        
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void UpdateRig(RigPresetType presetType, bool isLocalPlayer)
         {
@@ -219,9 +210,7 @@ namespace GameCore.Gameplay.Items.Rigging
             ChangeHandAnimatorLayer(rigPresetMeta, _leftHandLayerIndex, leftHandRigWeight);
             ChangeHandAnimatorLayer(rigPresetMeta, _rightHandLayerIndex, rightHandRigWeight);
         }
-
-        private void ResetRig(bool isLocalPlayer) => UpdateRig(RigPresetType.Default, isLocalPlayer);
-
+        
         private void ChangeHandRig(Transform handTarget, Transform handHint, TwoBoneIKConstraint handRig,
             RigPresetMeta.RigPose targetPose, RigPresetMeta.RigPose hintPose, float rigChangeDuration,
             float targetWeight)
@@ -237,11 +226,11 @@ namespace GameCore.Gameplay.Items.Rigging
 
         private void ChangeHandAnimatorLayer(RigPresetMeta rigPresetMeta, int layerIndex, float targetWeight)
         {
-            float from = _playersArmsAnimator.GetLayerWeight(layerIndex);
+            float from = _animator.GetLayerWeight(layerIndex);
             float duration = rigPresetMeta.AnimatorLayerWeightChangeTime;
 
             FloatAnimation(from, to: targetWeight, duration,
-                onVirtualUpdate: weight => _playersArmsAnimator.SetLayerWeight(layerIndex, weight));
+                onVirtualUpdate: weight => _animator.SetLayerWeight(layerIndex, weight));
         }
 
         private void FloatAnimation(float from, float to, float duration, TweenCallback<float> onVirtualUpdate) =>
@@ -252,43 +241,5 @@ namespace GameCore.Gameplay.Items.Rigging
 
         private void LocalRotateAnimation(Transform target, Vector3 eulerRotation, float duration) =>
             _sequence.Join(target.DOLocalRotate(eulerRotation, duration));
-
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
-
-        private void OnPlayerSpawned(PlayerEntity playerEntity)
-        {
-            bool isLocalPlayer = playerEntity.IsLocalPlayer();
-
-            if (!isLocalPlayer)
-                return;
-
-            ResetRig(isLocalPlayer: true);
-
-            PlayerInventory playerInventory = playerEntity.GetInventory();
-
-            playerInventory.OnItemEquippedEvent += OnItemEquipped;
-            playerInventory.OnItemDroppedEvent += OnItemDropped;
-            playerInventory.OnSelectedSlotChangedEvent += OnInventorySelectedSlotChanged;
-        }
-
-        private void OnPlayerDespawned(PlayerEntity playerEntity)
-        {
-            bool isLocalPlayer = playerEntity.IsLocalPlayer();
-
-            if (!isLocalPlayer)
-                return;
-
-            PlayerInventory playerInventory = playerEntity.GetInventory();
-
-            playerInventory.OnItemEquippedEvent -= OnItemEquipped;
-            playerInventory.OnItemDroppedEvent -= OnItemDropped;
-            playerInventory.OnSelectedSlotChangedEvent -= OnInventorySelectedSlotChanged;
-        }
-
-        private void OnItemEquipped(EquippedItemStaticData data) => TryUpdateRig(data.ClientID);
-
-        private void OnItemDropped(DroppedItemStaticData data) => TryUpdateRig(data.ClientID);
-
-        private void OnInventorySelectedSlotChanged(ChangedSlotStaticData data) => TryUpdateRig(data.ClientID);
     }
 }

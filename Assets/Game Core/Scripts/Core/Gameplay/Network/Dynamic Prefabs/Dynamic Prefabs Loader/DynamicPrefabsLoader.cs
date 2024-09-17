@@ -234,7 +234,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             _synchronousSpawnAckCount = 0;
             _synchronousSpawnTimeoutTimer = 0;
 
-            Debug.Log(message: "Loading dynamic prefab on the clients...");
+            // Debug.Log(message: "Loading dynamic prefab on the clients...");
             LoadAddressableClientRpc(assetGuid);
 
             // Server is starting to load a prefab, update UI.
@@ -260,8 +260,8 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
             {
                 if (_synchronousSpawnAckCount >= requiredAcknowledgementsCount)
                 {
-                    Debug.Log(message: $"All clients have loaded the prefab in {_synchronousSpawnTimeoutTimer}" +
-                                       "seconds, spawning the prefab on the server...");
+                    // Debug.Log(message: $"All clients have loaded the prefab in {_synchronousSpawnTimeoutTimer}" +
+                    //                    "seconds, spawning the prefab on the server...");
 
                     return LoadAndSendPrefab(assetGuid);
                 }
@@ -421,7 +421,7 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
         {
             _synchronousSpawnAckCount++;
 
-            Debug.Log(message: $"Client acknowledged successful prefab load with hash: {prefabHash}");
+            // Debug.Log(message: $"Client acknowledged successful prefab load with hash: {prefabHash}");
 
             DynamicPrefabLoadingUtilities.RecordThatClientHasLoadedAPrefab(prefabHash,
                 rpcParams.Receive.SenderClientId);
@@ -474,11 +474,11 @@ namespace GameCore.Gameplay.Network.DynamicPrefabs
                 // m_InGameUI.ClientLoadedPrefabStatusChanged(m_NetworkManager.LocalClientId, assetGuid.GetHashCode(),
                 //     "Undefined", InGameUI.LoadStatus.Loading);
 
-                Debug.Log(message: "Loading dynamic prefab on the client...");
+                // Debug.Log(message: "Loading dynamic prefab on the client...");
 
                 await DynamicPrefabLoadingUtilities.LoadDynamicPrefab(assetGuid, ArtificialDelayMilliseconds);
 
-                Debug.Log(message: "Client loaded dynamic prefab");
+                // Debug.Log(message: "Client loaded dynamic prefab");
 
                 DynamicPrefabLoadingUtilities.TryGetLoadedGameObjectFromGuid(assetGuid,
                     out AsyncOperationHandle<GameObject> loadedGameObject);

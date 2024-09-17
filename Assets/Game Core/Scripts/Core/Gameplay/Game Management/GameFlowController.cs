@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Dungeons;
@@ -34,7 +35,7 @@ namespace GameCore.Gameplay.GameManagement
             IVisualManager visualManager,
             ITrainEntity trainEntity,
             IPublisher<UIEventMessage> uiEventMessagePublisher
-            )
+        )
         {
             _gameManagerDecorator = gameManagerDecorator;
             _gameTimeManagerDecorator = gameTimeManagerDecorator;
@@ -130,7 +131,7 @@ namespace GameCore.Gameplay.GameManagement
 
         #region Main Logic
 
-        private void HandleGameState(GameState gameState)
+        private async void HandleGameState(GameState gameState)
         {
             switch (gameState)
             {
@@ -153,6 +154,10 @@ namespace GameCore.Gameplay.GameManagement
                     break;
 
                 case GameState.KillPlayersByMetroMonster:
+                    await UniTask.Delay(1000);
+                    
+                    _gameManagerDecorator.ChangeGameStateWhenAllPlayersReady(GameState.GameOver,
+                        GameState.KillPlayersByMetroMonster);
                     break;
             }
 
@@ -324,7 +329,7 @@ namespace GameCore.Gameplay.GameManagement
             foreach (PlayerEntity playerEntity in allPlayers.Values)
                 playerEntity.SetEntityLocation(entityLocation);
         }
-        
+
         private void ChangeVisualPresetForAll(VisualPresetType presetType) =>
             _visualManager.ChangePresetForAll(presetType, instant: true);
 

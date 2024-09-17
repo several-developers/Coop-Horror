@@ -91,6 +91,9 @@ namespace GameCore.Gameplay.Systems.Inventory
             if (isItemPreviewExists)
                 return;
 
+            var inventoryItemData = new InventoryItemData(itemID, uniqueItemID: -1);
+            _playerInventory.AddItem(inventoryItemData, slotIndex);
+            
             ulong clientID = _playerEntity.OwnerClientId;
 
             _itemsPreviewFactory.Create(
@@ -117,6 +120,8 @@ namespace GameCore.Gameplay.Systems.Inventory
 
             if (itemPreviewObject != null)
                 itemPreviewObject.Drop();
+                
+            _playerInventory.DropItem(slotIndex);
 
             _itemsPreviewObjects[slotIndex] = null;
         }
