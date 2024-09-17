@@ -167,7 +167,7 @@ namespace GameCore.Gameplay.Systems.Inventory
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void CreateItemPreviewServerSide(int slotIndex, int itemID) =>
-            _playerEntity.CreateItemPreviewServerRpc(slotIndex, itemID);
+            _playerEntity.CreateItemPreviewRpc(slotIndex, itemID);
 
         private void DropItem(DroppedItemStaticData data)
         {
@@ -197,7 +197,7 @@ namespace GameCore.Gameplay.Systems.Inventory
             _interactableItems[slotIndex] = null;
 
             DestroyItemPreview(slotIndex); // Client side
-            _playerEntity.DestroyItemPreviewServerRpc(slotIndex); // Server side
+            _playerEntity.DestroyItemPreviewRpc(slotIndex); // Server side
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------

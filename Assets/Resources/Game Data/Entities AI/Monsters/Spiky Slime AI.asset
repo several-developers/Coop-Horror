@@ -16,8 +16,8 @@ MonoBehaviour:
   _dangerLevel: 1
   _isDamageable: 1
   _health: 100
-  _spawnType: 3
-  _maxCount: 1
+  _spawnType: 0
+  _maxCount: 2
   _spawnChance: 50
   _spawnChanceMultiplierByGameTime:
     serializedVersion: 2
@@ -70,7 +70,9 @@ MonoBehaviour:
   _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
   _spawnTimePeriods:
-    _timePeriods: []
+    _timePeriods:
+    - _time: {x: 0, y: 1440}
+      _timeText: 00:00 - 24:00
   _aggressionSystemConfig:
     _minLoudnessToReact: 0.1
     _aggressionMeterToAggro: 10

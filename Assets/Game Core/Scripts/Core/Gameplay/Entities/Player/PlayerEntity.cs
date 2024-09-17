@@ -9,7 +9,6 @@ using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
 using GameCore.Gameplay.Entities.Train;
 using GameCore.Gameplay.Factories.ItemsPreview;
-using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.Health;
 using GameCore.Gameplay.Systems.InputManagement;
@@ -154,7 +153,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (IsOwner)
                 _currentFloor.Value = floor;
             else
-                SetFloorServerRpc(floor);
+                SetFloorRpc(floor);
         }
 
         public void DropItem(bool destroy = false)
@@ -171,6 +170,8 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         public void Kill(PlayerDeathReason deathReason) => KillRpc(deathReason);
+
+        public void Revive() => ReviveRpc();
 
         public void ToggleDead(bool isDead)
         {
@@ -505,31 +506,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         // RPC: -----------------------------------------------------------------------------------
 
-        [Rpc(target: SendTo.Owner)]
-        private void TakeDamageRpc(float damage) =>
-            _healthSystem.TakeDamage(damage);
-
-        [Rpc(target: SendTo.Owner)]
-        private void KillRpc(PlayerDeathReason deathReason) => EnterDeathState();
-
-        [ServerRpc(RequireOwnership = false)]
-        private void ChangeSelectedSlotServerRpc(int slotIndex) =>
-            _currentSelectedSlotIndex.Value = slotIndex;
-
-        [ServerRpc(RequireOwnership = false)]
-        public void CreateItemPreviewServerRpc(int slotIndex, int itemID, ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-            CreateItemPreviewClientRpc(senderClientID, slotIndex, itemID);
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        public void DestroyItemPreviewServerRpc(int slotIndex, ServerRpcParams serverRpcParams = default)
-        {
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-            DestroyItemPreviewClientRpc(senderClientID, slotIndex);
-        }
-
         [Rpc(target: SendTo.Everyone)]
         public void ToggleRagdollRpc(bool enable)
         {
@@ -539,18 +515,6 @@ namespace GameCore.Gameplay.Entities.Player
             RagdollController ragdollController = _references.RagdollController;
             ragdollController.ToggleRagdoll(enable);
         }
-
-        [Rpc(target: SendTo.Owner)]
-        private void SetEntityLocationRpc(EntityLocation entityLocation) =>
-            _entityLocation.Value = entityLocation;
-
-        [ServerRpc(RequireOwnership = false)]
-        private void SetFloorServerRpc(Floor floor) =>
-            _currentFloor.Value = floor;
-
-        [Rpc(target: SendTo.Owner)]
-        private void TeleportToTrainSeatRpc(int seatIndex) =>
-            _trainEntity.TeleportLocalPlayerToTrainSeat(seatIndex);
 
         [Rpc(target: SendTo.Server)]
         private void SetTrainAsParentRpc()
@@ -569,27 +533,39 @@ namespace GameCore.Gameplay.Entities.Player
         private void RemoveParentRpc() =>
             NetworkObject.TryRemoveParent();
 
-        [ClientRpc]
-        private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)
-        {
-            bool isMatches = senderClientID == NetworkHorror.ClientID;
+        [Rpc(target: SendTo.Owner)]
+        private void TakeDamageRpc(float damage) =>
+            _healthSystem.TakeDamage(damage);
 
-            if (isMatches)
-                return;
+        [Rpc(target: SendTo.Owner)]
+        private void KillRpc(PlayerDeathReason deathReason) => EnterDeathState();
 
+        [Rpc(target: SendTo.Owner)]
+        private void ReviveRpc() => EnterReviveState();
+        
+        [Rpc(target: SendTo.Owner)]
+        private void ChangeSelectedSlotRpc(int slotIndex) =>
+            _currentSelectedSlotIndex.Value = slotIndex;
+
+        [Rpc(target: SendTo.Owner)]
+        private void SetEntityLocationRpc(EntityLocation entityLocation) =>
+            _entityLocation.Value = entityLocation;
+
+        [Rpc(target: SendTo.Owner)]
+        private void TeleportToTrainSeatRpc(int seatIndex) =>
+            _trainEntity.TeleportLocalPlayerToTrainSeat(seatIndex);
+
+        [Rpc(target: SendTo.Owner)]
+        private void SetFloorRpc(Floor floor) =>
+            _currentFloor.Value = floor;
+
+        [Rpc(target: SendTo.NotOwner)]
+        public void CreateItemPreviewRpc(int slotIndex, int itemID) =>
             _inventoryManager.CreateItemPreviewClientSide(slotIndex, itemID, isFirstPerson: false);
-        }
 
-        [ClientRpc]
-        private void DestroyItemPreviewClientRpc(ulong senderClientID, int slotIndex)
-        {
-            bool isMatches = senderClientID == NetworkHorror.ClientID;
-
-            if (isMatches)
-                return;
-
+        [Rpc(target: SendTo.NotOwner)]
+        public void DestroyItemPreviewRpc(int slotIndex) =>
             _inventoryManager.DestroyItemPreview(slotIndex);
-        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -651,7 +627,7 @@ namespace GameCore.Gameplay.Entities.Player
             if (IsOwner)
                 _currentSelectedSlotIndex.Value = slotIndex;
             else
-                ChangeSelectedSlotServerRpc(slotIndex);
+                ChangeSelectedSlotRpc(slotIndex);
 
             PlaySound(SFXType.ItemSwitch, onlyLocal: true).Forget();
         }

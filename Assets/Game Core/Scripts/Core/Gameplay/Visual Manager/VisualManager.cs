@@ -130,6 +130,10 @@ namespace GameCore.Gameplay.VisualManagement
 
             _previousPresetType = presetType;
 
+#warning КОСТЫЛЬ
+            if (presetType == VisualPresetType.Dungeon)
+                _visualController.TogglePlayerInDungeonState(playerInDungeon: true);
+
             _visualController.UpdateVisual(presetConfig, instant);
         }
 
@@ -234,14 +238,14 @@ namespace GameCore.Gameplay.VisualManagement
 
         private void OnPlayerLocationChanged(EntityLocation location)
         {
-            bool changeAmbientSkyColor = location switch
+            bool playerInDungeon = location switch
             {
                 EntityLocation.Dungeon => true,
                 EntityLocation.Stairs => true,
                 _ => false
             };
 
-            _visualController.TogglePlayerInDungeonState(changeAmbientSkyColor);
+            _visualController.TogglePlayerInDungeonState(playerInDungeon);
         }
     }
 }

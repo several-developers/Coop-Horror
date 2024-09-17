@@ -56,8 +56,8 @@ namespace GameCore.Gameplay.Storages.Assets
             if (!success)
                 return;
 
-            string log = Log.HandleLog($"Added Asset with key '<gb>{key}</gb>'");
-            Debug.Log(log);
+            // string log = Log.HandleLog($"Added Asset with key '<gb>{key}</gb>'");
+            // Debug.Log(log);
         }
 
         public void AddDynamicAsset(TKey key, AssetReference assetReference)
@@ -67,8 +67,8 @@ namespace GameCore.Gameplay.Storages.Assets
             if (!success)
                 return;
 
-            string log = Log.HandleLog($"Added Dynamic Asset with key '<gb>{key}</gb>'");
-            Debug.Log(log);
+            // string log = Log.HandleLog($"Added Dynamic Asset with key '<gb>{key}</gb>'");
+            // Debug.Log(log);
         }
         
         public bool TryGetAssetReference(TKey key, out AssetReference assetReference)

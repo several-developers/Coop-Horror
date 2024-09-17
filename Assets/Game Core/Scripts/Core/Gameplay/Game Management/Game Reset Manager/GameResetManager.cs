@@ -126,7 +126,7 @@ namespace GameCore.Gameplay.GameManagement
         private static void RevivePlayer()
         {
             PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
-            localPlayer.EnterReviveState();
+            localPlayer.Revive();
         }
 
         private static void DestroyAllMonsters()

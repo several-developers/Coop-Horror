@@ -67,10 +67,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _spawnTime: {x: 0, y: 1440}
-  _spawnTimeText: 00:00 - 24:00
   _relatedMonstersToCount: 
   _floorChanceMultiplierConfigs: []
+  _spawnTimePeriods:
+    _timePeriods: []
   _disableAttack: 0
   _fireExitInteractionDistance: 0.5
   _fireExitInteractionDuration: 0.5
@@ -96,7 +96,7 @@ MonoBehaviour:
     _runningFirstTypeDistance: 24
     _runningSecondTypeDistance: 14
     _animationSpeedMultiplierRange: {x: 0.1, y: 2}
-  _brainWashSoundsDelay: {x: 1, y: 5}
+  _brainWashSoundsDelay: {x: 2.5, y: 6}
   _footstepsSE: {fileID: 11400000, guid: 7b8dd2117c5d6b64cb147cb6e62204cf, type: 2}
   _roarSE: {fileID: 11400000, guid: 6137db42e67de1f4d93bea16ce56ca46, type: 2}
   _brainwashSE: {fileID: 11400000, guid: 3b22c1e2cc487fd4092f635f98e060d1, type: 2}

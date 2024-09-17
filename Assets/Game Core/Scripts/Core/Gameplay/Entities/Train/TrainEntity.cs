@@ -131,14 +131,6 @@ namespace GameCore.Gameplay.Entities.Train
             _pathMovement.SlowDownTrain();
         }
 
-        public void TeleportAllPlayersToRandomSeats(bool ignoreChecks = false)
-        {
-            IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
-
-            foreach (PlayerEntity playerEntity in allPlayers.Values)
-                TeleportPlayerToRandomSeat(playerEntity, ignoreChecks);
-        }
-
         public void TeleportLocalPlayerToRandomSeat(bool ignoreChecks = false) =>
             TeleportLocalPlayerToRandomSeatRpc(ignoreChecks);
 
@@ -167,7 +159,7 @@ namespace GameCore.Gameplay.Entities.Train
             if (IsServerOnly)
                 _isMainLeverEnabled.Value = isEnabled;
             else
-                ToggleMainLeverStateServerRpc(isEnabled);
+                ToggleMainLeverStateRpc(isEnabled);
         }
 
         public void ToggleDoorState(bool isOpened)
@@ -175,7 +167,7 @@ namespace GameCore.Gameplay.Entities.Train
             if (IsServerOnly)
                 _isDoorOpened.Value = isOpened;
             else
-                ToggleDoorStateServerRpc(isOpened);
+                ToggleDoorStateRpc(isOpened);
             
             SFXType sfxType = isOpened ? SFXType.DoorOpen : SFXType.DoorClose;
             PlaySound(sfxType).Forget();
@@ -186,7 +178,7 @@ namespace GameCore.Gameplay.Entities.Train
             if (IsOwner)
                 _isStoppedAtSector.Value = isStoppedAtSector;
             else
-                ToggleStoppedAtSectorStateServerRPC(isStoppedAtSector);
+                ToggleStoppedAtSectorStateRPC(isStoppedAtSector);
         }
 
         public void EnableMainLever() =>
@@ -357,14 +349,14 @@ namespace GameCore.Gameplay.Entities.Train
 
         // RPC: -----------------------------------------------------------------------------------
 
-        [Rpc(target: SendTo.Owner)]
+        [Rpc(target: SendTo.Server)]
         private void TeleportLocalPlayerToRandomSeatRpc(bool ignoreChecks)
         {
             PlayerEntity localPlayer = PlayerEntity.GetLocalPlayer();
             TeleportPlayerToRandomSeat(localPlayer, ignoreChecks);
         }
 
-        [Rpc(target: SendTo.Owner, RequireOwnership = false)]
+        [Rpc(target: SendTo.Server)]
         public void StartTrainRpc()
         {
             OnMovementStartedEvent.Invoke();
@@ -393,32 +385,32 @@ namespace GameCore.Gameplay.Entities.Train
             }
         }
 
+        [Rpc(target: SendTo.Server)]
+        private void TakeSeatRpc(int seatIndex) =>
+            _seatsData.Value.TakeSeat(seatIndex);
+
+        [Rpc(target: SendTo.Server)]
+        private void LeftSeatRpc(int seatIndex) =>
+            _seatsData.Value.LeftSeat(seatIndex);
+
+        [Rpc(target: SendTo.Server)]
+        private void ToggleMainLeverStateRpc(bool isEnabled) =>
+            _isMainLeverEnabled.Value = isEnabled;
+
+        [Rpc(target: SendTo.Server)]
+        private void ToggleDoorStateRpc(bool isOpened) =>
+            _isDoorOpened.Value = isOpened;
+
+        [Rpc(target: SendTo.Server)]
+        private void ToggleStoppedAtSectorStateRPC(bool isStoppedAtSector) =>
+            _isStoppedAtSector.Value = isStoppedAtSector;
+
         [Rpc(target: SendTo.NotOwner)]
         public void PlayMainLeverPullAnimationRpc()
         {
             TrainMainLever mainLever = _references.MainLever;
             mainLever.InteractWithoutEvents(isLeverPulled: true);
         }
-
-        [ServerRpc(RequireOwnership = false)]
-        private void TakeSeatServerRpc(int seatIndex) =>
-            _seatsData.Value.TakeSeat(seatIndex);
-
-        [ServerRpc(RequireOwnership = false)]
-        private void LeftSeatServerRpc(int seatIndex) =>
-            _seatsData.Value.LeftSeat(seatIndex);
-
-        [ServerRpc(RequireOwnership = false)]
-        private void ToggleMainLeverStateServerRpc(bool isEnabled) =>
-            _isMainLeverEnabled.Value = isEnabled;
-
-        [ServerRpc(RequireOwnership = false)]
-        private void ToggleDoorStateServerRpc(bool isOpened) =>
-            _isDoorOpened.Value = isOpened;
-
-        [ServerRpc(RequireOwnership = false)]
-        private void ToggleStoppedAtSectorStateServerRPC(bool isStoppedAtSector) =>
-            _isStoppedAtSector.Value = isStoppedAtSector;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -444,13 +436,13 @@ namespace GameCore.Gameplay.Entities.Train
         private void OnTakeSeat(int seatIndex)
         {
             ToggleSeatsColliders(isEnabled: false);
-            TakeSeatServerRpc(seatIndex);
+            TakeSeatRpc(seatIndex);
         }
 
         private void OnLeftSeat(int seatIndex)
         {
             ToggleSeatsColliders(isEnabled: true);
-            LeftSeatServerRpc(seatIndex);
+            LeftSeatRpc(seatIndex);
         }
 
         private void OnMainLeverStateChanged(bool previousValue, bool newValue) =>

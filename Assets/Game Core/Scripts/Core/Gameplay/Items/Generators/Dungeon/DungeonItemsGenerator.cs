@@ -238,7 +238,7 @@ namespace GameCore.Gameplay.Items.Generators.Dungeon
                 .SetSpawnPosition(worldPosition)
                 .Build();
 
-            //_itemsFactory.CreateItemDynamic(itemID, spawnParams);
+            _itemsFactory.CreateItemDynamic(itemID, spawnParams);
         }
 
         private void ClearItemsSpawners()
