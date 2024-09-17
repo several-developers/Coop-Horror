@@ -71,7 +71,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void TakeDamage(float damage, IEntity source = null) =>
+        public void TakeDamage(float damage) =>
             _healthSystem.TakeDamage(damage);
 
         public void SetTargetPlayer(PlayerEntity playerEntity) =>

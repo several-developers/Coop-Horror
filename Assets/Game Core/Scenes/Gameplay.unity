@@ -28159,11 +28159,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spectator Camera
       objectReference: {fileID: 0}
-    - target: {fileID: 7920580804858251634, guid: a1f26bac0abe10946a710cbaa5c18fb8,
-        type: 3}
-      propertyPath: m_YAxis.Value
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a1f26bac0abe10946a710cbaa5c18fb8, type: 3}
 --- !u!4 &5020797609860941796 stripped

@@ -105,7 +105,7 @@ namespace GameCore.Gameplay.Entities.Player
         public event Func<bool> IsCrouching = () => false;
         public event Func<bool> IsSprinting = () => false;
 
-        private const float MinVelocityForNonAfk = 0.25f;
+        private const float MinVelocityForNonAfk = 0.015f;
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
@@ -134,8 +134,7 @@ namespace GameCore.Gameplay.Entities.Player
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void TakeDamage(float damage, IEntity source = null) =>
-            _healthSystem.TakeDamage(damage);
+        public void TakeDamage(float damage) => TakeDamageRpc(damage);
 
         public void Teleport(Vector3 position, Quaternion rotation, bool resetVelocity = false)
         {
@@ -178,13 +177,7 @@ namespace GameCore.Gameplay.Entities.Player
             PlaySound(SFXType.ItemDrop, onlyLocal: true).Forget();
         }
 
-        public void Kill(PlayerDeathReason deathReason)
-        {
-            if (IsOwner)
-                KillClientRpc(deathReason);
-            else
-                KillServerRpc(deathReason);
-        }
+        public void Kill(PlayerDeathReason deathReason) => KillRpc(deathReason);
 
         public void ToggleDead(bool isDead)
         {
@@ -450,17 +443,14 @@ namespace GameCore.Gameplay.Entities.Player
         {
             Vector3 currentPosition = transform.position;
             float distanceFromLastFrame = Vector3.Distance(a: currentPosition, b: _lastFramePosition);
-
-            _lastFramePosition = currentPosition;
-            
-            //return;
-            float moveSpeed = _references.Character.GetSpeed();
-            bool isMoving = moveSpeed > MinVelocityForNonAfk;
+            bool isMoving = distanceFromLastFrame > MinVelocityForNonAfk;
 
             if (isMoving)
                 TimeSinceAfk = 0f;
             else
                 TimeSinceAfk += Time.deltaTime;
+                
+            _lastFramePosition = currentPosition;
         }
 
         private void MakeFootstepsNoise()
@@ -522,8 +512,12 @@ namespace GameCore.Gameplay.Entities.Player
 
         // RPC: -----------------------------------------------------------------------------------
 
-        [ServerRpc(RequireOwnership = false)]
-        private void KillServerRpc(PlayerDeathReason deathReason) => KillClientRpc(deathReason);
+        [Rpc(target: SendTo.Owner)]
+        private void TakeDamageRpc(float damage) =>
+            _healthSystem.TakeDamage(damage);
+
+        [Rpc(target: SendTo.Owner)]
+        private void KillRpc(PlayerDeathReason deathReason) => EnterDeathState();
 
         [ServerRpc(RequireOwnership = false)]
         private void ChangeSelectedSlotServerRpc(int slotIndex) =>
@@ -581,9 +575,6 @@ namespace GameCore.Gameplay.Entities.Player
         [Rpc(target: SendTo.Server)]
         private void RemoveParentRpc() =>
             NetworkObject.TryRemoveParent();
-
-        [ClientRpc]
-        private void KillClientRpc(PlayerDeathReason deathReason) => EnterDeathState();
 
         [ClientRpc]
         private void CreateItemPreviewClientRpc(ulong senderClientID, int slotIndex, int itemID)

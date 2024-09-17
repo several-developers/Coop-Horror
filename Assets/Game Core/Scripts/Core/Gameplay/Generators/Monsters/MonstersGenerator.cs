@@ -121,8 +121,6 @@ namespace GameCore.Gameplay.Generators.Monsters
             if (!IsServer)
                 return;
 
-            _coroutineRunner.StopCoroutine(_monstersSpawnCycleCO);
-
             DungeonMonstersSpawner.OnRegisterMonstersSpawnerEvent -= OnRegisterMonstersSpawner;
 
             _timeObserver.OnHourPassedEvent -= OnHourPassed;

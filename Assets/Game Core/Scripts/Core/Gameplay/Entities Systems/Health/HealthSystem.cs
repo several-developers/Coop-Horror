@@ -27,9 +27,6 @@ namespace GameCore.Gameplay.Systems.Health
 
         public void Setup(float maxHealth)
         {
-            if (!IsOwner)
-                return;
-                
             HealthData healthData = new(maxHealth);
             SetHealth(healthData);
         }
@@ -39,10 +36,11 @@ namespace GameCore.Gameplay.Systems.Health
             if (!IsSpawned)
                 return;
             
-            if (IsOwner)
-                TakeDamageLogic(damage);
-            else
-                TakeDamageServerRpc(damage);
+            HealthData healthData = GetHealthData();
+            float newHealth = Mathf.Max(a: healthData.CurrentHealth - damage, b: 0f);
+            healthData.SetCurrentHealth(newHealth);
+
+            SetHealth(healthData);
         }
 
         public void Kill() => TakeDamage(damage: 100000f);
@@ -83,11 +81,6 @@ namespace GameCore.Gameplay.Systems.Health
             _healthData.Value = healthData;
             OnHealthChangedEvent.Invoke(healthData);
         }
-
-        // RPC: -----------------------------------------------------------------------------------
-
-        [ServerRpc(RequireOwnership = false)]
-        private void TakeDamageServerRpc(float damage) => TakeDamageLogic(damage);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

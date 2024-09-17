@@ -14,7 +14,7 @@ namespace GameCore.Gameplay.Items
 {
     [RequireComponent(typeof(FollowParent))]
     [RequireComponent(typeof(Rigidbody))]
-    public abstract class ItemObjectBase : NetworkBehaviour, IInteractableItem
+    public abstract class ItemObjectBase : NetcodeBehaviour, IInteractableItem
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -38,12 +38,12 @@ namespace GameCore.Gameplay.Items
 
         [SerializeField, ReadOnly]
         [LabelText("Unique Item ID")]
-        private int _uniqueItemIDInfo;
+        private int _uniqueItemIDDebug;
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public int ItemID { get; private set; }
-        public int UniqueItemID { get; private set; }
+        public int UniqueItemID => _uniqueItemID.Value;
         public bool DestroyOnSceneUnload { get; private set; } = true;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -52,6 +52,7 @@ namespace GameCore.Gameplay.Items
 
         private static int maxUniqueItemID;
 
+        private readonly NetworkVariable<int> _uniqueItemID = new(writePerm: Constants.OwnerPermission);
         private readonly NetworkVariable<bool> _isPickedUp = new(writePerm: Constants.OwnerPermission);
 
         private IItemsProvider _itemsProvider;
@@ -73,21 +74,18 @@ namespace GameCore.Gameplay.Items
             _collider = GetComponent<Collider>();
             _child = transform.GetChild(0).gameObject;
 
-            if (_changeItemIDAtAwake)
-            {
-                ItemID = _startItemID;
-                _itemIDDebug = _startItemID;
-            }
-
-            SetupItemUniqueID();
-            RegisterItem();
+            if (!_changeItemIDAtAwake)
+                return;
+                
+            ItemID = _startItemID;
+            _itemIDDebug = _startItemID;
         }
 
         private void OnCollisionEnter(Collision collision) => IgnorePlayerCollision(collision);
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void Setup(int itemID, float scale) => SetupServerRpc(itemID, scale);
+        public void Setup(int itemID, float scale) => SetupRpc(itemID, scale);
 
         public virtual void InteractionStarted(IEntity entity = null)
         {
@@ -114,27 +112,15 @@ namespace GameCore.Gameplay.Items
             if (_isPickedUp.Value)
                 return;
 
-            PickUpClientLogic();
-            PickUpServerRpc(NetworkObject);
+            PickUpRpc(NetworkObject);
         }
 
         public void Drop(Vector3 position, Quaternion rotation, bool randomPosition = false, bool destroy = false)
         {
             if (!_isPickedUp.Value)
                 return;
-
-            if (!destroy)
-            {
-                if (randomPosition)
-                    position = position.GetRandomPosition(radius: 0.5f);
-
-                Vector3 scale = _networkTransform.transform.localScale;
-                _networkTransform.Teleport(position, rotation, scale);
-
-                DropClientLogic();
-            }
-
-            DropRpc(destroy);
+            
+            DropRpc(position, rotation, randomPosition, destroy);
         }
 
         public void ShowServer() => ShowServerRpc();
@@ -156,36 +142,29 @@ namespace GameCore.Gameplay.Items
         public bool IsPickedUp() =>
             _isPickedUp.Value;
 
+        // PROTECTED METHODS: ---------------------------------------------------------------------
+
+        protected override void InitServerOnly()
+        {
+            SetupItemUniqueID();
+
+            // LOCAL METHODS: -----------------------------
+            
+            void SetupItemUniqueID()
+            {
+                maxUniqueItemID++;
+                _uniqueItemIDDebug = maxUniqueItemID;
+                _uniqueItemID.Value = maxUniqueItemID;
+            }
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void PickUpClientLogic()
-        {
-            if (_isPickedUpLocal)
-                return;
-
-            _isPickedUpLocal = true;
-
-            TogglePhysics(isEnabled: false);
-            HideClient();
-        }
-
-        private void DropClientLogic()
-        {
-            if (!_isPickedUpLocal)
-                return;
-
-            _isPickedUpLocal = false;
-
-            TogglePhysics(isEnabled: true);
-            _followParent.RemoveTarget();
-            ShowClient();
-        }
 
         private void TogglePhysics(bool isEnabled)
         {
             _rigidbody.isKinematic = !isEnabled;
             _rigidbody.velocity = Vector3.zero;
-
+            
             _collider.enabled = isEnabled;
         }
 
@@ -197,46 +176,50 @@ namespace GameCore.Gameplay.Items
             Physics.IgnoreCollision(collision.collider, _collider);
         }
 
-        private void SetupItemUniqueID()
-        {
-            maxUniqueItemID++;
-            UniqueItemID = maxUniqueItemID;
-            _uniqueItemIDInfo = maxUniqueItemID;
-        }
-
-        private void RegisterItem() =>
-            _itemsProvider.RegisterItem(item: this);
-
         // RPC: -----------------------------------------------------------------------------------
 
-        [ServerRpc(RequireOwnership = false)]
-        private void SetupServerRpc(int itemID, float itemScale) => SetupClientRpc(itemID, itemScale);
-
-        [ServerRpc(RequireOwnership = false)]
-        private void PickUpServerRpc(NetworkObjectReference itemNetworkObjectReference,
-            ServerRpcParams serverRpcParams = default)
+        [Rpc(target: SendTo.Everyone)]
+        private void SetupRpc(int itemID, float itemScale)
         {
-            bool isItemNetworkObjectExists = itemNetworkObjectReference.TryGet(out NetworkObject itemNetworkObject);
-
-            if (!isItemNetworkObjectExists)
-                return;
-
-            _isPickedUp.Value = true;
-
-#warning TEMP
-            // DestroyOnSceneUnload = false;
-
-            ulong senderClientID = serverRpcParams.Receive.SenderClientId;
-            bool changeOwnership = itemNetworkObject.OwnerClientId != senderClientID;
-
-            if (changeOwnership)
-                itemNetworkObject.ChangeOwnership(senderClientID);
-
-            PickUpClientRpc();
+            ItemID = itemID;
+            transform.localScale *= itemScale;
+            
+            _itemsProvider.RegisterItem(item: this);
         }
 
         [Rpc(target: SendTo.Everyone, RequireOwnership = false)]
-        private void DropRpc(bool destroy)
+        private void PickUpRpc(NetworkObjectReference itemNetworkObjectReference)
+        {
+            if (IsOwner)
+                _isPickedUp.Value = true;
+            
+            /*if (IsServerOnly)
+            {
+                bool isItemNetworkObjectExists = itemNetworkObjectReference.TryGet(out NetworkObject itemNetworkObject);
+
+                if (!isItemNetworkObjectExists)
+                    return;
+
+                _isPickedUp.Value = true;
+
+                ulong senderClientID = serverRpcParams.Receive.SenderClientId;
+                bool changeOwnership = itemNetworkObject.OwnerClientId != senderClientID;
+
+                if (changeOwnership)
+                    itemNetworkObject.ChangeOwnership(senderClientID);
+            }*/
+
+            if (_isPickedUpLocal)
+                return;
+
+            _isPickedUpLocal = true;
+
+            TogglePhysics(isEnabled: false);
+            HideClient();
+        }
+
+        [Rpc(target: SendTo.Everyone, RequireOwnership = false)]
+        private void DropRpc(Vector3 position, Quaternion rotation, bool randomPosition, bool destroy)
         {
             if (IsOwner)
             {
@@ -247,10 +230,23 @@ namespace GameCore.Gameplay.Items
                     return;
                 }
 
+                if (randomPosition)
+                    position = position.GetRandomPosition(radius: 0.5f);
+
+                Vector3 scale = _networkTransform.transform.localScale;
+                _networkTransform.Teleport(position, rotation, scale);
+
                 _isPickedUp.Value = false;
             }
 
-            DropClientLogic();
+            if (!_isPickedUpLocal)
+                return;
+
+            _isPickedUpLocal = false;
+
+            TogglePhysics(isEnabled: true);
+            _followParent.RemoveTarget();
+            ShowClient();
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -262,16 +258,6 @@ namespace GameCore.Gameplay.Items
 
         [Rpc(target: SendTo.Everyone)]
         private void HideRpc() => HideClient();
-
-        [ClientRpc]
-        private void SetupClientRpc(int itemID, float itemScale)
-        {
-            ItemID = itemID;
-            transform.localScale *= itemScale;
-        }
-
-        [ClientRpc]
-        private void PickUpClientRpc() => PickUpClientLogic();
 
         [ClientRpc]
         private void ShowClientRpc(ulong senderClientID)

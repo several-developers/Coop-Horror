@@ -68,10 +68,17 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         public void DetectNoise(Vector3 noisePosition, float noiseLoudness) =>
             _aggressionSystem.DetectNoise(noisePosition, noiseLoudness);
 
+        public void UpdateAggressionAnimation(int aggressionMeter) => UpdateAggressionAnimationRpc(aggressionMeter);
+
+        public void PlayAttackAnimation() => PlayAttackAnimationRpc();
+
+        public void PlayHideSpikesAnimation() => PlayHideSpikesAnimationRpc();
+
         public static IReadOnlyList<SpikySlimeEntity> GetAllSpikySlimes() => AllSpikySlimes;
         public SpikySlimeAIConfigMeta GetAIConfig() => _spikySlimeAIConfig;
         public SpikySlimeReferences GetReferences() => _references;
         public AggressionSystem GetAggressionSystem() => _aggressionSystem;
+        public AnimationController GetAnimationController() => _animationController;
 
         public override MonsterType GetMonsterType() =>
             MonsterType.SpikySlime;
@@ -80,8 +87,16 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         protected override void InitAll()
         {
-            SoundReproducer = new SpikySlimeSoundReproducer(soundProducer: this, _spikySlimeAIConfig);
-            _sizeController = new SizeController(spikySlimeEntity: this);
+            InitSystems();
+
+            // LOCAL METHODS: -----------------------------
+
+            void InitSystems()
+            {
+                SoundReproducer = new SpikySlimeSoundReproducer(soundProducer: this, _spikySlimeAIConfig);
+                _sizeController = new SizeController(spikySlimeEntity: this);
+                _animationController = new AnimationController(spikySlimeEntity: this);
+            }
         }
 
         protected override void InitServerOnly()
@@ -106,7 +121,6 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 _spikySlimeStateMachine = new StateMachineBase();
                 _aggressionSystem = new AggressionSystem(spikySlimeEntity: this, _balanceConfig);
                 _attackSystem = new AttackSystem(spikySlimeEntity: this);
-                _animationController = new AnimationController(spikySlimeEntity: this);
             }
 
             void SetupStates()
@@ -151,6 +165,18 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         [Rpc(target: SendTo.Everyone)]
         private void ChangeSlimeSizeRpc(float slimeScale) =>
             _sizeController.ChangeSize(slimeScale);
+
+        [Rpc(target: SendTo.Everyone)]
+        private void UpdateAggressionAnimationRpc(int aggressionMeter) =>
+            _animationController.UpdateAggressionAnimation(aggressionMeter);
+
+        [Rpc(target: SendTo.Everyone)]
+        private void PlayAttackAnimationRpc() =>
+            _animationController.PlayAttackAnimation();
+
+        [Rpc(target: SendTo.Everyone)]
+        private void PlayHideSpikesAnimationRpc() =>
+            _animationController.PlayHideSpikesAnimation();
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
         

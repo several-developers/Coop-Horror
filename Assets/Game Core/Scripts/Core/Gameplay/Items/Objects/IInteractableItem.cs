@@ -5,8 +5,8 @@ namespace GameCore.Gameplay.Items
 {
     public interface IInteractableItem : IInteractable
     {
-        int UniqueItemID { get; }
         int ItemID { get; }
+        int UniqueItemID { get; }
         void PickUp();
         void Drop(Vector3 position, Quaternion rotation, bool randomPosition = false, bool destroy = false);
         void ShowServer();

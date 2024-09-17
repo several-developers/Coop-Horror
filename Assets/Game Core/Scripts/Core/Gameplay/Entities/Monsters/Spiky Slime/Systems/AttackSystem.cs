@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using DG.Tweening;
 using GameCore.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
@@ -15,6 +14,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         public AttackSystem(SpikySlimeEntity spikySlimeEntity)
         {
+            AnimationController animationController = spikySlimeEntity.GetAnimationController();
             SpikySlimeAIConfigMeta spikySlimeAIConfig = spikySlimeEntity.GetAIConfig();
 
             _spikySlimeEntity = spikySlimeEntity;
@@ -28,6 +28,9 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             _attackRoutine.GetRoutineEvent += AttackCO;
 
             _attackTrigger.OnTriggerEvent += OnPlayerEnterAttackTrigger;
+
+            animationController.OnAttackAnimationEndedEvent += OnAttackAnimationEnded;
+            animationController.OnHideSpikesAnimationEndedEvent += OnHideSpikesAnimationEnded;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -39,8 +42,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         private readonly SpikySlimeAttackTrigger _attackTrigger;
         private readonly CoroutineHelper _attackRoutine;
         private readonly List<PlayerQueue> _playersQueues;
-
-        private Tweener _spikesTN;
+        
         private bool _attackInProgress;
         private bool _instantKill;
 
@@ -60,54 +62,16 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 return;
 
             _attackInProgress = true;
-            
+
             StopSound(SpikySlimeEntity.SFXType.CalmMovement);
             PlaySound(SpikySlimeEntity.SFXType.AngryMovement);
             PlaySound(SpikySlimeEntity.SFXType.Attack);
-            
-            PlayAttackAnimation();
+
+            _spikySlimeEntity.PlayAttackAnimation();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
-
-        private void PlayAttackAnimation()
-        {
-            SkinnedMeshRenderer slimeRenderer = _references.SlimeRenderer;
-            float duration = _attackSystemConfig.ShowSpikesAnimationDuration;
-            Ease ease = _attackSystemConfig.ShowSpikesAnimationEase;
-
-            _spikesTN.Kill();
-
-            _spikesTN = DOVirtual
-                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
-                {
-                    float shapeValue = Mathf.Lerp(a: 0f, b: 100f, t);
-                    slimeRenderer.SetBlendShapeWeight(index: 0, shapeValue);
-                })
-                .SetEase(ease)
-                .SetLink(_spikySlimeEntity.gameObject)
-                .OnComplete(OnAttack);
-        }
-
-        private void PlayHideSpikesAnimation()
-        {
-            SkinnedMeshRenderer slimeRenderer = _references.SlimeRenderer;
-            float duration = _attackSystemConfig.HideSpikesAnimationDuration;
-            Ease ease = _attackSystemConfig.HideSpikesAnimationEase;
-
-            _spikesTN.Kill();
-
-            _spikesTN = DOVirtual
-                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
-                {
-                    float shapeValue = Mathf.Lerp(a: 100f, b: 0f, t);
-                    slimeRenderer.SetBlendShapeWeight(index: 0, shapeValue);
-                })
-                .SetEase(ease)
-                .SetLink(_spikySlimeEntity.gameObject)
-                .OnComplete(OnSpikesHidden);
-        }
-
+        
         private void EnableAttackTrigger() =>
             _attackTrigger.ToggleCollider(isEnabled: true);
 
@@ -122,7 +86,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 return;
 
             bool isPlayerDead = playerEntity.IsDead();
-            
+
             if (isPlayerDead)
                 return;
 
@@ -136,7 +100,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             else
             {
                 float spikesDamage = _attackSystemConfig.SpikesDamage;
-                playerEntity.TakeDamage(spikesDamage, _spikySlimeEntity);
+                playerEntity.TakeDamage(spikesDamage);
             }
         }
 
@@ -182,10 +146,10 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                         continue;
 
                     isFreeJointFound = true;
-                    
+
                     Vector3 jointPosition = springJoint.transform.position;
                     float distance = Vector3.Distance(a: playerPosition, b: jointPosition);
-                    
+
                     if (distance >= minDistance)
                         continue;
 
@@ -195,7 +159,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
                 if (!isFreeJointFound)
                     return;
-                
+
                 PlayerReferences playerReferences = playerEntity.GetReferences();
                 Rigidbody spineRigidbody = playerReferences.SpineRigidbody;
                 allSpringJoints[closestIndex].connectedBody = spineRigidbody;
@@ -212,7 +176,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         private void PlaySound(SpikySlimeEntity.SFXType sfxType) =>
             _spikySlimeEntity.PlaySound(sfxType).Forget();
-        
+
         private void StopSound(SpikySlimeEntity.SFXType sfxType) =>
             _spikySlimeEntity.StopSound(sfxType);
 
@@ -230,7 +194,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             float spikesDuration = _attackSystemConfig.SpikesDuration;
             yield return new WaitForSeconds(spikesDuration);
 
-            PlayHideSpikesAnimation();
+            _spikySlimeEntity.PlayHideSpikesAnimation();
         }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
@@ -243,10 +207,10 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             _attackInProgress = false;
 
             _aggressionSystem.StartDecreaseTimer();
-            
+
             DisableAttackTrigger();
             FreeAllFromSpringJoints();
-            
+
             StopSound(SpikySlimeEntity.SFXType.AngryMovement);
             PlaySound(SpikySlimeEntity.SFXType.CalmMovement);
         }
@@ -282,6 +246,10 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
             DoDamage(clientID);
         }
+
+        private void OnAttackAnimationEnded() => OnAttack();
+
+        private void OnHideSpikesAnimationEnded() => OnSpikesHidden();
 
         // INNER CLASSES: -------------------------------------------------------------------------
 

@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using System;
+using Unity.Netcode;
 
 namespace GameCore.Gameplay.Network
 {
@@ -60,6 +61,25 @@ namespace GameCore.Gameplay.Network
                 TickOwner();
             else
                 TickNotOwner();
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            if (!_isInitialized)
+                return;
+
+            FixedTickAll();
+            
+            // if (IsServerOnly)
+            //     FixedTickServerOnly();
+            //
+            // if (IsServer)
+            //     FixedTickServer();
+            //
+            // if (IsOwner)
+            //     FixedTickOwner();
+            // else
+            //     FixedTickNotOwner();
         }
 
         protected void LateUpdate()
@@ -180,6 +200,13 @@ namespace GameCore.Gameplay.Network
         {
         }
 
+        /// <summary>
+        /// Вызывается у сервера и клиента (на каждом объекте).
+        /// </summary>
+        protected virtual void FixedTickAll()
+        {
+        }
+        
         /// <summary>
         /// Вызывается у сервера и клиента (на каждом объекте).
         /// </summary>

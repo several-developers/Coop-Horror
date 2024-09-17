@@ -98,6 +98,8 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
         public void SetSneakingState(bool isSneaking) =>
             IsSneaking = isSneaking;
 
+        public void SetHidingState(bool isHiding, bool instant = false) => SetHidingStateRpc(isHiding, instant);
+
         public void EnterIdleState() => ChangeState<IdleState>();
 
         public void EnterWanderingState() => ChangeState<WanderingState>();
@@ -340,6 +342,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
             mushroomSporesTrigger.Setup(sporesConfig, seed, isHatNew);
             mushroomSporesTrigger.Start();
         }
+
+        [Rpc(target: SendTo.Everyone)]
+        private void SetHidingStateRpc(bool isHiding, bool instant) =>
+            _animationController.SetHidingState(isHiding, instant);
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 

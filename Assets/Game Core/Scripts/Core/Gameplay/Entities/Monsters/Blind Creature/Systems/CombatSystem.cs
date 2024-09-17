@@ -120,7 +120,7 @@ namespace GameCore.Gameplay.Entities.Monsters.BlindCreature
                     continue;
             
                 playSlashSound = true;
-                damageable.TakeDamage(damage, _blindCreatureEntity);
+                damageable.TakeDamage(damage);
             }
             
             if (playSlashSound)

@@ -2,7 +2,7 @@
 {
     public interface IDamageable
     {
-        void TakeDamage(float damage, IEntity source = null);
+        void TakeDamage(float damage);
         bool IsDead();
     }
 }

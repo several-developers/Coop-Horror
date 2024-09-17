@@ -47,7 +47,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void ChangeAnimationHidingState(bool isHiding) =>
-            _animationController.SetHidingState(isHiding);
+            _mushroomEntity.SetHidingState(isHiding);
 
         private void ChangeHatTriggerState(bool isHiding)
         {

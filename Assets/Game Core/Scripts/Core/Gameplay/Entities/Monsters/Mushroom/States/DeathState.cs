@@ -26,7 +26,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             DisableSuspicionSystem();
             DisableWhisperingSystem();
             EnableRagdoll();
-            ShowFromGround();
+            DisableHidingState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -55,10 +55,7 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
             ragdollController.EnableRagdoll();
         }
 
-        private void ShowFromGround()
-        {
-            AnimationController animationController = _mushroomEntity.GetAnimationController();
-            animationController.SetHidingState(isHiding: false, instant: true);
-        }
+        private void DisableHidingState() =>
+            _mushroomEntity.SetHidingState(isHiding: false, instant: true);
     }
 }

@@ -98,6 +98,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 _decreaseTimerRoutine.Start();
             }
 
+            _spikySlimeEntity.UpdateAggressionAnimation(_aggressionMeter);
             OnAggressionMeterChangedEvent.Invoke(_aggressionMeter);
         }
 

@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using GameCore.Configs.Gameplay.Enemies;
 using UnityEngine;
 
@@ -11,28 +12,31 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         public AnimationController(SpikySlimeEntity spikySlimeEntity)
         {
             SpikySlimeAIConfigMeta spikySlimeAIConfig = spikySlimeEntity.GetAIConfig();
-            AggressionSystem aggressionSystem = spikySlimeEntity.GetAggressionSystem();
-            
+
             _spikySlimeEntity = spikySlimeEntity;
             _aggressionSystemConfig = spikySlimeAIConfig.GetAggressionSystemConfig();
+            _attackSystemConfig = spikySlimeAIConfig.GetAttackSystemConfig();
             _animationConfig = spikySlimeAIConfig.GetAnimationConfig();
             _references = spikySlimeEntity.GetReferences();
-
-            aggressionSystem.OnAggressionMeterChangedEvent += OnAggressionMeterChanged;
         }
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        public event Action OnAttackAnimationEndedEvent = delegate { };
+        public event Action OnHideSpikesAnimationEndedEvent = delegate { };
+        
         private readonly SpikySlimeEntity _spikySlimeEntity;
         private readonly SpikySlimeAIConfigMeta.AggressionSystemConfig _aggressionSystemConfig;
+        private readonly SpikySlimeAIConfigMeta.AttackSystemConfig _attackSystemConfig;
         private readonly SpikySlimeAIConfigMeta.AnimationConfig _animationConfig;
         private readonly SpikySlimeReferences _references;
 
-        private Tweener _spikesAnimationTN;
+        private Tweener _aggressiveAnimationTN;
+        private Tweener _spikesTN;
 
-        // PRIVATE METHODS: -----------------------------------------------------------------------
+        // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        private void HandleAnimation(int aggressionMeter)
+        public void UpdateAggressionAnimation(int aggressionMeter)
         {
             int maxMeter = _aggressionSystemConfig.AggressionMeterToAggro;
             float percent = aggressionMeter / (float)maxMeter;
@@ -53,9 +57,9 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             float startMultiplier = skinnedMeshSine.PeakMultiplier;
             float startAnimationSpeed = skinnedMeshSine.AnimationSpeed;
             
-            _spikesAnimationTN.Kill();
+            _aggressiveAnimationTN.Kill();
 
-            _spikesAnimationTN = DOVirtual
+            _aggressiveAnimationTN = DOVirtual
                 .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
                 {
                     float multiplier = Mathf.Lerp(a: startMultiplier, b: targetMultiplier, t);
@@ -68,8 +72,42 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 .SetLink(_spikySlimeEntity.gameObject);
         }
 
-        // EVENTS RECEIVERS: ----------------------------------------------------------------------
+        public void PlayAttackAnimation()
+        {
+            SkinnedMeshRenderer slimeRenderer = _references.SlimeRenderer;
+            float duration = _attackSystemConfig.ShowSpikesAnimationDuration;
+            Ease ease = _attackSystemConfig.ShowSpikesAnimationEase;
 
-        private void OnAggressionMeterChanged(int aggressionMeter) => HandleAnimation(aggressionMeter);
+            _spikesTN.Kill();
+
+            _spikesTN = DOVirtual
+                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
+                {
+                    float shapeValue = Mathf.Lerp(a: 0f, b: 100f, t);
+                    slimeRenderer.SetBlendShapeWeight(index: 0, shapeValue);
+                })
+                .SetEase(ease)
+                .SetLink(_spikySlimeEntity.gameObject)
+                .OnComplete(() => OnAttackAnimationEndedEvent.Invoke());
+        }
+        
+        public void PlayHideSpikesAnimation()
+        {
+            SkinnedMeshRenderer slimeRenderer = _references.SlimeRenderer;
+            float duration = _attackSystemConfig.HideSpikesAnimationDuration;
+            Ease ease = _attackSystemConfig.HideSpikesAnimationEase;
+
+            _spikesTN.Kill();
+
+            _spikesTN = DOVirtual
+                .Float(from: 0f, to: 1f, duration, onVirtualUpdate: t =>
+                {
+                    float shapeValue = Mathf.Lerp(a: 100f, b: 0f, t);
+                    slimeRenderer.SetBlendShapeWeight(index: 0, shapeValue);
+                })
+                .SetEase(ease)
+                .SetLink(_spikySlimeEntity.gameObject)
+                .OnComplete(() => OnHideSpikesAnimationEndedEvent.Invoke());
+        }
     }
 }
