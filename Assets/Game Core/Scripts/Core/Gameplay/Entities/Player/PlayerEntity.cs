@@ -194,7 +194,6 @@ namespace GameCore.Gameplay.Entities.Player
             OnLeftMobileHQSeat.Invoke();
 
         public void EnterAliveState() => ChangeState<AliveState>();
-        public void EnterReviveState() => ChangeState<ReviveState>();
         public void EnterSittingState() => ChangeState<SittingState>();
 
         public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
@@ -499,6 +498,7 @@ namespace GameCore.Gameplay.Entities.Player
             NoiseManager.MakeNoise(transform.position, noiseRange, noiseLoudness);
         }
 
+        private void EnterReviveState() => ChangeState<ReviveState>();
         private void EnterDeathState() => ChangeState<DeathState>();
 
         private void ChangeState<TState>() where TState : IState =>

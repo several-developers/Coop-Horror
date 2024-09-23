@@ -22,6 +22,8 @@ namespace CustomEditors
 
         private static DataManager _dataManager;
         private static Dictionary<Type, DataBase> _allData;
+        private static bool _isShown;
+        private static bool _isVisible;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -113,13 +115,20 @@ namespace CustomEditors
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _isShown = false;
+        }
+
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         [MenuItem(EditorMenuItem)]
         private static void OpenEditorWindow()
         {
             var window = GetWindow<DataEditor>();
-            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
+            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(width: 800, height: 600);
+            _isShown = true;
         }
 
         private static void SetupMenuStyle(OdinMenuTree tree)
@@ -167,10 +176,22 @@ namespace CustomEditors
             }
         }
 
+        private void OnBecameVisible() =>
+            _isVisible = true;
+
+        private void OnBecameInvisible() =>
+            _isVisible = false;
+
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private static void OnDataChanged()
         {
+            if (!_isShown)
+                return;
+
+            if (!_isVisible)
+                return;
+            
             var window = GetWindow<DataEditor>();
 
             if (window == null)

@@ -16,12 +16,12 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         {
             AnimationController animationController = spikySlimeEntity.GetAnimationController();
             SpikySlimeAIConfigMeta spikySlimeAIConfig = spikySlimeEntity.GetAIConfig();
+            SpikySlimeReferences references = spikySlimeEntity.GetReferences();
 
             _spikySlimeEntity = spikySlimeEntity;
             _attackSystemConfig = spikySlimeAIConfig.GetAttackSystemConfig();
-            _references = spikySlimeEntity.GetReferences();
             _aggressionSystem = spikySlimeEntity.GetAggressionSystem();
-            _attackTrigger = _references.AttackTrigger;
+            _attackTrigger = references.AttackTrigger;
             _attackRoutine = new CoroutineHelper(spikySlimeEntity);
             _playersQueues = new List<PlayerQueue>();
 
@@ -37,7 +37,6 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         private readonly SpikySlimeEntity _spikySlimeEntity;
         private readonly SpikySlimeAIConfigMeta.AttackSystemConfig _attackSystemConfig;
-        private readonly SpikySlimeReferences _references;
         private readonly AggressionSystem _aggressionSystem;
         private readonly SpikySlimeAttackTrigger _attackTrigger;
         private readonly CoroutineHelper _attackRoutine;
@@ -95,7 +94,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             if (_instantKill)
             {
                 playerEntity.Kill(PlayerDeathReason._);
-                AttachPlayerToFreeJoint(playerEntity);
+                _spikySlimeEntity.AttachPlayerToFreeJoint(clientID);
             }
             else
             {
@@ -103,77 +102,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 playerEntity.TakeDamage(spikesDamage);
             }
         }
-
-        private void AttachPlayerToFreeJoint(PlayerEntity playerEntity)
-        {
-            IReadOnlyList<SpringJoint> allSpringJoints = _references.GetAllSpringJoints();
-
-            FindClosestFreeSprintJoint();
-
-            // LOCAL METHODS: -----------------------------
-
-            void FindFreeSprintJoint()
-            {
-                foreach (SpringJoint springJoint in allSpringJoints)
-                {
-                    bool isFree = springJoint.connectedBody == null;
-
-                    if (!isFree)
-                        continue;
-
-                    PlayerReferences playerReferences = playerEntity.GetReferences();
-                    Rigidbody spineRigidbody = playerReferences.SpineRigidbody;
-                    springJoint.connectedBody = spineRigidbody;
-
-                    break;
-                }
-            }
-
-            void FindClosestFreeSprintJoint()
-            {
-                Vector3 playerPosition = playerEntity.transform.position;
-                int iterations = allSpringJoints.Count;
-                float minDistance = float.MaxValue;
-                int closestIndex = 0;
-                bool isFreeJointFound = false;
-
-                for (int i = 0; i < iterations; i++)
-                {
-                    SpringJoint springJoint = allSpringJoints[i];
-                    bool isFree = springJoint.connectedBody == null;
-
-                    if (!isFree)
-                        continue;
-
-                    isFreeJointFound = true;
-
-                    Vector3 jointPosition = springJoint.transform.position;
-                    float distance = Vector3.Distance(a: playerPosition, b: jointPosition);
-
-                    if (distance >= minDistance)
-                        continue;
-
-                    minDistance = distance;
-                    closestIndex = i;
-                }
-
-                if (!isFreeJointFound)
-                    return;
-
-                PlayerReferences playerReferences = playerEntity.GetReferences();
-                Rigidbody spineRigidbody = playerReferences.SpineRigidbody;
-                allSpringJoints[closestIndex].connectedBody = spineRigidbody;
-            }
-        }
-
-        private void FreeAllFromSpringJoints()
-        {
-            IReadOnlyList<SpringJoint> allSpringJoints = _references.GetAllSpringJoints();
-
-            foreach (SpringJoint springJoint in allSpringJoints)
-                springJoint.connectedBody = null;
-        }
-
+        
         private void PlaySound(SpikySlimeEntity.SFXType sfxType) =>
             _spikySlimeEntity.PlaySound(sfxType).Forget();
 
@@ -209,7 +138,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
             _aggressionSystem.StartDecreaseTimer();
 
             DisableAttackTrigger();
-            FreeAllFromSpringJoints();
+            _spikySlimeEntity.FreeAllFromSpringJoints();
 
             StopSound(SpikySlimeEntity.SFXType.AngryMovement);
             PlaySound(SpikySlimeEntity.SFXType.CalmMovement);

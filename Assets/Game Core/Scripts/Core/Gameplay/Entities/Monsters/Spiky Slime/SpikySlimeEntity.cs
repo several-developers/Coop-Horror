@@ -56,6 +56,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         private StateMachineBase _spikySlimeStateMachine;
         private AggressionSystem _aggressionSystem;
         private AttackSystem _attackSystem;
+        private SpikesAttachSystem _spikesAttachSystem;
         private AnimationController _animationController;
         private SizeController _sizeController;
 
@@ -73,6 +74,10 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         public void PlayAttackAnimation() => PlayAttackAnimationRpc();
 
         public void PlayHideSpikesAnimation() => PlayHideSpikesAnimationRpc();
+
+        public void AttachPlayerToFreeJoint(ulong clientID) => AttachPlayerToFreeJointRpc(clientID);
+
+        public void FreeAllFromSpringJoints() => FreeAllFromSpringJointsRpc();
 
         public static IReadOnlyList<SpikySlimeEntity> GetAllSpikySlimes() => AllSpikySlimes;
         public SpikySlimeAIConfigMeta GetAIConfig() => _spikySlimeAIConfig;
@@ -96,6 +101,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
                 SoundReproducer = new SpikySlimeSoundReproducer(soundProducer: this, _spikySlimeAIConfig);
                 _sizeController = new SizeController(spikySlimeEntity: this);
                 _animationController = new AnimationController(spikySlimeEntity: this);
+                _spikesAttachSystem = new SpikesAttachSystem(spikySlimeEntity: this);
             }
         }
 
@@ -177,6 +183,14 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         [Rpc(target: SendTo.Everyone)]
         private void PlayHideSpikesAnimationRpc() =>
             _animationController.PlayHideSpikesAnimation();
+
+        [Rpc(target: SendTo.Everyone)]
+        private void AttachPlayerToFreeJointRpc(ulong clientID) =>
+            _spikesAttachSystem.AttachPlayerToFreeJoint(clientID);
+
+        [Rpc(target: SendTo.Everyone)]
+        private void FreeAllFromSpringJointsRpc() =>
+            _spikesAttachSystem.FreeAllFromSpringJoints();
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
         

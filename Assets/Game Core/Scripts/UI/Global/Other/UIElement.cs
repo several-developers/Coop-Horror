@@ -24,6 +24,9 @@ namespace GameCore.UI.Global
 
         [SerializeField]
         private bool _ignoreCanvasGroupFade;
+        
+        [SerializeField]
+        private bool _lastSiblingOnShow;
 
         [SerializeField, Required, ShowIf(nameof(_changeCanvasState))]
         private Canvas _canvas;
@@ -79,9 +82,12 @@ namespace GameCore.UI.Global
                 return;
 
             _targetCG.alpha = 0;
-
+            
             if (_changeInteractableState)
                 DisableInteraction();
+
+            if (_changeCanvasState)
+                _canvas.enabled = false;
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
@@ -117,9 +123,16 @@ namespace GameCore.UI.Global
             IsShown = show;
 
             if (show)
+            {
+                if (_lastSiblingOnShow)
+                    transform.SetAsLastSibling();
+                
                 OnShowEvent.Invoke();
+            }
             else
+            {
                 OnHideEvent.Invoke();
+            }
 
             if (show && _changeCanvasState)
                 _canvas.enabled = true;
