@@ -28,6 +28,9 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         
         [SerializeField, Required]
         private Transform _anchorPoints;
+
+        [SerializeField, Required]
+        private Light _slimeLight;
         
         [SerializeField, Required]
         private SphereCollider _slimeTrigger;
@@ -46,6 +49,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         public ShakeAnimation ShakeAnimation => _shakeAnimation;
         public Transform ModelPivot => _modelPivot;
         public Transform AnchorPoints => _anchorPoints;
+        public Light SlimeLight => _slimeLight;
         public SphereCollider SlimeTrigger => _slimeTrigger;
         public TextMeshPro InfoTMP => _infoTMP;
 

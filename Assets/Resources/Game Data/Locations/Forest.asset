@@ -20,4 +20,9 @@ MonoBehaviour:
   _maxOutdoorDangerValue: 20
   _monstersSpawnMultipliersConfig:
     _configs: []
+  _sceneAsset:
+    m_AssetGUID: 94125c3d369b50348960125d36938ef5
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
   _lightingPreset: {fileID: 11400000, guid: 79d9a1f29cad7b14c960d41d99f3e275, type: 2}

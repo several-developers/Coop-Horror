@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0a5aa6369ce74bedab1591efe74c8ede, type: 3}
-  m_Name: Locations List
+  m_Name: Locations Database
   m_EditorClassIdentifier: 
   _metaName: Locations List
   _availableLocations:

@@ -35,8 +35,10 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             ConnectionManager.AddOnSceneEventCallback();
 
-            //The "BossRoom" server always advances to CharSelect immediately on start. Different games
-            //may do this differently.
+            ConnectionManager.AddLocationsScenes();
+
+            // The "BossRoom" server always advances to CharSelect immediately on start. Different games
+            // may do this differently.
             ConnectionManager.LoadScene(SceneName.Gameplay, isNetwork: true);
 
             if (_lobbyServiceFacade.CurrentUnityLobby != null)
@@ -149,7 +151,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
                 SessionManager<SessionPlayerData>.Instance.SetupConnectingPlayerSessionData(clientId,
                     connectionPayload.playerId, sessionPlayerData);
-                
+
                 return true;
             }
 
@@ -164,6 +166,8 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
 
             return false;
         }
+
+        // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private ConnectStatus GetConnectStatus(ConnectionPayload connectionPayload)
         {

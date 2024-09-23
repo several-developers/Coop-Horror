@@ -14,7 +14,8 @@ namespace GameCore.StateMachine
             IEntitiesAssetsStorage entitiesAssetsStorage,
             IMonstersAssetsStorage monstersAssetsStorage,
             IItemsAssetsStorage itemsAssetsStorage,
-            IItemsPreviewAssetsStorage itemsPreviewAssetsStorage
+            IItemsPreviewAssetsStorage itemsPreviewAssetsStorage,
+            IScenesAssetsStorage scenesAssetsStorage
         )
         {
             _gameStateMachine = gameStateMachine;
@@ -23,6 +24,7 @@ namespace GameCore.StateMachine
             _monstersAssetsStorage = monstersAssetsStorage;
             _itemsAssetsStorage = itemsAssetsStorage;
             _itemsPreviewAssetsStorage = itemsPreviewAssetsStorage;
+            _scenesAssetsStorage = scenesAssetsStorage;
 
             _gameStateMachine.AddState(this);
         }
@@ -35,6 +37,7 @@ namespace GameCore.StateMachine
         private readonly IMonstersAssetsStorage _monstersAssetsStorage;
         private readonly IItemsAssetsStorage _itemsAssetsStorage;
         private readonly IItemsPreviewAssetsStorage _itemsPreviewAssetsStorage;
+        private readonly IScenesAssetsStorage _scenesAssetsStorage;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -54,7 +57,8 @@ namespace GameCore.StateMachine
                 _entitiesAssetsStorage.WarmUp(),
                 _monstersAssetsStorage.WarmUp(),
                 _itemsAssetsStorage.WarmUp(),
-                _itemsPreviewAssetsStorage.WarmUp()
+                _itemsPreviewAssetsStorage.WarmUp(),
+                _scenesAssetsStorage.WarmUp()
             };
 
             await UniTask.WhenAll(tasks);

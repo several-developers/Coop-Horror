@@ -14,6 +14,7 @@ namespace GameCore.Infrastructure.Installers.Global
             BindMonstersAssetsStorage();
             BindItemsAssetsStorage();
             BindItemsPreviewAssetsStorage();
+            BindScenesAssetsStorage();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -48,6 +49,13 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             Container
                 .BindInterfacesTo<ItemsPreviewAssetsStorage>()
+                .AsSingle();
+        }
+        
+        private void BindScenesAssetsStorage()
+        {
+            Container
+                .BindInterfacesTo<ScenesAssetsStorage>()
                 .AsSingle();
         }
     }

@@ -4,9 +4,9 @@ using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Configs.Gameplay.LocationsList
+namespace GameCore.Configs.Global.LocationsDatabase
 {
-    public class LocationsListConfigMeta : ConfigMeta
+    public class LocationsDatabaseConfigMeta : ConfigMeta
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -19,9 +19,9 @@ namespace GameCore.Configs.Gameplay.LocationsList
         public IEnumerable<LocationMeta> GetAllAvailableLocationsMeta() => _availableLocations;
 
         public override string GetMetaCategory() =>
-            EditorConstants.GameplayConfigsListsCategory;
+            EditorConstants.GlobalConfigsListsCategory;
 
         public override ConfigScope GetConfigScope() =>
-            ConfigScope.GameplayScene;
+            ConfigScope.Global;
     }
 }

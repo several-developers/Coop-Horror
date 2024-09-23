@@ -22,6 +22,8 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         {
             if (_lobbyServiceFacade.CurrentUnityLobby != null)
                 _lobbyServiceFacade.BeginTracking();
+            
+            ConnectionManager.AddLocationsScenes();
         }
 
         public override void Exit() { }

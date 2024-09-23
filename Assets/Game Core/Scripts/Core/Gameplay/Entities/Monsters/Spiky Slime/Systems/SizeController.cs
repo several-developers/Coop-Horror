@@ -27,6 +27,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
         {
             Transform modelPivot = _references.ModelPivot;
             Transform anchorPoints = _references.AnchorPoints;
+            Light slimeLight = _references.SlimeLight;
             SphereCollider slimeTrigger = _references.SlimeTrigger;
             
             Vector3 triggerCenter = slimeTrigger.center;
@@ -34,6 +35,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
             modelPivot.localScale *= slimeScale;
             anchorPoints.localScale *= slimeScale;
+            slimeLight.range *= slimeScale;
             slimeTrigger.radius *= slimeScale;
             slimeTrigger.center = triggerCenter;
         }

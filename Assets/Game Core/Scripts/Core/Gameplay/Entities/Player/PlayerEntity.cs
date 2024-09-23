@@ -193,7 +193,11 @@ namespace GameCore.Gameplay.Entities.Player
         public void SendLeftMobileHQSeat() =>
             OnLeftMobileHQSeat.Invoke();
 
+        public void UpdateRig() =>
+            _references.RigController.TryUpdateRig(OwnerClientId);
+
         public void EnterAliveState() => ChangeState<AliveState>();
+        
         public void EnterSittingState() => ChangeState<SittingState>();
 
         public static IReadOnlyDictionary<ulong, PlayerEntity> GetAllPlayers() => AllPlayers;
@@ -636,8 +640,7 @@ namespace GameCore.Gameplay.Entities.Player
         {
             _inventory.SetSelectedSlotIndex(newValue);
             _inventoryManager.ToggleItemsState();
-            
-            _references.RigController.TryUpdateRig(OwnerClientId);
+            UpdateRig();
         }
 
         private void OnPlayerLocationChanged(EntityLocation previousValue, EntityLocation newValue) =>

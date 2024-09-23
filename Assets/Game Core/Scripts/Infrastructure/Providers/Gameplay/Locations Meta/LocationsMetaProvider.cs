@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.LocationsList;
+using GameCore.Configs.Global.LocationsDatabase;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
+using GameCore.Infrastructure.Providers.Global;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 {
@@ -10,9 +11,9 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LocationsMetaProvider(IGameplayConfigsProvider gameplayConfigsProvider)
+        public LocationsMetaProvider(IConfigsProvider configsProvider)
         {
-            _locationsListConfig = gameplayConfigsProvider.GetConfig<LocationsListConfigMeta>();
+            _locationsDatabaseConfig = configsProvider.GetConfig<LocationsDatabaseConfigMeta>();
             _locationsMeta = new Dictionary<LocationName, LocationMeta>();
 
             SetupLocationsDictionary();
@@ -20,11 +21,10 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 
         // FIELDS: --------------------------------------------------------------------------------
 
-        private readonly LocationsListConfigMeta _locationsListConfig;
+        private readonly LocationsDatabaseConfigMeta _locationsDatabaseConfig;
         private readonly Dictionary<LocationName, LocationMeta> _locationsMeta;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-
 
         public bool TryGetLocationMeta(LocationName locationName, out LocationMeta locationMeta) =>
             _locationsMeta.TryGetValue(locationName, out locationMeta);
@@ -33,7 +33,7 @@ namespace GameCore.Infrastructure.Providers.Gameplay.LocationsMeta
 
         private void SetupLocationsDictionary()
         {
-            IEnumerable<LocationMeta> allAvailableLocationsMeta = _locationsListConfig.GetAllAvailableLocationsMeta();
+            IEnumerable<LocationMeta> allAvailableLocationsMeta = _locationsDatabaseConfig.GetAllAvailableLocationsMeta();
 
             foreach (LocationMeta locationMeta in allAvailableLocationsMeta)
             {

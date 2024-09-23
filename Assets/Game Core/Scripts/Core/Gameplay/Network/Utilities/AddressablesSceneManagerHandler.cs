@@ -11,7 +11,7 @@ namespace GameCore.Gameplay.Network
 {
     public class AddressablesSceneManagerHandler : ISceneManagerHandler
     {
-        private Scene m_InvalidScene = new Scene();
+        private Scene m_InvalidScene = new();
 
         internal struct SceneEntry
         {

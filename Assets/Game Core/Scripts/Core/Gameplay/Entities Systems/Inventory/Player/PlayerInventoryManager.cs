@@ -100,16 +100,19 @@ namespace GameCore.Gameplay.Systems.Inventory
                 clientID: clientID,
                 itemID: itemID,
                 isFirstPerson: isFirstPerson,
-                callbackEvent: itemPreviewObject => { ItemPreviewCreated(itemPreviewObject, slotIndex); }
+                callbackEvent: itemPreviewObject => { ItemPreviewCreated(itemPreviewObject, slotIndex, isFirstPerson); }
             );
         }
 
-        private void ItemPreviewCreated(ItemPreviewObject itemPreview, int slotIndex)
+        private void ItemPreviewCreated(ItemPreviewObject itemPreview, int slotIndex, bool isFirstPerson)
         {
             bool isSelected = _playerInventory.GetSelectedSlotIndex() == slotIndex;
 
             if (!isSelected)
                 itemPreview.Hide();
+            
+            if (!isFirstPerson)
+                _playerEntity.UpdateRig();
 
             _itemsPreviewObjects[slotIndex] = itemPreview;
         }

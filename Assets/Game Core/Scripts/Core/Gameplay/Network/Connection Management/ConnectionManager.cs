@@ -1,9 +1,12 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Global;
 using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
+using GameCore.Gameplay.Storages.Assets;
 using GameCore.Infrastructure.Services.Global;
 using GameCore.StateMachine;
 using Sirenix.OdinInspector;
@@ -27,6 +30,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             LocalLobby localLobby,
             LocalLobbyUser lobbyUser,
             IScenesLoaderService scenesLoaderService,
+            IScenesAssetsStorage scenesAssetsStorage,
             IGameStateMachine gameStateMachine
         )
         {
@@ -38,6 +42,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             _localLobby = localLobby;
             _lobbyUser = lobbyUser;
             _scenesLoaderService = scenesLoaderService;
+            _scenesAssetsStorage = scenesAssetsStorage;
             _gameStateMachine = gameStateMachine;
         }
 
@@ -73,6 +78,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         private LocalLobbyUser _lobbyUser;
         private ConnectionState _currentState;
         private IScenesLoaderService _scenesLoaderService;
+        private IScenesAssetsStorage _scenesAssetsStorage;
         private IGameStateMachine _gameStateMachine;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -107,6 +113,17 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
         public void LoadScene(SceneName sceneName, bool isNetwork) =>
             _scenesLoaderService.LoadScene(sceneName, isNetwork);
 
+        public void AddLocationsScenes()
+        {
+            NetworkSceneManager sceneManager = NetworkManager.SceneManager;
+            sceneManager.SceneManagerHandler = new AddressablesSceneManagerHandler();
+
+            IEnumerable<string> allScenesPath = _scenesAssetsStorage.GetAllScenesPath();
+            string[] scenesPaths = allScenesPath.ToArray();
+            
+            sceneManager.RegisterExternalScenes(scenesPaths);
+        }
+        
         public void EnterLoadMainMenuState() =>
             _gameStateMachine.ChangeState<LoadMainMenuState>();
 
