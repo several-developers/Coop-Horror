@@ -187,9 +187,6 @@ namespace GameCore.Gameplay.Entities.Player
         [Button]
         public void SetTrainAsParent() => SetTrainAsParentRpc();
 
-        [Button]
-        public void RemoveParent() => RemoveParentRpc();
-
         public void SendLeftMobileHQSeat() =>
             OnLeftMobileHQSeat.Invoke();
 
@@ -532,10 +529,6 @@ namespace GameCore.Gameplay.Entities.Player
 
             NetworkObject.TrySetParent(newParent);
         }
-
-        [Rpc(target: SendTo.Server)]
-        private void RemoveParentRpc() =>
-            NetworkObject.TryRemoveParent();
 
         [Rpc(target: SendTo.Owner)]
         private void TakeDamageRpc(float damage) =>

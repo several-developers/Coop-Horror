@@ -11,6 +11,8 @@ namespace GameCore.Gameplay.Entities
         
         public void SetParent(NetworkObject newParent) => SetParentRpc(newParent);
         
+        public void RemoveParent() => RemoveParentRpc();
+        
         public MonoBehaviour GetMonoBehaviour() => this;
         public Transform GetTransform() => transform;
         public NetworkObject GetNetworkObject() => NetworkObject;
@@ -27,5 +29,9 @@ namespace GameCore.Gameplay.Entities
             
             NetworkObject.TrySetParent(networkObject);
         }
+        
+        [Rpc(target: SendTo.Server)]
+        private void RemoveParentRpc() =>
+            NetworkObject.TryRemoveParent();
     }
 }

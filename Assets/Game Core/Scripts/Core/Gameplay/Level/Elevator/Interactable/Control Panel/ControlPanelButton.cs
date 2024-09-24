@@ -79,7 +79,7 @@ namespace GameCore.Gameplay.Level.Elevator
         private void SetElevatorFloor()
         {
             ElevatorEntity elevatorEntity = ElevatorEntity.Get();
-            elevatorEntity.ChangeTargetFloor(_buttonFloor);
+            elevatorEntity.SetTargetFloor(_buttonFloor);
         }
 
         private void PlayAnimation() =>

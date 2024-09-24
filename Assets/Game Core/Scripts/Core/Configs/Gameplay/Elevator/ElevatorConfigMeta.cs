@@ -20,7 +20,7 @@ namespace GameCore.Configs.Gameplay.Elevator
         private float _reactivationDelay = 2f;
 
         [SerializeField, Min(0f)]
-        private float _doorOpenDelay = 0.5f;
+        private float _doorOpenDelay = 3f;
 
         [SerializeField, Min(0f)]
         private float _movementOffsetY = 200f;

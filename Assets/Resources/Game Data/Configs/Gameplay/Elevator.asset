@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Elevator
   m_EditorClassIdentifier: 
   _metaName: Elevator
-  _floorMovementDuration: 10
+  _movementDelay: 3
+  _movementDurationPerFloor: 5
   _reactivationDelay: 2
-  _doorOpenDelay: 1
+  _doorOpenDelay: 2
   _movementOffsetY: 100
   _speedUpCurve:
     serializedVersion: 2
