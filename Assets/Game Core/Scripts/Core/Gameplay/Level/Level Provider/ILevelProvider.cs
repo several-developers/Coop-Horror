@@ -7,6 +7,7 @@ namespace GameCore.Gameplay.Level
     public interface ILevelProvider
     {
         void ClearLevel();
+        bool TryGetElevatorMovePoint(Floor floor, out ElevatorMovePoint elevatorMovePoint);
         bool TryGetStairsFireExit(Floor floor, out FireExit fireExit);
         bool TryGetOtherFireExit(Floor floor, out FireExit fireExit);
         bool TryGetDungeon(Floor floor, out DungeonWrapper dungeonWrapper);

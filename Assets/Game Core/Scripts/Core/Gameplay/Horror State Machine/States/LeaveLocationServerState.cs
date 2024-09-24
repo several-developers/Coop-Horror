@@ -117,10 +117,10 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             _entitiesStorage.Clear();
         }
 
-        private void ResetElevator()
+        private static void ResetElevator()
         {
             ElevatorEntity elevatorEntity = ElevatorEntity.Get();
-            // Reset
+            elevatorEntity.ResetElevator();
         }
 
         private void UnloadLastLocation() =>

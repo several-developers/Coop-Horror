@@ -49,12 +49,11 @@ namespace GameCore.Gameplay.GameManagement
         // FIELDS: --------------------------------------------------------------------------------
 
         private const LocationName DefaultCurrentLocation = LocationName.Base;
-        private const LocationName DefaultSelectedLocation = LocationName.Forest;
         private const GameState DefaultGameState = GameState.Gameplay;
 
         private readonly NetworkVariable<LocationName> _currentLocation = new(DefaultCurrentLocation);
-        private readonly NetworkVariable<LocationName> _selectedLocation = new(DefaultSelectedLocation);
-        private readonly NetworkVariable<GameState> _gameState = new(DefaultGameState);
+        private readonly NetworkVariable<LocationName> _selectedLocation = new();
+        private readonly NetworkVariable<GameState> _gameState = new(value: DefaultGameState);
         private readonly NetworkVariable<int> _playersGold = new();
 
         private readonly Dictionary<ulong, bool> _playersLoadStates = new(capacity: 8); // Server only.
@@ -71,7 +70,7 @@ namespace GameCore.Gameplay.GameManagement
         private NetworkSceneManager _networkSceneManager;
         private BalanceConfigMeta _balanceConfig;
 
-        private LocationName _previousSelectedLocation = DefaultSelectedLocation;
+        private LocationName _previousSelectedLocation;
         private bool _isScenesSynchronized;
         private bool _isServerLocationLoaded;
 
@@ -161,6 +160,9 @@ namespace GameCore.Gameplay.GameManagement
 
         protected override void InitServerOnly()
         {
+            _selectedLocation.Value = _balanceConfig.DefaultSelectedLocation;
+            _previousSelectedLocation = _balanceConfig.DefaultSelectedLocation;
+            
             _networkHorror.OnPlayerConnectedEvent += OnPlayerConnected;
             _networkHorror.OnPlayerDisconnectedEvent += OnPlayerDisconnected;
 

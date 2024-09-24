@@ -16,6 +16,7 @@ MonoBehaviour:
   _gameRestartDelay: 8
   _noiseLoudnessMultiplier: 18
   _noiseObstacleMultiplier: 0.5
+  _defaultSelectedLocation: 12
   _monstersDangerLevelConfig:
     _dangerLevelConfigs:
     - _dangerLevel: 0

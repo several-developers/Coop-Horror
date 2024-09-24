@@ -4,10 +4,10 @@ using ECM2;
 using GameCore.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
-using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.Health;
@@ -108,11 +108,11 @@ namespace GameCore.Gameplay.Entities.Player
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
-        private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: Constants.OwnerPermission);
-        private readonly NetworkVariable<Floor> _currentFloor = new(writePerm: Constants.OwnerPermission);
-        private readonly NetworkVariable<float> _sanity = new(writePerm: Constants.OwnerPermission);
-        private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: Constants.OwnerPermission);
-        private readonly NetworkVariable<bool> _isDead = new(writePerm: Constants.OwnerPermission);
+        private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<Floor> _currentFloor = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<float> _sanity = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<bool> _isDead = new(writePerm: OwnerPermission);
 
         private static PlayerEntity _localPlayer;
 

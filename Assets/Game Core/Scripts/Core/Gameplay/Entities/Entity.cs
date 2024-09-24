@@ -9,8 +9,23 @@ namespace GameCore.Gameplay.Entities
     {
         // PUBLIC METHODS: ------------------------------------------------------------------------
         
+        public void SetParent(NetworkObject newParent) => SetParentRpc(newParent);
+        
         public MonoBehaviour GetMonoBehaviour() => this;
         public Transform GetTransform() => transform;
         public NetworkObject GetNetworkObject() => NetworkObject;
+
+        // RPC: -----------------------------------------------------------------------------------
+        
+        [Rpc(target: SendTo.Server)]
+        private void SetParentRpc(NetworkObjectReference newParent)
+        {
+            bool isNetworkObjectFound = newParent.TryGet(out NetworkObject networkObject);
+
+            if (!isNetworkObjectFound)
+                return;
+            
+            NetworkObject.TrySetParent(networkObject);
+        }
     }
 }

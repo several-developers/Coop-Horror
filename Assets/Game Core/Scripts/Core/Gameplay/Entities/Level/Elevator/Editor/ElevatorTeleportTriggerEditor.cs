@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Level.Elevator.Editor
 {
-    [CustomEditor(typeof(ElevatorTeleportTrigger))]
+    [CustomEditor(typeof(ElevatorTrigger))]
     public class ElevatorTeleportTriggerEditor : OdinEditor
     {
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         [DrawGizmo(GizmoType.NonSelected | GizmoType.Selected | GizmoType.InSelectionHierarchy |
                    GizmoType.NotInSelectionHierarchy)]
-        public static void RenderCustomGizmo(ElevatorTeleportTrigger obj, GizmoType gizmo)
+        public static void RenderCustomGizmo(ElevatorTrigger obj, GizmoType gizmo)
         {
             bool drawTrigger = obj.DrawTrigger;
 

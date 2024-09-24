@@ -10,8 +10,11 @@ namespace GameCore.Configs.Gameplay.Elevator
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
-        [SerializeField, Min(0f)]
-        private float _floorMovementDuration = 5f;
+        [SerializeField, Min(0f), SuffixLabel(Seconds, overlay: true)]
+        private float _movementDelay = 3f;
+        
+        [SerializeField, Min(0f), SuffixLabel(Seconds, overlay: true)]
+        private float _movementDurationPerFloor = 10f;
 
         [SerializeField, Min(0f)]
         private float _reactivationDelay = 2f;
@@ -43,7 +46,8 @@ namespace GameCore.Configs.Gameplay.Elevator
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public float FloorMovementDuration => _floorMovementDuration;
+        public float MovementDelay => _movementDelay;
+        public float MovementDurationPerFloor => _movementDurationPerFloor;
         public float ReactivationDelay => _reactivationDelay;
         public float DoorOpenDelay => _doorOpenDelay;
         public float MovementOffsetY => _movementOffsetY;

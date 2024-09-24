@@ -1,4 +1,5 @@
-﻿using GameCore.Infrastructure.Configs;
+﻿using GameCore.Enums.Gameplay;
+using GameCore.Infrastructure.Configs;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -18,6 +19,9 @@ namespace GameCore.Configs.Gameplay.Balance
         [SerializeField, Min(0f)]
         private float _noiseObstacleMultiplier = 0.5f;
 
+        [SerializeField]
+        private LocationName _defaultSelectedLocation = LocationName.Forest;
+
         [SerializeField, Space(5)]
         private MonstersDangerLevelConfig _monstersDangerLevelConfig;
 
@@ -26,6 +30,7 @@ namespace GameCore.Configs.Gameplay.Balance
         public float GameRestartDelay => _gameRestartDelay;
         public float NoiseLoudnessMultiplier => _noiseLoudnessMultiplier;
         public float NoiseObstacleMultiplier => _noiseObstacleMultiplier;
+        public LocationName DefaultSelectedLocation => _defaultSelectedLocation;
         public MonstersDangerLevelConfig MonstersDangerLevelConfig => _monstersDangerLevelConfig;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

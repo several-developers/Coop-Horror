@@ -131,7 +131,7 @@ namespace GameCore.Gameplay.Level.Elevator
 
             while (_currentFloor.Value != _targetFloor.Value)
             {
-                delay = _elevatorConfig.FloorMovementDuration;
+                delay = _elevatorConfig.MovementDurationPerFloor;
 
                 yield return new WaitForSeconds(delay);
 

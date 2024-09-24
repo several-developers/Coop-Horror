@@ -1,28 +1,21 @@
 ﻿using System;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
-using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Entities.Level.Elevator;
 using GameCore.Gameplay.Interactable;
 using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Zenject;
 
 namespace GameCore.Gameplay.Level.Elevator
 {
     public abstract class ControlPanelButton : MonoBehaviour, IInteractable
     {
-        // CONSTRUCTORS: --------------------------------------------------------------------------
-
-        [Inject]
-        private void Construct(IElevatorsManagerDecorator elevatorsManagerDecorator) =>
-            _elevatorsManagerDecorator = elevatorsManagerDecorator;
-
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.Settings)]
         [SerializeField]
-        private Floor _floor;
+        private Floor _buttonFloor;
         
         [Title(Constants.References)]
         [SerializeField, Required]
@@ -33,27 +26,18 @@ namespace GameCore.Gameplay.Level.Elevator
         
         // FIELDS: --------------------------------------------------------------------------------
         
+        public event Action OnButtonClickedEvent;
         public event Action OnInteractionStateChangedEvent;
-        public event Action<Floor> OnStartElevatorClickedEvent;
 
-        private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private bool _canInteract = true;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void Awake()
-        {
-            _elevatorsManagerDecorator.OnElevatorStoppedEvent += OnElevatorsStopped;
-            
-            _animationObserver.OnEnabledEvent += OnEnabledEvent;
-        }
+        private void Awake() =>
+            _animationObserver.OnEnabledEvent += OnButtonEnabled;
 
-        private void OnDestroy()
-        {
-            _elevatorsManagerDecorator.OnElevatorStoppedEvent -= OnElevatorsStopped;
-            
-            _animationObserver.OnEnabledEvent -= OnEnabledEvent;
-        }
+        private void OnDestroy() =>
+            _animationObserver.OnEnabledEvent -= OnButtonEnabled;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
@@ -69,45 +53,41 @@ namespace GameCore.Gameplay.Level.Elevator
         {
             ToggleInteract(canInteract: false);
             PlayAnimation();
-            StartElevator();
+            HandleClick();
         }
 
         public void ToggleInteract(bool canInteract)
         {
             _canInteract = canInteract;
-            SendInteractionStateChangedEvent();
+            OnInteractionStateChangedEvent?.Invoke();
         }
-
-        private void StartElevator() =>
-            OnStartElevatorClickedEvent?.Invoke(_floor);
 
         public InteractionType GetInteractionType() =>
             InteractionType.ElevatorFloorButton;
 
-        public bool CanInteract() =>
-            _canInteract && !IsElevatorMoving();
+        public bool CanInteract() => _canInteract;
+
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
+
+        private void HandleClick()
+        {
+            SetElevatorFloor();
+            OnButtonClickedEvent?.Invoke();
+        }
+        
+        private void SetElevatorFloor()
+        {
+            ElevatorEntity elevatorEntity = ElevatorEntity.Get();
+            elevatorEntity.ChangeTargetFloor(_buttonFloor);
+        }
 
         private void PlayAnimation() =>
             _animator.SetTrigger(id: AnimatorHashes.Trigger);
 
-        private void SendInteractionStateChangedEvent() =>
-            OnInteractionStateChangedEvent?.Invoke();
-
-        private bool IsElevatorMoving() =>
-            _elevatorsManagerDecorator.IsElevatorMoving();
         
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
-        private void OnEnabledEvent()
-        {
-            if (IsElevatorMoving())
-                return;
-            
-            ToggleInteract(canInteract: true);
-        }
-
-        private void OnElevatorsStopped(Floor floor) => ToggleInteract(canInteract: true);
+        private void OnButtonEnabled() => ToggleInteract(canInteract: true);
     }
 }

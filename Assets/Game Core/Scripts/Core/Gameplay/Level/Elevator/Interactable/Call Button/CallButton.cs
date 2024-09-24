@@ -86,11 +86,51 @@ namespace GameCore.Gameplay.Level.Elevator
 
         private void HandleClick()
         {
+            StartOrOpenElevator();
             PlayButtonPushSound();
+        }
+
+        private void StartOrOpenElevator()
+        {
+            bool canOpenElevator = CanOpenElevator();
+            
+            if (canOpenElevator)
+                OpenElevator();
+            else
+                StartElevator();
+        }
+
+        private static void OpenElevator()
+        {
+            ElevatorEntity elevatorEntity = GetElevatorEntity();
+            elevatorEntity.Open();
+        }
+        
+        private void StartElevator()
+        {
+            ElevatorEntity elevatorEntity = GetElevatorEntity();
+            elevatorEntity.StartElevator(_buttonFloor);
         }
 
         private void PlayButtonPushSound() => PlaySound(ElevatorEntity.SFXType.ButtonPush).Forget();
 
+        private static ElevatorEntity GetElevatorEntity() =>
+            ElevatorEntity.Get();
+
+        private bool CanOpenElevator()
+        {
+            ElevatorEntity elevatorEntity = GetElevatorEntity();
+            ElevatorEntity.ElevatorState elevatorState = elevatorEntity.GetElevatorState();
+            bool isIdleState = elevatorState == ElevatorEntity.ElevatorState.Idle;
+
+            if (!isIdleState)
+                return false;
+
+            Floor currentFloor = elevatorEntity.GetCurrentFloor();
+            bool isFloorsMatches = currentFloor == _buttonFloor;
+            return isFloorsMatches;
+        }
+        
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnButtonEnabled() => ToggleInteract(canInteract: true);

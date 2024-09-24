@@ -169,6 +169,18 @@ MonoBehaviour:
     TriggerNameHash: -759124288
     TransitionIndex: 0
   m_Animator: {fileID: 6099693894479532960}
+--- !u!114 &9165577154273298828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7277490165714156976}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 470eebc1c90c4e7bb1c2ebb048f836f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8298199399310787444 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7271449666460269675, guid: 8275d4c134cc66c45a26be671b3c87c9,

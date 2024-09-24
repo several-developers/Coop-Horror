@@ -1,5 +1,6 @@
 ﻿using System;
 using GameCore.Gameplay.Network;
+using GameCore.Gameplay.Other;
 using Sirenix.OdinInspector;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -12,6 +13,12 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         // MEMBERS: -------------------------------------------------------------------------------
 
         [SerializeField, Required]
+        private ElevatorTrigger _elevatorTrigger;
+
+        [SerializeField, Required]
+        private AnimationObserver _animationObserver;
+        
+        [SerializeField, Required]
         private Animator _animator;
         
         [SerializeField, Required]
@@ -22,6 +29,8 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
+        public ElevatorTrigger ElevatorTrigger => _elevatorTrigger;
+        public AnimationObserver AnimationObserver => _animationObserver;
         public Animator Animator => _animator;
         public NetworkAnimator NetworkAnimator => _networkAnimator;
         public ClientNetworkTransform NetworkTransform => _networkTransform;

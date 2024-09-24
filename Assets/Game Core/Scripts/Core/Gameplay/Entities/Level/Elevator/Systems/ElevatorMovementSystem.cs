@@ -1,5 +1,7 @@
-﻿using GameCore.Configs.Gameplay.Elevator;
+﻿using Cysharp.Threading.Tasks;
+using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Gameplay.Level.Elevator;
+using GameCore.Utilities;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Level.Elevator
@@ -35,18 +37,31 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         {
             float duration = GetMovementDuration();
             _time += Time.deltaTime / duration;
-            
-            if (_time > 1f)
+
+            if (_time >= 1.0f)
+            {
                 _time = 1f;
+                // StopMovement();
+            }
 
             float interpolatedValue = GetInterpolatedValue();
             Vector3 localPosition = _transform.localPosition;
             
-            _transform.localPosition = new Vector3(x: interpolatedValue, y: localPosition.y, z: localPosition.z);
+            _transform.localPosition = new Vector3(x: localPosition.x, y: interpolatedValue, z: localPosition.z);
         }
 
-        public void StartMovement()
+        public async UniTaskVoid StartMovement()
         {
+            float movementDelay = _elevatorConfig.MovementDelay;
+            int delay = movementDelay.ConvertToMilliseconds();
+
+            bool isCanceled = await UniTask
+                .Delay(delay, cancellationToken: _elevatorEntity.GetCancellationTokenOnDestroy())
+                .SuppressCancellationThrow();
+
+            if (isCanceled)
+                return;
+            
             _time = 0f;
             _isMoving = true;
         }
@@ -63,7 +78,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             _isMoving ? _elevatorConfig.SpeedUpCurve : _elevatorConfig.SlowDownCurve;
 
         private float GetMovementDuration() =>
-            _elevatorConfig.FloorMovementDuration;
+            _elevatorConfig.MovementDurationPerFloor;
         
         private float GetInterpolatedValue()
         {

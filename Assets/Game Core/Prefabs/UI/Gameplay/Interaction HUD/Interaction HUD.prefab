@@ -57,6 +57,7 @@ MonoBehaviour:
   _changeCanvasState: 0
   _ignoreScaleTime: 0
   _ignoreCanvasGroupFade: 0
+  _lastSiblingOnShow: 0
   _canvas: {fileID: 0}
   _fadeTime: 0.25
   _targetCG: {fileID: 3786323513249775983}
@@ -83,6 +84,8 @@ MonoBehaviour:
       _text: Press 'E' to open
     - _interactionType: 14
       _text: Press 'E' to open
+    - _interactionType: 15
+      _text: Press 'E' to start elevator
     _interactionDisabledTextSettings:
     - _interactionType: 1
       _text: Can't pick up item now

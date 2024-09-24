@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 4743154087899739280}
   - component: {fileID: 8489197676710068869}
   - component: {fileID: 8459538577111382923}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Teleport Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -80,7 +80,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _drawTrigger: 1
-  _elevator: {fileID: 0}
 --- !u!65 &8459538577111382923
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -408,6 +407,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _references:
+    _elevatorTrigger: {fileID: 8489197676710068869}
+    _animationObserver: {fileID: 1438626924451982710}
     _animator: {fileID: 4063332129356052314}
     _networkAnimator: {fileID: 7655716323036155030}
     _networkTransform: {fileID: -110539622567285648}
@@ -756,6 +757,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 7837860171167606010}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1438626924451982710 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9165577154273298828, guid: 21865b48c83039242b92a53b3a55b722,
+    type: 3}
+  m_PrefabInstance: {fileID: 7837860171167606010}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 470eebc1c90c4e7bb1c2ebb048f836f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &4063332129356052314 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 6099693894479532960, guid: 21865b48c83039242b92a53b3a55b722,
