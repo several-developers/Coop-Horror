@@ -45,11 +45,15 @@ namespace GameCore.Gameplay.Level.Elevator
         [SerializeField, Required]
         private Animator _animator;
 
+        [BoxGroup(Constants.References, showLabel: false), SerializeField]
+        private ElevatorReferences _references;
+
         // FIELDS: --------------------------------------------------------------------------------
         
         private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private ElevatorConfigMeta _elevatorConfig;
 
+        private ElevatorMovementSystem _movementSystem;
         private bool _isOpen;
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
@@ -73,13 +77,23 @@ namespace GameCore.Gameplay.Level.Elevator
         }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
-        
+
+        public ElevatorConfigMeta GetElevatorConfig() => _elevatorConfig;
+        public ElevatorReferences GetReferences() => _references;
         public Floor GetElevatorFloor() => _floor;
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void InitAll() =>
             SoundReproducer = new ElevatorSoundReproducer(soundProducer: this, _elevatorConfig);
+
+        protected override void InitServer()
+        {
+            _movementSystem = new ElevatorMovementSystem(elevatorBase: this);
+        }
+
+        protected override void TickServer() =>
+            _movementSystem.Tick();
 
         protected void SetElevatorFloor(Floor floor) =>
             _floor = floor;

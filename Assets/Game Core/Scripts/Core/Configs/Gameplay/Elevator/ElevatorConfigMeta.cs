@@ -18,6 +18,15 @@ namespace GameCore.Configs.Gameplay.Elevator
 
         [SerializeField, Min(0f)]
         private float _doorOpenDelay = 0.5f;
+
+        [SerializeField, Min(0f)]
+        private float _movementOffsetY = 200f;
+
+        [SerializeField]
+        private AnimationCurve _speedUpCurve;
+        
+        [SerializeField]
+        private AnimationCurve _slowDownCurve;
         
         [Title(SFXTitle)]
         [SerializeField, Required]
@@ -37,6 +46,9 @@ namespace GameCore.Configs.Gameplay.Elevator
         public float FloorMovementDuration => _floorMovementDuration;
         public float ReactivationDelay => _reactivationDelay;
         public float DoorOpenDelay => _doorOpenDelay;
+        public float MovementOffsetY => _movementOffsetY;
+        public AnimationCurve SpeedUpCurve => _speedUpCurve;
+        public AnimationCurve SlowDownCurve => _slowDownCurve;
         
         public SoundEvent DoorOpeningSE => _doorOpeningSE;
         public SoundEvent DoorClosingSE => _doorClosingSE;

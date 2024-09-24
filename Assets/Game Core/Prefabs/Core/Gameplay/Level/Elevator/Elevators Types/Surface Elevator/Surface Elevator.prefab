@@ -15,7 +15,7 @@ PrefabInstance:
     - target: {fileID: 3750073814762262346, guid: 6df2a89f02911334ebe435e37501e010,
         type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3750073814762262346, guid: 6df2a89f02911334ebe435e37501e010,
         type: 3}
@@ -67,14 +67,9 @@ PrefabInstance:
       propertyPath: _elevator
       value: 
       objectReference: {fileID: 3308865725088519337}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4298785324457527546, guid: 6df2a89f02911334ebe435e37501e010, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 6df2a89f02911334ebe435e37501e010, type: 3}
---- !u!95 &4294089274358508998 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4298785324457527546, guid: 6df2a89f02911334ebe435e37501e010,
-    type: 3}
-  m_PrefabInstance: {fileID: 17997955797624124}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &9046104790809611540
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -86,6 +81,11 @@ PrefabInstance:
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 4132571380
+      objectReference: {fileID: 0}
+    - target: {fileID: 247885306263143408, guid: bd93bbe5a7ce3ba43bbaa6f418078f7b,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6813362952058058416, guid: bd93bbe5a7ce3ba43bbaa6f418078f7b,
         type: 3}
@@ -173,7 +173,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _floor: 0
-  _animator: {fileID: 4294089274358508998}
+  _animator: {fileID: 5037807702858299982}
+--- !u!95 &5037807702858299982 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 4063332129356052314, guid: bd93bbe5a7ce3ba43bbaa6f418078f7b,
+    type: 3}
+  m_PrefabInstance: {fileID: 9046104790809611540}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7601978004778869502 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1510287895838584810, guid: bd93bbe5a7ce3ba43bbaa6f418078f7b,
