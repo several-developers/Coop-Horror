@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using UnityEngine;

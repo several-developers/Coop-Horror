@@ -1,15 +1,15 @@
 ﻿using GameCore.Configs.Gameplay.Elevator;
-using GameCore.Gameplay.Level.Elevator;
+using GameCore.Gameplay.Entities.Level.Elevator;
 using Sonity;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer
 {
-    public class ElevatorSoundReproducer : SoundReproducerBase<ElevatorBase.SFXType>
+    public class ElevatorSoundReproducer : SoundReproducerBase<ElevatorEntity.SFXType>
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         public ElevatorSoundReproducer(
-            ISoundProducer<ElevatorBase.SFXType> soundProducer,
+            ISoundProducer<ElevatorEntity.SFXType> soundProducer,
             ElevatorConfigMeta elevatorConfig
             ) : base(soundProducer)
         {
@@ -22,14 +22,14 @@ namespace GameCore.Gameplay.Systems.SoundReproducer
 
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
-        protected override SoundEvent GetSoundEvent(ElevatorBase.SFXType sfxType)
+        protected override SoundEvent GetSoundEvent(ElevatorEntity.SFXType sfxType)
         {
             SoundEvent soundEvent = sfxType switch
             {
-                ElevatorBase.SFXType.DoorOpening => _elevatorConfig.DoorOpeningSE,
-                ElevatorBase.SFXType.DoorClosing => _elevatorConfig.DoorClosingSE,
-                ElevatorBase.SFXType.FloorChange => _elevatorConfig.FloorChangeSE,
-                ElevatorBase.SFXType.ButtonPush => _elevatorConfig.ButtonPushSE,
+                ElevatorEntity.SFXType.DoorOpening => _elevatorConfig.DoorOpeningSE,
+                ElevatorEntity.SFXType.DoorClosing => _elevatorConfig.DoorClosingSE,
+                ElevatorEntity.SFXType.FloorChange => _elevatorConfig.FloorChangeSE,
+                ElevatorEntity.SFXType.ButtonPush => _elevatorConfig.ButtonPushSE,
                 _ => null
             };
 

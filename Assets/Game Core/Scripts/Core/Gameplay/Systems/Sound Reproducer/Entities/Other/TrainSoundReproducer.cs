@@ -1,5 +1,5 @@
 ﻿using GameCore.Configs.Gameplay.Train;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using Sonity;
 
 namespace GameCore.Gameplay.Systems.SoundReproducer

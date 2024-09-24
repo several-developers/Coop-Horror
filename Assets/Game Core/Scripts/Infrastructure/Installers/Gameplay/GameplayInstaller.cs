@@ -1,7 +1,7 @@
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Generators.Monsters;

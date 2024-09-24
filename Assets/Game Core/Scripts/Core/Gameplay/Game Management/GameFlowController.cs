@@ -5,7 +5,7 @@ using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Generators.Monsters;
 using GameCore.Gameplay.Network;

@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using GameCore.Configs.Gameplay.Balance;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.HorrorStateMachineSpace;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;

@@ -7,7 +7,7 @@ using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Player.Interaction;
 using GameCore.Gameplay.Entities.Player.States;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.Factories.ItemsPreview;
 using GameCore.Gameplay.Systems.Footsteps;
 using GameCore.Gameplay.Systems.Health;

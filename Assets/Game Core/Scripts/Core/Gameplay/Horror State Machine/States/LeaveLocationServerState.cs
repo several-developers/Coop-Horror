@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Level.Elevator;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Items;
-using GameCore.Gameplay.Level;
-using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Storages.Entities;
 using GameCore.Infrastructure.Providers.Gameplay.Items;
@@ -23,7 +22,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         public LeaveLocationServerState(
             IHorrorStateMachine horrorStateMachine,
             ILocationsLoader locationsLoader,
-            ILevelProvider levelProvider,
             IItemsProvider itemsProvider,
             IEntitiesStorage entitiesStorage,
             IGameManagerDecorator gameManagerDecorator,
@@ -32,7 +30,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
         {
             _horrorStateMachine = horrorStateMachine;
             _locationsLoader = locationsLoader;
-            _levelProvider = levelProvider;
             _itemsProvider = itemsProvider;
             _entitiesStorage = entitiesStorage;
             _gameManagerDecorator = gameManagerDecorator;
@@ -46,7 +43,6 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
         private readonly IHorrorStateMachine _horrorStateMachine;
         private readonly ILocationsLoader _locationsLoader;
-        private readonly ILevelProvider _levelProvider;
         private readonly IItemsProvider _itemsProvider;
         private readonly IEntitiesStorage _entitiesStorage;
         private readonly IGameManagerDecorator _gameManagerDecorator;
@@ -73,7 +69,7 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
 
             DestroyAllItems();
             KillAllEntities();
-            ClearDungeonElevators();
+            ResetElevator();
             UnloadLastLocation();
             EnterLeaveLocationClientState();
         }
@@ -121,24 +117,10 @@ namespace GameCore.Gameplay.HorrorStateMachineSpace
             _entitiesStorage.Clear();
         }
 
-        private void ClearDungeonElevators()
+        private void ResetElevator()
         {
-            List<Floor> floors = new() { Floor.One, Floor.Two, Floor.Three };
-
-            foreach (Floor floor in floors)
-            {
-                bool isElevatorFound = TryGetElevator(floor, out ElevatorBase elevatorBase);
-
-                if (!isElevatorFound)
-                    continue;
-
-                Object.Destroy(elevatorBase.gameObject);
-            }
-
-            // LOCAL METHODS: -----------------------------
-
-            bool TryGetElevator(Floor floor, out ElevatorBase result) =>
-                _levelProvider.TryGetElevator(floor, out result);
+            ElevatorEntity elevatorEntity = ElevatorEntity.Get();
+            // Reset
         }
 
         private void UnloadLastLocation() =>

@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.Factories.Menu;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.HorrorStateMachineSpace;

@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.Entities.Train;
+﻿using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.Network;
 
 namespace GameCore.Gameplay.HorrorStateMachineSpace

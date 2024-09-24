@@ -2,7 +2,7 @@
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Quests;

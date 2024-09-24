@@ -13,6 +13,8 @@ namespace GameCore.Gameplay.Network
 
         // FIELDS: --------------------------------------------------------------------------------
 
+        protected const NetworkVariableWritePermission OwnerPermission = Constants.OwnerPermission;
+
         private bool _isInitialized;
 
         // PUBLIC METHODS: ------------------------------------------------------------------------

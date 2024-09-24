@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Level.Elevator;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.VisualManagement;
@@ -207,15 +208,12 @@ namespace GameCore.Gameplay.Level.Elevator
         private void OnTeleportLocalPlayer(Transform elevatorTransform)
         {
             Floor currentFloor = GetCurrentFloor();
-            bool isElevatorFound = _levelProvider.TryGetElevator(currentFloor, out ElevatorBase targetElevator);
-
-            if (!isElevatorFound)
-                return;
+            ElevatorEntity elevatorEntity = ElevatorEntity.Get();
 
             PlayerEntity playerEntity = PlayerEntity.GetLocalPlayer();
             Transform target = playerEntity.transform;
             Transform parentFrom = elevatorTransform;
-            Transform parentTo = targetElevator.transform;
+            Transform parentTo = elevatorEntity.transform;
 
             GameUtilities.Teleport(target, parentFrom, parentTo, out Vector3 position, out Quaternion rotation);
             playerEntity.Teleport(position, rotation);

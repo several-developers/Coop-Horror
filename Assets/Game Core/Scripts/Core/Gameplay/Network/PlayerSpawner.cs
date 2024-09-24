@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.Entities.Train;
+using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.Factories.Entities;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network.ConnectionManagement;
