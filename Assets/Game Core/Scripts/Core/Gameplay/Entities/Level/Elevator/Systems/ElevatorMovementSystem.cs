@@ -30,7 +30,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             _levelProvider = levelProvider;
             _transform = elevatorEntity.transform;
             _movementLogicRoutine = new CoroutineHelper(elevatorEntity);
-            _lastTeleportPointOrigin = _transform.position;
+            _lastTeleportPoint = _transform.position;
 
             _movementLogicRoutine.GetRoutineEvent += MovementLogicCO;
         }
@@ -46,7 +46,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         private readonly Transform _transform;
         private readonly CoroutineHelper _movementLogicRoutine;
 
-        private Vector3 _lastTeleportPointOrigin;
+        private Vector3 _lastTeleportPoint;
         private MovementState _movementState;
         private bool _reachedTargetFloor;
 
@@ -61,9 +61,6 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
             _movementLogicRoutine.Start();
         }
-
-        public void StopMovement() =>
-            _movementLogicRoutine.Stop();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -122,9 +119,10 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             if (!isElevatorMovePointFound)
                 return;
 
-            _lastTeleportPointOrigin = elevatorMovePoint.transform.position;
+            Transform elevatorPoint = elevatorMovePoint.transform;
+            _lastTeleportPoint = elevatorPoint.position;
 
-            Vector3 teleportPosition = _lastTeleportPointOrigin;
+            Vector3 teleportPosition = _lastTeleportPoint;
             float movementOffsetY = _elevatorConfig.MovementOffsetY;
 
             switch (_movementState)
@@ -139,7 +137,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             }
 
             ClientNetworkTransform networkTransform = _references.NetworkTransform;
-            networkTransform.Teleport(teleportPosition, Quaternion.identity, newScale: Vector3.one);
+            networkTransform.Teleport(teleportPosition, elevatorPoint.rotation, newScale: Vector3.one);
         }
 
         private IEnumerator MovementLogicCO()
@@ -153,10 +151,8 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             _movementState = MovementState.MoveToStartPoint;
             
             yield return MoveToTeleportPointCO();
-            
-            float doorOpenDelay = _elevatorConfig.DoorOpenDelay;
-            yield return new WaitForSeconds(doorOpenDelay);
-            
+            yield return DoorOpenDelay();
+
             OnElevatorStoppedEvent?.Invoke();
 
             // LOCAL METHODS: -----------------------------
@@ -172,6 +168,8 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
                 float startPositionY = _transform.position.y;
                 float endPositionY = GetEndPositionY();
                 float movementDuration = GetMovementDuration();
+                movementDuration *= 0.5f; // 50% времени убытие, 50% времени прибытие 
+                
                 float elapsedTime = 0f;
 
                 while (elapsedTime < movementDuration)
@@ -182,13 +180,12 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
                     float interpolatedValue = GetInterpolatedValue(startPositionY, endPositionY, time);
 
                     _transform.position = 
-                        new Vector3(x: _lastTeleportPointOrigin.x, y: interpolatedValue, z: _lastTeleportPointOrigin.z);
+                        new Vector3(x: _lastTeleportPoint.x, y: interpolatedValue, z: _lastTeleportPoint.z);
 
                     yield return null;
                 }
 
-                _transform.position =
-                    new Vector3(x: _lastTeleportPointOrigin.x, y: endPositionY, z: _lastTeleportPointOrigin.z);
+                _transform.position = new Vector3(x: _lastTeleportPoint.x, y: endPositionY, z: _lastTeleportPoint.z);
             }
 
             IEnumerator ChangeFloorCO()
@@ -205,6 +202,12 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
                     yield return new WaitForSeconds(movementDuration);
                 } while (!_reachedTargetFloor);
+            }
+
+            IEnumerator DoorOpenDelay()
+            {
+                float doorOpenDelay = _elevatorConfig.DoorOpenDelay;
+                yield return new WaitForSeconds(doorOpenDelay);
             }
         }
 
@@ -241,13 +244,13 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
                 case MovementState.Idle:
                 case MovementState.MoveToStartPoint:
                 default:
-                    return _lastTeleportPointOrigin.y;
+                    return _lastTeleportPoint.y;
 
                 case MovementState.MoveUpToTeleportPoint:
-                    return _lastTeleportPointOrigin.y + movementOffsetY;
+                    return _lastTeleportPoint.y + movementOffsetY;
 
                 case MovementState.MoveDownToTeleportPoint:
-                    return _lastTeleportPointOrigin.y - movementOffsetY;
+                    return _lastTeleportPoint.y - movementOffsetY;
             }
         }
     }

@@ -19,13 +19,11 @@ namespace GameCore.Gameplay.Level.Elevator
 
         [Inject]
         private void Construct(
-            IElevatorsManagerDecorator elevatorsManagerDecorator,
             IVisualManager visualManager,
             ILevelProvider levelProvider,
             IGameplayConfigsProvider gameplayConfigsProvider
         )
         {
-            _elevatorsManagerDecorator = elevatorsManagerDecorator;
             _visualManager = visualManager;
             _levelProvider = levelProvider;
             _elevatorConfig = gameplayConfigsProvider.GetConfig<ElevatorConfigMeta>();
@@ -37,34 +35,11 @@ namespace GameCore.Gameplay.Level.Elevator
         private readonly NetworkVariable<Floor> _targetFloor = new();
         private readonly NetworkVariable<bool> _isElevatorMoving = new();
 
-        private IElevatorsManagerDecorator _elevatorsManagerDecorator;
         private IVisualManager _visualManager;
         private ILevelProvider _levelProvider;
         private ElevatorConfigMeta _elevatorConfig;
         private Coroutine _movementCO;
-
-        // GAME ENGINE METHODS: -------------------------------------------------------------------
-
-        private void Awake()
-        {
-            _elevatorsManagerDecorator.OnStartElevatorInnerEvent += StartElevatorServerRpc;
-            _elevatorsManagerDecorator.OnOpenElevatorInnerEvent += OpenElevatorServerRpc;
-            _elevatorsManagerDecorator.OnTeleportLocalPlayerInnerEvent += OnTeleportLocalPlayer;
-            _elevatorsManagerDecorator.GetCurrentFloorInnerEvent += GetCurrentFloor;
-            _elevatorsManagerDecorator.IsElevatorMovingInnerEvent += IsElevatorMoving;
-        }
-
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-
-            _elevatorsManagerDecorator.OnStartElevatorInnerEvent -= StartElevatorServerRpc;
-            _elevatorsManagerDecorator.OnOpenElevatorInnerEvent -= OpenElevatorServerRpc;
-            _elevatorsManagerDecorator.OnTeleportLocalPlayerInnerEvent -= OnTeleportLocalPlayer;
-            _elevatorsManagerDecorator.GetCurrentFloorInnerEvent -= GetCurrentFloor;
-            _elevatorsManagerDecorator.IsElevatorMovingInnerEvent -= IsElevatorMoving;
-        }
-
+        
         // PROTECTED METHODS: ---------------------------------------------------------------------
 
         protected override void InitAll() =>
@@ -110,14 +85,12 @@ namespace GameCore.Gameplay.Level.Elevator
 
         private void SendElevatorStartedEvent(Floor targetFloor)
         {
-            bool isMovingUp = IsMovingUp(targetFloor);
-            ElevatorStaticData data = new(_currentFloor.Value, targetFloor, isMovingUp);
-
-            _elevatorsManagerDecorator.ElevatorStarted(data);
+           
         }
 
-        private void SendElevatorStoppedEvent() =>
-            _elevatorsManagerDecorator.ElevatorStopped(_currentFloor.Value);
+        private void SendElevatorStoppedEvent()
+        {
+        }
 
         private IEnumerator ElevatorMovementCO()
         {
@@ -200,8 +173,9 @@ namespace GameCore.Gameplay.Level.Elevator
         }
 
         [ClientRpc]
-        private void OpenElevatorClientRpc(Floor floor) =>
-            _elevatorsManagerDecorator.ElevatorOpened(floor);
+        private void OpenElevatorClientRpc(Floor floor)
+        {
+        }
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -233,10 +207,6 @@ namespace GameCore.Gameplay.Level.Elevator
 
         private void OnCurrentFloorChanged(Floor previousValue, Floor newValue)
         {
-            bool isMovingUp = IsMovingUp(_targetFloor.Value);
-            ElevatorStaticData data = new(currentFloor: newValue, _targetFloor.Value, isMovingUp);
-
-            _elevatorsManagerDecorator.FloorChanged(data);
         }
     }
 }

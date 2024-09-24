@@ -1,7 +1,6 @@
 using GameCore.Gameplay.ChatManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
-using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Systems.Quests;
@@ -17,7 +16,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
         public override void InstallBindings()
         {
             BindGameManagerDecorator();
-            BindElevatorsManagerDecorator();
             BindQuestsManagerDecorator();
             BindGameTimeManagerDecorator();
             BindChatManagerDecorator();
@@ -33,13 +31,6 @@ namespace GameCore.Infrastructure.Installers.Gameplay
                 .AsSingle();
         }
 
-        private void BindElevatorsManagerDecorator()
-        {
-            Container
-                .BindInterfacesTo<ElevatorsManagerDecorator>()
-                .AsSingle();
-        }
-        
         private void BindQuestsManagerDecorator()
         {
             Container
