@@ -1,5 +1,57 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2463244543376421004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6705362537025683314}
+  - component: {fileID: 3912168789162400796}
+  m_Layer: 0
+  m_Name: NavMeshLink
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6705362537025683314
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2463244543376421004}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.257, y: 0.95, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1510287895838584810}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3912168789162400796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2463244543376421004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6eeb5dc026fdf4b488bc7ae0138ab719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_StartPoint: {x: 0, y: 0, z: 0.55}
+  m_EndPoint: {x: 0, y: 0, z: 1.6}
+  m_Width: 3.4
+  m_CostModifier: 0
+  m_Bidirectional: 1
+  m_AutoUpdatePosition: 0
+  m_Area: 0
 --- !u!1 &2755624527464989241
 GameObject:
   m_ObjectHideFlags: 0
@@ -215,6 +267,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1510287895838584810}
+  - component: {fileID: 644345356767443757}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -240,9 +293,40 @@ Transform:
   - {fileID: 1455471374682391429}
   - {fileID: 3447404202975004852}
   - {fileID: 3156513307412480410}
+  - {fileID: 6705362537025683314}
   m_Father: {fileID: 6813362952058058416}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &644345356767443757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4589658740520538786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 1
+  m_DefaultArea: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.083333336
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 8ff29ab810bfc3a4cbd915d42b7c6970, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &7367120358131881933
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,7 +375,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2628434434
+  GlobalObjectIdHash: 1004522756
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -606,6 +690,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1510287895838584810}
     m_Modifications:
+    - target: {fileID: 833219457996572261, guid: 21865b48c83039242b92a53b3a55b722,
+        type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 7866945982896999795, guid: 0000000000000000d000000000000000,
+        type: 0}
+    - target: {fileID: 5297765759385351645, guid: 21865b48c83039242b92a53b3a55b722,
+        type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 7866945982896999795, guid: 0000000000000000d000000000000000,
+        type: 0}
     - target: {fileID: 7277490165714156976, guid: 21865b48c83039242b92a53b3a55b722,
         type: 3}
       propertyPath: m_Name
@@ -701,12 +797,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 470eebc1c90c4e7bb1c2ebb048f836f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &2684389122319356199 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5297765759385351645, guid: 21865b48c83039242b92a53b3a55b722,
+    type: 3}
+  m_PrefabInstance: {fileID: 7837860171167606010}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &4929964748839220979
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2684389122319356199}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.023000002, y: 0.005, z: 0.030000001}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: -0.041, y: 0, z: -0.001}
+  m_TimeToStationary: 0.5
 --- !u!95 &4063332129356052314 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 6099693894479532960, guid: 21865b48c83039242b92a53b3a55b722,
     type: 3}
   m_PrefabInstance: {fileID: 7837860171167606010}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7446030054216491679 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 833219457996572261, guid: 21865b48c83039242b92a53b3a55b722,
+    type: 3}
+  m_PrefabInstance: {fileID: 7837860171167606010}
+  m_PrefabAsset: {fileID: 0}
+--- !u!208 &6603341572911657834
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7446030054216491679}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.025, y: 0.005, z: 0.030000001}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0.039, y: 0, z: -0.001}
+  m_TimeToStationary: 0.5
 --- !u!114 &7655716323036155030 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 503063006500513900, guid: 21865b48c83039242b92a53b3a55b722,
