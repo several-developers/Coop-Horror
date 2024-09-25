@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GameCore.Gameplay.Network;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -18,6 +19,8 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         public bool DrawTrigger => _drawTrigger;
         
         // FIELDS: --------------------------------------------------------------------------------
+
+        public event Action<Entity> OnEntityLeftEvent = delegate { }; 
 
         private readonly List<Entity> _insideEntitiesList = new();
         
@@ -42,9 +45,14 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
                 return;
 
             if (addToList)
+            {
                 _insideEntitiesList.Add(entity);
+            }
             else
+            {
                 _insideEntitiesList.Remove(entity);
+                OnEntityLeftEvent.Invoke(entity);
+            }
         }
     }
 }

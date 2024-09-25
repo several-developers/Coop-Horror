@@ -16,7 +16,7 @@ MonoBehaviour:
   _movementDelay: 3
   _movementDurationPerFloor: 10
   _doorOpenDelay: 1
-  _movementOffsetY: 100
+  _movementOffsetY: 50
   _speedUpCurve:
     serializedVersion: 2
     m_Curve:

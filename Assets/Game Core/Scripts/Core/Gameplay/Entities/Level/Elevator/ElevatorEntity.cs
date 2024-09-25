@@ -142,6 +142,8 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             _movementSystem.OnElevatorFloorChangedEvent += OnElevatorFloorChanged;
 
             _references.AnimationObserver.OnDoorClosedEvent += OnDoorClosed;
+
+            _references.ElevatorTrigger.OnEntityLeftEvent += OnEntityLeftWhileElevatorMoving;
         }
 
         protected override void DespawnAll()
@@ -156,6 +158,8 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             _movementSystem.OnElevatorFloorChangedEvent -= OnElevatorFloorChanged;
 
             _references.AnimationObserver.OnDoorClosedEvent -= OnDoorClosed;
+            
+            _references.ElevatorTrigger.OnEntityLeftEvent -= OnEntityLeftWhileElevatorMoving;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -265,6 +269,17 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         private void OnElevatorFloorChanged() => HandleFloorChangeForEntities();
 
         private void OnDoorClosed() => HandleParentForEntities(removeParent: false);
+
+        private void OnEntityLeftWhileElevatorMoving(Entity entity)
+        {
+            ElevatorState currentState = GetElevatorState();
+            bool isStateValid = currentState != ElevatorState.Idle;
+            
+            if (!isStateValid)
+                return;
+            
+            entity.RemoveParent();
+        }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------
 
