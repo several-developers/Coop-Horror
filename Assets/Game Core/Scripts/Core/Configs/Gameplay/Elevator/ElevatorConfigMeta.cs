@@ -17,9 +17,6 @@ namespace GameCore.Configs.Gameplay.Elevator
         private float _movementDurationPerFloor = 10f;
 
         [SerializeField, Min(0f)]
-        private float _reactivationDelay = 2f;
-
-        [SerializeField, Min(0f)]
         private float _doorOpenDelay = 3f;
 
         [SerializeField, Min(0f)]
@@ -48,7 +45,6 @@ namespace GameCore.Configs.Gameplay.Elevator
 
         public float MovementDelay => _movementDelay;
         public float MovementDurationPerFloor => _movementDurationPerFloor;
-        public float ReactivationDelay => _reactivationDelay;
         public float DoorOpenDelay => _doorOpenDelay;
         public float MovementOffsetY => _movementOffsetY;
         public AnimationCurve SpeedUpCurve => _speedUpCurve;

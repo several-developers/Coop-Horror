@@ -42,7 +42,7 @@ namespace GameCore.Gameplay.Entities.Monsters.SpikySlime
 
         public float GetRandomSlimeScale()
         {
-            EntityLocation entityLocation = _spikySlimeEntity.EntityLocation;
+            EntityLocation entityLocation = _spikySlimeEntity.GetCurrentLocation();
             SpikySlimeAIConfigMeta.SizeConfig sizeConfig = _spikySlimeAIConfig.GetRandomSizeConfig(entityLocation);
             Vector2 scaleRange = sizeConfig.Scale;
             float scale = Random.Range(scaleRange.x, scaleRange.y);

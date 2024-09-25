@@ -40,7 +40,7 @@ namespace GameCore.Gameplay.Systems.Utilities
                 if (isDead)
                     continue;
 
-                EntityLocation playerLocation = playerEntity.EntityLocation;
+                EntityLocation playerLocation = playerEntity.GetCurrentLocation();
                 bool isLocationMatches = playerLocation == location;
 
                 if (!isLocationMatches)

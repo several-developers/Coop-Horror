@@ -104,10 +104,10 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             _goodClownEntity.GetTargetPlayer();
 
         private EntityLocation GetClownLocation() =>
-            _goodClownEntity.EntityLocation;
+            _goodClownEntity.GetCurrentLocation();
 
         private Floor GetClownFloor() =>
-            _goodClownEntity.CurrentFloor;
+            _goodClownEntity.GetCurrentFloor();
         
         private float GetChasePositionCheckInterval() =>
             _followTargetConfig.PositionCheckInterval;

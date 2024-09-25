@@ -75,8 +75,6 @@ namespace GameCore.Gameplay.Entities.Level.Train
         public event Action OnOpenGameOverWarningMenuEvent = delegate { };
         public event Action OnOpenGameMapEvent = delegate { };
 
-        private const NetworkVariableWritePermission OwnerPermission = Constants.OwnerPermission;
-        
         private readonly NetworkVariable<SeatsRuntimeDataContainer> _seatsData = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<bool> _isMainLeverEnabled = new(value: true, writePerm: OwnerPermission);
         private readonly NetworkVariable<bool> _isDoorOpened = new(writePerm: OwnerPermission);

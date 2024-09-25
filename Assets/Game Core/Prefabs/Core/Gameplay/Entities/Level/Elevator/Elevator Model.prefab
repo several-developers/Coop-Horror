@@ -92,6 +92,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Elevator Model
       objectReference: {fileID: 0}
+    - target: {fileID: 6140994139569067330, guid: 8275d4c134cc66c45a26be671b3c87c9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8275d4c134cc66c45a26be671b3c87c9, type: 3}
 --- !u!1 &510753604234146347 stripped

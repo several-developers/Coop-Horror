@@ -15,7 +15,6 @@ MonoBehaviour:
   _metaName: Elevator
   _movementDelay: 3
   _movementDurationPerFloor: 10
-  _reactivationDelay: 2
   _doorOpenDelay: 1
   _movementOffsetY: 100
   _speedUpCurve:
@@ -24,20 +23,47 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
+      inSlope: 0.09794931
+      outSlope: 0.09794931
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.11477449
+      value: 0.011242082
+      inSlope: 0.12986897
+      outSlope: 0.12986897
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.5282317
+    - serializedVersion: 3
+      time: 0.42136016
+      value: 0.049965825
+      inSlope: 0.5627696
+      outSlope: 0.5627696
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.18401949
+    - serializedVersion: 3
+      time: 0.6822342
+      value: 0.58640665
+      inSlope: 4.0802994
+      outSlope: 4.0802994
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.063141964
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
+      inSlope: 0.0000020172088
+      outSlope: 0.0000020172088
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.23369631
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -48,20 +74,47 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
+      time: 0.6317383
+      value: 0.9577588
+      inSlope: 0.28569525
+      outSlope: 0.28569525
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
+      outWeight: 0.22614965
+    - serializedVersion: 3
+      time: 0.81339955
+      value: 0.9970236
+      inSlope: 0.047754567
+      outSlope: 0.047754567
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.9212984
+      value: 0.9960332
+      inSlope: 0.0066759083
+      outSlope: 0.0066759083
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1561721
+      outWeight: 0.46018118
+    - serializedVersion: 3
+      time: 0.99884033
+      value: 1
+      inSlope: 0.055643115
+      outSlope: 0.055643115
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.14991707
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

@@ -65,6 +65,10 @@ namespace GameCore.Infrastructure.Installers.Gameplay
             Container
                 .BindInterfacesTo<NetworkedMessageChannel<VisualPresetMessage>>()
                 .AsSingle();
+            
+            Container
+                .BindInterfacesTo<NetworkedMessageChannel<TargetVisualPresetMessage>>()
+                .AsSingle();
         }
     }
 }

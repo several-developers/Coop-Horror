@@ -126,7 +126,7 @@ namespace GameCore.Gameplay.Level.Elevator
             if (!isIdleState)
                 return false;
 
-            Floor currentFloor = elevatorEntity.GetCurrentFloor();
+            Floor currentFloor = elevatorEntity.GetCurrentElevatorFloor();
             bool isFloorsMatches = currentFloor == _buttonFloor;
             return isFloorsMatches;
         }

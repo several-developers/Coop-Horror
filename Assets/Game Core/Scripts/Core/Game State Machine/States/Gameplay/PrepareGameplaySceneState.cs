@@ -2,7 +2,6 @@
 using GameCore.Gameplay.ChatManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
-using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Systems.Noise;
@@ -65,7 +64,6 @@ namespace GameCore.StateMachine
 
             CreateGameManager();
             CreatePlayerSpawner();
-            CreateElevatorsManager();
             CreateQuestsManager();
             CreateGameTimeManager();
             CreateChatManager();
@@ -84,12 +82,6 @@ namespace GameCore.StateMachine
         {
             PlayerSpawner playerSpawnerPrefab = _prefabsListConfig.PlayerSpawner;
             CreateNetworkPrefab(playerSpawnerPrefab.gameObject);
-        }
-
-        private void CreateElevatorsManager()
-        {
-            ElevatorsManager elevatorsManagerPrefab = _prefabsListConfig.ElevatorsManager;
-            CreateNetworkPrefab(elevatorsManagerPrefab.gameObject);
         }
 
         private void CreateQuestsManager()

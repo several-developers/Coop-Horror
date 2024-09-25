@@ -94,8 +94,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
         private bool TryFoundTarget(out PlayerEntity result)
         {
             Vector3 clownPosition = _transform.position;
-            EntityLocation clownLocation = _goodClownEntity.EntityLocation;
-            Floor clownFloor = _goodClownEntity.CurrentFloor;
+            EntityLocation clownLocation = _goodClownEntity.GetCurrentLocation();
+            Floor clownFloor = _goodClownEntity.GetCurrentFloor();
             bool isInnocent = _goodClownEntity.IsInnocent;
 
             IReadOnlyDictionary<ulong, PlayerEntity> allPlayers = PlayerEntity.GetAllPlayers();
@@ -110,8 +110,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
                 if (isDead)
                     continue;
 
-                EntityLocation playerLocation = playerEntity.EntityLocation;
-                Floor playerFloor = playerEntity.CurrentFloor;
+                EntityLocation playerLocation = playerEntity.GetCurrentLocation();
+                Floor playerFloor = playerEntity.GetCurrentFloor();
                 bool isPlayerPositionValid = true;
 
                 if (isInnocent)

@@ -130,10 +130,10 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown.States
             _evilClownEntity.GetTargetPlayer();
 
         private EntityLocation GetClownLocation() =>
-            _evilClownEntity.EntityLocation;
+            _evilClownEntity.GetCurrentLocation();
 
         private Floor GetClownFloor() =>
-            _evilClownEntity.CurrentFloor;
+            _evilClownEntity.GetCurrentFloor();
 
         private float GetChasePositionCheckInterval() =>
             _evilClownAIConfig.ChasePositionCheckInterval;

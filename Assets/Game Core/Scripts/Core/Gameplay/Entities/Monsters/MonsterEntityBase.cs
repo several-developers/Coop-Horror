@@ -28,11 +28,6 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-#warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
-        public EntityLocation EntityLocation { get; private set; } = EntityLocation.Surface;
-#warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
-        public Floor CurrentFloor { get; private set; }
-
         protected ClientNetworkTransform NetworkTransform => _networkTransform;
 
         // FIELDS: --------------------------------------------------------------------------------
@@ -50,12 +45,8 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        protected virtual void Awake()
-        {
-#warning ПЕРЕДЕЛАТЬ НА СЕРВЕР
-            FindEntityLocation();
-        }
-        
+        protected override void StartServerOnly() => FindEntityLocation();
+
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public virtual void Teleport(Vector3 position, Quaternion rotation, bool resetVelocity = false)
@@ -68,19 +59,7 @@ namespace GameCore.Gameplay.Entities.Monsters
             SendEntityTeleportedEvent();
         }
         
-        public void SetTargetPlayerByID(ulong playerID) => SetTargetPlayerServerRPC(playerID);
-
-        /// <summary>
-        /// Вызывается после OnNetworkSpawn!
-        /// </summary>
-        public void SetEntityLocation(EntityLocation entityLocation) =>
-            EntityLocation = entityLocation;
-
-        /// <summary>
-        /// Вызывается после OnNetworkSpawn!
-        /// </summary>
-        public void SetFloor(Floor floor) =>
-            CurrentFloor = floor;
+        public void SetTargetPlayerByID(ulong playerID) => SetTargetPlayerRPC(playerID);
 
         public static void ClearAllMonsters() =>
             AllMonsters.Clear();
@@ -93,9 +72,6 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         protected void SendEntityTeleportedEvent() =>
             OnEntityTeleportedEvent.Invoke();
-
-        protected static bool IsClientIDMatches(ulong targetClientID) =>
-            NetworkHorror.ClientID == targetClientID;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
@@ -113,8 +89,8 @@ namespace GameCore.Gameplay.Entities.Monsters
                 if (!isDungeonRootFound)
                     continue;
 
-                CurrentFloor = dungeonRoot.Floor;
                 inDungeon = true;
+                SetFloor(dungeonRoot.Floor);
                 break;
             }
 
@@ -125,7 +101,9 @@ namespace GameCore.Gameplay.Entities.Monsters
             }
 
             int randomFloor = Random.Range(1, 4);
-            CurrentFloor = (Floor)randomFloor;
+            var floor = (Floor)randomFloor;
+            
+            SetFloor(floor);
         }
 
         private void SetTargetPlayerLocal(ulong playerID)
@@ -136,12 +114,9 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // RPC: -----------------------------------------------------------------------------------
 
-        [ServerRpc(RequireOwnership = false)]
-        private void SetTargetPlayerServerRPC(ulong playerID) => SetTargetPlayerClientRPC(playerID);
+        [Rpc(target: SendTo.Everyone)]
+        private void SetTargetPlayerRPC(ulong playerID) => SetTargetPlayerLocal(playerID);
         
-        [ClientRpc]
-        private void SetTargetPlayerClientRPC(ulong playerID) => SetTargetPlayerLocal(playerID);
-
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         public override void OnNetworkSpawn()

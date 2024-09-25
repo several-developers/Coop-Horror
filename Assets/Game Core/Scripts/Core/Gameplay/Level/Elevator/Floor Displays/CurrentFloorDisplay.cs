@@ -35,8 +35,8 @@ namespace GameCore.Gameplay.Level.Elevator
         
         private void UpdateDisplayInfo()
         {
-            Floor currentFloor = ElevatorEntity.GetCurrentFloor();
-            Floor targetFloor = ElevatorEntity.GetTargetFloor();
+            Floor currentFloor = ElevatorEntity.GetCurrentElevatorFloor();
+            Floor targetFloor = ElevatorEntity.GetTargetElevatorFloor();
             bool isTargetFloor = currentFloor == targetFloor;
             
             _moveDirectionTransform.gameObject.SetActive(!isTargetFloor);

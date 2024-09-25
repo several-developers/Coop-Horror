@@ -91,7 +91,9 @@ namespace GameCore.Gameplay.Entities.Monsters.EvilClown
 
         public void RunAway()
         {
-            switch (EntityLocation)
+            EntityLocation currentLocation = GetCurrentLocation();
+            
+            switch (currentLocation)
             {
                 case EntityLocation.Surface:
                     EnterRunAwayInSurfaceState();

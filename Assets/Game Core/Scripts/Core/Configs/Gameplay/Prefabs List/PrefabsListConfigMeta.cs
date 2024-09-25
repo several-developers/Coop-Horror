@@ -1,7 +1,6 @@
 ﻿using GameCore.Gameplay.ChatManagement;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
-using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Network.DynamicPrefabs;
 using GameCore.Gameplay.Systems.Noise;
@@ -18,9 +17,6 @@ namespace GameCore.Configs.Gameplay.PrefabsList
         // MEMBERS: -------------------------------------------------------------------------------
 
         [Title(Constants.References)]
-        [SerializeField, Required]
-        private ElevatorsManager _elevatorsManager;
-
         [SerializeField, Required]
         private PlayerSpawner _playerSpawner;
         
@@ -47,7 +43,6 @@ namespace GameCore.Configs.Gameplay.PrefabsList
 
         // PROPERTIES: ----------------------------------------------------------------------------
 
-        public ElevatorsManager ElevatorsManager => _elevatorsManager;
         public PlayerSpawner PlayerSpawner => _playerSpawner;
         public GameTimeManager GameTimeManager => _gameTimeManager;
         public QuestsManager QuestsManager => _questsManager;

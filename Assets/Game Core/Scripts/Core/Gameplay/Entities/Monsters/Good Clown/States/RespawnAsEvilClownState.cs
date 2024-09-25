@@ -103,8 +103,8 @@ namespace GameCore.Gameplay.Entities.Monsters.GoodClown.States
             if (!isTargetFound)
                 return;
             
-            EntityLocation goodClownLocation = _goodClownEntity.EntityLocation;
-            Floor goodClownFloor = _goodClownEntity.CurrentFloor;
+            EntityLocation goodClownLocation = _goodClownEntity.GetCurrentLocation();
+            Floor goodClownFloor = _goodClownEntity.GetCurrentFloor();
 
             evilClownEntity.SetTargetPlayer(targetPlayer);
             evilClownEntity.SetEntityLocation(goodClownLocation);

@@ -296,7 +296,10 @@ namespace GameCore.Gameplay.Entities.Monsters.Mushroom
 
         private void CheckSporesLighting()
         {
-            if (EntityLocation == EntityLocation.Dungeon)
+            EntityLocation currentLocation = GetCurrentLocation();
+            bool isLocationValid = currentLocation != EntityLocation.Dungeon;
+            
+            if (!isLocationValid)
                 return;
 
             MushroomAIConfigMeta.CommonConfig commonConfig = _mushroomAIConfig.GetCommonConfig();

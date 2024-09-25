@@ -14,11 +14,7 @@ namespace GameCore.Gameplay.Entities.Monsters
 
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        protected override void Awake()
-        {
-            CheckAgentState();
-            base.Awake();
-        }
+        private void Awake() => CheckAgentState();
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 

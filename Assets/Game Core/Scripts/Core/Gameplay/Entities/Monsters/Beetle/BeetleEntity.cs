@@ -79,7 +79,9 @@ namespace GameCore.Gameplay.Entities.Monsters.Beetle
 
         public void DecideStateByLocation()
         {
-            switch (EntityLocation)
+            EntityLocation currentLocation = GetCurrentLocation();
+            
+            switch (currentLocation)
             {
                 case EntityLocation.Surface:
                     EnterMoveToSurfaceFireExitState();

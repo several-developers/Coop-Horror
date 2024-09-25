@@ -67,8 +67,8 @@ namespace GameCore.Gameplay.Systems.Movement
         private Vector3 GetTargetPosition()
         {
             PlayerEntity targetPlayer = GetTargetPlayer();
-            EntityLocation playerLocation = targetPlayer.EntityLocation;
-            Floor playerFloor = targetPlayer.CurrentFloor;
+            EntityLocation playerLocation = targetPlayer.GetCurrentLocation();
+            Floor playerFloor = targetPlayer.GetCurrentFloor();
 
             EntityLocation clownLocation = GetClownLocationEvent.Invoke();
             Floor clownFloor = GetClownFloorEvent.Invoke();

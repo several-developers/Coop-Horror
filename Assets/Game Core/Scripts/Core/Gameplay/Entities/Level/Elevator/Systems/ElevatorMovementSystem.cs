@@ -6,6 +6,7 @@ using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Utilities;
+using GameCore.Gameplay.VisualManagement;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Level.Elevator
@@ -22,12 +23,17 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public ElevatorMovementSystem(ElevatorEntity elevatorEntity, ILevelProvider levelProvider)
+        public ElevatorMovementSystem(
+            ElevatorEntity elevatorEntity,
+            ILevelProvider levelProvider,
+            IVisualManager visualManager
+        )
         {
             _elevatorEntity = elevatorEntity;
             _elevatorConfig = elevatorEntity.GetElevatorConfig();
             _references = elevatorEntity.GetReferences();
             _levelProvider = levelProvider;
+            _visualManager = visualManager;
             _transform = elevatorEntity.transform;
             _movementLogicRoutine = new CoroutineHelper(elevatorEntity);
             _lastTeleportPoint = _transform.position;
@@ -38,11 +44,13 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         // FIELDS: --------------------------------------------------------------------------------
 
         public event Action OnElevatorStoppedEvent = delegate { };
+        public event Action OnElevatorFloorChangedEvent = delegate { };
 
         private readonly ElevatorEntity _elevatorEntity;
         private readonly ElevatorConfigMeta _elevatorConfig;
         private readonly ElevatorReferences _references;
         private readonly ILevelProvider _levelProvider;
+        private readonly IVisualManager _visualManager;
         private readonly Transform _transform;
         private readonly CoroutineHelper _movementLogicRoutine;
 
@@ -60,6 +68,16 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
                 return;
 
             _movementLogicRoutine.Start();
+        }
+
+        public ElevatorEntity.ElevatorState GetElevatorState()
+        {
+            return _movementState switch
+            {
+                MovementState.MoveUpToTeleportPoint => ElevatorEntity.ElevatorState.MovingUp,
+                MovementState.MoveDownToTeleportPoint => ElevatorEntity.ElevatorState.MovingDown,
+                _ => ElevatorEntity.ElevatorState.Idle
+            };
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -107,6 +125,19 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
             var newFloor = (Floor)newFloorIndex;
             _elevatorEntity.SetCurrentFloor(newFloor);
+            
+            OnElevatorFloorChangedEvent.Invoke();
+
+            switch (newFloor)
+            {
+                case Floor.Surface:
+                    _visualManager.SetLocationPreset();
+                    break;
+                
+                default:
+                    _visualManager.ChangePreset(VisualPresetType.Dungeon);
+                    break;
+            }
         }
 
         private void TeleportToSection()
@@ -145,11 +176,11 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             yield return MovementStartDelayCO();
             yield return MoveToTeleportPointCO();
             yield return ChangeFloorCO();
-            
+
             TeleportToSection();
-            
+
             _movementState = MovementState.MoveToStartPoint;
-            
+
             yield return MoveToTeleportPointCO();
             yield return DoorOpenDelay();
 
@@ -169,7 +200,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
                 float endPositionY = GetEndPositionY();
                 float movementDuration = GetMovementDuration();
                 movementDuration *= 0.5f; // 50% времени убытие, 50% времени прибытие 
-                
+
                 float elapsedTime = 0f;
 
                 while (elapsedTime < movementDuration)
@@ -179,7 +210,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
                     float time = elapsedTime / movementDuration;
                     float interpolatedValue = GetInterpolatedValue(startPositionY, endPositionY, time);
 
-                    _transform.position = 
+                    _transform.position =
                         new Vector3(x: _lastTeleportPoint.x, y: interpolatedValue, z: _lastTeleportPoint.z);
 
                     yield return null;
@@ -191,7 +222,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             IEnumerator ChangeFloorCO()
             {
                 float movementDuration = GetMovementDuration();
-                
+
                 do
                 {
                     ChangeFloor();
@@ -221,10 +252,10 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         }
 
         private Floor GetCurrentFloor() =>
-            _elevatorEntity.GetCurrentFloor();
+            _elevatorEntity.GetCurrentElevatorFloor();
 
         private Floor GetTargetFloor() =>
-            _elevatorEntity.GetTargetFloor();
+            _elevatorEntity.GetTargetElevatorFloor();
 
         private float GetMovementDuration() =>
             _elevatorConfig.MovementDurationPerFloor;

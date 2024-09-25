@@ -22,7 +22,7 @@ namespace GameCore.Gameplay.Level.Elevator
 
         protected override void UpdateFloorNumber()
         {
-            Floor targetFloor = ElevatorEntity.GetTargetFloor();
+            Floor targetFloor = ElevatorEntity.GetTargetElevatorFloor();
             UpdateFloorNumber(targetFloor);
         }
 

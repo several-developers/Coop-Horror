@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
+using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Systems.SoundReproducer;
+using GameCore.Gameplay.VisualManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -23,7 +25,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             FloorChange = 3,
             ButtonPush = 4
         }
-        
+
         public enum ElevatorState
         {
             Idle = 0,
@@ -34,9 +36,14 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
         [Inject]
-        private void Construct(ILevelProvider levelProvider, IGameplayConfigsProvider gameplayConfigsProvider)
+        private void Construct(
+            ILevelProvider levelProvider,
+            IVisualManager visualManager,
+            IGameplayConfigsProvider gameplayConfigsProvider
+        )
         {
             _levelProvider = levelProvider;
+            _visualManager = visualManager;
             _elevatorConfig = gameplayConfigsProvider.GetConfig<ElevatorConfigMeta>();
         }
 
@@ -50,14 +57,16 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         public event Action<Floor> OnCurrentFloorChangedEvent = delegate { };
         public event Action<Floor> OnTargetFloorChangedEvent = delegate { };
 
-        private readonly NetworkVariable<Floor> _currentFloor = new(writePerm: OwnerPermission);
-        private readonly NetworkVariable<Floor> _targetFloor = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<Floor> _currentElevatorFloor = new(writePerm: OwnerPermission);
+        private readonly NetworkVariable<Floor> _targetElevatorFloor = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<ElevatorState> _currentState = new(writePerm: OwnerPermission);
 
         private static ElevatorEntity _instance;
 
         private ILevelProvider _levelProvider;
+        private IVisualManager _visualManager;
         private ElevatorConfigMeta _elevatorConfig;
+
         private ElevatorMovementSystem _movementSystem;
         private bool _isOpen;
 
@@ -68,12 +77,16 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public void StartElevator() => StartElevatorRpc();
+        public void StartElevator()
+        {
+            Floor targetFloor = GetTargetElevatorFloor();
+            StartElevatorRpc(targetFloor);
+        }
 
         public void StartElevator(Floor targetFloor) => StartElevatorRpc(targetFloor);
 
         public void SetCurrentFloor(Floor floor) => SetCurrentFloorRpc(floor);
-        
+
         public void SetTargetFloor(Floor floor) => SetTargetFloorRpc(floor);
 
         public void Open()
@@ -91,22 +104,22 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             if (!IsOwner)
                 return;
 
-            _currentFloor.Value = Floor.Surface;
-            _targetFloor.Value = Floor.Surface;
+            _currentElevatorFloor.Value = Floor.Surface;
+            _targetElevatorFloor.Value = Floor.Surface;
             _currentState.Value = ElevatorState.Idle;
         }
-        
+
         public static ElevatorEntity Get() => _instance;
 
         public ElevatorConfigMeta GetElevatorConfig() => _elevatorConfig;
 
         public ElevatorReferences GetReferences() => _references;
 
-        public Floor GetCurrentFloor() =>
-            _currentFloor.Value;
+        public Floor GetCurrentElevatorFloor() =>
+            _currentElevatorFloor.Value;
 
-        public Floor GetTargetFloor() =>
-            _targetFloor.Value;
+        public Floor GetTargetElevatorFloor() =>
+            _targetElevatorFloor.Value;
 
         public ElevatorState GetElevatorState() =>
             _currentState.Value;
@@ -117,35 +130,37 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         {
             SoundReproducer = new ElevatorSoundReproducer(soundProducer: this, _elevatorConfig);
 
-            _currentFloor.OnValueChanged += OnCurrentFloorChanged;
-            _targetFloor.OnValueChanged += OnTargetFloorChanged;
+            _currentElevatorFloor.OnValueChanged += OnCurrentFloorChanged;
+            _targetElevatorFloor.OnValueChanged += OnTargetFloorChanged;
         }
 
         protected override void InitServerOnly()
         {
-            _movementSystem = new ElevatorMovementSystem(elevatorEntity: this, _levelProvider);
+            _movementSystem = new ElevatorMovementSystem(elevatorEntity: this, _levelProvider, _visualManager);
 
             _movementSystem.OnElevatorStoppedEvent += OnElevatorStopped;
-            
+            _movementSystem.OnElevatorFloorChangedEvent += OnElevatorFloorChanged;
+
             _references.AnimationObserver.OnDoorClosedEvent += OnDoorClosed;
         }
 
         protected override void DespawnAll()
         {
-            _currentFloor.OnValueChanged -= OnCurrentFloorChanged;
-            _targetFloor.OnValueChanged -= OnTargetFloorChanged;
+            _currentElevatorFloor.OnValueChanged -= OnCurrentFloorChanged;
+            _targetElevatorFloor.OnValueChanged -= OnTargetFloorChanged;
         }
 
         protected override void DespawnServerOnly()
         {
             _movementSystem.OnElevatorStoppedEvent -= OnElevatorStopped;
-            
+            _movementSystem.OnElevatorFloorChangedEvent -= OnElevatorFloorChanged;
+
             _references.AnimationObserver.OnDoorClosedEvent -= OnDoorClosed;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void SetElevatorAsParentForAllEntitiesInside()
+        private void HandleParentForEntities(bool removeParent)
         {
             ElevatorTrigger elevatorTrigger = _references.ElevatorTrigger;
             IEnumerable<Entity> insideEntitiesList = elevatorTrigger.GetInsideEntitiesList();
@@ -154,52 +169,52 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             {
                 if (entity == this)
                     continue;
-                
-                entity.SetParent(NetworkObject);
+
+                if (removeParent)
+                    entity.RemoveParent();
+                else
+                    entity.SetParent(NetworkObject);
             }
         }
 
-        private void RemoveParentForAllEntitiesInside()
+        private void HandleFloorChangeForEntities()
         {
+            Floor currentFloor = GetCurrentElevatorFloor();
+            
+            EntityLocation entityLocation = currentFloor == Floor.Surface
+                ? EntityLocation.Surface
+                : EntityLocation.Dungeon;
+
             ElevatorTrigger elevatorTrigger = _references.ElevatorTrigger;
             IEnumerable<Entity> insideEntitiesList = elevatorTrigger.GetInsideEntitiesList();
 
             foreach (Entity entity in insideEntitiesList)
             {
-                if (entity == this)
-                    continue;
-                
-                entity.RemoveParent();
+                entity.SetEntityLocation(entityLocation);
+                entity.SetFloor(currentFloor);
+
+                ChangeVisualPresetForPlayer(entity);
+            }
+
+            // LOCAL METHODS: -----------------------------
+
+            void ChangeVisualPresetForPlayer(Entity entity)
+            {
+                if (entity is not PlayerEntity playerEntity)
+                    return;
+
+                ulong clientID = playerEntity.OwnerClientId;
+                _visualManager.ChangePresetByFloor(currentFloor, clientID);
             }
         }
-        
+
         private void PlayOpenAnimation() =>
             _references.NetworkAnimator.SetTrigger(hash: AnimatorHashes.Open);
 
         private void PlayCloseAnimation() =>
             _references.NetworkAnimator.SetTrigger(hash: AnimatorHashes.Close);
-        
+
         // RPC: -----------------------------------------------------------------------------------
-
-        [Rpc(target: SendTo.Owner)]
-        private void StartElevatorRpc()
-        {
-            ElevatorState elevatorState = GetElevatorState();
-            bool isStateValid = elevatorState == ElevatorState.Idle;
-
-            if (!isStateValid)
-                return;
-
-            Floor targetFloor = GetTargetFloor();
-            Floor currentFloor = GetCurrentFloor();
-            bool isFloorsMatches = targetFloor == currentFloor;
-
-            if (isFloorsMatches)
-                return;
-            
-            Close();
-            _movementSystem.StartMovement();
-        }
         
         [Rpc(target: SendTo.Owner)]
         private void StartElevatorRpc(Floor targetFloor)
@@ -210,39 +225,54 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             if (!isStateValid)
                 return;
 
-            _targetFloor.Value = targetFloor;
-            Floor currentFloor = GetCurrentFloor();
+            _targetElevatorFloor.Value = targetFloor;
+            Floor currentFloor = GetCurrentElevatorFloor();
             bool isFloorsMatches = targetFloor == currentFloor;
 
             if (isFloorsMatches)
                 return;
-                
+
             Close();
             _movementSystem.StartMovement();
+            
+            _currentState.Value = _movementSystem.GetElevatorState();
         }
-        
+
         [Rpc(target: SendTo.Owner)]
         private void SetCurrentFloorRpc(Floor floor) =>
-            _currentFloor.Value = floor;
-        
+            _currentElevatorFloor.Value = floor;
+
         [Rpc(target: SendTo.Owner)]
         private void SetTargetFloorRpc(Floor floor) =>
-            _targetFloor.Value = floor;
+            _targetElevatorFloor.Value = floor;
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
         private void OnCurrentFloorChanged(Floor previousValue, Floor newValue) =>
             OnCurrentFloorChangedEvent.Invoke(newValue);
-        
+
         private void OnTargetFloorChanged(Floor previousValue, Floor newValue) =>
             OnTargetFloorChangedEvent.Invoke(newValue);
 
         private void OnElevatorStopped()
         {
-            RemoveParentForAllEntitiesInside();
+            _currentState.Value = ElevatorState.Idle;
+            
+            HandleParentForEntities(removeParent: true);
             Open();
         }
-        
-        private void OnDoorClosed() => SetElevatorAsParentForAllEntitiesInside();
+
+        private void OnElevatorFloorChanged() => HandleFloorChangeForEntities();
+
+        private void OnDoorClosed() => HandleParentForEntities(removeParent: false);
+
+        // DEBUG BUTTONS: -------------------------------------------------------------------------
+
+        [Title(Constants.DebugButtons)]
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugOpen() => Open();
+
+        [Button(buttonSize: 30), DisableInEditorMode]
+        private void DebugClose() => Close();
     }
 }

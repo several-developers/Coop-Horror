@@ -84,8 +84,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         public PlayerReferences References => _references;
         public InputReader InputReader { get; private set; }
-        public EntityLocation EntityLocation => _entityLocation.Value;
-        public Floor CurrentFloor => _currentFloor.Value;
         public float TimeSinceAfk { get; private set; }
         public bool IsInsideTrain { get; private set; } = true;
 
@@ -108,8 +106,6 @@ namespace GameCore.Gameplay.Entities.Player
 
         private static readonly Dictionary<ulong, PlayerEntity> AllPlayers = new();
 
-        private readonly NetworkVariable<EntityLocation> _entityLocation = new(writePerm: OwnerPermission);
-        private readonly NetworkVariable<Floor> _currentFloor = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<float> _sanity = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<int> _currentSelectedSlotIndex = new(writePerm: OwnerPermission);
         private readonly NetworkVariable<bool> _isDead = new(writePerm: OwnerPermission);
@@ -145,16 +141,6 @@ namespace GameCore.Gameplay.Entities.Player
         }
 
         public void TeleportToTrainSeat(int seatIndex) => TeleportToTrainSeatRpc(seatIndex);
-
-        public void SetEntityLocation(EntityLocation entityLocation) => SetEntityLocationRpc(entityLocation);
-
-        public void SetFloor(Floor floor)
-        {
-            if (IsOwner)
-                _currentFloor.Value = floor;
-            else
-                SetFloorRpc(floor);
-        }
 
         public void DropItem(bool destroy = false)
         {
@@ -274,7 +260,7 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnInteractEvent += OnInteract;
             InputReader.OnDropItemEvent += OnDropItem;
 
-            _entityLocation.OnValueChanged += OnPlayerLocationChanged;
+            CurrentLocation.OnValueChanged += OnPlayerLocationChanged;
 
             _inventory.OnItemEquippedEvent += OnItemEquipped;
             _inventory.OnSelectedSlotChangedEvent += OnOwnerSelectedSlotChanged;
@@ -400,7 +386,7 @@ namespace GameCore.Gameplay.Entities.Player
             InputReader.OnInteractEvent -= OnInteract;
             InputReader.OnDropItemEvent -= OnDropItem;
 
-            _entityLocation.OnValueChanged -= OnPlayerLocationChanged;
+            CurrentLocation.OnValueChanged -= OnPlayerLocationChanged;
 
             _inventory.OnItemEquippedEvent -= OnItemEquipped;
             _inventory.OnSelectedSlotChangedEvent -= OnOwnerSelectedSlotChanged;
@@ -545,16 +531,8 @@ namespace GameCore.Gameplay.Entities.Player
             _currentSelectedSlotIndex.Value = slotIndex;
 
         [Rpc(target: SendTo.Owner)]
-        private void SetEntityLocationRpc(EntityLocation entityLocation) =>
-            _entityLocation.Value = entityLocation;
-
-        [Rpc(target: SendTo.Owner)]
         private void TeleportToTrainSeatRpc(int seatIndex) =>
             _trainEntity.TeleportLocalPlayerToTrainSeat(seatIndex);
-
-        [Rpc(target: SendTo.Owner)]
-        private void SetFloorRpc(Floor floor) =>
-            _currentFloor.Value = floor;
 
         [Rpc(target: SendTo.NotOwner)]
         public void CreateItemPreviewRpc(int slotIndex, int itemID) =>
