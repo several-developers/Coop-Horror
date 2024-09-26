@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using GameCore.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
+using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Level;
+using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Gameplay.VisualManagement;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
@@ -143,7 +145,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
             _references.AnimationObserver.OnDoorClosedEvent += OnDoorClosed;
 
-            _references.ElevatorTrigger.OnEntityLeftEvent += OnEntityLeftWhileElevatorMoving;
+            _references.ElevatorTrigger.OnTargetLeftTriggerEvent += OnTargetLeftWhileElevatorMoving;
         }
 
         protected override void DespawnAll()
@@ -159,7 +161,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
             _references.AnimationObserver.OnDoorClosedEvent -= OnDoorClosed;
             
-            _references.ElevatorTrigger.OnEntityLeftEvent -= OnEntityLeftWhileElevatorMoving;
+            _references.ElevatorTrigger.OnTargetLeftTriggerEvent -= OnTargetLeftWhileElevatorMoving;
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
@@ -167,17 +169,17 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         private void HandleParentForEntities(bool removeParent)
         {
             ElevatorTrigger elevatorTrigger = _references.ElevatorTrigger;
-            IEnumerable<Entity> insideEntitiesList = elevatorTrigger.GetInsideEntitiesList();
+            IEnumerable<IReParentable> insideTargetsList = elevatorTrigger.GetInsideTargetsList();
 
-            foreach (Entity entity in insideEntitiesList)
+            foreach (IReParentable target in insideTargetsList)
             {
-                if (entity == this)
+                if (target is ElevatorEntity)
                     continue;
 
                 if (removeParent)
-                    entity.RemoveParent();
+                    target.RemoveParent();
                 else
-                    entity.SetParent(NetworkObject);
+                    target.SetParent(NetworkObject);
             }
         }
 
@@ -190,10 +192,13 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
                 : EntityLocation.Dungeon;
 
             ElevatorTrigger elevatorTrigger = _references.ElevatorTrigger;
-            IEnumerable<Entity> insideEntitiesList = elevatorTrigger.GetInsideEntitiesList();
+            IEnumerable<IReParentable> insideEntitiesList = elevatorTrigger.GetInsideTargetsList();
 
-            foreach (Entity entity in insideEntitiesList)
+            foreach (IReParentable target in insideEntitiesList)
             {
+                if (target is not Entity entity)
+                    continue;
+                
                 entity.SetEntityLocation(entityLocation);
                 entity.SetFloor(currentFloor);
 
@@ -270,7 +275,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
 
         private void OnDoorClosed() => HandleParentForEntities(removeParent: false);
 
-        private void OnEntityLeftWhileElevatorMoving(Entity entity)
+        private void OnTargetLeftWhileElevatorMoving(IReParentable target)
         {
             ElevatorState currentState = GetElevatorState();
             bool isStateValid = currentState != ElevatorState.Idle;
@@ -278,7 +283,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             if (!isStateValid)
                 return;
             
-            entity.RemoveParent();
+            target.RemoveParent();
         }
 
         // DEBUG BUTTONS: -------------------------------------------------------------------------

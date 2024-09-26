@@ -14,7 +14,7 @@ namespace GameCore.Gameplay.Items
 {
     [RequireComponent(typeof(FollowParent))]
     [RequireComponent(typeof(Rigidbody))]
-    public abstract class ItemObjectBase : NetcodeBehaviour, IInteractableItem
+    public abstract class ItemObjectBase : NetcodeBehaviour, IInteractableItem, IReParentable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
@@ -86,6 +86,10 @@ namespace GameCore.Gameplay.Items
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
         public void Setup(int itemID, float scale) => SetupRpc(itemID, scale);
+        
+        public void SetParent(NetworkObject newParent) => SetParentRpc(newParent);
+        
+        public void RemoveParent() => RemoveParentRpc();
 
         public virtual void InteractionStarted(IEntity entity = null)
         {
@@ -186,6 +190,21 @@ namespace GameCore.Gameplay.Items
             
             _itemsProvider.RegisterItem(item: this);
         }
+        
+        [Rpc(target: SendTo.Server)]
+        private void SetParentRpc(NetworkObjectReference newParent)
+        {
+            bool isNetworkObjectFound = newParent.TryGet(out NetworkObject networkObject);
+
+            if (!isNetworkObjectFound)
+                return;
+            
+            NetworkObject.TrySetParent(networkObject);
+        }
+
+        [Rpc(target: SendTo.Server)]
+        private void RemoveParentRpc() =>
+            NetworkObject.TryRemoveParent();
 
         [Rpc(target: SendTo.Everyone, RequireOwnership = false)]
         private void PickUpRpc(NetworkObjectReference itemNetworkObjectReference)

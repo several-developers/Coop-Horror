@@ -16,7 +16,7 @@ MonoBehaviour:
   _icon: {fileID: 21300000, guid: 558a80b270c742c4f8b5041e028a33af, type: 3}
   _itemName: Binoculars
   _itemID: 2
-  _scaleMultiplier: 2
+  _scaleMultiplier: 2.5
   _rigPresetType: 1
   _itemHandPlacement: 1
   _fpsItemPreview:

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace GameCore.Gameplay.Entities
 {
     [DisallowMultipleComponent]
-    public abstract class Entity : NetcodeBehaviour, IEntity
+    public abstract class Entity : NetcodeBehaviour, IEntity, IReParentable
     {
         // FIELDS: --------------------------------------------------------------------------------
         

@@ -182,6 +182,7 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
             _movementState = MovementState.MoveToStartPoint;
 
             yield return MoveToTeleportPointCO();
+            _elevatorEntity.PlaySound(ElevatorEntity.SFXType.DoorOpening).Forget();
             yield return DoorOpenDelay();
 
             OnElevatorStoppedEvent?.Invoke();

@@ -13,45 +13,56 @@ namespace GameCore.Gameplay.Entities.Level.Elevator
         [Title(Constants.Settings)]
         [SerializeField]
         private bool _drawTrigger;
-        
+
         // PROPERTIES: ----------------------------------------------------------------------------
 
         public bool DrawTrigger => _drawTrigger;
-        
+
+        private bool IsServer => NetworkHorror.IsTrueServer;
+
         // FIELDS: --------------------------------------------------------------------------------
 
-        public event Action<Entity> OnEntityLeftEvent = delegate { }; 
+        public event Action<IReParentable> OnTargetLeftTriggerEvent = delegate { };
 
-        private readonly List<Entity> _insideEntitiesList = new();
-        
+        private readonly List<IReParentable> _insideTargetsList = new();
+
         // GAME ENGINE METHODS: -------------------------------------------------------------------
 
-        private void OnTriggerEnter(Collider other) => TryGetEntity(other, addToList: true);
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!IsServer)
+                return;
 
-        private void OnTriggerExit(Collider other) => TryGetEntity(other, addToList: false);
+            TryGetEntity(other, addToList: true);
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (!IsServer)
+                return;
+
+            TryGetEntity(other, addToList: false);
+        }
 
         // PUBLIC METHODS: ------------------------------------------------------------------------
 
-        public IEnumerable<Entity> GetInsideEntitiesList() => _insideEntitiesList;
+        public IEnumerable<IReParentable> GetInsideTargetsList() => _insideTargetsList;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
         private void TryGetEntity(Component other, bool addToList)
         {
-            if (!NetworkHorror.IsTrueServer)
-                return;
-            
-            if (!other.TryGetComponent(out Entity entity))
+            if (!other.TryGetComponent(out IReParentable parentable))
                 return;
 
             if (addToList)
             {
-                _insideEntitiesList.Add(entity);
+                _insideTargetsList.Add(parentable);
             }
             else
             {
-                _insideEntitiesList.Remove(entity);
-                OnEntityLeftEvent.Invoke(entity);
+                _insideTargetsList.Remove(parentable);
+                OnTargetLeftTriggerEvent.Invoke(parentable);
             }
         }
     }
