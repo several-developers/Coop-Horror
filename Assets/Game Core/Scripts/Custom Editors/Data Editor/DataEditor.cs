@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameCore;
 using GameCore.Gameplay.Events;
-using GameCore.Infrastructure.Data;
+using GameCore.InfrastructureTools.Data;
 using GameCore.Utilities;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;

@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Enemies;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.MonstersAI

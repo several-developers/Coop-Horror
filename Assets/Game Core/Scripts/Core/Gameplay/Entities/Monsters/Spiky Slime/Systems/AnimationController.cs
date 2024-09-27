@@ -1,6 +1,6 @@
 ﻿using System;
 using DG.Tweening;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Monsters.SpikySlime

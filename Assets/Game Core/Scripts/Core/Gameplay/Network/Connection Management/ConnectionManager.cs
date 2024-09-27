@@ -8,7 +8,7 @@ using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.Storages.Assets;
 using GameCore.Infrastructure.Services.Global;
-using GameCore.StateMachine;
+using GameCore.Infrastructure.StateMachine;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using UnityEngine;

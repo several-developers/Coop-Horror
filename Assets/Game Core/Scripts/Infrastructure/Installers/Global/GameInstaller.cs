@@ -1,6 +1,6 @@
 ﻿using GameCore.Gameplay.Factories;
 using GameCore.Observers.Global.StateMachine;
-using GameCore.StateMachine;
+using GameCore.Infrastructure.StateMachine;
 using GameCore.Utilities;
 using UnityEngine;
 using Zenject;

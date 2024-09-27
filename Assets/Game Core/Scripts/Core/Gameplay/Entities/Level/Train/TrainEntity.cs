@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cinemachine;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.Train;
+using GameCore.Infrastructure.Configs.Gameplay.Train;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Interactable.Train;

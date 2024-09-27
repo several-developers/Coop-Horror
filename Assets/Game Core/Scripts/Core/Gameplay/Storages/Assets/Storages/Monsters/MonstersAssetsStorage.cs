@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Global.MonstersList;
+using GameCore.Infrastructure.Configs.Global.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
 using GameCore.Infrastructure.Providers.Global;

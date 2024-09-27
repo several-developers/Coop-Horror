@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Elevator;
+using GameCore.Infrastructure.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Items;

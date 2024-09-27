@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Enemies;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Systems.CombatLogics;
 

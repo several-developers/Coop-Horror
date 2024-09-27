@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Global.Game;
+﻿using GameCore.Infrastructure.Configs.Global.Game;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Infrastructure.Providers.Global;

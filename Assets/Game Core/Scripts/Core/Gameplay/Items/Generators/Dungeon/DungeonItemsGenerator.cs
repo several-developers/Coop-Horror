@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore.Configs.Gameplay.ItemsSpawn;
+using GameCore.Infrastructure.Configs.Gameplay.ItemsSpawn;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Factories.Items;
 using GameCore.Gameplay.GameManagement;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Quests;
-using GameCore.Configs.Gameplay.QuestsItems;
+using GameCore.Infrastructure.Configs.Gameplay.Quests;
+using GameCore.Infrastructure.Configs.Gameplay.QuestsItems;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Items;
 using Sirenix.Utilities;

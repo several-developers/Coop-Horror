@@ -1,5 +1,5 @@
-﻿using GameCore.Infrastructure.Data;
-using GameCore.Infrastructure.Providers.Global.Data;
+﻿using GameCore.Infrastructure.Providers.Global.Data;
+using GameCore.InfrastructureTools.Data;
 
 namespace GameCore.Infrastructure.Services.Global
 {

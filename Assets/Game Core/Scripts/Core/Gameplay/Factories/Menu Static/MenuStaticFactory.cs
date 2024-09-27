@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore.Configs.Global.MenuPrefabsList;
+using GameCore.Infrastructure.Configs.Global.MenuPrefabsList;
 using GameCore.Infrastructure.Providers.Global;
 using GameCore.UI.Global.MenuView;
 using GameCore.UI.Global.Other;

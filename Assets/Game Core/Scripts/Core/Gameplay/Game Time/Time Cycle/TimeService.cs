@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Configs.Gameplay.Time;
+using GameCore.Infrastructure.Configs.Gameplay.Time;
 using GameCore.Enums.Gameplay;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Observers.Gameplay.Time;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.RigPresets;
+using GameCore.Infrastructure.Configs.Gameplay.RigPresets;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Items.Rigging;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;

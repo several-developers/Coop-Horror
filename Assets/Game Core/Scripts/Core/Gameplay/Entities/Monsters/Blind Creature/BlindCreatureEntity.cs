@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Balance;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Balance;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.BlindCreature.States;
 using GameCore.Gameplay.Other;

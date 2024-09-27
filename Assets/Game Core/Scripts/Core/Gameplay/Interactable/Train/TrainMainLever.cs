@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Quests;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Quests;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.GameManagement;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.EvilClown.States;
 using GameCore.Gameplay.Entities.Player;

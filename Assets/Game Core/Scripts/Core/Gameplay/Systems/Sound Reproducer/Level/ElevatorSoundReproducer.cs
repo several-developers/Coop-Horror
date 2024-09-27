@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Elevator;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Elevator;
 using GameCore.Gameplay.Entities.Level.Elevator;
 using Sonity;
 

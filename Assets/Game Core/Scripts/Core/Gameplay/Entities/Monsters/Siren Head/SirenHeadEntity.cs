@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.SirenHead.States;
 using GameCore.Gameplay.Systems.Footsteps;

@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Entities;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Interactable.OutdoorChest;
 using Sonity;
 

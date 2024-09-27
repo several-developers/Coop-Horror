@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Utilities;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;

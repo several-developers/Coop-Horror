@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
-using GameCore.Configs.Gameplay.Balance;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Balance;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Systems.Utilities;
 using UnityEngine;
 

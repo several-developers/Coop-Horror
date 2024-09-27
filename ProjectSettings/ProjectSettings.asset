@@ -48,6 +48,7 @@ PlayerSettings:
   defaultScreenHeightWeb: 600
   m_StereoRenderingPath: 0
   m_ActiveColorSpace: 1
+  unsupportedMSAAFallback: 0
   m_MTRendering: 1
   mipStripping: 0
   numberOfMipsStripped: 0
@@ -121,6 +122,7 @@ PlayerSettings:
   switchNVNOtherPoolsGranularity: 16777216
   switchNVNMaxPublicTextureIDCount: 0
   switchNVNMaxPublicSamplerIDCount: 0
+  switchMaxWorkerMultiple: 8
   stadiaPresentMode: 0
   stadiaTargetFramerate: 0
   vulkanNumSwapchainBuffers: 3
@@ -548,7 +550,7 @@ PlayerSettings:
   switchSocketConcurrencyLimit: 14
   switchScreenResolutionBehavior: 2
   switchUseCPUProfiler: 0
-  switchUseGOLDLinker: 0
+  switchEnableFileSystemTrace: 0
   switchLTOSetting: 0
   switchApplicationID: 0x01004b9000490000
   switchNSODependencies: 
@@ -677,7 +679,6 @@ PlayerSettings:
   switchSocketBufferEfficiency: 4
   switchSocketInitializeEnabled: 1
   switchNetworkInterfaceManagerInitializeEnabled: 1
-  switchPlayerConnectionEnabled: 1
   switchUseNewStyleFilepaths: 0
   switchUseLegacyFmodPriorities: 1
   switchUseMicroSleepForYield: 1
@@ -789,7 +790,7 @@ PlayerSettings:
     PS4: ENVIRO_3;ENVIRO_URP
     PS5: ENVIRO_3;ENVIRO_URP
     Stadia: ENVIRO_3;ENVIRO_URP
-    Standalone: MAGICACLOTH2;UNITY_PIPELINE_URP;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ENVIRO_3;ENVIRO_URP;GRIFFIN_EDITOR_COROUTINES;GRIFFIN;GRIFFIN_2021
+    Standalone: MAGICACLOTH2;UNITY_PIPELINE_URP;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ENVIRO_3;ENVIRO_URP;GRIFFIN_EDITOR_COROUTINES;GRIFFIN;GRIFFIN_2021;ODIN_INSPECTOR_3_2;ODIN_INSPECTOR_3_3
     WebGL: ENVIRO_3;ENVIRO_URP
     Windows Store Apps: ENVIRO_3;ENVIRO_URP
     XboxOne: ENVIRO_3;ENVIRO_URP

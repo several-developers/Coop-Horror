@@ -5,7 +5,7 @@ using GameCore.Gameplay.Network.PrefabsRegistrar;
 using GameCore.Gameplay.Network.UnityServices.Auth;
 using GameCore.Gameplay.Network.UnityServices.Lobbies;
 using GameCore.Gameplay.PubSub;
-using GameCore.Infrastructure.Lifecycle;
+using GameCore.Infrastructure.Bootstrap;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;

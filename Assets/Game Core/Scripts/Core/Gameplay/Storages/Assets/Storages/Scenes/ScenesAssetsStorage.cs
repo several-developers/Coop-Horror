@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Global.LocationsDatabase;
+using GameCore.Infrastructure.Configs.Global.LocationsDatabase;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Infrastructure.Providers.Global;
 using UnityEngine.AddressableAssets;

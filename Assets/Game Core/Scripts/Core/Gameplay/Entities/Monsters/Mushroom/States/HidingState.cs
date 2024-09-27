@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Enemies;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 
 namespace GameCore.Gameplay.Entities.Monsters.Mushroom.States
 {

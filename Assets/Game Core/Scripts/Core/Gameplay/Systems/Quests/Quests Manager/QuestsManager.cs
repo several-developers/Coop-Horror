@@ -1,5 +1,5 @@
-﻿using GameCore.Configs.Gameplay.Quests;
-using GameCore.Configs.Gameplay.QuestsItems;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Quests;
+using GameCore.Infrastructure.Configs.Gameplay.QuestsItems;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;

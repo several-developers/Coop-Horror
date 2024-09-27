@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Entities;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Entities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.EntitiesConfigs

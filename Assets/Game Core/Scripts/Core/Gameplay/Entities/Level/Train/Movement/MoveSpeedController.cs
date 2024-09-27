@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Configs.Gameplay.Train;
+using GameCore.Infrastructure.Configs.Gameplay.Train;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

@@ -1,5 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters.EvilClown;
 using GameCore.Gameplay.Entities.Player;

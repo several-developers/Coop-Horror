@@ -1,6 +1,6 @@
 ﻿using DG.Tweening;
-using GameCore.Configs.Gameplay.Lighting;
-using GameCore.Configs.Gameplay.Visual;
+using GameCore.Infrastructure.Configs.Gameplay.Lighting;
+using GameCore.Infrastructure.Configs.Gameplay.Visual;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using UnityEngine;

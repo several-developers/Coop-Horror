@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Train;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Train;
 using GameCore.Gameplay.Entities.Level.Train;
 using Sonity;
 

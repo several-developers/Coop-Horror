@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using UnityEngine;
 using UnityEngine.AI;
 

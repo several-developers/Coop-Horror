@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Infrastructure.Configs;
+using GameCore.InfrastructureTools.Configs;
 
 namespace GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs
 {

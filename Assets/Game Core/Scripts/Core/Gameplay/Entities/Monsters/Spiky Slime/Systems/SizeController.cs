@@ -1,4 +1,4 @@
-﻿using GameCore.Configs.Gameplay.Enemies;
+﻿using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Enums.Gameplay;
 using UnityEngine;
 

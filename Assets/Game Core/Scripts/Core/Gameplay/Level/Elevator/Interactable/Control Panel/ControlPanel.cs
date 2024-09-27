@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Elevator;
+using GameCore.Infrastructure.Configs.Gameplay.Elevator;
 using GameCore.Gameplay.Entities.Level.Elevator;
 using GameCore.Gameplay.Systems.SoundReproducer;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;

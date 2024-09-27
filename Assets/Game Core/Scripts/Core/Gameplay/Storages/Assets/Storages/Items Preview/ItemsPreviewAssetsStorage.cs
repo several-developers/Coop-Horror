@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Global.ItemsList;
+using GameCore.Infrastructure.Configs.Global.ItemsList;
 using GameCore.Gameplay.Items;
 using GameCore.Infrastructure.Providers.Global;
 using UnityEngine.AddressableAssets;

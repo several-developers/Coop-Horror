@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ECM2;
-using GameCore.Configs.Gameplay.Player;
+using GameCore.Infrastructure.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Entities.Level.Train;

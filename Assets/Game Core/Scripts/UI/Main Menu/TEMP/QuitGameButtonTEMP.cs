@@ -1,5 +1,5 @@
 ﻿using GameCore.Gameplay.PubSub;
-using GameCore.Infrastructure.Lifecycle;
+using GameCore.Infrastructure.Bootstrap;
 using GameCore.UI.Global.Buttons;
 using Zenject;
 

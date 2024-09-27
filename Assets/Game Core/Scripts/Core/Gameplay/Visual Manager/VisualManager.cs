@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Lighting;
-using GameCore.Configs.Gameplay.Visual;
+using GameCore.Infrastructure.Configs.Gameplay.Lighting;
+using GameCore.Infrastructure.Configs.Gameplay.Visual;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;

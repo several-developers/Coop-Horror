@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.Balance;
+using GameCore.Infrastructure.Configs.Gameplay.Balance;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Level.Train;

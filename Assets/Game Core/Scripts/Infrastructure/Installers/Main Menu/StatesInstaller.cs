@@ -1,4 +1,4 @@
-﻿using GameCore.StateMachine;
+﻿using GameCore.Infrastructure.StateMachine;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.MainMenu

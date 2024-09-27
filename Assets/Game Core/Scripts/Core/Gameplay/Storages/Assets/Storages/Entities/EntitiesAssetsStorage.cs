@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Global.EntitiesList;
+using GameCore.Infrastructure.Configs.Global.EntitiesList;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Network.PrefabsRegistrar;
 using GameCore.Infrastructure.Providers.Global;

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Balance;
-using GameCore.Configs.Gameplay.Enemies;
-using GameCore.Configs.Gameplay.MonstersGenerator;
-using GameCore.Configs.Global.MonstersList;
+using GameCore.Infrastructure.Configs.Gameplay.Balance;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.MonstersGenerator;
+using GameCore.Infrastructure.Configs.Global.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Monsters;
 using GameCore.Gameplay.Factories.Monsters;

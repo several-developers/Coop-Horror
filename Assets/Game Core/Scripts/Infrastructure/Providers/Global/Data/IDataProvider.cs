@@ -1,4 +1,4 @@
-﻿using GameCore.Infrastructure.Data;
+﻿using GameCore.InfrastructureTools.Data;
 
 namespace GameCore.Infrastructure.Providers.Global.Data
 {

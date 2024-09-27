@@ -1,5 +1,5 @@
 ﻿using System;
-using GameCore.Configs.Gameplay.Elevator;
+using GameCore.Infrastructure.Configs.Gameplay.Elevator;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Level.Elevator;

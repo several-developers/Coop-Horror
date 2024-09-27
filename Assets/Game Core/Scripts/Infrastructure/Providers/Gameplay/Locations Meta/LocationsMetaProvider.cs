@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using GameCore.Configs.Global.LocationsDatabase;
+using GameCore.Infrastructure.Configs.Global.LocationsDatabase;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;

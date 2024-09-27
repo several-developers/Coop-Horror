@@ -1,6 +1,6 @@
 ﻿using System;
 using GameCore.Gameplay.Systems.InputManagement;
-using GameCore.Infrastructure.Configs;
+using GameCore.InfrastructureTools.Configs;
 using GameCore.Utilities;
 
 namespace GameCore.Infrastructure.Providers.Global

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameCore.Configs.Gameplay.Enemies;
-using GameCore.Configs.Global.MonstersList;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Global.MonstersList;
 using GameCore.Enums.Gameplay;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using GameCore.Infrastructure.Providers.Global;

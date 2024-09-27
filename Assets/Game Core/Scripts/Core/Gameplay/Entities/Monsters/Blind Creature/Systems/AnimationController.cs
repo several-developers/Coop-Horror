@@ -1,5 +1,5 @@
 ﻿using DG.Tweening;
-using GameCore.Configs.Gameplay.Enemies;
+using GameCore.Infrastructure.Configs.Gameplay.Enemies;
 using GameCore.Gameplay.Systems.Utilities;
 using Unity.Netcode.Components;
 using UnityEngine;

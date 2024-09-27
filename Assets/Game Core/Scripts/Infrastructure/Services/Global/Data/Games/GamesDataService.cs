@@ -1,4 +1,4 @@
-﻿using GameCore.Data;
+﻿using GameCore.Infrastructure.Data;
 using GameCore.Infrastructure.Providers.Global.Data;
 using UnityEngine;
 

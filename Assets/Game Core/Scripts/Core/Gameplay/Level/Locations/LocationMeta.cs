@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CustomEditors;
-using GameCore.Configs.Gameplay.Lighting;
+using GameCore.Infrastructure.Configs.Gameplay.Lighting;
 using GameCore.Enums.Gameplay;
 using GameCore.Enums.Global;
 using Sirenix.OdinInspector;

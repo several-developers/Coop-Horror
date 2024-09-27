@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using GameCore.Configs.Gameplay.ItemsSpawn;
+using GameCore.Infrastructure.Configs.Gameplay.ItemsSpawn;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Interactable.OutdoorChest;
 using GameCore.Gameplay.Factories.Entities;

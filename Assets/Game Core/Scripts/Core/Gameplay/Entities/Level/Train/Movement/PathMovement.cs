@@ -1,7 +1,7 @@
 ﻿using System;
 using Cinemachine;
 using DG.Tweening;
-using GameCore.Configs.Gameplay.Train;
+using GameCore.Infrastructure.Configs.Gameplay.Train;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Level.Train

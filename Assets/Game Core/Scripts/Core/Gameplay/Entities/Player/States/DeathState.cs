@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using GameCore.Configs.Gameplay.Player;
+using GameCore.Infrastructure.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.CamerasManagement;
 using GameCore.Gameplay.Systems.Health;
