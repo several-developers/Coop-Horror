@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Game Core/Scenes/Bootstrap.unity
     guid: 7b41b69d482a0574784f6d004dffab02
   - enabled: 1
-    path: Assets/Game Core/Scenes/FactoriesWarmUp.unity
+    path: Assets/Game Core/Scenes/AssetsWarmUp.unity
     guid: 52a7ff1130046124da1d83fa623f2a7d
   - enabled: 1
     path: Assets/Game Core/Scenes/MainMenu.unity

@@ -53,8 +53,8 @@ namespace GameCore.Infrastructure.StateMachine
         private void EnterPrepareMainMenuState() =>
             _gameStateMachine.ChangeState<PrepareMainMenuState>();
         
-        private void EnterLoadGameplayState() =>
-            _gameStateMachine.ChangeState<LoadGameplayState>();
+        private void EnterLoadGameplaySceneState() =>
+            _gameStateMachine.ChangeState<LoadGameplaySceneState>();
 
         // EVENTS RECEIVERS: ----------------------------------------------------------------------
 
@@ -64,6 +64,6 @@ namespace GameCore.Infrastructure.StateMachine
             EnterPrepareMainMenuState();
         }
 
-        private void OnStartButtonClicked() => EnterLoadGameplayState();
+        private void OnStartButtonClicked() => EnterLoadGameplaySceneState();
     }
 }

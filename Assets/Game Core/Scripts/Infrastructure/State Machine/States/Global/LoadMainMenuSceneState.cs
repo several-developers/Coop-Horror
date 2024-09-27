@@ -3,11 +3,11 @@ using GameCore.Infrastructure.Services.Global;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class LoadMainMenuState : IEnterState, IExitState
+    public class LoadMainMenuSceneState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LoadMainMenuState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
+        public LoadMainMenuSceneState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
         {
             _gameStateMachine = gameStateMachine;
             _scenesLoaderService = scenesLoaderService;

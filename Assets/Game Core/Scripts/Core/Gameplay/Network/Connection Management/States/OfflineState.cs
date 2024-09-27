@@ -79,7 +79,7 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             if (isCurrentSceneMainMenu)
                 return;
 
-            ConnectionManager.EnterLoadMainMenuState();
+            ConnectionManager.EnterLoadMainMenuSceneState();
         }
     }
 }

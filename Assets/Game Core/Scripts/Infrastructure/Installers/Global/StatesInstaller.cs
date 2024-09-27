@@ -11,10 +11,10 @@ namespace GameCore.Infrastructure.Installers.Global
         {
             BindBootstrapState();
             BindLoadDataState();
-            BindFactoriesWarmUpState();
-            BindLoadFactoriesWarmUpState();
-            BindLoadMainMenuState();
-            BindLoadGameplayState();
+            BindAssetsWarmUpState();
+            BindLoadAssetsWarmUpSceneState();
+            BindLoadMainMenuSceneState();
+            BindLoadGameplaySceneState();
 
 #if UNITY_EDITOR
             BindGameSetupForEditorState();
@@ -39,34 +39,34 @@ namespace GameCore.Infrastructure.Installers.Global
                 .NonLazy();
         }
 
-        private void BindFactoriesWarmUpState()
+        private void BindAssetsWarmUpState()
         {
             Container
-                .Bind<FactoriesWarmUpState>()
+                .Bind<AssetsWarmUpState>()
                 .AsSingle()
                 .NonLazy();
         }
 
-        private void BindLoadFactoriesWarmUpState()
+        private void BindLoadAssetsWarmUpSceneState()
         {
             Container
-                .Bind<LoadFactoriesWarmUpState>()
+                .Bind<LoadAssetsWarmUpSceneState>()
                 .AsSingle()
                 .NonLazy();
         }
 
-        private void BindLoadMainMenuState()
+        private void BindLoadMainMenuSceneState()
         {
             Container
-                .Bind<LoadMainMenuState>()
+                .Bind<LoadMainMenuSceneState>()
                 .AsSingle()
                 .NonLazy();
         }
 
-        private void BindLoadGameplayState()
+        private void BindLoadGameplaySceneState()
         {
             Container
-                .Bind<LoadGameplayState>()
+                .Bind<LoadGameplaySceneState>()
                 .AsSingle()
                 .NonLazy();
         }

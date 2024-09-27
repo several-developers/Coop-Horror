@@ -57,13 +57,13 @@ namespace GameCore.Infrastructure.StateMachine
         {
             if (IsSceneMatches(SceneName.Bootstrap))
             {
-                EnterLoadFactoriesWarmUpState();
+                EnterLoadAssetsWarmUpSceneState();
                 return;
             }
 
-            if (IsSceneMatches(SceneName.FactoriesWarmUp))
+            if (IsSceneMatches(SceneName.AssetsWarmUp))
             {
-                EnterFactoriesWarmUpState();
+                EnterAssetsWarmUpState();
                 return;
             }
 
@@ -107,11 +107,11 @@ namespace GameCore.Infrastructure.StateMachine
             return true;
         }
 
-        private void EnterLoadFactoriesWarmUpState() =>
-            _gameStateMachine.ChangeState<LoadFactoriesWarmUpState>();
+        private void EnterLoadAssetsWarmUpSceneState() =>
+            _gameStateMachine.ChangeState<LoadAssetsWarmUpSceneState>();
 
-        private void EnterFactoriesWarmUpState() =>
-            _gameStateMachine.ChangeState<FactoriesWarmUpState>();
+        private void EnterAssetsWarmUpState() =>
+            _gameStateMachine.ChangeState<AssetsWarmUpState>();
 
         private void EnterPrepareMainMenuState() =>
             _gameStateMachine.ChangeState<PrepareMainMenuState>();

@@ -3,11 +3,11 @@ using GameCore.Infrastructure.Services.Global;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class LoadFactoriesWarmUpState : IEnterState, IExitState
+    public class LoadGameplaySceneState : IEnterState, IExitState
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public LoadFactoriesWarmUpState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
+        public LoadGameplaySceneState(IGameStateMachine gameStateMachine, IScenesLoaderService scenesLoaderService)
         {
             _gameStateMachine = gameStateMachine;
             _scenesLoaderService = scenesLoaderService;
@@ -24,21 +24,24 @@ namespace GameCore.Infrastructure.StateMachine
 
         public void Enter()
         {
-            _scenesLoaderService.LoadScene(SceneName.FactoriesWarmUp, isNetwork: false);
-
             _scenesLoaderService.OnSceneLoadedEvent += OnSceneLoaded;
+
+            LoadGameplayScene();
         }
-        
+
         public void Exit() =>
             _scenesLoaderService.OnSceneLoadedEvent -= OnSceneLoaded;
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void EnterFactoriesWarmUpState() =>
-            _gameStateMachine.ChangeState<FactoriesWarmUpState>();
+        private void LoadGameplayScene() =>
+            _scenesLoaderService.LoadScene(SceneName.Gameplay, isNetwork: true);
+
+        private void EnterPrepareGameplaySceneState() =>
+            _gameStateMachine.ChangeState<PrepareGameplaySceneState>();
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private void OnSceneLoaded() => EnterFactoriesWarmUpState();
+        private void OnSceneLoaded() => EnterPrepareGameplaySceneState();
     }
 }

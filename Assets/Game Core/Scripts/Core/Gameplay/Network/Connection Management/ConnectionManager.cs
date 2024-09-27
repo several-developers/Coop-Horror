@@ -124,8 +124,8 @@ namespace GameCore.Gameplay.Network.ConnectionManagement
             sceneManager.RegisterExternalScenes(scenesPaths);
         }
         
-        public void EnterLoadMainMenuState() =>
-            _gameStateMachine.ChangeState<LoadMainMenuState>();
+        public void EnterLoadMainMenuSceneState() =>
+            _gameStateMachine.ChangeState<LoadMainMenuSceneState>();
 
         internal void ChangeState(ConnectionState nextState)
         {

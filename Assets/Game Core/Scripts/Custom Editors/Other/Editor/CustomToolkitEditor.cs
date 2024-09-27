@@ -21,7 +21,7 @@ namespace CustomEditors
         private const string ScrapyardLocationSceneMenuItem = LocationsScenesMenuItem + "🗑️ Scrapyard";
 
         private const string BootstrapSceneMenuItem = ScenesMenuItem + "🚀 Bootstrap";
-        private const string FactoriesWarmUpSceneMenuItem = ScenesMenuItem + "🏗️ Factories Warm Up";
+        private const string AssetsWarmUpSceneMenuItem = ScenesMenuItem + "🏗️ Assets Warm Up";
         //private const string LoginSceneMenuItem = ScenesMenuItem + "🗝 Login";
         //private const string TitleSceneMenuItem = ScenesMenuItem + "✨ Title";
         private const string MainMenuSceneMenuItem = ScenesMenuItem + "🌐 Main Menu";
@@ -31,7 +31,7 @@ namespace CustomEditors
         //private const string PrototypesSceneMenuItem = ScenesMenuItem + "⏳ Prototypes";
 
         private const string BootstrapScenePath = ScenesPath + "Bootstrap.unity";
-        private const string FactoriesWarmUpScenePath = ScenesPath + "FactoriesWarmUp.unity";
+        private const string AssetsWarmUpScenePath = ScenesPath + "AssetsWarmUp.unity";
         //private const string LoginScenePath = ScenesPath + "PixelBattleLogin.unity";
         //private const string TitleScenePath = ScenesPath + "TitleScreen.unity";
         private const string MainMenuScenePath = ScenesPath + "MainMenu.unity";
@@ -66,8 +66,8 @@ namespace CustomEditors
         [MenuItem(BootstrapSceneMenuItem)]
         private static void LoadBootstrapScene() => OpenScene(BootstrapScenePath);
 
-        [MenuItem(FactoriesWarmUpSceneMenuItem)]
-        private static void LoadFactoriesWarmUpScene() => OpenScene(FactoriesWarmUpScenePath);
+        [MenuItem(AssetsWarmUpSceneMenuItem)]
+        private static void LoadAssetsWarmUpScene() => OpenScene(AssetsWarmUpScenePath);
 
         [MenuItem(MainMenuSceneMenuItem)]
         private static void LoadMainMenuScene() => OpenScene(MainMenuScenePath);

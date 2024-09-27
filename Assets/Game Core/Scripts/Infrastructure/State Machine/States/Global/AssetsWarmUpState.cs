@@ -4,11 +4,11 @@ using GameCore.Gameplay.Storages.Assets;
 
 namespace GameCore.Infrastructure.StateMachine
 {
-    public class FactoriesWarmUpState : IEnterStateAsync
+    public class AssetsWarmUpState : IEnterStateAsync
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------
 
-        public FactoriesWarmUpState(
+        public AssetsWarmUpState(
             IGameStateMachine gameStateMachine,
             IMenusAssetsStorage menusAssetsStorage,
             IEntitiesAssetsStorage entitiesAssetsStorage,
@@ -43,13 +43,13 @@ namespace GameCore.Infrastructure.StateMachine
 
         public async UniTaskVoid Enter()
         {
-            await WarmUpFactories();
-            EnterLoadMainMenuState();
+            await WarmUpAssets();
+            EnterLoadMainMenuSceneState();
         }
 
         // PRIVATE METHODS: -----------------------------------------------------------------------
 
-        private async UniTask WarmUpFactories()
+        private async UniTask WarmUpAssets()
         {
             var tasks = new List<UniTask>
             {
@@ -64,7 +64,7 @@ namespace GameCore.Infrastructure.StateMachine
             await UniTask.WhenAll(tasks);
         }
 
-        private void EnterLoadMainMenuState() =>
-            _gameStateMachine.ChangeState<LoadMainMenuState>();
+        private void EnterLoadMainMenuSceneState() =>
+            _gameStateMachine.ChangeState<LoadMainMenuSceneState>();
     }
 }
