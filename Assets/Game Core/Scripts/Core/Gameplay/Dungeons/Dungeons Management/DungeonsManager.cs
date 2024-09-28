@@ -11,11 +11,6 @@ using Zenject;
 
 namespace GameCore.Gameplay.Dungeons
 {
-    public interface IDungeonsManager
-    {
-        void GenerateDungeonsOnAllClients();
-    }
-
     public class DungeonsManager : IDungeonsManager, IInitializable, IDisposable
     {
         // CONSTRUCTORS: --------------------------------------------------------------------------

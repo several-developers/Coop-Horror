@@ -3,9 +3,9 @@ using GameCore.Gameplay.Entities.Player;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace GameCore.Gameplay.CamerasManagement
+namespace GameCore.Gameplay.Managers.Cameras
 {
-    public class DeathCamera : MonoBehaviour
+    public class SpectatorCamera : MonoBehaviour
     {
         // MEMBERS: -------------------------------------------------------------------------------
 
@@ -32,11 +32,11 @@ namespace GameCore.Gameplay.CamerasManagement
         public void UpdateTarget(PlayerEntity playerEntity)
         {
             PlayerReferences playerReferences = playerEntity.GetReferences();
-            Transform hips = playerReferences.HipsRigidbody.transform;
-            Transform spine = playerReferences.SpineRigidbody.transform;
+            Transform spectatorTarget = playerReferences.SpectatorCameraTarget;
+            Transform playerTransform = playerEntity.transform;
             
-            _cinemachineFreeLook.m_Follow = spine;
-            _cinemachineFreeLook.m_LookAt = hips;
+            _cinemachineFreeLook.m_Follow = playerTransform;
+            _cinemachineFreeLook.m_LookAt = spectatorTarget;
         }
 
         public void ToggleCameraState(bool isEnabled)

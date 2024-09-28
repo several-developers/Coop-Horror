@@ -1,4 +1,4 @@
-﻿using GameCore.Gameplay.ChatManagement;
+﻿using GameCore.Gameplay.Managers.Chat;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;

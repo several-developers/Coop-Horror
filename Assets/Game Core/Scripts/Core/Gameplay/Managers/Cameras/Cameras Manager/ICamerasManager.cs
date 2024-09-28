@@ -1,7 +1,7 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 
-namespace GameCore.Gameplay.CamerasManagement
+namespace GameCore.Gameplay.Managers.Cameras
 {
     public interface ICamerasManager
     {

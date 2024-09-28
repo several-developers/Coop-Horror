@@ -6,7 +6,7 @@ using GameCore.Gameplay.GameTimeManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace GameCore.Gameplay.VisualManagement
+namespace GameCore.Gameplay.Managers.Visual
 {
     public class VisualController
     {

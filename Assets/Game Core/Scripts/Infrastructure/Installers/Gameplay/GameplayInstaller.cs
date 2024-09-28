@@ -1,4 +1,4 @@
-using GameCore.Gameplay.CamerasManagement;
+using GameCore.Gameplay.Managers.Cameras;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using GameCore.Gameplay.Entities.Level.Train;
@@ -10,9 +10,9 @@ using GameCore.Gameplay.Items.Generators.OutdoorChest;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network.Utilities;
-using GameCore.Gameplay.RoundManagement;
-using GameCore.Gameplay.UIManagement;
-using GameCore.Gameplay.VisualManagement;
+using GameCore.Gameplay.Managers.Round;
+using GameCore.Gameplay.Systems.UIManagement;
+using GameCore.Gameplay.Managers.Visual;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;

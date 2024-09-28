@@ -5,7 +5,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Player.CameraManagement;
 using UnityEngine;
 
-namespace GameCore.Gameplay.CamerasManagement
+namespace GameCore.Gameplay.Managers.Cameras
 {
     public class CamerasManager : ICamerasManager
     {

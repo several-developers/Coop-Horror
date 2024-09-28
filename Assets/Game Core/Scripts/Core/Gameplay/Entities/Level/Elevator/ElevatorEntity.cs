@@ -7,7 +7,7 @@ using GameCore.Gameplay.Items;
 using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.SoundReproducer;
-using GameCore.Gameplay.VisualManagement;
+using GameCore.Gameplay.Managers.Visual;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
 using Sirenix.OdinInspector;
 using Unity.Netcode;

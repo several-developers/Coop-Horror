@@ -1,10 +1,10 @@
-using GameCore.Gameplay.ChatManagement;
+using GameCore.Gameplay.Managers.Chat;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Systems.Quests;
-using GameCore.Gameplay.VisualManagement;
+using GameCore.Gameplay.Managers.Visual;
 using Zenject;
 
 namespace GameCore.Infrastructure.Installers.Gameplay

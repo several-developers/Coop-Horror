@@ -1,6 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
 
-namespace GameCore.Gameplay.VisualManagement
+namespace GameCore.Gameplay.Managers.Visual
 {
     public interface IVisualManager
     {

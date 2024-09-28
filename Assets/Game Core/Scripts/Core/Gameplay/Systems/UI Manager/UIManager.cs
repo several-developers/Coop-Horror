@@ -6,7 +6,7 @@ using GameCore.Observers.Gameplay.UIManager;
 using GameCore.UI.Global.MenuView;
 using GameCore.Utilities;
 
-namespace GameCore.Gameplay.UIManagement
+namespace GameCore.Gameplay.Systems.UIManagement
 {
     public class UIManager : IDisposable
     {

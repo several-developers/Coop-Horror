@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using Zenject;
 
-namespace GameCore.Gameplay.ChatManagement
+namespace GameCore.Gameplay.Managers.Chat
 {
     public class ChatManager : NetcodeBehaviour
     {

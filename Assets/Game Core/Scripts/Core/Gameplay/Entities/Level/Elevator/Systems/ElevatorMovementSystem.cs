@@ -6,7 +6,7 @@ using GameCore.Gameplay.Level;
 using GameCore.Gameplay.Level.Elevator;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Utilities;
-using GameCore.Gameplay.VisualManagement;
+using GameCore.Gameplay.Managers.Visual;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Level.Elevator

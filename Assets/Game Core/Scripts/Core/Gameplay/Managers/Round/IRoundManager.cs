@@ -1,6 +1,6 @@
 ﻿using GameCore.Enums.Gameplay;
 
-namespace GameCore.Gameplay.RoundManagement
+namespace GameCore.Gameplay.Managers.Round
 {
     public interface IRoundManager
     {

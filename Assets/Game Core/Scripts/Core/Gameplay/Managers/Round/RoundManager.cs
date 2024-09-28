@@ -6,7 +6,7 @@ using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Network;
 using UnityEngine;
 
-namespace GameCore.Gameplay.RoundManagement
+namespace GameCore.Gameplay.Managers.Round
 {
     public class RoundManager : IRoundManager, IDisposable
     {

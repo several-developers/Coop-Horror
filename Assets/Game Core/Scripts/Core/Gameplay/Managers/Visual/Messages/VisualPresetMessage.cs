@@ -1,7 +1,7 @@
 ﻿using GameCore.Enums.Gameplay;
 using Unity.Netcode;
 
-namespace GameCore.Gameplay.VisualManagement
+namespace GameCore.Gameplay.Managers.Visual
 {
     public struct VisualPresetMessage : INetworkSerializeByMemcpy
     {

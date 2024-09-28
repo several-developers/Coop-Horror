@@ -18,7 +18,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Zenject;
 
-namespace GameCore.Gameplay.VisualManagement
+namespace GameCore.Gameplay.Managers.Visual
 {
     public class VisualManager : MonoBehaviour, IVisualManager
     {

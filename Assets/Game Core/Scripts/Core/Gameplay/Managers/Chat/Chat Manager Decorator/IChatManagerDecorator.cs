@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameCore.Gameplay.ChatManagement
+namespace GameCore.Gameplay.Managers.Chat
 {
     public interface IChatManagerDecorator
     {
