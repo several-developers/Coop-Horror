@@ -6,7 +6,7 @@ using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.GameTimeManagement;
 using GameCore.Gameplay.Network;
 using GameCore.Gameplay.Systems.Quests;
-using GameCore.Gameplay.VisualManagement;
+using GameCore.Gameplay.Managers.Visual;
 using Unity.Netcode;
 using UnityEngine;
 

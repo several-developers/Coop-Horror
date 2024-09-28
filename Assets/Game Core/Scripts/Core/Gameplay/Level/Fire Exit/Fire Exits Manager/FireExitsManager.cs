@@ -1,7 +1,7 @@
 ﻿using GameCore.Enums.Gameplay;
 using GameCore.Gameplay.Entities;
 using GameCore.Gameplay.Entities.Player;
-using GameCore.Gameplay.VisualManagement;
+using GameCore.Gameplay.Managers.Visual;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Level

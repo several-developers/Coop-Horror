@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.CamerasManagement;
+using GameCore.Gameplay.Managers.Cameras;
 using GameCore.Gameplay.Dungeons;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Level.Train;
@@ -12,7 +12,7 @@ using GameCore.Gameplay.Network;
 using GameCore.Gameplay.PubSub;
 using GameCore.Gameplay.PubSub.Messages;
 using GameCore.Gameplay.Systems.Quests;
-using GameCore.Gameplay.VisualManagement;
+using GameCore.Gameplay.Managers.Visual;
 using GameCore.Observers.Gameplay.Game;
 using UnityEngine;
 using Zenject;

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using GameCore.Gameplay.ChatManagement;
+using GameCore.Gameplay.Managers.Chat;
 using GameCore.Gameplay.Network;
 using GameCore.Observers.Gameplay.UIManager;
 using GameCore.UI.Global.MenuView;

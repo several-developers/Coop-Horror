@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using GameCore.Infrastructure.Configs.Gameplay.Player;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.CamerasManagement;
+using GameCore.Gameplay.Managers.Cameras;
 using GameCore.Gameplay.Systems.Health;
 using GameCore.Gameplay.Systems.Inventory;
 using GameCore.Gameplay.Systems.Utilities;

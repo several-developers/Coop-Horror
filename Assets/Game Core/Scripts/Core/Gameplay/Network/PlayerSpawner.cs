@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.CamerasManagement;
+using GameCore.Gameplay.Managers.Cameras;
 using GameCore.Gameplay.Entities.Player;
 using GameCore.Gameplay.Entities.Level.Train;
 using GameCore.Gameplay.Factories.Entities;

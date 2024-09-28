@@ -1,5 +1,5 @@
 ﻿using GameCore.Enums.Gameplay;
-using GameCore.Gameplay.CamerasManagement;
+using GameCore.Gameplay.Managers.Cameras;
 using UnityEngine;
 
 namespace GameCore.Gameplay.Entities.Player.States

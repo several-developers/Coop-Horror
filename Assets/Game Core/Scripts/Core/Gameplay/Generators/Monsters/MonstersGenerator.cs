@@ -11,7 +11,7 @@ using GameCore.Gameplay.Factories.Monsters;
 using GameCore.Gameplay.GameManagement;
 using GameCore.Gameplay.Level.Locations;
 using GameCore.Gameplay.Network;
-using GameCore.Gameplay.RoundManagement;
+using GameCore.Gameplay.Managers.Round;
 using GameCore.Gameplay.Systems.Spawners;
 using GameCore.Gameplay.Utilities;
 using GameCore.Infrastructure.Providers.Gameplay.GameplayConfigs;
