@@ -8,7 +8,7 @@
 - 😱 Пугаться (по желанию)
 - 💀 Не умирать (не по желанию)
 
-📺 Список видео об состоянии проекта: [ссылка](https://drive.google.com/drive/folders/1VK3_G7nOYjda9a1ZvuGhukmBp1xemJuE?usp=drive_link).
+📺 Список видео о состоянии проекта: [ссылка](https://drive.google.com/drive/folders/1VK3_G7nOYjda9a1ZvuGhukmBp1xemJuE?usp=drive_link).
 
 ## Проект "полу-open-source"
 Вы можете:
